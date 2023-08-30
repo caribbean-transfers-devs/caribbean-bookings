@@ -2,5 +2,6 @@
     "/assets/css/base/fonts.min.css": "/assets/css/base/fonts.min.css",
     "/assets/css/base/base.min.css": "/assets/css/base/base.min.css",
     "/assets/js/base.min.js": "/assets/js/base.min.js",
-    "/assets/js/datatables.js": "/assets/js/datatables.js"
+    "/assets/js/datatables.js": "/assets/js/datatables.js",
+    "/assets/js/sweetalert2.js": "/assets/js/sweetalert2.js"
 }
