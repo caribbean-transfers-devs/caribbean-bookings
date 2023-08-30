@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Users\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,5 @@ Route::middleware(['guest'])->group(function () {
 
 //Meter al middleware para protejer estas rutas...
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::resource('users', UserController::class);

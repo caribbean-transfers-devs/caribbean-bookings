@@ -68,12 +68,12 @@
                         </a>
                     </li>
     
-                    <li class="sidebar-item">
+                    <li class="sidebar-item @if(request()->is('users') || request()->is('roles')) active @endif">
                         <a href="#auth" data-bs-toggle="collapse" class="sidebar-link collapsed">
                             <i class="align-middle" data-feather="users"></i> <span class="align-middle">Administración</span>
                         </a>
-                        <ul id="auth" class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar">
-                            <li class="sidebar-item"><a class="sidebar-link" href="pages-sign-in.html">Usuarios</a></li>
+                        <ul id="auth" class="sidebar-dropdown list-unstyled collapse @if(request()->is('users') || request()->is('roles')) show @endif" data-bs-parent="#sidebar">
+                            <li class="sidebar-item @if(request()->is('users')) active @endif"><a class="sidebar-link" href="{{ route('users.index') }}">Usuarios</a></li>
                             <li class="sidebar-item"><a class="sidebar-link" href="pages-sign-up.html">Roles</a></li>
                         </ul>
                     </li>    
