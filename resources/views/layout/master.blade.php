@@ -144,6 +144,7 @@
     </div>    
     
     <script src="{{ mix('/assets/js/base.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sweetalert2.js') }}"></script>
     @stack('bootom-stack')
 </body>
 </html>
