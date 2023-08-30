@@ -2,14 +2,15 @@
 @section('title') Usuarios @endsection
 
 @push('up-stack')
+    <script src="{{ mix('assets/js/datatables.js') }}"></script>
 @endpush
 
 @push('bootom-stack')
     <script>
         $(function() {
-            $('#active_users','#inactive_users').DataTable({
+            $('#active_users,#inactive_users').DataTable({
                 language: {
-                    url: '/assets/vendor/datatables/es.json'
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
                 }
             });
         });
@@ -37,7 +38,7 @@
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active show" id="tab-1" role="tabpanel">
-                                <div class="table-responsive">
+                                <div class="table-responsive mt-3">
                                     <table id="active_users" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
@@ -69,7 +70,7 @@
                                 </div>
                             </div>
                             <div class="tab-pane" id="tab-2" role="tabpanel">                                
-                                <div class="table-responsive">
+                                <div class="table-responsive mt-3">
                                     <table id="inactive_users" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
