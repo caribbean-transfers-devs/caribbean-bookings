@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
+use App\Models\User;
 use App\Repositories\Users\UserRepository;
 use Illuminate\Http\Request;
 
@@ -19,9 +20,9 @@ class UserController extends Controller
         return $userRepository->createUser($request);
     }
 
-    public function edit(Request $request, UserRepository $userRepository)
+    public function edit(Request $request, User $user, UserRepository $userRepository)
     {
-        return $userRepository->editUser($request);
+        return $userRepository->editUser($request, $user);
     }
 
     public function store(UserRequest $request, UserRepository $userRepository)
@@ -29,8 +30,8 @@ class UserController extends Controller
         return $userRepository->storeUser($request);
     }
 
-    public function update(UserRequest $request, UserRepository $userRepository)
+    public function update(UserRequest $request, User $user, UserRepository $userRepository)
     {
-        return $userRepository->updateUser($request);
+        return $userRepository->updateUser($request, $user);
     }
 }

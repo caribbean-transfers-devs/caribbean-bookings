@@ -24,4 +24,4 @@ Route::middleware(['guest'])->group(function () {
 //Meter al middleware para protejer estas rutas...
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::resource('users', UserController::class);
+Route::resource('/users', UserController::class);

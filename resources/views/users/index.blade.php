@@ -61,8 +61,24 @@
                                                             <span class="badge bg-danger">Si</span>
                                                         @endif
                                                     </td>
-                                                    <td></td>
-                                                    <td></td>
+                                                    <td>
+                                                        @foreach ($user->roles as $role)
+                                                            <span class="badge bg-primary">{{ $role->role->role }}</span>
+                                                        @endforeach
+                                                    </td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="actions" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                Acciones
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="actions">
+                                                                <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
+                                                                <li><a class="dropdown-item" href="#">Cambiar Contraseña</a></li>
+                                                                <li><hr class="dropdown-divider"></li>
+                                                                <li><a class="dropdown-item" href="#">Desactivar</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
                                                 </tr>                                        
                                             @endforeach
                                         </tbody>
@@ -93,7 +109,11 @@
                                                             <span class="badge bg-danger">Si</span>
                                                         @endif
                                                     </td>
-                                                    <td></td>
+                                                    <td>
+                                                        @foreach ($user->roles as $role)
+                                                            <span class="badge bg-primary">{{ $role->role->role }}</span>
+                                                        @endforeach
+                                                    </td>
                                                     <td></td>
                                                 </tr>                                        
                                             @endforeach

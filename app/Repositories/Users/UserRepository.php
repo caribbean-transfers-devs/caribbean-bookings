@@ -4,6 +4,7 @@ namespace App\Repositories\Users;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserRole;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -37,11 +38,11 @@ class UserRepository
         ]);
     }
 
-    public function editUser($request){
+    public function editUser($request,$user){
         return view('users.create_edit', [
             'roles' => Role::all(),
             'v_type' => 2,
-            'user' => User::find($request->id)
+            'user' => $user
         ]);
     }
 
@@ -56,11 +57,17 @@ class UserRepository
             $user->restricted = $request->restricted;
             $user->save();
 
-            $user->roles()->createMany($request->roles);
+            foreach ($request->roles as $role) {
+                $user_role = new UserRole();
+                $user_role->role_id = $role;
+                $user_role->user_id = $user->id;
+                $user_role->save();
+            }
 
             DB::commit();
 
             return response()->json([
+                'success' => true, 
                 'message' => 'Usuario creado correctamente',
                 'status' => Response::HTTP_OK
             ]);
@@ -69,28 +76,34 @@ class UserRepository
             DB::rollBack();
 
             return response()->json([
+                'success' => false,
                 'message' => 'Error al crear el usuario',
                 'status' => Response::HTTP_INTERNAL_SERVER_ERROR
             ]);
         }
     }
 
-    public function updateUser($request){
+    public function updateUser($request, $user){
         try {
             DB::beginTransaction();
 
-            $user = User::find($request->id);
             $user->name = $request->name;
             $user->email = strtolower($request->email);
             $user->restricted = $request->restricted;
             $user->save();
 
             $user->roles()->delete();
-            $user->roles()->createMany($request->roles);
+            foreach ($request->roles as $role) {
+                $user_role = new UserRole();
+                $user_role->role_id = $role;
+                $user_role->user_id = $user->id;
+                $user_role->save();
+            }
 
             DB::commit();
 
             return response()->json([
+                'success' => true, 
                 'message' => 'Usuario actualizado correctamente',
                 'status' => Response::HTTP_OK
             ]);
@@ -99,6 +112,7 @@ class UserRepository
             DB::rollBack();
 
             return response()->json([
+                'success' => false, 
                 'message' => 'Error al actualizar el usuario',
                 'status' => Response::HTTP_INTERNAL_SERVER_ERROR
             ]);
