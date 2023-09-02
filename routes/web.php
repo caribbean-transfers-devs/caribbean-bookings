@@ -25,3 +25,4 @@ Route::middleware(['guest'])->group(function () {
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::resource('/users', UserController::class);
+Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');

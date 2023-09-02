@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChgPassRequest;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
 use App\Repositories\Users\UserRepository;
@@ -33,5 +34,10 @@ class UserController extends Controller
     public function update(UserRequest $request, User $user, UserRepository $userRepository)
     {
         return $userRepository->updateUser($request, $user);
+    }
+
+    public function change_pass(ChgPassRequest $request, User $user, UserRepository $userRepository)
+    {
+        return $userRepository->changePass($request, $user);
     }
 }

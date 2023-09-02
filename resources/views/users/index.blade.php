@@ -14,6 +14,63 @@
                 }
             });
         });
+
+        function ChangePass(id){
+            $("#password").val('');
+            $("#confirm_pass").val('');
+            $("#pass_id").val(id);
+        }
+
+        $("#chgPassBtn").on('click', () => {
+            $("#chgPassBtn").prop('disabled', true);
+            $("#chgPassBtn").html('<i class="fas fa-spinner fa-pulse"></i>');
+            let frm_data = $("#frm_chg_pass").serialize();
+            let id = $("#pass_id").val();
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+                }
+            });       
+            $.ajax({
+                url: '/ChangePass/'+id,
+                type: 'PUT',
+                data: frm_data,
+                success: function(resp) {
+                    if(resp.success == 1){
+                        let timerInterval
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            icon: 'success',
+                            html: 'Contraseña cambiada con éxito. Será redirigido en <b></b>',
+                            timer: 2500,
+                            timerProgressBar: true,
+                            didOpen: () => {
+                                Swal.showLoading()
+                                    const b = Swal.getHtmlContainer().querySelector('b')
+                                    timerInterval = setInterval(() => {
+                                    b.textContent = (Swal.getTimerLeft() / 1000).toFixed(0)
+                                    }, 100)
+                                },
+                                willClose: () => {
+                                    clearInterval(timerInterval)
+                                }
+                        }).then((result) => {
+                            window.location.href = '/users'                        
+                        })
+                    }else{
+                        console.log(resp);
+                    }
+                }
+            }).fail(function(xhr, status, error) {
+                Swal.fire(
+                    '¡ERROR!',
+                    xhr.responseJSON.message,
+                    'error'
+                )
+                $("#chgPassBtn").html('Cambiar Contraseña');
+                $("#chgPassBtn").prop('disabled', false);
+            });        
+        })
     </script>
 @endpush
 
@@ -73,7 +130,7 @@
                                                             </button>
                                                             <ul class="dropdown-menu" aria-labelledby="actions">
                                                                 <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
-                                                                <li><a class="dropdown-item" href="#">Cambiar Contraseña</a></li>
+                                                                <li><a class="dropdown-item" href="#" onclick="ChangePass({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#chgPassModal">Cambiar Contraseña</a></li>
                                                                 <li><hr class="dropdown-divider"></li>
                                                                 <li><a class="dropdown-item" href="#">Desactivar</a></li>
                                                             </ul>
@@ -130,4 +187,6 @@
         </div>
 
     </div>
+
+    <x-modals.chg_pass />
 @endsection

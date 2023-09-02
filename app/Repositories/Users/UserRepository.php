@@ -118,4 +118,30 @@ class UserRepository
             ]);
         }
     }
+
+    public function changePass($request,$user){
+        try {
+            DB::beginTransaction();
+
+            $user->password = bcrypt($request->password);
+            $user->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Contraseña actualizada correctamente',
+                'status' => Response::HTTP_OK
+            ]);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error al actualizar la contraseña',
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ]);
+        }
+    }
 }
