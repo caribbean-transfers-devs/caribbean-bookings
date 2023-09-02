@@ -40,4 +40,9 @@ class UserController extends Controller
     {
         return $userRepository->changePass($request, $user);
     }
+
+    public function change_status(Request $request, User $user, UserRepository $userRepository)
+    {
+        return $userRepository->changeStatus($request, $user);
+    }
 }

@@ -71,6 +71,64 @@
                 $("#chgPassBtn").prop('disabled', false);
             });        
         })
+
+        function chgStatus(id,status){
+            let msg = status == 1 ? 'activa' : 'desactiva';
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "¿Desea "+msg+" este usuario?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '¡Si, '+msg+'r!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+                        }
+                    });       
+                    $.ajax({
+                        url: '/ChangeStatus/'+id,
+                        type: 'PUT',
+                        data: {status:status},
+                        success: function(resp) {
+                            if(resp.success == 1){
+                                let timerInterval
+                                Swal.fire({
+                                    title: '¡Éxito!',
+                                    icon: 'success',
+                                    html: 'Usuario '+msg+'do con éxito. Será redirigido en <b></b>',
+                                    timer: 2500,
+                                    timerProgressBar: true,
+                                    didOpen: () => {
+                                        Swal.showLoading()
+                                            const b = Swal.getHtmlContainer().querySelector('b')
+                                            timerInterval = setInterval(() => {
+                                            b.textContent = (Swal.getTimerLeft() / 1000).toFixed(0)
+                                            }, 100)
+                                        },
+                                        willClose: () => {
+                                            clearInterval(timerInterval)
+                                        }
+                                }).then((result) => {
+                                    location.reload();                        
+                                })
+                            }else{
+                                console.log(resp);
+                            }
+                        }
+                    }).fail(function(xhr, status, error) {
+                        Swal.fire(
+                            '¡ERROR!',
+                            xhr.responseJSON.message,
+                            'error'
+                        )
+                    });        
+                }
+            })
+        }
     </script>
 @endpush
 
@@ -132,7 +190,7 @@
                                                                 <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
                                                                 <li><a class="dropdown-item" href="#" onclick="ChangePass({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#chgPassModal">Cambiar Contraseña</a></li>
                                                                 <li><hr class="dropdown-divider"></li>
-                                                                <li><a class="dropdown-item" href="#">Desactivar</a></li>
+                                                                <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},0)">Desactivar</a></li>
                                                             </ul>
                                                         </div>
                                                     </td>
@@ -171,7 +229,16 @@
                                                             <span class="badge bg-primary">{{ $role->role->role }}</span>
                                                         @endforeach
                                                     </td>
-                                                    <td></td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="actions" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                Acciones
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="actions">
+                                                                <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},1)">Activar</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
                                                 </tr>                                        
                                             @endforeach
                                         </tbody>

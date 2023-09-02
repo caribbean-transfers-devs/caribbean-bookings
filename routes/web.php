@@ -26,3 +26,4 @@ Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::resource('/users', UserController::class);
 Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');
+Route::put('/ChangeStatus/{user}', [UserController::class, 'change_status'])->name('users.change_status');

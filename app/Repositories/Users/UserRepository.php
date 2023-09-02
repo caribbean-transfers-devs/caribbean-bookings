@@ -144,4 +144,30 @@ class UserRepository
             ]);
         }
     }
+
+    public function changeStatus($request,$user){
+        try {
+            DB::beginTransaction();
+
+            $user->status = $request->status;
+            $user->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Estado actualizado correctamente',
+                'status' => Response::HTTP_OK
+            ]);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error al actualizar el estado',
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ]);
+        }
+    }
 }
