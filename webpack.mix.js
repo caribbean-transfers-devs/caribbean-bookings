@@ -16,3 +16,4 @@ mix.copy('resources/css/base.min.css', data.assets + "css/base/base.min.css");
 mix.copy('resources/js/base.js', data.assets + "js/base.min.js");
 mix.copy('resources/js/datatables.js', data.assets + "js/datatables.js");
 mix.copy('resources/js/sweetalert2.all.min.js', data.assets + "js/sweetalert2.js");
+mix.copy('resources/js/views/userIndex.js', data.assets + "js/views/userIndex.js");
