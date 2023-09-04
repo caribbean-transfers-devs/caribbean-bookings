@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Users\UserController;
 
 /*
@@ -29,3 +30,5 @@ Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('
 Route::put('/ChangeStatus/{user}', [UserController::class, 'change_status'])->name('users.change_status');
 Route::post('/StoreIP', [UserController::class, 'store_ips'])->name('users.store_ips');
 Route::delete('/DeleteIPs/{ip}', [UserController::class, 'delete_ips'])->name('users.delete_ips');
+
+Route::resource('/roles', RoleController::class);

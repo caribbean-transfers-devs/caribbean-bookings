@@ -74,7 +74,7 @@
                         </a>
                         <ul id="auth" class="sidebar-dropdown list-unstyled collapse @if(request()->is('users') || request()->is('roles')) show @endif" data-bs-parent="#sidebar">
                             <li class="sidebar-item @if(request()->is('users')) active @endif"><a class="sidebar-link" href="{{ route('users.index') }}">Usuarios</a></li>
-                            <li class="sidebar-item"><a class="sidebar-link" href="pages-sign-up.html">Roles</a></li>
+                            <li class="sidebar-item"><a class="sidebar-link" href="{{ route('roles.index') }}">Roles</a></li>
                         </ul>
                     </li>    
                     
