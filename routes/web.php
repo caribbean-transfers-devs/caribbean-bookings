@@ -27,3 +27,5 @@ Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::resource('/users', UserController::class);
 Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');
 Route::put('/ChangeStatus/{user}', [UserController::class, 'change_status'])->name('users.change_status');
+Route::post('/StoreIP', [UserController::class, 'store_ips'])->name('users.store_ips');
+Route::delete('/DeleteIPs/{ip}', [UserController::class, 'delete_ips'])->name('users.delete_ips');

@@ -49,4 +49,8 @@ class User extends Authenticatable
     public function roles(){
         return $this->hasMany(UserRole::class, 'user_id', 'id');
     }
+
+    public function whitelist_ips(){
+        return $this->hasMany(WhitelistIp::class, 'user_id', 'id');
+    }
 }

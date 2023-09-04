@@ -5,6 +5,7 @@ namespace App\Repositories\Users;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserRole;
+use App\Models\WhitelistIp;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -17,15 +18,17 @@ class UserRepository
             
             $active_users = User::where('status', 1)->get();
             $inactive_users = User::where('status', 0)->get();
+            $valid_ips = WhitelistIp::all();
 
-            return view('users.index', compact('active_users', 'inactive_users'));
+            return view('users.index', compact('active_users', 'inactive_users', 'valid_ips'));
             
         } catch (\Throwable $e) {
 
             $active_users = [];
             $inactive_users = [];
+            $valid_ips = WhitelistIp::all();
 
-            return view('users.index', compact('active_users', 'inactive_users'));
+            return view('users.index', compact('active_users', 'inactive_users', 'valid_ips'));
         }
     }
     
@@ -168,6 +171,60 @@ class UserRepository
                 'message' => 'Error al actualizar el estado',
                 'status' => Response::HTTP_INTERNAL_SERVER_ERROR
             ]);
+        }
+    }
+
+    public function storeIps($request){       
+        try {
+            DB::beginTransaction();
+
+            $ip = new WhitelistIp();           
+            $ip->ip_address = $request->ip;
+            $ip->added_by = 4;//auth()->user()->id;
+            $ip->created_at = now();
+            $ip->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'IP guardada correctamente',
+                'status' => Response::HTTP_OK
+            ]);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error al guardar la IP',
+                'status' => Response::HTTP_UNPROCESSABLE_ENTITY
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
+    public function deleteIps($request,$ip){
+        try {
+            DB::beginTransaction();
+
+            $ip->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'IP eliminada correctamente',
+                'status' => Response::HTTP_OK
+            ]);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error al eliminar la IP',
+                'status' => Response::HTTP_UNPROCESSABLE_ENTITY
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 }
