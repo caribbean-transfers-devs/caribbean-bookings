@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Users\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,9 @@ Route::middleware(['guest'])->group(function () {
 
 //Meter al middleware para protejer estas rutas...
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::resource('/users', UserController::class);
+Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');
+Route::put('/ChangeStatus/{user}', [UserController::class, 'change_status'])->name('users.change_status');
+Route::post('/StoreIP', [UserController::class, 'store_ips'])->name('users.store_ips');
+Route::delete('/DeleteIPs/{ip}', [UserController::class, 'delete_ips'])->name('users.delete_ips');
