@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('roles_permits', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('role_id');
-            $table->unsignedBigInteger('submodule_id');
-            $table->primary('id');
+            $table->unsignedBigInteger('submodule_id');            
             $table->index('role_id');
             $table->index('submodule_id');
         });

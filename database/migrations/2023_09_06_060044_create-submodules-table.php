@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('submodules', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('module_id')->nullable();
-            $table->string('submodule', 120)->nullable();
-            $table->primary('id');
+            $table->string('submodule', 120)->nullable();            
             $table->index('module_id');
         });
     }

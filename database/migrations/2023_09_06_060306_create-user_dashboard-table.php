@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('user_dashboard', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('dashboard_id')->nullable();
-            $table->primary('id');
+            $table->unsignedBigInteger('dashboard_id')->nullable();    
             $table->index('user_id');
             $table->index('dashboard_id');
         });

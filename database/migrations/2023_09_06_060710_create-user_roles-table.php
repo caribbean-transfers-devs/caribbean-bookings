@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('user_roles', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('role_id');
-            $table->unsignedBigInteger('user_id');
-            $table->primary('id');
+            $table->unsignedBigInteger('user_id');            
             $table->index('role_id');
             $table->index('user_id');
         });
