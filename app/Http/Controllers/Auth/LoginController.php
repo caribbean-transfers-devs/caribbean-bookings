@@ -3,6 +3,9 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Support\Facades\Auth;
+use App\Traits\RoleTrait;
 
 class LoginController extends Controller
 {   
@@ -10,7 +13,21 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function check(){
-        die("Funcionalidad para validar el REQUEST");
+    public function check(LoginRequest $request){
+        if(!Auth::check())
+        {
+            $request->authenticate();
+            $request->session()->regenerate();
+            session(['roles' => RoleTrait::getRolesAndSubmodules()]);
+            return redirect()->intended('dashboard');
+        }
+    }
+
+    public function logout(Request $request) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerate();
+
+        return redirect(url('/'));
     }
 }

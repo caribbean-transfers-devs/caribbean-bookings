@@ -1,0 +1,135 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+
+class LoginRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     */
+    public function rules(): array
+    {
+        return [
+            "email"    => ["required", "email", "string"],
+            "password" => ["required", "string"]
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     */
+    public function messages(): array
+    {
+        return [
+            "email.required"    => "El campo email es requerido",
+            "email.email"       => "El campo email debe ser un email válido",
+            "password.required" => "El campo contraseña es requerido",
+        ];
+    }
+
+    public function authenticate() {
+        
+        $this->ensureIsNotRateLimited();   
+
+        //RECAPTCHA FIRST
+        $cu = curl_init();        
+        curl_setopt($cu, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify");
+        curl_setopt($cu, CURLOPT_POST, true);
+        curl_setopt($cu, CURLOPT_POSTFIELDS, http_build_query(array("secret" => config('services.gcaptcha.secret'), "response" => $this["g-recaptcha-response"])));
+        curl_setopt($cu, CURLOPT_RETURNTRANSFER, true);
+        //MIGHT NEED TO DELETE THIS WHEN IN PROD.
+        curl_setopt($cu, CURLOPT_SSL_VERIFYPEER, FALSE);   
+        $captchaResp = curl_exec($cu);
+        curl_close($cu);
+ 
+        $captchaResp = json_decode($captchaResp, true);
+        //dd($this->ip());
+
+        if($captchaResp["success"] == true && $captchaResp["score"] > 0.5){
+            $restricted_user = DB::table("users")->where("email", $this->email )->value("restricted");
+            $remember = ($this->boolean('remember-check')) ? true : false;
+            
+            if($restricted_user){
+                $ip_match = DB::table('whitelist_ips')->where('ip_address',$this->ip())->value('ip');
+                
+                if($ip_match == $this->ip()){
+                    
+                    if (! Auth::attempt([ 'email' => $this->email, 'password' => $this->password , 'status' => 1], $remember)) {
+                    
+                        RateLimiter::hit($this->throttleKey());
+                        
+                        throw ValidationException::withMessages([
+                            "email" => 'Las credenciales no son válidas, por favor intente de nuevo.',
+                        ]);
+                    }
+                }else{           
+                    RateLimiter::hit($this->throttleKey());
+                    abort(401);
+                }
+            }else{
+                if (! Auth::attempt([ 'email' => $this->email, 'password' => $this->password , 'status' => 1], $remember)) {
+                    RateLimiter::hit($this->throttleKey());
+        
+                    throw ValidationException::withMessages([
+                        "email" => 'Las credenciales no son válidas, por favor intente de nuevo.',
+                    ]);
+                }
+            }        
+
+            RateLimiter::clear($this->throttleKey());
+        }
+    }
+
+    /**
+     * Ensure the login request is not rate limited.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function ensureIsNotRateLimited()
+    {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+            return;
+        }
+
+        event(new Lockout($this));
+
+        $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            "email" => trans("auth.throttle", [
+                "seconds" => $seconds,
+                "minutes" => ceil($seconds / 60),
+            ]),
+        ]);
+    }
+
+    /**
+     * Get the rate limiting throttle key for the request.
+     *
+     * @return string
+     */
+    public function throttleKey()
+    {
+        return Str::transliterate(Str::lower($this->input("email"))."|".$this->ip());
+    }
+}
