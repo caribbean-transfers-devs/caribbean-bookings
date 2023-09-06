@@ -6,6 +6,7 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Reservations\ReservationsController;
+use App\Http\Controllers\Tpv\TpvController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,4 +38,5 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->where('id', '[0-9]+');
+    Route::get('/tpv/new', [TpvController::class, 'index']);
 });

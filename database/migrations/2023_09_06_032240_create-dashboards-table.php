@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('dashboards', function (Blueprint $table) {
             $table->id();
-            $table->string('dashboard_name', 150)->nullable();
-            $table->primary('id');
+            $table->string('dashboard_name', 150)->nullable();            
         });
     }
 

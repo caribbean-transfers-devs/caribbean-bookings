@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('modules', function (Blueprint $table) {
             $table->id();
-            $table->string('module', 80)->nullable(false);
-            $table->primary('id');
+            $table->string('module', 80)->nullable(false);            
         });
     }
 

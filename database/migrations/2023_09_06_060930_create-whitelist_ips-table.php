@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('ip_address', 15);
             $table->unsignedBigInteger('added_by')->nullable('false');
-            $table->timestamps();
-            $table->primary('id');
+            $table->timestamps();            
             $table->index('added_by');
         });
     }

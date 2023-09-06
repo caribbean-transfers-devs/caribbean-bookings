@@ -1,0 +1,149 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Seeder;
+
+class PanelSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        //Roles
+        DB::table('roles')->insert([
+            'role' => "Administrador",
+        ]);
+        DB::table('roles')->insert([
+            'role' => "Contabilidad",
+        ]);
+        DB::table('roles')->insert([
+            'role' => "Gerente - Call Center",
+        ]);
+        DB::table('roles')->insert([
+            'role' => "Agente - Call Center",
+        ]);
+
+        //Módulos
+        DB::table('modules')->insert([
+            'module' => "Usuarios",
+        ]);
+        DB::table('modules')->insert([
+            'module' => "Roles",
+        ]);
+        DB::table('modules')->insert([
+            'module' => "Reservaciones",
+        ]);
+
+        //Submodulos
+        // - Usuarios
+        DB::table('submodules')->insert([
+            'module_id' => 1,
+            'submodule' => "Ver usuarios",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 1,
+            'submodule' => "Crear usuarios",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 1,
+            'submodule' => "Editar usuarios",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 1,
+            'submodule' => "Activar/Desacrivar usuarios",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 1,
+            'submodule' => "Agregar IP's sin restricción",
+        ]);
+        // - Roles
+        DB::table('submodules')->insert([
+            'module_id' => 2,
+            'submodule' => "Ver roles",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 2,
+            'submodule' => "Crear roles",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 2,
+            'submodule' => "Editar roles",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 2,
+            'submodule' => "Eliminar roles",
+        ]);
+        // - Reservaciones
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Ver reservaciones",
+        ]);
+
+        //Roles - Permisos
+        // -> ADMIN
+        DB::table('roles_permits')->insert([
+            'role_id' => 1,
+            'submodule_id' => 1,
+        ]);
+        DB::table('roles_permits')->insert([
+            'role_id' => 1,
+            'submodule_id' => 2,
+        ]);
+        DB::table('roles_permits')->insert([
+            'role_id' => 1,
+            'submodule_id' => 3,
+        ]);
+        DB::table('roles_permits')->insert([
+            'role_id' => 1,
+            'submodule_id' => 4,
+        ]);
+        DB::table('roles_permits')->insert([
+            'role_id' => 1,
+            'submodule_id' => 5,
+        ]);
+        DB::table('roles_permits')->insert([
+            'role_id' => 1,
+            'submodule_id' => 6,
+        ]);
+        DB::table('roles_permits')->insert([
+            'role_id' => 1,
+            'submodule_id' => 7,
+        ]);
+        DB::table('roles_permits')->insert([
+            'role_id' => 1,
+            'submodule_id' => 8,
+        ]);
+        DB::table('roles_permits')->insert([
+            'role_id' => 1,
+            'submodule_id' => 9,
+        ]);
+        DB::table('roles_permits')->insert([
+            'role_id' => 1,
+            'submodule_id' => 10,
+        ]);
+
+        // Usuarios
+        // -> Usuario principal
+        DB::table('users')->insert([
+            'name' => "Cristobal",
+            'email' => "demo@demo.com",
+            'status' => 1,
+            'restricted' => 0,
+            'email_verified_at' => NULL,
+            'password' => '$2a$12$UGri/MetelMO75mCDeOg9OqmxwkCy/HehJZPFJjwUbI3d4YyiXJCK',
+            'remember_token' => NULL,
+            'created_at' => now(),
+            'updated_at' => now(),
+            'deleted_at' => NULL,
+        ]);
+        // Usuario -> ROL
+        //Usuario principal
+        DB::table('user_roles')->insert([
+            'role_id' => 1,
+            'user_id' => 1,
+        ]);
+    }
+}
