@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Users\UserController;
+use App\Http\Controllers\Reservations\ReservationsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,3 +33,5 @@ Route::post('/StoreIP', [UserController::class, 'store_ips'])->name('users.store
 Route::delete('/DeleteIPs/{ip}', [UserController::class, 'delete_ips'])->name('users.delete_ips');
 
 Route::resource('/roles', RoleController::class);
+
+Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->where('id', '[0-9]+');
