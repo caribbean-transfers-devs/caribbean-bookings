@@ -23,9 +23,9 @@
 					<div class="d-table-cell align-middle">
 
 						<div class="text-center mt-4">
-							<h1 class="h2">Welcome</h1>
+							<h1 class="h2">¡Bienvenido!</h1>
 							<p class="lead">
-								Sign in to your account to continue
+								Inicie sesión en su cuenta para continuar
 							</p>
 						</div>
 
@@ -33,27 +33,39 @@
 							<div class="card-body">
 								<div class="m-sm-4">
 									<div class="text-center">
-										<img src="/assets/img/avatars/avatar.jpg" alt="Charles Hall" class="img-fluid rounded-circle" width="132" height="132">
+										<img src="/assets/img/logos/caribbean_icon.png" alt="Caribbean Transfers" class="img-fluid" width="132" height="132">
 									</div>
-									<form>
+									@if ($errors->any())
+										<div class="alert alert-danger mt-3" role="alert">
+											<div class="alert-message">
+												{{ $errors->first() }}
+											</div>
+										</div>										
+									@endif
+									<form id="log-in-form" method="POST" action="{{ route('login') }}">
+										@csrf
 										<div class="mb-3">
 											<label class="form-label">Email</label>
-											<input class="form-control form-control-lg" type="email" name="email" placeholder="Enter your email">
+											<input class="form-control form-control-lg" type="email" name="email" placeholder="Su email" value="{{ old('email') }}">
 										</div>
 										<div class="mb-3">
-											<label class="form-label">Password</label>
-											<input class="form-control form-control-lg" type="password" name="password" placeholder="Enter your password">
+											<label class="form-label">Contraseña</label>
+											<input class="form-control form-control-lg" type="password" name="password" placeholder="Su contraseña">
 										</div>
 										<div>
 											<label class="form-check">
 												<input class="form-check-input" type="checkbox" value="remember-me" name="remember-me" checked>
 												<span class="form-check-label">
-													Remember me next time
+													Recuerdame
 												</span>
 											</label>
 										</div>
 										<div class="text-center mt-3">
-											<a href="index.html" class="btn btn-lg btn-primary">Sign in</a>
+											<button 
+                                                class="g-recaptcha btn btn-primary btn-lg"
+                                                data-sitekey="{{ config('services.gcaptcha.key')}}" 
+                                                data-callback="onSubmit"
+                                                data-action = 'submit'>Iniciar Sesión</button>
 										</div>
 									</form>
 								</div>
@@ -65,6 +77,13 @@
 			</div>
 		</div>
 	</main>
+
+	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+        function onSubmit(token) {
+            document.getElementById("log-in-form").submit();
+        }
+    </script>
 </body>
 
 </html>

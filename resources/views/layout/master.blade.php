@@ -36,17 +36,17 @@
                 <div class="sidebar-user">
                     <div class="d-flex justify-content-center">
                         <div class="flex-shrink-0">
-                            <img src="/assets/img/logos/caribbean_icon.png" class="avatar img-fluid rounded me-1" alt="Charles Hall">
+                            <img src="/assets/img/logos/caribbean_icon.png" class="avatar img-fluid rounded me-1" alt="{{ auth()->user()->name }}">
                         </div>
                         <div class="flex-grow-1 ps-2">
                             <a class="sidebar-user-title dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                Charles Hall
+                                {{ auth()->user()->name }}
                             </a>
                             <div class="dropdown-menu dropdown-menu-start">                                
-                                <a class="dropdown-item" href="#">Cerrar Sesión</a>
+                                <a class="dropdown-item" href="{{ route('logout') }}">Cerrar Sesión</a>
                             </div>
     
-                            <div class="sidebar-user-subtitle">Designer</div>
+                            <div class="sidebar-user-subtitle">Caribbean Transfers</div>
                         </div>
                     </div>
                 </div>
@@ -56,8 +56,8 @@
                         Pages
                     </li>                  
     
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="pages-profile.html">
+                    <li class="sidebar-item @if(request()->is('/')) active @endif">
+                        <a class="sidebar-link" href="/">
                             <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
                         </a>
                     </li>
@@ -111,7 +111,7 @@
                                 <img src="/assets/img/logos/caribbean_icon.png" class="avatar img-fluid rounded" alt="Caribbean">
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="#">Cerrar Sesión</a>
+                                <a class="dropdown-item" href="{{ route('logout') }}">Cerrar Sesión</a>
                             </div>
                         </li>
                     </ul>
