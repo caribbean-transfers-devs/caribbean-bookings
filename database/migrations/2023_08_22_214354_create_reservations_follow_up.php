@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('reservation_id')->default(0);
             $table->string('name', 150);
             $table->text('text')->nullable();
-            $table->enum('type', ['CLIENT', 'INTERN', 'ALL', 'HISTORY'])->default('INTERN');
+            $table->enum('type', ['CLIENT', 'INTERN', 'OPERATION', 'HISTORY'])->default('INTERN');
             $table->timestamps();
 
             $table->index('reservation_id');

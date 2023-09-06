@@ -41,6 +41,11 @@ class ApiSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('sales_types')->insert([
+            'name' => "Descuento",
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         #Destinos
         DB::table('destinations')->insert([
