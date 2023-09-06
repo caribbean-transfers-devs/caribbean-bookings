@@ -11,6 +11,9 @@ class RolesPermit extends Model
 
     public $timestamps = false;
 
+    //table name
+    protected $table = 'roles_permits';
+
     /**
      * Relations
      */

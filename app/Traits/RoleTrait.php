@@ -26,7 +26,7 @@ trait RoleTrait
         $permissions_data = [];
         if (count($roles) > 0){
             $permissions_data['roles'] = $roles;
-            $roles_permits = UserRole::where('user_id', $user_id)->leftJoin('roles_permit', 'roles_permit.role_id', '=', 'user_roles.role_id')
+            $roles_permits = UserRole::where('user_id', $user_id)->leftJoin('roles_permits', 'roles_permits.role_id', '=', 'user_roles.role_id')
             ->distinct()->pluck('submodule_id')->toArray();
             $permissions_data['permissions'] = $roles_permits;
         }
