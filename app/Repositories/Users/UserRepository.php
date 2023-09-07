@@ -180,7 +180,7 @@ class UserRepository
 
             $ip = new WhitelistIp();           
             $ip->ip_address = $request->ip;
-            $ip->added_by = 4;//auth()->user()->id;
+            $ip->added_by = auth()->user()->id;
             $ip->created_at = now();
             $ip->save();
 
