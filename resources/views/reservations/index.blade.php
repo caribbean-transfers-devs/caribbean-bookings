@@ -6,7 +6,8 @@
 @endpush
 
 @push('bootom-stack')
-    <script src="{{ mix('assets/js/views/reservationsIndex.js') }}"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+    <script src="{{ mix('assets/js/views/reservationsIndex.js') }}"></script>    
 @endpush
 
 @section('content')
@@ -19,8 +20,11 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">Reservaciones</h5>
-                        <div class="card-header d-flex justify-content-end align-items-center gap-3">                            
-                                                                                
+                        <div class="card-header d-flex justify-content-end align-items-center gap-3"> 
+                            <div class="input-group">
+                                <input type="text" name="lookup_date" id="lookup_date" class="form-control" value="{{ $from }} a {{ $to }}">
+                                <button class="btn btn-success" type="button" onclick="Search()">Ver</button>
+                            </div>                                                                           
                         </div>                       
                     </div>
                     <div class="card-body">
