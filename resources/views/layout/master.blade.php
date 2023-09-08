@@ -67,8 +67,8 @@
                         </a>
                     </li>
     
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="pages-invoice.html">
+                    <li class="sidebar-item @if(request()->is('reservations')) active @endif">
+                        <a class="sidebar-link" href="{{ route('reservations.index') }}">
                             <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Reservaciones</span>
                         </a>
                     </li>

@@ -37,6 +37,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('/roles', RoleController::class);
 
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/reservations', [ReservationsController::class, 'index'])->name('reservations.index');
     Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->where('id', '[0-9]+');
 
     Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');

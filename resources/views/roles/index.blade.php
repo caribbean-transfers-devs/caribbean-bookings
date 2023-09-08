@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title') Usuarios @endsection
+@section('title') Roles @endsection
 
 @push('up-stack')
     <script src="{{ mix('assets/js/datatables.js') }}"></script>
