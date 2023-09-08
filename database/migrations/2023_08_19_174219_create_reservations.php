@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('rate_group');
             $table->tinyInteger('is_cancelled')->default(0);            
             $table->tinyInteger('is_commissionable')->default(1);            
+            $table->tinyInteger('pay_at_arrival')->default(0);    
 
             $table->unsignedBigInteger('site_id')->nullable();
             $table->unsignedBigInteger('destination_id')->nullable();
