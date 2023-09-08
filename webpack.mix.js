@@ -20,3 +20,4 @@ mix.copy('resources/js/views/userIndex.js', data.assets + "js/views/userIndex.js
 mix.copy('resources/js/views/rolesIndex.js', data.assets + "js/views/rolesIndex.js");
 mix.copy('resources/js/views/reservationsIndex.js', data.assets + "js/views/reservationsIndex.js");
 mix.sass('resources/scss/reservations/detail.scss', data.assets + "css/reservations/detail.min.css");
+mix.sass('resources/scss/tpv/index.scss', data.assets + "css/tpv/index.min.css");

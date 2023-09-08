@@ -61,6 +61,11 @@
                             <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
                         </a>
                     </li>
+                    <li class="sidebar-item @if(request()->is('/tpv/handler')) active @endif">
+                        <a class="sidebar-link" href="/tpv/handler">
+                            <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">TPV</span>
+                        </a>
+                    </li>
     
                     <li class="sidebar-item @if(request()->is('reservations')) active @endif">
                         <a class="sidebar-link" href="{{ route('reservations.index') }}">

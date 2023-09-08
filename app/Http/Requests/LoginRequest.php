@@ -68,7 +68,7 @@ class LoginRequest extends FormRequest
             $remember = ($this->boolean('remember-check')) ? true : false;
             
             if($restricted_user){
-                $ip_match = DB::table('whitelist_ips')->where('ip_address',$this->ip())->value('ip');
+                $ip_match = DB::table('whitelist_ips')->where('ip_address',$this->ip())->value('ip_address');
                 
                 if($ip_match == $this->ip()){
                     
