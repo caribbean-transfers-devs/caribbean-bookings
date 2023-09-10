@@ -18,4 +18,17 @@ class ReservationsItem extends Model
     {
         return $this->belongsTo(Reservation::class, 'reservation_id', 'id');
     }
+
+    public function destination_service()
+    {
+        return $this->belongsTo(DestinationService::class, 'destination_service_id', 'id');
+    }
+
+    public function origin(){
+        return $this->belongsTo(Destination::class, 'from_zone', 'id');
+    }
+
+    public function destination(){
+        return $this->belongsTo(Destination::class, 'to_zone', 'id');
+    }
 }
