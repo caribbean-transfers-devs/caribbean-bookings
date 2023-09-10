@@ -18,6 +18,6 @@ class Sale extends Model
 
     public function type()
     {
-        return $this->belongsTo(SaleType::class, 'sale_type_id', 'id');
+        return $this->belongsTo(SalesType::class, 'sale_type_id', 'id');
     }
 }

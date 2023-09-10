@@ -159,9 +159,6 @@
                     <button class="btn btn-secondary btn-sm">Invitación de pago</button>
                     <button class="btn btn-success btn-sm"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
                     <button class="btn btn-danger btn-sm"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
-                    <button class="btn btn-danger btn-sm"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
-                    <button class="btn btn-danger btn-sm"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
-                    <button class="btn btn-danger btn-sm"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
                 </div>
 
                 <div class="tab">
@@ -262,32 +259,26 @@
                                     <tr>
                                         <th>Tipo</th>
                                         <th class="text-left">Descripción</th>
+                                        <th class="text-center">Cantidad</th>
                                         <th class="text-center">Total</th>
                                         <th class="text-center">Vendedor</th>
                                         <th class="text-center"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Transportación</td>
-                                        <td class="text-left">Taxi | Viaje Sencillo</td>
-                                        <td class="text-end">40</td>
-                                        <td class="text-center">Juan Pérez</td>
-                                        <td class="text-center">
-                                            <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                            <a href="#"><i class="align-middle" data-feather="trash"></i></a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Extra</td>
-                                        <td class="text-left">Vino </td>
-                                        <td class="text-end">40</td>
-                                        <td class="text-center">Juan Pérez</td>
-                                        <td class="text-center">
-                                            <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                            <a href="#"><i class="align-middle" data-feather="trash"></i></a>
-                                        </td>
-                                    </tr> 
+                                    @foreach ($reservation->sales as $sale)
+                                        <tr>
+                                            <td>{{ $sale->type->name }}</td>
+                                            <td class="text-left">{{ $sale->description }}</td>
+                                            <td class="text-center">{{ $sale->quantity }}</td>
+                                            <td class="text-center">{{ number_format($sale->total,2) }}</td>
+                                            <td class="text-center">{{ $sale->call_center_agent_id }}</td>
+                                            <td class="text-center">
+                                                <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
+                                                <a href="#"><i class="align-middle" data-feather="trash"></i></a>
+                                            </td>
+                                        </tr>
+                                    @endforeach                                   
                                 </tbody>
                             </table>
                         </div>
@@ -309,30 +300,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Efectivo</td>
-                                        <td class="text-end">20.00</td>
-                                        <td class="text-end">18.00</td>
-                                        <td class="text-center">
-                                            <span class="badge bg-success">Pagado</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                            <a href="#"><i class="align-middle" data-feather="trash"></i></a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Efectivo</td>
-                                        <td class="text-end">5.00</td>
-                                        <td class="text-end">18.00</td>
-                                        <td class="text-center">
-                                            <span class="badge bg-danger">Pendiente</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                            <a href="#"><i class="align-middle" data-feather="trash"></i></a>
-                                        </td>
-                                    </tr>  
+                                    @foreach ($reservation->payments as $payment)
+                                        <tr>
+                                            <td>{{ $payment->payment_method }}</td>
+                                            <td class="text-end">{{ number_format($payment->total) }}</td>
+                                            <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
+                                            <td class="text-center">
+                                                {{ $payment->status == 1 ? '<span class="badge bg-success">Pagado</span>' : '<span class="badge bg-danger">Pendiente</span>' }}                                                
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
+                                                <a href="#"><i class="align-middle" data-feather="trash"></i></a>
+                                            </td>
+                                        </tr>
+                                    @endforeach                                   
                                 </tbody>
                             </table>
                         </div>
@@ -417,101 +398,14 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="serviceSalesModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Agregar venta</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceSalesTypeForm">Tipo</label>
-                        <select class="form-control mb-2" id="serviceSalesTypeForm">
-                            <option value="1" selected>Transportación</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceSalesDescriptionForm">Descripción</label>
-						<input type="text" class="form-control mb-2" id="serviceSalesDescriptionForm">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceSalesQuantityForm">Cantidad</label>
-						<input type="number" class="form-control mb-2" id="serviceSalesQuantityForm">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceSalesTotalForm">Total</label>
-						<input type="number" class="form-control mb-2" id="serviceSalesTotalForm">
-                    </div>
-                    <div class="col-sm-12 col-md-12">
-                        <label class="form-label" for="serviceSalesAgentForm">Agente</label>
-						<select class="form-control mb-2" id="serviceSalesAgentForm">
-                            <option value="1" selected>Juan Perez</option>
-                            <option value="1">Esteban Vega</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="servicePaymentsModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Agregar pago</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsTypeModal">Tipo</label>
-                        <select class="form-control mb-2" id="servicePaymentsTypeModal">
-                            <option value="1" selected>Efectivo</option>
-                            <option value="2">Tarjeta</option>
-                            <option value="3">PayPal</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsDescriptionModal">Descripción / referencia</label>
-						<input type="text" class="form-control mb-2" id="servicePaymentsDescriptionModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsTotalModal">Total</label>
-						<input type="number" class="form-control mb-2" id="servicePaymentsTotalModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
-						<select class="form-control mb-2" id="servicePaymentsCurrencyModal">
-                            <option value="1" selected>USD</option>
-                            <option value="2">MXN</option>                            
-                        </select>
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsExchangeModal">Tipo de cambio</label>
-						<input type="number" class="form-control mb-2" id="servicePaymentsExchangeModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsRequestModal">Solicitar pago</label>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="servicePaymentsRequestModal">
-                            <label class="form-check-label" for="servicePaymentsRequestModal">Solicitar al cliente al abordar</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
+
+<x-modals.new_sale_reservation>
+    <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
+</x-modals.new_sale_reservation>
+
+<x-modals.new_payment_reservation>
+    <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
+</x-modals.new_payment_reservation>
 
 <x-modals.edit_reservation_details :reservation=$reservation />
 @endsection
