@@ -9,8 +9,6 @@ class ReservationFollowUp extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
-
     protected $table = 'reservations_follow_up';
 
     public function reservation()

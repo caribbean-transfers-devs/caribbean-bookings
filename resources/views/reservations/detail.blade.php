@@ -34,7 +34,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h5 class="card-title mb-0">caribbean-transfers.com</h5>
+                        <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
                     </div>
                     <div class="card-body">
 
@@ -42,35 +42,64 @@
                             <tbody>
                                 <tr>
                                     <th>Nombre</th>
-                                    <td>Omar Alejandro Trujillo Flores</td>
+                                    <td>{{ $reservation->client_first_name }} {{ $reservation->client_last_name }}</td>
                                 </tr>
                                 <tr>
                                     <th>E-mail</th>
-                                    <td>omar.trujillo.91@gmail.com</td>
+                                    <td>{{ $reservation->client_email }}</td>
                                 </tr>
                                 <tr>
                                     <th>Teléfono</th>
-                                    <td>+52 998 1710512</td>
+                                    <td>{{ $reservation->client_phone }}</td>
                                 </tr>
                                 <tr>
                                     <th>Moneda</th>
-                                    <td>USD</td>
+                                    <td>{{ $reservation->currency == 1 ? 'USD' : 'MXN' }}</td>
                                 </tr>                                
                                 <tr>
                                     <th>Estatus</th>
                                     <td>
-                                        <span class="badge bg-success">Confirmed</span>
-                                        <span class="badge bg-info">Pending</span>
-                                        <span class="badge bg-danger">Cancelled</span>
+                                        @foreach ($reservation->items as $item)
+                                            @if ($item->op_one_status == 'PENDING')
+                                                <span class="badge bg-info">OW Pending</span>
+                                            @endif
+                                            @if ($item->op_two_status == 'PENDING')
+                                                <span class="badge bg-info">RT Pending</span>
+                                            @endif
+                                            @if ($item->op_one_status == 'CONFIRMED')
+                                                <span class="badge bg-success">OW Confirmed</span>
+                                            @endif
+                                            @if ($item->op_two_status == 'CONFIRMED')
+                                                <span class="badge bg-success">RT Confirmed</span>
+                                            @endif
+                                            @if ($item->op_one_status == 'CONFIRMED')
+                                                <span class="badge bg-success">OW Completed</span>
+                                            @endif
+                                            @if ($item->op_two_status == 'CONFIRMED')
+                                                <span class="badge bg-success">RT Completed</span>
+                                            @endif
+                                            @if ($item->op_one_status == 'CANCELLED')
+                                                <span class="badge bg-danger">OW Cancelled</span>
+                                            @endif
+                                            @if ($item->op_two_status == 'CANCELLED')
+                                                <span class="badge bg-danger">RT Cancelled</span>
+                                            @endif
+                                            @if ($item->op_one_status == 'NOSHOW')
+                                                <span class="badge bg-danger">OW No Show</span>
+                                            @endif
+                                            @if ($item->op_two_status == 'NOSHOW')
+                                                <span class="badge bg-danger">RT No Show</span>
+                                            @endif
+                                        @endforeach                                                                              
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Unidad</th>
-                                    <td>Cancún</td>
+                                    <td>{{ $reservation->destination->name }}</td>
                                 </tr>
                                 <tr>
                                     <th>Creación</th>
-                                    <td>2023/12/01 11:58</td>
+                                    <td>{{ $reservation->created_at }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -78,26 +107,28 @@
                         <strong>Actividad</strong>
 
                         <ul class="timeline mt-2 mb-0">
-                            <li class="timeline-item">
-                                <strong>[CLIENT]</strong>
-                                <span class="float-end text-muted text-sm">30m ago</span>
-                                <p>Este es un comentario hecho por el cliente</p>
-                            </li>
-                            <li class="timeline-item">
-                                <strong>[INTERN] Titulo mensaje interno</strong>
-                                <span class="float-end text-muted text-sm">2h ago</span>
-                                <p>Este es un comentario interno...</p>
-                            </li>
-                            <li class="timeline-item">
-                                <strong>[OPERATION]</strong>
-                                <span class="float-end text-muted text-sm">3h ago</span>
-                                <p>Este mensaje será solo visto por la gente de operación...</p>
-                            </li>
-                            <li class="timeline-item">
-                                <strong>[HISTORY]</strong>
-                                <span class="float-end text-muted text-sm">2d ago</span>
-                                <p>Debe mostrar los cambios que se han hecho en la reserva...</p>
-                            </li>
+                            @foreach ($reservation->followUps as $followUp)
+                                <li class="timeline-item">
+                                    <strong>[{{ $followUp->type }}]</strong>
+                                    @php
+                                        $time = $followUp->created_at->diffInMinutes(now());
+                                        if($time > 90){
+                                            $time /= 60;
+                                            $time = number_format($time, 0, '.', '');
+                                            $time .= ' hours';
+                                        }else if($time > 1440){
+                                            $time /= 1440;
+                                            $time = number_format($time, 0, '.', '');
+                                            $time .= ' days';
+                                        }else{
+                                            $time .= ' minutes';
+                                        }
+                                    @endphp
+                                    <span class="float-end text-muted text-sm">{{ $time }} ago</span>
+                                    <p>{{ $followUp->text }}</p>
+                                </li>  
+                            @endforeach
+                           
                         </ul>
 
                     </div>
@@ -481,45 +512,6 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="serviceClientModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Datos del cliente</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceClientFirstNameModal">Nombres</label>
-						<input type="text" class="form-control mb-2" id="serviceClientFirstNameModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceClientLastNameModal">Apellidos</label>
-						<input type="text" class="form-control mb-2" id="serviceClientLastNameModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceClientEmailModal">E-mail</label>
-						<input type="email" class="form-control mb-2" id="serviceClientEmailModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceClientPhoneModal">Teléfono</label>
-						<input type="text" class="form-control mb-2" id="serviceClientPhoneModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
-						<select class="form-control mb-2" id="servicePaymentsCurrencyModal">
-                            <option value="1" selected>USD</option>
-                            <option value="2">MXN</option>                            
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
+
+<x-modals.edit_reservation_details :reservation=$reservation />
 @endsection
