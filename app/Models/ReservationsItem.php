@@ -18,9 +18,4 @@ class ReservationsItem extends Model
     {
         return $this->belongsTo(Reservation::class, 'reservation_id', 'id');
     }
-
-    public function services()
-    {
-        return $this->hasMany(ReservationsService::class, 'reservation_item_id', 'id');
-    }
 }
