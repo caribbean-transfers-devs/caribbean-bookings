@@ -23,8 +23,66 @@
 
 @section('content')
     <div class="container-fluid p-0">
-
+        @php
+            // echo "<pre>";
+            // print_r($websites);
+            // die();
+        @endphp
         <h1 class="h3 mb-3">Reservaciones</h1>
+        <div class="card">                    
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-sm-3">
+                        <label class="form-label" for="lookup_date">Fecha de creación</label>
+                        <input type="text" name="date" id="lookup_date" class="form-control" value="">
+                    </div>
+                    <div class="col-12 col-sm-3">
+                        <label class="form-label" for="filter_text">Nombre/Reservación/Teléfono/Referencia</label>
+                        <input type="text" name="filter_text" id="filter_text" class="form-control mb-3">
+                    </div>
+                    <div class="col-12 col-sm-3">
+                        <label class="form-label" for="filter_text">Tipo de producto</label>
+                        <select class="form-control mb-3">
+                            @foreach ($services as $key => $value)
+                                <optgroup label="{{ $key }}">
+                                    @foreach ($value as $service)                                    
+                                        <option value="{{ $service->id }}">{{ $service->service_name }}</option>                                                          
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-3">
+                        <label class="form-label" for="filter_text">Zona</label>
+                            <select class="form-control mb-3">
+                                @foreach ($zones as $key => $value)
+                                <optgroup label="{{ $key }}">
+                                    @foreach ($value as $zone)                                    
+                                        <option value="{{ $zone->id }}">{{ $zone->zone_name }}</option>                                                          
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-3">
+                        <label class="form-label" for="filter_text">Sitio</label>
+                        <select class="form-control mb-3">
+                            @foreach ($websites as $key => $value)
+                                <option value="{{ $value->id }}">{{ $value->site_name }}</option> 
+                            @endforeach
+                        </select>                        
+                    </div>
+                    <div class="col-12 col-sm-3">
+                        <label class="form-label" for="filter_text">Método de pago</label>
+                        <select class="form-control mb-3">
+                            <option value="1">CASH</option>
+                            <option value="1">CARD</option>
+                            <option value="1">PAYPAL</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-12 col-sm-9">
@@ -48,11 +106,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php
-                                        // echo "<pre>";
-                                        // print_r($bookings);
-                                        // die();
-                                    @endphp
                                     @if(sizeof($bookings) >= 1)
                                         @foreach ($bookings as $item)
                                             @php                                                

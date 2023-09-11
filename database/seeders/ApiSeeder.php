@@ -409,6 +409,23 @@ class ApiSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
+        DB::table('payments_exchange_rate')->insert([
+            'origin' => "MXN",
+            'destination' => "MXN",
+            'exchange_rate' => 1,
+            'operation' => "multiplication",
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('payments_exchange_rate')->insert([
+            'origin' => "USD",
+            'destination' => "MXN",
+            'exchange_rate' => 18,
+            'operation' => "division",
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
 
         //API
         DB::table('api')->insert([
