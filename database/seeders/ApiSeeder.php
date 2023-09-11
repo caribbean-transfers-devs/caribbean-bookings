@@ -421,7 +421,7 @@ class ApiSeeder extends Seeder
             'origin' => "USD",
             'destination' => "MXN",
             'exchange_rate' => 18,
-            'operation' => "division",
+            'operation' => "multiplication",
             'created_at' => now(),
             'updated_at' => now(),
         ]);

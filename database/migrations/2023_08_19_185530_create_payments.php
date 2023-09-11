@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('total', 10, 2);
             $table->decimal('exchange_rate', 10, 2);
             $table->enum('payment_method', ['CASH', 'PAYPAL', 'CARD'])->default('CASH');
+            $table->enum('currency', ['USD', 'MXN'])->default('USD');
             $table->text('object')->nullable();
             $table->unsignedBigInteger('reservation_id')->nullable();
             $table->string('reference');

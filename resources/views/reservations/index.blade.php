@@ -97,7 +97,7 @@
                                         <th>Estatus</th>
                                         <th>Cliente</th>
                                         <th>Servicio</th>
-                                        <th>Pasjaeros</th>
+                                        <th>Pasajeros</th>
                                         <th>Total</th>
                                         <th>Moneda</th>
                                         <th>Pendiente</th>

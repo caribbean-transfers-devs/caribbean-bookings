@@ -19,4 +19,18 @@ class Destination extends Model
     {
         return $this->hasMany(Reservation::class, 'destination_id', 'id');
     }
+
+    public function destination_services()
+    {
+        return $this->hasMany(DestinationService::class, 'destination_id', 'id');
+    }
+
+    public function from_destination()
+    {
+        return $this->hasMany(ReservationsItem::class, 'from_zone', 'id');
+    }
+
+    public function to_destination(){
+        return $this->hasMany(ReservationsItem::class, 'to_zone', 'id');
+    }
 }
