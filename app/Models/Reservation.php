@@ -38,4 +38,9 @@ class Reservation extends Model
     {
         return $this->hasMany(ReservationFollowUp::class, 'reservation_id', 'id');
     }
+
+    public function site()
+    {
+        return $this->belongsTo(Site::class, 'site_id', 'id');
+    }
 }

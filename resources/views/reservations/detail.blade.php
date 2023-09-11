@@ -34,7 +34,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h5 class="card-title mb-0">caribbean-transfers.com</h5>
+                        <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
                     </div>
                     <div class="card-body">
 
@@ -42,35 +42,64 @@
                             <tbody>
                                 <tr>
                                     <th>Nombre</th>
-                                    <td>Omar Alejandro Trujillo Flores</td>
+                                    <td>{{ $reservation->client_first_name }} {{ $reservation->client_last_name }}</td>
                                 </tr>
                                 <tr>
                                     <th>E-mail</th>
-                                    <td>omar.trujillo.91@gmail.com</td>
+                                    <td>{{ $reservation->client_email }}</td>
                                 </tr>
                                 <tr>
                                     <th>Teléfono</th>
-                                    <td>+52 998 1710512</td>
+                                    <td>{{ $reservation->client_phone }}</td>
                                 </tr>
                                 <tr>
                                     <th>Moneda</th>
-                                    <td>USD</td>
+                                    <td>{{ $reservation->currency == 1 ? 'USD' : 'MXN' }}</td>
                                 </tr>                                
                                 <tr>
                                     <th>Estatus</th>
                                     <td>
-                                        <span class="badge bg-success">Confirmed</span>
-                                        <span class="badge bg-info">Pending</span>
-                                        <span class="badge bg-danger">Cancelled</span>
+                                        @foreach ($reservation->items as $item)
+                                            @if ($item->op_one_status == 'PENDING')
+                                                <span class="badge bg-info">OW Pending</span>
+                                            @endif
+                                            @if ($item->op_two_status == 'PENDING')
+                                                <span class="badge bg-info">RT Pending</span>
+                                            @endif
+                                            @if ($item->op_one_status == 'CONFIRMED')
+                                                <span class="badge bg-success">OW Confirmed</span>
+                                            @endif
+                                            @if ($item->op_two_status == 'CONFIRMED')
+                                                <span class="badge bg-success">RT Confirmed</span>
+                                            @endif
+                                            @if ($item->op_one_status == 'CONFIRMED')
+                                                <span class="badge bg-success">OW Completed</span>
+                                            @endif
+                                            @if ($item->op_two_status == 'CONFIRMED')
+                                                <span class="badge bg-success">RT Completed</span>
+                                            @endif
+                                            @if ($item->op_one_status == 'CANCELLED')
+                                                <span class="badge bg-danger">OW Cancelled</span>
+                                            @endif
+                                            @if ($item->op_two_status == 'CANCELLED')
+                                                <span class="badge bg-danger">RT Cancelled</span>
+                                            @endif
+                                            @if ($item->op_one_status == 'NOSHOW')
+                                                <span class="badge bg-danger">OW No Show</span>
+                                            @endif
+                                            @if ($item->op_two_status == 'NOSHOW')
+                                                <span class="badge bg-danger">RT No Show</span>
+                                            @endif
+                                        @endforeach                                                                              
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Unidad</th>
-                                    <td>Cancún</td>
+                                    <td>{{ $reservation->destination->name }}</td>
                                 </tr>
                                 <tr>
                                     <th>Creación</th>
-                                    <td>2023/12/01 11:58</td>
+                                    <td>{{ $reservation->created_at }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -78,26 +107,28 @@
                         <strong>Actividad</strong>
 
                         <ul class="timeline mt-2 mb-0">
-                            <li class="timeline-item">
-                                <strong>[CLIENT]</strong>
-                                <span class="float-end text-muted text-sm">30m ago</span>
-                                <p>Este es un comentario hecho por el cliente</p>
-                            </li>
-                            <li class="timeline-item">
-                                <strong>[INTERN] Titulo mensaje interno</strong>
-                                <span class="float-end text-muted text-sm">2h ago</span>
-                                <p>Este es un comentario interno...</p>
-                            </li>
-                            <li class="timeline-item">
-                                <strong>[OPERATION]</strong>
-                                <span class="float-end text-muted text-sm">3h ago</span>
-                                <p>Este mensaje será solo visto por la gente de operación...</p>
-                            </li>
-                            <li class="timeline-item">
-                                <strong>[HISTORY]</strong>
-                                <span class="float-end text-muted text-sm">2d ago</span>
-                                <p>Debe mostrar los cambios que se han hecho en la reserva...</p>
-                            </li>
+                            @foreach ($reservation->followUps as $followUp)
+                                <li class="timeline-item">
+                                    <strong>[{{ $followUp->type }}]</strong>
+                                    @php
+                                        $time = $followUp->created_at->diffInMinutes(now());
+                                        if($time > 90){
+                                            $time /= 60;
+                                            $time = number_format($time, 0, '.', '');
+                                            $time .= ' hours';
+                                        }else if($time > 1440){
+                                            $time /= 1440;
+                                            $time = number_format($time, 0, '.', '');
+                                            $time .= ' days';
+                                        }else{
+                                            $time .= ' minutes';
+                                        }
+                                    @endphp
+                                    <span class="float-end text-muted text-sm">{{ $time }} ago</span>
+                                    <p>{{ $followUp->text }}</p>
+                                </li>  
+                            @endforeach
+                           
                         </ul>
 
                     </div>
@@ -127,9 +158,6 @@
                     </div>
                     <button class="btn btn-secondary btn-sm">Invitación de pago</button>
                     <button class="btn btn-success btn-sm"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
-                    <button class="btn btn-danger btn-sm"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
-                    <button class="btn btn-danger btn-sm"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
-                    <button class="btn btn-danger btn-sm"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
                     <button class="btn btn-danger btn-sm"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
                 </div>
 
@@ -231,32 +259,26 @@
                                     <tr>
                                         <th>Tipo</th>
                                         <th class="text-left">Descripción</th>
+                                        <th class="text-center">Cantidad</th>
                                         <th class="text-center">Total</th>
                                         <th class="text-center">Vendedor</th>
                                         <th class="text-center"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Transportación</td>
-                                        <td class="text-left">Taxi | Viaje Sencillo</td>
-                                        <td class="text-end">40</td>
-                                        <td class="text-center">Juan Pérez</td>
-                                        <td class="text-center">
-                                            <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                            <a href="#"><i class="align-middle" data-feather="trash"></i></a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Extra</td>
-                                        <td class="text-left">Vino </td>
-                                        <td class="text-end">40</td>
-                                        <td class="text-center">Juan Pérez</td>
-                                        <td class="text-center">
-                                            <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                            <a href="#"><i class="align-middle" data-feather="trash"></i></a>
-                                        </td>
-                                    </tr> 
+                                    @foreach ($reservation->sales as $sale)
+                                        <tr>
+                                            <td>{{ $sale->type->name }}</td>
+                                            <td class="text-left">{{ $sale->description }}</td>
+                                            <td class="text-center">{{ $sale->quantity }}</td>
+                                            <td class="text-center">{{ number_format($sale->total,2) }}</td>
+                                            <td class="text-center">{{ $sale->call_center_agent_id }}</td>
+                                            <td class="text-center">
+                                                <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
+                                                <a href="#"><i class="align-middle" data-feather="trash"></i></a>
+                                            </td>
+                                        </tr>
+                                    @endforeach                                   
                                 </tbody>
                             </table>
                         </div>
@@ -278,30 +300,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Efectivo</td>
-                                        <td class="text-end">20.00</td>
-                                        <td class="text-end">18.00</td>
-                                        <td class="text-center">
-                                            <span class="badge bg-success">Pagado</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                            <a href="#"><i class="align-middle" data-feather="trash"></i></a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Efectivo</td>
-                                        <td class="text-end">5.00</td>
-                                        <td class="text-end">18.00</td>
-                                        <td class="text-center">
-                                            <span class="badge bg-danger">Pendiente</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                            <a href="#"><i class="align-middle" data-feather="trash"></i></a>
-                                        </td>
-                                    </tr>  
+                                    @foreach ($reservation->payments as $payment)
+                                        <tr>
+                                            <td>{{ $payment->payment_method }}</td>
+                                            <td class="text-end">{{ number_format($payment->total) }}</td>
+                                            <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
+                                            <td class="text-center">
+                                                {{ $payment->status == 1 ? '<span class="badge bg-success">Pagado</span>' : '<span class="badge bg-danger">Pendiente</span>' }}                                                
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
+                                                <a href="#"><i class="align-middle" data-feather="trash"></i></a>
+                                            </td>
+                                        </tr>
+                                    @endforeach                                   
                                 </tbody>
                             </table>
                         </div>
@@ -386,140 +398,14 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="serviceSalesModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Agregar venta</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceSalesTypeForm">Tipo</label>
-                        <select class="form-control mb-2" id="serviceSalesTypeForm">
-                            <option value="1" selected>Transportación</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceSalesDescriptionForm">Descripción</label>
-						<input type="text" class="form-control mb-2" id="serviceSalesDescriptionForm">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceSalesQuantityForm">Cantidad</label>
-						<input type="number" class="form-control mb-2" id="serviceSalesQuantityForm">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceSalesTotalForm">Total</label>
-						<input type="number" class="form-control mb-2" id="serviceSalesTotalForm">
-                    </div>
-                    <div class="col-sm-12 col-md-12">
-                        <label class="form-label" for="serviceSalesAgentForm">Agente</label>
-						<select class="form-control mb-2" id="serviceSalesAgentForm">
-                            <option value="1" selected>Juan Perez</option>
-                            <option value="1">Esteban Vega</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="servicePaymentsModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Agregar pago</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsTypeModal">Tipo</label>
-                        <select class="form-control mb-2" id="servicePaymentsTypeModal">
-                            <option value="1" selected>Efectivo</option>
-                            <option value="2">Tarjeta</option>
-                            <option value="3">PayPal</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsDescriptionModal">Descripción / referencia</label>
-						<input type="text" class="form-control mb-2" id="servicePaymentsDescriptionModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsTotalModal">Total</label>
-						<input type="number" class="form-control mb-2" id="servicePaymentsTotalModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
-						<select class="form-control mb-2" id="servicePaymentsCurrencyModal">
-                            <option value="1" selected>USD</option>
-                            <option value="2">MXN</option>                            
-                        </select>
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsExchangeModal">Tipo de cambio</label>
-						<input type="number" class="form-control mb-2" id="servicePaymentsExchangeModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsRequestModal">Solicitar pago</label>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="servicePaymentsRequestModal">
-                            <label class="form-check-label" for="servicePaymentsRequestModal">Solicitar al cliente al abordar</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="serviceClientModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Datos del cliente</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceClientFirstNameModal">Nombres</label>
-						<input type="text" class="form-control mb-2" id="serviceClientFirstNameModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceClientLastNameModal">Apellidos</label>
-						<input type="text" class="form-control mb-2" id="serviceClientLastNameModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceClientEmailModal">E-mail</label>
-						<input type="email" class="form-control mb-2" id="serviceClientEmailModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceClientPhoneModal">Teléfono</label>
-						<input type="text" class="form-control mb-2" id="serviceClientPhoneModal">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
-						<select class="form-control mb-2" id="servicePaymentsCurrencyModal">
-                            <option value="1" selected>USD</option>
-                            <option value="2">MXN</option>                            
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
+
+<x-modals.new_sale_reservation>
+    <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
+</x-modals.new_sale_reservation>
+
+<x-modals.new_payment_reservation>
+    <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
+</x-modals.new_payment_reservation>
+
+<x-modals.edit_reservation_details :reservation=$reservation />
 @endsection
