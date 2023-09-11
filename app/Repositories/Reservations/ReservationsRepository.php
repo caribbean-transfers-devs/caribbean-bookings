@@ -61,8 +61,40 @@ class ReservationsRepository
                                         'init' => $date['init'].' 00:00:00',
                                         'end' => $date['end'].' 23:59:59',
                                     ]);
+        
+        $services = [];
+        $db_services = DB::select("SELECT ds.id, dest.name as destination_name, IFNULL(dest_trans.translation, ds.name) AS service_name
+                                FROM destination_services as ds
+                                    INNER JOIN destinations as dest ON dest.id = ds.destination_id
+                                    LEFT JOIN destination_services_translate as dest_trans ON dest_trans.destination_services_id = ds.id AND dest_trans.lang = 'es'
+                                    ORDER BY ds.order ASC");        
+        if(sizeof($db_services) >=1 ):
+            foreach( $db_services as $key => $value ):
+                if( !isset(  $services[ $value->destination_name ] ) ) $services[ $value->destination_name ] = [];
+                $services[ $value->destination_name ][] = $value;
+            endforeach;            
+        endif;
 
-        return view('reservations.index', compact('bookings') );
+        $zones = [];
+        $db_zones = DB::select("SELECT dest.name as destination_name, z.id, z.name as zone_name
+                                FROM zones as z
+                                    INNER JOIN destinations as dest ON dest.id = z.destination_id
+                                ORDER BY z.name ASC");
+        if(sizeof($db_zones) >=1 ):
+            foreach( $db_zones as $key => $value ):
+                if( !isset(  $zones[ $value->destination_name ] ) ) $zones[ $value->destination_name ] = [];
+                $zones[ $value->destination_name ][] = $value;
+            endforeach;            
+        endif;
+
+        $websites = DB::select("SELECT id, name as site_name
+                                FROM sites
+                                ORDER BY site_name ASC");
+        // echo "<pre>";
+        // print_r($sites);
+        // die();
+
+        return view('reservations.index', compact('bookings','services','zones','websites') );
 
         /*if(!$request->lookup_date){
             $from = date('Y-m-d');

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('payment_method', ['CASH', 'PAYPAL', 'CARD'])->default('CASH');
             $table->text('object')->nullable();
             $table->unsignedBigInteger('reservation_id')->nullable();
+            $table->string('reference');
             $table->timestamps();
             
             $table->index('reservation_id');
