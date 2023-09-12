@@ -124,4 +124,16 @@ class ReservationsRepository
             return view('reservations.index', compact('reservations','from','to'));
         } */     
     }
+
+    public function destroy($request, $reservation)
+    {
+        try {
+            $reservation->is_cancelled = 1;
+            $reservation->save();
+            $reservation->items()->update(['op_one_status' => 'CANCELLED', 'op_two_status' => 'CANCELLED']);
+            return response()->json(['message' => 'Reservation cancelled successfully'], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

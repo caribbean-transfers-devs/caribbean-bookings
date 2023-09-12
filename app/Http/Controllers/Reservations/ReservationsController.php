@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Reservations;
 
 use App\Http\Controllers\Controller;
+use App\Models\Reservation;
 use App\Repositories\Reservations\DetailRepository;
 use App\Repositories\Reservations\ReservationsRepository;
 use Illuminate\Http\Request;
@@ -16,5 +17,10 @@ class ReservationsController extends Controller
     public function index(Request $request, ReservationsRepository $reservationRepository)
     {
         return $reservationRepository->index($request);
+    }
+
+    public function destroy(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
+    {
+        return $reservationRepository->destroy($request,$reservation);
     }
 }

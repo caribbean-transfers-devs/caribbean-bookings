@@ -8,7 +8,7 @@
 @endpush
 
 @push('bootom-stack')
-    
+    <script src="{{ mix('assets/js/views/reservationsDetail.js') }}"></script>
 @endpush
 
 @section('content')
@@ -137,28 +137,29 @@
 
             <div class="col-xl-8">
                 <div class="controls">
+                    @csrf
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Re-envio de correo
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Español</a>
+                            <a class="dropdown-item" href="#" onclick="sendMail('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','es')">Español</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Inglés</a>
+                            <a class="dropdown-item" href="#" onclick="sendMail('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Inglés</a>
                         </div>
                     </div>
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            TEXTO
+                            Enviar Mensaje
                         </button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="#">SMS</a>
                             <a class="dropdown-item" href="#">Whatsapp</a>
                         </div>
                     </div>
-                    <button class="btn btn-secondary btn-sm">Invitación de pago</button>
-                    <button class="btn btn-success btn-sm"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
-                    <button class="btn btn-danger btn-sm"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
+                    <button class="btn btn-secondary btn-sm" onclick="sendMail('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Invitación de pago</button>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
+                    <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
                 </div>
 
                 <div class="tab">
@@ -188,9 +189,9 @@
                                 </button>
                             </div>
                             
-                            @for ($i = 1; $i <=2; $i++)                                                    
+                            @foreach ($reservation->items as $item)                                                    
                             <div class="services-container">
-                                <h3>xFs81LF</h3>
+                                <h3>{{ $item->code }}</h3>
                                 <div class="items-container">                                    
                                     <div class="items">
                                         <div class="information_data">
@@ -245,7 +246,7 @@
                                     </div>                              
                                 </div>                                
                             </div>
-                            @endfor
+                            @endforeach
                         </div>
                         <div class="tab-pane" id="icon-tab-2" role="tabpanel">
                             <div class="d-flex">
