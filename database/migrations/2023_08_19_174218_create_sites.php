@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('logo');
+            $table->string('payment_domain')->nullable();
             $table->string('color', 40);
             $table->string('transactional_email');
             $table->tinyInteger('transactional_email_send')->default(1);
