@@ -7,40 +7,43 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use App\Traits\ApiTrait;
 
 class TpvRepository
 {
-    public function handler($request){  
-        $uuid = Str::uuid()->toString();
-        if (!Session::has('tpv')):          
-            Session::put('tpv', []);
-        endif;
+    use ApiTrait;
 
+    public function handler($request){        
+        Session::forget('tpv');
+        $uuid = Str::uuid()->toString();
+
+        if (!Session::has('tpv')):
+            //Requerimos el Token y seteamos su tiempo de vida...
+            $token = $this->init();
+            if($token['status'] == false):
+                return response()->json([
+                    'success' => false,
+                    'message' => '('.$token['code'].') '.$token['message'],
+                    'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+                ]);
+            endif;
+            
+            $tpv = [
+                "token" => [
+                    "token" => $token['data']['token'],
+                    "expires_in" => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " + " . $token['data']['expires_in'] . " seconds"))
+                ]      
+            ];
+            $tpv[$uuid] = $this->empty();
+            Session::put('tpv', $tpv);
+            return redirect('/tpv/new/'.$uuid);
+        endif;
+        
         $tpv = Session::get('tpv');
-        $tpv[$uuid] =  [
-            "type" => "one-way",
-            "start" => [
-                "place" => "",
-                "lat" => "",
-                "lng" => "",
-            ],
-            "end" => [
-                "place" => "",
-                "lat" => "",
-                "lng" => "",
-            ],
-            "language" => "en",
-            "passengers" => 1,
-            "currency" => "USD",
-            "rate_group" => "xLjDl18", //Grupo de tarifa por defecto...
-        ];
+        $tpv[$uuid] = $this->empty();
 
         Session::put('tpv', $tpv);
         return redirect('/tpv/new/'.$uuid);
-    }
-
-    public function setQuote($request){
-
     }
 
     public function index($request)
@@ -49,10 +52,19 @@ class TpvRepository
         if(!isset( $tpv[ $request->code ] )):
             return redirect('/');
         endif;
+        $config = $tpv[ $request->code ];
 
-        // echo "<pre>";
-        // print_r($tpv[ $request->code ]);
-        // die();        
         return view('tpv.index');
     }
+
+    public function quote($request){
+
+        $tpv = Session::get('tpv');
+        if(!isset( $tpv[ $request->code ] )):
+            return redirect('/');
+        endif;
+        $config = $tpv[ $request->code ];        
+    }
+
+    
 }

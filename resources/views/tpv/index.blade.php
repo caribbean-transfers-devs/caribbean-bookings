@@ -3,10 +3,11 @@
 
 @push('up-stack')
     <link href="{{ mix('/assets/css/tpv/index.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/tpv/index.min.css') }}" rel="stylesheet" > 
+    <link href="{{ mix('/assets/css/tpv/index.min.css') }}" rel="stylesheet" >        
 @endpush
 
-@push('bootom-stack')
+@push('bootom-stack')    
+    <script src="{{ mix('/assets/js/views/tpv/index.min.js') }}"></script>
 @endpush
 
 @section('content')
@@ -19,43 +20,60 @@
         <div class="row">
 
             <div class="col-xs-12">
-                <div class="bookingbox">
-                    <div class="type">
-                        <label class="form-label" for="serviceTypeForm">Tipo de viaje</label>
+                <form class="bookingbox" method="post" action="/tpv/new/00653ec6-7fde-4bf6-a4c2-937fc0376496">
+                    @csrf
+                    <div class="type">                        
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" name="round_trip" value="1">
                             <label class="form-check-label" for="flexSwitchCheckDefault">Viaje redondo</label>
                         </div>
-                    </div>                            
+                        <div class="reset">
+                            <a href="/tpv/handler" class="btn btn-secondary btn-sm">Limpiar</a>
+                        </div>
+                    </div>
                     <div class="from">
-                        <label class="form-label" for="serviceTypeForm">Desde</label>
-                        <input type="text" class="form-control" id="serviceFromForm">
+                        <label class="form-label" for="bookingFromForm">Desde</label>
+                        <input class="form-control" type="text" name="from_name"  id="bookingFromForm" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="50" tabindex="1">
                     </div>
                     <div class="to">
-                        <label class="form-label" for="serviceTypeForm">Hacia</label>
-                        <input type="text" class="form-control" id="serviceFromForm">
+                        <label class="form-label" for="bookingToForm">Hacia</label>
+                        <input type="text" class="form-control" id="bookingToForm" name="to_name">
                     </div>
                     <div class="language">
-                        <label class="form-label" for="serviceTypeForm">Idioma</label>
-                        <select class="form-control mb-2">
-                            <option value="USD">EN</option>
-                            <option value="MXN">ES</option>
+                        <label class="form-label" for="bookingLanguageForm">Idioma</label>
+                        <select class="form-control mb-2" id="bookingLanguageForm" name="language">
+                            <option value="en">EN</option>
+                            <option value="es">ES</option>
                         </select>
                     </div>
                     <div class="passengers">
-                        <label class="form-label" for="serviceTypeForm">Pasajeros</label>
-                        <select class="form-control mb-2">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
+                        <label class="form-label" for="bookingPassengersForm">Pasajeros</label>
+                        <select class="form-control mb-2" id="bookingPassengersForm" name="passengers">
+                            @for ($i = 1; $i < 25; $i++)
+                                <option value="{{ $i }}">{{ $i }}</option>                                
+                            @endfor                            
                         </select>
                     </div>
                     <div class="rate_group">
-                        <label class="form-label" for="serviceTypeForm">Grupo de tarifa</label>
-                        <select class="form-control mb-2">
+                        <label class="form-label" for="bookingRategroupForm">Grupo de tarifa</label>
+                        <select class="form-control mb-2" id="bookingRategroupForm" name="rate_group">
                             <option value="xLjDl18">Default</option>                                    
                         </select>
                     </div>
-                </div>
+                    <div class="dates">
+                        <div>
+                            <label class="form-label" for="bookingPickupForm">Pickup</label>
+                            <input type="text" class="form-control" id="bookingPickupForm" name="pickup">
+                        </div>
+                        <div>
+                            <label class="form-label" for="bookingDeparturePickupForm">Departure pickup</label>
+                            <input type="text" class="form-control" id="bookingDeparturePickupForm" name="departure_pickup">
+                        </div>
+                    </div>
+                    <div class="button">
+                        <button class="btn btn-primary">Cotizar</button>
+                    </div>
+                </form>
             </div>
 
             <div class="col-xl-4">

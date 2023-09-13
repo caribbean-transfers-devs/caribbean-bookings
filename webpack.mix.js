@@ -21,3 +21,5 @@ mix.copy('resources/js/views/rolesIndex.js', data.assets + "js/views/rolesIndex.
 mix.copy('resources/js/views/reservationsIndex.js', data.assets + "js/views/reservationsIndex.js");
 mix.sass('resources/scss/reservations/detail.scss', data.assets + "css/reservations/detail.min.css");
 mix.sass('resources/scss/tpv/index.scss', data.assets + "css/tpv/index.min.css");
+mix.copy('resources/js/views/tpv/index.js', data.assets + "js/views/tpv/index.min.js");
+mix.copy('resources/js/autoComplete.min.js', data.assets + "js/autoComplete.min.js");

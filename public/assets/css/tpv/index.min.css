@@ -1,5 +1,1 @@
-div.bookingbox {
-  padding: 15px;
-  background-color: white;
-  border-radius: 5px;
-}
+.bookingbox{grid-column-gap:10px;grid-row-gap:10px;background-color:#fff;border-radius:5px;display:grid;grid-template-areas:"type type type type" "from from to to" "language passengers rate_group rate_group" "dates dates dates dates" "button button button button";padding:15px}.bookingbox>div.type{display:flex;grid-area:type;justify-content:space-between}.bookingbox>div.from{grid-area:from}.bookingbox>div.to{grid-area:to}.bookingbox>div.language{grid-area:language}.bookingbox>div.passengers{grid-area:passengers}.bookingbox>div.rate_group{grid-area:rate_group}.bookingbox>div.dates{grid-column-gap:10px;grid-row-gap:10px;display:grid;grid-area:dates;grid-template-columns:1fr 1fr}.bookingbox>div.dates>:nth-child(2){display:none}.bookingbox>div.button{grid-area:button}.bookingbox>div.button>button{width:100%}@media (max-width:767px){.bookingbox{grid-template-areas:"type type type type" "from from from from" "to to to to" "language passengers rate_group rate_group" "dates dates dates dates" "button button button button"}}
