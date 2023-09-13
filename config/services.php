@@ -36,4 +36,7 @@ return [
         'secret' => env('SECRET_KEY'),
     ],
 
+    'gmaps' => [
+        'key' => env('GMAPS_API_KEY'),
+    ],
 ];

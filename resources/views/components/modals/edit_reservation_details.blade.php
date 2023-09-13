@@ -10,23 +10,23 @@
                     <div class="row">
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceClientFirstNameModal">Nombres</label>
-                            <input type="text" class="form-control mb-2" id="serviceClientFirstNameModal" value="{{ $reservation->client_first_name }}">
+                            <input type="text" class="form-control mb-2" id="serviceClientFirstNameModal" name="client_first_name" value="{{ $reservation->client_first_name }}">
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceClientLastNameModal">Apellidos</label>
-                            <input type="text" class="form-control mb-2" id="serviceClientLastNameModal" value="{{ $reservation->client_last_name }}">
+                            <input type="text" class="form-control mb-2" id="serviceClientLastNameModal" name="client_last_name" value="{{ $reservation->client_last_name }}">
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceClientEmailModal">E-mail</label>
-                            <input type="email" class="form-control mb-2" id="serviceClientEmailModal" value="{{ $reservation->client_email }}">
+                            <input type="email" class="form-control mb-2" id="serviceClientEmailModal" name="client_email" value="{{ $reservation->client_email }}">
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceClientPhoneModal">Teléfono</label>
-                            <input type="text" class="form-control mb-2" id="serviceClientPhoneModal" value="{{ $reservation->client_phone }}">
+                            <input type="text" class="form-control mb-2" id="serviceClientPhoneModal" name="client_phone" value="{{ $reservation->client_phone }}">
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
-                            <select class="form-select mb-2" id="servicePaymentsCurrencyModal">
+                            <select class="form-select mb-2" id="servicePaymentsCurrencyModal" name="currency">
                                 <option value="1" {{ $reservation->currency == 1 ? 'selected' : '' }}>USD</option>
                                 <option value="2" {{ $reservation->currency == 2 ? 'selected' : '' }}>MXN</option>                            
                             </select>
@@ -37,7 +37,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" name="btn_edit_res_details">Guardar</button>
+                <button type="button" class="btn btn-primary" id="btn_edit_res_details">Guardar</button>
             </div>
         </div>
     </div>

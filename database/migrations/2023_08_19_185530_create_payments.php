@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('description');            
             $table->decimal('total', 10, 2);
             $table->decimal('exchange_rate', 10, 2);
+            $table->smallInteger('status')->default(0);
             $table->enum('operation', ['multiplication', 'division'])->default('multiplication');
             $table->enum('payment_method', ['CASH', 'PAYPAL', 'CARD'])->default('CASH');
             $table->enum('currency', ['USD', 'MXN'])->default('USD');
@@ -23,6 +24,7 @@ return new class extends Migration
             $table->unsignedBigInteger('reservation_id')->nullable();
             $table->string('reference')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index('reservation_id');
             //$table->foreign('reservation_id')->references('id')->on('reservations');
