@@ -26,6 +26,7 @@ return new class extends Migration
             //$table->foreign('sale_type_id')->references('id')->on('sales');
             //$table->foreign('reservation_id')->references('id')->on('reservations');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
