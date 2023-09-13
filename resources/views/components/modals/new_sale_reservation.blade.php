@@ -37,7 +37,7 @@
                             </select>
                         </div>
                     </div>
-                    <input type="hidden" id="reservation_id" name="reservation_id" value="{{ $reservation_id }}">
+                    <input type="hidden" name="reservation_id" value="{{ $reservation_id }}">
                 </form>
                 <input type="hidden" id="type_form" value="1">
                 <input type="hidden" id="sale_id">

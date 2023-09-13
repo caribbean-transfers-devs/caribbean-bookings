@@ -43,7 +43,7 @@
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" id="reservation_id" value="{{ $reservation_id }}">
+                    <input type="hidden" name="reservation_id" value="{{ $reservation_id }}">
                 </form>
             </div>
             <div class="modal-footer">

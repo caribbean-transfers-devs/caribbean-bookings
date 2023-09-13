@@ -126,6 +126,24 @@ class ReservationsRepository
         } */     
     }
 
+    public function update($request,$reservation){
+        try{
+            DB::beginTransaction();
+            $reservation->client_first_name = $request->client_first_name;
+            $reservation->client_last_name = $request->client_last_name;
+            $reservation->client_email = $request->client_email;
+            $reservation->client_phone = $request->client_phone;
+            $reservation->currency = $request->currency;
+            $reservation->save();
+            $check = $this->create_followUps($reservation->id, 'SE EDITARON DATOS DE LA RESERVA POR '.auth()->user()->name, 'HISTORY', 'EDICIÓN');
+            DB::commit();
+            return response()->json(['message' => 'Reservation updated successfully', 'success' => true], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error editing reservation', 'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function destroy($request, $reservation)
     {
         try {
