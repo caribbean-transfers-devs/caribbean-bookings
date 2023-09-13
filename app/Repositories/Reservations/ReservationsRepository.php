@@ -3,6 +3,7 @@
 namespace App\Repositories\Reservations;
 
 use App\Models\Reservation;
+use App\Models\ReservationFollowUp;
 use App\Models\ReservationsItem;
 use App\Models\ReservationsService;
 use Exception;
@@ -128,12 +129,38 @@ class ReservationsRepository
     public function destroy($request, $reservation)
     {
         try {
+            DB::beginTransaction();
             $reservation->is_cancelled = 1;
             $reservation->save();
             $reservation->items()->update(['op_one_status' => 'CANCELLED', 'op_two_status' => 'CANCELLED']);
+            $check = $this->create_followUps($reservation->id, 'SE CANCELO LA RESERVA POR '.auth()->user()->name, 'HISTORY', 'CANCELACIÓN');
+            DB::commit();
             return response()->json(['message' => 'Reservation cancelled successfully'], Response::HTTP_OK);
         } catch (Exception $e) {
+            DB::rollBack();
             return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function follow_ups($request)
+    {        
+        $check = $this->create_followUps($request->reservation_id, $request->text, $request->type, $request->name);
+        if($check){
+            return response()->json(['message' => 'Follow up created successfully','success' => true], Response::HTTP_OK);
+        }else{
+            return response()->json(['message' => 'Error creating follow up','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }   
+
+    public function create_followUps($reservation_id, $text, $type, $name = null)
+    {
+        $follow_up = new ReservationFollowUp();
+        $follow_up->reservation_id = $reservation_id;
+        $follow_up->text = $text;
+        $follow_up->type = $type;
+        $follow_up->name = $name;
+        $follow_up->save();
+
+        return $follow_up->id;
     }
 }

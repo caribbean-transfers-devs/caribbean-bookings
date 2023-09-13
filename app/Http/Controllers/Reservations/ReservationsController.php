@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Reservations;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ReservationFollowUpsRequest;
 use App\Models\Reservation;
 use App\Repositories\Reservations\DetailRepository;
 use App\Repositories\Reservations\ReservationsRepository;
@@ -22,5 +23,10 @@ class ReservationsController extends Controller
     public function destroy(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
     {
         return $reservationRepository->destroy($request,$reservation);
+    }
+
+    public function followups(ReservationFollowUpsRequest $request, ReservationsRepository $reservationRepository)
+    {
+        return $reservationRepository->follow_ups($request);
     }
 }

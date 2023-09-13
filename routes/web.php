@@ -41,6 +41,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/reservations/{reservation}', [ReservationsController::class, 'destroy'])->name('reservations.destroy');
     Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->where('id', '[0-9]+');
 
+    Route::post('/reservationsfollowups', [ReservationsController::class, 'followups'])->name('reservations.followups');
+
     Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
     Route::get('/tpv/new/{code}', [TpvController::class, 'index'])->name('tpv.new');
 });

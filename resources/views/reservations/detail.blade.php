@@ -408,5 +408,9 @@
     <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
 </x-modals.new_payment_reservation>
 
+<x-modals.new_follow_reservation>
+    <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
+</x-modals.new_follow_reservation>
+
 <x-modals.edit_reservation_details :reservation=$reservation />
 @endsection
