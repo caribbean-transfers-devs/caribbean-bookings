@@ -60,38 +60,15 @@
                                 <tr>
                                     <th>Estatus</th>
                                     <td>
-                                        @foreach ($reservation->items as $item)
-                                            @if ($item->op_one_status == 'PENDING')
-                                                <span class="badge bg-info">OW Pending</span>
-                                            @endif
-                                            @if ($item->op_two_status == 'PENDING')
-                                                <span class="badge bg-info">RT Pending</span>
-                                            @endif
-                                            @if ($item->op_one_status == 'CONFIRMED')
-                                                <span class="badge bg-success">OW Confirmed</span>
-                                            @endif
-                                            @if ($item->op_two_status == 'CONFIRMED')
-                                                <span class="badge bg-success">RT Confirmed</span>
-                                            @endif
-                                            @if ($item->op_one_status == 'CONFIRMED')
-                                                <span class="badge bg-success">OW Completed</span>
-                                            @endif
-                                            @if ($item->op_two_status == 'CONFIRMED')
-                                                <span class="badge bg-success">RT Completed</span>
-                                            @endif
-                                            @if ($item->op_one_status == 'CANCELLED')
-                                                <span class="badge bg-danger">OW Cancelled</span>
-                                            @endif
-                                            @if ($item->op_two_status == 'CANCELLED')
-                                                <span class="badge bg-danger">RT Cancelled</span>
-                                            @endif
-                                            @if ($item->op_one_status == 'NOSHOW')
-                                                <span class="badge bg-danger">OW No Show</span>
-                                            @endif
-                                            @if ($item->op_two_status == 'NOSHOW')
-                                                <span class="badge bg-danger">RT No Show</span>
-                                            @endif
-                                        @endforeach                                                                              
+                                        @if ($data['status'] == "PENDING")
+                                            <span class="badge bg-info">PENDING</span>
+                                        @endif
+                                        @if ($data['status'] == "CONFIRMED")
+                                            <span class="badge bg-success">CONFIRMED</span>
+                                        @endif
+                                        @if ($data['status'] == "CANCELLED")
+                                            <span class="badge bg-danger">CANCELLED</span>
+                                        @endif                                                                             
                                     </td>
                                 </tr>
                                 <tr>
@@ -200,7 +177,7 @@
                                             <p><strong>Pasajeros:</strong> {{ $item->passengers }}</p>
                                             <p><strong>Desde:</strong> {{ $item->from_name }}</p>
                                             <p><strong>Hacia:</strong> {{ $item->to_name }}</p>
-                                            <p><strong>Pickup:</strong> {{ $item->op_one_pickup }}</p>
+                                            <p><strong>Pickup:</strong> {{ ((!empty($item->op_one_pickup))? date("Y-m-d H:i", strtotime($item->op_one_pickup)) : '¡CORREGIR!') }}</p>
                                             <p>
                                                 @switch($item->op_one_status)
                                                     @case('PENDING')
@@ -231,15 +208,13 @@
                                     </div>
                                     @if ($item->is_round_trip)
                                         <div class="flight_data">
-                                            <h4>Round Trip</h4>
+                                            <h4>Regreso</h4>
                                         </div>
                                         <div class="items">
                                             <div class="information_data">
-                                                <p><strong>Desde:</strong> {{ $item->to_name }}</p>
-                                                <p><strong>Hacia:</strong> {{ $item->from_name }}</p>
-                                                <p><strong>Pickup:</strong> {{ $item->op_two_pickup }}</p>
+                                                <p><strong>Pickup:</strong> {{ ((!empty($item->op_two_pickup))? date("Y-m-d H:i", strtotime($item->op_two_pickup)) : '¡CORREGIR!') }}</p>
                                                 <p>
-                                                    @switch($item->op_one_status)
+                                                    @switch($item->op_two_status)
                                                         @case('PENDING')
                                                             <span class="badge bg-secondary">PENDING</span>
                                                         @break
@@ -256,14 +231,6 @@
                                                             
                                                     @endswitch
                                                 </p>
-                                            </div>
-                                            <div class="actions">
-                                                <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
-                                                    <i class="align-middle" data-feather="edit"></i>
-                                                </button> 
-                                                <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->to_name }}','{{ $item->from_name }}','{{ $item->distance_time }}','{{ $item->distance_km }}')">
-                                                    <i class="align-middle" data-feather="map-pin"></i>
-                                                </button>
                                             </div>
                                         </div>              
                                     @endif                                    
@@ -322,9 +289,9 @@
                                 <thead>
                                     <tr>
                                         <th>Método</th>
+                                        <th>Descripción</th>
                                         <th class="text-center">Total</th>
                                         <th class="text-center">TC</th>
-                                        <th class="text-center">Estatus<sup>*</sup></th>
                                         <th class="text-center"></th>
                                     </tr>
                                 </thead>
@@ -332,15 +299,9 @@
                                     @foreach ($reservation->payments as $payment)
                                         <tr>
                                             <td>{{ $payment->payment_method }}</td>
+                                            <td>{{ $payment->description }}</td>
                                             <td class="text-end">{{ number_format($payment->total) }}</td>
                                             <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
-                                            <td class="text-center">
-                                                @if($payment->status == 1)
-                                                    <span class="badge bg-success">Pagado</span>
-                                                @else
-                                                    <span class="badge bg-danger">Pendiente</span>
-                                                @endif                                              
-                                            </td>
                                             <td class="text-center">
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
                                                 <a href="#" onclick="deletePayment({{ $payment->id }})"><i class="align-middle" data-feather="trash"></i></a>

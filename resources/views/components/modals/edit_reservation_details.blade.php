@@ -26,7 +26,7 @@
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
-                            <select class="form-select mb-2" id="servicePaymentsCurrencyModal" name="currency">
+                            <select class="form-select mb-2" id="servicePaymentsCurrencyModal" name="currency" readonly>
                                 <option value="1" {{ $reservation->currency == 1 ? 'selected' : '' }}>USD</option>
                                 <option value="2" {{ $reservation->currency == 2 ? 'selected' : '' }}>MXN</option>                            
                             </select>
