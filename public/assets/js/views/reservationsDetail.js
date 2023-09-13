@@ -5,6 +5,13 @@ $(function() {
         $("#type_form").val(1);
         $("#btn_new_sale").prop('disabled', false);
     });
+
+    $('#servicePaymentsModal').on('hidden.bs.modal', function () {
+        $("#frm_new_payment")[0].reset();
+        $("#payment_id").val('');
+        $("#type_form_pay").val(1);
+        $("#btn_new_payment").prop('disabled', false);
+    });
 });
 
 function sendMail(code,mail,languague){

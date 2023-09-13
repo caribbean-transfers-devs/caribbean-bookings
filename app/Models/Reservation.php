@@ -34,6 +34,11 @@ class Reservation extends Model
         return $this->hasMany(Sale::class, 'reservation_id', 'id');
     }
 
+    public function callCenterAgent()
+    {
+        return $this->belongsTo(User::class, 'call_center_agent_id', 'id');
+    }
+
     public function followUps()
     {
         return $this->hasMany(ReservationFollowUp::class, 'reservation_id', 'id');

@@ -43,7 +43,10 @@ class ReservationsRepository
                                         GROUP BY reservation_id
                                     ) as s ON s.reservation_id = rez.id
                                     LEFT JOIN (
-                                        SELECT reservation_id, ROUND( COALESCE(SUM(total * exchange_rate), 0), 2) as total_payments,
+                                        SELECT reservation_id,
+                                        ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                                    WHEN operation = 'division' THEN total / exchange_rate
+                                                            ELSE total END), 2) AS total_payments,
                                         GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
                                         FROM payments
                                         GROUP BY reservation_id

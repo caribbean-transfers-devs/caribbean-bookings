@@ -21,7 +21,7 @@ class TpvController extends Controller
             return response()->json([
                     'error' => [
                         'code' => 'required_params', 
-                        'message' =>  $validator->errors()->all() 
+                        'message' =>  'code is required'
                     ]
                 ], Response::HTTP_BAD_REQUEST);
         }
@@ -29,8 +29,22 @@ class TpvController extends Controller
         return $tpvRepository->index($request);
     }
 
-    /*public function detail(Request $request, AutocompleteRepository $autocompleteRepository)
-    {
-        return $autocompleteRepository->search($request);
-    }*/
+    public function quote(Request $request, $code, TpvRepository $tpvRepository){
+        return $tpvRepository->quote($request);
+    }
+
+    public function autocomplete(Request $request, $code, AutocompleteRepository $autocompleteRepository){
+
+        if ( !$request->keyword || empty($request->keyword) ) {
+            return response()->json([
+                    'error' => [
+                        'code' => 'required_params', 
+                        'message' =>  'keyword is required'
+                    ]
+                ], Response::HTTP_BAD_REQUEST);
+        }
+
+
+        return $autocompleteRepository->autocomplete($request->keyword);
+    }
 }

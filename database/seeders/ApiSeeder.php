@@ -17,6 +17,7 @@ class ApiSeeder extends Seeder
         DB::table('sites')->insert([
             'name' => "caribbean-transfers.com",
             'logo' => "https://ik.imagekit.io/zqiqdytbq/transportation-api/mailing/logo.png",
+            'payment_domain' => "https://caribbean-transfers.com",
             'color' => "#CE8506",
             'transactional_email' => "bookings@caribbean-transfers.com",
             'transactional_email_send' => 1,
@@ -27,6 +28,7 @@ class ApiSeeder extends Seeder
         DB::table('sites')->insert([
             'name' => "[CS] caribbean-transfers.com",
             'logo' => "https://ik.imagekit.io/zqiqdytbq/transportation-api/mailing/logo.png",
+            'payment_domain' => "https://caribbean-transfers.com",
             'color' => "#CE8506",
             'transactional_email' => "bookings@caribbean-transfers.com",
             'transactional_email_send' => 1,

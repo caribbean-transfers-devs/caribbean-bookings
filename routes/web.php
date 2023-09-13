@@ -51,4 +51,6 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
     Route::get('/tpv/new/{code}', [TpvController::class, 'index'])->name('tpv.new');
+    Route::post('/tpv/new/{code}', [TpvController::class, 'quote'])->name('tpv.quote');
+    Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
 });

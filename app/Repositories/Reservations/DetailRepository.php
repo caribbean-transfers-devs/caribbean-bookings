@@ -15,14 +15,40 @@ class DetailRepository
 {
     public function detail($request,$id)
     {
-        $reservation = Reservation::with('destination','items','sales','payments','followUps','site')->find($id);
+        $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site')->find($id);
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
         $sellers = User::whereIn('id', $users_ids)->get();
         
         $sales_types = SalesType::all();
-
         $services_types = DestinationService::where('status',1)->where('destination_id',$reservation->destination_id)->get();
 
-        return view('reservations.detail', compact('reservation','sellers','sales_types','services_types'));
+        //Sumamos las ventas y restamos pagos para saber si la reserva está confirmada o no..
+        $data = [
+            "status" => "PENDING",
+            "total_sales" => 0,
+            "total_payments" => 0,
+        ];
+
+        foreach( $reservation->sales as $sale ):
+            $data['total_sales'] += $sale->total;            
+        endforeach;
+
+        foreach( $reservation->payments as $payment ):
+            if($payment->operation == "multiplication"):
+                $data['total_payments'] += ($payment->total * $payment->exchange_rate);
+            endif;
+            if($payment->operation == "division"):
+                $data['total_payments'] += ($payment->total / $payment->exchange_rate);
+            endif;                      
+        endforeach;
+
+        if($data['total_payments'] >= $data['total_sales']):
+            $data['status'] = "CONFIRMED";
+        endif;
+        if($reservation->is_cancelled == 1):
+            $data['status'] = "CANCELLED";
+        endif;
+
+        return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data'));
     }
 }
