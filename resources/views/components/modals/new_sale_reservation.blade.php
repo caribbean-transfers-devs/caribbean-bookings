@@ -9,37 +9,42 @@
                 <form id="frm_new_sale">
                     <div class="row">
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="serviceSalesTypeForm">Tipo</label>
-                            <select class="form-select mb-2" id="serviceSalesTypeForm" name="sale_type_id">
-                                <option value="1" selected>Transportación</option>
+                            <label class="form-label" for="new_sale_type_id">Tipo</label>
+                            <select class="form-select mb-2" id="new_sale_type_id" name="sale_type_id">
+                                @foreach($types as $type)
+                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="serviceSalesDescriptionForm">Descripción</label>
-                            <input type="text" class="form-control mb-2" id="serviceSalesDescriptionForm" name="description">
+                            <label class="form-label" for="new_sale_description">Descripción</label>
+                            <input type="text" class="form-control mb-2" id="new_sale_description" name="description">
                         </div>
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="serviceSalesQuantityForm">Cantidad</label>
-                            <input type="number" class="form-control mb-2" id="serviceSalesQuantityForm" name="quantity">
+                            <label class="form-label" for="new_sale_quantity">Cantidad</label>
+                            <input type="number" class="form-control mb-2" id="new_sale_quantity" name="quantity">
                         </div>
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="serviceSalesTotalForm">Total</label>
-                            <input type="number" class="form-control mb-2" id="serviceSalesTotalForm" name="total">
+                            <label class="form-label" for="new_sale_total">Total</label>
+                            <input type="number" class="form-control mb-2" id="new_sale_total" name="total">
                         </div>
                         <div class="col-sm-12 col-md-12">
-                            <label class="form-label" for="serviceSalesAgentForm">Agente</label>
-                            <select class="form-select mb-2" id="serviceSalesAgentForm" name="call_center_agent_id"> 
-                                <option value="1" selected>Juan Perez</option>
-                                <option value="1">Esteban Vega</option>
+                            <label class="form-label" for="new_sale_agent_id">Agente</label>
+                            <select class="form-select mb-2" id="new_sale_agent_id" name="call_center_agent_id"> 
+                                @foreach($sellers as $agent)
+                                    <option value="{{ $agent->id }}">{{ $agent->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
-                    <input type="hidden" id="reservation_id" value="{{ $reservation_id }}">
+                    <input type="hidden" id="reservation_id" name="reservation_id" value="{{ $reservation_id }}">
                 </form>
+                <input type="hidden" id="type_form" value="1">
+                <input type="hidden" id="sale_id">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="btn_new_sale">Guardar</button>
+                <button type="button" class="btn btn-primary" id="btn_new_sale" onclick="saveSale()">Guardar</button>
             </div>
         </div>
     </div>

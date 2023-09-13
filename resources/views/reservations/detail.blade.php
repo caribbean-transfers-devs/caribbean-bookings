@@ -157,7 +157,7 @@
                             <a class="dropdown-item" href="#">Whatsapp</a>
                         </div>
                     </div>
-                    <button class="btn btn-secondary btn-sm" onclick="sendMail('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Invitación de pago</button>
+                    <button class="btn btn-secondary btn-sm" onclick="sendInvitation('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Invitación de pago</button>
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
                     <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
                 </div>
@@ -273,10 +273,10 @@
                                             <td class="text-left">{{ $sale->description }}</td>
                                             <td class="text-center">{{ $sale->quantity }}</td>
                                             <td class="text-center">{{ number_format($sale->total,2) }}</td>
-                                            <td class="text-center">{{ $sale->call_center_agent_id }}</td>
+                                            <td class="text-center">{{ $sale->callCenterAgent->name }}</td>
                                             <td class="text-center">
-                                                <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                                <a href="#"><i class="align-middle" data-feather="trash"></i></a>
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#serviceSalesModal" onclick="getSale({{ $sale->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
+                                                <a href="#" onclick="deleteSale({{ $sale->id }})"><i class="align-middle" data-feather="trash"></i></a>
                                             </td>
                                         </tr>
                                     @endforeach                                   
@@ -307,7 +307,11 @@
                                             <td class="text-end">{{ number_format($payment->total) }}</td>
                                             <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
                                             <td class="text-center">
-                                                {{ $payment->status == 1 ? '<span class="badge bg-success">Pagado</span>' : '<span class="badge bg-danger">Pendiente</span>' }}                                                
+                                                @if($payment->status == 1)
+                                                    <span class="badge bg-success">Pagado</span>
+                                                @else
+                                                    <span class="badge bg-danger">Pendiente</span>
+                                                @endif                                              
                                             </td>
                                             <td class="text-center">
                                                 <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
@@ -400,7 +404,7 @@
     </div>
 </div>
 
-<x-modals.new_sale_reservation>
+<x-modals.new_sale_reservation :sellers=$sellers :types=$sales_types>
     <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
 </x-modals.new_sale_reservation>
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Reservations\ReservationsController;
+use App\Http\Controllers\Sales\SalesController;
 use App\Http\Controllers\Tpv\TpvController;
 
 /*
@@ -42,6 +43,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->where('id', '[0-9]+');
 
     Route::post('/reservationsfollowups', [ReservationsController::class, 'followups'])->name('reservations.followups');
+
+    Route::resource('/sales',SalesController::class);
 
     Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
     Route::get('/tpv/new/{code}', [TpvController::class, 'index'])->name('tpv.new');
