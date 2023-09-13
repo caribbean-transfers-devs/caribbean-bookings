@@ -135,7 +135,7 @@ class ReservationsRepository
             $reservation->client_phone = $request->client_phone;
             $reservation->currency = $request->currency;
             $reservation->save();
-            $check = $this->create_followUps($reservation->id, 'SE EDITARON DATOS DE LA RESERVA POR '.auth()->user()->name, 'HISTORY', 'EDICIÓN');
+            $check = $this->create_followUps($reservation->id, 'Se editaron datos de la reserva por '.auth()->user()->name, 'HISTORY', 'EDICIÓN');
             DB::commit();
             return response()->json(['message' => 'Reservation updated successfully', 'success' => true], Response::HTTP_OK);
         } catch (Exception $e) {

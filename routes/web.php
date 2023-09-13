@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Payments\PaymentsController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Reservations\ReservationsController;
@@ -46,6 +47,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/reservationsfollowups', [ReservationsController::class, 'followups'])->name('reservations.followups');
 
     Route::resource('/sales',SalesController::class);
+    Route::resource('/payments',PaymentsController::class);
 
     Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
     Route::get('/tpv/new/{code}', [TpvController::class, 'index'])->name('tpv.new');

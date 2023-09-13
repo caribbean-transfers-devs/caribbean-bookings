@@ -342,8 +342,8 @@
                                                 @endif                                              
                                             </td>
                                             <td class="text-center">
-                                                <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                                <a href="#"><i class="align-middle" data-feather="trash"></i></a>
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
+                                                <a href="#" onclick="deletePayment({{ $payment->id }})"><i class="align-middle" data-feather="trash"></i></a>
                                             </td>
                                         </tr>
                                     @endforeach                                   

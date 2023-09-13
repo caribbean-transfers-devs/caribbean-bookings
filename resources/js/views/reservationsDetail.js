@@ -5,6 +5,13 @@ $(function() {
         $("#type_form").val(1);
         $("#btn_new_sale").prop('disabled', false);
     });
+
+    $('#servicePaymentsModal').on('hidden.bs.modal', function () {
+        $("#frm_new_payment")[0].reset();
+        $("#payment_id").val('');
+        $("#type_form_pay").val(1);
+        $("#btn_new_payment").prop('disabled', false);
+    });
 });
 
 function sendMail(code,mail,languague){
@@ -357,3 +364,120 @@ function serviceInfo(origin,destination,time,km){
     $("#destination_time").html(time);
     $("#destination_kms").html(km);
 }
+
+function getPayment(id){
+    $("#btn_new_payment").prop('disabled', true);
+    $("#type_form_pay").val(2);
+    $("#payment_id").val(id);
+    $.ajax({
+        url: '/payments/'+id,
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            $("#servicePaymentsTypeModal").val(data.payment_method);
+            $("#servicePaymentsDescriptionModal").val(data.reference);
+            $("#servicePaymentsTotalModal").val(data.total);
+            $("#servicePaymentsCurrencyModal").val(data.currency);
+            $("#servicePaymentsExchangeModal").val(data.exchange_rate);
+            $("#btn_new_payment").prop('disabled', false);
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    });
+}
+
+function deletePayment(id){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    swal.fire({
+        title: '¿Está seguro de eliminar el pago?',
+        text: "Esta acción no se puede revertir",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.value) {
+            $.ajax({
+                url: '/payments/'+id,
+                type: 'DELETE',
+                dataType: 'json',
+                success: function (data) {
+                    swal.fire({
+                        title: 'Pago eliminado',
+                        text: 'Se ha eliminado el pago correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        location.reload();
+                    });
+                },
+                error: function (data) {
+                    swal.fire({
+                        title: 'Error',
+                        text: 'Ha ocurrido un error al eliminar el pago',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        }
+    });
+}
+
+$("#btn_new_payment").on('click', function(){
+    $("#btn_new_payment").prop('disabled', true);
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    let frm_data = $("#frm_new_payment").serializeArray();
+    let type = $("#type_form_pay").val();
+    let type_req = type == 1 ? 'POST' : 'PUT';
+    let url_req = type == 1 ? '/payments' : '/payments/'+$("#payment_id").val();
+    $.ajax({
+        url: url_req,
+        type: type_req,
+        data: frm_data,
+        success: function(resp) {
+            if (resp.success == 1) {
+                window.onbeforeunload = null;
+                let timerInterval
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    html: 'Pago guardado con éxito. Será redirigido en <b></b>',
+                    timer: 2500,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        const b = Swal.getHtmlContainer().querySelector('b')
+                        timerInterval = setInterval(() => {
+                            b.textContent = (Swal.getTimerLeft() / 1000)
+                                .toFixed(0)
+                        }, 100)
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    location.reload();
+                })
+            } else {
+                console.log(resp);
+            }
+        }
+    }).fail(function(xhr, status, error) {
+        Swal.fire(
+            '¡ERROR!',
+            xhr.responseJSON.message,
+            'error'
+        )
+        $("#btn_new_payment").prop('disabled', false);
+    });
+});
