@@ -195,55 +195,78 @@
                                 <div class="items-container">                                    
                                     <div class="items">
                                         <div class="information_data">
-                                            <p><strong>Tipo:</strong> Taxi</p>
-                                            <p><strong>Pasajeros:</strong> 4</p>
-                                            <p><strong>Desde:</strong> Aeropuerto de Cancún</p>
-                                            <p><strong>Hacia:</strong> Hotel Alux</p>
-                                            <p><strong>Pickup:</strong> 2023-10-15 @ 12:30</p>
+                                            <p><strong>Tipo:</strong> {{ $item->destination_service->name }}</p>
+                                            <p><strong>Pasajeros:</strong> {{ $item->passengers }}</p>
+                                            <p><strong>Desde:</strong> {{ $item->from_name }}</p>
+                                            <p><strong>Hacia:</strong> {{ $item->to_name }}</p>
+                                            <p><strong>Pickup:</strong> {{ $item->op_one_pickup }}</p>
                                             <p>
-                                                <!-- 'PENDING', 'COMPLETED', 'NOSHOW', 'CANCELLED' -->
-                                                <span class="badge bg-secondary">PENDING</span>
-                                                <span class="badge bg-success">COMPLETED</span>
-                                                <span class="badge bg-warning">NOSHOW</span>
-                                                <span class="badge bg-danger">CANCELLED</span>
+                                                @switch($item->op_one_status)
+                                                    @case('PENDING')
+                                                        <span class="badge bg-secondary">PENDING</span>
+                                                    @break
+                                                    @case('CONFIRMED')
+                                                        <span class="badge bg-success">CONFIRMED</span>
+                                                    @break
+                                                    @case('NOSHOW')
+                                                        <span class="badge bg-warning">NOSHOW</span>
+                                                    @break
+                                                    @case('CANCELLED')
+                                                        <span class="badge bg-danger">CANCELLED</span>
+                                                    @break                                                
+                                                    @default
+                                                        
+                                                @endswitch
                                             </p>
                                         </div>
-                                        <div class="actions">
+                                        <div class="actions mb-3">
                                             <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
                                                 <i class="align-middle" data-feather="edit"></i>
                                             </button>                                           
                                             <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal">
                                                 <i class="align-middle" data-feather="map-pin"></i>
                                             </button>
-                                        </div>
-                                        <div class="flight_data">
-                                            <h4>Datos de vuelo</h4>
-                                        </div>
+                                        </div>                                        
                                     </div>
-                                    <div class="items">
-                                        <div class="information_data">
-                                            <p><strong>Tipo:</strong> Taxi</p>
-                                            <p><strong>Pasajeros:</strong> 4</p>
-                                            <p><strong>Desde:</strong> Aeropuerto de Cancún</p>
-                                            <p><strong>Hacia:</strong> Hotel Alux</p>
-                                            <p><strong>Pickup:</strong> 2023-10-17 @ 14:00</p>
-                                            <p>
-                                                <!-- 'PENDING', 'COMPLETED', 'NOSHOW', 'CANCELLED' -->
-                                                <span class="badge bg-secondary">PENDING</span>
-                                                <span class="badge bg-success">COMPLETED</span>
-                                                <span class="badge bg-warning">NOSHOW</span>
-                                                <span class="badge bg-danger">CANCELLED</span>
-                                            </p>
+                                    @if ($item->is_round_trip)
+                                        <div class="flight_data">
+                                            <h4>Round Trip</h4>
                                         </div>
-                                        <div class="actions">
-                                            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
-                                                <i class="align-middle" data-feather="edit"></i>
-                                            </button> 
-                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal">
-                                                <i class="align-middle" data-feather="map-pin"></i>
-                                            </button>
-                                        </div>
-                                    </div>                              
+                                        <div class="items">
+                                            <div class="information_data">
+                                                <p><strong>Desde:</strong> {{ $item->to_name }}</p>
+                                                <p><strong>Hacia:</strong> {{ $item->from_name }}</p>
+                                                <p><strong>Pickup:</strong> {{ $item->op_two_pickup }}</p>
+                                                <p>
+                                                    @switch($item->op_one_status)
+                                                        @case('PENDING')
+                                                            <span class="badge bg-secondary">PENDING</span>
+                                                        @break
+                                                        @case('CONFIRMED')
+                                                            <span class="badge bg-success">CONFIRMED</span>
+                                                        @break
+                                                        @case('NOSHOW')
+                                                            <span class="badge bg-warning">NOSHOW</span>
+                                                        @break
+                                                        @case('CANCELLED')
+                                                            <span class="badge bg-danger">CANCELLED</span>
+                                                        @break                                                
+                                                        @default
+                                                            
+                                                    @endswitch
+                                                </p>
+                                            </div>
+                                            <div class="actions">
+                                                <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
+                                                    <i class="align-middle" data-feather="edit"></i>
+                                                </button> 
+                                                <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal">
+                                                    <i class="align-middle" data-feather="map-pin"></i>
+                                                </button>
+                                            </div>
+                                        </div>              
+                                    @endif                                    
+                                                    
                                 </div>                                
                             </div>
                             @endforeach
