@@ -8,5 +8,6 @@
     "/assets/js/sweetalert2.js": "/assets/js/sweetalert2.js",
     "/assets/js/views/userIndex.js": "/assets/js/views/userIndex.js",
     "/assets/js/views/rolesIndex.js": "/assets/js/views/rolesIndex.js",
-    "/assets/js/views/reservationsIndex.js": "/assets/js/views/reservationsIndex.js"
+    "/assets/js/views/reservationsIndex.js": "/assets/js/views/reservationsIndex.js",
+    "/assets/js/views/reservationsDetail.js": "/assets/js/views/reservationsDetail.js"
 }

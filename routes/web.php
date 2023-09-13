@@ -3,9 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Payments\PaymentsController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Reservations\ReservationsController;
+use App\Http\Controllers\Sales\SalesController;
 use App\Http\Controllers\Tpv\TpvController;
 
 /*
@@ -38,7 +40,14 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/reservations', [ReservationsController::class, 'index'])->name('reservations.index');
+    Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');
+    Route::delete('/reservations/{reservation}', [ReservationsController::class, 'destroy'])->name('reservations.destroy');
     Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->where('id', '[0-9]+');
+
+    Route::post('/reservationsfollowups', [ReservationsController::class, 'followups'])->name('reservations.followups');
+
+    Route::resource('/sales',SalesController::class);
+    Route::resource('/payments',PaymentsController::class);
 
     Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
     Route::get('/tpv/new/{code}', [TpvController::class, 'index'])->name('tpv.new');

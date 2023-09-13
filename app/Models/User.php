@@ -53,4 +53,8 @@ class User extends Authenticatable
     public function whitelist_ips(){
         return $this->hasMany(WhitelistIp::class, 'user_id', 'id');
     }
+
+    public function sales(){
+        return $this->hasMany(Sale::class, 'call_center_agent_id', 'id');
+    }
 }

@@ -8,7 +8,8 @@
 @endpush
 
 @push('bootom-stack')
-    
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.gmaps.key') }}&callback=initMap" async defer></script>
+    <script src="{{ mix('assets/js/views/reservationsDetail.js') }}"></script>
 @endpush
 
 @section('content')
@@ -137,28 +138,29 @@
 
             <div class="col-xl-8">
                 <div class="controls">
+                    @csrf
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Re-envio de correo
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Español</a>
+                            <a class="dropdown-item" href="#" onclick="sendMail('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','es')">Español</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Inglés</a>
+                            <a class="dropdown-item" href="#" onclick="sendMail('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Inglés</a>
                         </div>
                     </div>
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            TEXTO
+                            Enviar Mensaje
                         </button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="#">SMS</a>
                             <a class="dropdown-item" href="#">Whatsapp</a>
                         </div>
                     </div>
-                    <button class="btn btn-secondary btn-sm">Invitación de pago</button>
-                    <button class="btn btn-success btn-sm"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
-                    <button class="btn btn-danger btn-sm"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
+                    <button class="btn btn-secondary btn-sm" onclick="sendInvitation('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Invitación de pago</button>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
+                    <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
                 </div>
 
                 <div class="tab">
@@ -188,64 +190,91 @@
                                 </button>
                             </div>
                             
-                            @for ($i = 1; $i <=2; $i++)                                                    
+                            @foreach ($reservation->items as $item)                                                    
                             <div class="services-container">
-                                <h3>xFs81LF</h3>
+                                <h3>{{ $item->code }}</h3>
                                 <div class="items-container">                                    
                                     <div class="items">
                                         <div class="information_data">
-                                            <p><strong>Tipo:</strong> Taxi</p>
-                                            <p><strong>Pasajeros:</strong> 4</p>
-                                            <p><strong>Desde:</strong> Aeropuerto de Cancún</p>
-                                            <p><strong>Hacia:</strong> Hotel Alux</p>
-                                            <p><strong>Pickup:</strong> 2023-10-15 @ 12:30</p>
+                                            <p><strong>Tipo:</strong> {{ $item->destination_service->name }}</p>
+                                            <p><strong>Pasajeros:</strong> {{ $item->passengers }}</p>
+                                            <p><strong>Desde:</strong> {{ $item->from_name }}</p>
+                                            <p><strong>Hacia:</strong> {{ $item->to_name }}</p>
+                                            <p><strong>Pickup:</strong> {{ $item->op_one_pickup }}</p>
                                             <p>
-                                                <!-- 'PENDING', 'COMPLETED', 'NOSHOW', 'CANCELLED' -->
-                                                <span class="badge bg-secondary">PENDING</span>
-                                                <span class="badge bg-success">COMPLETED</span>
-                                                <span class="badge bg-warning">NOSHOW</span>
-                                                <span class="badge bg-danger">CANCELLED</span>
+                                                @switch($item->op_one_status)
+                                                    @case('PENDING')
+                                                        <span class="badge bg-secondary">PENDING</span>
+                                                    @break
+                                                    @case('CONFIRMED')
+                                                        <span class="badge bg-success">CONFIRMED</span>
+                                                    @break
+                                                    @case('NOSHOW')
+                                                        <span class="badge bg-warning">NOSHOW</span>
+                                                    @break
+                                                    @case('CANCELLED')
+                                                        <span class="badge bg-danger">CANCELLED</span>
+                                                    @break                                                
+                                                    @default
+                                                        
+                                                @endswitch
                                             </p>
                                         </div>
-                                        <div class="actions">
+                                        <div class="actions mb-3">
                                             <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
                                                 <i class="align-middle" data-feather="edit"></i>
                                             </button>                                           
-                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal">
+                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->from_name }}','{{ $item->to_name }}','{{ $item->distance_time }}','{{ $item->distance_km }}')">
                                                 <i class="align-middle" data-feather="map-pin"></i>
                                             </button>
-                                        </div>
-                                        <div class="flight_data">
-                                            <h4>Datos de vuelo</h4>
-                                        </div>
+                                        </div>                                        
                                     </div>
-                                    <div class="items">
-                                        <div class="information_data">
-                                            <p><strong>Tipo:</strong> Taxi</p>
-                                            <p><strong>Pasajeros:</strong> 4</p>
-                                            <p><strong>Desde:</strong> Aeropuerto de Cancún</p>
-                                            <p><strong>Hacia:</strong> Hotel Alux</p>
-                                            <p><strong>Pickup:</strong> 2023-10-17 @ 14:00</p>
-                                            <p>
-                                                <!-- 'PENDING', 'COMPLETED', 'NOSHOW', 'CANCELLED' -->
-                                                <span class="badge bg-secondary">PENDING</span>
-                                                <span class="badge bg-success">COMPLETED</span>
-                                                <span class="badge bg-warning">NOSHOW</span>
-                                                <span class="badge bg-danger">CANCELLED</span>
-                                            </p>
+                                    @if ($item->is_round_trip)
+                                        <div class="flight_data">
+                                            <h4>Round Trip</h4>
                                         </div>
-                                        <div class="actions">
-                                            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
-                                                <i class="align-middle" data-feather="edit"></i>
-                                            </button> 
-                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal">
-                                                <i class="align-middle" data-feather="map-pin"></i>
-                                            </button>
-                                        </div>
-                                    </div>                              
+                                        <div class="items">
+                                            <div class="information_data">
+                                                <p><strong>Desde:</strong> {{ $item->to_name }}</p>
+                                                <p><strong>Hacia:</strong> {{ $item->from_name }}</p>
+                                                <p><strong>Pickup:</strong> {{ $item->op_two_pickup }}</p>
+                                                <p>
+                                                    @switch($item->op_one_status)
+                                                        @case('PENDING')
+                                                            <span class="badge bg-secondary">PENDING</span>
+                                                        @break
+                                                        @case('CONFIRMED')
+                                                            <span class="badge bg-success">CONFIRMED</span>
+                                                        @break
+                                                        @case('NOSHOW')
+                                                            <span class="badge bg-warning">NOSHOW</span>
+                                                        @break
+                                                        @case('CANCELLED')
+                                                            <span class="badge bg-danger">CANCELLED</span>
+                                                        @break                                                
+                                                        @default
+                                                            
+                                                    @endswitch
+                                                </p>
+                                            </div>
+                                            <div class="actions">
+                                                <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
+                                                    <i class="align-middle" data-feather="edit"></i>
+                                                </button> 
+                                                <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->to_name }}','{{ $item->from_name }}','{{ $item->distance_time }}','{{ $item->distance_km }}')">
+                                                    <i class="align-middle" data-feather="map-pin"></i>
+                                                </button>
+                                            </div>
+                                        </div>              
+                                    @endif                                    
+                                                    
                                 </div>                                
                             </div>
-                            @endfor
+                            <input type="hidden" id="from_lat" value="{{ $item->from_lat }}">
+                            <input type="hidden" id="from_lng" value="{{ $item->from_lng }}">
+                            <input type="hidden" id="to_lat" value="{{ $item->to_lat }}">
+                            <input type="hidden" id="to_lng" value="{{ $item->to_lng }}">
+                            @endforeach
                         </div>
                         <div class="tab-pane" id="icon-tab-2" role="tabpanel">
                             <div class="d-flex">
@@ -272,10 +301,10 @@
                                             <td class="text-left">{{ $sale->description }}</td>
                                             <td class="text-center">{{ $sale->quantity }}</td>
                                             <td class="text-center">{{ number_format($sale->total,2) }}</td>
-                                            <td class="text-center">{{ $sale->call_center_agent_id }}</td>
+                                            <td class="text-center">{{ $sale->callCenterAgent->name }}</td>
                                             <td class="text-center">
-                                                <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                                <a href="#"><i class="align-middle" data-feather="trash"></i></a>
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#serviceSalesModal" onclick="getSale({{ $sale->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
+                                                <a href="#" onclick="deleteSale({{ $sale->id }})"><i class="align-middle" data-feather="trash"></i></a>
                                             </td>
                                         </tr>
                                     @endforeach                                   
@@ -306,11 +335,15 @@
                                             <td class="text-end">{{ number_format($payment->total) }}</td>
                                             <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
                                             <td class="text-center">
-                                                {{ $payment->status == 1 ? '<span class="badge bg-success">Pagado</span>' : '<span class="badge bg-danger">Pendiente</span>' }}                                                
+                                                @if($payment->status == 1)
+                                                    <span class="badge bg-success">Pagado</span>
+                                                @else
+                                                    <span class="badge bg-danger">Pendiente</span>
+                                                @endif                                              
                                             </td>
                                             <td class="text-center">
-                                                <a href="#"><i class="align-middle" data-feather="edit-2"></i></a>
-                                                <a href="#"><i class="align-middle" data-feather="trash"></i></a>
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
+                                                <a href="#" onclick="deletePayment({{ $payment->id }})"><i class="align-middle" data-feather="trash"></i></a>
                                             </td>
                                         </tr>
                                     @endforeach                                   
@@ -326,86 +359,21 @@
     </div>
 
 <!-- Modals -->
-<div class="modal fade" id="serviceMapModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Información de servicio</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6">
-                        <p><strong>Desde:</strong> Aeropuerto de Cancún</p>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <p><strong>Hacia:</strong> Hotel Alux Cancun</p>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <p><strong>Tiempo:</strong> 25 min.</p>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <p><strong>KM:</strong> 8 KM</p>
-                    </div>
-                    <div class="col-12">
-                        <div class="content" id="services_map">Div para visualizar el mapa</div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="serviceEditModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Editar servicio</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceTypeForm">Tipo</label>
-                        <select class="form-control mb-2">
-                            <option value="1">Taxi</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaxForm">Pasajeros</label>
-						<input type="text" class="form-control mb-2" id="servicePaxForm">
-                    </div>
-                    <div class="col-sm-12 col-md-12">
-                        <label class="form-label" for="serviceFromForm">Desde</label>
-						<input type="text" class="form-control mb-2" id="serviceFromForm">
-                    </div>
-                    <div class="col-sm-12 col-md-12">
-                        <label class="form-label" for="serviceToForm">Hacia</label>
-						<input type="text" class="form-control mb-2" id="serviceToForm">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceDateForm">Hora de recogida</label>
-						<input type="datetime-local" class="form-control mb-2" id="serviceDateForm">
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
+<x-modals.service_map />
 
-<x-modals.new_sale_reservation>
+<x-modals.edit_reservation_service :services=$services_types />
+
+<x-modals.new_sale_reservation :sellers=$sellers :types=$sales_types>
     <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
 </x-modals.new_sale_reservation>
 
 <x-modals.new_payment_reservation>
     <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
 </x-modals.new_payment_reservation>
+
+<x-modals.new_follow_reservation>
+    <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
+</x-modals.new_follow_reservation>
 
 <x-modals.edit_reservation_details :reservation=$reservation />
 @endsection
