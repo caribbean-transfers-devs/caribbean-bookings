@@ -322,3 +322,38 @@ $("#btn_edit_res_details").on('click', function(){
         $("#btn_edit_res_details").prop('disabled', false);
     });
 });
+
+function initMap() {
+    var from_lat = parseFloat($('#from_lat').val());
+    var from_lng = parseFloat($('#from_lng').val());
+    var to_lat = parseFloat($('#to_lat').val());
+    var to_lng = parseFloat($('#to_lng').val());
+
+    var location1 = { lat: from_lat, lng: from_lng };
+    var location2 = { lat: to_lat, lng: to_lng };
+
+    // Create a map centered at one of the locations
+    var map = new google.maps.Map(document.getElementById('services_map'), {
+        center: location1, 
+        zoom: 10 
+    });
+
+    var marker1 = new google.maps.Marker({
+        position: location1,
+        map: map,
+        title: 'Origen'
+    });
+
+    var marker2 = new google.maps.Marker({
+        position: location2,
+        map: map,
+        title: 'Destino'
+    });
+}
+
+function serviceInfo(origin,destination,time,km){
+    $("#origin_location").html(origin);
+    $("#destination_location").html(destination);
+    $("#destination_time").html(time);
+    $("#destination_kms").html(km);
+}

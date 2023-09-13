@@ -8,6 +8,7 @@
 @endpush
 
 @push('bootom-stack')
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.gmaps.key') }}&callback=initMap" async defer></script>
     <script src="{{ mix('assets/js/views/reservationsDetail.js') }}"></script>
 @endpush
 
@@ -223,7 +224,7 @@
                                             <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
                                                 <i class="align-middle" data-feather="edit"></i>
                                             </button>                                           
-                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal">
+                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->from_name }}','{{ $item->to_name }}','{{ $item->distance_time }}','{{ $item->distance_km }}')">
                                                 <i class="align-middle" data-feather="map-pin"></i>
                                             </button>
                                         </div>                                        
@@ -260,7 +261,7 @@
                                                 <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
                                                     <i class="align-middle" data-feather="edit"></i>
                                                 </button> 
-                                                <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal">
+                                                <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->to_name }}','{{ $item->from_name }}','{{ $item->distance_time }}','{{ $item->distance_km }}')">
                                                     <i class="align-middle" data-feather="map-pin"></i>
                                                 </button>
                                             </div>
@@ -269,6 +270,10 @@
                                                     
                                 </div>                                
                             </div>
+                            <input type="hidden" id="from_lat" value="{{ $item->from_lat }}">
+                            <input type="hidden" id="from_lng" value="{{ $item->from_lng }}">
+                            <input type="hidden" id="to_lat" value="{{ $item->to_lat }}">
+                            <input type="hidden" id="to_lng" value="{{ $item->to_lng }}">
                             @endforeach
                         </div>
                         <div class="tab-pane" id="icon-tab-2" role="tabpanel">
@@ -354,78 +359,9 @@
     </div>
 
 <!-- Modals -->
-<div class="modal fade" id="serviceMapModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Información de servicio</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6">
-                        <p><strong>Desde:</strong> Aeropuerto de Cancún</p>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <p><strong>Hacia:</strong> Hotel Alux Cancun</p>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <p><strong>Tiempo:</strong> 25 min.</p>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <p><strong>KM:</strong> 8 KM</p>
-                    </div>
-                    <div class="col-12">
-                        <div class="content" id="services_map">Div para visualizar el mapa</div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="serviceEditModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Editar servicio</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceTypeForm">Tipo</label>
-                        <select class="form-control mb-2">
-                            <option value="1">Taxi</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="servicePaxForm">Pasajeros</label>
-						<input type="text" class="form-control mb-2" id="servicePaxForm">
-                    </div>
-                    <div class="col-sm-12 col-md-12">
-                        <label class="form-label" for="serviceFromForm">Desde</label>
-						<input type="text" class="form-control mb-2" id="serviceFromForm">
-                    </div>
-                    <div class="col-sm-12 col-md-12">
-                        <label class="form-label" for="serviceToForm">Hacia</label>
-						<input type="text" class="form-control mb-2" id="serviceToForm">
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <label class="form-label" for="serviceDateForm">Hora de recogida</label>
-						<input type="datetime-local" class="form-control mb-2" id="serviceDateForm">
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
+<x-modals.service_map />
+
+<x-modals.edit_reservation_service :services=$services_types />
 
 <x-modals.new_sale_reservation :sellers=$sellers :types=$sales_types>
     <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
