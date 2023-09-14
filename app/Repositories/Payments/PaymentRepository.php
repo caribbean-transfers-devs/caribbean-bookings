@@ -20,19 +20,13 @@ class PaymentRepository
         try {
             DB::beginTransaction();
             
-            $reservation = Reservation::find($request->reservation_id);
-            $current_currency = $reservation->currency;
-            $operation = 'multiplication';
-            if($current_currency == 'USD' && $request->currency == 'MXN'){
-                $operation = 'division';
-            }
             $payment = new Payment();
             $payment->reservation_id = $request->reservation_id;
             $payment->description = 'Panel';
             $payment->total = $request->total;
             $payment->status = 1;
             $payment->exchange_rate = $request->exchange_rate;
-            $payment->operation = $operation;
+            $payment->operation = $request->operation;
             $payment->payment_method = $request->payment_method;
             $payment->currency = $request->currency;
             $payment->reservation_id = $request->reservation_id;
@@ -58,18 +52,11 @@ class PaymentRepository
         try {
             DB::beginTransaction();
 
-            $reservation = Reservation::find($request->reservation_id);
-            $current_currency = $reservation->currency;
-            $operation = 'multiplication';
-            if($current_currency == 'USD' && $request->currency == 'MXN'){
-                $operation = 'division';
-            }
-
             $payment->reservation_id = $request->reservation_id;
             $payment->description = 'Panel';
             $payment->total = $request->total;
             $payment->status = 1;
-            $payment->operation = $operation;
+            $payment->operation = $request->operation;
             $payment->exchange_rate = $request->exchange_rate;
             $payment->payment_method = $request->payment_method;
             $payment->currency = $request->currency;

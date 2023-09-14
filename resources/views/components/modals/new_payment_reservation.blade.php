@@ -27,16 +27,21 @@
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
                             <select class="form-select mb-2" id="servicePaymentsCurrencyModal" name="currency">
-                                <option value="USD" selected>USD</option>
-                                <option value="MXN">MXN</option>                            
+                                <option value="USD" @if ($currency == 'USD')
+                                    selected
+                                @endif>USD</option>
+                                <option value="MXN" @if ($currency == 'MXN')
+                                selected
+                                @endif>MXN</option>                            
                             </select>
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="servicePaymentsExchangeModal">Tipo de cambio</label>
-                            <input type="number" class="form-control mb-2" id="servicePaymentsExchangeModal" name="exchange_rate" value="1.00">
+                            <input type="number" class="form-control mb-2" id="servicePaymentsExchangeModal" name="exchange_rate" value="1.00" readonly>
                         </div>
                     </div>
-                    <input type="hidden" name="reservation_id" value="{{ $reservation_id }}">
+                    <input type="hidden" name="reservation_id" value="{{ $reservation_id }}" id="reserv_id_pay">
+                    <input type="hidden" name="operation" value="multiplication" id="operation_pay">
                 </form>
                 <input type="hidden" id="type_form_pay" value="1">
                 <input type="hidden" id="payment_id">

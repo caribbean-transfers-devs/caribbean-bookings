@@ -10,7 +10,7 @@
                     <div class="row">
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceTypeForm">Tipo</label>
-                            <select class="form-control mb-2">
+                            <select class="form-control mb-2" id="destination_serv" name="destination_service_id">
                                 @foreach ($services as $service)
                                     <option value="{{ $service->id }}">{{ $service->name }}</option>
                                 @endforeach                            
@@ -18,26 +18,31 @@
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="servicePaxForm">Pasajeros</label>
-                            <input type="text" class="form-control mb-2" id="servicePaxForm">
+                            <input type="text" class="form-control mb-2" id="servicePaxForm" name="passengers">
                         </div>
                         <div class="col-sm-12 col-md-12">
                             <label class="form-label" for="serviceFromForm">Desde</label>
-                            <input type="text" class="form-control mb-2" id="serviceFromForm">
+                            <input type="text" class="form-control mb-2" id="serviceFromForm" name="from_name">
                         </div>
                         <div class="col-sm-12 col-md-12">
                             <label class="form-label" for="serviceToForm">Hacia</label>
-                            <input type="text" class="form-control mb-2" id="serviceToForm">
+                            <input type="text" class="form-control mb-2" id="serviceToForm" name="to_name">
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceDateForm">Hora de recogida</label>
-                            <input type="datetime-local" class="form-control mb-2" id="serviceDateForm">
+                            <input type="datetime-local" class="form-control mb-2" id="serviceDateForm" name="op_one_pickup">
                         </div>
+                        <div class="col-sm-12 col-md-6 d-none" id="info_return">
+                            <label class="form-label" for="serviceDateRoundForm">Hora de regreso</label>
+                            <input type="datetime-local" class="form-control mb-2" id="serviceDateRoundForm" name="op_two_pickup">
+                        </div>
+                        <input type="hidden" name="item_id_edit" id="item_id_edit">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" >Guardar</button>
+                <button type="button" class="btn btn-primary" id="btn_edit_item">Guardar</button>
             </div>
         </div>
     </div>

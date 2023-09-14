@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Reservations;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReservationDetailsRequest;
 use App\Http\Requests\ReservationFollowUpsRequest;
+use App\Http\Requests\ReservationItemRequest;
 use App\Models\Reservation;
+use App\Models\ReservationsItem;
 use App\Repositories\Reservations\DetailRepository;
 use App\Repositories\Reservations\ReservationsRepository;
 use Illuminate\Http\Request;
@@ -34,5 +36,15 @@ class ReservationsController extends Controller
     public function followups(ReservationFollowUpsRequest $request, ReservationsRepository $reservationRepository)
     {
         return $reservationRepository->follow_ups($request);
+    }
+
+    public function get_exchange(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
+    {
+        return $reservationRepository->get_exchange($request,$reservation);
+    }
+
+    public function editreservitem(ReservationItemRequest $request, ReservationsRepository $reservationRepository, ReservationsItem $item)
+    {
+        return $reservationRepository->editreservitem($request,$item);
     }
 }
