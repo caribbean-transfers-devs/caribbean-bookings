@@ -55,7 +55,7 @@
                                 </tr>
                                 <tr>
                                     <th>Moneda</th>
-                                    <td>{{ $reservation->currency == 1 ? 'USD' : 'MXN' }}</td>
+                                    <td>{{ $reservation->currency }}</td>
                                 </tr>                                
                                 <tr>
                                     <th>Estatus</th>
@@ -198,10 +198,22 @@
                                             </p>
                                         </div>
                                         <div class="actions mb-3">
-                                            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
+                                            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" 
+                                            onclick="itemInfo({{ $item }})">
                                                 <i class="align-middle" data-feather="edit"></i>
-                                            </button>                                           
-                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->from_name }}','{{ $item->to_name }}','{{ $item->distance_time }}','{{ $item->distance_km }}')">
+                                            </button>   
+                                            @php
+                                                //TRANSFORM NUMBER OF SECS INTO HOURS OR MINUTES
+                                                $time = $item->distance_time / 60;
+                                                if($time > 90){
+                                                    $time /= 60;
+                                                    $time = number_format($time, 0, '.', '');
+                                                    $time .= ' horas';
+                                                }else{
+                                                    $time .= ' minutos';
+                                                }
+                                            @endphp                                        
+                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->from_name }}','{{ $item->to_name }}','{{ $time }}','{{ $item->distance_km }}')">
                                                 <i class="align-middle" data-feather="map-pin"></i>
                                             </button>
                                         </div>                                        
@@ -291,6 +303,7 @@
                                         <th>Método</th>
                                         <th>Descripción</th>
                                         <th class="text-center">Total</th>
+                                        <th class="text-center">Moneda</th>
                                         <th class="text-center">TC</th>
                                         <th class="text-center"></th>
                                     </tr>
@@ -301,6 +314,7 @@
                                             <td>{{ $payment->payment_method }}</td>
                                             <td>{{ $payment->description }}</td>
                                             <td class="text-end">{{ number_format($payment->total) }}</td>
+                                            <td class="text-center">{{ $payment->currency }}</td>
                                             <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
                                             <td class="text-center">
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
@@ -330,6 +344,7 @@
 
 <x-modals.new_payment_reservation>
     <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
+    <x-slot name="currency">{{ $reservation->currency }}</x-slot>
 </x-modals.new_payment_reservation>
 
 <x-modals.new_follow_reservation>

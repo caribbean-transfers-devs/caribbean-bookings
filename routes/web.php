@@ -43,8 +43,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');
     Route::delete('/reservations/{reservation}', [ReservationsController::class, 'destroy'])->name('reservations.destroy');
     Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->where('id', '[0-9]+');
-
+    Route::get('/GetExchange/{reservation}', [ReservationsController::class, 'get_exchange'])->name('reservations.get_exchange');
     Route::post('/reservationsfollowups', [ReservationsController::class, 'followups'])->name('reservations.followups');
+    Route::put('/editreservitem/{item}', [ReservationsController::class, 'editreservitem'])->name('reservations.editreservitem');
 
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);

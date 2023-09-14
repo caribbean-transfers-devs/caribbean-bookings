@@ -10,5 +10,6 @@
     "/assets/js/views/rolesIndex.js": "/assets/js/views/rolesIndex.js",
     "/assets/js/views/reservationsIndex.js": "/assets/js/views/reservationsIndex.js",
     "/assets/js/views/reservationsDetail.js": "/assets/js/views/reservationsDetail.js",
-    "/assets/js/views/tpv/index.min.js": "/assets/js/views/tpv/index.min.js"
+    "/assets/js/views/tpv/index.min.js": "/assets/js/views/tpv/index.min.js",
+    "/assets/js/autoComplete.min.js": "/assets/js/autoComplete.min.js"
 }
