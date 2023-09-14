@@ -192,4 +192,23 @@ class ReservationsRepository
         $exchange = DB::table('payments_exchange_rate')->where('origin',$currency)->where('destination',$to_currency)->first();
         return $exchange;
     }
+
+    public function editreservitem($request, $item)
+    {
+        try {
+            DB::beginTransaction();
+            $item->destination_service_id = $request->destination_service_id;
+            $item->passengers = $request->passengers;
+            $item->from_name = $request->from_name;
+            $item->to_name = $request->to_name;
+            $item->op_one_pickup = $request->op_one_pickup;
+            $item->op_two_pickup = $request->op_two_pickup ?? null;
+            $item->save();
+            DB::commit();
+            return response()->json(['message' => 'Item updated successfully', 'success' => true], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error updating item', 'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

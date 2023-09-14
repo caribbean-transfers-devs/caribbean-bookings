@@ -14,6 +14,34 @@ $(function() {
     });
 });
 
+function initMap() {
+    var from_lat = parseFloat($('#from_lat').val());
+    var from_lng = parseFloat($('#from_lng').val());
+    var to_lat = parseFloat($('#to_lat').val());
+    var to_lng = parseFloat($('#to_lng').val());
+
+    var location1 = { lat: from_lat, lng: from_lng };
+    var location2 = { lat: to_lat, lng: to_lng };
+
+    // Create a map centered at one of the locations
+    var map = new google.maps.Map(document.getElementById('services_map'), {
+        center: location1, 
+        zoom: 10 
+    });
+
+    var marker1 = new google.maps.Marker({
+        position: location1,
+        map: map,
+        title: 'Origen'
+    });
+
+    var marker2 = new google.maps.Marker({
+        position: location2,
+        map: map,
+        title: 'Destino'
+    });
+}
+
 function sendMail(code,mail,languague){
     var url = "https://api.caribbean-transfers.com/api/v1/reservation/send?code="+code+"&email="+mail+"&language="+languague+"&type=new";
     $.ajax({
@@ -330,39 +358,33 @@ $("#btn_edit_res_details").on('click', function(){
     });
 });
 
-function initMap() {
-    var from_lat = parseFloat($('#from_lat').val());
-    var from_lng = parseFloat($('#from_lng').val());
-    var to_lat = parseFloat($('#to_lat').val());
-    var to_lng = parseFloat($('#to_lng').val());
-
-    var location1 = { lat: from_lat, lng: from_lng };
-    var location2 = { lat: to_lat, lng: to_lng };
-
-    // Create a map centered at one of the locations
-    var map = new google.maps.Map(document.getElementById('services_map'), {
-        center: location1, 
-        zoom: 10 
-    });
-
-    var marker1 = new google.maps.Marker({
-        position: location1,
-        map: map,
-        title: 'Origen'
-    });
-
-    var marker2 = new google.maps.Marker({
-        position: location2,
-        map: map,
-        title: 'Destino'
-    });
-}
-
 function serviceInfo(origin,destination,time,km){
     $("#origin_location").html(origin);
     $("#destination_location").html(destination);
     $("#destination_time").html(time);
     $("#destination_kms").html(km);
+}
+
+function itemInfo(item){
+    $("#item_id_edit").val(item.id);
+    $("#servicePaxForm").val(item.passengers);
+    $("#destination_serv").val(item.destination_service_id);
+    $("#serviceFromForm").val(item.from_name);
+    $("#serviceToForm").val(item.to_name);
+    $("#serviceDateForm").val(item.op_one_pickup);
+    if(item.op_one_status != 'PENDING'){
+        $("#serviceDateForm").prop('readonly', true);
+    }
+    if(item.op_two_status != 'PENDING'){
+        $("#serviceDateRoundForm").prop('readonly', true);
+    }
+    if(item.is_round_trip == 1){
+        $("#serviceDateRoundForm").val(item.op_two_pickup);
+        $("#info_return").removeClass('d-none');
+    }else{
+        $("#serviceDateRoundForm").val('');
+        $("#info_return").addClass('d-none');
+    }
 }
 
 function getPayment(id){
@@ -497,5 +519,57 @@ $("#servicePaymentsCurrencyModal").on('change', function(){
         error: function (data) {
             console.log(data);
         }
+    });
+});
+
+$("#btn_edit_item").on('click', function(){
+    $("#btn_edit_item").prop('disabled', true);
+    let frm_data = $("#edit_reservation_service").serializeArray();
+    let type_req ='PUT';
+    let url_req = '/editreservitem/'+$("#item_id_edit").val();
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    $.ajax({
+        url: url_req,
+        type: type_req,
+        data: frm_data,
+        success: function(resp) {
+            if (resp.success == 1) {
+                window.onbeforeunload = null;
+                let timerInterval
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    html: 'Datos del servicio editados con éxito. Será redirigido en <b></b>',
+                    timer: 2500,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        const b = Swal.getHtmlContainer().querySelector('b')
+                        timerInterval = setInterval(() => {
+                            b.textContent = (Swal.getTimerLeft() / 1000)
+                                .toFixed(0)
+                        }, 100)
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    location.reload();
+                })
+            } else {
+                console.log(resp);
+            }
+        }
+    }).fail(function(xhr, status, error) {
+        Swal.fire(
+            '¡ERROR!',
+            xhr.responseJSON.message,
+            'error'
+        )
+        $("#btn_edit_item").prop('disabled', false);
     });
 });

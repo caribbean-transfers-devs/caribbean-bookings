@@ -198,10 +198,22 @@
                                             </p>
                                         </div>
                                         <div class="actions mb-3">
-                                            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal">
+                                            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" 
+                                            onclick="itemInfo({{ $item }})">
                                                 <i class="align-middle" data-feather="edit"></i>
-                                            </button>                                           
-                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->from_name }}','{{ $item->to_name }}','{{ $item->distance_time }}','{{ $item->distance_km }}')">
+                                            </button>   
+                                            @php
+                                                //TRANSFORM NUMBER OF SECS INTO HOURS OR MINUTES
+                                                $time = $item->distance_time / 60;
+                                                if($time > 90){
+                                                    $time /= 60;
+                                                    $time = number_format($time, 0, '.', '');
+                                                    $time .= ' horas';
+                                                }else{
+                                                    $time .= ' minutos';
+                                                }
+                                            @endphp                                        
+                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->from_name }}','{{ $item->to_name }}','{{ $time }}','{{ $item->distance_km }}')">
                                                 <i class="align-middle" data-feather="map-pin"></i>
                                             </button>
                                         </div>                                        
