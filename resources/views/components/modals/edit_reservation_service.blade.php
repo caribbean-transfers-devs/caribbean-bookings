@@ -21,6 +21,10 @@
                             <input type="text" class="form-control mb-2" id="servicePaxForm" name="passengers">
                         </div>
                         <div class="col-sm-12 col-md-12">
+                            <label class="form-label" for="serviceFlightForm">Numéro de Vuelo</label>
+                            <input type="text" class="form-control mb-2" id="serviceFlightForm" name="flight_number">
+                        </div>
+                        <div class="col-sm-12 col-md-12">
                             <label class="form-label" for="serviceFromForm">Desde</label>
                             <input type="text" class="form-control mb-2" id="serviceFromForm" name="from_name">
                         </div>
@@ -37,6 +41,10 @@
                             <input type="datetime-local" class="form-control mb-2" id="serviceDateRoundForm" name="op_two_pickup">
                         </div>
                         <input type="hidden" name="item_id_edit" id="item_id_edit">
+                        <input type="hidden" name="from_lat" id="from_lat_edit">
+                        <input type="hidden" name="from_lng" id="from_lng_edit">
+                        <input type="hidden" name="to_lat" id="to_lat_edit">
+                        <input type="hidden" name="to_lng" id="to_lng_edit">
                     </div>
                 </form>
             </div>

@@ -162,9 +162,9 @@
                         <div class="tab-pane active" id="icon-tab-1" role="tabpanel">
                             <div class="d-flex">
                                 <h4 class="flex-grow-1 tab-title">Servicios</h4> 
-                                <button class="btn btn-success float-end">
+                                <!--<button class="btn btn-success float-end">
                                     <i class="align-middle" data-feather="plus"></i>
-                                </button>
+                                </button>-->
                             </div>
                             
                             @foreach ($reservation->items as $item)                                                    
