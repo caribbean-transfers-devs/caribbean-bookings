@@ -65,7 +65,7 @@ class LoginRequest extends FormRequest
 
         if($captchaResp["success"] == true && $captchaResp["score"] > 0.5){
             $restricted_user = DB::table("users")->where("email", $this->email )->value("restricted");
-            $remember = ($this->boolean('remember-check')) ? true : false;
+            $remember = ($this->boolean('remember-me')) ? true : false;
             
             if($restricted_user){
                 $ip_match = DB::table('whitelist_ips')->where('ip_address',$this->ip())->value('ip_address');
