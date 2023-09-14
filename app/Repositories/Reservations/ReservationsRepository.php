@@ -184,4 +184,12 @@ class ReservationsRepository
 
         return $follow_up->id;
     }
+
+    public function get_exchange($request, $reservation)
+    {
+        $currency = $request->currency;
+        $to_currency = $reservation->currency;
+        $exchange = DB::table('payments_exchange_rate')->where('origin',$currency)->where('destination',$to_currency)->first();
+        return $exchange;
+    }
 }

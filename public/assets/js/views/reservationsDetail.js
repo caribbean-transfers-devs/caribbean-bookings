@@ -481,3 +481,21 @@ $("#btn_new_payment").on('click', function(){
         $("#btn_new_payment").prop('disabled', false);
     });
 });
+
+$("#servicePaymentsCurrencyModal").on('change', function(){
+    let currency = $(this).val();
+    let reservation_id = $("#reserv_id_pay").val();
+    $.ajax({
+        url: '/GetExchange/'+reservation_id+'?currency='+currency,
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            $("#servicePaymentsExchangeModal").val(data.exchange_rate);
+            $("#operation_pay").val(data.operation);
+            $("#btn_new_payment").prop('disabled', false);
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    });
+});

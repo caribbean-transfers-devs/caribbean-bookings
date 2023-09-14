@@ -35,4 +35,9 @@ class ReservationsController extends Controller
     {
         return $reservationRepository->follow_ups($request);
     }
+
+    public function get_exchange(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
+    {
+        return $reservationRepository->get_exchange($request,$reservation);
+    }
 }
