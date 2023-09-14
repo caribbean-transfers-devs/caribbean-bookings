@@ -33,18 +33,8 @@ class TpvController extends Controller
         return $tpvRepository->quote($request);
     }
 
-    public function autocomplete(Request $request, $code, AutocompleteRepository $autocompleteRepository){
+    public function autocomplete(Request $request, $code, AutocompleteRepository $autocompleteRepository){       
 
-        if ( !$request->keyword || empty($request->keyword) ) {
-            return response()->json([
-                    'error' => [
-                        'code' => 'required_params', 
-                        'message' =>  'keyword is required'
-                    ]
-                ], Response::HTTP_BAD_REQUEST);
-        }
-
-
-        return $autocompleteRepository->autocomplete($request->keyword);
+        return $autocompleteRepository->autocomplete($request);
     }
 }

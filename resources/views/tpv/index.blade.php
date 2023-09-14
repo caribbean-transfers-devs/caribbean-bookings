@@ -33,7 +33,8 @@
                     </div>
                     <div class="from">
                         <label class="form-label" for="bookingFromForm">Desde</label>
-                        <input class="form-control" type="text" name="from_name"  id="bookingFromForm" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="50" tabindex="1">
+                        <input class="form-control" type="text" name="from_name" id="bookingFromForm">
+                        <div id="autocomplete-results" class="autocomplete-results"></div>
                     </div>
                     <div class="to">
                         <label class="form-label" for="bookingToForm">Hacia</label>

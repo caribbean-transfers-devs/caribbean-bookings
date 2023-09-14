@@ -12,9 +12,28 @@ class AutocompleteRepository
 {
     use ApiTrait;
 
-    public function autocomplete($keyword){
+    public function autocomplete($request){
         
-        $this->sendAutocomplete($keyword);
-        die("END...");
+        if ( !$request->keyword || empty($request->keyword) ) {
+            return response()->json([
+                    'error' => [
+                        'code' => 'required_params', 
+                        'message' =>  'keyword is required'
+                    ]
+                ], Response::HTTP_BAD_REQUEST);
+        }
+
+        
+        $data = $this->sendAutocomplete($request->keyword);
+        if(isset($data['error'])):
+            return response()->json([
+                'error' => [
+                    'code' => $data['error']['code'],
+                    'message' => $data['error']['message'],
+                ]
+            ], 422);
+        endif;
+       
+        return response()->json($data['items'], 200);
     }
 }
