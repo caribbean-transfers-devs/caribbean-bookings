@@ -201,6 +201,15 @@ class ReservationsRepository
             $item->passengers = $request->passengers;
             $item->from_name = $request->from_name;
             $item->to_name = $request->to_name;
+            $item->flight_number = $request->flight_number;
+            if($request->from_lat){
+                $item->from_lat = $request->from_lat;
+                $item->from_lng = $request->from_lng;
+            }
+            if($request->to_lat){
+                $item->to_lat = $request->to_lat;
+                $item->to_lng = $request->to_lng;
+            }
             $item->op_one_pickup = $request->op_one_pickup;
             $item->op_two_pickup = $request->op_two_pickup ?? null;
             $item->save();

@@ -27,7 +27,8 @@ class ReservationItemRequest extends FormRequest
             'from_name' => 'required|string|max:255',
             'to_name' => 'required|string|max:255',
             'op_one_pickup' => 'required|date',
-            'op_two_pickup' => 'nullable|date'
+            'op_two_pickup' => 'nullable|date',
+            'flight_number' => 'required|string|max:255',
         ];
     }
 
@@ -50,6 +51,9 @@ class ReservationItemRequest extends FormRequest
             'op_one_pickup.required' => 'La fecha de recogida es requerida',
             'op_one_pickup.date' => 'La fecha de recogida debe ser una fecha válida',
             'op_two_pickup.date' => 'La fecha de vuelta debe ser una fecha válida',
+            'flight_number.required' => 'El número de vuelo es requerido',
+            'flight_number.string' => 'El número de vuelo debe ser una cadena de caracteres',
+            'flight_number.max' => 'El número de vuelo debe ser menor a 255 caracteres',
         ];
     }
 }

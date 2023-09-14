@@ -372,6 +372,7 @@ function itemInfo(item){
     $("#serviceFromForm").val(item.from_name);
     $("#serviceToForm").val(item.to_name);
     $("#serviceDateForm").val(item.op_one_pickup);
+    $("#serviceFlightForm").val(item.flight_number);
     if(item.op_one_status != 'PENDING'){
         $("#serviceDateForm").prop('readonly', true);
     }

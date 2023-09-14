@@ -24,15 +24,16 @@
                             <label class="form-label" for="serviceClientPhoneModal">Teléfono</label>
                             <input type="text" class="form-control mb-2" id="serviceClientPhoneModal" name="client_phone" value="{{ $reservation->client_phone }}">
                         </div>
-                        <div class="col-sm-12 col-md-6">
+                        <!--<div class="col-sm-12 col-md-6">
                             <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
                             <select class="form-select mb-2" id="servicePaymentsCurrencyModal" name="currency" readonly>
                                 <option value="1" {{ $reservation->currency == 1 ? 'selected' : '' }}>USD</option>
                                 <option value="2" {{ $reservation->currency == 2 ? 'selected' : '' }}>MXN</option>                            
                             </select>
-                        </div>
+                        </div>-->
                     </div>
                     <input type="hidden" id="reservation_id" value="{{ $reservation->id }}">
+                    <input type="hidden" name="currency" value="{{ $reservation->currency }}">
                 </form>
             </div>
             <div class="modal-footer">
