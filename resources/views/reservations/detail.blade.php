@@ -1,3 +1,7 @@
+@php
+    use App\Traits\RoleTrait;
+@endphp
+
 @extends('layout.master')
 @section('title') Detalle @endsection
 
@@ -25,15 +29,16 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-actions float-end">
+                            @if (RoleTrait::hasPermission(11))
                             <div class="dropdown show">
                                 <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
                                     <i class="align-middle" data-feather="more-horizontal"></i>
                                 </a>
-
                                 <div class="dropdown-menu dropdown-menu-end">
                                     <a class="dropdown-item" href="#" type="button" data-bs-toggle="modal" data-bs-target="#serviceClientModal">Editar</a>
                                 </div>
                             </div>
+                            @endif
                         </div>
                         <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
                     </div>
@@ -81,7 +86,7 @@
                                 </tr>
                             </tbody>
                         </table>
-
+                        @if (RoleTrait::hasPermission(25))
                         <strong>Actividad</strong>
 
                         <ul class="timeline mt-2 mb-0">
@@ -108,7 +113,7 @@
                             @endforeach
                            
                         </ul>
-
+                        @endif
                     </div>
                 </div>
             </div>
@@ -116,7 +121,8 @@
             <div class="col-xl-8">
                 <div class="controls">
                     @csrf
-                    <div class="btn-group btn-group-sm">
+                    @if (RoleTrait::hasPermission(20))
+                    <div class="btn-group btn-group-sm">                        
                         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Re-envio de correo
                         </button>
@@ -126,6 +132,8 @@
                             <a class="dropdown-item" href="#" onclick="sendMail('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Inglés</a>
                         </div>
                     </div>
+                    @endif
+                    @if (RoleTrait::hasPermission(21))
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Enviar Mensaje
@@ -135,9 +143,16 @@
                             <a class="dropdown-item" href="#">Whatsapp</a>
                         </div>
                     </div>
+                    @endif
+                    @if (RoleTrait::hasPermission(22))
                     <button class="btn btn-secondary btn-sm" onclick="sendInvitation('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Invitación de pago</button>
+                    @endif
+                    @if (RoleTrait::hasPermission(23))
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
+                    @endif
+                    @if (RoleTrait::hasPermission(24))
                     <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
+                    @endif
                 </div>
 
                 <div class="tab">
@@ -161,10 +176,12 @@
                     <div class="tab-content">
                         <div class="tab-pane active" id="icon-tab-1" role="tabpanel">
                             <div class="d-flex">
-                                <h4 class="flex-grow-1 tab-title">Servicios</h4> 
+                                <h4 class="flex-grow-1 tab-title">Servicios</h4>
+                                @if (RoleTrait::hasPermission(12)) 
                                 <!--<button class="btn btn-success float-end">
                                     <i class="align-middle" data-feather="plus"></i>
                                 </button>-->
+                                @endif
                             </div>
                             
                             @foreach ($reservation->items as $item)                                                    
@@ -198,10 +215,12 @@
                                             </p>
                                         </div>
                                         <div class="actions mb-3">
+                                            @if (RoleTrait::hasPermission(13))
                                             <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" 
                                             onclick="itemInfo({{ $item }})">
                                                 <i class="align-middle" data-feather="edit"></i>
-                                            </button>   
+                                            </button>  
+                                            @endif 
                                             @php
                                                 //TRANSFORM NUMBER OF SECS INTO HOURS OR MINUTES
                                                 $time = $item->distance_time / 60;
@@ -258,9 +277,11 @@
                         <div class="tab-pane" id="icon-tab-2" role="tabpanel">
                             <div class="d-flex">
                                 <h4 class="flex-grow-1 tab-title">Ventas</h4> 
+                                @if (RoleTrait::hasPermission(14))
                                 <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#serviceSalesModal">
                                     <i class="align-middle" data-feather="plus"></i>
                                 </button>
+                                @endif
                             </div>
                             <table class="table table-striped table-sm">
                                 <thead>
@@ -282,8 +303,12 @@
                                             <td class="text-center">{{ number_format($sale->total,2) }}</td>
                                             <td class="text-center">{{ $sale->callCenterAgent->name }}</td>
                                             <td class="text-center">
+                                                @if (RoleTrait::hasPermission(15))
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#serviceSalesModal" onclick="getSale({{ $sale->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
+                                                @endif
+                                                @if (RoleTrait::hasPermission(16))
                                                 <a href="#" onclick="deleteSale({{ $sale->id }})"><i class="align-middle" data-feather="trash"></i></a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach                                   
@@ -293,9 +318,11 @@
                         <div class="tab-pane" id="icon-tab-3" role="tabpanel">
                             <div class="d-flex">
                                 <h4 class="flex-grow-1 tab-title">Pagos</h4> 
-                                <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
-                                    <i class="align-middle" data-feather="plus"></i>
-                                </button>
+                                @if (RoleTrait::hasPermission(14))
+                                    <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
+                                        <i class="align-middle" data-feather="plus"></i>
+                                    </button>
+                                @endif
                             </div>
                             <table class="table table-striped table-sm">
                                 <thead>
@@ -317,8 +344,12 @@
                                             <td class="text-center">{{ $payment->currency }}</td>
                                             <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
                                             <td class="text-center">
+                                                @if (RoleTrait::hasPermission(15))
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
+                                                @endif
+                                                @if (RoleTrait::hasPermission(16))
                                                 <a href="#" onclick="deletePayment({{ $payment->id }})"><i class="align-middle" data-feather="trash"></i></a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach                                   

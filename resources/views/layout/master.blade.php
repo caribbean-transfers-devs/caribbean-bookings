@@ -1,3 +1,6 @@
+@php
+    use App\Traits\RoleTrait;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -61,28 +64,35 @@
                             <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
                         </a>
                     </li>
+                    @if(RoleTrait::hasPermission(26))
                     <li class="sidebar-item @if(request()->is('/tpv/handler')) active @endif">
                         <a class="sidebar-link" href="/tpv/handler">
                             <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">TPV</span>
                         </a>
                     </li>
-    
+                    @endif
+                    @if(RoleTrait::hasPermission(10))
                     <li class="sidebar-item @if(request()->is('reservations')) active @endif">
                         <a class="sidebar-link" href="{{ route('reservations.index') }}">
                             <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Reservaciones</span>
                         </a>
                     </li>
-    
+                    @endif
+                    @if(RoleTrait::hasPermission(1) || RoleTrait::hasPermission(6))
                     <li class="sidebar-item @if(request()->is('users') || request()->is('roles')) active @endif">
                         <a href="#auth" data-bs-toggle="collapse" class="sidebar-link collapsed">
                             <i class="align-middle" data-feather="users"></i> <span class="align-middle">Administración</span>
                         </a>
                         <ul id="auth" class="sidebar-dropdown list-unstyled collapse @if(request()->is('users') || request()->is('roles')) show @endif" data-bs-parent="#sidebar">
-                            <li class="sidebar-item @if(request()->is('users')) active @endif"><a class="sidebar-link" href="{{ route('users.index') }}">Usuarios</a></li>
-                            <li class="sidebar-item"><a class="sidebar-link" href="{{ route('roles.index') }}">Roles</a></li>
+                            @if(RoleTrait::hasPermission(1))
+                                <li class="sidebar-item @if(request()->is('users')) active @endif"><a class="sidebar-link" href="{{ route('users.index') }}">Usuarios</a></li>
+                            @endif
+                            @if(RoleTrait::hasPermission(6))
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('roles.index') }}">Roles</a></li>
+                            @endif
                         </ul>
                     </li>    
-                    
+                    @endif
                 </ul>
             </div>
         </nav>
@@ -92,7 +102,7 @@
                 <a class="sidebar-toggle js-sidebar-toggle">
                     <i class="hamburger align-self-center"></i>
                 </a>
-    
+                @if(RoleTrait::hasPermission(27))
                 <form class="d-none d-sm-inline-block">
                     <div class="input-group input-group-navbar">
                         <input type="text" class="form-control" placeholder="Buscar..." aria-label="Busqueda">
@@ -101,7 +111,7 @@
                         </button>
                     </div>
                 </form>
-    
+                @endif
                 <div class="navbar-collapse collapse">
                     <ul class="navbar-nav navbar-align">                                           
                         <li class="nav-item">

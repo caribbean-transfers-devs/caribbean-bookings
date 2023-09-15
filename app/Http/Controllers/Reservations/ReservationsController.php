@@ -7,35 +7,51 @@ use App\Http\Requests\ReservationFollowUpsRequest;
 use App\Http\Requests\ReservationItemRequest;
 use App\Models\Reservation;
 use App\Models\ReservationsItem;
+use App\Models\Role;
 use App\Repositories\Reservations\DetailRepository;
 use App\Repositories\Reservations\ReservationsRepository;
 use Illuminate\Http\Request;
+use App\Traits\RoleTrait;
 
 class ReservationsController extends Controller
 {
     public function detail(Request $request, DetailRepository $detailRepository, $id)
     {
-        return $detailRepository->detail($request,$id);
+        if(RoleTrait::hasPermission(10)){
+            return $detailRepository->detail($request,$id);
+        }else{
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
     }
 
     public function index(Request $request, ReservationsRepository $reservationRepository)
     {
-        return $reservationRepository->index($request);
+        if(RoleTrait::hasPermission(10)){
+            return $reservationRepository->index($request);
+        }else{
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
     }
 
     public function update(ReservationDetailsRequest $request, ReservationsRepository $reservationRepository, Reservation $reservation)
     {
-        return $reservationRepository->update($request,$reservation);
+        if(RoleTrait::hasPermission(11)){
+            return $reservationRepository->update($request,$reservation);
+        }
     }
 
     public function destroy(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
     {
-        return $reservationRepository->destroy($request,$reservation);
+        if(RoleTrait::hasPermission(24)){
+            return $reservationRepository->destroy($request,$reservation);
+        }
     }
 
     public function followups(ReservationFollowUpsRequest $request, ReservationsRepository $reservationRepository)
     {
-        return $reservationRepository->follow_ups($request);
+        if(RoleTrait::hasPermission(23)){
+            return $reservationRepository->follow_ups($request);
+        }
     }
 
     public function get_exchange(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
@@ -45,6 +61,8 @@ class ReservationsController extends Controller
 
     public function editreservitem(ReservationItemRequest $request, ReservationsRepository $reservationRepository, ReservationsItem $item)
     {
-        return $reservationRepository->editreservitem($request,$item);
+        if(RoleTrait::hasPermission(13)){
+            return $reservationRepository->editreservitem($request,$item);
+        }
     }
 }

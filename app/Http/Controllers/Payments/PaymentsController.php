@@ -7,12 +7,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PaymentRequest;
 use App\Models\Payment;
 use App\Repositories\Payments\PaymentRepository;
+use App\Traits\RoleTrait;
 
 class PaymentsController extends Controller
 {
     public function store(PaymentRequest $request, PaymentRepository $paymentRepository)
     {
-        return $paymentRepository->store($request);
+        if(RoleTrait::hasPermission(14)){
+            return $paymentRepository->store($request);
+        }        
     }
 
     public function show(Payment $payment)
@@ -22,11 +25,15 @@ class PaymentsController extends Controller
 
     public function update(PaymentRequest $request, PaymentRepository $paymentRepository,Payment $payment)
     {
-        return $paymentRepository->update($request,$payment);
+        if(RoleTrait::hasPermission(15)){
+            return $paymentRepository->update($request,$payment);
+        }
     }
 
     public function destroy(Request $request, PaymentRepository $paymentRepository,Payment $payment)
     {
-        return $paymentRepository->destroy($request,$payment);
+        if(RoleTrait::hasPermission(16)){
+            return $paymentRepository->destroy($request,$payment);
+        }
     }
 }
