@@ -10,51 +10,76 @@ use App\Models\User;
 use App\Models\WhitelistIp;
 use App\Repositories\Users\UserRepository;
 use Illuminate\Http\Request;
+use App\Traits\RoleTrait;
 
 class UserController extends Controller
 {
     public function index(Request $request, UserRepository $userRepository)
     {
-        return $userRepository->indexUsers($request);
+        if(RoleTrait::hasPermission(1)){
+            return $userRepository->indexUsers($request);
+        }else{
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
     }
 
     public function create(Request $request, UserRepository $userRepository)
     {
-        return $userRepository->createUser($request);
+        if(RoleTrait::hasPermission(2)){
+            return $userRepository->createUser($request);
+        }else{
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
     }
 
     public function edit(Request $request, User $user, UserRepository $userRepository)
     {
-        return $userRepository->editUser($request, $user);
+        if(RoleTrait::hasPermission(3)){
+            return $userRepository->editUser($request, $user);
+        }else{
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
     }
 
     public function store(UserRequest $request, UserRepository $userRepository)
     {
-        return $userRepository->storeUser($request);
+        if(RoleTrait::hasPermission(2)){
+            return $userRepository->storeUser($request);
+        }
     }
 
     public function update(UserRequest $request, User $user, UserRepository $userRepository)
     {
-        return $userRepository->updateUser($request, $user);
+        if(RoleTrait::hasPermission(3)){
+            return $userRepository->updateUser($request, $user);
+        }
     }
 
     public function change_pass(ChgPassRequest $request, User $user, UserRepository $userRepository)
     {
-        return $userRepository->changePass($request, $user);
+        if(RoleTrait::hasPermission(3)){
+            return $userRepository->changePass($request, $user);
+        }
     }
 
     public function change_status(Request $request, User $user, UserRepository $userRepository)
     {
-        return $userRepository->changeStatus($request, $user);
+        if(RoleTrait::hasPermission(4)){
+            return $userRepository->changeStatus($request, $user);
+        }       
     }
 
     public function store_ips(ValidIPRequest $request, UserRepository $userRepository)
     {
-        return $userRepository->storeIps($request);
+        if(RoleTrait::hasPermission(5)){
+            return $userRepository->storeIps($request);
+        }        
     }
 
     public function delete_ips(Request $request, WhitelistIp $ip, UserRepository $userRepository)
     {
-        return $userRepository->deleteIps($request, $ip);
+        if(RoleTrait::hasPermission(5)){
+            return $userRepository->deleteIps($request, $ip);
+        }
     }
 }

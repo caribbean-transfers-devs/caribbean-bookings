@@ -7,12 +7,15 @@ use App\Http\Requests\SaleRequest;
 use App\Models\Sale;
 use App\Repositories\Sales\SaleRepository;
 use Illuminate\Http\Request;
+use App\Traits\RoleTrait;
 
 class SalesController extends Controller
 {
     public function store(SaleRequest $request, SaleRepository $saleRepository)
     {
-        return $saleRepository->store($request);
+        if(RoleTrait::hasPermission(17)){
+            return $saleRepository->store($request);
+        }
     }
 
     public function show(Sale $sale)
@@ -22,11 +25,15 @@ class SalesController extends Controller
 
     public function update(SaleRequest $request, SaleRepository $saleRepository,Sale $sale)
     {
-        return $saleRepository->update($request,$sale);
+        if(RoleTrait::hasPermission(18)){
+            return $saleRepository->update($request,$sale);
+        }
     }
 
     public function destroy(Request $request, SaleRepository $saleRepository,Sale $sale)
     {
-        return $saleRepository->destroy($request,$sale);
+        if(RoleTrait::hasPermission(19)){
+            return $saleRepository->destroy($request,$sale);
+        }
     }
 }
