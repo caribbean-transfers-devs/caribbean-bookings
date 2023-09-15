@@ -1,3 +1,6 @@
+@php
+    use App\Traits\RoleTrait;
+@endphp
 @extends('layout.master')
 @section('title') Usuarios @endsection
 
@@ -19,9 +22,13 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">Usuarios</h5>
-                        <div class="card-header d-flex justify-content-end align-items-center gap-3">                            
-                            <a href="{{ route('users.create') }}" class="btn btn-success">Añadir Usuario</a>   
-                            <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#whiteIPsModal">Ver IPs</a>                         
+                        <div class="card-header d-flex justify-content-end align-items-center gap-3">   
+                            @if(RoleTrait::hasPermission(2))                         
+                                <a href="{{ route('users.create') }}" class="btn btn-success">Añadir Usuario</a>   
+                            @endif
+                            @if(RoleTrait::hasPermission(5)) 
+                                <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#whiteIPsModal">Ver IPs</a>   
+                            @endif                      
                         </div>                       
                     </div>
                     <div class="card-body">
@@ -65,10 +72,14 @@
                                                                 Acciones
                                                             </button>
                                                             <ul class="dropdown-menu" aria-labelledby="actions">
-                                                                <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
-                                                                <li><a class="dropdown-item" href="#" onclick="ChangePass({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#chgPassModal">Cambiar Contraseña</a></li>
-                                                                <li><hr class="dropdown-divider"></li>
-                                                                <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},0)">Desactivar</a></li>
+                                                                @if(RoleTrait::hasPermission(3)) 
+                                                                    <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
+                                                                    <li><a class="dropdown-item" href="#" onclick="ChangePass({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#chgPassModal">Cambiar Contraseña</a></li>
+                                                                    <li><hr class="dropdown-divider"></li>
+                                                                @endif
+                                                                @if(RoleTrait::hasPermission(4)) 
+                                                                    <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},0)">Desactivar</a></li>
+                                                                @endif
                                                             </ul>
                                                         </div>
                                                     </td>
@@ -113,9 +124,13 @@
                                                                 Acciones
                                                             </button>
                                                             <ul class="dropdown-menu" aria-labelledby="actions">
-                                                                <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
-                                                                <li><hr class="dropdown-divider"></li>
-                                                                <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},1)">Activar</a></li>
+                                                                @if(RoleTrait::hasPermission(3)) 
+                                                                    <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
+                                                                    <li><hr class="dropdown-divider"></li>
+                                                                @endif
+                                                                @if(RoleTrait::hasPermission(4)) 
+                                                                    <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},1)">Activar</a></li>
+                                                                @endif
                                                             </ul>
                                                         </div>
                                                     </td>
