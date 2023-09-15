@@ -1,4 +1,4 @@
-@import '../components/autocomplete';
+@import '../components/loader';
 
 .bookingbox{
     padding: 15px;
@@ -9,7 +9,7 @@
     grid-row-gap: 10px;
     grid-template-areas: "type type type type"
     "from from to to"
-    "language passengers rate_group rate_group"
+    "language passengers currency rate_group"
     "dates dates dates dates"
     "button button button button";
     
@@ -27,6 +27,9 @@
     }
     > div.language{
         grid-area: language;
+    }
+    > div.currency{
+        grid-area: currency;
     }
     > div.passengers{
         grid-area: passengers;
@@ -55,10 +58,146 @@
         grid-template-areas: "type type type type"
                             "from from from from"
                             "to to to to"
-                            "language passengers rate_group rate_group"
+                            "language passengers currency rate_group"
                             "dates dates dates dates"
                             "button button button button";
     }
 
 }
 
+.quote_container{
+    display: grid;
+    grid-template-columns: 600px 1fr;
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+    margin-top: 25px;
+    > div.left_{
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        > div.item{
+            display: grid;
+            grid-template-columns: 200px 1fr 1fr;
+            grid-column-gap: 10px;
+            grid-row-gap: 10px;
+            background-color: white;
+            border-radius: 5px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            > div.one_{
+                align-self: center;
+                img{
+                    width: 100%;
+                    height: auto;
+                }
+            }
+            > div.two_{
+                h2{
+                    color: #2D008E;
+                    font-size: 14pt;
+                    font-weight: bold;
+                }
+                ul{
+                    padding-left: 15px;
+                }
+            }
+            > div.three_{
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                > div:nth-child(1){
+                    text-align: right;
+                    p{
+                        margin: 0px;
+                        &:nth-child(1){
+                            font-size: 13pt;
+                            font-weight: bold;
+                        }
+                    }
+                }
+                > div:nth-child(2){
+
+                    .checkButton {
+                        display: none;
+                    }
+                    
+                    .custom-button {
+                        display: inline-block;
+                        width: 100%;
+                        border-radius: 4px;
+                        background: linear-gradient(263deg, #191970 7.15%, #3E3ED3 100%);
+                        color: white;
+                        cursor: pointer;
+                        border: none;
+                        position: relative;
+                        &:hover{
+                            color: white;
+                        }
+                    }
+                    
+                    .custom-button.checked {
+                        background-color: #e74c3c;
+                    }
+                    
+                    .checkButton + label svg {
+                        display: none;
+                        position: absolute;
+                        right: 10px;
+                        top: 7px;
+                    }
+                    
+                    .checkButton:checked + label {
+                        background: #1cbb8c;
+                        border-color: #1cbb8c;
+                    }                    
+                }
+            }
+        }
+    }
+    > div.right_{
+        background-color: white;
+        padding: 15px;
+        border-radius: 5px;
+        > div.client_information{
+            margin-bottom: 23px;
+            border-bottom: 1px solid #ced4da;
+            padding-bottom: 25px;
+            > div.one_{
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-column-gap: 10px;
+                grid-row-gap: 10px;
+                margin-bottom: 15px;
+                label{
+                    font-weight: bold;
+                }
+            }
+            > div.two_{
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                label{
+                    font-weight: bold;
+                }
+            }
+        }
+        > div.additional{
+            > div.one_{
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                label{
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+
+div#loadContent{
+    div.loading{
+        display: flex;
+        justify-content: center;
+        margin-top: 25px;
+    }
+}

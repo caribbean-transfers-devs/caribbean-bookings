@@ -1,56 +1,120 @@
-const input = document.getElementById('bookingFromForm');
-const resultsDiv = document.getElementById('autocomplete-results');
+function initialize(div) {
+  var input = document.getElementById(div);
+  var autocomplete = new google.maps.places.Autocomplete(input);
 
-input.addEventListener('keydown', delayAutocomplete(function (e) {
-  const searchTerm = input.value.trim();
+  autocomplete.addListener('place_changed', function() {
+      var place = autocomplete.getPlace();
+      if(div == "bookingFromForm"){        
+        var fromLat = document.getElementsByName("from_lat");
+            fromLat[0].value = place.geometry.location.lat();
 
-  if (searchTerm === '') {
-    resultsDiv.innerHTML = '';
-    return;
-  }
+        var fromLng = document.getElementsByName("from_lng");
+            fromLng[0].value = place.geometry.location.lng();
+      }
+      if(div == "bookingToForm"){
+        var toLat = document.getElementsByName("to_lat");
+            toLat[0].value = place.geometry.location.lat();
 
-  searchDestinationsAJAX(searchTerm);
-}, 500));
-
-function searchDestinationsAJAX(searchTerm) {
-  fetch(`/tpv/autocomplete/${searchTerm}`)
-    .then(response => response.json())
-    .then(data => {
-      mostrarResultados(data);
-    })
-    .catch(error => {
-      console.error('Error en la solicitud AJAX:', error);
-    });
+        var toLng = document.getElementsByName("to_lng");
+            toLng[0].value = place.geometry.location.lng();
+      }
+  });
 }
 
-function mostrarResultados(results) {
-  
-  if (results.hasOwnProperty('error')) {
-    resultsDiv.innerHTML = '<p>No se encontraron resultados</p>';
-  } else {
-    
-    const listItems = results.map(result => `<div onclick="setItem('${result.name}','${result.geo.lat}','${result.geo.lat}')">${result.name} <span>${result.address}</span></div>`).join('');
-    resultsDiv.innerHTML = listItems;
+google.maps.event.addDomListener(window, 'load', initialize('bookingFromForm') );
+google.maps.event.addDomListener(window, 'load', initialize('bookingToForm') );
 
+document.addEventListener('DOMContentLoaded', function() {
+  const fechaInput = document.getElementById('bookingPickupForm');
+  const rangeCheckbox = document.getElementById('flexSwitchCheckDefault');
+  let pickerInit = flatpickr("#bookingPickupForm", {    
+    mode: "single",
+    dateFormat: "Y-m-d H:i",
+    enableTime: true,
+    minDate: "today"
+  });
+  let pickerEnd = flatpickr("#bookingDepartureForm", {    
+    mode: "single",
+    dateFormat: "Y-m-d H:i",
+    enableTime: true,
+    minDate: "today"
+  });
+
+  // Función para actualizar el modo de Flatpickr
+  function updatePickerMode() {
+    var departureContainer = document.getElementById("departureContainer");
+    if (rangeCheckbox.checked) {
+      departureContainer.style.display = "block";
+    }else{
+      departureContainer.style.display = "none";
+    }
   }
-}
-
-//Delay on the autocomplete
-function delayAutocomplete(callback, ms) {
-    var timer = 0;
-    return function () {
-        var context = this,
-            args = arguments;
-        clearTimeout(timer);
-        timer = setTimeout(function () {
-            callback.apply(context, args);
-        }, ms || 0);
-    };
-}
-
-document.addEventListener('click', function (event) {
-  const target = event.target;  
-  if (target !== input && target !== resultsDiv) {
-    resultsDiv.innerHTML = '';
-  }
+  rangeCheckbox.addEventListener('change', updatePickerMode);
 });
+
+
+function saveQuote(event){
+  event.preventDefault();
+  $("#btn_quote").prop('disabled', true);
+  $.ajaxSetup({
+      headers: {
+          'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+      }
+  });
+
+  let frm_data = $("#bookingboxForm").serializeArray();
+
+  $.ajax({
+      url: '/tpv/quote',
+      type: 'POST',
+      data: frm_data,
+      beforeSend: function() {        
+        $("#loadContent").html('<div class="loading"><span class="loader"></span></div>');
+      },
+      success: function(resp) {
+
+        $("html, body").animate({ scrollTop: $("#loadContent").offset().top }, 300);
+
+        $("#loadContent").html(resp);
+        $("#btn_quote").prop('disabled', false);
+      },
+  }).fail(function(xhr, status, error) {
+      console.log(xhr);
+      Swal.fire(
+          '¡ERROR!',
+          xhr.responseJSON.message,
+          'error'
+      )
+      $("#loadContent").html("");
+      $("#btn_quote").prop('disabled', false);
+  });
+}
+
+function makeReservationButton(event){
+  event.preventDefault();
+  $("#btn_make_reservation").prop('disabled', true).text("Enviando...");
+  $.ajaxSetup({
+      headers: {
+          'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+      }
+  });
+
+  let frm_data = $("#formReservation").serializeArray();
+
+  $.ajax({
+      url: '/tpv/create',
+      type: 'POST',
+      data: frm_data,      
+      success: function(resp) {
+        window.location.replace(`/reservations/detail/${resp.config.id}`);        
+      },
+  }).fail(function(xhr, status, error) {
+      console.log(xhr);
+      Swal.fire(
+          '¡ERROR!',
+          xhr.responseJSON.message,
+          'error'
+      );
+      $("#btn_make_reservation").prop('disabled', false).text("Enviar");
+  });
+}

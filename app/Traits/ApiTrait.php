@@ -15,17 +15,17 @@ trait ApiTrait
                 "place" => "",
                 "lat" => "",
                 "lng" => "",
+                "pickup" => date("Y-m-d H:i"),
             ],
             "end" => [
                 "place" => "",
                 "lat" => "",
                 "lng" => "",
+                "pickup" => NULL,
             ],
             "language" => "en",
             "passengers" => 1,
             "currency" => "USD",
-            "pickup" => date("Y-m-d H:i"),
-            "departure_pickup" => NULL,
             "rate_group" => "xLjDl18", //Grupo de tarifa por defecto...
         ];
 
@@ -80,6 +80,20 @@ trait ApiTrait
         $tpv = Session::get('tpv');
         
         return self::sendRequest('/api/v1/autocomplete', 'POST', array('keyword' => $keyword), $tpv['token']['token']);
+    }
+
+    public static function makeQuote($data = []){
+        self::checkToken();
+        $tpv = Session::get('tpv');
+
+        return self::sendRequest('/api/v1/quote', 'POST', $data, $tpv['token']['token']);
+    }
+
+    public static function makeReservation($data = []){
+        self::checkToken();
+        $tpv = Session::get('tpv');
+
+        return self::sendRequest('/api/v1/create', 'POST', $data, $tpv['token']['token']);
     }
 
     public static function sendRequest($end_point, $method = 'GET', $data = null, $token = null) {
