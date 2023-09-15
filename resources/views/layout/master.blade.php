@@ -102,7 +102,7 @@
                 <a class="sidebar-toggle js-sidebar-toggle">
                     <i class="hamburger align-self-center"></i>
                 </a>
-    
+                @if(RoleTrait::hasPermission(27))
                 <form class="d-none d-sm-inline-block">
                     <div class="input-group input-group-navbar">
                         <input type="text" class="form-control" placeholder="Buscar..." aria-label="Busqueda">
@@ -111,7 +111,7 @@
                         </button>
                     </div>
                 </form>
-    
+                @endif
                 <div class="navbar-collapse collapse">
                     <ul class="navbar-nav navbar-align">                                           
                         <li class="nav-item">
