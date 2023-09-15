@@ -15,17 +15,17 @@ trait ApiTrait
                 "place" => "",
                 "lat" => "",
                 "lng" => "",
+                "pickup" => date("Y-m-d H:i"),
             ],
             "end" => [
                 "place" => "",
                 "lat" => "",
                 "lng" => "",
+                "pickup" => NULL,
             ],
             "language" => "en",
             "passengers" => 1,
             "currency" => "USD",
-            "pickup" => date("Y-m-d H:i"),
-            "departure_pickup" => NULL,
             "rate_group" => "xLjDl18", //Grupo de tarifa por defecto...
         ];
 
@@ -52,7 +52,6 @@ trait ApiTrait
     }
 
     public static function checkToken(){
-
         if (!Session::has('tpv')):
             $token = self::init();
             $tpv['token'] = [
@@ -62,14 +61,39 @@ trait ApiTrait
             Session::put('tpv', $tpv);
         else:
             $tpv = Session::get('tpv');
-            Session::put('tpv', $tpv);
+            if(isset( $tpv['token']['expires_in'] ) ):
+                $nowDate = date('Y-m-d H:i:s', strtotime(date("Y-m-d H:i:s") . ' - 1440 minutes'));
+                if($nowDate <= $tpv['token']['expires_in']):
+                    $token = self::init();
+                    $tpv['token'] = [
+                        "token" => $token['data']['token'],
+                        "expires_in" => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " + " . $token['data']['expires_in'] . " seconds"))
+                    ];
+                    Session::put('tpv', $tpv);
+                endif;
+            endif;
         endif;
     }
 
-    public static function sendAutocomplete($keyword = ''){
-        
+    public static function sendAutocomplete($keyword = ''){        
         self::checkToken();
-        //$data = self::sendRequest('/api/v1/autocomplete', 'POST', array('keyword' => $keyword));
+        $tpv = Session::get('tpv');
+        
+        return self::sendRequest('/api/v1/autocomplete', 'POST', array('keyword' => $keyword), $tpv['token']['token']);
+    }
+
+    public static function makeQuote($data = []){
+        self::checkToken();
+        $tpv = Session::get('tpv');
+
+        return self::sendRequest('/api/v1/quote', 'POST', $data, $tpv['token']['token']);
+    }
+
+    public static function makeReservation($data = []){
+        self::checkToken();
+        $tpv = Session::get('tpv');
+
+        return self::sendRequest('/api/v1/create', 'POST', $data, $tpv['token']['token']);
     }
 
     public static function sendRequest($end_point, $method = 'GET', $data = null, $token = null) {

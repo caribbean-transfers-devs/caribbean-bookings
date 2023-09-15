@@ -5,8 +5,7 @@
 @extends('layout.master')
 @section('title') Detalle @endsection
 
-@push('up-stack')
-    <script src="{{ mix('assets/js/datatables.js') }}"></script>
+@push('up-stack')    
     <link href="{{ mix('/assets/css/reservations/detail.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/reservations/detail.min.css') }}" rel="stylesheet" > 
 @endpush
@@ -14,6 +13,7 @@
 @push('bootom-stack')
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.gmaps.key') }}&callback=initMap" async defer></script>
     <script src="{{ mix('assets/js/views/reservationsDetail.js') }}"></script>
+    <script src="{{ mix('assets/js/datatables.js') }}"></script>
 @endpush
 
 @section('content')

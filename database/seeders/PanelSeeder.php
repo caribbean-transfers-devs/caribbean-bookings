@@ -36,6 +36,12 @@ class PanelSeeder extends Seeder
         DB::table('modules')->insert([
             'module' => "Reservaciones",
         ]);
+        DB::table('modules')->insert([
+            'module' => "TPV",
+        ]);
+        DB::table('modules')->insert([
+            'module' => "General",
+        ]);
 
         //Submodulos
         // - Usuarios
@@ -80,6 +86,74 @@ class PanelSeeder extends Seeder
         DB::table('submodules')->insert([
             'module_id' => 3,
             'submodule' => "Ver reservaciones",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Editar datos personales",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Agregar servicios",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Editar servicios",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Agregar pagos",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Editar pagos",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Eliminar pagos",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Agregar ventas",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Editar ventas",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Eliminar ventas",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Re-enviar voucher al cliente",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Enviar SMS/Whatsapp",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Enviar Invitación de pago",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Agregar Seguimientos",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Cancelar reservacion",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 3,
+            'submodule' => "Ver historial",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 4,
+            'submodule' => "Ver TPV",
+        ]);
+        DB::table('submodules')->insert([
+            'module_id' => 5,
+            'submodule' => "Buscador de reservaciones",
         ]);
 
         //Roles - Permisos

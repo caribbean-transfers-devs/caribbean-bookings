@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Tpv;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TpvRequest;
+use App\Http\Requests\TpvCreateRequest;
 use App\Repositories\Tpv\TpvRepository;
 use App\Repositories\Tpv\AutocompleteRepository;
 use Illuminate\Http\Request;
@@ -29,22 +30,15 @@ class TpvController extends Controller
         return $tpvRepository->index($request);
     }
 
-    public function quote(Request $request, $code, TpvRepository $tpvRepository){
+    public function quote(TpvRequest $request, TpvRepository $tpvRepository){
         return $tpvRepository->quote($request);
     }
 
+    public function create(TpvCreateRequest $request, TpvRepository $tpvRepository){       
+        return $tpvRepository->create($request);
+    }
+
     public function autocomplete(Request $request, $code, AutocompleteRepository $autocompleteRepository){
-
-        if ( !$request->keyword || empty($request->keyword) ) {
-            return response()->json([
-                    'error' => [
-                        'code' => 'required_params', 
-                        'message' =>  'keyword is required'
-                    ]
-                ], Response::HTTP_BAD_REQUEST);
-        }
-
-
-        return $autocompleteRepository->autocomplete($request->keyword);
+        return $autocompleteRepository->autocomplete($request);
     }
 }

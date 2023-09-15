@@ -51,7 +51,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('/payments',PaymentsController::class);
 
     Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
-    Route::get('/tpv/new/{code}', [TpvController::class, 'index'])->name('tpv.new');
-    Route::post('/tpv/new/{code}', [TpvController::class, 'quote'])->name('tpv.quote');
+    Route::get('/tpv/edit/{code}', [TpvController::class, 'index'])->name('tpv.new');
+    Route::post('/tpv/quote', [TpvController::class, 'quote'])->name('tpv.quote');
+    Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
     Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
 });
