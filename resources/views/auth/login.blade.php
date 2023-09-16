@@ -33,7 +33,7 @@
 							<div class="card-body">
 								<div class="m-sm-4">
 									<div class="text-center">
-										<img src="/assets/img/logos/caribbean_icon.png" alt="Caribbean Transfers" class="img-fluid" width="132" height="132">
+										<img src="/assets/img/logos/brand.svg" alt="Caribbean Transfers" class="img-fluid" width="132" height="132">
 									</div>
 									@if ($errors->any())
 										<div class="alert alert-danger mt-3" role="alert">
