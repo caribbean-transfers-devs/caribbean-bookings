@@ -1,8 +1,9 @@
 {
+    "/assets/css/zones/index.min.css": "/assets/css/zones/index.min.css?id=fd584d2eaff620ad9295fcaf84928368",
     "/assets/css/tpv/index.min.css": "/assets/css/tpv/index.min.css?id=6724a6e34dbbb2fb088e1893c41884c6",
     "/assets/css/reservations/detail.min.css": "/assets/css/reservations/detail.min.css?id=aba96d58b8cbdcd09ca2f21481b2fa35",
     "/assets/css/base/fonts.min.css": "/assets/css/base/fonts.min.css?id=faed934797e40bbaddcfc2b1176db9fb",
-    "/assets/css/base/base.min.css": "/assets/css/base/base.min.css?id=0ce1efa531fb2bcd1743fdfa0dc92e6c",
+    "/assets/css/base/base.min.css": "/assets/css/base/base.min.css?id=78f2fc16e0b2b4bbaa900a345a40799e",
     "/assets/js/base.min.js": "/assets/js/base.min.js?id=ec4e3b17fc9af9db0043757c8e3c86ca",
     "/assets/js/datatables.js": "/assets/js/datatables.js?id=eb41f7bd8c0f3e2fd64b4cee95ae32f4",
     "/assets/js/sweetalert2.js": "/assets/js/sweetalert2.js?id=d7fc0a33768de1ab15b73cdff524a27d",
@@ -10,5 +11,6 @@
     "/assets/js/views/rolesIndex.js": "/assets/js/views/rolesIndex.js?id=26b49c53bd6c061db8c059636743abd4",
     "/assets/js/views/reservationsIndex.js": "/assets/js/views/reservationsIndex.js?id=62d82e8789963195edde0a99c8c10f59",
     "/assets/js/views/reservationsDetail.js": "/assets/js/views/reservationsDetail.js?id=0fe0fdf1bae6c11d8e00a9a0940e5b18",
-    "/assets/js/views/tpv/index.min.js": "/assets/js/views/tpv/index.min.js?id=38f580d1f2ea4627271e36656213cc4b"
+    "/assets/js/views/tpv/index.min.js": "/assets/js/views/tpv/index.min.js?id=38f580d1f2ea4627271e36656213cc4b",
+    "/assets/js/views/zones/index.min.js": "/assets/js/views/zones/index.min.js?id=91f91466881f26552df946f4b292ab9e"
 }

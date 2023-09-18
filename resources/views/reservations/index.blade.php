@@ -12,12 +12,12 @@
 @extends('layout.master')
 @section('title') Reservaciones @endsection
 
-@push('up-stack')
-    <script src="{{ mix('assets/js/datatables.js') }}"></script>
+@push('up-stack')    
 @endpush
 
 @push('bootom-stack')
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+    <script src="{{ mix('assets/js/datatables.js') }}"></script>
     <script src="{{ mix('assets/js/views/reservationsIndex.js') }}"></script>    
 @endpush
 

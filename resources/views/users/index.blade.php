@@ -4,11 +4,11 @@
 @extends('layout.master')
 @section('title') Usuarios @endsection
 
-@push('up-stack')
-    <script src="{{ mix('assets/js/datatables.js') }}"></script>
+@push('up-stack')    
 @endpush
 
 @push('bootom-stack')
+    <script src="{{ mix('assets/js/datatables.js') }}"></script>
     <script src="{{ mix('assets/js/views/userIndex.js') }}"></script>
 @endpush
 
@@ -37,108 +37,104 @@
                             <li class="nav-item" role="presentation"><a class="nav-link" href="#tab-2" data-bs-toggle="tab" role="tab" aria-selected="false" tabindex="-1">Usuarios Inactivos</a></li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane active show" id="tab-1" role="tabpanel">
-                                <div class="table-responsive mt-3">
-                                    <table id="active_users" class="table table-striped table-bordered">
-                                        <thead>
+                            <div class="tab-pane active show mt-3" id="tab-1" role="tabpanel">                                
+                                <table id="active_users" class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Correo</th>
+                                            <th>Restringido</th>
+                                            <th>Roles</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($active_users as $user)
                                             <tr>
-                                                <th>Nombre</th>
-                                                <th>Correo</th>
-                                                <th>Restringido</th>
-                                                <th>Roles</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($active_users as $user)
-                                                <tr>
-                                                    <td>{{ $user->name }}</td>
-                                                    <td>{{ $user->email }}</td>
-                                                    <td>
-                                                        @if ($user->restricted == 0)
-                                                            <span class="badge bg-secondary">No</span>
-                                                        @else
-                                                            <span class="badge bg-danger">Si</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @foreach ($user->roles as $role)
-                                                            <span class="badge bg-primary">{{ $role->role->role }}</span>
-                                                        @endforeach
-                                                    </td>
-                                                    <td>
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="actions" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                Acciones
-                                                            </button>
-                                                            <ul class="dropdown-menu" aria-labelledby="actions">
-                                                                @if(RoleTrait::hasPermission(3)) 
-                                                                    <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
-                                                                    <li><a class="dropdown-item" href="#" onclick="ChangePass({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#chgPassModal">Cambiar Contraseña</a></li>
-                                                                    <li><hr class="dropdown-divider"></li>
-                                                                @endif
-                                                                @if(RoleTrait::hasPermission(4)) 
-                                                                    <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},0)">Desactivar</a></li>
-                                                                @endif
-                                                            </ul>
-                                                        </div>
-                                                    </td>
-                                                </tr>                                        
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                <td>{{ $user->name }}</td>
+                                                <td>{{ $user->email }}</td>
+                                                <td>
+                                                    @if ($user->restricted == 0)
+                                                        <span class="badge bg-secondary">No</span>
+                                                    @else
+                                                        <span class="badge bg-danger">Si</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @foreach ($user->roles as $role)
+                                                        <span class="badge bg-primary">{{ $role->role->role }}</span>
+                                                    @endforeach
+                                                </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="actions" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            Acciones
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="actions">
+                                                            @if(RoleTrait::hasPermission(3)) 
+                                                                <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
+                                                                <li><a class="dropdown-item" href="#" onclick="ChangePass({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#chgPassModal">Contraseña</a></li>
+                                                                <li><hr class="dropdown-divider"></li>
+                                                            @endif
+                                                            @if(RoleTrait::hasPermission(4)) 
+                                                                <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},0)">Desactivar</a></li>
+                                                            @endif
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>                                        
+                                        @endforeach
+                                    </tbody>
+                                </table>                                
                             </div>
-                            <div class="tab-pane" id="tab-2" role="tabpanel">                                
-                                <div class="table-responsive mt-3">
-                                    <table id="inactive_users" class="table table-striped table-bordered">
-                                        <thead>
+                            <div class="tab-pane mt-3" id="tab-2" role="tabpanel">                                
+                                <table id="inactive_users" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Correo</th>
+                                            <th>Restringido</th>
+                                            <th>Roles</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($inactive_users as $user)
                                             <tr>
-                                                <th>Nombre</th>
-                                                <th>Correo</th>
-                                                <th>Restringido</th>
-                                                <th>Roles</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($inactive_users as $user)
-                                                <tr>
-                                                    <td>{{ $user->name }}</td>
-                                                    <td>{{ $user->email }}</td>
-                                                    <td>
-                                                        @if ($user->restricted == 0)
-                                                            <span class="badge bg-secondary">No</span>
-                                                        @else
-                                                            <span class="badge bg-danger">Si</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @foreach ($user->roles as $role)
-                                                            <span class="badge bg-primary">{{ $role->role->role }}</span>
-                                                        @endforeach
-                                                    </td>
-                                                    <td>
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="actions" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                Acciones
-                                                            </button>
-                                                            <ul class="dropdown-menu" aria-labelledby="actions">
-                                                                @if(RoleTrait::hasPermission(3)) 
-                                                                    <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
-                                                                    <li><hr class="dropdown-divider"></li>
-                                                                @endif
-                                                                @if(RoleTrait::hasPermission(4)) 
-                                                                    <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},1)">Activar</a></li>
-                                                                @endif
-                                                            </ul>
-                                                        </div>
-                                                    </td>
-                                                </tr>                                        
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                <td>{{ $user->name }}</td>
+                                                <td>{{ $user->email }}</td>
+                                                <td>
+                                                    @if ($user->restricted == 0)
+                                                        <span class="badge bg-secondary">No</span>
+                                                    @else
+                                                        <span class="badge bg-danger">Si</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @foreach ($user->roles as $role)
+                                                        <span class="badge bg-primary">{{ $role->role->role }}</span>
+                                                    @endforeach
+                                                </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-secondary dropdown-toggle button-sm" type="button" id="actions" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            Acciones
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="actions">
+                                                            @if(RoleTrait::hasPermission(3)) 
+                                                                <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
+                                                                <li><hr class="dropdown-divider"></li>
+                                                            @endif
+                                                            @if(RoleTrait::hasPermission(4)) 
+                                                                <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},1)">Activar</a></li>
+                                                            @endif
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>                                        
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 

@@ -22,4 +22,6 @@ mix.copy('resources/js/views/reservationsIndex.js', data.assets + "js/views/rese
 mix.copy('resources/js/views/reservationsDetail.js', data.assets + "js/views/reservationsDetail.js");
 mix.sass('resources/scss/reservations/detail.scss', data.assets + "css/reservations/detail.min.css");
 mix.sass('resources/scss/tpv/index.scss', data.assets + "css/tpv/index.min.css");
+mix.sass('resources/scss/zones/index.scss', data.assets + "css/zones/index.min.css");
 mix.copy('resources/js/views/tpv/index.js', data.assets + "js/views/tpv/index.min.js");
+mix.copy('resources/js/views/zones/index.js', data.assets + "js/views/zones/index.min.js");

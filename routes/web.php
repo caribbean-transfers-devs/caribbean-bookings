@@ -9,6 +9,7 @@ use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Reservations\ReservationsController;
 use App\Http\Controllers\Sales\SalesController;
 use App\Http\Controllers\Tpv\TpvController;
+use App\Http\Controllers\Configs\ZonesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,4 +56,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/tpv/quote', [TpvController::class, 'quote'])->name('tpv.quote');
     Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
     Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
+
+    Route::get('/config/destinations', [ZonesController::class, 'index'])->name('config.zones');
+    Route::get('/config/destinations/{id}', [ZonesController::class, 'getZones'])->name('config.zones.getZones');
+    Route::get('/config/destinations/{id}/points', [ZonesController::class, 'getPoints'])->name('config.getPoints');
+    Route::put('/config/destinations/{id}/points', [ZonesController::class, 'setPoints'])->name('config.setPoints');
+
+    //Route::get('/config/zones/get/{id}', [ZonesController::class, 'getZones'])->name('config.getZones');
+    //Route::get('/config/zones/points', [ZonesController::class, 'getPoints'])->name('config.getPoints');
+    //Route::put('/config/zones/points/{id}', [ZonesController::class, 'setPoints'])->name('config.setPoints');
 });
