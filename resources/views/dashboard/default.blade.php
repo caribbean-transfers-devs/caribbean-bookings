@@ -123,7 +123,7 @@
                                         <td>{{ $item->reservations->client_first_name }} {{ $item->reservations->client_last_name }}</td>                                           
                                         <td>{{ $item->destination_service->name }}</td>
                                         <td class="text-center">{{ $item->passengers }}</td>
-                                        <td class="text-center">{{ $item->destination->name }}</td>
+                                        <td class="text-center">Destination name</td>
                                     </tr>        
                                 @endforeach
                             </tbody>

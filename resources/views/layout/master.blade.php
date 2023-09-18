@@ -7,14 +7,15 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <title>@yield('title') | Bookings</title>
 	<meta name="description" content="Caribbean Transfers - Bookings">
     <link rel="preconnect" href="https://fonts.gstatic.com">
 	<link rel="shortcut icon" href="/assets/img/icons/icon-48x48.png">
 
-    <link href="{{ mix('/assets/css/base/fonts.min.css') }}&family=Inter:wght@300;400;600&display=swap" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/base/fonts.min.css') }}&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/base/fonts.min.css') }}?family=Inter:wght@300;400;600&display=swap" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/base/fonts.min.css') }}?family=Inter:wght@300;400;600&display=swap" rel="stylesheet" >
     <link href="{{ mix('/assets/css/base/base.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/base/base.min.css') }}" rel="stylesheet" >
 
@@ -39,7 +40,7 @@
                 <div class="sidebar-user">
                     <div class="d-flex justify-content-center">
                         <div class="flex-shrink-0">
-                            <img src="/assets/img/logos/caribbean_icon.png" class="avatar img-fluid rounded me-1" alt="{{ auth()->user()->name }}">
+                            <img src="/assets/img/logos/brand.svg" class="avatar img-fluid rounded me-1" alt="{{ auth()->user()->name }}">
                         </div>
                         <div class="flex-grow-1 ps-2">
                             <a class="sidebar-user-title dropdown-toggle" href="#" data-bs-toggle="dropdown">
@@ -78,6 +79,17 @@
                         </a>
                     </li>
                     @endif
+                    
+                    <li class="sidebar-item">
+                        <a href="#configs" data-bs-toggle="collapse" class="sidebar-link collapsed">
+                            <i class="align-middle" data-feather="database"></i> <span class="align-middle">Configuraciones</span>
+                        </a>
+                        <ul id="configs" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item"><a class="sidebar-link" href="{{ route('config.zones') }}">Zonas</a></li>
+                        </ul>
+                    </li>                    
+
+
                     @if(RoleTrait::hasPermission(1) || RoleTrait::hasPermission(6))
                     <li class="sidebar-item @if(request()->is('users') || request()->is('roles')) active @endif">
                         <a href="#auth" data-bs-toggle="collapse" class="sidebar-link collapsed">
@@ -123,7 +135,7 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-icon pe-md-0 dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                <img src="/assets/img/logos/caribbean_icon.png" class="avatar img-fluid rounded" alt="Caribbean">
+                                <img src="/assets/img/logos/brand.svg" class="avatar img-fluid rounded" alt="Caribbean">
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item" href="{{ route('logout') }}">Cerrar Sesión</a>

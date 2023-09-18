@@ -1,0 +1,1 @@
+.search-container{grid-column-gap:15px;display:grid;grid-template-columns:400px 150px}.search-container>div:nth-child(2) button{height:100%;width:100%}#zone_map_container{height:550px;text-align:center;width:100%}
