@@ -32,8 +32,8 @@ return [
     ],
 
     'gcaptcha' => [
-        'key' => env('SITE_KEY'),
-        'secret' => env('SECRET_KEY'),
+        'key' => env('RECAPTCHA_SITE_KEY'),
+        'secret' => env('RECAPTCHA_SECRET_KEY'),
     ],
 
     'gmaps' => [

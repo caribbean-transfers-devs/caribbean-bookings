@@ -33,7 +33,7 @@
             <div class="col-12 col-sm-12">
                 <div class="card">                    
                     <div class="card-body">
-                        <div class="table-responsive mt-3">
+                        <div class="table-responsive">
                             <table id="zones_table" class="table table-striped table-sm">
                                 <thead>
                                     <tr>
@@ -51,7 +51,7 @@
                                                 <td class="text-center">{{ $value->is_primary }}</td>
                                                 <td class="text-center">{{ $value->status }}</td>
                                                 <td class="text-center">
-                                                    <button class="btn btn-secondary btn-sm" disabled>Editar</button>
+                                                    <!--<button class="btn btn-secondary btn-sm" disabled>Editar</button>-->
                                                     <button class="btn btn-primary btn-sm" onclick="getPoints(event, {{ $value->destination_id }}, {{ $value->id }} )"><i class="fas fa-fw fa-map-marker"></i></button>
                                                 </td>
                                             </tr>

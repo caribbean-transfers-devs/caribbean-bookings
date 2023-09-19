@@ -9,13 +9,7 @@ $(function() {
     $('#zones_table').DataTable({
         language: {
             url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
-        },
-        columnDefs : [
-            { "width": "30%", "targets": 0 },
-            { "width": "20%", "targets": 1 },
-            { "width": "20%", "targets": 2 },
-            { "width": "30%", "targets": 3 },            
-        ]
+        }
     });    
 
     $('#btnSendZone').on('click', function (e) {        

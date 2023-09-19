@@ -25,3 +25,5 @@ mix.sass('resources/scss/tpv/index.scss', data.assets + "css/tpv/index.min.css")
 mix.sass('resources/scss/zones/index.scss', data.assets + "css/zones/index.min.css");
 mix.copy('resources/js/views/tpv/index.js', data.assets + "js/views/tpv/index.min.js");
 mix.copy('resources/js/views/zones/index.js', data.assets + "js/views/zones/index.min.js");
+mix.sass('resources/scss/rates/index.scss', data.assets + "css/rates/index.min.css");
+mix.copy('resources/js/views/rates/index.js', data.assets + "js/views/rates/index.min.js");
