@@ -202,8 +202,8 @@ class PanelSeeder extends Seeder
         // Usuarios
         // -> Usuario principal
         DB::table('users')->insert([
-            'name' => "Cristobal",
-            'email' => "demo@demo.com",
+            'name' => "Omar Trujillo",
+            'email' => "development@caribbean-transfers.com",
             'status' => 1,
             'restricted' => 0,
             'email_verified_at' => NULL,

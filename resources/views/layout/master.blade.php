@@ -86,6 +86,7 @@
                         </a>
                         <ul id="configs" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li class="sidebar-item"><a class="sidebar-link" href="{{ route('config.zones') }}">Zonas</a></li>
+                            <li class="sidebar-item"><a class="sidebar-link" href="{{ route('config.ratesDestination') }}">Tarifas</a></li>
                         </ul>
                     </li>                    
 

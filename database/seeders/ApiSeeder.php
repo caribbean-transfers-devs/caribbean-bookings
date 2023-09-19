@@ -79,119 +79,78 @@ class ApiSeeder extends Seeder
         ]);
         DB::table('zones')->insert([
             'destination_id' => 1,
-            'name' => "Cancun Downtown",
+            'name' => "Cancun",
             'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
         DB::table('zones')->insert([
             'destination_id' => 1,
-            'name' => "Cancun Hotel Zone",
+            'name' => "Puerto Juarez",
             'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
         DB::table('zones')->insert([
             'destination_id' => 1,
-            'name' => "Tulum",
+            'name' => "Costa Mujeres",
             'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-
-        #Puntoz de Zonas - Cancun Airport
-        DB::table('zones_points')->insert([
-            'zone_id' => 1,
-            'latitude' => 21.020191,
-            'longitude' => -86.854778,
+        DB::table('zones')->insert([
+            'destination_id' => 1,
+            'name' => "Puerto Morelos",
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        DB::table('zones_points')->insert([
-            'zone_id' => 1,
-            'latitude' => 21.038780,
-            'longitude' => -86.851311,
+        DB::table('zones')->insert([
+            'destination_id' => 1,
+            'name' => "Playa del Carmen",
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        DB::table('zones_points')->insert([
-            'zone_id' => 1,
-            'latitude' => 21.063410,
-            'longitude' => -86.890800,
+        DB::table('zones')->insert([
+            'destination_id' => 1,
+            'name' => "Playa Car",
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        DB::table('zones_points')->insert([
-            'zone_id' => 1,
-            'latitude' => 21.048610,
-            'longitude' => -86.901067,
+        DB::table('zones')->insert([
+            'destination_id' => 1,
+            'name' => "Puerto Aventuras",
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-
-        #Puntoz de Zonas - Cancun Downtown
-        DB::table('zones_points')->insert([
-            'zone_id' => 2,
-            'latitude' => 21.044412,
-            'longitude' => -86.845496,
+        DB::table('zones')->insert([
+            'destination_id' => 1,
+            'name' => "Akumal",
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        DB::table('zones_points')->insert([
-            'zone_id' => 2,
-            'latitude' => 21.174695,
-            'longitude' => -86.816541,
+        DB::table('zones')->insert([
+            'destination_id' => 1,
+            'name' => "Tulum Pueblo",
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        DB::table('zones_points')->insert([
-            'zone_id' => 2,
-            'latitude' => 21.207058,
-            'longitude' => -86.853767,
+        DB::table('zones')->insert([
+            'destination_id' => 1,
+            'name' => "Tulum Zona Hotelera",
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        DB::table('zones_points')->insert([
-            'zone_id' => 2,
-            'latitude' => 21.161289,
-            'longitude' => -86.946835,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        DB::table('zones_points')->insert([
-            'zone_id' => 2,
-            'latitude' => 21.093796,
-            'longitude' => -86.907953,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-         #Puntoz de Zonas - Cancun Hotel Zone
-         DB::table('zones_points')->insert([
-            'zone_id' => 3,
-            'latitude' => 21.020191,
-            'longitude' => -86.808859,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        DB::table('zones_points')->insert([
-            'zone_id' => 3,
-            'latitude' => 21.170483,
-            'longitude' => -86.815278,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        DB::table('zones_points')->insert([
-            'zone_id' => 3,
-            'latitude' => 21.152723,
-            'longitude' => -86.732705,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        DB::table('zones_points')->insert([
-            'zone_id' => 3,
-            'latitude' => 21.020080,
-            'longitude' => -86.778166,
+        DB::table('zones')->insert([
+            'destination_id' => 1,
+            'name' => "Bahía Principe",
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -222,18 +181,7 @@ class ApiSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        DB::table('destination_services')->insert([
-            'name' => 'Shared Shuttle',
-            'passengers' => 8,
-            'luggage' => 5,
-            'order' => 3,
-            'destination_id' => 1,
-            'status' => 1,
-            'image_url' => 'https://ik.imagekit.io/zqiqdytbq/transportation-api/shared.jpg',
-            'price_type' => 'shared',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+
         #Servicios - Traducciones
         DB::table('destination_services_translate')->insert([
             'lang' => 'es',
@@ -250,13 +198,6 @@ class ApiSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        DB::table('destination_services_translate')->insert([
-            'lang' => 'es',
-            'translation' => "Transportación compartida",
-            'destination_services_id' => 3,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
 
         //Rate Groups
         DB::table('rates_groups')->insert([
@@ -265,132 +206,12 @@ class ApiSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-       
-        //Cancun Downtown
-        #Precios - Taxi
-        DB::table('rates')->insert([
-            'destination_service_id' => 1,
-            'destination_id' => 1,
-            'rate_group_id' => 1,
-            'zone_id' => 2,
-            'one_way' => 34,
-            'round_trip' => 60,
-            'ow_12' => 0,
-            'rt_12' => 0,
-            'ow_37' => 0,
-            'rt_37' => 0,
-            'up_8_ow' => 0,
-            'up_8_rt' => 0,
+        DB::table('rates_groups')->insert([
+            'name' => "Afiliados",
+            'code' => "vPFGoWD",
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
-
-        #Precios - Private
-        DB::table('rates')->insert([
-            'destination_service_id' => 2,
-            'destination_id' => 1,
-            'rate_group_id' => 1,
-            'zone_id' => 2,
-            'one_way' => 0,
-            'round_trip' => 0,
-            'ow_12' => 30,
-            'rt_12' => 55,
-            'ow_37' => 40,
-            'rt_37' => 75,
-            'up_8_ow' => 50,
-            'up_8_rt' => 95,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('rates')->insert([
-            'destination_service_id' => 3,
-            'destination_id' => 1,
-            'rate_group_id' => 1,
-            'zone_id' => 2,
-            'one_way' => 10,
-            'round_trip' => 18,
-            'ow_12' => 0,
-            'rt_12' => 0,
-            'ow_37' => 0,
-            'rt_37' => 0,
-            'up_8_ow' => 0,
-            'up_8_rt' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        //Cancun Hotel Zone
-        #Precios - Taxi
-        DB::table('rates')->insert([
-            'destination_service_id' => 1,
-            'destination_id' => 1,
-            'rate_group_id' => 1,
-            'zone_id' => 3,
-            'one_way' => 34,
-            'round_trip' => 60,
-            'ow_12' => 0,
-            'rt_12' => 0,
-            'ow_37' => 0,
-            'rt_37' => 0,
-            'up_8_ow' => 0,
-            'up_8_rt' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        #Precios - Private
-        DB::table('rates')->insert([
-            'destination_service_id' => 2,
-            'destination_id' => 1,
-            'rate_group_id' => 1,
-            'zone_id' => 3,
-            'one_way' => 0,
-            'round_trip' => 0,
-            'ow_12' => 30,
-            'rt_12' => 55,
-            'ow_37' => 40,
-            'rt_37' => 75,
-            'up_8_ow' => 50,
-            'up_8_rt' => 95,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        DB::table('rates')->insert([
-            'destination_service_id' => 3,
-            'destination_id' => 1,
-            'rate_group_id' => 1,
-            'zone_id' => 3,
-            'one_way' => 12,
-            'round_trip' => 22,
-            'ow_12' => 0,
-            'rt_12' => 0,
-            'ow_37' => 0,
-            'rt_37' => 0,
-            'up_8_ow' => 0,
-            'up_8_rt' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]); 
-
-        //Tarfias de Transfers
-        DB::table('rates_transfers')->insert([
-            'destination_service_id' => 1,
-            'destination_id' => 1,
-            'rate_group_id' => 1,
-            'zone_one' => 2,
-            'zone_two' => 3,
-            'one_way' => 34,
-            'round_trip' => 60,
-            'ow_12' => 0,
-            'rt_12' => 0,
-            'ow_37' => 0,
-            'rt_37' => 0,
-            'up_8_ow' => 0,
-            'up_8_rt' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        ]);         
 
 
         //Tipo de Cambio

@@ -10,6 +10,7 @@ use App\Http\Controllers\Reservations\ReservationsController;
 use App\Http\Controllers\Sales\SalesController;
 use App\Http\Controllers\Tpv\TpvController;
 use App\Http\Controllers\Configs\ZonesController;
+use App\Http\Controllers\Configs\RatesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,7 +63,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/config/destinations/{id}/points', [ZonesController::class, 'getPoints'])->name('config.getPoints');
     Route::put('/config/destinations/{id}/points', [ZonesController::class, 'setPoints'])->name('config.setPoints');
 
-    //Route::get('/config/zones/get/{id}', [ZonesController::class, 'getZones'])->name('config.getZones');
-    //Route::get('/config/zones/points', [ZonesController::class, 'getPoints'])->name('config.getPoints');
-    //Route::put('/config/zones/points/{id}', [ZonesController::class, 'setPoints'])->name('config.setPoints');
+    Route::get('/config/rates/destination', [RatesController::class, 'index'])->name('config.ratesDestination');
+    Route::get('/config/rates/destination/{id}/get', [RatesController::class, 'items'])->name('config.ratesZones');
+    Route::post('/config/rates/get', [RatesController::class, 'getRates'])->name('config.getRates');
+    Route::post('/config/rates/new', [RatesController::class, 'newRates'])->name('config.newRates');
+    Route::delete('/config/rates/delete', [RatesController::class, 'deleteRates'])->name('config.deleteRates');
+    Route::put('/config/rates/update', [RatesController::class, 'updateRates'])->name('config.updateRates');
 });
