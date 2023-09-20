@@ -29,12 +29,7 @@ class ZonesRepository{
                                         'destination_id' => $request->id,
                                 ]);
         if(sizeof($data) <= 0):
-            return response()->json([
-                'error' => [
-                    'code' => 'NOT_FOUND', 
-                    'message' =>  'Zones points not found'
-                ]
-            ], Response::HTTP_BAD_REQUEST);
+            return response()->json([], 200);
         endif;
 
         $items = [];
