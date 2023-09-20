@@ -75,8 +75,8 @@
                     <div class="currency">
                         <label class="form-label" for="bookingCurrencyForm">Moneda</label>
                         <select class="form-control mb-2" id="bookingCurrencyForm" name="currency">
-                            <option value="USD">MXN</option>
-                            <option value="MXN">USD</option>
+                            <option value="USD">USD</option>
+                            <option value="MXN">MXN</option>
                         </select>
                     </div>
                     <div class="dates">
