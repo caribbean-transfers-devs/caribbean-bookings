@@ -78,7 +78,7 @@ class RatesRepository{
             "to_data" => [],
             "rate_group_data" => [],
         ];
-
+        
         if(sizeof($rates) <= 0 && $request->service_id != 0):                       
             $data['from_data'] = Zones::find($request->from_id)->toArray();
             $data['to_data'] = Zones::find($request->to_id)->toArray();
