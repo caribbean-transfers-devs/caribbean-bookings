@@ -128,7 +128,7 @@ function initDraw(zone_id) {
                     type: 'PUT',
                     data: { coordinates },
                     beforeSend: function() {        
-                        //$("#zones_table tbody").empty();
+                        $("#zone_map_container").empty().html(`<div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div>`);
                     },
                     success: function(resp) {
                         
@@ -161,8 +161,7 @@ function initDraw(zone_id) {
                             xhr.responseJSON.message,
                             'error'
                         );
-                        //$("#zones_table tbody").empty();
-                        //$("#btn_qbtnSearchZonesuote").prop('disabled', false);
+                        $("#zonesModal").modal("hide");
                 });
 
                 console.log( coordinates );

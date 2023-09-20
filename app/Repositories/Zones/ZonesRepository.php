@@ -57,16 +57,14 @@ class ZonesRepository{
             DB::beginTransaction();
             
             $delete = ZonesPoints::where('zone_id', $request->id)->delete();
-            if($delete):
-                if(sizeof($request->coordinates) >= 1):
-                    foreach($request->coordinates as $key => $value):
-                        $point = new ZonesPoints;
-                        $point->zone_id = $request->id;
-                        $point->latitude = $value['lat'];
-                        $point->longitude = $value['lng'];
-                        $point->save();                        
-                    endforeach;
-                endif;
+            if(sizeof($request->coordinates) >= 1):
+                foreach($request->coordinates as $key => $value):
+                    $point = new ZonesPoints;
+                    $point->zone_id = $request->id;
+                    $point->latitude = $value['lat'];
+                    $point->longitude = $value['lng'];
+                    $point->save();                        
+                endforeach;
             endif;
 
             DB::commit();
