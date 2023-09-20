@@ -67,7 +67,7 @@
         <button type="button" class="btn btn-sm btn-success btnUpdateRates">Actualizar Tarifas</button>
     </form>
 @else
-
+    @if ( isset( $data['from_data'] ) && !empty( $data['from_data'] ) )
     <form class="item" id="newPriceForm">
         <input type="hidden" name="rate_group_id" value="{{ $data['rate_group_data']['id'] }}"/>
         <input type="hidden" name="destination_service_id" value="{{ $data['service_data']['id'] }}"/>
@@ -130,4 +130,12 @@
             </div>
         @endif
     </form>
+    @else
+        <div class="alert alert-primary alert-dismissible" role="alert" style="margin:0px;">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert-message">
+                <strong>¡Lo sentimos!</strong> no hay tarifas que editar...
+            </div>
+        </div>
+    @endif
 @endif
