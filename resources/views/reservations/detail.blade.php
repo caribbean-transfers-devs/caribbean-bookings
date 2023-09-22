@@ -11,8 +11,8 @@
 @endpush
 
 @push('bootom-stack')
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.gmaps.key') }}&callback=initMap" async defer></script>
-    <script src="{{ mix('assets/js/views/reservationsDetail.js') }}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.gmaps.key') }}&libraries=places"></script>
+    <script src="{{ mix('assets/js/views/reservations/reservationsDetail.js') }}"></script>
     <script src="{{ mix('assets/js/datatables.js') }}"></script>
 @endpush
 

@@ -80,16 +80,21 @@
                     </li>
                     @endif
                     
+                    @if(RoleTrait::hasPermission(28) || RoleTrait::hasPermission(32))
                     <li class="sidebar-item">
                         <a href="#configs" data-bs-toggle="collapse" class="sidebar-link collapsed">
                             <i class="align-middle" data-feather="database"></i> <span class="align-middle">Configuraciones</span>
                         </a>
                         <ul id="configs" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            @if(RoleTrait::hasPermission(28))
                             <li class="sidebar-item"><a class="sidebar-link" href="{{ route('config.zones') }}">Zonas</a></li>
+                            @endif
+                            @if(RoleTrait::hasPermission(32))
                             <li class="sidebar-item"><a class="sidebar-link" href="{{ route('config.ratesDestination') }}">Tarifas</a></li>
+                            @endif
                         </ul>
                     </li>                    
-
+                    @endif
 
                     @if(RoleTrait::hasPermission(1) || RoleTrait::hasPermission(6))
                     <li class="sidebar-item @if(request()->is('users') || request()->is('roles')) active @endif">

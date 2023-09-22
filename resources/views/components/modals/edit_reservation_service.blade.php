@@ -30,7 +30,9 @@
                         </div>
                         <div class="col-sm-12 col-md-12">
                             <label class="form-label" for="serviceToForm">Hacia</label>
-                            <input type="text" class="form-control mb-2" id="serviceToForm" name="to_name">
+                            <div style="position:relative;">
+                                <input type="text" class="form-control mb-2" id="serviceToForm" name="to_name">
+                            </div>
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceDateForm">Hora de recogida</label>

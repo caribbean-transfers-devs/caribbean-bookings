@@ -4,7 +4,9 @@
 @extends('layout.master')
 @section('title') Usuarios @endsection
 
-@push('up-stack')    
+@push('up-stack')
+    <link href="{{ mix('/assets/css/users/index.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/users/index.min.css') }}" rel="stylesheet" > 
 @endpush
 
 @push('bootom-stack')
@@ -15,22 +17,21 @@
 @section('content')
     <div class="container-fluid p-0">
 
-        <h1 class="h3 mb-3">Usuarios</h1>
+        <div class="top_items">
+            <h1 class="h3">Usuarios</h1>
+            <div>   
+                @if(RoleTrait::hasPermission(2))                         
+                    <a href="{{ route('users.create') }}" class="btn btn-success">Añadir Usuario</a>   
+                @endif
+                @if(RoleTrait::hasPermission(5)) 
+                    <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#whiteIPsModal">Ver IPs</a>   
+                @endif                      
+            </div>   
+        </div>        
 
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Usuarios</h5>
-                        <div class="card-header d-flex justify-content-end align-items-center gap-3">   
-                            @if(RoleTrait::hasPermission(2))                         
-                                <a href="{{ route('users.create') }}" class="btn btn-success">Añadir Usuario</a>   
-                            @endif
-                            @if(RoleTrait::hasPermission(5)) 
-                                <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#whiteIPsModal">Ver IPs</a>   
-                            @endif                      
-                        </div>                       
-                    </div>
                     <div class="card-body">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item" role="presentation"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab" aria-selected="true">Usuarios Activos</a></li>

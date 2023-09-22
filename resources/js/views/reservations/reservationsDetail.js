@@ -366,6 +366,8 @@ function serviceInfo(origin,destination,time,km){
 }
 
 function itemInfo(item){
+    console.log(item);
+
     $("#item_id_edit").val(item.id);
     $("#servicePaxForm").val(item.passengers);
     $("#destination_serv").val(item.destination_service_id);
@@ -373,6 +375,13 @@ function itemInfo(item){
     $("#serviceToForm").val(item.to_name);
     $("#serviceDateForm").val(item.op_one_pickup);
     $("#serviceFlightForm").val(item.flight_number);
+
+    $("#from_lat_edit").val(item.from_lat);
+    $("#from_lng_edit").val(item.from_lng);
+    $("#to_lat_edit").val(item.to_lat);
+    $("#to_lng_edit").val(item.to_lng);
+
+
     if(item.op_one_status != 'PENDING'){
         $("#serviceDateForm").prop('readonly', true);
     }
@@ -573,4 +582,33 @@ $("#btn_edit_item").on('click', function(){
         )
         $("#btn_edit_item").prop('disabled', false);
     });
+});
+
+function initialize(div) {
+    var input = document.getElementById(div);
+    var autocomplete = new google.maps.places.Autocomplete(input);
+  
+    autocomplete.addListener('place_changed', function() {
+        var place = autocomplete.getPlace();
+        if(div == "serviceFromForm"){        
+          var fromLat = document.getElementById("from_lat_edit");
+              fromLat.value = place.geometry.location.lat();
+  
+          var fromLng = document.getElementById("from_lng_edit");
+              fromLng.value = place.geometry.location.lng();
+        }
+        if(div == "serviceToForm"){
+          var toLat = document.getElementById("to_lat_edit");
+              toLat.value = place.geometry.location.lat();
+  
+          var toLng = document.getElementById("to_lng_edit");
+              toLng.value = place.geometry.location.lng();
+        }
+    });
+}
+
+$(function() {
+    google.maps.event.addDomListener(window, 'load', initialize('serviceFromForm') );
+    google.maps.event.addDomListener(window, 'load', initialize('serviceToForm') );
+    initMap();
 });
