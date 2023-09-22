@@ -1,6 +1,8 @@
 @if(sizeof($rates) >= 1)
     <form id="editPriceForm">
-        <button type="button" class="btn btn-sm btn-success btnUpdateRates">Actualizar Tarifas</button>
+        @if (!RoleTrait::hasPermission(34))
+            <button type="button" class="btn btn-sm btn-success btnUpdateRates">Actualizar Tarifas</button>
+        @endif
         @foreach($rates as $key => $value)
             @php
                 // echo "<pre>";
@@ -26,7 +28,9 @@
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][round_trip]" value="{{ $value->round_trip }}">
                             </div>
                         </div>
-                        <button class="btn btn-sm btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
+                        @if (!RoleTrait::hasPermission(35))
+                            <button class="btn btn-sm btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
+                        @endif
                     </div>
                 @endif
 
@@ -58,13 +62,17 @@
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][up_8_rt]" value="{{ $value->up_8_rt }}">
                             </div>
                         </div>
-                        <button class="btn btn-sm btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
+                        @if (!RoleTrait::hasPermission(35))
+                            <button class="btn btn-sm btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
+                        @endif
                     </div>
                 @endif
                 
             </div>
         @endforeach
-        <button type="button" class="btn btn-sm btn-success btnUpdateRates">Actualizar Tarifas</button>
+        @if (!RoleTrait::hasPermission(34))
+            <button type="button" class="btn btn-sm btn-success btnUpdateRates">Actualizar Tarifas</button>
+        @endif
     </form>
 @else
     @if ( isset( $data['from_data'] ) && !empty( $data['from_data'] ) )
@@ -94,7 +102,9 @@
                         <input type="text" class="form-control" value="0.00" name="round_trip">
                     </div>
                 </div>
-                <button class="btn btn-sm btn-success" type="button" id="btn_add_rate">Agregar Tarifa</button>
+                @if (!RoleTrait::hasPermission(33))
+                    <button class="btn btn-sm btn-success" type="button" id="btn_add_rate">Agregar Tarifa</button>
+                @endif
             </div>
         @endif
 
@@ -126,7 +136,9 @@
                         <input type="text" class="form-control" value="0.00" name="up_8_rt">
                     </div>
                 </div>
-                <button class="btn btn-sm btn-success" type="button" id="btn_add_rate">Agregar Tarifa</button>
+                @if (!RoleTrait::hasPermission(33))
+                    <button class="btn btn-sm btn-success" type="button" id="btn_add_rate">Agregar Tarifa</button>
+                @endif
             </div>
         @endif
     </form>
