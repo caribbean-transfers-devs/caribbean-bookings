@@ -12,78 +12,33 @@
 @extends('layout.master')
 @section('title') Reservaciones @endsection
 
-@push('up-stack')    
+@push('up-stack')
+    <link href="{{ mix('/assets/css/reservations/index.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/reservations/index.min.css') }}" rel="stylesheet" > 
 @endpush
 
 @push('bootom-stack')
-    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
     <script src="{{ mix('assets/js/datatables.js') }}"></script>
-    <script src="{{ mix('assets/js/views/reservationsIndex.js') }}"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="{{ mix('assets/js/views/reservations/reservationsIndex.js') }}"></script>
 @endpush
 
 @section('content')
     <div class="container-fluid p-0">
         @php
             // echo "<pre>";
-            // print_r($websites);
+            // print_r($data);
             // die();
         @endphp
-        <h1 class="h3 mb-3">Reservaciones</h1>
-        <div class="card">                    
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 col-sm-3">
-                        <label class="form-label" for="lookup_date">Fecha de creación</label>
-                        <input type="text" name="date" id="lookup_date" class="form-control" value="">
-                    </div>
-                    <div class="col-12 col-sm-3">
-                        <label class="form-label" for="filter_text">Nombre/Reservación/Teléfono/Referencia</label>
-                        <input type="text" name="filter_text" id="filter_text" class="form-control mb-3">
-                    </div>
-                    <div class="col-12 col-sm-3">
-                        <label class="form-label" for="filter_text">Tipo de producto</label>
-                        <select class="form-control mb-3">
-                            @foreach ($services as $key => $value)
-                                <optgroup label="{{ $key }}">
-                                    @foreach ($value as $service)                                    
-                                        <option value="{{ $service->id }}">{{ $service->service_name }}</option>                                                          
-                                    @endforeach
-                                </optgroup>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-12 col-sm-3">
-                        <label class="form-label" for="filter_text">Zona</label>
-                            <select class="form-control mb-3">
-                                @foreach ($zones as $key => $value)
-                                <optgroup label="{{ $key }}">
-                                    @foreach ($value as $zone)                                    
-                                        <option value="{{ $zone->id }}">{{ $zone->zone_name }}</option>                                                          
-                                    @endforeach
-                                </optgroup>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-12 col-sm-3">
-                        <label class="form-label" for="filter_text">Sitio</label>
-                        <select class="form-control mb-3">
-                            @foreach ($websites as $key => $value)
-                                <option value="{{ $value->id }}">{{ $value->site_name }}</option> 
-                            @endforeach
-                        </select>                        
-                    </div>
-                    <div class="col-12 col-sm-3">
-                        <label class="form-label" for="filter_text">Método de pago</label>
-                        <select class="form-control mb-3">
-                            <option value="1">CASH</option>
-                            <option value="1">CARD</option>
-                            <option value="1">PAYPAL</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <h1 class="h3 mb-3 button_">
+            Reservaciones
+            <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</a>  
+        </h1>
+        
         <div class="row">
             <div class="col-12 col-sm-9">
                 <div class="card">                    
@@ -269,4 +224,5 @@
 
     </div>
 
+<x-modals.reservations.listing :data="$data" :services="$services" :zones="$zones" :websites="$websites" />    
 @endsection

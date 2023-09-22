@@ -13,13 +13,62 @@ use Illuminate\Support\Facades\DB;
 class ReservationsRepository
 {
     public function index($request)
-    {   
-
-        $date = [
-            "init" => date("Y-m-d"),
-            "end" => date("Y-m-d")
+    {          
+        $data = [
+            "init" => date("Y-m-d") . " 00:00:00",
+            "end" => date("Y-m-d") . " 23:59:59",
+            "filter_text" => NULL,
+            "product_type" => 0,
+            "zone" => 0,
+            "site" => 0,
+            "payment_method" => NULL
+        ];
+        
+        //Query DB
+        $query = ' AND rez.created_at BETWEEN :init AND :end';
+        $queryData = [
+            'init' => date("Y-m-d") . " 00:00:00",
+            'end' => date("Y-m-d") . " 23:59:59",
         ];
 
+        if(isset( $request->date ) && !empty( $request->date )){            
+            $tmp_date = explode(" - ", $request->date);
+            $data['init'] = $tmp_date[0];
+            $data['end'] = $tmp_date[1];
+            
+            $queryData['init'] = $data['init'].' 00:00:00';
+            $queryData['end'] = $data['end'].' 23:59:59';
+        }        
+        if(isset( $request->product_type ) && !empty( $request->product_type )){
+            $data['product_type'] = $request->product_type;
+
+            $queryData['product_type'] = $data['product_type'];
+            $query .= " AND FIND_IN_SET(:product_type, service_type_id) > 0";
+        }
+        if(isset( $request->zone ) && !empty( $request->zone )){
+            $data['zone'] = $request->zone;
+            $queryData['zone'] = $data['zone'];
+            $query .= " AND FIND_IN_SET(:zone, zone_two_id) > 0";
+        }
+        if(isset( $request->site ) && $request->site != 0){
+            $data['site'] = $request->site;
+            $query .= ' AND site.id = :site';
+            $queryData['site'] = $data['site'];
+        }
+        if(isset( $request->payment_method ) && !empty( $request->payment_method )){
+            $data['payment_method'] = $request->payment_method;
+        }
+        if(isset( $request->filter_text ) && !empty( $request->filter_text )){            
+            $data['filter_text'] = $request->filter_text;
+            $queryData = [];
+            $query  = " AND (
+                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
+                        ( rez.client_phone like '%".$data['filter_text']."%') OR
+                        ( rez.client_email like '%".$data['filter_text']."%') OR
+                        ( it.code like '".$data['filter_text']."' )
+                    )";            
+        }         
+        
         $bookings = DB::select("SELECT 
                                     rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, 
                                     rez.pay_at_arrival,
@@ -32,6 +81,8 @@ class ReservationsRepository
                                     site.name as site_name,
                                     GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
                                     GROUP_CONCAT(DISTINCT it.zone_two_name ORDER BY it.zone_two_name ASC SEPARATOR ',') AS destination_name,
+                                    GROUP_CONCAT(DISTINCT it.zone_two_id ORDER BY it.zone_two_id ASC SEPARATOR ',') AS zone_two_id,
+                                    GROUP_CONCAT(DISTINCT it.service_type_id ORDER BY it.service_type_id ASC SEPARATOR ',') AS service_type_id,
                                     GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
                                     SUM(it.passengers) as passengers,
                                     GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name
@@ -53,19 +104,21 @@ class ReservationsRepository
                                     ) as p ON p.reservation_id = rez.id
                                     LEFT JOIN (
                                         SELECT 
-                                            it.reservation_id, it.passengers, it.code, zone_one.name as zone_one_name, zone_two.name as zone_two_name, it.is_round_trip, dest.name as service_type_name
+                                            it.reservation_id, it.passengers, it.code, zone_one.id as zone_one_id, zone_one.name as zone_one_name, zone_two.id as zone_two_id, zone_two.name as zone_two_name, it.is_round_trip, 
+                                            dest.id as service_type_id,
+                                            dest.name as service_type_name
                                         FROM reservations_items as it
                                         INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                         INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
                                         INNER JOIN destination_services as dest ON dest.id = it.destination_service_id
                                     ) as it ON it.reservation_id = rez.id
-                                WHERE rez.created_at BETWEEN :init AND :end
+                                WHERE 1=1 {$query}
                                 GROUP BY rez.id, site.name",
-                                    [
-                                        'init' => $date['init'].' 00:00:00',
-                                        'end' => $date['end'].' 23:59:59',
-                                    ]);
-        
+                                    $queryData);
+        // echo "<pre>";
+        // print_r($bookings);
+        // die();
+
         $services = [];
         $db_services = DB::select("SELECT ds.id, dest.name as destination_name, IFNULL(dest_trans.translation, ds.name) AS service_name
                                 FROM destination_services as ds
@@ -98,7 +151,7 @@ class ReservationsRepository
         // print_r($sites);
         // die();
 
-        return view('reservations.index', compact('bookings','services','zones','websites') );
+        return view('reservations.index', compact('bookings','services','zones','websites','data') );
 
         /*if(!$request->lookup_date){
             $from = date('Y-m-d');

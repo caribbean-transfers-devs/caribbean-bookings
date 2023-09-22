@@ -42,6 +42,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/reservations', [ReservationsController::class, 'index'])->name('reservations.index');
+    Route::post('/reservations', [ReservationsController::class, 'index'])->name('reservations.search');
     Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');
     Route::delete('/reservations/{reservation}', [ReservationsController::class, 'destroy'])->name('reservations.destroy');
     Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->where('id', '[0-9]+');
