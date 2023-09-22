@@ -9,6 +9,7 @@
 	<meta name="description" content="Caribbean Transfers - Bookings">
     <link rel="preconnect" href="https://fonts.gstatic.com">
 	<link rel="shortcut icon" href="/assets/img/icons/icon-48x48.png">
+	<meta name='robots' content='noindex,follow' />
 
     <link href="{{ mix('/assets/css/base/fonts.min.css') }}&family=Inter:wght@300;400;600&display=swap" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/base/fonts.min.css') }}&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" >
