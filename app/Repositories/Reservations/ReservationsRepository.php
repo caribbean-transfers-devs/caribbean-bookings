@@ -72,8 +72,7 @@ class ReservationsRepository
         $bookings = DB::select("SELECT 
                                     rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, 
                                     rez.pay_at_arrival,
-                                    SUM(s.total_sales) as total_sales,
-                                    SUM(p.total_payments) as total_payments,
+                                    COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     CASE
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         ELSE 'CONFIRMED'
@@ -103,14 +102,18 @@ class ReservationsRepository
                                         GROUP BY reservation_id
                                     ) as p ON p.reservation_id = rez.id
                                     LEFT JOIN (
-                                        SELECT 
-                                            it.reservation_id, it.passengers, it.code, zone_one.id as zone_one_id, zone_one.name as zone_one_name, zone_two.id as zone_two_id, zone_two.name as zone_two_name, it.is_round_trip, 
-                                            dest.id as service_type_id,
-                                            dest.name as service_type_name
+                                        SELECT  it.reservation_id, it.is_round_trip,
+                                                SUM(it.passengers) as passengers,
+                                                GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS code,
+                                                GROUP_CONCAT(DISTINCT zone_two.name ORDER BY zone_two.name ASC SEPARATOR ',') AS zone_two_name, 
+                                                GROUP_CONCAT(DISTINCT zone_two.id ORDER BY zone_two.id ASC SEPARATOR ',') AS zone_two_id, 
+                                                GROUP_CONCAT(DISTINCT dest.id ORDER BY dest.id ASC SEPARATOR ',') AS service_type_id, 
+                                                GROUP_CONCAT(DISTINCT dest.name ORDER BY dest.name ASC SEPARATOR ',') AS service_type_name
                                         FROM reservations_items as it
                                         INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                         INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
                                         INNER JOIN destination_services as dest ON dest.id = it.destination_service_id
+                                        GROUP BY it.reservation_id, it.is_round_trip
                                     ) as it ON it.reservation_id = rez.id
                                 WHERE 1=1 {$query}
                                 GROUP BY rez.id, site.name",
