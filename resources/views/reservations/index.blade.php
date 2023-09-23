@@ -99,7 +99,7 @@
                                                     $resume['status']['CANCELLED'][$item->currency] += $item->total_sales;
                                                     $resume['status']['CANCELLED']['count']++;
                                                 endif;                                                
-
+                                                $total_pending = $item->total_sales - $item->total_payments;
                                             @endphp
                                             <tr>
                                                 <td>{{ $item->site_name }}</td>
@@ -126,7 +126,7 @@
                                                 <td class="text-center">{{ $item->passengers }}</td>
                                                 <td class="text-end">{{ $item->total_sales }}</td>
                                                 <td class="text-center">{{ $item->currency }}</td>
-                                                <td class="text-end">{{ number_format(($item->total_sales - $item->total_payments),2) }}</td>
+                                                <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td>
                                                 <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td>
                                                 <td class="text-center">{{ $item->destination_name }}</td>
                                             </tr>
