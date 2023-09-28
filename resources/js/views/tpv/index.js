@@ -118,3 +118,16 @@ function makeReservationButton(event){
       $("#btn_make_reservation").prop('disabled', false).text("Enviar");
   });
 }
+
+function setTotal(total){
+  $("#formTotal").val(total);  
+}
+
+$(document).on("change", "#formSite", function() {
+  var selectedValue = $(this).val();
+  $("#formTotal").attr("readonly", true);
+  
+  if(selectedValue == 5){
+    $("#formTotal").attr("readonly", false);
+  }
+});

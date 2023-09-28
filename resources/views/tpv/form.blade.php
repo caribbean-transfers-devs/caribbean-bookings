@@ -28,7 +28,7 @@
                             <p>Veículos ({{ $item['vehicles'] }})</p>
                         </div>
                         <div>
-                            <input type="radio" class="checkButton" id="serviceButton-{{$service_counter}}" name="service_token" value="{{ $item['token'] }}">
+                            <input type="radio" class="checkButton" id="serviceButton-{{$service_counter}}" name="service_token" value="{{ $item['token'] }}" onclick="setTotal('{{ $item['price'] }}')">
                             <label for="serviceButton-{{$service_counter}}" class="btn custom-button">
                                 Reservar
                             </label>
@@ -105,6 +105,10 @@
                             @endforeach
                         @endif
                     </select>
+                </div>
+                <div>
+                    <label class="form-label" for="formTotal">Total</label>
+                    <input class="form-control" type="number" name="data[callcenter][total]" id="formTotal" autocomplete="off" value="0" readonly>
                 </div>
                 <button type="button" class="btn btn-success" onclick="makeReservationButton(event)" id="btn_make_reservation">Enviar</button>
             </div>
