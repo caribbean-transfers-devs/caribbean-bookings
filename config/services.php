@@ -39,4 +39,8 @@ return [
     'gmaps' => [
         'key' => env('GMAPS_API_KEY'),
     ],
+    'mailjet' => [
+        'key' => env('MAILJET_KEY'),
+        'secret' => env('MAILJET_SECRET'),
+    ],
 ];

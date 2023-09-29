@@ -68,19 +68,40 @@ function sendMail(code,mail,languague){
     
 }
 
-function sendInvitation(code,mail,languague){
-    var url = "https://api.caribbean-transfers.com/api/v1/reservation/send?code="+code+"&email="+mail+"&language="+languague+"&type=new";
+function sendInvitation(event, item_id, lang = 'en'){
+    event.preventDefault();
+    var url = "/reservations/payment-request";
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    }); 
     $.ajax({
         url: url,
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
+        data: { item_id:item_id, lang:lang },
         success: function (data) {
-            swal.fire({
-                title: 'Invitación enviado',
-                text: 'Se ha enviado la invitación correctamente',
+            Swal.fire({
+                title: '¡Éxito!',
                 icon: 'success',
-                confirmButtonText: 'Aceptar'
-            });
+                html: 'Solicitúd de pago enviada. Será redirigido en <b></b>',
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading()
+                    const b = Swal.getHtmlContainer().querySelector('b')
+                    timerInterval = setInterval(() => {
+                        b.textContent = (Swal.getTimerLeft() / 1000)
+                            .toFixed(0)
+                    }, 100)
+                },
+                willClose: () => {
+                    clearInterval(timerInterval)
+                }
+            }).then((result) => {
+                location.reload();
+            })
         },
         error: function (data) {
             swal.fire({
@@ -90,8 +111,7 @@ function sendInvitation(code,mail,languague){
                 confirmButtonText: 'Aceptar'
             });
         }
-    });
-    
+    });    
 }
 
 function cancelReservation(id){
@@ -612,3 +632,134 @@ $(function() {
     google.maps.event.addDomListener(window, 'load', initialize('serviceToForm') );
     initMap();
 });
+
+function getContactPoints(item_id, destination_id){
+    $("#arrival_confirmation_item_id").val(item_id);
+    $("#terminal_id").empty().html('<option value="0">Cargando...</option>');
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    $.ajax({
+        url: '/reservations/confirmation/contact-points',
+        type: 'POST',
+        data: { destination_id: destination_id },
+        success: function(resp) {
+            //console.log(resp);
+            let xHTML = '';
+            for (const key in resp) {
+                if (resp.hasOwnProperty(key)) {
+                    const data = resp[key];
+                    xHTML += `<option value="${data.id}">${data.name}</option>`;                    
+                }
+            }
+            $("#terminal_id").empty().html(xHTML);           
+        }
+    }).fail(function(xhr, status, error) {
+        Swal.fire(
+            '¡ERROR!',
+            xhr.responseJSON.message,
+            'error'
+        )        
+    });    
+}
+
+function sendArrivalConfirmation(){
+    $("#btnSendArrivalConfirmation").prop('disabled', true);
+    let frm_data = $("#formArrivalConfirmation").serializeArray();    
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    $.ajax({
+        url: '/reservations/confirmation/arrival',
+        type: 'POST',
+        data: frm_data,
+        success: function(resp) {
+            
+            if (resp.status == 'success') {
+                window.onbeforeunload = null;
+                let timerInterval
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    html: 'Confirmación enviada. Será redirigido en <b></b>',
+                    timer: 2500,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        const b = Swal.getHtmlContainer().querySelector('b')
+                        timerInterval = setInterval(() => {
+                            b.textContent = (Swal.getTimerLeft() / 1000)
+                                .toFixed(0)
+                        }, 100)
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    location.reload();
+                })
+            }
+        }
+    }).fail(function(xhr, status, error) {
+        Swal.fire(
+            '¡ERROR!',
+            xhr.responseJSON.message,
+            'error'
+        )
+        $("#btnSendArrivalConfirmation").prop('disabled', false);
+    });
+}
+
+function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en'){
+    event.preventDefault();
+    //console.log(item_id);
+    //console.log(destination_id);
+    //$("#arrival_confirmation_item_id").val(item_id);
+    //$("#terminal_id").empty().html('<option value="0">Cargando...</option>');
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    $.ajax({
+        url: '/reservations/confirmation/departure',
+        type: 'POST',
+        data: { item_id:item_id, destination_id: destination_id, lang:lang },
+        success: function(resp) {
+            if (resp.status == 'success') {
+                window.onbeforeunload = null;
+                let timerInterval
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    html: 'Confirmación de regreso enviada. Será redirigido en <b></b>',
+                    timer: 2500,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        const b = Swal.getHtmlContainer().querySelector('b')
+                        timerInterval = setInterval(() => {
+                            b.textContent = (Swal.getTimerLeft() / 1000)
+                                .toFixed(0)
+                        }, 100)
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    location.reload();
+                })
+            }    
+        }
+    }).fail(function(xhr, status, error) {
+        Swal.fire(
+            '¡ERROR!',
+            xhr.responseJSON.message,
+            'error'
+        )        
+    });
+}

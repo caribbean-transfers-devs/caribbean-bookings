@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReservationDetailsRequest;
 use App\Http\Requests\ReservationFollowUpsRequest;
 use App\Http\Requests\ReservationItemRequest;
+use App\Http\Requests\ReservationConfirmationRequest;
 use App\Models\Reservation;
 use App\Models\ReservationsItem;
 use App\Models\Role;
@@ -64,5 +65,21 @@ class ReservationsController extends Controller
         if(RoleTrait::hasPermission(13)){
             return $reservationRepository->editreservitem($request,$item);
         }
+    }
+
+    public function contactPoint(Request $request, ReservationsRepository $reservationRepository){
+        return $reservationRepository->getContactPoints($request);
+    }
+
+    public function arrivalConfirmation(ReservationConfirmationRequest $request, ReservationsRepository $reservationRepository){
+        return $reservationRepository->sendArrivalConfirmation($request);
+    }
+
+    public function departureConfirmation(Request $request, ReservationsRepository $reservationRepository){
+        return $reservationRepository->sendDepartureConfirmation($request);
+    }
+
+    public function paymentRequest(Request $request, ReservationsRepository $reservationRepository){
+        return $reservationRepository->sendPaymentRequest($request);
     }
 }

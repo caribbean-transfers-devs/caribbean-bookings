@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('payment_domain')->nullable();
             $table->string('color', 40);
             $table->string('transactional_email');
+            $table->string('transactional_phone');
             $table->tinyInteger('transactional_email_send')->default(1);
             $table->tinyInteger('is_commissionable')->default(1);
             $table->timestamps();
