@@ -145,7 +145,15 @@
                     </div>
                     @endif
                     @if (RoleTrait::hasPermission(22))
-                    <button class="btn btn-secondary btn-sm" onclick="sendInvitation('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Invitación de pago</button>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Invitación de pago
+                            </button>
+                            <div class="dropdown-menu" style="">
+                                <a class="dropdown-item" href="#" onclick="sendInvitation(event, '{{ $reservation->id }}','en')">Enviar en inglés</a>
+                                <a class="dropdown-item" href="#" onclick="sendInvitation(event, '{{ $reservation->id }}','es')">Enviar en español</a>
+                            </div>
+                        </div>
                     @endif
                     @if (RoleTrait::hasPermission(23))
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
@@ -184,7 +192,7 @@
                                 @endif
                             </div>
                             
-                            @foreach ($reservation->items as $item)                                                    
+                            @foreach ($reservation->items as $item)                      
                             <div class="services-container">
                                 <h3>{{ $item->code }}</h3>
                                 <div class="items-container">                                    
@@ -218,7 +226,7 @@
                                             @if (RoleTrait::hasPermission(13))
                                             <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" 
                                             onclick="itemInfo({{ $item }})">
-                                                <i class="align-middle" data-feather="edit"></i>
+                                                Editar
                                             </button>  
                                             @endif 
                                             @php
@@ -233,9 +241,25 @@
                                                 }
                                             @endphp                                        
                                             <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->from_name }}','{{ $item->to_name }}','{{ $time }}','{{ $item->distance_km }}')">
-                                                <i class="align-middle" data-feather="map-pin"></i>
+                                                Ver mapa
                                             </button>
-                                        </div>                                        
+                                            @if($item->is_primary == 1)
+                                                <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
+                                                    Confirmacion de llegada
+                                                </button>
+                                            @endif
+                                            @if ($item->is_round_trip)
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        Confirmacion de salida
+                                                    </button>
+                                                    <div class="dropdown-menu" style="">
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en')">Enviar en inglés</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es')">Enviar en español</a>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
                                     @if ($item->is_round_trip)
                                         <div class="flight_data">
@@ -383,4 +407,6 @@
 </x-modals.new_follow_reservation>
 
 <x-modals.edit_reservation_details :reservation=$reservation />
+<x-modals.reservations.confirmation :reservation=$reservation />
+
 @endsection

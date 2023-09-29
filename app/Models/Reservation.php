@@ -21,7 +21,10 @@ class Reservation extends Model
 
     public function items()
     {
-        return $this->hasMany(ReservationsItem::class, 'reservation_id', 'id');
+        //return $this->hasMany(ReservationsItem::class, 'reservation_id', 'id');
+        return $this->hasMany(ReservationsItem::class, 'reservation_id', 'id')
+        ->join('zones', 'zones.id', '=', 'reservations_items.from_zone')
+        ->select('reservations_items.*', 'reservations_items.id as reservations_item_id', 'zones.*');
     }
 
     public function payments()
