@@ -11,6 +11,7 @@ use App\Http\Controllers\Sales\SalesController;
 use App\Http\Controllers\Tpv\TpvController;
 use App\Http\Controllers\Configs\ZonesController;
 use App\Http\Controllers\Configs\RatesController;
+use App\Http\Controllers\Operation\OperationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +54,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/reservations/confirmation/arrival', [ReservationsController::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
     Route::post('/reservations/confirmation/departure', [ReservationsController::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');
     Route::post('/reservations/payment-request', [ReservationsController::class, 'paymentRequest'])->name('reservations.paymentRequest');
+
+    Route::get('/operation', [OperationController::class, 'index'])->name('operation.index');
 
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);

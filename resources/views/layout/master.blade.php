@@ -72,6 +72,23 @@
                         </a>
                     </li>
                     @endif
+
+                    @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37))
+                    <li class="sidebar-item">
+                        <a href="#operation" data-bs-toggle="collapse" class="sidebar-link collapsed">
+                            <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Operación</span>
+                        </a>
+                        <ul id="operation" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            @if(RoleTrait::hasPermission(36))
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.index') }}">Descargar</a></li>                           
+                            @endif
+                            @if(RoleTrait::hasPermission(37))
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.index') }}">Filtrar</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                    @endif
+
                     @if(RoleTrait::hasPermission(10))
                     <li class="sidebar-item @if(request()->is('reservations')) active @endif">
                         <a class="sidebar-link" href="{{ route('reservations.index') }}">
