@@ -56,6 +56,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/reservations/payment-request', [ReservationsController::class, 'paymentRequest'])->name('reservations.paymentRequest');
 
     Route::get('/operation', [OperationController::class, 'index'])->name('operation.index');
+    Route::get('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment');
+    Route::post('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment.search');
+    Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
 
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);
