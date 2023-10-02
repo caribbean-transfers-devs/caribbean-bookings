@@ -83,7 +83,7 @@
                                 <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.index') }}">Descargar</a></li>                           
                             @endif
                             @if(RoleTrait::hasPermission(37))
-                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.index') }}">Filtrar</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.managment') }}">Gestión</a></li>
                             @endif
                         </ul>
                     </li>
