@@ -1,3 +1,7 @@
+@php
+    use App\Traits\RoleTrait;
+@endphp
+
 @if(sizeof($rates) >= 1)
     <form id="editPriceForm">
         @if (!RoleTrait::hasPermission(34))
