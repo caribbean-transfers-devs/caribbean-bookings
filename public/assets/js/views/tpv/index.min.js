@@ -125,9 +125,10 @@ function setTotal(total){
 
 $(document).on("change", "#formSite", function() {
   var selectedValue = $(this).val();
-  $("#formTotal").attr("readonly", true);
+  //$("#formTotal").attr("readonly", true);
   
   if(selectedValue == 2 || selectedValue == 4 || selectedValue == 5){
-    $("#formTotal").attr("readonly", false);
+    //$("#formTotal").attr("readonly", false);
   }
+  $("#formTotal").attr("readonly", false);
 });
