@@ -325,7 +325,7 @@
                                             <td class="text-left">{{ $sale->description }}</td>
                                             <td class="text-center">{{ $sale->quantity }}</td>
                                             <td class="text-center">{{ number_format($sale->total,2) }}</td>
-                                            <td class="text-center">{{ $sale->callCenterAgent->name }}</td>
+                                            <td class="text-center">{{ $sale->callCenterAgent->name ?? 'System' }}</td>
                                             <td class="text-center">
                                                 @if (RoleTrait::hasPermission(15))
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#serviceSalesModal" onclick="getSale({{ $sale->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
