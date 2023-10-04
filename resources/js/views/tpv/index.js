@@ -127,7 +127,7 @@ $(document).on("change", "#formSite", function() {
   var selectedValue = $(this).val();
   $("#formTotal").attr("readonly", true);
   
-  if(selectedValue == 5){
+  if(selectedValue == 2 || selectedValue == 4 || selectedValue == 5){
     $("#formTotal").attr("readonly", false);
   }
 });
