@@ -126,6 +126,11 @@ class TpvRepository
             'special_request' => $request->special_request,            
             'site_id' => $request->site_id,
             'call_center_agent' => $request->call_center_agent,
+            'data' => [
+                'callcenter' => [
+                    'total' => $request->data['callcenter']['total']
+                ]
+            ]
         ];
         
         if($request->payment_method == "CASH"):            

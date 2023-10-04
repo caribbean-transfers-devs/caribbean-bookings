@@ -44,7 +44,7 @@ class Reservation extends Model
 
     public function followUps()
     {
-        return $this->hasMany(ReservationFollowUp::class, 'reservation_id', 'id');
+        return $this->hasMany(ReservationFollowUp::class, 'reservation_id', 'id')->orderBy('created_at', 'desc');
     }
 
     public function site()
