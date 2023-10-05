@@ -120,7 +120,8 @@ function makeReservationButton(event){
 }
 
 function setTotal(total){
-  $("#formTotal").val(total);  
+  $("#formTotal").val(total);
+  $("#formTotal").attr("readonly", false);
 }
 
 $(document).on("change", "#formSite", function() {

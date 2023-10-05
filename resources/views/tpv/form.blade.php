@@ -97,6 +97,10 @@
                     </select>
                 </div>
                 <div>
+                    <label class="form-label" for="formReference">Referencia</label>
+                    <input class="form-control" type="text" name="data[callcenter][reference]" id="formReference" autocomplete="off">                                    
+                </div>
+                <div>
                     <label class="form-label" for="formAgent">Agente</label>
                     <select class="form-control" id="formAgent" name="call_center_agent">
                         @if (isset( $agents ) && sizeof($agents) >= 1)
