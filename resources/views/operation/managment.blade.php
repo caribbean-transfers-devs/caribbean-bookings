@@ -54,12 +54,11 @@
             <div class="col-12 col-sm-12">
                 <div class="tab">
                     <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab">Llegadas</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#tab-2" data-bs-toggle="tab" role="tab">Regreso</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab">Servicios</a></li>                        
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-1" role="tabpanel">
-                            <h4 class="tab-title">Listado de reservaciones arrival/transfers</h4>
+                            <h4 class="tab-title">Listado de reservaciones a operar</h4>
                             <table id="reservations_table" class="table table-striped table-sm">
                                 <thead>
                                     <tr>                                                        
@@ -81,13 +80,17 @@
                                 <tbody>
                                     @if(sizeof($items)>=1)
                                         @foreach($items as $key => $value)
-                                            @if($value->operation_type == 'arrival')
+                                            
                                                 @php
                                                     $payment = ( $value->total_sales - $value->total_payments );
                                                     if($payment < 0) $payment = 0;
 
-                                                    
-                                                    switch ($value->op_one_status) {
+                                                    $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
+                                                    $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
+                                                    $operation_from = (($value->operation_type == 'arrival')? $value->from_name : $value->to_name );
+                                                    $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
+
+                                                    switch ($operation_status) {
                                                         case 'PENDING':
                                                             $label = 'btn-secondary';
                                                             break;
@@ -107,14 +110,14 @@
                                                 @endphp
                                                 <tr>
                                                     <td>{{ $value->site_name }}</td>
-                                                    <td>{{ $value->op_one_pickup }}</td>
-                                                    <td class="text-center"><span class="badge {{ $label }} rounded-pill">{{ $value->op_one_status }}</span></td>
+                                                    <td>{{ $operation_pickup }}</td>
+                                                    <td class="text-center"><span class="badge {{ $label }} rounded-pill">{{ $operation_status }}</span></td>
                                                     <td>{{ $value->code }}</td>
                                                     <td>{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
                                                     <td>{{ $value->service_name }}</td>
                                                     <td class="text-center">{{ $value->passengers }}</td>
-                                                    <td>{{ $value->from_name }}</td>
-                                                    <td>{{ $value->to_name }}</td>
+                                                    <td>{{ $operation_from }}</td>
+                                                    <td>{{ $operation_to }}</td>
                                                     <td class="text-center">{{ $value->status }}</td>
                                                     <td class="text-end">{{ number_format($payment,2) }}</td>
                                                     <td class="text-center">{{ $value->currency }}</td>
@@ -133,88 +136,7 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endif
-                                        @endforeach
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tab-pane" id="tab-2" role="tabpanel">
-                            <h4 class="tab-title">Listado de reservacione de departure/transfers</h4>
-                            <table id="reservations_table" class="table table-striped table-sm">
-                                <thead>
-                                    <tr>                                                        
-                                        <th>Sitio</th>
-                                        <th>Pickup</th>
-                                        <th class="text-center">Estatus Op.</th>
-                                        <th>Código</th>
-                                        <th>Cliente</th>
-                                        <th>Vehículo</th>
-                                        <th>Pasajeros</th>
-                                        <th>Desde</th>
-                                        <th>Hacia</th>
-                                        <th>Pago</th>
-                                        <th>Total</th>
-                                        <th>Moneda</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if(sizeof($items)>=1)
-                                        @foreach($items as $key => $value)
-                                            @if($value->operation_type == 'departure')
-                                            @php
-                                                $payment = ( $value->total_sales - $value->total_payments );
-                                                if($payment < 0) $payment = 0;
 
-                                                
-                                                switch ($value->op_two_status) {
-                                                    case 'PENDING':
-                                                        $label = 'btn-secondary';
-                                                        break;
-                                                    case 'COMPLETED':
-                                                        $label = 'btn-success';
-                                                        break;
-                                                    case 'NOSHOW':
-                                                        $label = 'btn-warning';
-                                                        break;
-                                                    case 'CANCELLED':
-                                                        $label = 'btn-danger';
-                                                        break;
-                                                    default:
-                                                        $label = 'btn-secondary';
-                                                        break;
-                                                }
-                                            @endphp
-                                                <tr>
-                                                    <td>{{ $value->site_name }}</td>
-                                                    <td>{{ $value->op_two_pickup }}</td>
-                                                    <td class="text-center"><span class="badge {{ $label }} rounded-pill">{{ $value->op_two_status }}</span></td>
-                                                    <td>{{ $value->code }}</td>
-                                                    <td>{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
-                                                    <td>{{ $value->service_name }}</td>
-                                                    <td class="text-center">{{ $value->passengers }}</td>
-                                                    <td>{{ $value->to_name }}</td>
-                                                    <td>{{ $value->from_name }}</td>
-                                                    <td class="text-center">{{ $value->status }}</td>
-                                                    <td class="text-end">{{ number_format($payment,2) }}</td>
-                                                    <td class="text-center">{{ $value->currency }}</td>
-                                                    <td class="text-center">
-                                                        <div class="btn-group btn-group-sm">
-                                                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                Operación
-                                                            </button>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }})">Pendiente</a>
-                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'COMPLETED',{{ $value->id }}, {{ $value->reservation_id }})">Completado</a>
-                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'NOSHOW',{{ $value->id }}, {{ $value->reservation_id }})">No show</a>
-                                                                <div class="dropdown-divider"></div>
-                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }})">Cancelado</a>                                                                
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endif
                                         @endforeach
                                     @endif
                                 </tbody>
