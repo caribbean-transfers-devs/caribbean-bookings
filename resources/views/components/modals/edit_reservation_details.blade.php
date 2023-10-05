@@ -1,3 +1,4 @@
+
 <div class="modal fade" id="serviceClientModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
@@ -23,6 +24,19 @@
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceClientPhoneModal">Teléfono</label>
                             <input type="text" class="form-control mb-2" id="serviceClientPhoneModal" name="client_phone" value="{{ $reservation->client_phone }}">
+                        </div>
+                        <div class="col-sm-12 col-md-12"><hr></div>
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="serviceSiteReference">Sitio</label>
+                            <select class="form-select mb-2" id="serviceSiteReference" name="site_id" readonly>
+                                @foreach($sites as $key => $value)
+                                    <option value="{{ $value->id }}" {{ $reservation->site_id == $value->id ? 'selected' : '' }}>{{ $value->name }}</option>
+                                @endforeach                      
+                            </select>
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="serviceClientReference">Referencia</label>
+                            <input type="text" class="form-control mb-2" id="serviceClientReference" name="reference" value="{{ $reservation->reference }}">
                         </div>
                         <!--<div class="col-sm-12 col-md-6">
                             <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>

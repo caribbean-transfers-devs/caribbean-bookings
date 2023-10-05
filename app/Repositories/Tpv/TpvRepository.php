@@ -129,6 +129,7 @@ class TpvRepository
             'call_center_agent' => $request->call_center_agent,
             'data' => [
                 'callcenter' => [
+                    'reference' => $request->data['callcenter']['reference'],
                     'total' => $request->data['callcenter']['total']
                 ]
             ]

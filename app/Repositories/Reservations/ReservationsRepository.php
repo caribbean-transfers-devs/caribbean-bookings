@@ -196,6 +196,8 @@ class ReservationsRepository
             $reservation->client_last_name = $request->client_last_name;
             $reservation->client_email = $request->client_email;
             $reservation->client_phone = $request->client_phone;
+            $reservation->site_id = $request->site_id;
+            $reservation->reference = $request->reference;
             $reservation->save();
             $check = $this->create_followUps($reservation->id, 'Se editaron datos de la reserva por '.auth()->user()->name, 'HISTORY', 'EDICIÓN');
             DB::commit();

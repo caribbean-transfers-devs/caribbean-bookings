@@ -183,11 +183,15 @@
         }
         > div.additional{
             > div.one_{
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-column-gap: 15px;
+                grid-row-gap: 15px;
                 label{
                     font-weight: bold;
+                }
+                button{
+                    align-self: flex-end;
                 }
             }
         }
