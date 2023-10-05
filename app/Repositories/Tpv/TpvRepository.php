@@ -90,6 +90,7 @@ class TpvRepository
         $tpv[ $request->code ]['passengers'] = $request->passengers;
         $tpv[ $request->code ]['currency'] = $request->currency;
         $tpv[ $request->code ]['rate_group'] = $request->rate_group;
+        $tpv[ $request->code ]['lastminute'] = 1;
 
         Session::put('tpv', $tpv);
 
