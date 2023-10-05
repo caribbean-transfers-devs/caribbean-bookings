@@ -82,12 +82,13 @@
                                         @foreach($items as $key => $value)
                                             
                                                 @php
+
                                                     $payment = ( $value->total_sales - $value->total_payments );
                                                     if($payment < 0) $payment = 0;
 
                                                     $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
                                                     $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
-                                                    $operation_from = (($value->operation_type == 'arrival')? $value->from_name : $value->to_name );
+                                                    $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
                                                     $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
 
                                                     switch ($operation_status) {
