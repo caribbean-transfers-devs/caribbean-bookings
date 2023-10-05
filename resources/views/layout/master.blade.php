@@ -57,14 +57,19 @@
     
                 <ul class="sidebar-nav">
                     <li class="sidebar-header">
-                        Pages
-                    </li>                  
-    
-                    <li class="sidebar-item @if(request()->is('/')) active @endif">
-                        <a class="sidebar-link" href="/">
-                            <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
-                        </a>
+                        Módulos
                     </li>
+
+                    <!--<li class="sidebar-item">
+                        <a href="#dashboard" data-bs-toggle="collapse" class="sidebar-link collapsed">
+                            <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboards</span>
+                        </a>
+                        <ul id="dashboard" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">                           
+                            <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.admin') }}">Admin</a></li>                            
+                        </ul>
+                    </li>-->
+
+
                     @if(RoleTrait::hasPermission(26))
                     <li class="sidebar-item @if(request()->is('/tpv/handler')) active @endif">
                         <a class="sidebar-link" href="/tpv/handler">
