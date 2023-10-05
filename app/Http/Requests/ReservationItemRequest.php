@@ -28,7 +28,7 @@ class ReservationItemRequest extends FormRequest
             'to_name' => 'required|string|max:255',
             'op_one_pickup' => 'required|date',
             'op_two_pickup' => 'nullable|date',
-            'flight_number' => 'required|string|max:255',
+            'flight_number' => 'nullable|string|max:255',
         ];
     }
 

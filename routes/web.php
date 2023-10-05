@@ -33,6 +33,8 @@ Route::middleware(['guest'])->group(function () {
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
+
     Route::resource('/users', UserController::class);
     Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');
     Route::put('/ChangeStatus/{user}', [UserController::class, 'change_status'])->name('users.change_status');
