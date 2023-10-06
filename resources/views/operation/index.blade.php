@@ -84,6 +84,7 @@
                                             <thead>
                                                 <tr>                                                        
                                                     <th>Sitio</th>
+                                                    <th class="text-center">Tipo</th>
                                                     <th>Código</th>
                                                     <th>Cliente</th>
                                                     <th>Pickup</th>
@@ -106,6 +107,7 @@
                                                         @endphp                                                                                                        
                                                         <tr>
                                                             <td>{{ $valueItem->site_name }}</td>
+                                                            <td>{{ $valueItem->final_service_type }}</td>
                                                             <td>{{ $valueItem->code }}</td>
                                                             <td>{{ $valueItem->client_first_name }} {{ $valueItem->client_last_name }}</td>
                                                             <td>{{ date("H:i", strtotime($valueItem->filtered_date)) }}</td>

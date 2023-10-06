@@ -1,4 +1,5 @@
 @php
+    use App\Traits\RoleTrait;
     $resume = [
         'status' => [
             'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
@@ -64,6 +65,7 @@
                                     <tr>                                                        
                                         <th>Sitio</th>
                                         <th>Pickup</th>
+                                        <th class="text-center">Tipo</th>
                                         <th class="text-center">Estatus Op.</th>
                                         <th>Código</th>
                                         <th>Cliente</th>
@@ -82,7 +84,6 @@
                                         @foreach($items as $key => $value)
                                             
                                                 @php
-
                                                     $payment = ( $value->total_sales - $value->total_payments );
                                                     if($payment < 0) $payment = 0;
 
@@ -111,9 +112,16 @@
                                                 @endphp
                                                 <tr>
                                                     <td>{{ $value->site_name }}</td>
-                                                    <td>{{ $operation_pickup }}</td>
+                                                    <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                                    <td>{{ $value->final_service_type }}</td>
                                                     <td class="text-center"><span class="badge {{ $label }} rounded-pill">{{ $operation_status }}</span></td>
-                                                    <td>{{ $value->code }}</td>
+                                                    <td>
+                                                        @if (RoleTrait::hasPermission(38))
+                                                            <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
+                                                        @else
+                                                            {{ $value->code }}
+                                                        @endif
+                                                    </td>
                                                     <td>{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
                                                     <td>{{ $value->service_name }}</td>
                                                     <td class="text-center">{{ $value->passengers }}</td>
