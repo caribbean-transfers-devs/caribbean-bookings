@@ -17,7 +17,7 @@
                             </select>
                         </div>
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="follow_up_name">Nombre (opcional)</label>
+                            <label class="form-label" for="follow_up_name">Asunto</label>
                             <input type="text" class="form-control mb-2" id="follow_up_name" name="name">
                         </div>
                         <div class="col-sm-12">

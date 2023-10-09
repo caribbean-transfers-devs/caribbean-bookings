@@ -84,6 +84,10 @@
                                     <th>Creación</th>
                                     <td>{{ $reservation->created_at }}</td>
                                 </tr>
+                                <tr>
+                                    <th>Referencia</th>
+                                    <td>{{ $reservation->reference }}</td>
+                                </tr>
                             </tbody>
                         </table>
                         @if (RoleTrait::hasPermission(25))
