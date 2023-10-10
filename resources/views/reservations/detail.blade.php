@@ -196,7 +196,7 @@
                                 @endif
                             </div>
                             
-                            @foreach ($reservation->items as $item)                      
+                            @foreach ($reservation->items as $item)               
                             <div class="services-container">
                                 <h3>{{ $item->code }}</h3>
                                 <div class="items-container">                                    
@@ -252,17 +252,15 @@
                                                     Confirmacion de llegada
                                                 </button>
                                             @endif
-                                            @if ($item->is_round_trip)
-                                                <div class="btn-group btn-group-sm">
-                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        Confirmacion de salida
-                                                    </button>
-                                                    <div class="dropdown-menu" style="">
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en')">Enviar en inglés</a>
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es')">Enviar en español</a>
-                                                    </div>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    Confirmacion de salida
+                                                </button>
+                                                <div class="dropdown-menu" style="">
+                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en')">Enviar en inglés</a>
+                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es')">Enviar en español</a>
                                                 </div>
-                                            @endif
+                                            </div>
                                         </div>
                                     </div>
                                     @if ($item->is_round_trip)
