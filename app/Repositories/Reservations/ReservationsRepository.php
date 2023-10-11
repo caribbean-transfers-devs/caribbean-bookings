@@ -69,6 +69,7 @@ class ReservationsRepository
                         ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
                         ( rez.client_phone like '%".$data['filter_text']."%') OR
                         ( rez.client_email like '%".$data['filter_text']."%') OR
+                        ( rez.reference like '%".$data['filter_text']."%') OR
                         ( it.code like '".$data['filter_text']."' )
                     )";            
         }         
