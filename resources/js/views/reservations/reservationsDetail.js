@@ -714,7 +714,7 @@ function sendArrivalConfirmation(){
     });
 }
 
-function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en'){
+function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', type = 'departure'){
     event.preventDefault();
     //console.log(item_id);
     //console.log(destination_id);
@@ -728,7 +728,7 @@ function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en'){
     $.ajax({
         url: '/reservations/confirmation/departure',
         type: 'POST',
-        data: { item_id:item_id, destination_id: destination_id, lang:lang },
+        data: { item_id:item_id, destination_id: destination_id, lang:lang, type:type },
         success: function(resp) {
             if (resp.status == 'success') {
                 window.onbeforeunload = null;
