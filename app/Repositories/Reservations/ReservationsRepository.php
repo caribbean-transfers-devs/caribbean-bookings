@@ -309,7 +309,7 @@ class ReservationsRepository
                             $join->on('cp_translate.contact_point_id', '=', 'cp.id')
                                 ->where('cp_translate.lang', '=', $lang );
                         })->where('cp.id', '=', $point_id)->get();
-
+                        
         $message = $this->arrivalMessage($lang, $item[0], $point[0]);
         
         //Data to send in confirmation..
@@ -408,7 +408,7 @@ class ReservationsRepository
                                 INNER JOIN sites as sit ON sit.id = rez.site_id
                                     WHERE it.id = :id", ['id' => $request['item_id'] ]);
         
-        $message = $this->departureMessage($lang, $item[0], $request['destination_id']);
+        $message = $this->departureMessage($lang, $item[0], $request['destination_id'], $request['type']);
 
         //Data to send in confirmation..
         $email_data = array(
@@ -466,8 +466,19 @@ class ReservationsRepository
 
     }
 
-    public function departureMessage($lang = "en", $item = [], $destination_id){
-        $departure_date = date("Y-m-d H:i", strtotime($item->op_two_pickup));
+    public function departureMessage($lang = "en", $item = [], $destination_id, $type = "departure"){      
+        $departure_date = NULL;
+        $destination = NULL;
+        
+        if($type == "transfer-pickup"):
+            $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
+            $destination = $item->from_name;
+        endif;
+
+        if($type == "departure" || $type == "transfer-return"):
+            $departure_date = date("Y-m-d H:i", strtotime($item->op_two_pickup));
+            $destination = $item->to_name;
+        endif;
 
         $message = '';
         if($destination_id == 1 && $lang == "en"):
@@ -481,7 +492,7 @@ class ReservationsRepository
             return <<<EOF
                     <p>Departure confirmation</p>
                     <p>Dear $item->client_first_name | Reservation Number: $item->code</p>
-                    <p>Thank you for choosing Caribbean Transfers the reason for this email is to confirm your pick up time. The date indicated on your reservation is $departure_date hrs. We will be waiting for you in $item->to_name at that time.</p>
+                    <p>Thank you for choosing Caribbean Transfers the reason for this email is to confirm your pick up time. The date indicated on your reservation is $departure_date hrs. We will be waiting for you in $destination at that time.</p>
                     $message     
                     <p>You can also confirm by phone: $item->transactional_phone</p>
                     <p>Tips not included</p>
@@ -490,7 +501,7 @@ class ReservationsRepository
             return <<<EOF
                     <p>Confirmación de salida</p>
                     <p>Estimado/a $item->client_first_name | Reservación No: $item->code</p>
-                    <p>Gracias por elegir a Caribbean Transfers el motivo de este correo es confirmar su hora de recolección. La fecha indicada en su reserva es $departure_date hrs. Le estaremos esperando en $item->to_name a esa hora.</p>
+                    <p>Gracias por elegir a Caribbean Transfers el motivo de este correo es confirmar su hora de recolección. La fecha indicada en su reserva es $departure_date hrs. Le estaremos esperando en $destination a esa hora.</p>
                     $message     
                     <p>También puedes confirmar por teléfono: $item->transactional_phone</p>
                     <p>Propinas no incluidas</p>

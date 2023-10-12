@@ -196,7 +196,12 @@
                                 @endif
                             </div>
                             
-                            @foreach ($reservation->items as $item)               
+                            @foreach ($reservation->items as $item)   
+                            @php
+                                // echo "<pre>";
+                                // print_r($item->from_zone);
+                                // die();
+                            @endphp            
                             <div class="services-container">
                                 <h3>{{ $item->code }}</h3>
                                 <div class="items-container">                                    
@@ -246,21 +251,7 @@
                                             @endphp                                        
                                             <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->from_name }}','{{ $item->to_name }}','{{ $time }}','{{ $item->distance_km }}')">
                                                 Ver mapa
-                                            </button>
-                                            @if($item->is_primary == 1)
-                                                <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
-                                                    Confirmacion de llegada
-                                                </button>
-                                            @endif
-                                            <div class="btn-group btn-group-sm">
-                                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    Confirmacion de salida
-                                                </button>
-                                                <div class="dropdown-menu" style="">
-                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en')">Enviar en inglés</a>
-                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es')">Enviar en español</a>
-                                                </div>
-                                            </div>
+                                            </button>                                           
                                         </div>
                                     </div>
                                     @if ($item->is_round_trip)
@@ -289,8 +280,43 @@
                                                     @endswitch
                                                 </p>
                                             </div>
-                                        </div>              
-                                    @endif                                    
+                                            
+                                        </div>           
+                                    @endif
+
+                                    <div>                                        
+                                        <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
+                                            Confirmacion de llegada
+                                        </button>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Confirmacion de salida
+                                            </button>
+                                            <div class="dropdown-menu" style="">
+                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'departure')">Enviar en inglés</a>
+                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'departure')">Enviar en español</a>
+                                            </div>
+                                        </div>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Transfer recogida
+                                            </button>
+                                            <div class="dropdown-menu" style="">
+                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-pickup')">Enviar en inglés</a>
+                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-pickup')">Enviar en español</a>
+                                            </div>
+                                        </div>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Transfer regreso
+                                            </button>
+                                            <div class="dropdown-menu" style="">
+                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-return')">Enviar en inglés</a>
+                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-return')">Enviar en español</a>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>                                
                                                     
                                 </div>                                
                             </div>
