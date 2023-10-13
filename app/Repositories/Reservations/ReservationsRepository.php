@@ -408,7 +408,7 @@ class ReservationsRepository
                                 INNER JOIN sites as sit ON sit.id = rez.site_id
                                     WHERE it.id = :id", ['id' => $request['item_id'] ]);
         
-        $message = $this->departureMessage($lang, $item[0], $request['destination_id'], $request['type']);
+        $message = $this->departureMessage($lang, $item[0], $request['destination_id'], $request['type']);        
 
         //Data to send in confirmation..
         $email_data = array(
@@ -468,16 +468,26 @@ class ReservationsRepository
 
     public function departureMessage($lang = "en", $item = [], $destination_id, $type = "departure"){      
         $departure_date = NULL;
-        $destination = NULL;
+        $destination = NULL;     
         
         if($type == "transfer-pickup"):
             $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
             $destination = $item->from_name;
         endif;
 
-        if($type == "departure" || $type == "transfer-return"):
+        if($type == "transfer-return"):
             $departure_date = date("Y-m-d H:i", strtotime($item->op_two_pickup));
             $destination = $item->to_name;
+        endif;
+
+        if($type == "departure"):            
+            if(empty( $item->op_two_pickup )):
+                $destination = $item->from_name;
+                $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
+            else:
+                $destination = $item->to_name;
+                $departure_date = date("Y-m-d H:i", strtotime($item->op_two_pickup));
+            endif;
         endif;
 
         $message = '';
