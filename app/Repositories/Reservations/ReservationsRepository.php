@@ -375,7 +375,7 @@ class ReservationsRepository
                     <p>Before boarding, you will be asked to show photo identification of the cardholder of the card with which the payment was made.</p>
                     <p>This is your reservation voucher, please verify that the following information is correct.</p>
                     <p>Dear $item->client_first_name | Reservation No: $item->code.</p>
-                    <p>Thank you for choosing * COMPANY*, we appreciate your confidence, the information below will facilitate your contact with our staff at the airport, flight $item->flight_number lands at $point->point_name on $arrival_date hrs therefore our representative will be waiting for you at the Welcome Bar with a $point->point_description identifier.</p>
+                    <p>Thank you for choosing us, we appreciate your confidence, the information below will facilitate your contact with our staff at the airport, flight $item->flight_number lands at $point->point_name on $arrival_date hrs therefore our representative will be waiting for you at the Welcome Bar with a $point->point_description identifier.</p>
                     <p>To facilitate contact, please turn on your cell phone as soon as you land, you can use the free WIFI network at the airport to contact us. Let us know when you are ready to board your unit (after clearing customs and collecting your bags), a representative will be ready to meet you and take you to your assigned unit.</p>
                     <p>Please confirm receipt</p>
                     <p>Thank you for your confidence, have a great trip.</p>
