@@ -375,7 +375,7 @@ class ReservationsRepository
                     <p>Before boarding, you will be asked to show photo identification of the cardholder of the card with which the payment was made.</p>
                     <p>This is your reservation voucher, please verify that the following information is correct.</p>
                     <p>Dear $item->client_first_name | Reservation No: $item->code.</p>
-                    <p>Thank you for choosing us, we appreciate your confidence, the information below will facilitate your contact with our staff at the airport, flight $item->flight_number lands at $point->point_name on $arrival_date hrs therefore our representative will be waiting for you at the Welcome Bar with a $point->point_description identifier.</p>
+                    <p>Thank you for choosing Caribbean Transfers, we appreciate your confidence, the information below will facilitate your contact with our staff at the airport, flight $item->flight_number lands at $point->point_name on $arrival_date hrs therefore our representative will be waiting for you at the Welcome Bar with a $point->point_description identifier.</p>
                     <p>To facilitate contact, please turn on your cell phone as soon as you land, you can use the free WIFI network at the airport to contact us. Let us know when you are ready to board your unit (after clearing customs and collecting your bags), a representative will be ready to meet you and take you to your assigned unit.</p>
                     <p>Please confirm receipt</p>
                     <p>Thank you for your confidence, have a great trip.</p>
@@ -389,7 +389,7 @@ class ReservationsRepository
                 <p>Antes de abordar se le solicitará la identificación con fotografía del titular de la tarjeta con la que se realizó el pago</p>
                 <p>Este es su comprobante de reserva, verifique que la información detallada a continuación sea correcta.</p>
                 <p>Estimado/a $item->client_first_name | Reservación No: $item->code</p>
-                <p>Gracias por elegirnos, agradecemos su confianza, la información escrita a continuación facilitará su contacto con nuestro staff en el Aeropuerto, el vuelo $item->flight_number aterriza en $point->point_name el día $arrival_date hrs por lo tanto nuestro representante lo estará esperando en $point->point_description con un identificador de Caribbean Transfers</p>
+                <p>Gracias por elegir a Caribbean Transfers, agradecemos su confianza, la información escrita a continuación facilitará su contacto con nuestro staff en el Aeropuerto, el vuelo $item->flight_number aterriza en $point->point_name el día $arrival_date hrs por lo tanto nuestro representante lo estará esperando en $point->point_description con un identificador de Caribbean Transfers</p>
                 <p>Para facilitar el contacto encienda su celular tan pronto como aterrice, puede usar la red gratuita del WIFI en el aeropuerto para poder contactarnos. Avísenos cuando esté listo para abordar su unidad (después de pasar aduana y recolectar sus maletas), un representante estará listo para recibirle y acercarlo a la unidad asignada.</p>
                 <p>Por favor confirme de recibido</p>
                 <p>Gracias por su confianza, que tenga un excelente viaje</p>
