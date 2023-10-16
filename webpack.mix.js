@@ -32,3 +32,4 @@ mix.copy('resources/js/views/zones/index.js', data.assets + "js/views/zones/inde
 mix.sass('resources/scss/rates/index.scss', data.assets + "css/rates/index.min.css");
 mix.copy('resources/js/views/rates/index.js', data.assets + "js/views/rates/index.min.js");
 mix.copy('resources/js/views/operation/managment.js', data.assets + "js/views/operation/managment.min.js");
+mix.copy('resources/js/views/operation/confirmation.js', data.assets + "js/views/operation/confirmation.min.js");
