@@ -78,7 +78,7 @@
                     </li>
                     @endif
 
-                    @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37))
+                    @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) )
                     <li class="sidebar-item">
                         <a href="#operation" data-bs-toggle="collapse" class="sidebar-link collapsed">
                             <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Operación</span>
@@ -89,6 +89,9 @@
                             @endif
                             @if(RoleTrait::hasPermission(37))
                                 <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.managment') }}">Gestión</a></li>
+                            @endif
+                            @if(RoleTrait::hasPermission(39))
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.confirmation') }}">Confirmaciones</a></li>
                             @endif
                         </ul>
                     </li>

@@ -14,6 +14,7 @@
                                 <option value="CASH" selected>Efectivo</option>
                                 <option value="PAYPAL">PayPal</option>
                                 <option value="CARD">Tarjeta</option>
+                                <option value="TRANSFER">Transferencia</option>
                             </select>
                         </div>
                         <div class="col-sm-12 col-md-6">

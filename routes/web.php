@@ -61,6 +61,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment');
     Route::post('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment.search');
     Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
+    Route::get('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation');
+    Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');
+
 
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);
