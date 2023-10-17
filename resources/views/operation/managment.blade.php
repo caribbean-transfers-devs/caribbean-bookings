@@ -63,8 +63,8 @@
                             <table id="reservations_table" class="table table-striped table-sm">
                                 <thead>
                                     <tr>                                                        
-                                        <th>Sitio</th>
                                         <th>Pickup</th>
+                                        <th>Sitio</th>
                                         <th class="text-center">Tipo</th>
                                         <th class="text-center">Estatus Op.</th>
                                         <th>Código</th>
@@ -111,8 +111,8 @@
                                                     }
                                                 @endphp
                                                 <tr>
-                                                    <td>{{ $value->site_name }}</td>
                                                     <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                                    <td>{{ $value->site_name }}</td>
                                                     <td>{{ $value->final_service_type }}</td>
                                                     <td class="text-center"><span class="badge {{ $label }} rounded-pill">{{ $operation_status }}</span></td>
                                                     <td>
