@@ -1,1 +1,201 @@
-.loader{animation:rotation 1s linear infinite;border:5px solid;border-color:#fff #fff #2d008e;border-radius:50%;box-sizing:border-box;display:inline-block;height:48px;width:48px}@keyframes rotation{0%{transform:rotate(0deg)}to{transform:rotate(1turn)}}.bookingbox{grid-column-gap:10px;grid-row-gap:10px;background-color:#fff;border-radius:5px;display:grid;grid-template-areas:"type type type type" "from from to to" "language passengers currency rate_group" "dates dates dates dates" "button button button button";padding:15px}.bookingbox>div.type{display:flex;grid-area:type;justify-content:space-between}.bookingbox>div.from{grid-area:from;position:relative}.bookingbox>div.to{grid-area:to}.bookingbox>div.language{grid-area:language}.bookingbox>div.currency{grid-area:currency}.bookingbox>div.passengers{grid-area:passengers}.bookingbox>div.rate_group{grid-area:rate_group}.bookingbox>div.dates{grid-column-gap:10px;grid-row-gap:10px;display:grid;grid-area:dates;grid-template-columns:1fr 1fr}.bookingbox>div.dates>:nth-child(2){display:none}.bookingbox>div.button{grid-area:button}.bookingbox>div.button>button{width:100%}@media (max-width:767px){.bookingbox{grid-template-areas:"type type type type" "from from from from" "to to to to" "language passengers currency rate_group" "dates dates dates dates" "button button button button"}}.quote_container{grid-column-gap:15px;grid-row-gap:15px;display:grid;grid-template-columns:600px 1fr;margin-top:25px}.quote_container>div.left_{display:flex;flex-direction:column;gap:15px}.quote_container>div.left_>div.item{grid-column-gap:10px;grid-row-gap:10px;background-color:#fff;border:1px solid #ced4da;border-radius:5px;display:grid;grid-template-columns:200px 1fr 1fr;padding:10px}.quote_container>div.left_>div.item>div.one_{align-self:center}.quote_container>div.left_>div.item>div.one_ img{height:auto;width:100%}.quote_container>div.left_>div.item>div.two_ h2{color:#2d008e;font-size:14pt;font-weight:700}.quote_container>div.left_>div.item>div.two_ ul{padding-left:15px}.quote_container>div.left_>div.item>div.three_{display:flex;flex-direction:column;justify-content:space-between}.quote_container>div.left_>div.item>div.three_>div:first-child{text-align:right}.quote_container>div.left_>div.item>div.three_>div:first-child p{margin:0}.quote_container>div.left_>div.item>div.three_>div:first-child p:first-child{font-size:13pt;font-weight:700}.quote_container>div.left_>div.item>div.three_>div:nth-child(2) .checkButton{display:none}.quote_container>div.left_>div.item>div.three_>div:nth-child(2) .custom-button{background:linear-gradient(263deg,#191970 7.15%,#3e3ed3);border:none;border-radius:4px;color:#fff;cursor:pointer;display:inline-block;position:relative;width:100%}.quote_container>div.left_>div.item>div.three_>div:nth-child(2) .custom-button:hover{color:#fff}.quote_container>div.left_>div.item>div.three_>div:nth-child(2) .custom-button.checked{background-color:#e74c3c}.quote_container>div.left_>div.item>div.three_>div:nth-child(2) .checkButton+label svg{display:none;position:absolute;right:10px;top:7px}.quote_container>div.left_>div.item>div.three_>div:nth-child(2) .checkButton:checked+label{background:#1cbb8c;border-color:#1cbb8c}.quote_container>div.right_{background-color:#fff;border-radius:5px;padding:15px}.quote_container>div.right_>div.client_information{border-bottom:1px solid #ced4da;margin-bottom:23px;padding-bottom:25px}.quote_container>div.right_>div.client_information>div.one_{grid-column-gap:10px;grid-row-gap:10px;display:grid;grid-template-columns:1fr 1fr;margin-bottom:15px}.quote_container>div.right_>div.client_information>div.one_ label{font-weight:700}.quote_container>div.right_>div.client_information>div.two_{display:flex;flex-direction:column;gap:15px}.quote_container>div.right_>div.client_information>div.two_ label{font-weight:700}.quote_container>div.right_>div.additional>div.one_{grid-column-gap:15px;grid-row-gap:15px;display:grid;grid-template-columns:1fr 1fr}.quote_container>div.right_>div.additional>div.one_ label{font-weight:700}.quote_container>div.right_>div.additional>div.one_ button{align-self:flex-end}div#loadContent div.loading{display:flex;justify-content:center;margin-top:25px}
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #FFF;
+  border-bottom-color: #2D008E;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.bookingbox {
+  padding: 15px;
+  background-color: white;
+  border-radius: 5px;
+  display: grid;
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+  grid-template-areas: "type type type type" "from from to to" "language passengers currency rate_group" "dates dates dates dates" "button button button button";
+}
+.bookingbox > div.type {
+  grid-area: type;
+  display: flex;
+  justify-content: space-between;
+}
+.bookingbox > div.from {
+  grid-area: from;
+  position: relative;
+}
+.bookingbox > div.to {
+  grid-area: to;
+}
+.bookingbox > div.language {
+  grid-area: language;
+}
+.bookingbox > div.currency {
+  grid-area: currency;
+}
+.bookingbox > div.passengers {
+  grid-area: passengers;
+}
+.bookingbox > div.rate_group {
+  grid-area: rate_group;
+}
+.bookingbox > div.dates {
+  grid-area: dates;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+}
+.bookingbox > div.dates > :nth-child(2) {
+  display: none;
+}
+.bookingbox > div.button {
+  grid-area: button;
+}
+.bookingbox > div.button > button {
+  width: 100%;
+}
+@media (max-width: 767px) {
+  .bookingbox {
+    grid-template-areas: "type type type type" "from from from from" "to to to to" "language passengers currency rate_group" "dates dates dates dates" "button button button button";
+  }
+}
+
+.quote_container {
+  display: grid;
+  grid-template-columns: 600px 1fr;
+  grid-column-gap: 15px;
+  grid-row-gap: 15px;
+  margin-top: 25px;
+}
+.quote_container > div.left_ {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.quote_container > div.left_ > div.item {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr;
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+  background-color: white;
+  border-radius: 5px;
+  padding: 10px;
+  border: 1px solid #ced4da;
+}
+.quote_container > div.left_ > div.item > div.one_ {
+  align-self: center;
+}
+.quote_container > div.left_ > div.item > div.one_ img {
+  width: 100%;
+  height: auto;
+}
+.quote_container > div.left_ > div.item > div.two_ h2 {
+  color: #2D008E;
+  font-size: 14pt;
+  font-weight: bold;
+}
+.quote_container > div.left_ > div.item > div.two_ ul {
+  padding-left: 15px;
+}
+.quote_container > div.left_ > div.item > div.three_ {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.quote_container > div.left_ > div.item > div.three_ > div:nth-child(1) {
+  text-align: right;
+}
+.quote_container > div.left_ > div.item > div.three_ > div:nth-child(1) p {
+  margin: 0px;
+}
+.quote_container > div.left_ > div.item > div.three_ > div:nth-child(1) p:nth-child(1) {
+  font-size: 13pt;
+  font-weight: bold;
+}
+.quote_container > div.left_ > div.item > div.three_ > div:nth-child(2) .checkButton {
+  display: none;
+}
+.quote_container > div.left_ > div.item > div.three_ > div:nth-child(2) .custom-button {
+  display: inline-block;
+  width: 100%;
+  border-radius: 4px;
+  background: linear-gradient(263deg, #191970 7.15%, #3E3ED3 100%);
+  color: white;
+  cursor: pointer;
+  border: none;
+  position: relative;
+}
+.quote_container > div.left_ > div.item > div.three_ > div:nth-child(2) .custom-button:hover {
+  color: white;
+}
+.quote_container > div.left_ > div.item > div.three_ > div:nth-child(2) .custom-button.checked {
+  background-color: #e74c3c;
+}
+.quote_container > div.left_ > div.item > div.three_ > div:nth-child(2) .checkButton + label svg {
+  display: none;
+  position: absolute;
+  right: 10px;
+  top: 7px;
+}
+.quote_container > div.left_ > div.item > div.three_ > div:nth-child(2) .checkButton:checked + label {
+  background: #1cbb8c;
+  border-color: #1cbb8c;
+}
+.quote_container > div.right_ {
+  background-color: white;
+  padding: 15px;
+  border-radius: 5px;
+}
+.quote_container > div.right_ > div.client_information {
+  margin-bottom: 23px;
+  border-bottom: 1px solid #ced4da;
+  padding-bottom: 25px;
+}
+.quote_container > div.right_ > div.client_information > div.one_ {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+  margin-bottom: 15px;
+}
+.quote_container > div.right_ > div.client_information > div.one_ label {
+  font-weight: bold;
+}
+.quote_container > div.right_ > div.client_information > div.two_ {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.quote_container > div.right_ > div.client_information > div.two_ label {
+  font-weight: bold;
+}
+.quote_container > div.right_ > div.additional > div.one_ {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 15px;
+  grid-row-gap: 15px;
+}
+.quote_container > div.right_ > div.additional > div.one_ label {
+  font-weight: bold;
+}
+.quote_container > div.right_ > div.additional > div.one_ button {
+  align-self: flex-end;
+}
+
+div#loadContent div.loading {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+}

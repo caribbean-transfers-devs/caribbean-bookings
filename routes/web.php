@@ -61,6 +61,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment');
     Route::post('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment.search');
     Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
+    
+    Route::post('/operation/managment/fetch', [OperationController::class, 'fetchData'])->name('operation.managment.fetch');
+    Route::post('/operation/managment/create-lock', [OperationController::class, 'createLock'])->name('operation.managment.createLock');
+
+
     Route::get('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation');
     Route::post('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation.search');
     Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');

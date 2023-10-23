@@ -36,4 +36,12 @@ class OperationController extends Controller
         }
         return $operationRepository->statusUpdate($request);        
     }
+
+    public function fetchData(Request $request, OperationRepository $operationRepository){
+        return $operationRepository->fetchData($request);
+    }
+
+    public function createLock(Request $request, OperationRepository $operationRepository){
+        return $operationRepository->createLock($request);    
+    }
 }

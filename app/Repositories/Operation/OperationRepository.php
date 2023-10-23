@@ -131,16 +131,105 @@ class OperationRepository
     }
     
     public function managment($request){
+        return view('operation.managment');
+    }
 
+    public function statusUpdate($request){
+        
+        try {
+            DB::beginTransaction();
+            
+            $item = ReservationsItem::find($request->item_id);
+            if($request->type == "arrival"):
+                $item->op_one_status = $request->status;
+            endif;
+            if($request->type == "departure"):
+                $item->op_two_status = $request->status;
+            endif;
+            $item->save();
+            
+
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $request->rez_id;
+            $follow_up_db->save();
+
+            DB::commit();
+            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], Response::HTTP_OK);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        
+    }
+
+    public function fetchData($request){
         $date = date("Y-m-d");
         if(isset( $request->date )):
             $date = $request->date;
         endif;
-
         $search['init_date'] = $date." 00:00:00";
         $search['end_date'] = $date." 23:59:59";
 
-        $items = DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, '' as messages,
+        $op_data = [
+            "status" => "OPEN",
+            "date_time" => NULL
+        ];
+        $op_query = DB::select("SELECT * FROM operation_closing 
+                                WHERE DATE_FORMAT(op_close_date,'%Y-%m-%d') = :current_date
+                            ORDER BY op_close_date DESC LIMIT 1", ['current_date' => $date ]);
+        if( isset( $op_query[0] ) ):
+            $op_data['status'] = $op_query[0]->op_close_type;
+            $op_data['date_time'] = $op_query[0]->op_close_date;
+        endif;
+
+        
+        $items = $this->queryItems($search);
+        $finalData = [];
+
+        if(sizeof( $items ) > 0):
+            foreach( $items as $key => $value ):
+                $payment = ( $value->total_sales - $value->total_payments );
+                if($payment < 0) $payment = 0;
+
+                $time = $value->operation_type == 'arrival' ? $value->op_one_pickup : $value->op_two_pickup;
+                $data = [
+                    "op_pickup" => date("H:i", strtotime( $time )),
+                    "site" => $value->site_name,
+                    "type" => $value->final_service_type,
+                    "op_status" => $value->operation_type == 'arrival' ? $value->op_one_status : $value->op_two_status,
+                    "code" => $value->code,
+                    "client_name" => $value->client_first_name." ".$value->client_last_name,
+                    "service_name" => $value->service_name,
+                    "passengers" => $value->passengers,
+                    "op_from_name" => $value->operation_type == 'arrival' ? $value->from_name : $value->to_name,
+                    "op_to_name" => $value->operation_type == 'arrival' ? $value->to_name : $value->from_name,
+                    "payment_status" => $value->status,
+                    "payment" => number_format($payment,2),
+                    "currency" => $value->currency,                    
+                    "reservation_id" => $value->reservation_id,
+                    "id" => $value->id,
+                    "options" => [
+                        "can_update_op" => true
+                    ]
+                ];
+
+                $finalData[] = $data;
+
+                
+            endforeach;
+        endif;
+
+        return response()->json(['op_data' => $op_data, "items" => $finalData], Response::HTTP_OK);
+
+    }
+
+    public function queryItems($search){
+
+        return  DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, '' as messages,
                                                 COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                                 CASE
                                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
@@ -218,39 +307,74 @@ class OperationRepository
                                         "init_date_three" => $search['init_date'],
                                         "init_date_four" => $search['end_date'],
                                     ]);
-
-        return view('operation.managment', compact('items','date'));
     }
 
-    public function statusUpdate($request){
-        
+    public function createLock($request){
+        // echo "<pre>";
+        // print_r($request->type);
+        // die();
+
         try {
             DB::beginTransaction();
-            
-            $item = ReservationsItem::find($request->item_id);
-            if($request->type == "arrival"):
-                $item->op_one_status = $request->status;
-            endif;
-            if($request->type == "departure"):
-                $item->op_two_status = $request->status;
-            endif;
-            $item->save();
-            
 
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $request->rez_id;
-            $follow_up_db->save();
+            $search = [];
+            $search['init_date'] = $request->date." 00:00:00";
+            $search['end_date'] = $request->date." 23:59:59";
+            $items = $this->queryItems($search);
+            $today = date("Y-m-d H:i:s");
+
+            $update = [];
+            $count = 0;
+            foreach($items as $key => $value):
+                $count++;
+
+                if($value->operation_type == "arrival"):
+                    $update[] = [
+                        "id" => $value->id,
+                        "type" => $value->operation_type,
+                        "scheduled_code" => $count,
+                        "scheduled_time" => $today,
+                        "scheduled_type" => $request->type,
+                    ];
+                endif;
+
+                if($value->operation_type == "departure"):
+                    $update[] = [
+                        "id" => $value->id,
+                        "type" => $value->operation_type,
+                        "scheduled_code" => $count,
+                        "scheduled_time" => $today,
+                        "scheduled_type" => $request->type,
+                    ];
+                endif;
+
+            endforeach;
+
+            echo "<pre>";
+            print_r($update);
+            die();
+            
+            //Update
+            foreach($update as $key => $value):
+                $item = ReservationsItem::find($value['id']);
+                if($request->type == "arrival"):
+                    $item->op_one_status = $request->status;
+                endif;
+                if($request->type == "departure"):
+                    $item->op_two_status = $request->status;
+                endif;
+                $item->save();
+            endforeach;
+
+            echo "<pre>";
+            print_r($update);
+            die();
 
             DB::commit();
-            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], Response::HTTP_OK);
-
+            return response()->json(['message' => 'Actualización realizada con éxito', 'success' => true], Response::HTTP_OK);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-        
+            return response()->json(['message' => 'Error al actualizar la operación'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }        
     }
 }
