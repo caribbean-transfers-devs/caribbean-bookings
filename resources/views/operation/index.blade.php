@@ -120,6 +120,7 @@
                                                     <th>Total</th>
                                                     <th>Moneda</th>
                                                     <th>Comentarios</th>
+                                                    <th>Ref.</th>
                                                 </tr>
                                             </thead>
                                             <tbody>                                                
@@ -157,6 +158,7 @@
                                                             <td class="text-end">{{ number_format($payment,2) }}</td>                                                            
                                                             <td class="text-center">{{ $valueItem->currency }}</td>
                                                             <td>{{ $valueItem->messages }}</td>
+                                                            <td>{{ $valueItem->reference }}</td>
                                                         </tr>
                                                     @endforeach
                                                 @endif                                                 
