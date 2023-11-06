@@ -45,6 +45,7 @@ class OperationRepository
                                                 LEFT JOIN (
                                                     SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                                     FROM sales
+                                                    WHERE deleted_at IS NULL
                                                     GROUP BY reservation_id
                                                 ) as s ON s.reservation_id = rez.id
                                                 LEFT JOIN (
@@ -81,6 +82,7 @@ class OperationRepository
                                         LEFT JOIN (
                                                 SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                                 FROM sales
+                                                WHERE deleted_at IS NULL
                                                 GROUP BY reservation_id
                                         ) as s ON s.reservation_id = rez.id
                                         LEFT JOIN (
@@ -162,6 +164,7 @@ class OperationRepository
                                             LEFT JOIN (
                                                 SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                                 FROM sales
+                                                WHERE deleted_at IS NULL
                                                 GROUP BY reservation_id
                                             ) as s ON s.reservation_id = rez.id
                                             LEFT JOIN (
@@ -198,6 +201,7 @@ class OperationRepository
                                     LEFT JOIN (
                                             SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                             FROM sales
+                                            WHERE deleted_at IS NULL
                                             GROUP BY reservation_id
                                     ) as s ON s.reservation_id = rez.id
                                     LEFT JOIN (
