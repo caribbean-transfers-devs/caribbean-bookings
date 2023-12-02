@@ -1,28 +1,120 @@
-function initialize(div) {
-  var input = document.getElementById(div);
-  var autocomplete = new google.maps.places.Autocomplete(input);
+var from_autocomplete = document.getElementById('aff-input-from');
+var to_autocomplete = document.getElementById('aff-input-to');
 
-  autocomplete.addListener('place_changed', function() {
-      var place = autocomplete.getPlace();
-      if(div == "bookingFromForm"){        
+let setup = {        
+  lang: 'es',
+  currency: 'USD',
+  deeplink: '/resultados',
+  serviceType: 'OW',
+  pax: 1,
+  items: {
+      from: {
+          name: '',
+          latitude: '',
+          longitude: '',
+          pickupDate: '',
+          pickupTime: '00:00',
+      },
+      to: {
+          name: '',
+          latitude: '',
+          longitude: '',
+          pickupDate: '',
+          pickupTime: '00:00',
+      },
+  },
+  setLang: function(lang){
+    setup.lang = lang;    
+  },
+  loadingMessage: function(item){
+
+    const loader = document.getElementById(item);
+    loader.innerHTML = '';
+    
+    const div = document.createElement('div');
+    div.classList.add("loader");
+    const image = document.createElement('img');
+    image.width = 35;
+    image.height = 35;
+    image.src = '/assets/img/loader.gif';
+    
+    div.appendChild(image);
+    loader.appendChild(div);
+
+  },
+  autocomplete: function(keyword, element){
+    let size = keyword.length;
+      if(size < 3) return false;
+      setup.loadingMessage(element);
+
+      fetch(`/tpv/autocomplete/${keyword}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+      }).then((response) => {
+          return response.json()
+      }).then((data) => {
+          this.makeItems(data,element);
+      }).catch((error) => {
+          console.error('Error:', error);
+      });
+  },
+  makeItems: function(data, element){
+      const finalElement = document.getElementById(element);
+      finalElement.innerHTML = '';
+
+      for (let key in data) {
+          if (data.hasOwnProperty(key)) {
+              const itemDiv = document.createElement('div');
+              itemDiv.textContent = data[key].name;
+
+              const span = document.createElement('span');
+              span.textContent = data[key].address;
+
+              itemDiv.appendChild(span);
+
+              itemDiv.addEventListener('click', function() { 
+                  setup.setItem(element, data[key]);
+              });              
+              finalElement.appendChild(itemDiv);
+          }
+    }    
+  },
+  setItem(element, data = {}){
+    const finalElement = document.getElementById(element);
+    finalElement.innerHTML = '';
+
+    if(element === "aff-input-from-elements"){
+        const initInput = document.getElementById('aff-input-from');
+        initInput.value = data.name;
+        setup.items.from.name = data.name;
+        setup.items.from.latitude = data.geo.lat;
+        setup.items.from.longitude = data.geo.lng;
+        
         var fromLat = document.getElementsByName("from_lat");
-            fromLat[0].value = place.geometry.location.lat();
-
+            fromLat[0].value = data.geo.lat;
         var fromLng = document.getElementsByName("from_lng");
-            fromLng[0].value = place.geometry.location.lng();
-      }
-      if(div == "bookingToForm"){
+            fromLng[0].value = data.geo.lng;
+
+    }
+
+    if(element === "aff-input-to-elements"){
+        const initInput = document.getElementById('aff-input-to');
+        initInput.value = data.name;
+        setup.items.to.name = data.name;
+        setup.items.to.latitude = data.geo.lat;
+        setup.items.to.longitude = data.geo.lng;
+        
         var toLat = document.getElementsByName("to_lat");
-            toLat[0].value = place.geometry.location.lat();
+            toLat[0].value = data.geo.lat;
 
         var toLng = document.getElementsByName("to_lng");
-            toLng[0].value = place.geometry.location.lng();
-      }
-  });
-}
+            toLng[0].value = data.geo.lng;
+    }
+  }
+};
 
-google.maps.event.addDomListener(window, 'load', initialize('bookingFromForm') );
-google.maps.event.addDomListener(window, 'load', initialize('bookingToForm') );
 
 document.addEventListener('DOMContentLoaded', function() {
   const fechaInput = document.getElementById('bookingPickupForm');
@@ -123,6 +215,36 @@ function setTotal(total){
   $("#formTotal").val(total);
   $("#formTotal").attr("readonly", false);
 }
+
+
+
+function affDelayAutocomplete(callback, ms) {
+  var timer = 0;
+  return function () {
+      var context = this,
+          args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+          callback.apply(context, args);
+      }, ms || 0);
+  };
+}
+
+
+
+from_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
+  setup.autocomplete( e.target.value, 'aff-input-from-elements');
+}, 500));
+from_autocomplete.addEventListener('focus', (e) => {
+  setup.autocomplete( e.target.value, 'aff-input-from-elements');
+});
+to_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {        
+  setup.autocomplete( e.target.value, 'aff-input-to-elements');
+}, 500));
+to_autocomplete.addEventListener('focus', (e) => {
+  setup.autocomplete( e.target.value, 'aff-input-to-elements');
+});
+
 
 $(document).on("change", "#formSite", function() {
   var selectedValue = $(this).val();

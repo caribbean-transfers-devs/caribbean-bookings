@@ -10,8 +10,7 @@
 @push('bootom-stack')
     <script>
         const code = '{!! $config['code'] !!}';
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.gmaps.key') }}&libraries=places"></script>
+    </script>    
     <script src="{{ mix('/assets/js/views/tpv/index.min.js') }}"></script>
     <script src="https://cdn.datatables.net/v/bs5/dt-1.13.6/datatables.min.js"></script>
 @endpush
@@ -44,12 +43,14 @@
                         </div>
                     </div>
                     <div class="from">
-                        <label class="form-label" for="bookingFromForm">Desde</label>
-                        <input class="form-control" type="text" name="from_name" id="bookingFromForm">
+                        <label class="form-label" for="aff-input-from">Desde</label>
+                        <input class="form-control" type="text" name="from_name" id="aff-input-from">
+                        <div class="autocomplete-results" id="aff-input-from-elements"></div>
                     </div>
                     <div class="to">
                         <label class="form-label" for="bookingToForm">Hacia</label>
-                        <input type="text" class="form-control" id="bookingToForm" name="to_name">
+                        <input type="text" class="form-control" name="to_name" id="aff-input-to">
+                        <div class="autocomplete-results" id="aff-input-to-elements"></div>
                     </div>
                     <div class="language">
                         <label class="form-label" for="bookingLanguageForm">Idioma</label>

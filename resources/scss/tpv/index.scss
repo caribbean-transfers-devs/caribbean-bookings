@@ -1,4 +1,4 @@
-@import '../components/loader';
+@import '../components/autocomplete';
 
 .bookingbox{
     padding: 15px;
@@ -24,6 +24,7 @@
     }
     > div.to{
         grid-area: to;
+        position: relative;
     }
     > div.language{
         grid-area: language;
