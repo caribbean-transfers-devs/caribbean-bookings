@@ -35,7 +35,7 @@
             // die();
         @endphp
         <h1 class="h3 mb-3 button_">
-            Reservaciones
+            Reservaciones - {{ date("Y-m-d", strtotime($data['init']))}} a {{ date("Y-m-d", strtotime($data['end']))}}
             <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</a>  
         </h1>
         
