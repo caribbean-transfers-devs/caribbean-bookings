@@ -121,7 +121,7 @@
                                                     <td>
                                                         @if (RoleTrait::hasPermission(40))
                                                             <button class="btn {{ (($confirmation_type == 0)? 'btn-warning':'btn-success')}}" onClick="updateConfirmation(event,{{$value->id}},'{{$value->operation_type}}',{{$confirmation_type}},{{$value->reservation_id}})">
-                                                                <i class="align-middle" data-feather="check-circle"></i>
+                                                                <i class="align-middle" data-feather="check-circle" data-value="{{ $confirmation_type }}"></i>
                                                             </button>
                                                         @endif
                                                     </td>
