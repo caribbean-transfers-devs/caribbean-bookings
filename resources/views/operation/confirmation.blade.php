@@ -118,10 +118,10 @@
                                                     }
                                                 @endphp
                                                 <tr>
-                                                    <td data-value="{{ $confirmation_type }}">
+                                                    <td>
                                                         @if (RoleTrait::hasPermission(40))
-                                                            <button class="btn {{ (($confirmation_type == 0)? 'btn-warning':'btn-success')}}" onClick="updateConfirmation(event,{{$value->id}},'{{$value->operation_type}}',{{$confirmation_type}},{{$value->reservation_id}})">
-                                                                <i class="align-middle" data-feather="check-circle"></i>
+                                                            <button class="btn btn-order {{ (($confirmation_type == 0)? 'btn-warning':'btn-success')}}" onClick="updateConfirmation(event,{{$value->id}},'{{$value->operation_type}}',{{$confirmation_type}},{{$value->reservation_id}})">
+                                                                {{ (($confirmation_type == 0)? 'N':'Y')}}
                                                             </button>
                                                         @endif
                                                     </td>
