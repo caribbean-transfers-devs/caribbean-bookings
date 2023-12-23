@@ -47,6 +47,7 @@
                             <table id="reservations_table" class="table table-striped table-sm">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th>Sitio</th>
                                         <th>Código</th>
                                         <th>Estatus</th>
@@ -102,6 +103,11 @@
                                                 $total_pending = $item->total_sales - $item->total_payments;
                                             @endphp
                                             <tr>
+                                                <td class="text-end">
+                                                    @if($item->is_today >= 1)
+                                                        <i class="align-middle me-2" data-feather="alert-circle"></i>
+                                                    @endif
+                                                </td>
                                                 <td>{{ $item->site_name }}</td>
                                                 <td>
                                                     <a href="reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a>
