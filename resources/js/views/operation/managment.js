@@ -20,6 +20,28 @@ $(function() {
 
 function setStatus(event, type, status, item_id, rez_id){
     event.preventDefault();
+    var clickedRow = event.target.closest('tr');
+    var statusCell = clickedRow.querySelector('td:nth-child(4)');
+    //statusCell.textContent = status;
+
+    let alert_type = 'btn-secondary';
+    switch (status) {
+        case 'PENDING':
+            alert_type = 'btn-secondary';
+            break;
+        case 'COMPLETED':
+            alert_type = 'btn-success';
+            break; 
+        case 'NOSHOW':
+            alert_type = 'btn-warning';
+            break;
+        case 'CANCELLED':
+            alert_type = 'btn-danger';
+            break;  
+        default:
+            alert_type = 'btn-secondary';
+            break;
+    }    
 
     swal.fire({
         title: '¿Está seguro de actualizar el estatus?',
@@ -48,7 +70,7 @@ function setStatus(event, type, status, item_id, rez_id){
                         title: '¡Éxito!',
                         icon: 'success',
                         html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
-                        timer: 2500,
+                        timer: 1500,
                         timerProgressBar: true,
                         didOpen: () => {
                             Swal.showLoading()
@@ -62,7 +84,7 @@ function setStatus(event, type, status, item_id, rez_id){
                             clearInterval(timerInterval)
                         }
                     }).then((result) => {
-                        location.reload();
+                        statusCell.innerHTML = `<span class="badge ${alert_type} rounded-pill">${status}</span>`;                        
                     })
 
                 }
@@ -76,8 +98,7 @@ function setStatus(event, type, status, item_id, rez_id){
             });
 
         }
-    });
-
+    });    
    
 }
 

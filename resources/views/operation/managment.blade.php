@@ -42,6 +42,24 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     
     <script src="{{ mix('/assets/js/views/operation/managment.min.js') }}"></script>
+    <script>        
+        var inactivityTime = (5 * 60000); // 30 segundos en milisegundos
+        var timeoutId;
+    
+        function resetTimer() {          
+            clearTimeout(timeoutId);          
+            timeoutId = setTimeout(refreshPage, inactivityTime);
+        }
+    
+        function refreshPage() {          
+            location.reload();
+        }
+            
+        document.addEventListener('mousemove', resetTimer);
+        document.addEventListener('keydown', resetTimer);
+                
+        resetTimer();
+    </script>
 @endpush
 
 @section('content')
