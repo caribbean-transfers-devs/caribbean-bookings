@@ -30,6 +30,8 @@ mix.sass('resources/scss/zones/index.scss', data.assets + "css/zones/index.min.c
 mix.copy('resources/js/views/tpv/index.js', data.assets + "js/views/tpv/index.min.js");
 mix.copy('resources/js/views/zones/index.js', data.assets + "js/views/zones/index.min.js");
 mix.sass('resources/scss/rates/index.scss', data.assets + "css/rates/index.min.css");
+mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/admin.min.css");
+
 mix.copy('resources/js/views/rates/index.js', data.assets + "js/views/rates/index.min.js");
 mix.copy('resources/js/views/operation/managment.js', data.assets + "js/views/operation/managment.min.js");
 mix.copy('resources/js/views/operation/confirmation.js', data.assets + "js/views/operation/confirmation.min.js");
