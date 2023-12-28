@@ -60,14 +60,15 @@
                         Módulos
                     </li>
 
-                    <!--<li class="sidebar-item">
-                        <a href="#dashboard" data-bs-toggle="collapse" class="sidebar-link collapsed">
-                            <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboards</span>
-                        </a>
-                        <ul id="dashboard" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">                           
-                            <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.admin') }}">Admin</a></li>                            
+                    @if(RoleTrait::hasPermission(42))
+                    <li class="sidebar-item">
+                        <ul id="dashboard" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            @if(RoleTrait::hasPermission(42))                       
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.admin') }}">Admin</a></li>
+                            @endif
                         </ul>
-                    </li>-->
+                    </li>
+                    @endif
 
 
                     @if(RoleTrait::hasPermission(26))
