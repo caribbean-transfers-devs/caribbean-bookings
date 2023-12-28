@@ -11,6 +11,10 @@ class DashboardController extends Controller
         return $dashboard->index();        
     }
     public function admin(DashboardRepository $dashboard){
+        if(!RoleTrait::hasPermission(42)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+        
         return $dashboard->admin();        
     }
 }
