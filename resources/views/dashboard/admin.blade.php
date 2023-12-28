@@ -2,11 +2,63 @@
 @section('title') Admin Dashboard @endsection
 
 @push('up-stack')
-    <link href="{{ mix('/assets/css/dashboards/admin.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/dashboards/admin.min.css') }}" rel="stylesheet" > 
+    <link href="{{ mix('/assets/css/dashboards/admin.min.css') }}" rel="preload" as="style">
+    <link href="{{ mix('/assets/css/dashboards/admin.min.css') }}" rel="stylesheet"> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @endpush
 
 @push('bootom-stack')
+    <script>
+        var datos = @json($items);
+        
+        function getDays(objeto) {
+            var dates = [];
+            
+            for (var new_date in objeto) {                
+                if (objeto.hasOwnProperty(new_date) && /\d{4}-\d{2}-\d{2}/.test(new_date)) {                    
+                    var update_day = parseInt(new_date.split('-')[2]);
+                    dates.push(update_day);
+                }
+            }
+
+            return dates;
+        }
+
+        function getCounter(objeto) {
+            var counterByDate = [];
+
+            for (var new_date in objeto) {                
+                if (objeto.hasOwnProperty(new_date) && /\d{4}-\d{2}-\d{2}/.test(new_date)) {                    
+                    var counter = objeto[new_date].counter;
+                    counterByDate.push(counter);
+                }
+            }
+
+            return counterByDate;
+        }
+
+
+        const ctx = document.getElementById('myChart');
+    
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: getDays(datos),
+                datasets: [{
+                label: 'Resumen del mes',
+                data: getCounter(datos),
+                borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+  </script>
 @endpush
 
 @section('content')
@@ -60,7 +112,7 @@
                 </div>                
             </div>
             <div class="col-12 col-sm-8">
-
+                <canvas id="myChart"></canvas>
             </div>
         </div>
 

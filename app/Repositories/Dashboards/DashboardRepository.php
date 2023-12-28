@@ -22,6 +22,7 @@ class DashboardRepository
         //Query DB
         $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1';
         $items = [];
+        $day_by_day = [];
 
         // Recorre desde el primer día hasta el último día del mes
         for ($fecha = date("Y-m-d", strtotime("first day of this month")); $fecha <= date("Y-m-d", strtotime("last day of this month")); $fecha = date("Y-m-d", strtotime($fecha . " +1 day"))) {
@@ -102,6 +103,9 @@ class DashboardRepository
                 }
             endforeach;
         }
+
+        //dd($items);
+        
         
         return view('dashboard.admin', ['items' => $items]);
     }
