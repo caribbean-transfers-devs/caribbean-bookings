@@ -19,8 +19,7 @@
     <div class="container-fluid p-0">
 
         <div class="mb-3">
-            <h1 class="h3 d-inline align-middle">TPV</h1>
-                   
+            <h1 class="h3 d-inline align-middle">TPV</h1>                   
         </div>
 
         <div class="row">
