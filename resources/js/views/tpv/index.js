@@ -60,26 +60,64 @@ let setup = {
           console.error('Error:', error);
       });
   },
-  makeItems: function(data, element){
-      const finalElement = document.getElementById(element);
-      finalElement.innerHTML = '';
+  makeItems: function(data, element){    
 
-      for (let key in data) {
-          if (data.hasOwnProperty(key)) {
-              const itemDiv = document.createElement('div');
-              itemDiv.textContent = data[key].name;
+    const finalElement = document.getElementById(element);
+          finalElement.innerHTML = '';
 
-              const span = document.createElement('span');
-              span.textContent = data[key].address;
+    for (let key in data) {
+      if (data.hasOwnProperty(key)) {
 
-              itemDiv.appendChild(span);
+        if(data[key].type === "DEFAULT"){
 
-              itemDiv.addEventListener('click', function() { 
-                  setup.setItem(element, data[key]);
-              });              
-              finalElement.appendChild(itemDiv);
-          }
-    }    
+            const itemDiv = document.createElement('div');
+                  itemDiv.textContent = data[key].name;
+                  itemDiv.className = 'default';
+
+            const span = document.createElement('span');
+                  span.textContent = data[key].address;
+
+                  itemDiv.appendChild(span);
+                  itemDiv.addEventListener('click', function() { 
+                    setup.setItem(element, data[key]);
+                  });
+
+            finalElement.appendChild(itemDiv);
+        }
+
+        if(data[key].type === "GCP"){
+            const itemNameDiv = document.createElement('div');      
+                  itemNameDiv.className = 'GCP';            
+
+            const itemInformation = document.createElement('div');
+                  itemInformation.textContent = data[key].name;
+
+                  const span = document.createElement('span');
+                    span.textContent = data[key].address;
+
+
+                  itemInformation.appendChild(span);
+                  itemInformation.addEventListener('click', function() { 
+                    setup.setItem(element, data[key]);
+                  });
+
+                const itemButton = document.createElement('button');
+                      itemButton.textContent = 'ADD';
+                      itemButton.type = 'button';
+                      itemButton.addEventListener('click', function() {                         
+                        setup.saveHotel(element, data[key]);
+                      });
+                            
+                itemNameDiv.appendChild(itemInformation);
+                itemNameDiv.appendChild(itemButton);
+
+                finalElement.appendChild(itemNameDiv);
+
+        }
+
+
+      }
+    }
   },
   setItem(element, data = {}){
     const finalElement = document.getElementById(element);
@@ -112,7 +150,34 @@ let setup = {
         var toLng = document.getElementsByName("to_lng");
             toLng[0].value = data.geo.lng;
     }
-  }
+  },
+  saveHotel: function(element, data){      
+      let item = {
+        name: data.name,
+        address: data.address,
+        start: {
+          lat: data.geo.lat,
+          lng: data.geo.lng,
+        },
+      };
+
+      $.ajax({
+        url: 'https://api.caribbean-transfers.com/api/v1/hotels/add',
+        type: 'POST',
+        data: item,
+        beforeSend: function() {
+          setup.loadingMessage(element);
+        },
+        success: function(resp) {
+          setup.setItem(element, data);          
+          alert("Hotel agregado con éxito...");
+          const finalElement = document.getElementById(element);
+          finalElement.innerHTML = '';          
+        },
+    }).fail(function(xhr, status, error) {
+      console.log(error);
+    });
+  },
 };
 
 
