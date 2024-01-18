@@ -12,6 +12,7 @@ use App\Http\Controllers\Tpv\TpvController;
 use App\Http\Controllers\Configs\ZonesController;
 use App\Http\Controllers\Configs\RatesController;
 use App\Http\Controllers\Operation\OperationController;
+use App\Http\Controllers\Reports\PaymentsController as ReportPayment;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +66,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation.search');
     Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');
 
+    //Reportes
+    Route::get('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment');
+    Route::post('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment.action');
 
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);
