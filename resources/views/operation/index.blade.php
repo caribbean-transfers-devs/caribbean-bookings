@@ -141,6 +141,9 @@
                                                             <td>
                                                                 @if($valueItem->operation_type == 'arrival')
                                                                     {{ $valueItem->from_name }}
+                                                                    @if(!empty($valueItem->flight_number))
+                                                                        [{{ $valueItem->flight_number }}]
+                                                                    @endif
                                                                 @endif
                                                                 @if($valueItem->operation_type == 'departure')
                                                                     {{ $valueItem->to_name }}
