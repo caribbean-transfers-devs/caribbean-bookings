@@ -67,7 +67,9 @@ class SalesRepository
                         ( rez.reference like '%".$data['filter_text']."%') OR
                         ( it.code like '".$data['filter_text']."' )
                     )";            
-        }         
+        }
+
+        $query .= " AND rez.is_cancelled <> 1";
         
         $bookings = DB::select("SELECT 
                                     rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, 
