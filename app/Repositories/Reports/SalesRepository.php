@@ -50,9 +50,10 @@ class SalesRepository
             $query .= " AND FIND_IN_SET(:zone, zone_two_id) > 0";
         }
         if(isset( $request->site ) && sizeof($request->site) > 0 ){                
-            $data['site'] = $request->site;
-            $query .= ' AND site.id IN(:site)';
-            $queryData['site'] = implode(",", $request->site);
+            //dd(implode(",", $request->site));
+            //$data['site'] = $request->site;
+            $query .= ' AND site.id IN( '.implode(",", $request->site).' )';
+            //$queryData['site'] = implode(",", $request->site);
         }
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
             $data['payment_method'] = $request->payment_method;
