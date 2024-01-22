@@ -83,7 +83,7 @@
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.payment') }}">Pagos</a></li>
                                 @endif
                                 @if(RoleTrait::hasPermission(44))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.payment') }}">Ventas</a></li>
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.sales') }}">Ventas</a></li>
                                 @endif
                             </ul>
                         </li>
