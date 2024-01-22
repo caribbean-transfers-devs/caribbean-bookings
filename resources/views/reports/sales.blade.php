@@ -190,7 +190,19 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $total = [
+                                    "quantity" => 0,
+                                    "USD" => 0,
+                                    "MXN" => 0,
+                                ];
+                            @endphp
                             @foreach($sites as $key => $value)
+                                @php
+                                    $total['quantity'] += $value['count'];
+                                    $total['USD'] += $value['USD'];
+                                    $total['MXN'] += $value['MXN'];
+                                @endphp
                             <tr>
                                 <td>{{ strtolower( $key) }}</td>
                                 <td class="text-center">{{ $value['count'] }}</td>
@@ -199,6 +211,14 @@
                             </tr>
                             @endforeach
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>Total</td>
+                                <td class="text-center">{{ $total['quantity'] }}</td>
+                                <td>{{ number_format($total['USD'],2) }}</td>
+                                <td>{{ number_format($total['MXN'],2) }}</td>
+                            </tr>
+                        </tfoot>
                     </table>
 
                     <div class="card-header">
