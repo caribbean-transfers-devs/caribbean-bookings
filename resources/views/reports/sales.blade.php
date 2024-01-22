@@ -13,8 +13,9 @@
 @section('title') Reservaciones @endsection
 
 @push('up-stack')
-    <link href="{{ mix('/assets/css/reservations/index.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/reservations/index.min.css') }}" rel="stylesheet" > 
+    <link href="{{ mix('/assets/css/reservations/index.min.css') }}" rel="preload" as="style">
+    <link href="{{ mix('/assets/css/reservations/index.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
 @endpush
 
 @push('bootom-stack')
@@ -24,6 +25,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
+    
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+
     <script src="{{ mix('assets/js/views/reservations/reservationsIndex.js') }}"></script>
 
     <script>
@@ -33,6 +39,17 @@
             noResultsText: 'No se encontraron resultados',
             noChoicesText: 'No hay opciones para elegir',
             itemSelectText: 'Clic para elegir',
+        });
+
+        $('#reservations_table_sales').DataTable({
+            dom: 'Bfrtip',
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
+            },
+            paging: false,
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
         });
     </script>
 @endpush
@@ -54,7 +71,7 @@
                 <div class="card">                    
                     <div class="card-body">
                         <div class="table-responsive mt-3">
-                            <table id="reservations_table" class="table table-striped table-sm">
+                            <table id="reservations_table_sales" class="table table-striped table-sm">
                                 <thead>
                                     <tr>                                        
                                         <th>Sitio</th>
