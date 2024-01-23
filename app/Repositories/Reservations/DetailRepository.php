@@ -44,7 +44,7 @@ class DetailRepository
             endif;                      
         endforeach;
 
-        if($data['total_payments'] >= $data['total_sales']):
+        if( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ):
             $data['status'] = "CONFIRMED";
         endif;
         if($reservation->is_cancelled == 1):
