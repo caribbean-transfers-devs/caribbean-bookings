@@ -131,7 +131,7 @@
                                             <tr>
                                                 <td>{{ $item->site_name }}</td>
                                                 <td>
-                                                    <a href="reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a>
+                                                    <a href="/reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a>
                                                 </td> 
                                                 <td class="text-center">
                                                     @if ($item->is_cancelled == 0)                                                                                                   
