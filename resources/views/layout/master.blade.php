@@ -85,6 +85,9 @@
                                 @if(RoleTrait::hasPermission(44))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.sales') }}">Ventas</a></li>
                                 @endif
+                                @if(RoleTrait::hasPermission(45))
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.commissions') }}">Comisiones</a></li>
+                                @endif
                             </ul>
                         </li>
                     @endif

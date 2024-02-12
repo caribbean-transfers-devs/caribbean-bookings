@@ -14,6 +14,7 @@ use App\Http\Controllers\Configs\RatesController;
 use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Reports\PaymentsController as ReportPayment;
 use App\Http\Controllers\Reports\SalesController as ReportSales;
+use App\Http\Controllers\Reports\CommissionsController as ReportCommissions;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +73,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment.action');
     Route::get('/reports/sales', [ReportSales::class, 'index'])->name('reports.sales');
     Route::post('/reports/sales', [ReportSales::class, 'index'])->name('reports.sales.action');
+    Route::get('/reports/commissions', [ReportCommissions::class, 'index'])->name('reports.commissions');
+    Route::post('/reports/commissions', [ReportCommissions::class, 'index'])->name('reports.commissions.action');
 
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);
