@@ -1,5 +1,6 @@
 @php
     $users = [];
+    $exchange_rate = 16.50;
 @endphp
 @extends('layout.master')
 @section('title') Comisiones @endsection
@@ -61,7 +62,7 @@
 @section('content')
     <div class="container-fluid p-0">
         <h1 class="h3 mb-3 button_">
-            Reporte de comisiones
+            Reporte de comisiones - [{{ $exchange_rate }}]
             <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</a>
         </h1>
 
@@ -105,7 +106,7 @@
                                                 endif;
 
                                                 if($value->currency == "MXN"):
-                                                    $users[ $value->employee ]['USD'] += $value->total_sales;
+                                                    $users[ $value->employee ]['MXN'] += $value->total_sales;
                                                 endif;
 
                                                 $users[ $value->employee ]['QUANTITY']++;
@@ -167,16 +168,39 @@
                                         <th>Cantidad</th>
                                         <th>USD</th>
                                         <th>MXN</th>
+                                        <th>Total</th>
+                                        <th>Comisión</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @if(sizeof($users) >= 1)
                                         @foreach($users as $key => $value)
+                                            @php
+                                                $total = ($value['USD'] * $exchange_rate) + $value['MXN'];
+                                                $commission = 0;
+                                                if($total >= 50000 && $total >= 74999):
+                                                    $commission = 2500;
+                                                endif;
+                                                if($total >= 75000 && $total >= 99999):
+                                                    $commission = 3750;
+                                                endif;
+                                                if($total >= 100000 && $total >= 124999):
+                                                    $commission = 6250;
+                                                endif;
+                                                if($total >= 125000 && $total >= 174999):
+                                                    $commission = 8750;
+                                                endif;
+                                                if($total >= 200000):
+                                                    $commission = 100000;
+                                                endif;
+                                            @endphp
                                             <tr>
                                                 <td>{{ $key }}</td>
                                                 <td>{{ $value['QUANTITY'] }}</td>
                                                 <td>{{ number_format($value['USD'],2) }}</td>
-                                                <td>{{ number_format($value['MXN'],2) }}</td>                                                
+                                                <td>{{ number_format($value['MXN'],2) }}</td>
+                                                <td>{{ number_format($total,2) }}</td>
+                                                <td>{{ number_format($commission,2) }}</td>                                       
                                             </tr>
                                         @endforeach
                                     @endif
