@@ -188,6 +188,8 @@ class CommissionsRepository
                                 $status = "COMPLETADO";
                         endif;
 
+                        $items[$key]->status = $status;
+
                         if( $status == "PENDIENTE" || empty( $value->employee ) ):
                                 unset( $items[$key] );
                         endif;
