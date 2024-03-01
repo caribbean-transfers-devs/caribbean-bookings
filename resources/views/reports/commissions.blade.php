@@ -178,21 +178,27 @@
                                             @php
                                                 $total = ($value['USD'] * $exchange_rate) + $value['MXN'];
                                                 $commission = 0;
-                                                if($total >= 50000 && $total >= 74999):
-                                                    $commission = 2500;
+                                                if($total >= 50000 && $total <= 74999):
+                                                    //$commission = 2500;
+                                                    $commission = 0.05 * $total;
                                                 endif;
-                                                if($total >= 75000 && $total >= 99999):
-                                                    $commission = 3750;
+                                                if($total >= 75000 && $total <= 99999):
+                                                    //$commission = 3750;
+                                                    $commission = 0.05 * $total;
                                                 endif;
-                                                if($total >= 100000 && $total >= 124999):
-                                                    $commission = 6250;
+                                                if($total >= 100000 && $total <= 124999):
+                                                    //$commission = 6250;
+                                                    $commission = 0.05 * $total;
                                                 endif;
-                                                if($total >= 125000 && $total >= 174999):
-                                                    $commission = 8750;
+                                                if($total >= 125000 && $total <= 174999):
+                                                    //$commission = 8750;
+                                                    $commission = 0.05 * $total;
                                                 endif;
                                                 if($total >= 200000):
-                                                    $commission = 100000;
+                                                    //$commission = 100000;
+                                                    $commission = 0.05 * $total;
                                                 endif;
+                                                
                                             @endphp
                                             <tr>
                                                 <td>{{ $key }}</td>
