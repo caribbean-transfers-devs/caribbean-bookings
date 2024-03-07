@@ -1,4 +1,4 @@
-$('.table').DataTable({
+$('.items_table').DataTable({
     language: {
         url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
     },
@@ -55,6 +55,8 @@ function updateSpam(event, id, type, update){
                         html: 'Servicio actualizado con éxito.',
                         showConfirmButton: false,
                         timer: 1500
+                    }).then((result) => {
+                        location.reload();
                     });
 
                 }
