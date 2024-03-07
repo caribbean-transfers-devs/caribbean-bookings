@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Operation\OperationRepository;
 use App\Repositories\Operation\ConfirmationRepository;
+use App\Repositories\Operation\SpamRepository;
 use App\Traits\RoleTrait;
 
 class OperationController extends Controller
@@ -35,5 +36,18 @@ class OperationController extends Controller
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $operationRepository->statusUpdate($request);        
+    }
+
+    public function spam(Request $request, SpamRepository $spamRepository){
+        if(!$this->hasPermission(47)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+        return $spamRepository->index($request);
+    }
+    public function spamUpdate(Request $request, SpamRepository $spamRepository){
+        if(!$this->hasPermission(47)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+        return $spamRepository->spamUpdate($request);
     }
 }
