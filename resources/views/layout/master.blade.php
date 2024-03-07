@@ -100,7 +100,7 @@
                     </li>
                     @endif
 
-                    @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) )
+                    @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) )
                     <li class="sidebar-item">
                         <a href="#operation" data-bs-toggle="collapse" class="sidebar-link collapsed">
                             <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Operación</span>
