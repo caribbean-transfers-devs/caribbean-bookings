@@ -62,7 +62,7 @@
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-1" role="tabpanel">
                             <h4 class="tab-title">Listado de reservaciones a operar</h4>
-                            <table id="reservations_table" class="table table-striped table-sm">
+                            <table id="reservations_table" class="table table-striped table-sm items_table">
                                 <thead>
                                     <tr>        
                                         <th></th>                                                
