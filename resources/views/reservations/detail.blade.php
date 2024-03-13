@@ -194,8 +194,7 @@
                                     <i class="align-middle" data-feather="plus"></i>
                                 </button>-->
                                 @endif
-                            </div>
-                            
+                            </div>                            
                             @foreach ($reservation->items as $item)   
                             @php
                                 // echo "<pre>";
@@ -204,7 +203,7 @@
                             @endphp            
                             <div class="services-container">
                                 <h3>{{ $item->code }}</h3>
-                                <div class="items-container">                                    
+                                <div class="items-container">
                                     <div class="items">
                                         <div class="information_data">
                                             <p><strong>Tipo:</strong> {{ $item->destination_service->name }}</p>
@@ -226,8 +225,7 @@
                                                     @case('CANCELLED')
                                                         <span class="badge bg-danger">CANCELLED</span>
                                                     @break                                                
-                                                    @default
-                                                        
+                                                    @default                                                        
                                                 @endswitch
                                             </p>
                                         </div>
@@ -251,7 +249,7 @@
                                             @endphp                                        
                                             <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->from_name }}','{{ $item->to_name }}','{{ $time }}','{{ $item->distance_km }}')">
                                                 Ver mapa
-                                            </button>                                           
+                                            </button>
                                         </div>
                                     </div>
                                     @if ($item->is_round_trip)
@@ -284,7 +282,7 @@
                                         </div>           
                                     @endif
 
-                                    <div>                                        
+                                    <div>
                                         <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
                                             Confirmacion de llegada
                                         </button>
@@ -316,8 +314,7 @@
                                             </div>
                                         </div>
                                         
-                                    </div>                                
-                                                    
+                                    </div>
                                 </div>                                
                             </div>
                             <input type="hidden" id="from_lat" value="{{ $item->from_lat }}">

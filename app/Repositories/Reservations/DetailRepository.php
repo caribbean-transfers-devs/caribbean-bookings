@@ -51,6 +51,8 @@ class DetailRepository
             $data['status'] = "CANCELLED";
         endif;
 
+        // return $reservation;
+
         return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data','sites'));
     }
 }
