@@ -36,3 +36,4 @@ mix.copy('resources/js/views/rates/index.js', data.assets + "js/views/rates/inde
 mix.copy('resources/js/views/operation/managment.js', data.assets + "js/views/operation/managment.min.js");
 mix.copy('resources/js/views/operation/confirmation.js', data.assets + "js/views/operation/confirmation.min.js");
 mix.copy('resources/js/views/operation/spam.js', data.assets + "js/views/operation/spam.min.js");
+mix.copy('resources/js/views/reports/cash.js', data.assets + "js/views/reports/cash.min.js");

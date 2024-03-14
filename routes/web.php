@@ -15,6 +15,7 @@ use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Reports\PaymentsController as ReportPayment;
 use App\Http\Controllers\Reports\SalesController as ReportSales;
 use App\Http\Controllers\Reports\CommissionsController as ReportCommissions;
+use App\Http\Controllers\Reports\CashController as ReportCash;
 use App\Http\Controllers\Reports\CCFormController;
 
 /*
@@ -81,6 +82,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/reports/commissions', [ReportCommissions::class, 'index'])->name('reports.commissions.action');
     Route::get('/reports/ccform', [CCFormController::class, 'index'])->name('reports.ccform');
     Route::get('/reports/ccform/pdf', [CCFormController::class, 'createPDF'])->name('reports.ccform.createPDF');
+    Route::get('/reports/cash', [ReportCash::class, 'index'])->name('reports.cash');
+    Route::post('/reports/cash', [ReportCash::class, 'index'])->name('reports.cash.action');
+    Route::put('/reports/cash/update-status', [ReportCash::class, 'update'])->name('reports.cash.action.update');
 
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);
