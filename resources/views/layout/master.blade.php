@@ -73,7 +73,7 @@
                         </li>
                     @endif
 
-                    @if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45))
+                    @if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50))
                         <li class="sidebar-item">
                             <a href="#reports" data-bs-toggle="collapse" class="sidebar-link collapsed">
                                 <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Reportes</span>
