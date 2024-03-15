@@ -3,11 +3,8 @@
     use App\Traits\Reports\PaymentsTrait;
     
     $resume = [
-        'status' => [
-            'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-            'CONFIRMED' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-            'CANCELLED' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-        ]
+        'PENDIENTE' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
+        'CONFIRMADO' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
     ];
     $sites = [];
     $destinations = [];
@@ -61,7 +58,7 @@
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-1" role="tabpanel">
-                            <h4 class="tab-title">Listado de reservaciones operadas el día {{ $date }}</h4>
+                            <h4 class="tab-title">Listado de reservaciones operadas el día {{ $date_search }}</h4>
                             <table id="reservations_table" class="table table-striped table-sm">
                                 <thead>
                                     <tr>
@@ -84,8 +81,22 @@
                                 <tbody>
                                     @if(sizeof($items)>=1)
                                         @foreach($items as $key => $value)
-                                            
-                                                @php
+                                            @php                                                
+                                                $show = false;
+                                                $payments = PaymentsTrait::getPayments($value->reservation_id);
+                                                if(sizeof($payments) >= 1):
+                                                    foreach($payments as $keyP => $valueP):
+                                                        if($valueP->payment_method == 'CASH'):
+                                                            $show = true;
+                                                        endif;
+                                                    endforeach;
+                                                else:
+                                                    $show = true;
+                                                endif;
+                                            @endphp
+
+                                            @if( $show )
+                                                @php                                                
                                                     $payment = ( $value->total_sales - $value->total_payments );
                                                     if($payment < 0) $payment = 0;
 
@@ -112,6 +123,12 @@
                                                             break;
                                                     }
                                                     $confirmation_type = (( $value->payment_reconciled == 0 )? 1 : 0);
+
+                                                    if( isset( $resume[ $value->status ] ) ):
+                                                        $resume[ $value->status ][ $value->currency ] += $value->total_sales;
+                                                        $resume[ $value->status ]['count']++;
+                                                    endif;
+
                                                 @endphp
                                                 <tr>
                                                     <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
@@ -135,11 +152,18 @@
                                                     <td class="text-center">{{ $value->passengers }}</td>
                                                     <td>{{ $operation_from }}</td>
                                                     <td>{{ $operation_to }}</td>
-                                                    <td class="text-center">{{ $value->status }}</td>
+                                                    <td class="text-center">
+                                                        @if($value->status == "PENDIENTE")
+                                                            <span class="badge btn-secondary rounded-pill">Pendiente</span>
+                                                        @endif
+                                                        @if($value->status == "CONFIRMADO")
+                                                            <span class="badge btn-success rounded-pill">Confirmado</span>
+                                                        @endif
+                                                    </td>
                                                     <td class="text-end">{{ number_format($value->total_sales,2) }}</td>
                                                     <td class="text-center">{{ $value->currency }}</td>
                                                 </tr>
-
+                                            @endif
                                         @endforeach
                                     @endif
                                 </tbody>
@@ -147,6 +171,38 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Resumen por estatus</h4>
+                    </div>
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th style="width:35%;">Estatus</th>
+                                <th style="width:25%" class="text-center">Cantidad</th>
+                                <th class="text-center">USD</th>
+                                <th class="text-center">MXN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Pendiente</td>
+                                <td class="text-center">{{ $resume['PENDIENTE']['count'] }}</td>
+                                <td class="text-end">{{ number_format($resume['PENDIENTE']['USD'],2) }}</td>
+                                <td class="text-end">{{ number_format($resume['PENDIENTE']['MXN'],2) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Confirmado</td>
+                                <td class="text-center">{{ $resume['CONFIRMADO']['count'] }}</td>
+                                <td class="text-end">{{ number_format($resume['CONFIRMADO']['USD'],2) }}</td>
+                                <td class="text-end">{{ number_format($resume['CONFIRMADO']['MXN'],2) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
 
@@ -165,7 +221,7 @@
                     @csrf
                     <div class="col-12 col-sm-6">
                         <label class="form-label" for="lookup_date">Fecha de creación</label>
-                        <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
+                        <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date_search }}">
                     </div>
                 </form>
             </div>

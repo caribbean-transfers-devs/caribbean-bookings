@@ -11,16 +11,21 @@ use App\Models\ReservationFollowUp;
 class CashRepository
 {    
     public function index($request){
+        
+        $search = [];
+        $date_search = date("Y-m-d"). " - ".date("Y-m-d");
+        if(isset($request->date)){
+            $dateRange = explode(" - ", $request->date);
+            $search['init_date'] = $dateRange[0]." 00:00:00";
+            $search['end_date'] = $dateRange[1]." 23:59:59";
+            $date_search = $dateRange[0]. " - ".$dateRange[1];
+        } else {
+            $date = date("Y-m-d");
+            $search['init_date'] = $date." 00:00:00";
+            $search['end_date'] = $date." 23:59:59";
+        }
 
-        $date = date("Y-m-d");
-        if(isset( $request->date )):
-            $date = $request->date;
-        endif;
-
-        $search['init_date'] = $date." 00:00:00";
-        $search['end_date'] = $date." 23:59:59";
-
-        $items = DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, '' as messages,
+        $items = DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, sit.is_cxc, sit.is_cxp, '' as messages,
                                                 COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                                 CASE
                                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
@@ -55,10 +60,10 @@ class CashRepository
                                                 GROUP BY reservation_id
                                             ) as p ON p.reservation_id = rez.id
                                     WHERE it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
-                                    AND rez.is_cancelled = 0 AND rez.pay_at_arrival = 1
+                                    AND rez.is_cancelled = 0 AND sit.is_cxc <> 1
                                     GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                                     UNION 
-                                    SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_two_pickup as filtered_date, 'departure' as operation_type, sit.name as site_name, '' as messages,
+                                    SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_two_pickup as filtered_date, 'departure' as operation_type, sit.name as site_name, sit.is_cxc, sit.is_cxp, '' as messages,
                                                 COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                                 CASE
                                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
@@ -92,7 +97,7 @@ class CashRepository
                                             GROUP BY reservation_id
                                     ) as p ON p.reservation_id = rez.id
                                     WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
-                                    AND rez.is_cancelled = 0 AND rez.pay_at_arrival = 1
+                                    AND rez.is_cancelled = 0 AND sit.is_cxc <> 1
                                     GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id",[
                                         "init_date_one" => $search['init_date'],
                                         "init_date_two" => $search['end_date'],
@@ -100,7 +105,7 @@ class CashRepository
                                         "init_date_four" => $search['end_date'],
                                     ]);
 
-        return view('reports.cash', compact('items','date'));
+        return view('reports.cash', compact('items','date_search'));
     }
 
     public function update($request){

@@ -1,4 +1,4 @@
-$('.table').DataTable({
+$('#reservations_table').DataTable({
     language: {
         url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
     },
@@ -12,9 +12,9 @@ $(function() {
         element: "#lookup_date",        
         css: [
             'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-            'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
             'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
         ],
+        plugins: ['RangePlugin'],
         zIndex: 10
     })
 });
