@@ -141,7 +141,7 @@
                                                     <td>{{ $value->final_service_type }}</td>
                                                     <td class="text-center"><span class="badge {{ $label }} rounded-pill">{{ $operation_status }}</span></td>
                                                     <td>
-                                                        @if (RoleTrait::hasPermission(38))
+                                                        @if (RoleTrait::hasPermission(10))
                                                             <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
                                                         @else
                                                             {{ $value->code }}
