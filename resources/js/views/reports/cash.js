@@ -1,8 +1,12 @@
 $('#reservations_table').DataTable({
+    dom: 'Bfrtip',
     language: {
         url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
     },
     paging: false,
+    buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+    ],
     ordering: true,
     "order": [[2, 'asc']] 
 });
