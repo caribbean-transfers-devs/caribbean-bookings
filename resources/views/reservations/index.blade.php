@@ -7,6 +7,7 @@
         ]
     ];
     $sites = [];
+    $affiliates = [];
     $destinations = [];
 @endphp
 @extends('layout.master')
@@ -64,7 +65,7 @@
                                 <tbody>
                                     @if(sizeof($bookings) >= 1)
                                         @foreach ($bookings as $item)
-                                            @php                                                
+                                            @php
                                                 if($item->is_cancelled == 0):
                                                     if($item->pay_at_arrival == 1):
                                                         $item->status = "CONFIRMED";
@@ -80,9 +81,22 @@
                                                                 'MXN' => 0,
                                                                 'count' => 0
                                                             ];
-                                                        endif;
+                                                        endif;                                                        
                                                         $sites[$item->site_name][$item->currency] += $item->total_sales;
                                                         $sites[$item->site_name]['count']++;
+
+                                                        if($item->affiliate_id != 0 ):
+                                                            if(!isset( $affiliates[$item->site_name] )):
+                                                                $affiliates[$item->site_name] = [
+                                                                    'USD' => 0,
+                                                                    'MXN' => 0,
+                                                                    'count' => 0
+                                                                ];
+                                                            endif;
+                                                            $affiliates[$item->site_name][$item->currency] += $item->total_sales;
+                                                            $affiliates[$item->site_name]['count']++;
+                                                        endif;
+
 
                                                         if(!isset( $destinations[$item->destination_name] )):
                                                             $destinations[$item->destination_name] = [
@@ -93,7 +107,7 @@
                                                         endif;
                                                         $destinations[$item->destination_name][$item->currency] += $item->total_sales;
                                                         $destinations[$item->destination_name]['count']++;
-
+                                    
                                                     endif;
 
                                                 else:
@@ -151,76 +165,109 @@
                     <div class="card-header">
                         <h4>Resumen por estatus</h4>
                     </div>
-                    <table class="table table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th style="width:35%;">Estatus</th>
-                                <th style="width:25%">Cantidad</th>
-                                <th class="text-center">USD</th>
-                                <th class="text-center">MXN</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($resume['status'] as $key => $value)
-                            <tr>
-                                <td>{{ strtolower( $key) }}</td>
-                                <td class="text-center">{{ $value['count'] }}</td>
-                                <td class="text-end">{{ number_format($value['USD'],2) }}</td>
-                                <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Estatus</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($resume['status'] as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="card-header">
                         <hr>
                         <h4>Resumen por sitio</h4>
                     </div>
-                    <table class="table table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th style="width:35%;">Estatus</th>
-                                <th style="width:25%">Cantidad</th>
-                                <th class="text-center">USD</th>
-                                <th class="text-center">MXN</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($sites as $key => $value)
-                            <tr>
-                                <td>{{ strtolower( $key) }}</td>
-                                <td class="text-center">{{ $value['count'] }}</td>
-                                <td class="text-end">{{ number_format($value['USD'],2) }}</td>
-                                <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Estatus</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($sites as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="card-header">
                         <hr>
                         <h4>Resumen por destino</h4>
                     </div>
-                    <table class="table table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th style="width:35%;">Destino</th>
-                                <th style="width:25%">Cantidad</th>
-                                <th class="text-center">USD</th>
-                                <th class="text-center">MXN</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($destinations as $key => $value)
-                            <tr>
-                                <td>{{ strtolower( $key) }}</td>
-                                <td class="text-center">{{ $value['count'] }}</td>
-                                <td class="text-end">{{ number_format($value['USD'],2) }}</td>
-                                <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Destino</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($destinations as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card-header">
+                        <hr>
+                        <h4>Resumen afiliados</h4>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Estatus</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($affiliates as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
                 </div>
 
