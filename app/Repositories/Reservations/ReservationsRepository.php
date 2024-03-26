@@ -164,7 +164,7 @@ class ReservationsRepository
         if(sizeof( $bookings ) > 0):                
             usort($bookings, array($this, 'orderByDateTime'));
         endif;
-
+        
         return view('reservations.index', compact('bookings','services','zones','websites','data') );
 
         /*if(!$request->lookup_date){

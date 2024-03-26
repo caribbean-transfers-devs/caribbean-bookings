@@ -3,7 +3,8 @@ $(function() {
         language: {
             url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
         },
-        paging: false
+        paging: false,
+        order: []
     });
 
     const picker = new easepick.create({
