@@ -159,9 +159,11 @@ class ReservationsRepository
         $websites = DB::select("SELECT id, name as site_name
                                 FROM sites
                                 ORDER BY site_name ASC");
-        // echo "<pre>";
-        // print_r($sites);
-        // die();
+
+        
+        if(sizeof( $bookings ) > 0):                
+            usort($bookings, array($this, 'orderByDateTime'));
+        endif;
 
         return view('reservations.index', compact('bookings','services','zones','websites','data') );
 
@@ -610,4 +612,9 @@ class ReservationsRepository
 
         echo $message; die();
     }
+
+    private function orderByDateTime($a, $b) {
+        return strtotime($b->created_at) - strtotime($a->created_at);
+    }
+
 }
