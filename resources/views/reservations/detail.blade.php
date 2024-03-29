@@ -78,7 +78,7 @@
                                 </tr>
                                 <tr>
                                     <th>Unidad</th>
-                                    <td>{{ $reservation->destination->name }}</td>
+                                    <td>{{ $reservation->destination->name ?? '' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Creación</th>
