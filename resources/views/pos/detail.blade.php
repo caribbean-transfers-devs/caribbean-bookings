@@ -1,0 +1,124 @@
+@php
+    use App\Traits\RoleTrait;
+@endphp
+
+@extends('layout.master')
+@section('title') Detalle @endsection
+
+@push('up-stack')    
+    <link href="{{ mix('/assets/css/pos/detail.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/pos/detail.min.css') }}" rel="stylesheet" > 
+@endpush
+
+@push('bootom-stack')
+    <script src="{{ mix('assets/js/views/pos/detail.min.js') }}"></script>
+    <script src="{{ mix('assets/js/datatables.js') }}"></script>
+@endpush
+
+@section('content')
+    <div class="container-fluid p-0">
+
+        <div class="mb-3">
+            <h1 class="h3 d-inline align-middle">Detalle de venta</h1>            
+        </div>
+
+        <div class="row justify-content-center">
+
+            <div class="col-xl-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
+                    </div>
+                    <div class="card-body">
+
+                        <table class="table table-sm mt-2 mb-4">
+                            <tbody>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <td>{{ $reservation->client_first_name }} {{ $reservation->client_last_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>E-mail</th>
+                                    <td>{{ $reservation->client_email ? $reservation->client_email : 'No se registró el email' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Teléfono</th>
+                                    <td>{{ $reservation->client_phone ? $reservation->client_phone : 'No se registró el teléfono' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Moneda</th>
+                                    <td>{{ $reservation->currency }}</td>
+                                </tr>                                
+                                <tr>
+                                    <th>Estatus</th>
+                                    <td>
+                                        @if ($data['status'] == "PENDING")
+                                            <span class="badge bg-info">PENDING</span>
+                                        @endif
+                                        @if ($data['status'] == "CONFIRMED")
+                                            <span class="badge bg-success">CONFIRMED</span>
+                                        @endif
+                                        @if ($data['status'] == "CANCELLED")
+                                            <span class="badge bg-danger">CANCELLED</span>
+                                        @endif                                                                             
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Unidad</th>
+                                    <td>{{ $reservation->destination->name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Creación</th>
+                                    <td>{{ $reservation->created_at }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Folio</th>
+                                    <td>{{ $reservation->reference }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Vendedor</th>
+                                    <td>{{ $reservation->vendor->name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Capturista</th>
+                                    <td>{{ $reservation->user->name }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        @if (RoleTrait::hasPermission(25))
+                        <strong>Actividad</strong>
+
+                        <ul class="timeline mt-2 mb-0">
+                            @foreach ($reservation->followUps as $followUp)
+                                <li class="timeline-item">
+                                    <strong>[{{ $followUp->type }}]</strong>
+                                    @php
+                                        $time = $followUp->created_at->diffInMinutes(now());
+                                        if($time > 90){
+                                            $time /= 60;
+                                            $time = number_format($time, 0, '.', '');
+                                            $time .= ' hours';
+                                        }else if($time > 1440){
+                                            $time /= 1440;
+                                            $time = number_format($time, 0, '.', '');
+                                            $time .= ' days';
+                                        }else{
+                                            $time .= ' minutes';
+                                        }
+                                    @endphp
+                                    <span class="float-end text-muted text-sm">{{ $time }} ago</span>
+                                    <p>{{ $followUp->text }}</p>
+                                </li>  
+                            @endforeach
+                           
+                        </ul>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            
+        </div>        
+        
+    </div>
+
+@endsection

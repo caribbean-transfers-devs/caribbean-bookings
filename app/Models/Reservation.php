@@ -51,4 +51,19 @@ class Reservation extends Model
     {
         return $this->belongsTo(Site::class, 'site_id', 'id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
+    public function clip()
+    {
+        return $this->belongsTo(Clip::class);
+    }
 }
