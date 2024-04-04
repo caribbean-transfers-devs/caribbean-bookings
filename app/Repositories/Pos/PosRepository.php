@@ -21,9 +21,12 @@ use App\Models\Clip;
 use App\Models\UserRole;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Traits\CodeTrait;
 
 class PosRepository
 {
+    use CodeTrait;
+
     public function index($request){
         $data = [
             "init" => date("Y-m-d") . " 00:00:00",
@@ -385,10 +388,6 @@ class PosRepository
 
         if( !$result ) return response()->json(['message' => 'Ocurrió un error al borrar la información de la base de datos','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
         return response()->json(['message' => 'Se eliminó el vendedor correctamente','success' => true], Response::HTTP_OK);
-    }
-
-    private function generateCode() {
-        return bin2hex(random_bytes(15));
     }
 
     private function timeToSeconds($time) {

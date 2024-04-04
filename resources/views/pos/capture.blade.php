@@ -91,13 +91,13 @@
                                     <label class="form-label" for="from_zone_id">Zona origen</label>
                                     <select class="form-control mb-2" id="from_zone_id" name="from_zone_id">
                                         @foreach($zones as $zone)
-                                            <option value="{{ $zone->id }}">{{ $zone->name }}</option>
+                                            <option value="{{ $zone->id }}" {{ $zone->id == 1 ? 'selected' : '' }}>{{ $zone->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="form-label" for="from_name">Desde (Hotel)</label>
-                                    <input class="form-control" type="text" name="from_name" id="from_name">
+                                    <label class="form-label" for="from_name">Lugar de origen</label>
+                                    <input class="form-control" type="text" name="from_name" id="from_name" value="Cancun Airport">
                                 </div>
                                 <div>
                                     <label class="form-label" for="to_zone_id">Zona destino</label>
@@ -108,7 +108,7 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="form-label" for="to_name">Hasta (Hotel)</label>
+                                    <label class="form-label" for="to_name">Lugar de destino (Hotel, Airb&b, Zona)</label>
                                     <input class="form-control" type="text" name="to_name" id="to_name">
                                 </div>
                             </div>
@@ -178,8 +178,8 @@
                                 <div>
                                     <label class="form-label" for="is_round_trip">Tipo de servicio</label>
                                     <select class="form-control mb-2" id="is_round_trip" name="is_round_trip">
-                                        <option value="0">Sencillo</option>
-                                        <option value="1">Redondo</option>
+                                        <option value="0" selected>Llegada</option>
+                                        <option value="1">Salida</option>
                                     </select>
                                 </div>
                                 <div>
@@ -194,7 +194,7 @@
                                     <label class="form-label" for="destination_service_id">Vehículo</label>
                                     <select class="form-control mb-2" id="destination_service_id" name="destination_service_id">
                                         @foreach($destination_services as $destination_service)
-                                            <option value="{{ $destination_service->id }}">{{ $destination_service->name }}</option>
+                                            <option value="{{ $destination_service->id }}" {{ $destination_service->id == 4 ? 'selected' : '' }}>{{ $destination_service->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

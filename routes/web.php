@@ -97,7 +97,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
 
     Route::get('/punto-de-venta', [PosController::class, 'index'])->name('pos.index');
-    Route::post('/punto-de-venta', [PosController::class, 'index'])->name('pos.index');
+    Route::post('/punto-de-venta', [PosController::class, 'index'])->name('pos.index.action');
     Route::get('/punto-de-venta/detail/{id}', [PosController::class, 'detail'])->where('id', '[0-9]+');
     Route::get('/punto-de-venta/capture', [PosController::class, 'capture'])->name('pos.capture');
     Route::post('/punto-de-venta/capture/create', [PosController::class, 'create'])->name('pos.capture.create');
