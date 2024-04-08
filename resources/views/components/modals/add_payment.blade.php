@@ -1,3 +1,6 @@
+@php
+    use App\Traits\RoleTrait;
+@endphp
 @props(['clips'])
 
 <div class="modal" tabindex="-1" id="addPaymentModal">
@@ -8,6 +11,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <label class="form-label" for="reference">Referencia de pago</label>
+                        <input class="form-control" type="text" name="reference" id="reference" required min="3">
+                    </div>
+                </div>
                 <div class="row mb-3">
                     <div class="col-12">
                         <label class="form-label" for="payment_method">Forma de pago</label>
@@ -38,6 +47,21 @@
                         </select>
                     </div>
                 </div>
+                @if(RoleTrait::hasPermission(58))
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="tipo_cambio_select" class="">Tipo de cambio personalizado?</label>
+                            <select class="form-control mb-2" id="tipo_cambio_select" name="tipo_cambio_select">
+                                <option value="0">No</option>
+                                <option value="1">Sí</option>
+                            </select>
+                        </div>
+                        <div class="col-6" id="tipo_cambio_container" style="display: none">
+                            <label for="tipo_cambio" class="">Tipo de cambio</label>
+                            <input type="number" step=".01" class="form-control" id="tipo_cambio">
+                        </div>
+                    </div>
+                @endif
                 <div class="row mb-3">
                     <div class="col-12">
                         <label for="paid" class="">Cantidad pagada:</label>
@@ -46,6 +70,9 @@
                 </div>
                 <div class="alert alert-danger" role="alert" style="padding: .95rem; display:none">
                     Escribe una cantidad correcta
+                </div>
+                <div style="mt-3">
+                    Faltan: $<span class="total_remaining">0</span> <span class="total-currency">USD</span>
                 </div>
             </div>
             <div class="modal-footer">

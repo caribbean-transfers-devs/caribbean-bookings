@@ -22,10 +22,12 @@ use App\Models\UserRole;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Traits\CodeTrait;
+use App\Traits\RoleTrait;
 
 class PosRepository
 {
     use CodeTrait;
+    use RoleTrait;
 
     public function index($request){
         $data = [
@@ -228,19 +230,25 @@ class PosRepository
         $duplicated_reservation = Reservation::where('reference', $request->folio)->count();
         if( $duplicated_reservation ) return response()->json(['message' => 'Ese folio ya ha sido registrado','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR); 
 
-        $default_site_id = 11; // Considerando que el id corresponde a: "[APTO] caribbean-taxi.com"
-        $site = Site::find( $default_site_id );
+        if( $request->is_round_trip ) {
+            if( !$request->departure_date ) return response()->json(['message' => 'Tienes que registrar una fecha válida','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR); 
+        }
+
+        $site_id = $request->is_round_trip ? 11 : 21;
 
         $default_destination_id = 1; // Considerando que el id corresponde a: "Cancún"
         $destination = Destination::find( $default_destination_id );
 
-        $from_zone = Zones::find( $request->from_zone_id );
-        $from_autocomplete = Autocomplete::where('name', 'like', $from_zone->name)->first();
-        // if( !$from_autocomplete ) return response()->json(['message' => 'No se pudo obtener la latitud y longitud del autocomplete','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+        $from_coordinates = $this->getLatLngByZoneId( $request->from_zone_id );
+        $to_coordinates = $this->getLatLngByZoneId( $request->to_zone_id );
 
+        $from_lat = $from_coordinates['lat'];
+        $from_lng = $from_coordinates['lng'];
+        $to_lat = $to_coordinates['lat'];
+        $to_lng = $to_coordinates['lng'];
+
+        $from_zone = Zones::find( $request->from_zone_id );
         $to_zone = Zones::find( $request->to_zone_id );
-        $to_autocomplete = Autocomplete::where('name', 'like', $to_zone->name)->first();
-        // if( !$to_autocomplete ) return response()->json(['message' => 'No se pudo obtener la latitud y longitud del autocomplete','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
 
         $destination_service = DestinationService::find( $request->destination_service_id );
         if( !$destination_service ) return response()->json(['message' => 'No se encontró el vehículo','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -248,30 +256,38 @@ class PosRepository
         // Obteniendo pagos
         $payments = [];
         for($i = 0; $i < $request->number_of_payments; $i++) {
+            $reference_variable = "reference_$i";
             $payment_method_variable = "payment_method_$i";
             $clip_id_variable = "clip_id_$i";
             $payment_variable = "payment_$i";
             $currency_variable = "currency_$i";
+            $custom_currency_exchange_variable = "custom_currency_exchange_$i";
+
+            $custom_currency_exchange = 0;
+            if( RoleTrait::hasPermission(58) && $request->$custom_currency_exchange_variable ) {
+                $custom_currency_exchange = $request->$custom_currency_exchange_variable;
+            }
 
             $terminal_exchange_rate = TerminalPaymentExchangeRate::where('terminal', $request->terminal)
             ->where('origin', $request->$currency_variable)
             ->where('destination', $request->sold_in_currency)
             ->first();
-            if( !$terminal_exchange_rate ) return response()->json(['message' => 'No se pudo convertir el cambio de monera, posiblemente necesites agregar el caso de conversión que estás solicitando','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+            if( !$terminal_exchange_rate && !$terminal_exchange_rate ) return response()->json(['message' => 'No se pudo convertir el cambio de monera, posiblemente necesites agregar el caso de conversión que estás solicitando','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
 
             $payments[] = [
+                'reference' => $request->$reference_variable,
                 'payment_method' => $request->$payment_method_variable,
                 'clip_id' => $request->$clip_id_variable,
                 'total' => $request->$payment_variable,
-                'operation' =>  $terminal_exchange_rate->operation,
-                'exchange_rate' =>  $terminal_exchange_rate->exchange_rate,
+                'operation' => $custom_currency_exchange ? 'multiplication' : $terminal_exchange_rate->operation,
+                'exchange_rate' => $custom_currency_exchange ? $custom_currency_exchange : $terminal_exchange_rate->exchange_rate,
             ];
         }
         if( sizeof($payments) === 0 ) return response()->json(['message' => 'Se necesitan agregar pagos para la captura','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR); 
 
 
         try {
-            DB::transaction(function () use ($request, $site, $default_destination_id, $default_site_id, $destination, $from_autocomplete, $from_zone, $to_autocomplete, $to_zone, $destination_service, $payments) {
+            DB::transaction(function () use ($request, $site_id, $default_destination_id, $destination, $from_lat, $from_lng, $to_lat, $to_lng, $from_zone, $to_zone, $destination_service, $payments) {
                 // Creando reservación
                 $reservation = new Reservation;
                 $reservation->client_first_name = $request->client_first_name;
@@ -280,12 +296,12 @@ class PosRepository
                 $reservation->client_phone = $request->client_phone ? $request->client_phone : null;
                 $reservation->currency = $request->sold_in_currency;
                 $reservation->rate_group = 'xLjDl18';
-                $reservation->pay_at_arrival = 1; // pendiente por checar
-                $reservation->site_id = $site ? $default_site_id : null;
+                $reservation->pay_at_arrival = 1;
+                $reservation->site_id = $site_id;
                 $reservation->destination_id = $destination ? $default_destination_id : null;
                 $reservation->vendor_id = $request->vendor_id;
                 $reservation->user_id = auth()->user()->id;
-                $reservation->reference = $request->folio; // Pendiente
+                $reservation->reference = $request->folio;
                 $reservation->created_at = Carbon::now();
                 $reservation->updated_at = Carbon::now();
                 $reservation->save();
@@ -301,21 +317,22 @@ class PosRepository
                 // Creando item de reservación
                 $item = new ReservationsItem();
                 $item->reservation_id = $reservation->id;
-                $item->code = $this->generateCode(); // Pendiente
+                $item->code = $this->generateCode();
                 $item->destination_service_id = $request->destination_service_id;
                 $item->from_name = $request->from_name ? $request->from_name : $from_zone->name;
-                $item->from_lat = ($from_autocomplete && $from_autocomplete->latitude) ? $from_autocomplete->latitude : '';
-                $item->from_lng = ($from_autocomplete && $from_autocomplete->longitude) ? $from_autocomplete->longitude : '';
-                $item->from_zone = $from_zone->id;
+                $item->from_lat = $from_lat;
+                $item->from_lng = $from_lng;
+                $item->from_zone = $request->from_zone_id;
                 $item->to_name = $request->to_name ? $request->to_name : $to_zone->name;
-                $item->to_lat = ($to_autocomplete && $to_autocomplete->latitude) ? $to_autocomplete->latitude : '';
-                $item->to_lng = ($to_autocomplete && $to_autocomplete->longitude) ? $to_autocomplete->longitude : '';
-                $item->to_zone = $to_zone->id;
+                $item->to_lat = $to_lat;
+                $item->to_lng = $to_lng;
+                $item->to_zone = $request->to_zone_id;
                 $item->distance_time = $to_zone->time ? $this->timeToSeconds( $to_zone->time ) : 0;
                 $item->distance_km = $to_zone->distance ? $to_zone->distance : '';
                 $item->is_round_trip = $request->is_round_trip;
                 $item->passengers = $request->passengers;
                 $item->op_one_status = 'NOSHOW';
+                $item->op_one_pickup = $request->is_round_trip ? $request->departure_date : null;
                 $item->op_two_status = 'NOSHOW';
                 $item->created_at = Carbon::now();
                 $item->updated_at = Carbon::now();
@@ -334,16 +351,16 @@ class PosRepository
                 // Creando Payments
                 foreach($payments as $_payment) {
                     $payment = new Payment();
-                    $payment->description = 'Panel'; // Pendiente
+                    $payment->description = 'Panel';
                     $payment->total = $_payment['total'];
                     $payment->exchange_rate = $_payment['exchange_rate'];
-                    $payment->status = 0; // Pendiente
+                    $payment->status = 0;
                     $payment->operation = $_payment['operation'];
                     $payment->payment_method = $_payment['payment_method'];
                     $payment->currency = $request->sold_in_currency;
                     $payment->clip_id = $_payment['payment_method'] === 'CARD' ? $_payment['clip_id'] : null;
                     $payment->reservation_id = $reservation->id;
-                    $payment->reference = $request->reference ? $request->reference : null;
+                    $payment->reference = $_payment['reference'];
                     $payment->created_at = Carbon::now();
                     $payment->updated_at = Carbon::now();
                     $payment->save();
@@ -407,6 +424,110 @@ class PosRepository
         $seconds = $hours * 3600 + $minutes * 60;
         
         return $seconds;
+    }
+
+    private function getLatLngByZoneId($zone_id) {
+        $equivalences = [
+            1 => [
+                'lat' => 21.0442754,
+                'lng' => -86.8772972,
+            ],
+            2 => [
+                'lat' => 21.135166,
+                'lng' => -86.746224,
+            ],
+            3 => [
+                'lat' => 21.1831607,
+                'lng' => -86.8087541,
+            ],
+            4 => [
+                'lat' => 21.2217215,
+                'lng' => -86.8029101,
+            ],
+            5 => [
+                'lat' => 20.8471632,
+                'lng' => -86.8803245,
+            ],
+            6 => [
+                'lat' => 20.644799,
+                'lng' => -87.0917467,
+            ],
+            7 => [
+                'lat' => 21.0815015,
+                'lng' => -86.8546508,
+            ],
+            8 => [
+                'lat' => 20.5067138,
+                'lng' => -87.2386847,
+            ],
+            9 => [
+                'lat' => 20.4027428,
+                'lng' => -87.3193673,
+            ],
+            10 => [
+                'lat' => 20.214244,
+                'lng' => -87.4559179,
+            ],
+            11 => [
+                'lat' => 20.187102,
+                'lng' => -87.443475,
+            ],
+            12 => [
+                'lat' => 20.3618852,
+                'lng' => -87.3327632,
+            ],
+            13 => [
+                'lat' => 20.7612258,
+                'lng' => -86.9612859,
+            ],
+            14 => [
+                'lat' => 20.8704582,
+                'lng' => -87.0702105,
+            ],
+            15 => [
+                'lat' => 20.0311617,
+                'lng' => -87.4780201,
+            ],
+            16 => [
+                'lat' => 20.689586,
+                'lng' => -88.2047133,
+            ],
+            17 => [
+                'lat' => 21.4323185,
+                'lng' => -87.3375753,
+            ],
+            18 => [
+                'lat' => 20.6787816,
+                'lng' => -88.5733424,
+            ],
+            19 => [
+                'lat' => 20.9776327,
+                'lng' => -89.6322621,
+            ],
+            20 => [
+                'lat' => 18.526777,
+                'lng' => -88.3300811,
+            ],
+            21 => [
+                'lat' => 21.2440641,
+                'lng' => -86.8119526,
+            ],
+            22 => [
+                'lat' => 20.1695036,
+                'lng' => -87.6847257,
+            ],
+            23 => [
+                'lat' => 20.199593,
+                'lng' => -87.49902,
+            ],
+        ];
+
+        if( !isset($equivalences[$zone_id]) ) return ['lat' => '', 'lng' => ''];
+
+        $lat = $equivalences[$zone_id]['lat'];
+        $lng = $equivalences[$zone_id]['lng'];
+
+        return ['lat' => $lat, 'lng' => $lng];
     }
 
 }

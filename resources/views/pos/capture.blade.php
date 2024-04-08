@@ -12,6 +12,12 @@
 
 @push('bootom-stack')
     <script src="{{ mix('/assets/js/views/pos/capture.min.js') }}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
 @endpush
 
 <script>
@@ -30,6 +36,11 @@
             <div class="col-xs-12">
                 <form class="pos-form" id="posForm" method="post">
                     @csrf
+
+                    <input type="hidden" name="from_lat">
+                    <input type="hidden" name="from_lng">
+                    <input type="hidden" name="to_lat">
+                    <input type="hidden" name="to_lng">
 
                     <div class="top-grid-container">
                         <div>
@@ -95,9 +106,10 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div>
+                                <div style="position: relative">
                                     <label class="form-label" for="from_name">Lugar de origen</label>
                                     <input class="form-control" type="text" name="from_name" id="from_name" value="Cancun Airport">
+                                    <div class="autocomplete-results" id="from_name_elements"></div>
                                 </div>
                                 <div>
                                     <label class="form-label" for="to_zone_id">Zona destino</label>
@@ -107,9 +119,10 @@
                                         @endforeach                        
                                     </select>
                                 </div>
-                                <div>
+                                <div style="position: relative">
                                     <label class="form-label" for="to_name">Lugar de destino (Hotel, Airb&b, Zona)</label>
                                     <input class="form-control" type="text" name="to_name" id="to_name">
+                                    <div class="autocomplete-results" id="to_name_elements"></div>
                                 </div>
                             </div>
                         </div>
@@ -118,10 +131,6 @@
                             <h2>Datos de la venta ($)</h2>
 
                             <div class="capture-inputs-container">
-                                <div class="double-col">
-                                    <label class="form-label" for="reference">Referencia de pago</label>
-                                    <input class="form-control" type="text" name="reference" id="reference">
-                                </div>
                                 <div>
                                     <label class="form-label" for="sold_in_currency">Se cotizó la venta en:</label>
                                     <select class="form-control mb-2" id="sold_in_currency" name="sold_in_currency">
@@ -143,6 +152,7 @@
                                         <tr>
                                             <th>Pago</th>
                                             <th>Currency</th>
+                                            <th>reference</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -161,7 +171,7 @@
                                 <div class="total-remaining-container">
                                     <strong>Falta por pagar: </strong>
                                     <div class="color-total-container red">
-                                        $<span id="total_remaining">0</span> <span class="total-currency">USD</span>    
+                                        $<span class="total_remaining">0</span> <span class="total-currency">USD</span>    
                                     </div>
                                 </div>
 
@@ -189,6 +199,10 @@
                                             <option value="{{ $i }}">{{ $i }}</option>                             
                                         @endfor                            
                                     </select>
+                                </div>
+                                <div class="double-col" id="departure_date_container" style="display: none">
+                                    <label class="form-label" for="departure_date">Fecha de salida</label>
+                                    <input class="form-control" id="departure_date" name="departure_date" data-default-mode="single" value="2023-09-15 12:00">
                                 </div>
                                 <div class="double-col">
                                     <label class="form-label" for="destination_service_id">Vehículo</label>

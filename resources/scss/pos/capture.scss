@@ -1,3 +1,9 @@
+@import '../components/autocomplete';
+
+.autocomplete-results {
+    z-index: 9;
+}
+
 .pos-form {
     .top-grid-container {
         display: grid;
