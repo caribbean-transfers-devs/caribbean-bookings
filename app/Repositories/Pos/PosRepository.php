@@ -295,7 +295,7 @@ class PosRepository
                 $reservation->client_email = $request->client_email ? $request->client_email : null;
                 $reservation->client_phone = $request->client_phone ? $request->client_phone : null;
                 $reservation->currency = $request->sold_in_currency;
-                $reservation->rate_group = 'xLjDl18';
+                $reservation->rate_group = '0B842B8C';
                 $reservation->pay_at_arrival = 1;
                 $reservation->site_id = $site_id;
                 $reservation->destination_id = $destination ? $default_destination_id : null;
