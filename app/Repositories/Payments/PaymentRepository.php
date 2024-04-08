@@ -31,6 +31,7 @@ class PaymentRepository
             $payment->currency = $request->currency;
             $payment->reservation_id = $request->reservation_id;
             $payment->reference = $request->reference;
+            $payment->user_id = auth()->user()->id;
             $payment->save();
 
             DB::commit();
