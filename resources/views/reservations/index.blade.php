@@ -198,9 +198,9 @@
                             <tfooter>
                                 <tr>
                                     <td>Total</td>
-                                    <td class="text-center">{{ $resume_total }}</td>
-                                    <td class="text-end">{{ $resume_total_usd }}</td>
+                                    <td class="text-center">{{ $resume_total }}</td>                                    
                                     <td class="text-end">{{ $resume_total_mxn }}</td>
+                                    <td class="text-end">{{ $resume_total_usd }}</td>
                                 </tr>
                             </tfooter>                             
                         </table>
