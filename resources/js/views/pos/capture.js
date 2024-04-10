@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     sold_in_currency_select.addEventListener('change', (e) => {
         currency_span.innerText = `(${e.target.value})`;
         $('.total-currency').text(e.target.value);
+        $('#paid_in_currency').val(e.target.value)
     })
 
     tipoCambioSelect?.addEventListener('change', (e) => {
@@ -36,11 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.value === 'CASH') {
             clipContainer.style.display = "none";
             $('#paid_in_currency').prop('disabled', false);
+            $('#reference_container').hide();
             return;
         }
 
         clipContainer.style.display = "block";
         $('#paid_in_currency').val('MXN').prop('disabled', true).trigger('change');
+        $('#reference_container').show();
     });
 
     terminalSelect.addEventListener('change', () => {
@@ -158,14 +161,14 @@ document.addEventListener('DOMContentLoaded', function() {
             custom_currency_exchange = Number($('#tipo_cambio').val());
         }
         
-        const reference = $('#reference').val();
         const payment_method = $('#payment_method').val();
+        const reference = payment_method === 'CARD' ? $('#reference').val() : '';
         const clip_id = $('#clip_id').val();
         const origin_currency = $('#paid_in_currency').val();
         const destination_currency = $('#sold_in_currency').val();
         const terminal = $('#terminal').val();
 
-        if( reference.length < 3 ) {
+        if( payment_method === 'CARD' && reference.length < 3 ) {
             $alert.text('Escribe la referencia de pago. Mínimo 4 caracteres');
             return $alert.show();
         }
@@ -204,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <tr>
                 <td class="payment">${payment}</td>
                 <td class="currency">${origin_currency}</td>
-                <td class="reference">${reference}</td>
+                <td class="reference">${reference || 'No aplica'}</td>
                 <td align="center">
                     <button class="btn btn-danger btn-sm">Eliminar</button>
                 </td>

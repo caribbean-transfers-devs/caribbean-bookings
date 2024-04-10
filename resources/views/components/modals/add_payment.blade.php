@@ -13,17 +13,17 @@
             <div class="modal-body">
                 <div class="row mb-3">
                     <div class="col-12">
-                        <label class="form-label" for="reference">Referencia de pago</label>
-                        <input class="form-control" type="text" name="reference" id="reference" required min="3">
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-12">
                         <label class="form-label" for="payment_method">Forma de pago</label>
                         <select class="form-control mb-2" id="payment_method" name="payment_method">
                             <option value="CASH">Efectivo</option>
                             <option value="CARD">Tarjeta</option>
                         </select>
+                    </div>
+                </div>
+                <div class="row mb-3" id="reference_container" style="display: none">
+                    <div class="col-12">
+                        <label class="form-label" for="reference">Referencia de pago</label>
+                        <input class="form-control" type="text" name="reference" id="reference" required min="3">
                     </div>
                 </div>
                 <div class="row mb-3" id="clip_container" style="display: none">

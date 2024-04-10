@@ -59,4 +59,10 @@ class PosController extends Controller
         return $posRepository->deleteVendor($request);
     }
 
+    public function editCreatedAt(Request $request, PosRepository $posRepository){
+        if( !RoleTrait::hasPermission(59) ) abort(403, 'NO TIENE AUTORIZACIÓN.');
+
+        return $posRepository->editCreatedAt($request);
+    }
+
 }

@@ -275,7 +275,7 @@ class PosRepository
             if( !$terminal_exchange_rate && !$terminal_exchange_rate ) return response()->json(['message' => 'No se pudo convertir el cambio de monera, posiblemente necesites agregar el caso de conversión que estás solicitando','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
 
             $payments[] = [
-                'reference' => $request->$reference_variable,
+                'reference' => $request->$payment_method_variable === 'CARD' ? $request->$reference_variable : null,
                 'payment_method' => $request->$payment_method_variable,
                 'clip_id' => $request->$clip_id_variable,
                 'total' => $request->$payment_variable,
@@ -331,9 +331,9 @@ class PosRepository
                 $item->distance_km = $to_zone->distance ? $to_zone->distance : '';
                 $item->is_round_trip = $request->is_round_trip;
                 $item->passengers = $request->passengers;
-                $item->op_one_status = 'NOSHOW';
-                $item->op_one_pickup = $request->is_round_trip ? $request->departure_date : null;
-                $item->op_two_status = 'NOSHOW';
+                $item->op_one_status = 'PENDING';
+                $item->op_one_pickup = $request->is_round_trip ? $request->departure_date : Carbon::now();
+                $item->op_two_status = 'PENDING';
                 $item->created_at = Carbon::now();
                 $item->updated_at = Carbon::now();
                 $item->save();
@@ -341,7 +341,7 @@ class PosRepository
                 // Creando Sale
                 $sale = new Sale();
                 $sale->reservation_id = $reservation->id;
-                $sale->description = $destination_service->name . ' | ' . ($request->is_round_trip ? 'Round Trip' : 'One Way');
+                $sale->description = $destination_service->name . ' | ' . 'One Way';
                 $sale->quantity = 1;
                 $sale->total = $request->total;
                 $sale->created_at = Carbon::now();
@@ -405,6 +405,20 @@ class PosRepository
 
         if( !$result ) return response()->json(['message' => 'Ocurrió un error al borrar la información de la base de datos','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
         return response()->json(['message' => 'Se eliminó el vendedor correctamente','success' => true], Response::HTTP_OK);
+    }
+
+    public function editCreatedAt($request){
+        if( !$request->created_at ) return response()->json(['message' => 'No se encontró la fecha','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+        if( !$request->id ) return response()->json(['message' => 'No se encontró el id','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+
+        $reservation = Reservation::where('id', $request->id)->whereNotNull('vendor_id')->first();
+        if( !$reservation ) return response()->json(['message' => 'No existe esa reservación','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+
+        $reservation->created_at = $request->created_at;
+        $result = $reservation->save();
+
+        if( !$result ) return response()->json(['message' => 'Ocurrió un error al guardar la información en la base de datos','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+        return response()->json(['message' => 'Se modificó la fecha de creación correctamente','success' => true], Response::HTTP_OK);
     }
 
     private function timeToSeconds($time) {

@@ -706,3 +706,87 @@ function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', 
         )        
     });
 }
+
+$(function() {
+    flatpickr("#created_at", {    
+        mode: "single",
+        dateFormat: "Y-m-d H:i",
+        enableTime: true,
+    });
+});
+
+document.getElementById('modifyCreatedAt')?.addEventListener('click', () => {
+    const submitBtn = document.getElementById('modifyCreatedAt');
+    const $alert = $('#alert_created_at');
+    $alert.text('');
+    $alert.hide();
+
+    const created_at = $('#created_at').val();
+    if( !created_at ) {
+        $alert.show();
+        $alert.text('Agrega una fecha');
+        return;
+    }
+
+    const token = document.getElementsByName('_token')[0];
+
+    let frm_data = [
+        {name: 'created_at', value: created_at},
+        {name: 'id', value: reservation_id},
+        {name: '_token', value: token.value},
+    ];
+    let type_req = 'PUT';
+    let url_req = '/punto-de-venta/edit-created-at';
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Cargando...';
+
+    $.ajax({
+        url: url_req,
+        type: type_req,
+        data: frm_data,
+        success: function(resp) {
+            if ( typeof resp === 'object' && 'success' in resp && resp.success ) {
+                window.onbeforeunload = null;
+                let timerInterval
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    html: 'Datos guardados con éxito. Será redirigido en <b></b>',
+                    timer: 2500,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        const b = Swal.getHtmlContainer().querySelector('b')
+                        timerInterval = setInterval(() => {
+                            b.textContent = (Swal.getTimerLeft() / 1000)
+                                .toFixed(0)
+                        }, 100)
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    location.reload();
+                })
+            } else {
+                Swal.fire({
+                    title: 'Oops!',
+                    icon: 'error',
+                    html: 'Ocurrió un error inesperado',
+                    timer: 2500,
+                });
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Modificar';
+            }
+        }
+    }).fail(function(xhr, status, error) {
+        Swal.fire(
+            '¡ERROR!',
+            xhr.responseJSON.message,
+            'error'
+        );
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Modificar';
+    });
+})

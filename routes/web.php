@@ -105,6 +105,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/punto-de-venta/vendors/create', [PosController::class, 'createVendor'])->name('pos.vendors.create');
     Route::put('/punto-de-venta/vendors/edit', [PosController::class, 'editVendor'])->name('pos.vendors.edit');
     Route::delete('/punto-de-venta/vendors/delete', [PosController::class, 'deleteVendor'])->name('pos.vendors.delete');
+    Route::put('/punto-de-venta/edit-created-at', [PosController::class, 'editCreatedAt'])->name('pos.editCreatedAt');
 
     Route::get('/config/destinations', [ZonesController::class, 'index'])->name('config.zones');
     Route::get('/config/destinations/{id}', [ZonesController::class, 'getZones'])->name('config.zones.getZones');

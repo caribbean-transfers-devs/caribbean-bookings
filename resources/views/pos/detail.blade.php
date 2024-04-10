@@ -15,8 +15,13 @@
     <script src="{{ mix('assets/js/datatables.js') }}"></script>
 @endpush
 
+<script>
+    var reservation_id = <?= $reservation->id ?>;
+</script>
+
 @section('content')
     <div class="container-fluid p-0">
+        @csrf
 
         <div class="mb-3">
             <h1 class="h3 d-inline align-middle">Detalle de venta</h1>            
@@ -30,6 +35,9 @@
                         <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
                     </div>
                     <div class="card-body">
+                        @if(RoleTrait::hasPermission(59))
+                            <a href="#" class="btn btn-info change-date-btn" data-bs-toggle="modal" data-bs-target="#modify_pos_created_at">Cambiar fecha de creación</a>
+                        @endif
 
                         <table class="table table-sm mt-2 mb-4">
                             <tbody>
@@ -83,6 +91,14 @@
                                     <th>Capturista</th>
                                     <td>{{ $reservation->user->name }}</td>
                                 </tr>
+                                <tr>
+                                    <th>Total de venta</th>
+                                    <td>${{ round($data['total_sales'], 2) }} {{ $reservation->currency }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Total pagado</th>
+                                    <td>${{ round($data['total_payments'], 2) }} {{ $reservation->currency }}</td>
+                                </tr>
                             </tbody>
                         </table>
                         @if (RoleTrait::hasPermission(25))
@@ -120,5 +136,7 @@
         </div>        
         
     </div>
+
+    <x-modals.modify_pos_created_at />
 
 @endsection
