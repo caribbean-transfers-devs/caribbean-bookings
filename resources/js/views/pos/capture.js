@@ -15,12 +15,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const isRoundTripSelect = document.getElementById('is_round_trip');
     const tipoCambioSelect = document.getElementById('tipo_cambio_select');
 
-    openPaymentModalBtn.addEventListener('click', (e) => e.preventDefault());
+    openPaymentModalBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        $('#payment_method').val('CASH').trigger('change');
+        $('#reference_container').hide();
+        $('#clip_container').hide();
+        $('#paid_in_currency').val( $(sold_in_currency_select).val() ).prop('disabled', false);
+    });
 
     sold_in_currency_select.addEventListener('change', (e) => {
         currency_span.innerText = `(${e.target.value})`;
         $('.total-currency').text(e.target.value);
-        $('#paid_in_currency').val(e.target.value)
+        $('#paid_in_currency').val(e.target.value).trigger('change');
     })
 
     tipoCambioSelect?.addEventListener('change', (e) => {
