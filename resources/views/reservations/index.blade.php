@@ -9,6 +9,9 @@
     $sites = [];
     $affiliates = [];
     $destinations = [];
+    $resume_total = 0;
+    $resume_total_mxn = 0;
+    $resume_total_usd = 0;
 @endphp
 @extends('layout.master')
 @section('title') Reservaciones @endsection
@@ -177,6 +180,13 @@
                             </thead>
                             <tbody>
                                 @foreach($resume['status'] as $key => $value)
+                                @php
+                                    if( $key == "PENDING" || $key == "CONFIRMED" ):
+                                        $resume_total = $resume_total + $value['count'];
+                                        $resume_total_mxn = $resume_total_mxn + $value['USD'];
+                                        $resume_total_usd = $resume_total_usd + $value['MXN'];
+                                    endif;
+                                @endphp
                                 <tr>
                                     <td>{{ strtolower( $key) }}</td>
                                     <td class="text-center">{{ $value['count'] }}</td>
@@ -185,6 +195,14 @@
                                 </tr>
                                 @endforeach
                             </tbody>
+                            <tfooter>
+                                <tr>
+                                    <td>Total</td>
+                                    <td class="text-center">{{ $resume_total }}</td>                                    
+                                    <td class="text-end">{{ $resume_total_mxn }}</td>
+                                    <td class="text-end">{{ $resume_total_usd }}</td>
+                                </tr>
+                            </tfooter>                             
                         </table>
                     </div>
 
