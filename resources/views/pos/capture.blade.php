@@ -200,9 +200,9 @@
                                         @endfor                            
                                     </select>
                                 </div>
-                                <div class="double-col" id="departure_date_container" style="display: none">
-                                    <label class="form-label" for="departure_date">Fecha de salida</label>
-                                    <input class="form-control" id="departure_date" name="departure_date" data-default-mode="single" value="2023-09-15 12:00">
+                                <div class="double-col" id="departure_date_container">
+                                    <label class="form-label" for="departure_date">Fecha de servicio</label>
+                                    <input class="form-control" id="departure_date" name="departure_date" data-default-mode="single" value="{{ date("Y-m-d H:i") }}">
                                 </div>
                                 <div class="double-col">
                                     <label class="form-label" for="destination_service_id">Vehículo</label>

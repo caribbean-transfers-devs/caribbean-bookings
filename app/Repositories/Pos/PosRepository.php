@@ -332,7 +332,7 @@ class PosRepository
                 $item->is_round_trip = $request->is_round_trip;
                 $item->passengers = $request->passengers;
                 $item->op_one_status = 'PENDING';
-                $item->op_one_pickup = $request->is_round_trip ? $request->departure_date : Carbon::now();
+                $item->op_one_pickup = $request->departure_date;
                 $item->op_two_status = 'PENDING';
                 $item->created_at = Carbon::now();
                 $item->updated_at = Carbon::now();

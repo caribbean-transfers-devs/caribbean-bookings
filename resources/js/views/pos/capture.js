@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
     })
 
     isRoundTripSelect.addEventListener('change', (e) => {
-        if( $(isRoundTripSelect).val() === '1' ) $('#departure_date_container').show();
-        else $('#departure_date_container').hide();
+        //if( $(isRoundTripSelect).val() === '1' ) $('#departure_date_container').show();
+        //else $('#departure_date_container').hide();
     })
 
     formaDePagoSelect.addEventListener('change', (e) => {
