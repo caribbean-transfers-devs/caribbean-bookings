@@ -302,7 +302,7 @@ class PosRepository
                 $reservation->vendor_id = $request->vendor_id;
                 $reservation->user_id = auth()->user()->id;
                 $reservation->reference = $request->folio;
-                $reservation->created_at = Carbon::now();
+                $reservation->created_at = $request->is_round_trip ? Carbon::now() : $request->departure_date;
                 $reservation->updated_at = Carbon::now();
                 $reservation->save();
         
