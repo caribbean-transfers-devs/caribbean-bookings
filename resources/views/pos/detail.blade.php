@@ -73,7 +73,7 @@
                                 </tr>
                                 <tr>
                                     <th>Unidad</th>
-                                    <td>{{ $reservation->destination->name }}</td>
+                                    <td>{{ $reservation->destination->name ?? '' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Creación</th>
@@ -90,6 +90,14 @@
                                 <tr>
                                     <th>Capturista</th>
                                     <td>{{ $reservation->user->name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Origen</th>
+                                    <td>{{ ($from_zone->name ?? '-') . ' | ' . $reservation->items[0]->from_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Destino</th>
+                                    <td>{{ ($to_zone->name ?? '-') . ' | ' . $reservation->items[0]->to_name }}</td>
                                 </tr>
                                 <tr>
                                     <th>Total de venta</th>

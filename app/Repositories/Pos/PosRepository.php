@@ -102,7 +102,11 @@ class PosRepository
             GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
             SUM(it.passengers) as passengers,
             GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-            COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_one_pickup_today), 0) as is_today                                     
+            COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_one_pickup_today), 0) as is_today,                                     
+            rez.terminal,
+            SUM(it.is_round_trip) as is_round_trip,
+            vr.name AS vendor,
+            rez.reference
             FROM reservations as rez
             INNER JOIN sites as site ON site.id = rez.site_id
             LEFT JOIN (
@@ -136,6 +140,10 @@ class PosRepository
                 INNER JOIN destination_services as dest ON dest.id = it.destination_service_id
                 GROUP BY it.reservation_id, it.is_round_trip
             ) as it ON it.reservation_id = rez.id
+            LEFT JOIN (
+                SELECT vr.id, vr.name
+                FROM vendors as vr
+            ) as vr ON rez.vendor_id = vr.id
             WHERE 1=1 AND vendor_id IS NOT NULL {$query}
             GROUP BY rez.id, site.name",
         $queryData);
@@ -180,8 +188,12 @@ class PosRepository
         $sellers = User::whereIn('id', $users_ids)->get();
         
         $sales_types = SalesType::all();
+        $zones = Zones::all();
         $services_types = DestinationService::where('status',1)->where('destination_id',$reservation->destination_id)->get();
         $sites = Site::get();
+
+        $from_zone = $zones->first(function($zone) use($reservation) { return $zone->id === $reservation->items[0]->from_zone; });
+        $to_zone = $zones->first(function($zone) use($reservation) { return $zone->id === $reservation->items[0]->to_zone; });
 
         //Sumamos las ventas y restamos pagos para saber si la reserva está confirmada o no..
         $data = [
@@ -212,7 +224,7 @@ class PosRepository
 
         // return $reservation;
 
-        return view('pos.detail', compact('reservation','sellers','sales_types','services_types','data','sites'));
+        return view('pos.detail', compact('reservation','sellers','sales_types', 'from_zone', 'to_zone','services_types','data','sites'));
     }
 
     public function capture($request){
@@ -296,6 +308,7 @@ class PosRepository
                 $reservation->client_phone = $request->client_phone ? $request->client_phone : null;
                 $reservation->currency = $request->sold_in_currency;
                 $reservation->rate_group = '0B842B8C';
+                $reservation->terminal = $request->terminal;
                 $reservation->pay_at_arrival = 1;
                 $reservation->site_id = $site_id;
                 $reservation->destination_id = $destination ? $default_destination_id : null;

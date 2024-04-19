@@ -1,5 +1,6 @@
 @php
     use App\Traits\RoleTrait;
+    use Carbon\Carbon;
 @endphp
 @php
     $resume = [
@@ -11,6 +12,18 @@
     ];
     $sites = [];
     $destinations = [];
+
+    function getShift($created_at) {
+        $time = Carbon::parse($created_at)->format('H:i');
+
+        if ($time >= '08:30' && $time <= '15:00') {
+            return 'Matutino';
+        } elseif ($time >= '15:01' && $time <= '21:00') {
+            return 'Vespertino';
+        } else {
+            return 'Guardia';
+        }
+    }
 @endphp
 @extends('layout.master')
 @section('title') Ventas capturadas @endsection
@@ -18,6 +31,7 @@
 @push('up-stack')
     <link href="{{ mix('/assets/css/pos/index.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/pos/index.min.css') }}" rel="stylesheet" > 
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
 @endpush
 
 @push('bootom-stack')
@@ -28,6 +42,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="{{ mix('assets/js/views/pos/index.min.js') }}"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 @endpush
 
 @section('content')
@@ -50,18 +68,20 @@
                             <table id="reservations_table" class="table table-striped table-sm">
                                 <thead>
                                     <tr>
-                                        <th></th>
-                                        <th>Sitio</th>
-                                        <th>Código</th>
-                                        <th>Estatus</th>
-                                        <th>Cliente</th>
-                                        <th>Servicio</th>
-                                        <th>Pasajeros</th>
-                                        <th>Total</th>
+                                        <th>Fecha</th>
+                                        <th>Vendedor</th>
+                                        <th>Terminal</th>
+                                        <th>Folio</th>
+                                        <th>Venta</th>
                                         <th>Moneda</th>
-                                        <th>Pendiente</th>
-                                        <th>Método</th>
-                                        <th>Destino</th>
+                                        <th>Zona</th>
+                                        <th>Unidad</th>
+                                        <th>Moneda2</th>
+                                        <th>Pax</th>
+                                        <th>Servicio</th>
+                                        <th>Turno</th>
+                                        <th>Hora</th>
+                                        <th>Observaciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -106,42 +126,26 @@
                                                 $total_pending = $item->total_sales - $item->total_payments;
                                             @endphp
                                             <tr>
-                                                <td class="text-end">
-                                                    @if($item->is_today >= 1)
-                                                        <i class="align-middle me-2" data-feather="alert-circle"></i>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $item->site_name }}</td>
                                                 <td>
                                                     @if(RoleTrait::hasPermission(53))
-                                                        <a href="punto-de-venta/detail/{{ $item->id }}">{{ $item->reservation_codes }}</a>
+                                                        <a href="punto-de-venta/detail/{{ $item->id }}">{{ substr($item->created_at, 0, 10) }}</a>
                                                     @else
-                                                        {{ $item->reservation_codes }}
+                                                        {{ substr($item->created_at, 0, 10) }}
                                                     @endif
-                                                </td> 
-                                                <td class="text-center">
-                                                    @if ($item->is_cancelled == 0)                                                                                                   
-                                                        @switch($item->status)
-                                                            @case('CONFIRMED')
-                                                                <span class="badge bg-success">Confirmado</span>
-                                                                @break
-                                                            @case('PENDING')
-                                                                <span class="badge bg-info">Pendiente</span>
-                                                                @break
-                                                            @default                                                            
-                                                        @endswitch
-                                                    @else
-                                                            <span class="badge bg-danger">Cancelado</span>
-                                                    @endif
-                                                </td> 
-                                                <td>{{ $item->client_full_name }}</td>                                           
+                                                </td>
+                                                <td>{{ $item->vendor }}</td>                                           
+                                                <td>{{ $item->terminal ? str_replace('T', 'Terminal ', $item->terminal) : 'No se capturó la terminal' }}</td>
+                                                <td>{{ $item->reference }}</td>
+                                                <td>{{ $item->total_sales }}</td>
+                                                <td>{{ $item->currency }}</td>
+                                                <td>{{ $item->destination_name }}</td>
                                                 <td>{{ $item->service_type_name }}</td>
-                                                <td class="text-center">{{ $item->passengers }}</td>
-                                                <td class="text-end">{{ $item->total_sales }}</td>
-                                                <td class="text-center">{{ $item->currency }}</td>
-                                                <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td>
-                                                <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td>
-                                                <td class="text-center">{{ $item->destination_name }}</td>
+                                                <td>{{ ((empty($item->payment_type_name))? 'Efectivo' : str_replace(['CARD', 'CASH'], ['Tarjeta', 'Efectivo'], $item->payment_type_name) ) }}</td>
+                                                <td>{{ $item->passengers }}</td>
+                                                <td>{{ $item->is_round_trip ? 'Salida' : 'Llegada' }}</td>
+                                                <td>{{ getShift($item->created_at) }}</td>
+                                                <td>{{ substr($item->created_at, -8, 5) }}</td>
+                                                <td></td>
                                             </tr>
                                         @endforeach
                                     @endif
