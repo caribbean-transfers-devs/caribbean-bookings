@@ -145,7 +145,7 @@ class PosRepository
                 FROM vendors as vr
             ) as vr ON rez.vendor_id = vr.id
             WHERE 1=1 AND vendor_id IS NOT NULL {$query}
-            GROUP BY rez.id, site.name",
+            GROUP BY rez.id, site.name, vr.vendor",
         $queryData);
 
         $services = [];
