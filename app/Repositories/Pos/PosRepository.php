@@ -297,6 +297,12 @@ class PosRepository
         }
         if( sizeof($payments) === 0 ) return response()->json(['message' => 'Se necesitan agregar pagos para la captura','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR); 
 
+        $total_paid = collect($payments)->sum(function($payment) {
+            if( $payment['operation'] === 'multiplication' ) return $payment['total'] * $payment['exchange_rate'];
+            return round($payment['total'] / $payment['exchange_rate'], 2);
+        });
+
+        if( $total_paid < $request->total ) return response()->json(['message' => 'La cantidad pagada no cubre el total de la venta','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
 
         try {
             DB::transaction(function () use ($request, $site_id, $default_destination_id, $destination, $from_lat, $from_lng, $to_lat, $to_lng, $from_zone, $to_zone, $destination_service, $payments) {

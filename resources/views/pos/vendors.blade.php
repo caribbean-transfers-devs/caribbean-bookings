@@ -46,8 +46,8 @@
                                 @foreach ($vendors as $vendor)
                                     <tr>
                                         <td>{{ $vendor->name }}</td>
-                                        <td>{{ $vendor->email }}</td>
-                                        <td>{{ $vendor->phone }}</td>
+                                        <td>{{ $vendor->email ?? 'No se registró' }}</td>
+                                        <td>{{ $vendor->phone ?? 'No se registró' }}</td>
                                         <td>
                                             @if ($vendor->status)
                                                 <span class="badge bg-primary">Activo</span>

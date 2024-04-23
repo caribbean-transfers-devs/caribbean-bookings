@@ -219,11 +219,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button class="btn btn-danger btn-sm">Eliminar</button>
                 </td>
 
-                <input type="hidden" name="reference_${number_of_rows}" value="${reference}">
-                <input type="hidden" name="payment_method_${number_of_rows}" value="${payment_method}">
-                <input type="hidden" name="clip_id_${number_of_rows}" value="${clip_id}">
-                <input type="hidden" name="payment_${number_of_rows}" value="${payment}">
-                <input type="hidden" name="currency_${number_of_rows}" value="${origin_currency}">
+                <input type="hidden" class="hidden_reference" name="reference_${number_of_rows}" value="${reference}">
+                <input type="hidden" class="hidden_payment_method" name="payment_method_${number_of_rows}" value="${payment_method}">
+                <input type="hidden" class="hidden_clip_id" name="clip_id_${number_of_rows}" value="${clip_id}">
+                <input type="hidden" class="hidden_payment" name="payment_${number_of_rows}" value="${payment}">
+                <input type="hidden" class="hidden_currency" name="currency_${number_of_rows}" value="${origin_currency}">
                 
                 <input type="hidden" class="custom_currency_exchange" name="custom_currency_exchange_${number_of_rows}" value="${custom_currency_exchange}">
             </tr>
@@ -274,6 +274,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         $('#sold_in_currency').prop('disabled', false);
         $('#total').prop('disabled', false);
+
+        $('#payments_table tbody').children().each(function(index) {
+            $(this).find('.hidden_reference').attr('name', `reference_${index}`);
+            $(this).find('.hidden_payment_method').attr('name', `payment_method_${index}`);
+            $(this).find('.hidden_clip_id').attr('name', `clip_id_${index}`);
+            $(this).find('.hidden_payment').attr('name', `payment_${index}`);
+            $(this).find('.hidden_currency').attr('name', `currency_${index}`);
+            $(this).find('.custom_currency_exchange').attr('name', `custom_currency_exchange_${index}`);
+        });
 
         let frm_data = $("#posForm").serializeArray();
         let type_req = 'POST';

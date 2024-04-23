@@ -109,6 +109,32 @@
                                 </tr>
                             </tbody>
                         </table>
+
+                        <table class="table table-striped table-sm mt-2 mb-4">
+                            <thead>
+                                <tr>
+                                    <th>Método</th>
+                                    <th>Descripción</th>
+                                    <th>Referencia</th>
+                                    <th class="text-center">Total</th>
+                                    <th class="text-center">Moneda</th>
+                                    <th class="text-center">TC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($reservation->payments as $payment)
+                                    <tr>
+                                        <td>{{ $payment->payment_method }}</td>
+                                        <td>{{ $payment->description }}</td>
+                                        <td>{{ $payment->reference ?? '-' }}</td>
+                                        <td class="text-end">{{ number_format($payment->total) }}</td>
+                                        <td class="text-center">{{ $payment->currency }}</td>
+                                        <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
+                                    </tr>
+                                @endforeach                                   
+                            </tbody>
+                        </table>
+
                         @if (RoleTrait::hasPermission(25))
                         <strong>Actividad</strong>
 

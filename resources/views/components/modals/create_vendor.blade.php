@@ -18,13 +18,13 @@
                     <div class="row mb-3">
                         <div class="col-12">
                             <label for="email">Email</label>
-                            <input type="email" class="form-control" autocomplete="off" name="email" id="email" required>
+                            <input type="email" class="form-control" autocomplete="off" name="email" id="email">
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-12">
                             <label for="phone">Teléfono</label>
-                            <input type="tel" class="form-control" autocomplete="off" name="phone" id="phone" required>
+                            <input type="tel" class="form-control" autocomplete="off" name="phone" id="phone">
                         </div>
                     </div>
                     <div class="row mb-3">
