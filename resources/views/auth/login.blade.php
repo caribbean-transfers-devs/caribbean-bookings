@@ -43,7 +43,7 @@
 											</div>
 										</div>										
 									@endif
-									<form id="log-in-form" method="POST" action="https://ct-beta.up.railway.app/login">
+									<form id="log-in-form" method="POST" action="/login">
 										@csrf
 										<div class="mb-3">
 											<label class="form-label">Email</label>
