@@ -140,7 +140,12 @@
                                                             {{ $value->code }}
                                                         @endif
                                                     </td>
-                                                    <td>{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
+                                                    <td>
+                                                        {{ $value->client_first_name }} {{ $value->client_last_name }}
+                                                        @if(!empty($value->reference))
+                                                            [{{ $value->reference }}]
+                                                        @endif
+                                                    </td>
                                                     <td>{{ $value->service_name }}</td>
                                                     <td class="text-center">{{ $value->passengers }}</td>
                                                     <td>{{ $operation_from }}</td>
