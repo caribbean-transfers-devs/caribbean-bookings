@@ -386,7 +386,8 @@ function serviceInfo(origin,destination,time,km){
 }
 
 function itemInfo(item){
-    console.log(item);
+    $("#from_zone_id").val(item.from_zone);
+    $("#to_zone_id").val(item.to_zone);
 
     $("#item_id_edit").val(item.reservations_item_id);
     $("#servicePaxForm").val(item.passengers);

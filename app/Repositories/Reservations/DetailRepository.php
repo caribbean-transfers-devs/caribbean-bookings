@@ -8,6 +8,7 @@ use App\Models\SalesType;
 use App\Models\User;
 use App\Models\UserRole;
 use App\Models\Site;
+use App\Models\Zones;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +23,7 @@ class DetailRepository
         
         $sales_types = SalesType::all();
         $services_types = DestinationService::where('status',1)->where('destination_id',$reservation->destination_id)->get();
+        $zones = Zones::where('destination_id', 1)->get();
         $sites = Site::get();
 
         //Sumamos las ventas y restamos pagos para saber si la reserva está confirmada o no..
@@ -53,6 +55,6 @@ class DetailRepository
 
         // return $reservation;
 
-        return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data','sites'));
+        return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data','sites','zones'));
     }
 }
