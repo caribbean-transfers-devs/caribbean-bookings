@@ -48,6 +48,13 @@ class ReservationsController extends Controller
         }
     }
 
+    public function duplicated(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
+    {
+        if(RoleTrait::hasPermission(24)){
+            return $reservationRepository->duplicated($request,$reservation);
+        }
+    }
+
     public function followups(ReservationFollowUpsRequest $request, ReservationsRepository $reservationRepository)
     {
         if(RoleTrait::hasPermission(23)){

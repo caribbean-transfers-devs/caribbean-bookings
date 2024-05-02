@@ -17,7 +17,7 @@ class ReservationsRepository
     use MailjetTrait;
     
     public function index($request)
-    {          
+    {
         $data = [
             "init" => date("Y-m-d") . " 00:00:00",
             "end" => date("Y-m-d") . " 23:59:59",
@@ -25,6 +25,7 @@ class ReservationsRepository
             "product_type" => 0,
             "zone" => 0,
             "site" => 0,
+            "is_duplicated" => 0,
             "payment_method" => NULL
         ];
         
@@ -35,7 +36,10 @@ class ReservationsRepository
             'end' => date("Y-m-d") . " 23:59:59",
         ];
 
-        if(isset( $request->date ) && !empty( $request->date )){            
+        $query .= ' AND rez.is_duplicated = :is_duplicated ';
+        $queryData['is_duplicated'] = $data['is_duplicated'];
+
+        if(isset( $request->date ) && !empty( $request->date )){
             $tmp_date = explode(" - ", $request->date);
             $data['init'] = $tmp_date[0];
             $data['end'] = $tmp_date[1];
@@ -75,7 +79,7 @@ class ReservationsRepository
         }         
         
         $bookings = DB::select("SELECT 
-                                    rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, rez.affiliate_id, 
+                                    rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, rez.is_duplicated, rez.affiliate_id, 
                                     rez.pay_at_arrival,
                                     COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     CASE
@@ -161,7 +165,7 @@ class ReservationsRepository
                                 ORDER BY site_name ASC");
 
         
-        if(sizeof( $bookings ) > 0):                
+        if(sizeof( $bookings ) > 0):
             usort($bookings, array($this, 'orderByDateTime'));
         endif;
         
@@ -217,9 +221,10 @@ class ReservationsRepository
 
     public function destroy($request, $reservation)
     {
-        try {
+        try {            
             DB::beginTransaction();
             $reservation->is_cancelled = 1;
+            ( isset($request->type) ? $reservation->cancellation_type_id = $request->type : '' );
             $reservation->save();
             $reservation->items()->update(['op_one_status' => 'CANCELLED', 'op_two_status' => 'CANCELLED']);
             $check = $this->create_followUps($reservation->id, 'SE CANCELO LA RESERVA POR '.auth()->user()->name, 'HISTORY', 'CANCELACIÓN');
@@ -230,6 +235,21 @@ class ReservationsRepository
             return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function duplicated($request, $reservation)
+    {
+        try {            
+            DB::beginTransaction();
+            $reservation->is_duplicated = 1;
+            $reservation->save();
+            $check = $this->create_followUps($reservation->id, 'SE MARCO COMO DUPLICADA RESERVA POR '.auth()->user()->name, 'HISTORY', 'DUPLICADA');
+            DB::commit();
+            return response()->json(['message' => 'Reservation duplicated successfully'], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
 
     public function follow_ups($request)
     {        

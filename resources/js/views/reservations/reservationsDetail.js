@@ -1,3 +1,6 @@
+
+let types_cancellations = {};
+
 $(function() {
     $('#serviceSalesModal').on('hidden.bs.modal', function () {
         $("#frm_new_sale")[0].reset();
@@ -13,6 +16,17 @@ $(function() {
         $("#btn_new_payment").prop('disabled', false);
     });
 });
+
+function typesCancellations(){
+    const __types_cancellations = document.getElementById('types_cancellations');
+    if( __types_cancellations != null ){
+        let options = JSON.parse(__types_cancellations.value);
+        options.forEach(option => {
+            types_cancellations[option.id] = option.name_es;
+        });
+    }
+}
+typesCancellations();
 
 function initMap() {
     var from_lat = parseFloat($('#from_lat').val());
@@ -119,20 +133,25 @@ function cancelReservation(id){
         headers: {
             'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
         }
-    }); 
+    });
     swal.fire({
         title: '¿Está seguro de cancelar la reservación?',
         text: "Esta acción no se puede revertir",
+        inputLabel: "Selecciona el motivo de cancelación",
+        input: "select",
+        inputOptions: types_cancellations,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
-        if (result.value) {
+        console.log(result, id);
+        if (result.isConfirmed) {
             var url = "/reservations/"+id;
             $.ajax({
                 url: url,
                 type: 'DELETE',
+                data: { type: result.value },
                 dataType: 'json',
                 success: function (data) {
                     swal.fire({
@@ -148,6 +167,49 @@ function cancelReservation(id){
                     swal.fire({
                         title: 'Error',
                         text: 'Ha ocurrido un error al cancelar la reservación',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        }
+    });
+}
+
+function duplicatedReservation(id){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    swal.fire({
+        title: '¿Está seguro de marcar como duplicado la reservación?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        console.log(result, id);
+        if (result.isConfirmed) {
+            var url = "/reservationsDuplicated/"+id;
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                dataType: 'json',
+                success: function (data) {
+                    swal.fire({
+                        title: 'Reservación duplicada',
+                        text: 'Se ha marcado como duplicado la reservación correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        location.reload();
+                    });
+                },
+                error: function (data) {
+                    swal.fire({
+                        title: 'Error',
+                        text: 'Ha ocurrido un error al marcar la reservación',
                         icon: 'error',
                         confirmButtonText: 'Aceptar'
                     });
@@ -386,8 +448,7 @@ function serviceInfo(origin,destination,time,km){
 }
 
 function itemInfo(item){
-    $("#from_zone_id").val(item.from_zone);
-    $("#to_zone_id").val(item.to_zone);
+    console.log(item);
 
     $("#item_id_edit").val(item.reservations_item_id);
     $("#servicePaxForm").val(item.passengers);

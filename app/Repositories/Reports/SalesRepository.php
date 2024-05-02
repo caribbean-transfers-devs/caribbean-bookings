@@ -20,6 +20,7 @@ class SalesRepository
             "product_type" => 0,
             "zone" => 0,
             "site" => 0,
+            "is_duplicated" => 0,
             "payment_method" => NULL
         ];
         
@@ -29,6 +30,9 @@ class SalesRepository
             'init' => date("Y-m-d") . " 00:00:00",
             'end' => date("Y-m-d") . " 23:59:59",
         ];
+
+        $query .= ' AND rez.is_duplicated = :is_duplicated ';
+        $queryData['is_duplicated'] = $data['is_duplicated'];
 
         if(isset( $request->date ) && !empty( $request->date )){            
             $tmp_date = explode(" - ", $request->date);

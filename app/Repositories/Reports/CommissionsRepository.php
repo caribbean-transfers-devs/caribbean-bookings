@@ -77,7 +77,7 @@ class CommissionsRepository
 						GROUP BY s.reservation_id
 				        ) as emp ON emp.reservation_id = rez.id
         WHERE rez.created_at BETWEEN :init_date_one AND :init_date_two
-        AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.pay_at_arrival = 0
+        AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.pay_at_arrival = 0
         GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id, it_counter.quantity, p.payment_type_name, emp.employee", [
                                         "init_date_one" => $search['init_date'],
                                         "init_date_two" => $search['end_date'],
@@ -135,7 +135,7 @@ class CommissionsRepository
 						GROUP BY s.reservation_id
 				        ) as emp ON emp.reservation_id = rez.id
         WHERE (it.op_one_pickup BETWEEN :init_date_one AND :init_date_two OR it.op_two_pickup BETWEEN :init_date_three AND :init_date_four)
-        AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.pay_at_arrival = 1
+        AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.pay_at_arrival = 1
         GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id, it_counter.quantity, p.payment_type_name, emp.employee", [
                                     "init_date_one" => $search['init_date'],
                                     "init_date_two" => $search['end_date'],
