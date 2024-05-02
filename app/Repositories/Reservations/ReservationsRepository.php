@@ -270,10 +270,12 @@ class ReservationsRepository
             $item->from_name = $request->from_name;
             $item->to_name = $request->to_name;
             $item->flight_number = $request->flight_number;
+            $item->from_zone = $request->from_zone_id;
             if($request->from_lat){
                 $item->from_lat = $request->from_lat;
                 $item->from_lng = $request->from_lng;
             }
+            $item->to_zone = $request->to_zone_id;
             if($request->to_lat){
                 $item->to_lat = $request->to_lat;
                 $item->to_lng = $request->to_lng;

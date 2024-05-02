@@ -416,7 +416,7 @@
 <!-- Modals -->
 <x-modals.service_map />
 
-<x-modals.edit_reservation_service :services=$services_types />
+<x-modals.edit_reservation_service :services=$services_types :zones=$zones />
 
 <x-modals.new_sale_reservation :sellers=$sellers :types=$sales_types>
     <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
