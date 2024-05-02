@@ -92,6 +92,10 @@
                                     <td>{{ $reservation->user->name }}</td>
                                 </tr>
                                 <tr>
+                                    <th>Observaciones</th>
+                                    <td>{{ $reservation->comments }}</td>
+                                </tr>
+                                <tr>
                                     <th>Origen</th>
                                     <td>{{ ($from_zone->name ?? '-') . ' | ' . $reservation->items[0]->from_name }}</td>
                                 </tr>

@@ -145,7 +145,7 @@
                                                 <td>{{ $item->is_round_trip ? 'Salida' : 'Llegada' }}</td>
                                                 <td>{{ getShift($item->created_at) }}</td>
                                                 <td>{{ substr($item->created_at, -8, 5) }}</td>
-                                                <td></td>
+                                                <td>{{ $item->comments }}</td>
                                             </tr>
                                         @endforeach
                                     @endif

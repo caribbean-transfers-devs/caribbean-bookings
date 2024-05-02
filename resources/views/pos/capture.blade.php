@@ -212,6 +212,10 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="double-col">
+                                    <label class="form-label" for="comments">Observaciones</label>
+                                    <textarea class="form-control" name="comments" row="4"></textarea>
+                                </div>
                             </div>
                         </div>
     
