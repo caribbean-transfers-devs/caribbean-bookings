@@ -31,23 +31,22 @@
                             <select class="form-select mb-2" id="serviceSiteReference" name="site_id" readonly>
                                 @foreach($sites as $key => $value)
                                     <option value="{{ $value->id }}" {{ $reservation->site_id == $value->id ? 'selected' : '' }}>{{ $value->name }}</option>
-                                @endforeach                      
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceClientReference">Referencia</label>
                             <input type="text" class="form-control mb-2" id="serviceClientReference" name="reference" value="{{ $reservation->reference }}">
                         </div>
-                        <!--<div class="col-sm-12 col-md-6">
+                        <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
                             <select class="form-select mb-2" id="servicePaymentsCurrencyModal" name="currency" readonly>
-                                <option value="1" {{ $reservation->currency == 1 ? 'selected' : '' }}>USD</option>
-                                <option value="2" {{ $reservation->currency == 2 ? 'selected' : '' }}>MXN</option>                            
+                                <option value="USD" {{ $reservation->currency == 'USD' ? 'selected' : '' }}>USD</option>
+                                <option value="MXN" {{ $reservation->currency == 'MXN' ? 'selected' : '' }}>MXN</option>
                             </select>
-                        </div>-->
+                        </div>
                     </div>
                     <input type="hidden" id="reservation_id" value="{{ $reservation->id }}">
-                    <input type="hidden" name="currency" value="{{ $reservation->currency }}">
                 </form>
             </div>
             <div class="modal-footer">
