@@ -73,6 +73,9 @@
                                         @endif
                                         @if ($data['status'] == "CANCELLED")
                                             <span class="badge bg-danger">CANCELLED</span>
+                                        @endif
+                                        @if ($data['status'] == "DUPLICATED")
+                                            <span class="badge bg-danger">DUPLICADO</span>
                                         @endif                                                                             
                                     </td>
                                 </tr>

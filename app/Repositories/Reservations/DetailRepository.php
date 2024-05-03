@@ -58,7 +58,9 @@ class DetailRepository
         if($reservation->is_cancelled == 1):
             $data['status'] = "CANCELLED";
         endif;
-
+        if($reservation->is_duplicated == 1):
+            $data['status'] = "DUPLICATED";
+        endif;
         // return $reservation;
 
         return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data','sites','zones','types_cancellations'));
