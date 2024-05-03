@@ -62,8 +62,8 @@ class Reservation extends Model
         return $this->belongsTo(Vendor::class);
     }
 
-    public function clip()
+    /*public function clip()
     {
         return $this->belongsTo(Clip::class);
-    }
+    }*/
 }

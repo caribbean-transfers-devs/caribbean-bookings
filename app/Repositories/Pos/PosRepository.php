@@ -181,7 +181,7 @@ class PosRepository
     }
 
     public function detail($request,$id){
-        $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site', 'user', 'vendor', 'clip')->whereNotNull('vendor_id')->where('id', $id)->first();
+        $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site', 'user', 'vendor')->with('payments.clip')->whereNotNull('vendor_id')->where('id', $id)->first();
         if( !$reservation ) abort(404);
 
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');

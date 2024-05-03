@@ -1,5 +1,5 @@
 @php
-    use App\Traits\RoleTrait;
+    use App\Traits\RoleTrait;    
 @endphp
 
 @extends('layout.master')
@@ -123,6 +123,7 @@
                                     <th class="text-center">Total</th>
                                     <th class="text-center">Moneda</th>
                                     <th class="text-center">TC</th>
+                                    <th class="text-center">Tipo</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -134,6 +135,7 @@
                                         <td class="text-end">{{ number_format($payment->total) }}</td>
                                         <td class="text-center">{{ $payment->currency }}</td>
                                         <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
+                                        <td class="text-end">{{ $payment->clip->name }}</td>
                                     </tr>
                                 @endforeach                                   
                             </tbody>

@@ -16,4 +16,8 @@ class Payment extends Model
     {
         return $this->belongsTo(Reservation::class);
     }
+    
+    public function clip(){
+        return $this->belongsTo(Clip::class, 'clip_id', 'id');
+    }
 }
