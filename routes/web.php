@@ -17,6 +17,7 @@ use App\Http\Controllers\Reports\SalesController as ReportSales;
 use App\Http\Controllers\Reports\CommissionsController as ReportCommissions;
 use App\Http\Controllers\Reports\CashController as ReportCash;
 use App\Http\Controllers\Reports\CCFormController;
+use App\Http\Controllers\Pos\PosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +95,17 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/tpv/quote', [TpvController::class, 'quote'])->name('tpv.quote');
     Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
     Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
+
+    Route::get('/punto-de-venta', [PosController::class, 'index'])->name('pos.index');
+    Route::post('/punto-de-venta', [PosController::class, 'index'])->name('pos.index.action');
+    Route::get('/punto-de-venta/detail/{id}', [PosController::class, 'detail'])->where('id', '[0-9]+');
+    Route::get('/punto-de-venta/capture', [PosController::class, 'capture'])->name('pos.capture');
+    Route::post('/punto-de-venta/capture/create', [PosController::class, 'create'])->name('pos.capture.create');
+    Route::get('/punto-de-venta/vendors', [PosController::class, 'vendors'])->name('pos.vendors');
+    Route::post('/punto-de-venta/vendors/create', [PosController::class, 'createVendor'])->name('pos.vendors.create');
+    Route::put('/punto-de-venta/vendors/edit', [PosController::class, 'editVendor'])->name('pos.vendors.edit');
+    Route::delete('/punto-de-venta/vendors/delete', [PosController::class, 'deleteVendor'])->name('pos.vendors.delete');
+    Route::put('/punto-de-venta/edit-created-at', [PosController::class, 'editCreatedAt'])->name('pos.editCreatedAt');
 
     Route::get('/config/destinations', [ZonesController::class, 'index'])->name('config.zones');
     Route::get('/config/destinations/{id}', [ZonesController::class, 'getZones'])->name('config.zones.getZones');
