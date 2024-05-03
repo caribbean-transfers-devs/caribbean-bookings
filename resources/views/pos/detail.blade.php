@@ -135,7 +135,7 @@
                                         <td class="text-end">{{ number_format($payment->total) }}</td>
                                         <td class="text-center">{{ $payment->currency }}</td>
                                         <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
-                                        <td class="text-end">{{ $payment->clip->name }}</td>
+                                        <td class="text-end">{{ $payment->clip->name ?? '' }}</td>
                                     </tr>
                                 @endforeach                                   
                             </tbody>
