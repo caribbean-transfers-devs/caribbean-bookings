@@ -96,8 +96,13 @@ trait ApiTrait
         return self::sendRequest('/api/v1/create', 'POST', $data, $tpv['token']['token']);
     }
 
+    public static function makeTypesCancellations($data = []){
+        return self::sendRequest('/api/v1/types/cancellations/get', 'GET', $data);
+    }
+
     public static function sendRequest($end_point, $method = 'GET', $data = null, $token = null) {
         $url = 'https://api.caribbean-transfers.com'.$end_point;
+        // $url = 'http://127.0.0.1:8001'.$end_point;
         $ch = curl_init($url);
 
         if ($method == 'POST') {

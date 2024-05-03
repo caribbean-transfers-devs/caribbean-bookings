@@ -9,12 +9,17 @@ use App\Models\User;
 use App\Models\UserRole;
 use App\Models\Site;
 use App\Models\Zones;
+
+use App\Traits\ApiTrait;
+
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class DetailRepository
 {
+    use ApiTrait;
+    
     public function detail($request,$id)
     {
         $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site')->find($id);
@@ -25,6 +30,7 @@ class DetailRepository
         $services_types = DestinationService::where('status',1)->where('destination_id',$reservation->destination_id)->get();
         $zones = Zones::where('destination_id', 1)->get();
         $sites = Site::get();
+        $types_cancellations = ApiTrait::makeTypesCancellations();
 
         //Sumamos las ventas y restamos pagos para saber si la reserva está confirmada o no..
         $data = [
@@ -55,6 +61,6 @@ class DetailRepository
 
         // return $reservation;
 
-        return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data','sites','zones'));
+        return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data','sites','zones','types_cancellations'));
     }
 }
