@@ -29,7 +29,7 @@ class ReservationsRepository
         ];
         
         //Query DB
-        $query = ' AND rez.created_at BETWEEN :init AND :end';
+        $query = ' AND rez.site_id NOT IN(21) AND rez.created_at BETWEEN :init AND :end';
         $queryData = [
             'init' => date("Y-m-d") . " 00:00:00",
             'end' => date("Y-m-d") . " 23:59:59",
