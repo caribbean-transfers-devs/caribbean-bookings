@@ -408,7 +408,7 @@ $(function() {
         mode: "single",
         dateFormat: "Y-m-d H:i",
         enableTime: true,
-        minDate: "today"
+        minDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
     });
 });
 
