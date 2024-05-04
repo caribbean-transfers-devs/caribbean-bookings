@@ -34,10 +34,15 @@
                     <div class="card-header">
                         <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
                     </div>
-                    <div class="card-body">
-                        @if(RoleTrait::hasPermission(59))
-                            <a href="#" class="btn btn-info change-date-btn" data-bs-toggle="modal" data-bs-target="#modify_pos_created_at">Cambiar fecha de creación</a>
-                        @endif
+                    <div class="card-body">                        
+                        <div class="button-list">
+                            @if(RoleTrait::hasPermission(59))
+                                <a href="#" class="btn btn-info change-date-btn" data-bs-toggle="modal" data-bs-target="#modify_pos_created_at">Cambiar fecha de creación</a>
+                            @endif
+                            @if(RoleTrait::hasPermission(10))
+                                <a href="/reservations/detail/{{ $reservation->id }}" class="btn btn-primary">Actualización general</a>
+                            @endif
+                        </div>
 
                         <table class="table table-sm mt-2 mb-4">
                             <tbody>
