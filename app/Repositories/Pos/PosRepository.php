@@ -349,7 +349,7 @@ class PosRepository
                 $item->to_zone = $request->to_zone_id;
                 $item->distance_time = $to_zone->time ? $this->timeToSeconds( $to_zone->time ) : 0;
                 $item->distance_km = $to_zone->distance ? $to_zone->distance : '';
-                $item->is_round_trip = $request->is_round_trip;
+                $item->is_round_trip = 0;
                 $item->passengers = $request->passengers;
                 $item->op_one_status = 'PENDING';
                 $item->op_one_pickup = $request->departure_date;
