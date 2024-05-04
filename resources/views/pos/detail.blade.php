@@ -39,7 +39,7 @@
                             @if(RoleTrait::hasPermission(59))
                                 <a href="#" class="btn btn-info change-date-btn" data-bs-toggle="modal" data-bs-target="#modify_pos_created_at">Cambiar fecha de creación</a>
                             @endif
-                            @if(RoleTrait::hasPermission(10))
+                            @if(RoleTrait::hasPermission(61))
                                 <a href="/reservations/detail/{{ $reservation->id }}" class="btn btn-primary">Actualización general</a>
                             @endif
                         </div>

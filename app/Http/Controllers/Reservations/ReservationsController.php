@@ -18,7 +18,7 @@ class ReservationsController extends Controller
 {
     public function detail(Request $request, DetailRepository $detailRepository, $id)
     {
-        if(RoleTrait::hasPermission(10)){
+        if(RoleTrait::hasPermission(10) || RoleTrait::hasPermission(61)){
             return $detailRepository->detail($request,$id);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
