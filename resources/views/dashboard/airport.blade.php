@@ -10,7 +10,6 @@
 @push('bootom-stack')
     <script>
         var datos = @json($items);
-        console.log(datos);
         
         function getDays(objeto) {
             var dates = [];
@@ -46,9 +45,9 @@
             data: {
                 labels: getDays(datos),
                 datasets: [{
-                label: 'Resumen del mes',
-                data: getCounter(datos),
-                borderWidth: 1
+                    label: 'Resumen del mes',
+                    data: getCounter(datos),
+                    borderWidth: 1
                 }]
             },
             options: {
