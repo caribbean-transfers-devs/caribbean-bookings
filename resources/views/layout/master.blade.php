@@ -67,10 +67,10 @@
                             </a>
                             <ul id="dashboard" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                                 @if(RoleTrait::hasPermission(42))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.admin') }}">Admin</a></li>
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['general']) }}">Ventas</a></li>
+                                    <!--<li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.admin') }}">Admin</a></li>-->
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['general']) }}">Ventas Generales</a></li>
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['online']) }}">Ventas en linea</a></li>
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['airport']) }}">Ventas de aereopuerto</a></li>
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['airport']) }}">Ventas de Aereopuerto</a></li>
                                 @endif
                             </ul>
                         </li>
