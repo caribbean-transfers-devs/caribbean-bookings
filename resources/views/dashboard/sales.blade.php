@@ -527,7 +527,7 @@
                                     <div class="item-timeline timeline-{{ ( $item->status == "CONFIRMED" ? "success" : "warning" ) }}">
                                         <div class="t-dot" data-original-title="" title=""></div>
                                         <div class="t-text">
-                                            <p><span>{{ $item->client_full_name }}</span> - {{ $item->destination_name }} - <a href="javascript:void(0);">{{ $item->reservation_codes }}</a></p>
+                                            <p><span>{{ $item->client_full_name }}</span> - {{ $item->destination_name }} - <a href="{{ route('reservations.details',['id' => $item->id]) }}">{{ $item->reservation_codes }}</a></p>
                                             <span class="badge">{{ $item->status }}</span>
                                             <p class="t-time">$ {{ number_format($item->total_sales,2) }}</p>
                                         </div>
@@ -585,7 +585,7 @@
         <div class="col-xl-4 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget widget-chart-two">
                 <div class="widget-heading">
-                    <h5 class="">Resumen de ventas por sitio</h5>
+                    <h5 class="">Resumen de ventas del més por sitio</h5>
                 </div>
                 <div class="widget-content">
                     <div id="chartMonthSites" class=""></div>
@@ -598,7 +598,7 @@
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget widget-chart-one">
                 <div class="widget-heading">
-                    <h5 class="">Resumen de ventas por destino</h5>
+                    <h5 class="">Resumen de ventas del més por destino</h5>
                 </div>
 
                 <div class="widget-content">
