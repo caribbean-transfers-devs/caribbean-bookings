@@ -40,6 +40,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
+    Route::get('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('dashboard.sales');
+    Route::post('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('reservations.sales.search');
+
+    // Route::post('/dashboard/sales/general', [DashboardController::class, 'sales'])->name('reservations.sales.search');
+    // Route::post('/dashboard/sales/online', [DashboardController::class, 'sales'])->name('reservations.sales.search');
+    // Route::post('/dashboard/sales/airport', [DashboardController::class, 'sales'])->name('reservations.sales.search');
 
     Route::resource('/users', UserController::class);
     Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');
@@ -55,7 +61,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');
     Route::put('/reservationsDuplicated/{reservation}', [ReservationsController::class, 'duplicated'])->name('reservations.duplicated');
     Route::delete('/reservations/{reservation}', [ReservationsController::class, 'destroy'])->name('reservations.destroy');
-    Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->where('id', '[0-9]+');
+    Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');
     Route::get('/GetExchange/{reservation}', [ReservationsController::class, 'get_exchange'])->name('reservations.get_exchange');
     Route::post('/reservationsfollowups', [ReservationsController::class, 'followups'])->name('reservations.followups');
     Route::put('/editreservitem/{item}', [ReservationsController::class, 'editreservitem'])->name('reservations.editreservitem');    

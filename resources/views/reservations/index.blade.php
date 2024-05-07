@@ -45,7 +45,7 @@
         
         <div class="row">
             <div class="col-12 col-sm-9">
-                <div class="card">                    
+                <div class="card">
                     <div class="card-body">
                         <div class="table-responsive mt-3">
                             <table id="reservations_table" class="table table-striped table-sm">
@@ -100,7 +100,6 @@
                                                             $affiliates[$item->site_name]['count']++;
                                                         endif;
 
-
                                                         if(!isset( $destinations[$item->destination_name] )):
                                                             $destinations[$item->destination_name] = [
                                                                 'USD' => 0,
@@ -110,7 +109,6 @@
                                                         endif;
                                                         $destinations[$item->destination_name][$item->currency] += $item->total_sales;
                                                         $destinations[$item->destination_name]['count']++;
-                                    
                                                     endif;
 
                                                 else:
@@ -163,7 +161,6 @@
                 </div>
             </div>
             <div class="col-12 col-sm-3">
-                
                 <div class="card">
                     <div class="card-header">
                         <h4>Resumen por estatus</h4>
@@ -294,5 +291,5 @@
 
     </div>
 
-<x-modals.reservations.listing :data="$data" :services="$services" :zones="$zones" :websites="$websites" />    
+<x-modals.reservations.listing :data="$data" :services="$services" :zones="$zones" :websites="$websites" />
 @endsection

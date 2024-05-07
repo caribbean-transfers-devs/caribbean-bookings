@@ -10,6 +10,7 @@
 @push('bootom-stack')
     <script>
         var datos = @json($items);
+        console.log(datos);
         
         function getDays(objeto) {
             var dates = [];
