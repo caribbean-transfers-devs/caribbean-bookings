@@ -161,9 +161,6 @@
                 </div>
             </div>
             <div class="col-12 col-sm-3">
-                @php
-                    dump($sites);
-                @endphp
                 <div class="card">
                     <div class="card-header">
                         <h4>Resumen por estatus</h4>
