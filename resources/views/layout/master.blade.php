@@ -59,59 +59,6 @@
                     <li class="sidebar-header">
                         Módulos
                     </li>
-                    @php
-                        // $links = [];
-
-                        // if(RoleTrait::hasPermission(42)){
-                        //     array_push($links,[
-                        //         'type' => 'multiple',
-                        //         'icon' => '<i class="align-middle" data-feather="sliders"></i>',
-                        //         'code' => 'dashboard',
-                        //         'name' => 'Dashboards',
-                        //         'route' => null,
-                        //         'active' => request()->routeIs('dashboard.*'),
-                        //         'urls' => [
-                        //             array(
-                        //                 'name' => 'Admin',
-                        //                 'route' => route('dashboard.admin'),
-                        //                 'active' => request()->routeIs('dashboard.admin'),
-                        //             ),
-                        //             array(
-                        //                 'name' => 'Ventas en linea',
-                        //                 'route' => route('dashboard.online.sales'),
-                        //                 'active' => request()->routeIs('dashboard.online.sales'),
-                        //             ),
-                        //             array(
-                        //                 'name' => 'Ventas en aereopuerto',
-                        //                 'route' => route('dashboard.airport.sales'),
-                        //                 'active' => request()->routeIs('dashboard.airport.sales'),
-                        //             )
-                        //         ]                        
-                        //     ]);
-                        // }
-
-                        // if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50)){
-
-                        //     $urls = [];
-                        //     if(RoleTrait::hasPermission(43) && $links['code'] == "reports" ){
-                        //         $urls['name'] = 'Pagos';
-                        //         $urls['name'] = route('reports.payment');
-                        //         $urls['active'] = request()->routeIs('reports.payment');
-                        //     }
-
-                        //     array_push($links,[
-                        //         'type' => 'multiple',
-                        //         'icon' => '<i class="align-middle" data-feather="sliders"></i>',
-                        //         'code' => 'reports',
-                        //         'name' => 'Reportes',
-                        //         'route' => null,
-                        //         'active' => request()->routeIs('reports.*'),
-                        //         'urls' => $urls
-                        //     ]);                            
-                        // }
-
-                        // dump($links);
-                    @endphp
 
                     @if(RoleTrait::hasPermission(42))
                         <li class="sidebar-item">
@@ -121,9 +68,9 @@
                             <ul id="dashboard" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                                 @if(RoleTrait::hasPermission(42))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.admin') }}">Admin</a></li>
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales') }}">Ventas</a></li>
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.online.sales') }}">Ventas en linea</a></li>
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.airport.sales') }}">Ventas de aereopuerto</a></li>
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['general']) }}">Ventas</a></li>
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['online']) }}">Ventas en linea</a></li>
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['airport']) }}">Ventas de aereopuerto</a></li>
                                 @endif
                             </ul>
                         </li>

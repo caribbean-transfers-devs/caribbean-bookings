@@ -39,9 +39,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-    Route::get('/dashboard/sales', [DashboardController::class, 'sales'])->name('dashboard.sales');
-    Route::get('/dashboard/online/sales', [DashboardController::class, 'online'])->name('dashboard.online.sales');
-    Route::get('/dashboard/airport/sales', [DashboardController::class, 'airport'])->name('dashboard.airport.sales');
+    Route::get('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('dashboard.sales');
 
     Route::resource('/users', UserController::class);
     Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');

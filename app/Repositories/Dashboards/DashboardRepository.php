@@ -54,8 +54,9 @@ class DashboardRepository
         
         return view('dashboard.admin', ['items' => $bookings_month]);
     }
+    
 
-    public function sales($request){
+    public function sales($request, $type){
         $bookings_day = [];
         $bookings_month = [];
         $queryDataDay = [
@@ -68,7 +69,15 @@ class DashboardRepository
         ];
         
         //Query DB
-        $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 ';
+        if( $type == "general" ){            
+            $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 ';
+        }
+        if( $type == "online" ){            
+            $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 AND rez.site_id NOT IN (11,21) ';
+        }
+        if( $type == "airport" ){            
+            $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 AND rez.site_id IN (11,21) ';
+        }        
 
         $bookings_day[date("Y-m-d")] = [
             "items" => [],
@@ -123,146 +132,6 @@ class DashboardRepository
         }
         
         return view('dashboard.sales', ['bookings_day' => $bookings_day, 'bookings_month' => $bookings_month]);
-    }    
-
-    public function online($request){
-        $bookings_day = [];
-        $bookings_month = [];
-        $queryDataDay = [
-            "init" => date("Y-m-d") . " 00:00:00",
-            "end" => date("Y-m-d") . " 23:59:59",
-        ];        
-        $queryDataMonth = [
-            "init" => date("Y-m-d", strtotime("first day of this month")) . " 00:00:00",
-            "end" => date("Y-m-d", strtotime("last day of this month")) . " 23:59:59",
-        ];
-        
-        //Query DB
-        $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 AND rez.site_id NOT IN (11,21) ';
-
-        $bookings_day[date("Y-m-d")] = [
-            "items" => [],
-            "counter" => 0,
-            "USD" => 0,
-            "MXN" => 0,
-        ];
-
-        // Recorre desde el primer día hasta el último día del mes
-        for ($fecha = date("Y-m-d", strtotime("first day of this month")); $fecha <= date("Y-m-d", strtotime("last day of this month")); $fecha = date("Y-m-d", strtotime($fecha . " +1 day"))) {
-            $bookings_month[$fecha] = [
-                "items" => [],
-                "counter" => 0,
-                "USD" => 0,
-                "MXN" => 0,
-            ];
-        }
-
-        $bookings_data_day = $this->dataBooking($query, $queryDataDay);
-        $bookings_data_month = $this->dataBooking($query, $queryDataMonth);
-
-        if(sizeof( $bookings_data_day ) >= 1){
-            foreach($bookings_data_day as $bookingsDay):
-                $date_ = date("Y-m-d", strtotime( $bookingsDay->created_at ));
-                if( isset( $bookings_day[ $date_ ] ) ){
-                    $bookings_day[ $date_ ]['items'][] = $bookingsDay;
-                    $bookings_day[ $date_ ]['counter']++;
-                    if( $bookingsDay->currency == "USD" ):
-                        $bookings_day[ $date_ ]['USD'] += $bookingsDay->total_sales;
-                    endif;
-                    if( $bookingsDay->currency == "MXN" ):
-                        $bookings_day[ $date_ ]['MXN'] += $bookingsDay->total_sales;
-                    endif;                   
-                }
-            endforeach;
-        }
-
-        if(sizeof( $bookings_data_month ) >= 1){
-            foreach($bookings_data_month as $value):
-                $date_ = date("Y-m-d", strtotime( $value->created_at ));
-                if( isset( $bookings_month[ $date_ ] ) ){
-                    $bookings_month[ $date_ ]['items'][] = $value;
-                    $bookings_month[ $date_ ]['counter']++;
-                    if( $value->currency == "USD" ):
-                        $bookings_month[ $date_ ]['USD'] += $value->total_sales;
-                    endif;
-                    if( $value->currency == "MXN" ):
-                        $bookings_month[ $date_ ]['MXN'] += $value->total_sales;
-                    endif;                   
-                }
-            endforeach;
-        }
-        
-        return view('dashboard.online', ['bookings_day' => $bookings_day, 'bookings_month' => $bookings_month]);
-    }
-
-    public function airport($request){
-        $bookings_day = [];
-        $bookings_month = [];
-        $queryDataDay = [
-            "init" => date("Y-m-d") . " 00:00:00",
-            "end" => date("Y-m-d") . " 23:59:59",
-        ];        
-        $queryDataMonth = [
-            "init" => date("Y-m-d", strtotime("first day of this month")) . " 00:00:00",
-            "end" => date("Y-m-d", strtotime("last day of this month")) . " 23:59:59",
-        ];
-        
-        //Query DB
-        $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 AND rez.site_id IN (11,21) ';
-
-        $bookings_day[date("Y-m-d")] = [
-            "items" => [],
-            "counter" => 0,
-            "USD" => 0,
-            "MXN" => 0,
-        ];
-
-        // Recorre desde el primer día hasta el último día del mes
-        for ($fecha = date("Y-m-d", strtotime("first day of this month")); $fecha <= date("Y-m-d", strtotime("last day of this month")); $fecha = date("Y-m-d", strtotime($fecha . " +1 day"))) {
-            $bookings_month[$fecha] = [
-                "items" => [],
-                "counter" => 0,
-                "USD" => 0,
-                "MXN" => 0,
-            ];
-        }
-
-        $bookings_data_day = $this->dataBooking($query, $queryDataDay);
-        $bookings_data_month = $this->dataBooking($query, $queryDataMonth);
-
-        if(sizeof( $bookings_data_day ) >= 1){
-            foreach($bookings_data_day as $bookingsDay):
-                $date_ = date("Y-m-d", strtotime( $bookingsDay->created_at ));
-                if( isset( $bookings_day[ $date_ ] ) ){
-                    $bookings_day[ $date_ ]['items'][] = $bookingsDay;
-                    $bookings_day[ $date_ ]['counter']++;
-                    if( $bookingsDay->currency == "USD" ):
-                        $bookings_day[ $date_ ]['USD'] += $bookingsDay->total_sales;
-                    endif;
-                    if( $bookingsDay->currency == "MXN" ):
-                        $bookings_day[ $date_ ]['MXN'] += $bookingsDay->total_sales;
-                    endif;                   
-                }
-            endforeach;
-        }
-
-        if(sizeof( $bookings_data_month ) >= 1){
-            foreach($bookings_data_month as $value):
-                $date_ = date("Y-m-d", strtotime( $value->created_at ));
-                if( isset( $bookings_month[ $date_ ] ) ){
-                    $bookings_month[ $date_ ]['items'][] = $value;
-                    $bookings_month[ $date_ ]['counter']++;
-                    if( $value->currency == "USD" ):
-                        $bookings_month[ $date_ ]['USD'] += $value->total_sales;
-                    endif;
-                    if( $value->currency == "MXN" ):
-                        $bookings_month[ $date_ ]['MXN'] += $value->total_sales;
-                    endif;                   
-                }
-            endforeach;
-        }
-        
-        return view('dashboard.airport', ['bookings_day' => $bookings_day, 'bookings_month' => $bookings_month]);
     }
 
     public function dataBooking($query, $queryData){

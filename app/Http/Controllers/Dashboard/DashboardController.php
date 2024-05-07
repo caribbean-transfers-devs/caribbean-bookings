@@ -22,27 +22,11 @@ class DashboardController extends Controller
         return $dashboard->admin();        
     }
 
-    public function sales(Request $request, DashboardRepository $dashboard){
+    public function sales(Request $request, $type, DashboardRepository $dashboard){
         if(!RoleTrait::hasPermission(42)){
             //abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
 
-        return $dashboard->sales($request);
-    }    
-    
-    public function online(Request $request, DashboardRepository $dashboard){
-        if(!RoleTrait::hasPermission(42)){
-            //abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }
-
-        return $dashboard->online($request);
-    }
-    
-    public function airport(Request $request, DashboardRepository $dashboard){
-        if(!RoleTrait::hasPermission(42)){
-            //abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }
-
-        return $dashboard->airport($request);
+        return $dashboard->sales($request, $type);
     }
 }
