@@ -402,6 +402,8 @@
                 }
             },
             // colors: apexcharts.seriesDestinationMonth().colors,
+
+            colors: ['#e7515a', '#2196f3', , '#2196f3', '#2196f3', '#2196f3', '#2196f3', '#2196f3', '#2196f3', '#2196f3', '#2196f3', '#2196f3'],
             dataLabels: {
                 enabled: true,
             },

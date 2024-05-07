@@ -23,8 +23,8 @@ class DashboardController extends Controller
     }
 
     public function sales(Request $request, $type, DashboardRepository $dashboard){
-        if(!RoleTrait::hasPermission(42)){
-            //abort(403, 'NO TIENE AUTORIZACIÓN.');
+        if(  ( $type == "general" && !RoleTrait::hasPermission(42)) || ( $type == "online" && !RoleTrait::hasPermission(62)) || ( $type == "airport" && !RoleTrait::hasPermission(63))  ){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
 
         return $dashboard->sales($request, $type);

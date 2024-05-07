@@ -60,18 +60,24 @@
                         Módulos
                     </li>
 
-                    @if(RoleTrait::hasPermission(42))
+                    @if(RoleTrait::hasPermission(42) || RoleTrait::hasPermission(62) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(63))
                         <li class="sidebar-item">
                             <a href="#dashboard" data-bs-toggle="collapse" class="sidebar-link collapsed">
                                 <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboards</span>
                             </a>
                             <ul id="dashboard" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                <!--<li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.admin') }}">Admin</a></li>-->
                                 @if(RoleTrait::hasPermission(42))
-                                    <!--<li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.admin') }}">Admin</a></li>-->
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['general']) }}">Ventas Generales</a></li>
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['online']) }}">Ventas en linea</a></li>
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['airport']) }}">Ventas de Aereopuerto</a></li>
                                 @endif
+
+                                @if(RoleTrait::hasPermission(62))
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['online']) }}">Ventas en linea</a></li>
+                                @endif
+                                
+                                @if(RoleTrait::hasPermission(63))
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['airport']) }}">Ventas de Aereopuerto</a></li>
+                                @endif                                
                             </ul>
                         </li>
                     @endif
