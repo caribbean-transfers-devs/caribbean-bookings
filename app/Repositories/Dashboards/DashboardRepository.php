@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Spatie\LaravelIgnition\Recorders\DumpRecorder\Dump;
+use Illuminate\Support\Str;
+use Faker\Factory as Faker;
 
 class DashboardRepository
 {
@@ -55,10 +57,40 @@ class DashboardRepository
         return view('dashboard.admin', ['items' => $bookings_month]);
     }
     
-
     public function sales($request, $type){
-        $bookings_day = [];
-        $bookings_month = [];
+
+        $bookings_day = [];//NOS AYUDA A SABER LAS ESTADISTICAS DE VENTAS DEL DIA
+        $bookings_month = [];//NOS AYUDA A SABER LAS ESTADISTICAS DE VENTAS DEL MES
+        $bookings_sites_month = [
+            "USD" => 0,
+            "MXN" => 0,
+            "counter" => 0,
+            "data" => []
+        ];
+
+        $bookings_destinations_month = [
+            "USD" => 0,
+            "MXN" => 0,
+            "counter" => 0,
+            "data" => []
+        ];
+
+        $data = [
+            "init" => date("Y-m-d", strtotime("first day of this month")) . " 00:00:00",
+            "end" => date("Y-m-d", strtotime("last day of this month")) . " 23:59:59",
+        ];
+        
+        //Query DB        
+        if( $type == "general" ){
+            $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 ';
+        }
+        if( $type == "online" ){
+            $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 AND rez.site_id NOT IN (11,21) ';
+        }
+        if( $type == "airport" ){
+            $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 AND rez.site_id IN (11,21) ';
+        }
+
         $queryDataDay = [
             "init" => date("Y-m-d") . " 00:00:00",
             "end" => date("Y-m-d") . " 23:59:59",
@@ -67,17 +99,6 @@ class DashboardRepository
             "init" => date("Y-m-d", strtotime("first day of this month")) . " 00:00:00",
             "end" => date("Y-m-d", strtotime("last day of this month")) . " 23:59:59",
         ];
-        
-        //Query DB
-        if( $type == "general" ){            
-            $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 ';
-        }
-        if( $type == "online" ){            
-            $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 AND rez.site_id NOT IN (11,21) ';
-        }
-        if( $type == "airport" ){            
-            $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 AND rez.site_id IN (11,21) ';
-        }        
 
         $bookings_day[date("Y-m-d")] = [
             "items" => [],
@@ -86,14 +107,31 @@ class DashboardRepository
             "MXN" => 0,
         ];
 
-        // Recorre desde el primer día hasta el último día del mes
-        for ($fecha = date("Y-m-d", strtotime("first day of this month")); $fecha <= date("Y-m-d", strtotime("last day of this month")); $fecha = date("Y-m-d", strtotime($fecha . " +1 day"))) {
-            $bookings_month[$fecha] = [
-                "items" => [],
-                "counter" => 0,
-                "USD" => 0,
-                "MXN" => 0,
-            ];
+        if(isset( $request->date ) && !empty( $request->date )){
+            $tmp_date = explode(" - ", $request->date);
+            $data['init'] = $tmp_date[0];
+            $data['end'] = $tmp_date[1];
+            $queryDataMonth['init'] = $tmp_date[0].' 00:00:00';
+            $queryDataMonth['end'] = $tmp_date[1].' 23:59:59';
+            // Recorre desde el primer día hasta el último día del mes
+            for ($fecha = date("Y-m-d", strtotime($tmp_date[0])); $fecha <= date("Y-m-d", strtotime($tmp_date[1])); $fecha = date("Y-m-d", strtotime($fecha . " +1 day"))) {
+                $bookings_month[$fecha] = [
+                    "items" => [],
+                    "counter" => 0,
+                    "USD" => 0,
+                    "MXN" => 0,
+                ];
+            }
+        }else{
+            // Recorre desde el primer día hasta el último día del mes
+            for ($fecha = date("Y-m-d", strtotime("first day of this month")); $fecha <= date("Y-m-d", strtotime("last day of this month")); $fecha = date("Y-m-d", strtotime($fecha . " +1 day"))) {
+                $bookings_month[$fecha] = [
+                    "items" => [],
+                    "counter" => 0,
+                    "USD" => 0,
+                    "MXN" => 0,
+                ];
+            }            
         }
 
         $bookings_data_day = $this->dataBooking($query, $queryDataDay);
@@ -128,15 +166,55 @@ class DashboardRepository
                         $bookings_month[ $date_ ]['MXN'] += $value->total_sales;
                     endif;                   
                 }
+
+                //ALIMENTAMOS LAS VENTAS DEL MES POR SITIO
+                if(!isset( $bookings_sites_month['data'][Str::slug($value->site_name)] )):
+                    $bookings_sites_month['data'][Str::slug($value->site_name)] = [
+                        'name' => '',
+                        'USD' => 0,
+                        'MXN' => 0,                        
+                        'counter' => 0                        
+                    ];
+                endif;
+                $bookings_sites_month[$value->currency] += $value->total_sales;
+                $bookings_sites_month['counter']++;
+                $bookings_sites_month['data'][Str::slug($value->site_name)]['name'] = $value->site_name;
+                $bookings_sites_month['data'][Str::slug($value->site_name)][$value->currency] += $value->total_sales;
+                $bookings_sites_month['data'][Str::slug($value->site_name)]['counter']++;
+
+                //ALIMENTAMOS LAS VENTAS DEL MES POR DESTINO
+                if(!isset( $bookings_destinations_month['data'][Str::slug($value->destination_name)] )):
+                    $faker = Faker::create();
+                    $cadenaAleatoria = $faker->regexify('[A-F0-9]{6}');
+                    $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))] = [
+                        'name' => '',
+                        'USD' => 0,
+                        'MXN' => 0,
+                        'counter' => 0,
+                        'color' => '#' . $cadenaAleatoria
+                    ];
+                endif;
+                $bookings_destinations_month[$value->currency] += $value->total_sales;
+                $bookings_destinations_month['counter']++;
+                $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))]['name'] = ($value->destination_name != "" ? $value->destination_name : "Indefinido");
+                $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))][$value->currency] += $value->total_sales;
+                $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))]['counter']++;
+                
             endforeach;
         }
         
-        return view('dashboard.sales', ['bookings_day' => $bookings_day, 'bookings_month' => $bookings_month]);
+        return view('dashboard.sales', [
+            'bookings_day' => $bookings_day, 
+            'bookings_month' => $bookings_month, 
+            'bookings_sites_month' => $bookings_sites_month, 
+            'bookings_destinations_month' => $bookings_destinations_month, 
+            'data' => $data
+        ]);
     }
 
     public function dataBooking($query, $queryData){
         return DB::select("SELECT 
-                            rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, 
+                            rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, rez.is_duplicated, rez.affiliate_id, 
                             rez.pay_at_arrival,
                             COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                             CASE
@@ -188,5 +266,5 @@ class DashboardRepository
                         WHERE 1=1 {$query}
                         GROUP BY rez.id, site.name",
                             $queryData);
-    }
+    }   
 }

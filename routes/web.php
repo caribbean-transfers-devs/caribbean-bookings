@@ -40,6 +40,11 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
     Route::get('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('dashboard.sales');
+    Route::post('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('reservations.sales.search');
+
+    // Route::post('/dashboard/sales/general', [DashboardController::class, 'sales'])->name('reservations.sales.search');
+    // Route::post('/dashboard/sales/online', [DashboardController::class, 'sales'])->name('reservations.sales.search');
+    // Route::post('/dashboard/sales/airport', [DashboardController::class, 'sales'])->name('reservations.sales.search');
 
     Route::resource('/users', UserController::class);
     Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');

@@ -46,7 +46,7 @@ class ReservationsRepository
             
             $queryData['init'] = $data['init'].' 00:00:00';
             $queryData['end'] = $data['end'].' 23:59:59';
-        }        
+        }
         if(isset( $request->product_type ) && !empty( $request->product_type )){
             $data['product_type'] = $request->product_type;
 
@@ -197,7 +197,7 @@ class ReservationsRepository
             $items = ReservationsItem::select('reservation_id')->whereIn('id', $services)->pluck('reservation_id');
             $reservations = Reservation::whereIn('id',$items)->with('destination', 'items')->get();
             return view('reservations.index', compact('reservations','from','to'));
-        } */     
+        } */
     }
 
     public function update($request,$reservation){
