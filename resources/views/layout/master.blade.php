@@ -72,7 +72,7 @@
                                 @endif
 
                                 @if(RoleTrait::hasPermission(62))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['online']) }}">Ventas en linea</a></li>
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['online']) }}">Ventas en Linea</a></li>
                                 @endif
                                 
                                 @if(RoleTrait::hasPermission(63))
