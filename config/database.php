@@ -93,6 +93,46 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        // conexión a la base de datos de origen
+        'origen' => [
+            'driver' => 'mysql',
+            'host' => env('ORIGEN_DB_HOST', '127.0.0.1'),
+            'port' => env('ORIGEN_DB_PORT', '3306'),
+            'database' => env('ORIGEN_DB_DATABASE', 'forge'),
+            'username' => env('ORIGEN_DB_USERNAME', 'forge'),
+            'password' => env('ORIGEN_DB_PASSWORD', ''),
+            'unix_socket' => env('ORIGEN_DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        // conexión a la base de datos de destino
+        'destino' => [
+            'driver' => 'mysql',
+            'host' => env('DESTINO_DB_HOST', '127.0.0.1'),
+            'port' => env('DESTINO_DB_PORT', '3306'),
+            'database' => env('DESTINO_DB_DATABASE', 'forge'),
+            'username' => env('DESTINO_DB_USERNAME', 'forge'),
+            'password' => env('DESTINO_DB_PASSWORD', ''),
+            'unix_socket' => env('DESTINO_DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            // 'options' => extension_loaded('pdo_mysql') ? array_filter([
+            //     PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            // ]) : [],            
+        ],
+
     ],
 
     /*
