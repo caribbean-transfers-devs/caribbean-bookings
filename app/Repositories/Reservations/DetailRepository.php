@@ -22,7 +22,7 @@ class DetailRepository
     
     public function detail($request,$id)
     {
-        $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site')->find($id);
+        $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site', 'cancellationType')->find($id);
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
         $sellers = User::whereIn('id', $users_ids)->get();
         
