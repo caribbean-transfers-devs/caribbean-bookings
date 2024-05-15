@@ -30,7 +30,7 @@ class ReservationsRepository
         ];
         
         //Query DB
-        $query = ' AND rez.created_at BETWEEN :init AND :end';
+        $query = ' AND rez.site_id NOT IN(21) AND rez.created_at BETWEEN :init AND :end';
         $queryData = [
             'init' => date("Y-m-d") . " 00:00:00",
             'end' => date("Y-m-d") . " 23:59:59",
@@ -209,6 +209,7 @@ class ReservationsRepository
             $reservation->client_phone = $request->client_phone;
             $reservation->site_id = $request->site_id;
             $reservation->reference = $request->reference;
+            $reservation->currency = $request->currency;
             $reservation->save();
             $check = $this->create_followUps($reservation->id, 'Se editaron datos de la reserva por '.auth()->user()->name, 'HISTORY', 'EDICIÓN');
             DB::commit();

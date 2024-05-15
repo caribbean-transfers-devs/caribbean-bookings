@@ -1,0 +1,57 @@
+.button-list{
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+div.controls{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+.services-container{
+    padding: 15px;
+    background-color: #dde9fa;
+    margin-top: 15px;
+    border-radius: 8px;
+    > div.items-container{
+        padding: 15px;
+        background-color: white;
+        border-radius: 5px;
+        > div.items{
+            margin-bottom: 15px;
+            border-bottom: 1px solid #dde9fa;
+            &:last-child{
+                margin-bottom: 0px;
+                border-bottom: 0px;
+            }
+            > div.information_data{
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-column-gap: 5px;
+                grid-row-gap: 5px;
+                margin-bottom: 8px;
+                > p{
+                    margin: 0px;
+                    > strong{
+                        color: #000;
+                    }
+                }
+            }
+            > div.flight_data{
+                margin-top: 8px;
+            }
+        }
+    }
+}
+
+div#serviceMapModal{
+    div#services_map{
+        height: 350px;
+    }
+}
+
+.pac-container{
+    z-index: 9999;
+}

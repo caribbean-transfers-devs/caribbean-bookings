@@ -1,6 +1,3 @@
-
-let types_cancellations = {};
-
 $(function() {
     $('#serviceSalesModal').on('hidden.bs.modal', function () {
         $("#frm_new_sale")[0].reset();
@@ -16,45 +13,6 @@ $(function() {
         $("#btn_new_payment").prop('disabled', false);
     });
 });
-
-function typesCancellations(){
-    const __types_cancellations = document.getElementById('types_cancellations');
-    if( __types_cancellations != null ){
-        let options = JSON.parse(__types_cancellations.value);
-        options.forEach(option => {
-            types_cancellations[option.id] = option.name_es;
-        });
-    }
-}
-typesCancellations();
-
-function initMap() {
-    var from_lat = parseFloat($('#from_lat').val());
-    var from_lng = parseFloat($('#from_lng').val());
-    var to_lat = parseFloat($('#to_lat').val());
-    var to_lng = parseFloat($('#to_lng').val());
-
-    var location1 = { lat: from_lat, lng: from_lng };
-    var location2 = { lat: to_lat, lng: to_lng };
-
-    // Create a map centered at one of the locations
-    var map = new google.maps.Map(document.getElementById('services_map'), {
-        center: location1, 
-        zoom: 10 
-    });
-
-    var marker1 = new google.maps.Marker({
-        position: location1,
-        map: map,
-        title: 'Origen'
-    });
-
-    var marker2 = new google.maps.Marker({
-        position: location2,
-        map: map,
-        title: 'Destino'
-    });
-}
 
 function sendMail(code,mail,languague){
     var url = "https://api.caribbean-transfers.com/api/v1/reservation/send?code="+code+"&email="+mail+"&language="+languague+"&type=new";
@@ -133,25 +91,20 @@ function cancelReservation(id){
         headers: {
             'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
         }
-    });
+    }); 
     swal.fire({
         title: '¿Está seguro de cancelar la reservación?',
         text: "Esta acción no se puede revertir",
-        inputLabel: "Selecciona el motivo de cancelación",
-        input: "select",
-        inputOptions: types_cancellations,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
-        console.log(result, id);
-        if (result.isConfirmed) {
+        if (result.value) {
             var url = "/reservations/"+id;
             $.ajax({
                 url: url,
                 type: 'DELETE',
-                data: { type: result.value },
                 dataType: 'json',
                 success: function (data) {
                     swal.fire({
@@ -167,49 +120,6 @@ function cancelReservation(id){
                     swal.fire({
                         title: 'Error',
                         text: 'Ha ocurrido un error al cancelar la reservación',
-                        icon: 'error',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            });
-        }
-    });
-}
-
-function duplicatedReservation(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
-    swal.fire({
-        title: '¿Está seguro de marcar como duplicado la reservación?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        console.log(result, id);
-        if (result.isConfirmed) {
-            var url = "/reservationsDuplicated/"+id;
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                dataType: 'json',
-                success: function (data) {
-                    swal.fire({
-                        title: 'Reservación duplicada',
-                        text: 'Se ha marcado como duplicado la reservación correctamente',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        location.reload();
-                    });
-                },
-                error: function (data) {
-                    swal.fire({
-                        title: 'Error',
-                        text: 'Ha ocurrido un error al marcar la reservación',
                         icon: 'error',
                         confirmButtonText: 'Aceptar'
                     });
@@ -449,8 +359,6 @@ function serviceInfo(origin,destination,time,km){
 
 function itemInfo(item){
     console.log(item);
-    $("#from_zone_id").val(item.from_zone);
-    $("#to_zone_id").val(item.to_zone);
 
     $("#item_id_edit").val(item.reservations_item_id);
     $("#servicePaxForm").val(item.passengers);
@@ -668,35 +576,6 @@ $("#btn_edit_item").on('click', function(){
     });
 });
 
-function initialize(div) {
-    var input = document.getElementById(div);
-    var autocomplete = new google.maps.places.Autocomplete(input);
-  
-    autocomplete.addListener('place_changed', function() {
-        var place = autocomplete.getPlace();
-        if(div == "serviceFromForm"){        
-          var fromLat = document.getElementById("from_lat_edit");
-              fromLat.value = place.geometry.location.lat();
-  
-          var fromLng = document.getElementById("from_lng_edit");
-              fromLng.value = place.geometry.location.lng();
-        }
-        if(div == "serviceToForm"){
-          var toLat = document.getElementById("to_lat_edit");
-              toLat.value = place.geometry.location.lat();
-  
-          var toLng = document.getElementById("to_lng_edit");
-              toLng.value = place.geometry.location.lng();
-        }
-    });
-}
-
-$(function() {
-    google.maps.event.addDomListener(window, 'load', initialize('serviceFromForm') );
-    google.maps.event.addDomListener(window, 'load', initialize('serviceToForm') );
-    initMap();
-});
-
 function getContactPoints(item_id, destination_id){
     $("#arrival_confirmation_item_id").val(item_id);
     $("#terminal_id").empty().html('<option value="0">Cargando...</option>');
@@ -827,3 +706,87 @@ function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', 
         )        
     });
 }
+
+$(function() {
+    flatpickr("#created_at", {    
+        mode: "single",
+        dateFormat: "Y-m-d H:i",
+        enableTime: true,
+    });
+});
+
+document.getElementById('modifyCreatedAt')?.addEventListener('click', () => {
+    const submitBtn = document.getElementById('modifyCreatedAt');
+    const $alert = $('#alert_created_at');
+    $alert.text('');
+    $alert.hide();
+
+    const created_at = $('#created_at').val();
+    if( !created_at ) {
+        $alert.show();
+        $alert.text('Agrega una fecha');
+        return;
+    }
+
+    const token = document.getElementsByName('_token')[0];
+
+    let frm_data = [
+        {name: 'created_at', value: created_at},
+        {name: 'id', value: reservation_id},
+        {name: '_token', value: token.value},
+    ];
+    let type_req = 'PUT';
+    let url_req = '/punto-de-venta/edit-created-at';
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Cargando...';
+
+    $.ajax({
+        url: url_req,
+        type: type_req,
+        data: frm_data,
+        success: function(resp) {
+            if ( typeof resp === 'object' && 'success' in resp && resp.success ) {
+                window.onbeforeunload = null;
+                let timerInterval
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    html: 'Datos guardados con éxito. Será redirigido en <b></b>',
+                    timer: 2500,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        const b = Swal.getHtmlContainer().querySelector('b')
+                        timerInterval = setInterval(() => {
+                            b.textContent = (Swal.getTimerLeft() / 1000)
+                                .toFixed(0)
+                        }, 100)
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    location.reload();
+                })
+            } else {
+                Swal.fire({
+                    title: 'Oops!',
+                    icon: 'error',
+                    html: 'Ocurrió un error inesperado',
+                    timer: 2500,
+                });
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Modificar';
+            }
+        }
+    }).fail(function(xhr, status, error) {
+        Swal.fire(
+            '¡ERROR!',
+            xhr.responseJSON.message,
+            'error'
+        );
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Modificar';
+    });
+})

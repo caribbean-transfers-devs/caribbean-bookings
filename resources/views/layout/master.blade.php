@@ -112,6 +112,25 @@
                         </li>
                     @endif
 
+                    @if(RoleTrait::hasPermission(51) || RoleTrait::hasPermission(52) || RoleTrait::hasPermission(54))
+                    <li class="sidebar-item">
+                        <a href="#pos" data-bs-toggle="collapse" class="sidebar-link collapsed">
+                            <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">Punto de venta</span>
+                        </a>
+                        <ul id="pos" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            @if(RoleTrait::hasPermission(51))
+                            <li class="sidebar-item"><a class="sidebar-link" href="{{ route('pos.index') }}">Ventas</a></li>
+                            @endif
+                            @if(RoleTrait::hasPermission(52))
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('pos.capture') }}">Capturar venta</a></li>
+                            @endif
+                            @if(RoleTrait::hasPermission(54))
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('pos.vendors') }}">Vendedores</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                    @endif
+
                     @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) )
                         <li class="sidebar-item">
                             <a href="#operation" data-bs-toggle="collapse" class="sidebar-link collapsed">

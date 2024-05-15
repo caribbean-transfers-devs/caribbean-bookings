@@ -73,6 +73,9 @@
                                         @endif
                                         @if ($data['status'] == "CANCELLED")
                                             <span class="badge bg-danger">CANCELLED</span>
+                                        @endif
+                                        @if ($data['status'] == "DUPLICATED")
+                                            <span class="badge bg-danger">DUPLICADO</span>
                                         @endif                                                                             
                                     </td>
                                 </tr>
@@ -385,6 +388,7 @@
                                         <th class="text-center">Total</th>
                                         <th class="text-center">Moneda</th>
                                         <th class="text-center">TC</th>
+                                        <th class="text-start">Ref.</th>
                                         <th class="text-center"></th>
                                     </tr>
                                 </thead>
@@ -396,6 +400,7 @@
                                             <td class="text-end">{{ number_format($payment->total) }}</td>
                                             <td class="text-center">{{ $payment->currency }}</td>
                                             <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
+                                            <td class="text-start">{{ $payment->reference }}</td>
                                             <td class="text-center">
                                                 @if (RoleTrait::hasPermission(15))
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})"><i class="align-middle" data-feather="edit-2"></i></a>

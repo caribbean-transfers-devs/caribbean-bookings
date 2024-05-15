@@ -26,8 +26,16 @@ mix.sass('resources/scss/reservations/detail.scss', data.assets + "css/reservati
 mix.sass('resources/scss/reservations/index.scss', data.assets + "css/reservations/index.min.css");
 mix.sass('resources/scss/users/index.scss', data.assets + "css/users/index.min.css");
 mix.sass('resources/scss/tpv/index.scss', data.assets + "css/tpv/index.min.css");
+mix.sass('resources/scss/pos/index.scss', data.assets + "css/pos/index.min.css");
+mix.sass('resources/scss/pos/detail.scss', data.assets + "css/pos/detail.min.css");
+mix.sass('resources/scss/pos/capture.scss', data.assets + "css/pos/capture.min.css");
+mix.sass('resources/scss/pos/vendors.scss', data.assets + "css/pos/vendors.min.css");
 mix.sass('resources/scss/zones/index.scss', data.assets + "css/zones/index.min.css");
 mix.copy('resources/js/views/tpv/index.js', data.assets + "js/views/tpv/index.min.js");
+mix.copy('resources/js/views/pos/index.js', data.assets + "js/views/pos/index.min.js");
+mix.copy('resources/js/views/pos/detail.js', data.assets + "js/views/pos/detail.min.js");
+mix.copy('resources/js/views/pos/capture.js', data.assets + "js/views/pos/capture.min.js");
+mix.copy('resources/js/views/pos/vendors.js', data.assets + "js/views/pos/vendors.min.js");
 mix.copy('resources/js/views/zones/index.js', data.assets + "js/views/zones/index.min.js");
 mix.sass('resources/scss/rates/index.scss', data.assets + "css/rates/index.min.css");
 mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/admin.min.css");
