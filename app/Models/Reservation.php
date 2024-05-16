@@ -62,6 +62,11 @@ class Reservation extends Model
         return $this->belongsTo(Vendor::class);
     }
 
+    public function cancellationType()
+    {
+        return $this->belongsTo(CancellationTypes::class, 'cancellation_type_id', 'id');
+    }
+
     /*public function clip()
     {
         return $this->belongsTo(Clip::class);

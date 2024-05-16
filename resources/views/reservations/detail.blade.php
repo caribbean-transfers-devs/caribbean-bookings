@@ -1,5 +1,5 @@
 @php
-    use App\Traits\RoleTrait;
+    use App\Traits\RoleTrait;    
 @endphp
 
 @extends('layout.master')
@@ -91,6 +91,12 @@
                                     <th>Referencia</th>
                                     <td>{{ $reservation->reference }}</td>
                                 </tr>
+                                @if( isset( $reservation->cancellationType->name_es ) )
+                                    <tr>
+                                        <th>Motivo de cancelación</th>
+                                        <td>{{ $reservation->cancellationType->name_es }}</td>
+                                    </tr>
+                                @endif
                             </tbody>
                         </table>
                         @if (RoleTrait::hasPermission(25))
