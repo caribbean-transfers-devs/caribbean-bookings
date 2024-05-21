@@ -69,6 +69,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/reservations/confirmation/arrival', [ReservationsController::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
     Route::post('/reservations/confirmation/departure', [ReservationsController::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');
     Route::post('/reservations/payment-request', [ReservationsController::class, 'paymentRequest'])->name('reservations.paymentRequest');
+    Route::post('/reservations/upload', [ReservationsController::class, 'uploadMedia'])->name('reservations.upload');
+    Route::get('/reservations/upload/{id}', [ReservationsController::class, 'getMedia'])->name('reservations.upload.getmedia');
+    Route::delete('/reservations/upload/{id}', [ReservationsController::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
 
     Route::get('/operation', [OperationController::class, 'index'])->name('operation.index');
     Route::get('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment');

@@ -11,6 +11,7 @@ use App\Models\ReservationsItem;
 use App\Models\Role;
 use App\Repositories\Reservations\DetailRepository;
 use App\Repositories\Reservations\ReservationsRepository;
+use App\Repositories\Reservations\UploadRepository;
 use Illuminate\Http\Request;
 use App\Traits\RoleTrait;
 
@@ -88,5 +89,23 @@ class ReservationsController extends Controller
 
     public function paymentRequest(Request $request, ReservationsRepository $reservationRepository){
         return $reservationRepository->sendPaymentRequest($request);
+    }
+
+    public function uploadMedia(Request $request, UploadRepository $uploadRepository){
+        if(RoleTrait::hasPermission(64)){
+            return $uploadRepository->add($request);
+        }
+    }
+
+    public function deleteMedia(Request $request, UploadRepository $uploadRepository){
+        if(RoleTrait::hasPermission(66)){
+            return $uploadRepository->delete($request);
+        }
+    }
+
+    public function getMedia(Request $request, DetailRepository $detailRepository){
+        if(RoleTrait::hasPermission(65)){
+            return $detailRepository->getMedia($request);
+        }
     }
 }

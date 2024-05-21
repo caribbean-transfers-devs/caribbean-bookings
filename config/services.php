@@ -43,4 +43,9 @@ return [
         'key' => env('MAILJET_KEY'),
         'secret' => env('MAILJET_SECRET'),
     ],
+    'digital_ocean' => [
+        'key' => env('DO_SPACES_KEY'),
+        'secret' => env('DO_SPACES_SECRET'),
+        'bucket' => env('DO_SPACES_BUCKET'),
+    ],
 ];

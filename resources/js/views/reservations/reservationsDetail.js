@@ -827,3 +827,76 @@ function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', 
         )        
     });
 }
+
+function loadContent() {
+    $('#media-listing').load('/reservations/upload/' + rez_id, function(response, status, xhr) {
+        if (status == "error") {
+            $('#media-listing').html('Error al cargar el contenido');
+        }
+    });
+}
+
+loadContent();
+
+Dropzone.options.uploadForm = {    
+    maxFilesize: 5, // Tamaño máximo del archivo en MB
+    acceptedFiles: 'image/*,.pdf', // Solo permitir imágenes y archivos PDF
+    dictDefaultMessage: 'Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...',
+    addRemoveLinks: false,
+    autoProcessQueue: true,
+    uploadMultiple: false,
+    headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    init: function() {        
+        this.on("success", function(file, response) {
+            loadContent();
+        });
+        this.on("error", function(file, errorMessage) {
+            console.log('Error al subir el archivo:', errorMessage);
+        });
+    }
+};
+
+$( document ).delegate( ".deleteMedia", "click", function(e) {
+    e.preventDefault();
+    let id = $(this).data("id");
+
+
+    swal.fire({
+        title: '¿Está seguro de eliminar el documento?',
+        text: "Esta acción no se puede revertir",        
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+                }
+            });
+            $.ajax({
+                url: '/reservations/upload/'+id,
+                type: 'DELETE',
+                data: { id:id },
+                success: function(resp) {
+                    swal.fire({
+                        title: 'Documento eliminado',
+                        text: 'El documento ha sido eliminado con éxito',
+                        icon: 'success',
+                    });
+                    loadContent();
+                }
+            }).fail(function(xhr, status, error) {
+                Swal.fire(
+                    '¡ERROR!',
+                    xhr.responseJSON.message,
+                    'error'
+                )        
+            });
+        }
+    });    
+
+});

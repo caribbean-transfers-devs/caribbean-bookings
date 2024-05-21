@@ -15,6 +15,7 @@ use App\Traits\ApiTrait;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use App\Models\ReservationsMedia;
 
 class DetailRepository
 {
@@ -31,7 +32,8 @@ class DetailRepository
         $zones = Zones::where('destination_id', 1)->get();
         $sites = Site::get();
         $types_cancellations = ApiTrait::makeTypesCancellations();
-
+        $media = ReservationsMedia::orderBy('id', 'desc')->get();
+        
         //Sumamos las ventas y restamos pagos para saber si la reserva está confirmada o no..
         $data = [
             "status" => "PENDING",
@@ -63,6 +65,14 @@ class DetailRepository
         endif;
         // return $reservation;
 
-        return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data','sites','zones','types_cancellations'));
+        return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data','sites','zones','types_cancellations','media'));
+    }
+
+    public function getMedia($request){
+        $media = ReservationsMedia::where('reservation_id', $request->id)
+                          ->orderBy('id', 'desc')
+                          ->get();
+
+        return view('reservations.media', compact('media'));        
     }
 }

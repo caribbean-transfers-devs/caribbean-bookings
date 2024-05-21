@@ -7,11 +7,18 @@
 
 @push('up-stack')    
     <link href="{{ mix('/assets/css/reservations/detail.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/reservations/detail.min.css') }}" rel="stylesheet" > 
+    <link href="{{ mix('/assets/css/reservations/detail.min.css') }}" rel="stylesheet" >    
 @endpush
 
 @push('bootom-stack')
+    <script>
+        const rez_id = {{ $reservation->id }};
+    </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.gmaps.key') }}&libraries=places"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+
     <script src="{{ mix('assets/js/views/reservations/reservationsDetail.js') }}"></script>
     <script src="{{ mix('assets/js/datatables.js') }}"></script>
 @endpush
@@ -197,6 +204,13 @@
                                 <i class="align-middle" data-feather="credit-card"></i>
                             </a>
                         </li>
+                        @if (RoleTrait::hasPermission(65))
+                            <li class="nav-item">
+                                <a class="nav-link" href="#icon-tab-4" data-bs-toggle="tab" role="tab">
+                                    <i class="align-middle" data-feather="camera"></i>
+                                </a>
+                            </li>
+                        @endif
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="icon-tab-1" role="tabpanel">
@@ -420,6 +434,19 @@
                                 </tbody>
                             </table>
                         </div>
+                        @if (RoleTrait::hasPermission(65))
+                            <div class="tab-pane" id="icon-tab-4" role="tabpanel">                       
+                                @if (RoleTrait::hasPermission(64))
+                                    <form id="upload-form" class="dropzone" action="/reservations/upload">
+                                        @csrf
+                                        <input type="hidden" name="folder" value="{{ $reservation->id }}">
+                                    </form>
+                                @endif
+                                @if (RoleTrait::hasPermission(65))
+                                    <div class="image-listing" id="media-listing"></div>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
