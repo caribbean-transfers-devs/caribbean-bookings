@@ -67,7 +67,7 @@
 @section('content')
     <div class="container-fluid p-0">
         <h1 class="h3 mb-3 button_">
-            Gestión de operación
+            Reporte de pagos
             <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</a>        
         </h1>
         
@@ -79,7 +79,7 @@
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-1" role="tabpanel">
-                            <h4 class="tab-title">Listado de reservaciones a operar</h4>
+                            <h4 class="tab-title">Listado de pagos por reservacion</h4>
                             <table id="reservations_table" class="table table-striped table-sm">
                                 <thead>
                                     <tr>                                                        
@@ -163,7 +163,7 @@
                                                                     else:
                                                                         $total_ = $valueP->total*$valueP->exchange_rate;
                                                                     endif;
-                                                                    echo '['.$valueP->payment_method.': '.$total_.']';
+                                                                    echo '['.$valueP->payment_method.' | '.$total_.' | '.$valueP->reference.']';
                                                                 endforeach;
                                                             endif;                                                            
                                                         @endphp

@@ -9,6 +9,6 @@ use Illuminate\Support\Facades\Session;
 trait PaymentsTrait
 {
     public static function getPayments($id){
-        return DB::select("SELECT total, exchange_rate, payment_method, currency, operation FROM payments WHERE reservation_id = :id ", [ "id" => $id ]);        
+        return DB::select("SELECT total, exchange_rate, payment_method, currency, operation, reference FROM payments WHERE reservation_id = :id ", [ "id" => $id ]);        
     }
 }
