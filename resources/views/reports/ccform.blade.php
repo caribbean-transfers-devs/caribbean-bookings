@@ -32,24 +32,46 @@
                     zIndex: 10,
                     plugins: ['RangePlugin'],
                 });
-            Search();
+            searchOne();
+            searchTwo();
         });
 
-        function Search(){
-            $("#iframeContainer").empty();
+        function searchOne(){
+            $("#iframeOneContainer").empty();
             $("#btnSearch").text("Buscando....").attr("disabled", true);
 
             let date = $('#lookup_date').val();
-            $("#placeholder_dates").text(date);
+            $("#placeholder_dates_one").text(`${date} | LLEGADAS`);
 
             var iframe = document.createElement('iframe');
             iframe.id = 'pdfIframe';
             iframe.width = '100%';
             iframe.height = '700px';
             iframe.style.border = '1px solid #ddd';
-            iframe.src = '/reports/ccform/pdf?date='+date;
+            iframe.src = '/reports/ccform/pdf?type=arrival&date='+date;
         
-            document.getElementById('iframeContainer').appendChild(iframe);
+            document.getElementById('iframeOneContainer').appendChild(iframe);
+            
+            
+            $("#btnSearch").text("Buscar").attr("disabled", false);
+            $('#filterModal').modal('hide');
+        }
+
+        function searchTwo(){
+            $("#iframeTwoContainer").empty();
+            $("#btnSearch").text("Buscando....").attr("disabled", true);
+
+            let date = $('#lookup_date').val();
+            $("#placeholder_dates_two").text(`${date} | SALIDAS`);
+
+            var iframe = document.createElement('iframe');
+            iframe.id = 'pdfIframe';
+            iframe.width = '100%';
+            iframe.height = '700px';
+            iframe.style.border = '1px solid #ddd';
+            iframe.src = '/reports/ccform/pdf?type=departure&date='+date;
+        
+            document.getElementById('iframeTwoContainer').appendChild(iframe);
             
             
             $("#btnSearch").text("Buscar").attr("disabled", false);
@@ -71,11 +93,15 @@
 
                 <div class="tab">
                     <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab" id="placeholder_dates">{{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }}</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab" id="placeholder_dates_one">{{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }} | LLEGADAS</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#tab-2" data-bs-toggle="tab" role="tab" id="placeholder_dates_two">{{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }} | SALIDAS</a></li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-1" role="tabpanel">                                                                                
-                            <div id="iframeContainer"></div>
+                            <div id="iframeOneContainer"></div>
+                        </div>
+                        <div class="tab-pane" id="tab-2" role="tabpanel">                                                                                
+                            <div id="iframeTwoContainer"></div>
                         </div>
                     </div>
                 </div>
@@ -103,7 +129,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" onclick="Search()" id="btnSearch">Buscar</button>
+                <button type="button" class="btn btn-success" onclick="searchOne(),searchTwo()" id="btnSearch">Buscar</button>
             </div>
         </div>
     </div>
