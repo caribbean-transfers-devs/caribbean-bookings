@@ -26,12 +26,17 @@ class CCFormRepository
         $search = [
             "init_date" => date("Y-m-d")." 00:00:00",
             "end_date" => date("Y-m-d")." 23:59:59",
+            "type" => "arrival"
         ];
 
         if(isset( $request->date )):
             $new_date = explode(" - ", $request->date);
             $search['init_date'] = $new_date[0]." 00:00:00";
             $search['end_date'] = $new_date[1]." 23:59:59";
+        endif;
+
+        if(isset( $request->type )):
+            $search['type'] = $request->type;
         endif;
 
         $data = DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, '' as messages,
@@ -117,11 +122,25 @@ class CCFormRepository
         $ids = [];
         $payments_with_errors = [];
         $payments_with_success = [];
+                
+        if($search['type'] == "arrival"):
+            $filtered_data = array_filter($data, function($item) {
+                return !in_array($item->final_service_type, ['TRANSFER', 'DEPARTURE']);
+            });
+            $data = array_values($filtered_data);
+        endif;
+
+        if($search['type'] == "departure"):
+            $filtered_data = array_filter($data, function($item) {
+                return !in_array($item->final_service_type, ['ARRIVAL']);
+            });
+            $data = array_values($filtered_data);
+        endif;
 
         foreach($data as $key => $value):
             $value->payment_items = [];
             $ids[] = $value->reservation_id;
-        endforeach;        
+        endforeach;
         
         $ids = array_unique($ids);
         
