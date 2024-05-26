@@ -542,12 +542,13 @@
             </div>
         </div>
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
-            <div class="widget widget-wallet-one">
+            <div class="widget widget-wallet-one mb-2">
                 <div class="wallet-info text-center mb-3">
-                    <p class="wallet-title mb-3">Balance del día</p>
+                    <p class="wallet-title mb-3">Total de reservas del día</p>
                     <p class="total-amount mb-3">{{ $day_data['total'] }}</p>
                 </div>
-                <hr>
+            </div>
+            <div class="widget widget-wallet-one mb-2">
                 <ul class="list-group list-group-media">
                     <li class="list-group-item ">
                         <div class="media">
@@ -558,6 +559,10 @@
                             </div>
                         </div>
                     </li>
+                </ul>
+            </div>
+            <div class="widget widget-wallet-one mb-2s">
+                <ul class="list-group list-group-media">
                     <li class="list-group-item">
                         <div class="media">
                             <div class="media-body">
@@ -568,12 +573,12 @@
                         </div>
                     </li>
                 </ul>
-            </div>
+            </div>            
         </div>
     </div>
 
     <div class="row">
-        <div class="col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget widget-chart-one">
                 <div class="widget-heading">
                     <h5 class="">Resumen de ventas del més</h5>
@@ -584,7 +589,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-4 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget widget-chart-two">
                 <div class="widget-heading">
                     <h5 class="">Resumen de ventas del més por sitio</h5>
