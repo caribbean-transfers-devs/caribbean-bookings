@@ -142,7 +142,7 @@
                                                 <td>{{ $item->service_type_name }}</td>
                                                 <td>{{ ((empty($item->payment_type_name))? 'Efectivo' : str_replace(['CARD', 'CASH'], ['Tarjeta', 'Efectivo'], $item->payment_type_name) ) }}</td>
                                                 <td>{{ $item->passengers }}</td>
-                                                <td>{{ (( $item->is_round_trip == 21 ) ? 'Llegada':'Salida') }}</td>
+                                                <td>{{ (( $item->site_id == 21 ) ? 'Llegada':'Salida') }}</td>
                                                 <td>{{ getShift($item->created_at) }}</td>
                                                 <td>{{ substr($item->created_at, -8, 5) }}</td>
                                                 <td>{{ $item->comments }}</td>
