@@ -1,4 +1,5 @@
 @php
+    use App\Traits\Reports\PaymentsTrait;
     $resume = [
         'status' => [
             'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
@@ -154,7 +155,24 @@
                                                 <td class="text-end">{{ $item->total_sales }}</td>
                                                 <td class="text-center">{{ $item->currency }}</td>
                                                 <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td>
-                                                <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td>
+                                                <td class="text-center">
+                                                    @php
+                                                            $payments = PaymentsTrait::getPayments($item->id);
+                                                            if(sizeof( $payments ) >= 1):
+                                                                foreach($payments as $keyP => $valueP):
+                                                                    //dd();
+                                                                    $total_ = 0;
+
+                                                                    if($valueP->operation == "division"):
+                                                                        $total_ = $valueP->total/$valueP->exchange_rate;
+                                                                    else:
+                                                                        $total_ = $valueP->total*$valueP->exchange_rate;
+                                                                    endif;
+                                                                    echo '['.$valueP->payment_method.' | '.$total_.' | '.$valueP->reference.']';
+                                                                endforeach;
+                                                            endif;                                                            
+                                                    @endphp
+                                                </td>
                                                 <td class="text-center">{{ $item->destination_name }}</td>
                                             </tr>
                                         @endforeach
