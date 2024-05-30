@@ -1,0 +1,20 @@
+@import '../base/base';
+body.dark {
+    .nav{
+        &.nav-pills{                
+            li {
+                &.nav-item {
+                    button {
+                        &.nav-link {
+                            border: 1px solid #bfc9d4;
+
+                            &.active {
+                                border: 1px solid #0e1726;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

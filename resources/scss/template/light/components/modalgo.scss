@@ -1,0 +1,53 @@
+@import '../base/base';
+.modal-backdrop {
+  background: linear-gradient(75deg, rgba(22, 28, 36, 0.48) 0%, rgb(22, 28, 36) 100%);
+
+  &.show {
+    opacity: .8;
+  }
+}
+
+.modal-content {
+  border: 0;
+
+  .modal-header {
+    background-color: #16161D;
+
+    h5 {
+      color: white;
+    }
+
+    svg {
+      color: white;
+    }
+
+    .btn-close {
+      svg {
+        color: white;
+      }
+    }
+  }
+
+  .modal-footer {
+    background-color: #16161D;
+    display: flex;
+    gap: 8px;
+
+    button.btn {
+      margin: 0;
+    }
+
+    .btn {
+      color: white;
+      &.red{
+        border: 1px solid #D01317;
+        background-color: #D01317;
+      }
+
+      &.black{
+        border: 1px solid white;
+        background-color: transparent;        
+      }      
+    }
+  }
+}

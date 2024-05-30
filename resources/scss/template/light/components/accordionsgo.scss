@@ -1,0 +1,44 @@
+@import '../base/base';
+
+
+/*
+    Basic
+*/
+
+.accordion {
+  .card-header {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    background-color: #16161D;
+    color: white;
+
+    section > div {
+      &.collapsed {
+        color: white;
+      }
+
+      &:not(.collapsed) {
+        color: white;
+        border-bottom: 1px solid white;
+      }
+
+      // .icons {
+      //   position: absolute;
+      //   right: 0;
+      //   top: 0;
+      //   bottom: 0;
+      //   padding: 9px;
+
+      //   svg {
+      //     width: 18px;
+      //     transition: .5s;
+      //     transform: rotate(0);
+      //   }
+      // }
+
+      // &[aria-expanded="true"] .icons svg {
+      //   transform: rotate(180deg);
+      // }
+    }
+  }
+}

@@ -40,6 +40,13 @@ mix.copy('resources/js/views/zones/index.js', data.assets + "js/views/zones/inde
 mix.sass('resources/scss/rates/index.scss', data.assets + "css/rates/index.min.css");
 mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/admin.min.css");
 
+//core styles
+mix.sass('resources/scss/core.scss', data.assets + '/css/core/core.min.css');
+//dashboard styles
+mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css");
+//dashboard scripts
+mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/views/dashboard/index.js'], data.assets + "js/views/dashboard/index.min.js");
+
 mix.copy('resources/js/views/rates/index.js', data.assets + "js/views/rates/index.min.js");
 mix.copy('resources/js/views/operation/managment.js', data.assets + "js/views/operation/managment.min.js");
 mix.copy('resources/js/views/operation/confirmation.js', data.assets + "js/views/operation/confirmation.min.js");
