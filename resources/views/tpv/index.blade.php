@@ -61,7 +61,7 @@
                     <div class="passengers">
                         <label class="form-label" for="bookingPassengersForm">Pasajeros</label>
                         <select class="form-control mb-2" id="bookingPassengersForm" name="passengers">
-                            @for ($i = 1; $i < 35; $i++)
+                            @for ($i = 1; $i < 50; $i++)
                                 <option value="{{ $i }}">{{ $i }}</option>                             
                             @endfor                            
                         </select>
