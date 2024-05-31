@@ -207,6 +207,7 @@ class DashboardRepository
 
         if(sizeof( $bookings_data_day ) >= 1){
             foreach($bookings_data_day as $bookingsDay):
+                $bookingsDay->status = ( $bookingsDay->pay_at_arrival == 1 || $bookingsDay->status == "CONFIRMED"  ? "CONFIRMED" : $bookingsDay->status ) ;//MODIFICAMOS EL TEXTO DE LOS ESTATUS EN BASE AL IDIOMA
                 $date_ = date("Y-m-d", strtotime( $bookingsDay->created_at ));
 
                 $bookings_day[$bookingsDay->currency]["total"] += $bookingsDay->total_sales;
@@ -263,6 +264,7 @@ class DashboardRepository
 
         if(sizeof( $bookings_data_month ) >= 1){
             foreach($bookings_data_month as $value):
+                $value->status = ( $value->pay_at_arrival == 1 || $value->status == "CONFIRMED"  ? "CONFIRMED" : $value->status ) ;//MODIFICAMOS EL TEXTO DE LOS ESTATUS EN BASE AL IDIOMA
                 $date_ = date("Y-m-d", strtotime( $value->created_at ));
 
                 $bookings_month[$value->currency]["total"] += $value->total_sales;

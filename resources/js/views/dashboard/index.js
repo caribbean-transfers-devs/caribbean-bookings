@@ -468,7 +468,7 @@ window.addEventListener("load", function(){
             },
             colors: ['#D01317', '#16161D'],
             dataLabels: {
-                enabled: true
+                enabled: false
             },
             markers: {
                 discrete: [
@@ -581,7 +581,23 @@ window.addEventListener("load", function(){
                 },
                 x: {
                     show: false,
-                }
+                },
+                // custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                //     console.log( series, seriesIndex, dataPointIndex, w );
+                //     const usd = dashboard.seriesBookingsCurrencyMonth().series[0].data[dataPointIndex];
+                //     const mxn = dashboard.seriesBookingsCurrencyMonth().series[1].data[dataPointIndex];
+                //     console.log(usd, mxn);
+                //     // return `<div class="custom-tooltip">
+                //     //             <div class="apexcharts-tooltip-y-group">
+                //     //                 <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                //     //                 <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
+                //     //             </div>
+                //     //             <div class="apexcharts-tooltip-y-group">
+                //     //                 <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
+                //     //                 <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+                //     //             </div>
+                //     //         </div>`;
+                // }                
             },
             fill: {
                 type:"gradient",
