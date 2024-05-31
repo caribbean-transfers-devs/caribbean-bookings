@@ -6,7 +6,7 @@ window.addEventListener("load", function(){
         ParsedObject = getParseObject;
 
         const bookings_day = new PerfectScrollbar(document.querySelector('.bookings_day'));
-        // components.actionTable($('.table-rendering'));
+        dashboard.actionTable($('.table-rendering'));
 
         var Theme = 'dark';
 

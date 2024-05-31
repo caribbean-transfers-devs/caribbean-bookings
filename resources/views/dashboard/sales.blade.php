@@ -37,6 +37,45 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.5.5/perfect-scrollbar.min.js"></script>
     <script>
+        let language = "es";
+        const translations = {
+            en: {
+                "table.results": "Results",
+                "table.search": "Search",
+                "table.pagination": "Showing page",
+                "table.of": "of",
+                'affiliates.payment_method.paypal': "Enter the email address of your PayPal account",
+                'affiliates.payment_method.transfer': "Indicate your interbank code",
+                'affiliates.commission.amount': "Indicates the amount to commission",
+                'affiliates.commission.volume': "Indicates the volume to commission",
+                'shared.email': 'The payment link will be sent by email to the email account indicated below, you can edit it if you wish',
+                'shared.sms': 'The payment link will be sent by SMS to the telephone number indicated below, you can edit it if you wish',
+
+                'shared.affiliate.email': 'The register link will be sent by email to the email account indicated below, you can edit it if you wish',
+                'shared.affiliate.sms': 'The register link will be sent by SMS to the telephone number indicated below, you can edit it if you wish',
+
+                'loading.message': 'One moment, please...',
+                'tools.script.text': 'Cancun Airport Transportation'
+            },
+            es: {
+                "table.results": "Resultados",
+                "table.search": "Buscar",
+                "table.pagination": "Mostrando pagina",
+                "table.of": "de",
+                'affiliates.payment_method.paypal': "Indica el correo de su cuenta de PayPal",
+                'affiliates.payment_method.transfer': "Indique su clabe interbancaria",
+                'affiliates.commission.amount': "Indica el monto para comisionar",
+                'affiliates.commission.volume': "Indica el volumen para comisionar",
+                'shared.email': 'Se enviara por correo el link de pago, a la cuenta de correo indicada a continuación, pude editarlo si lo desea',
+                'shared.sms': 'Se enviara por sms el link de pago, al teléfono indicado a continuación, pude editarlo si lo desea',
+
+                'shared.affiliate.email': 'Se enviara por correo el link de registro, a la cuenta de correo indicada a continuación, pude editarlo si lo desea',
+                'shared.affiliate.sms': 'Se enviara por sms  el link de registro, al teléfono indicado a continuación, pude editarlo si lo desea',
+
+                'loading.message': 'Un momento por favor...',
+                'tools.script.text': 'Transporte al Aeropuerto de Cancún'
+            }
+        };        
         let dashboard = {
             dataDay: @json(( isset($bookings_day) ? $bookings_day : [] )),
             dataSitesDay: @json($bookings_sites_day),
@@ -65,6 +104,39 @@
                 }
                 return s.join(dec);
             },
+            getTranslation: function(item){
+                return (translations[language][item]) ? translations[language][item] : 'Translate not found';
+            },            
+            actionTable: function(table){
+                let buttons = [];
+                const _settings = {},
+                    _buttons = table.data('button');
+
+                if( _buttons != undefined && _buttons.length > 0 ){
+                    _buttons.forEach(_btn => {
+                        buttons.push(_btn);
+                    });
+                }
+
+                _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-6 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-6 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
+                                <'table-responsive'tr>
+                                <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>`;                        
+                _settings.deferRender = true;
+                _settings.responsive = true;
+                _settings.buttons = buttons;        
+                _settings.order = [[ 0, "DESC" ]];
+                _settings.lengthMenu = [10, 20, 50];
+                _settings.pageLength = 10;                
+                _settings.oLanguage = {
+                    "oPaginate": { "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>', "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' },
+                    "sInfo": this.getTranslation("table.pagination") + " _PAGE_ " + this.getTranslation("table.of") + " _PAGES_",
+                    "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
+                    "sSearchPlaceholder": this.getTranslation("table.search") + "...",
+                    "sLengthMenu": this.getTranslation("table.results") + " :  _MENU_",
+                };
+
+                table.DataTable( _settings );
+            },            
             seriesStatusDay: function() {
                 let object = {
                     USD: 0,
@@ -562,5 +634,7 @@
         </div>
     </div>
 
+    <x-modals.reservations.bookings_day :bookings="$bookings_day" />
+    <x-modals.reservations.bookings_month :bookings="$bookings_month" />
     <x-modals.reservations.reports :data="$data" />
 @endsection

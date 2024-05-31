@@ -1,9 +1,9 @@
 @import "../../plugins/apex/apexcharts";
-// @import "../../plugins/src/table/datatable/datatables";
-// @import "../template/plugins/light/table/datatable/dt-global_style";
-// @import "../template/plugins/light/table/datatable/custom_dt_custom";
-// @import "../template/plugins/dark/table/datatable/dt-global_style";
-// @import "../template/plugins/dark/table/datatable/custom_dt_custom";
+@import "../../plugins/table/datatable/datatables";
+@import "../template/plugins/light/table/datatable/dt-global_style";
+@import "../template/plugins/light/table/datatable/custom_dt_custom";
+@import "../template/plugins/dark/table/datatable/dt-global_style";
+@import "../template/plugins/dark/table/datatable/custom_dt_custom";
 
 @import '../template/light/components/accordions';
 // @import '../template/light/components/accordionsgo';
