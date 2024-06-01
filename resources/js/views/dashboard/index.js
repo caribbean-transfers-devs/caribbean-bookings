@@ -468,7 +468,13 @@ window.addEventListener("load", function(){
             },
             colors: ['#D01317', '#16161D'],
             dataLabels: {
-                enabled: false
+                enabled: false,
+                // enabledOnSeries: undefined,
+                // formatter: function (val, opts) {
+                //     console.log(val);
+                //     console.log(opts);
+                //     // return val
+                // },
             },
             markers: {
                 discrete: [
