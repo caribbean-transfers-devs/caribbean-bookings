@@ -341,6 +341,7 @@
                 return seriesMonth;
             },
         }
+        // console.log(dashboard.seriesBookingsCurrencyMonth());
         $(function() {
             const picker = new easepick.create({
                 element: "#lookup_date",        
