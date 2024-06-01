@@ -68,7 +68,7 @@ window.addEventListener("load", function(){
                             show: true,
                             fontSize: '26px',
                             fontFamily: 'Nunito, sans-serif',
-                            color: ( ParsedObject.settings.layout.darkMode ? '#bfc9d4' : '#0e1726' ),
+                            color: '#0e1726',
                             offsetY: 16,
                             formatter: function (val) {
                                 return val
@@ -93,7 +93,7 @@ window.addEventListener("load", function(){
             stroke: {
                 show: true,
                 width: 15,
-                colors: ( ParsedObject.settings.layout.darkMode ? '#0e1726' : '#ffffff' )
+                colors: '#ffffff'
             },
             series: dashboard.seriesStatusDay().series,
             labels: dashboard.seriesStatusDay().labels,
@@ -170,7 +170,7 @@ window.addEventListener("load", function(){
                             show: true,
                             fontSize: '26px',
                             fontFamily: 'Nunito, sans-serif',
-                            color: ( ParsedObject.settings.layout.darkMode ? '#bfc9d4' : '#0e1726' ),
+                            color: '#0e1726',
                             offsetY: 16,
                             formatter: function (val) {
                                 return val
@@ -195,7 +195,7 @@ window.addEventListener("load", function(){
             stroke: {
                 show: true,
                 width: 15,
-                colors: ( ParsedObject.settings.layout.darkMode ? '#0e1726' : '#ffffff' )
+                colors: '#ffffff'
             },
             series: dashboard.seriesStatusMonth().series,
             labels: dashboard.seriesStatusMonth().labels,
@@ -280,7 +280,7 @@ window.addEventListener("load", function(){
                 floating: false,
                 style: {
                     fontSize: '18px',
-                    color: ( ParsedObject.settings.layout.darkMode ? '#e0e6ed' : '#0e1726' )
+                    color: '#0e1726'
                 }
             },
             title: {
@@ -292,7 +292,7 @@ window.addEventListener("load", function(){
                 floating: false,
                 style: {
                     fontSize: '18px',
-                    color: ( ParsedObject.settings.layout.darkMode ? '#e0e6ed' : '#0e1726' )
+                    color: '#0e1726'
                 },
             },
             stroke: {
@@ -301,15 +301,6 @@ window.addEventListener("load", function(){
                 width: 2,
                 lineCap: 'square'
             },
-            //     {
-            //         name: 'Expenses',
-            //         data: [16800, 16800, 15500, 14800, 15500, 17000, 21000, 16000, 15000, 17000, 14000, 17000]
-            //     },
-            //     {
-            //         name: 'Income',
-            //         data: [16500, 17500, 16200, 17300, 16000, 21500, 16000, 17000, 16000, 19000, 18000, 19000]
-            //     }
-            // ],
             series: dashboard.seriesBookingsMonth().series,
             //labels: dashboard.seriesBookingsMonth().labels,
             xaxis: {
@@ -409,13 +400,13 @@ window.addEventListener("load", function(){
                                     <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
                                 </div>
                                 <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
-                                </div>
-                                <div class="apexcharts-tooltip-y-group">
                                     <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
                                     <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
                                 </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
+                                </div>                                
                             </div>`;
                 }
             },
@@ -468,13 +459,10 @@ window.addEventListener("load", function(){
             },
             colors: ['#D01317', '#16161D'],
             dataLabels: {
-                enabled: false,
-                // enabledOnSeries: undefined,
-                // formatter: function (val, opts) {
-                //     console.log(val);
-                //     console.log(opts);
-                //     // return val
-                // },
+                enabled: true,
+                formatter: function (value, { seriesIndex, dataPointIndex, w }) {
+                    return dashboard.number_format(value,2,'.',',')
+                },
             },
             markers: {
                 discrete: [
@@ -588,22 +576,22 @@ window.addEventListener("load", function(){
                 x: {
                     show: false,
                 },
-                // custom: function({ series, seriesIndex, dataPointIndex, w }) {
-                //     console.log( series, seriesIndex, dataPointIndex, w );
-                //     const usd = dashboard.seriesBookingsCurrencyMonth().series[0].data[dataPointIndex];
-                //     const mxn = dashboard.seriesBookingsCurrencyMonth().series[1].data[dataPointIndex];
-                //     console.log(usd, mxn);
-                //     // return `<div class="custom-tooltip">
-                //     //             <div class="apexcharts-tooltip-y-group">
-                //     //                 <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
-                //     //                 <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
-                //     //             </div>
-                //     //             <div class="apexcharts-tooltip-y-group">
-                //     //                 <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
-                //     //                 <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
-                //     //             </div>
-                //     //         </div>`;
-                // }                
+                custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                    // console.log( series, seriesIndex, dataPointIndex, w );
+                    // // console.log( series[seriesIndex][dataPointIndex] );
+                    // console.log(w.config.series[0].name + ":  " + w.config.series[0].data[dataPointIndex]);
+                    // console.log(w.config.series[1].name + ":  " + w.config.series[0].data[dataPointIndex]);
+                    return `<div class="custom-tooltip">
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(series[0][dataPointIndex],2,'.',',') }</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(series[1][dataPointIndex],2,'.',',') }</span>
+                                </div>
+                            </div>`;
+                }                
             },
             fill: {
                 type:"gradient",
@@ -685,12 +673,12 @@ window.addEventListener("load", function(){
                                     <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
                                 </div>
                                 <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
-                                </div>
-                                <div class="apexcharts-tooltip-y-group">
                                     <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
                                     <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
                                 </div>
                             </div>`;
                 }                
@@ -757,12 +745,12 @@ window.addEventListener("load", function(){
                                     <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
                                 </div>
                                 <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
-                                </div>
-                                <div class="apexcharts-tooltip-y-group">
                                     <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
                                     <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+                                </div>                                
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
                                 </div>
                             </div>`;
                 }
@@ -830,12 +818,12 @@ window.addEventListener("load", function(){
                                     <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
                                 </div>
                                 <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
-                                </div>
-                                <div class="apexcharts-tooltip-y-group">
                                     <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
                                     <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
                                 </div>
                             </div>`;
                 }                
@@ -903,12 +891,12 @@ window.addEventListener("load", function(){
                                     <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
                                 </div>
                                 <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
-                                </div>
-                                <div class="apexcharts-tooltip-y-group">
                                     <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
                                     <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
                                 </div>
                             </div>`;
                 }                
@@ -916,7 +904,7 @@ window.addEventListener("load", function(){
             responsive: [{
                 breakpoint: 575,
             }]
-        }        
+        }
 
         /**
              ==============================
