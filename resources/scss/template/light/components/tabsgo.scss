@@ -1,0 +1,28 @@
+@import '../base/base';
+.nav {
+    &.nav-pills {
+        background: #16161D;
+        gap: 8px;
+
+        li {
+            &.nav-item {
+                button {
+                    &.nav-link {
+                        border: 1px solid white;
+                        color: white;
+                        background-color: transparent;
+
+                        svg {
+                            color: white;
+                        }
+
+                        &.active {
+                            border: 1px solid #D01317;
+                            background-color: #D01317;
+                        }
+                    }
+                }
+            }
+        }        
+    }
+}

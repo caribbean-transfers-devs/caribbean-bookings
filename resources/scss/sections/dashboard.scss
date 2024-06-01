@@ -1,0 +1,113 @@
+@import "../../plugins/apex/apexcharts";
+@import "../../plugins/table/datatable/datatables";
+@import "../template/plugins/light/table/datatable/dt-global_style";
+@import "../template/plugins/light/table/datatable/custom_dt_custom";
+@import "../template/plugins/dark/table/datatable/dt-global_style";
+@import "../template/plugins/dark/table/datatable/custom_dt_custom";
+
+@import '../template/light/components/accordions';
+// @import '../template/light/components/accordionsgo';
+@import '../template/dark/components/accordions';
+// @import '../template/dark/components/accordionsgo';
+@import '../template/light/components/tabs';
+// @import '../template/light/components/tabsgo';
+@import '../template/dark/components/tabs';
+// @import '../template/dark/components/tabsgo';
+@import '../template/light/components/modal';
+// @import '../template/light/components/modalgo';
+@import '../template/dark/components/modal';
+// @import '../template/dark/components/modalgo';
+
+@import '../template/light/users/account-setting';
+@import '../template/dark/users/account-setting';
+
+@import '../template/light/widgets/_widgets/reset-analytics';
+@import '../template/dark/widgets/_widgets/reset-analytics';
+@import '../template/light/widgets/_widgets/widget-six';
+@import '../template/dark/widgets/_widgets/widget-six';
+@import '../template/light/widgets/_widgets/reset-sales';
+@import '../template/dark/widgets/_widgets/reset-sales';
+@import '../template/light/widgets/_widgets/widget-activity-four';
+@import '../template/dark/widgets/_widgets/widget-activity-four';
+@import '../template/light/widgets/_widgets/widget-chart-two';
+@import '../template/dark/widgets/_widgets/widget-chart-two';
+
+.button_alignment{
+    align-self: end;
+
+    button{
+        width: 100%;
+    }
+}
+
+body{
+    .section{
+        border: 0;
+        box-shadow: none;
+    }
+
+    .general-info{
+        background: transparent;
+        border-radius: 0;
+
+        .info, .save-info {
+            padding: 0;
+        }
+    }
+    
+    .widget {
+        &.widget-six {        
+            .widget-heading {
+                h6 {
+                    margin-bottom: 0;
+                }
+
+                margin-bottom: 20px;
+            }
+        }
+    }
+
+    .widget-activity-four {
+        .timeline-line .item-timeline {
+            &:hover .t-text span.badge {
+                padding: 2px 30px;
+            }            
+        }
+    }
+
+    .modal-content {
+        .modal-body{
+            padding: 0;
+        }
+    }
+
+    &.dark{
+
+        .section{
+            border: 0;
+            box-shadow: none;
+        }
+    
+        .general-info{
+            background: transparent;
+            border-radius: 0;
+    
+            .info, .save-info {
+                padding: 0;
+            }
+        }
+
+        .widget {
+            &.widget-six {        
+                .widget-heading {
+                    h6 {
+                        margin-bottom: 0;
+                    }
+    
+                    margin-bottom: 20px;
+                }
+            }
+        }
+
+    }
+} 

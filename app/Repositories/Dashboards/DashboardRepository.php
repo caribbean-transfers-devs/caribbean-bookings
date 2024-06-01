@@ -59,20 +59,88 @@ class DashboardRepository
     
     public function sales($request, $type){
 
-        $bookings_day = [];//NOS AYUDA A SABER LAS ESTADISTICAS DE VENTAS DEL DIA
-        $bookings_month = [];//NOS AYUDA A SABER LAS ESTADISTICAS DE VENTAS DEL MES
+        $bookings_day = [
+            "USD" => [
+                "total" => 0,
+                "counter" => 0
+            ],
+            "MXN" => [
+                "total" => 0,
+                "counter" => 0
+            ],
+            "counter" => 0,
+            "bookings" => [],
+            "bookings_day" => [],
+            "status" => [
+                "confirmed" => [
+                    "title" => "Confirmed",
+                    "color" => "#00ab55",
+                    "USD" => 0,
+                    "MXN" => 0,
+                    "counter" => 0,
+                ],
+                "pending" => [
+                    "title" => "Pending",
+                    "color" => "#e2a03f",
+                    "USD" => 0,
+                    "MXN" => 0,
+                    "counter" => 0,
+                ],                    
+            ],            
+        ];//NOS AYUDA A SABER LAS ESTADISTICAS DE VENTAS DEL DIA
+        $bookings_month = [
+            "USD" => [
+                "total" => 0,
+                "counter" => 0
+            ],
+            "MXN" => [
+                "total" => 0,
+                "counter" => 0
+            ],
+            "counter" => 0,
+            "bookings" => [],
+            "bookings_day" => [],
+            "status" => [
+                "confirmed" => [
+                    "title" => "Confirmed",
+                    "color" => "#00ab55",
+                    "USD" => 0,
+                    "MXN" => 0,
+                    "counter" => 0,
+                ],
+                "pending" => [
+                    "title" => "Pending",
+                    "color" => "#e2a03f",
+                    "USD" => 0,
+                    "MXN" => 0,
+                    "counter" => 0,
+                ],
+            ],
+        ];//NOS AYUDA A SABER LAS ESTADISTICAS DE VENTAS DEL MES
+        $bookings_sites_day = [
+            "USD" => 0,
+            "MXN" => 0,
+            "counter" => 0,
+            "data" => [],
+        ];        
         $bookings_sites_month = [
             "USD" => 0,
             "MXN" => 0,
             "counter" => 0,
-            "data" => []
+            "data" => [],
         ];
 
+        $bookings_destinations_day = [
+            "USD" => 0,
+            "MXN" => 0,
+            "counter" => 0,
+            "data" => [],
+        ];        
         $bookings_destinations_month = [
             "USD" => 0,
             "MXN" => 0,
             "counter" => 0,
-            "data" => []
+            "data" => [],
         ];
 
         $data = [
@@ -100,11 +168,11 @@ class DashboardRepository
             "end" => date("Y-m-d", strtotime("last day of this month")) . " 23:59:59",
         ];
 
-        $bookings_day[date("Y-m-d")] = [
-            "items" => [],
-            "counter" => 0,
+        $bookings_day["bookings_day"][date("Y-m-d")] = [
             "USD" => 0,
             "MXN" => 0,
+            "counter" => 0,
+            "bookings" => [],
         ];
 
         if(isset( $request->date ) && !empty( $request->date )){
@@ -115,7 +183,7 @@ class DashboardRepository
             $queryDataMonth['end'] = $tmp_date[1].' 23:59:59';
             // Recorre desde el primer día hasta el último día del mes
             for ($fecha = date("Y-m-d", strtotime($tmp_date[0])); $fecha <= date("Y-m-d", strtotime($tmp_date[1])); $fecha = date("Y-m-d", strtotime($fecha . " +1 day"))) {
-                $bookings_month[$fecha] = [
+                $bookings_month["bookings_day"][$fecha] = [
                     "items" => [],
                     "counter" => 0,
                     "USD" => 0,
@@ -125,13 +193,13 @@ class DashboardRepository
         }else{
             // Recorre desde el primer día hasta el último día del mes
             for ($fecha = date("Y-m-d", strtotime("first day of this month")); $fecha <= date("Y-m-d", strtotime("last day of this month")); $fecha = date("Y-m-d", strtotime($fecha . " +1 day"))) {
-                $bookings_month[$fecha] = [
+                $bookings_month["bookings_day"][$fecha] = [
                     "items" => [],
                     "counter" => 0,
                     "USD" => 0,
                     "MXN" => 0,
                 ];
-            }            
+            }
         }
 
         $bookings_data_day = $this->dataBooking($query, $queryDataDay);
@@ -139,33 +207,81 @@ class DashboardRepository
 
         if(sizeof( $bookings_data_day ) >= 1){
             foreach($bookings_data_day as $bookingsDay):
+                $bookingsDay->status = ( $bookingsDay->pay_at_arrival == 1 || $bookingsDay->status == "CONFIRMED"  ? "CONFIRMED" : $bookingsDay->status ) ;//MODIFICAMOS EL TEXTO DE LOS ESTATUS EN BASE AL IDIOMA
                 $date_ = date("Y-m-d", strtotime( $bookingsDay->created_at ));
-                if( isset( $bookings_day[ $date_ ] ) ){
-                    $bookings_day[ $date_ ]['items'][] = $bookingsDay;
-                    $bookings_day[ $date_ ]['counter']++;
-                    if( $bookingsDay->currency == "USD" ):
-                        $bookings_day[ $date_ ]['USD'] += $bookingsDay->total_sales;
-                    endif;
-                    if( $bookingsDay->currency == "MXN" ):
-                        $bookings_day[ $date_ ]['MXN'] += $bookingsDay->total_sales;
-                    endif;                   
+
+                $bookings_day[$bookingsDay->currency]["total"] += $bookingsDay->total_sales;
+                $bookings_day[$bookingsDay->currency]["counter"]++;
+                $bookings_day['counter']++;
+                $bookings_day["bookings"][] = $bookingsDay;
+
+                if( isset( $bookings_day["bookings_day"][ $date_ ] ) ){
+                    $bookings_day["bookings_day"][ $date_ ]['bookings_day'][] = $bookingsDay;
+                    $bookings_day["bookings_day"][ $date_ ]['counter']++;
+                    $bookings_day["bookings_day"][ $date_ ][$bookingsDay->currency] += $bookingsDay->total_sales;
                 }
+
+                if( isset( $bookings_day["status"][ Str::slug($bookingsDay->status) ] ) ){  
+                    $bookings_day["status"][ Str::slug($bookingsDay->status) ][$bookingsDay->currency] += $bookingsDay->total_sales;
+                    $bookings_day["status"][ Str::slug($bookingsDay->status) ]['counter']++;
+                }
+
+                //ALIMENTAMOS LAS VENTAS DEL MES POR SITIO
+                if(!isset( $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)] )):
+                    $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)] = [
+                        'name' => '',
+                        'USD' => 0,
+                        'MXN' => 0,                        
+                        'counter' => 0                        
+                    ];
+                endif;
+                $bookings_sites_day[$bookingsDay->currency] += $bookingsDay->total_sales;
+                $bookings_sites_day['counter']++;
+                $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)]['name'] = $bookingsDay->site_name;
+                $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)][$bookingsDay->currency] += $bookingsDay->total_sales;
+                $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)]['counter']++;
+
+                //ALIMENTAMOS LAS VENTAS DEL MES POR DESTINO
+                if(!isset( $bookings_destinations_day['data'][Str::slug($bookingsDay->destination_name)] )):
+                    $faker = Faker::create();
+                    $cadenaAleatoria = $faker->regexify('[A-F0-9]{6}');
+                    $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))] = [
+                        'name' => '',
+                        'USD' => 0,
+                        'MXN' => 0,
+                        'counter' => 0,
+                        'color' => '#' . $cadenaAleatoria
+                    ];
+                endif;
+                $bookings_destinations_day[$bookingsDay->currency] += $bookingsDay->total_sales;
+                $bookings_destinations_day['counter']++;
+                $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))]['name'] = ($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido");
+                $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))][$bookingsDay->currency] += $bookingsDay->total_sales;
+                $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))]['counter']++;
+
             endforeach;
         }
 
         if(sizeof( $bookings_data_month ) >= 1){
             foreach($bookings_data_month as $value):
+                $value->status = ( $value->pay_at_arrival == 1 || $value->status == "CONFIRMED"  ? "CONFIRMED" : $value->status ) ;//MODIFICAMOS EL TEXTO DE LOS ESTATUS EN BASE AL IDIOMA
                 $date_ = date("Y-m-d", strtotime( $value->created_at ));
-                if( isset( $bookings_month[ $date_ ] ) ){
-                    $bookings_month[ $date_ ]['items'][] = $value;
-                    $bookings_month[ $date_ ]['counter']++;
-                    if( $value->currency == "USD" ):
-                        $bookings_month[ $date_ ]['USD'] += $value->total_sales;
-                    endif;
-                    if( $value->currency == "MXN" ):
-                        $bookings_month[ $date_ ]['MXN'] += $value->total_sales;
-                    endif;                   
+
+                $bookings_month[$value->currency]["total"] += $value->total_sales;
+                $bookings_month[$value->currency]["counter"]++;
+                $bookings_month['counter']++;
+                $bookings_month["bookings"][] = $value;
+
+                if( isset( $bookings_month["bookings_day"][ $date_ ] ) ){
+                    $bookings_month["bookings_day"][ $date_ ]['bookings_day'][] = $value;
+                    $bookings_month["bookings_day"][ $date_ ]['counter']++;
+                    $bookings_month["bookings_day"][ $date_ ][$value->currency] += $value->total_sales;
                 }
+
+                if( isset( $bookings_month["status"][ Str::slug($value->status) ] ) ){
+                    $bookings_month["status"][ Str::slug($value->status) ][$value->currency] += $value->total_sales;
+                    $bookings_month["status"][ Str::slug($value->status) ]['counter']++;
+                }                
 
                 //ALIMENTAMOS LAS VENTAS DEL MES POR SITIO
                 if(!isset( $bookings_sites_month['data'][Str::slug($value->site_name)] )):
@@ -205,9 +321,11 @@ class DashboardRepository
         
         return view('dashboard.sales', [
             'bookings_day' => $bookings_day, 
-            'bookings_month' => $bookings_month, 
-            'bookings_sites_month' => $bookings_sites_month, 
-            'bookings_destinations_month' => $bookings_destinations_month, 
+            'bookings_sites_day' => $bookings_sites_day,
+            'bookings_destinations_day' => $bookings_destinations_day,
+            'bookings_month' => $bookings_month,
+            'bookings_sites_month' => $bookings_sites_month,
+            'bookings_destinations_month' => $bookings_destinations_month,
             'data' => $data
         ]);
     }

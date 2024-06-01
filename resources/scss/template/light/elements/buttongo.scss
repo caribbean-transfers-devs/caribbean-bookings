@@ -1,0 +1,24 @@
+@import '../base/base';
+.btn-red{
+    border: 1px solid #D01317;
+    background-color: #D01317;
+    color: white;
+
+    &:hover{
+        border: 1px solid #D01317;
+        background-color: #D01317;
+        color: white;
+    }
+}
+
+.btn-black{
+    border: 1px solid #16161D;
+    background-color: #16161D;
+    color: white;
+
+    &:hover{
+        border: 1px solid #16161D;
+        background-color: #16161D;
+        color: white;
+    }
+}
