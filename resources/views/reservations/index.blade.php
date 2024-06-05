@@ -62,6 +62,7 @@
                                         <th>Moneda</th>
                                         <th>Pendiente</th>
                                         <th>Método</th>
+                                        <th>Origen</th>
                                         <th>Destino</th>
                                     </tr>
                                 </thead>
@@ -69,6 +70,7 @@
                                     @if(sizeof($bookings) >= 1)
                                         @foreach ($bookings as $item)
                                             @php
+                                                //dd($item);
                                                 if($item->is_cancelled == 0):
                                                     if($item->pay_at_arrival == 1):
                                                         $item->status = "CONFIRMED";
@@ -100,15 +102,15 @@
                                                             $affiliates[$item->site_name]['count']++;
                                                         endif;
 
-                                                        if(!isset( $destinations[$item->destination_name] )):
-                                                            $destinations[$item->destination_name] = [
+                                                        if(!isset( $destinations[$item->destination_name_to] )):
+                                                            $destinations[$item->destination_name_to] = [
                                                                 'USD' => 0,
                                                                 'MXN' => 0,
                                                                 'count' => 0
                                                             ];
                                                         endif;
-                                                        $destinations[$item->destination_name][$item->currency] += $item->total_sales;
-                                                        $destinations[$item->destination_name]['count']++;
+                                                        $destinations[$item->destination_name_to][$item->currency] += $item->total_sales;
+                                                        $destinations[$item->destination_name_to]['count']++;
                                                     endif;
 
                                                 else:
@@ -149,7 +151,8 @@
                                                 <td class="text-center">{{ $item->currency }}</td>
                                                 <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td>
                                                 <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td>
-                                                <td class="text-center">{{ $item->destination_name }}</td>
+                                                <td class="text-center">{{ $item->destination_name_from }}</td>
+                                                <td class="text-center">{{ $item->destination_name_to }}</td>
                                             </tr>
                                         @endforeach
                                     @endif
