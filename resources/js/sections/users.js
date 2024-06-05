@@ -1,10 +1,14 @@
-$(function() {
-    $('#active_users,#inactive_users,#tbl_whitelist').DataTable({
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
-        }
-    });
-});
+// $(function() {
+//     $('#active_users,#inactive_users,#tbl_whitelist').DataTable({
+//         language: {
+//             url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
+//         }
+//     });
+// });
+
+if( document.querySelector('.table-rendering') != null ){
+    components.actionTable($('.table-rendering'));
+}
 
 function ChangePass(id){
     $("#password").val('');

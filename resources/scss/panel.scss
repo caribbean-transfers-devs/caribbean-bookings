@@ -1,0 +1,13 @@
+@import "../plugins/waves/waves";
+@import "../plugins/highlight/styles/monokai-sublime";
+@import "../plugins/sweetalerts2/sweetalerts2.scss";
+
+@import "./template/light/loader";
+@import "./template/dark/loader";
+// @import "./template/light/loadergo";
+// @import "./template/dark/loadergo";
+
+@import "./template/light/elements/alert";
+@import "./template/dark/elements/alert";
+// @import "./template/light/elements/buttongo";
+// @import "./template/dark/elements/buttongo";

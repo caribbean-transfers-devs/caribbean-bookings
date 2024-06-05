@@ -14,15 +14,12 @@
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
                     </div>
-
                     <div class="row mb-3">
                         <div class="col-12">
                             <label for="confirm_pass" class="">Confirmar Contraseña</label>
-                            <input type="password" class="form-control" id="confirm_pass" name="confirm_pass"
-                                    required>
+                            <input type="password" class="form-control" id="confirm_pass" name="confirm_pass" required>
                         </div>
                     </div>
-
                     <input type="hidden" name="id" id="pass_id">
                 </form>
             </div>

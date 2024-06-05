@@ -18,6 +18,9 @@ use App\Http\Controllers\Reports\CommissionsController as ReportCommissions;
 use App\Http\Controllers\Reports\CashController as ReportCash;
 use App\Http\Controllers\Reports\CCFormController;
 use App\Http\Controllers\Pos\PosController;
+use App\Http\Controllers\Enterprise\EnterpriseController;
+use App\Http\Controllers\Vehicle\VehicleController;
+use App\Http\Controllers\Driver\DriverController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +45,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
     Route::get('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('dashboard.sales');
     Route::post('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('reservations.sales.search');
+
+    Route::resource('/enterprises', EnterpriseController::class);
+    Route::resource('/vehicles', VehicleController::class);
+    Route::resource('/drivers', DriverController::class);
+
 
     Route::resource('/users', UserController::class);
     Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');

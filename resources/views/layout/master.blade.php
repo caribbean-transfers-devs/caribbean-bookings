@@ -192,6 +192,10 @@
                                 @if(RoleTrait::hasPermission(6))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('roles.index') }}">Roles</a></li>
                                 @endif
+
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('enterprises.index') }}">Empresas</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('vehicles.index') }}">Vehiculos</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('drivers.index') }}">Conductores</a></li>
                             </ul>
                         </li>
                     @endif
@@ -257,7 +261,7 @@
                     </div>
                 </div>
             </footer>
-        </div>        
+        </div>
     </div>    
     
     <script src="{{ mix('/assets/js/base.min.js') }}"></script>
