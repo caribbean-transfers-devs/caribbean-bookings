@@ -25,10 +25,10 @@ class ReservationsItem extends Model
     }
 
     public function origin(){
-        return $this->belongsTo(Destination::class, 'from_zone', 'id');
+        return $this->belongsTo(Zones::class, 'from_zone', 'id');
     }
 
     public function destination(){
-        return $this->belongsTo(Destination::class, 'to_zone', 'id');
+        return $this->belongsTo(Zones::class, 'to_zone', 'id');
     }
 }

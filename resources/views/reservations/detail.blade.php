@@ -32,7 +32,7 @@
 
         <div class="row">
 
-            <div class="col-xl-4">
+            <div class="col-12 col-xl-3">
                 <div class="card">
                     <div class="card-header">
                         <div class="card-actions float-end">
@@ -113,21 +113,7 @@
                             @foreach ($reservation->followUps as $followUp)
                                 <li class="timeline-item">
                                     <strong>[{{ $followUp->type }}]</strong>
-                                    @php
-                                        $time = $followUp->created_at->diffInMinutes(now());
-                                        if($time > 90){
-                                            $time /= 60;
-                                            $time = number_format($time, 0, '.', '');
-                                            $time .= ' hours';
-                                        }else if($time > 1440){
-                                            $time /= 1440;
-                                            $time = number_format($time, 0, '.', '');
-                                            $time .= ' days';
-                                        }else{
-                                            $time .= ' minutes';
-                                        }
-                                    @endphp
-                                    <span class="float-end text-muted text-sm">{{ $time }} ago</span>
+                                    <span class="float-end text-muted text-sm">{{ date("Y/m/d H:i", strtotime($followUp->created_at)) }}</span>
                                     <p>{{ $followUp->text }}</p>
                                 </li>  
                             @endforeach
@@ -138,7 +124,7 @@
                 </div>
             </div>
 
-            <div class="col-xl-8">
+            <div class="col-12 col-xl-9">
                 <div class="controls">
                     @csrf
                     @if (RoleTrait::hasPermission(20))
@@ -176,14 +162,17 @@
                         </div>
                     @endif
                     @if (RoleTrait::hasPermission(23))
-                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
+                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
                     @endif
                     @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
                     <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
-                    <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
+                        <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
                     @endif
                     @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                    <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Marcar como duplicado</button>
+                        <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Marcar como duplicado</button>
+                    @endif
+                    @if (RoleTrait::hasPermission(67) && ($reservation->is_cancelled == 1 || $reservation->is_duplicated == 1) )
+                        <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> Activar</button>
                     @endif
                 </div>
 
@@ -214,140 +203,255 @@
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="icon-tab-1" role="tabpanel">
-                            <div class="d-flex">
-                                <h4 class="flex-grow-1 tab-title">Servicios</h4>
+                            <div class="d-flex">                                
                                 @if (RoleTrait::hasPermission(12)) 
                                 <!--<button class="btn btn-success float-end">
                                     <i class="align-middle" data-feather="plus"></i>
                                 </button>-->
                                 @endif
                             </div>                            
-                            @foreach ($reservation->items as $item)   
-                            @php
-                                // echo "<pre>";
-                                // print_r($item->from_zone);
-                                // die();
-                            @endphp            
-                            <div class="services-container">
-                                <h3>{{ $item->code }}</h3>
-                                <div class="items-container">
-                                    <div class="items">
-                                        <div class="information_data">
-                                            <p><strong>Tipo:</strong> {{ $item->destination_service->name }}</p>
-                                            <p><strong>Pasajeros:</strong> {{ $item->passengers }}</p>
-                                            <p><strong>Desde:</strong> {{ $item->from_name }}</p>
-                                            <p><strong>Hacia:</strong> {{ $item->to_name }}</p>
-                                            <p><strong>Pickup:</strong> {{ ((!empty($item->op_one_pickup))? date("Y-m-d H:i", strtotime($item->op_one_pickup)) : '¡CORREGIR!') }}</p>
-                                            <p>
-                                                @switch($item->op_one_status)
-                                                    @case('PENDING')
-                                                        <span class="badge bg-secondary">PENDING</span>
-                                                    @break
-                                                    @case('CONFIRMED')
-                                                        <span class="badge bg-success">CONFIRMED</span>
-                                                    @break
-                                                    @case('NOSHOW')
-                                                        <span class="badge bg-warning">NOSHOW</span>
-                                                    @break
-                                                    @case('CANCELLED')
-                                                        <span class="badge bg-danger">CANCELLED</span>
-                                                    @break                                                
-                                                    @default                                                        
-                                                @endswitch
-                                            </p>
-                                        </div>
-                                        <div class="actions mb-3">
-                                            @if (RoleTrait::hasPermission(13))
-                                            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" 
-                                            onclick="itemInfo({{ $item }})">
-                                                Editar
-                                            </button>  
-                                            @endif 
-                                            @php
-                                                //TRANSFORM NUMBER OF SECS INTO HOURS OR MINUTES
-                                                $time = $item->distance_time / 60;
-                                                if($time > 90){
-                                                    $time /= 60;
-                                                    $time = number_format($time, 0, '.', '');
-                                                    $time .= ' horas';
-                                                }else{
-                                                    $time .= ' minutos';
-                                                }
-                                            @endphp                                        
-                                            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="serviceInfo('{{ $item->from_name }}','{{ $item->to_name }}','{{ $time }}','{{ $item->distance_km }}')">
-                                                Ver mapa
-                                            </button>
-                                        </div>
-                                    </div>
-                                    @if ($item->is_round_trip)
-                                        <div class="flight_data">
-                                            <h4>Regreso</h4>
-                                        </div>
+                            @foreach ($reservation->items as $item)
+                                @php
+                                    //dd( $item->op_one_confirmation );
+                                @endphp
+                                <div class="services-container">
+                                    <h3>{{ $item->code }}</h3>
+                                    <div class="items-container">
                                         <div class="items">
                                             <div class="information_data">
-                                                <p><strong>Pickup:</strong> {{ ((!empty($item->op_two_pickup))? date("Y-m-d H:i", strtotime($item->op_two_pickup)) : '¡CORREGIR!') }}</p>
-                                                <p>
-                                                    @switch($item->op_two_status)
-                                                        @case('PENDING')
-                                                            <span class="badge bg-secondary">PENDING</span>
-                                                        @break
-                                                        @case('CONFIRMED')
-                                                            <span class="badge bg-success">CONFIRMED</span>
-                                                        @break
-                                                        @case('NOSHOW')
-                                                            <span class="badge bg-warning">NOSHOW</span>
-                                                        @break
-                                                        @case('CANCELLED')
-                                                            <span class="badge bg-danger">CANCELLED</span>
-                                                        @break                                                
-                                                        @default
-                                                            
-                                                    @endswitch
-                                                </p>
+                                                <p><strong>Tipo:</strong> {{ (( $item->is_round_trip == 1 )? 'Round Trip':'One Way') }}</p>
+                                                <p><strong>Vehículo:</strong> {{ $item->destination_service->name }}</p>
+                                                <p><strong>Pasajeros:</strong> {{ $item->passengers }}</p>
+                                                <p><strong># de Vuelo:</strong> {{ $item->flught_number ?? 'N/A' }}</p>
                                             </div>
-                                            
-                                        </div>           
-                                    @endif
+                                            <div class="actions mb-3">
+                                                @if (RoleTrait::hasPermission(13))
+                                                    <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" onclick="itemInfo({{ $item }})">Editar</button>
+                                                @endif
+                                                <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
+                                                    Confirmacion de llegada
+                                                </button>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        Confirmacion de salida
+                                                    </button>
+                                                    <div class="dropdown-menu" style="">
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'departure')">Enviar en inglés</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'departure')">Enviar en español</a>
+                                                    </div>
+                                                </div>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        Transfer recogida
+                                                    </button>
+                                                    <div class="dropdown-menu" style="">
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-pickup')">Enviar en inglés</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-pickup')">Enviar en español</a>
+                                                    </div>
+                                                </div>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        Transfer regreso
+                                                    </button>
+                                                    <div class="dropdown-menu" style="">
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-return')">Enviar en inglés</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-return')">Enviar en español</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="item-data">
+                                            <table class="table table-striped table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <td>Desde</td>
+                                                        <td>Hacia</td>
+                                                        <td>Pickup</td>
+                                                        <td>Operación</td>
+                                                        <td></td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <p><strong>Zona</strong>: {{ $item->origin->name }}</p>
+                                                            <p><strong>Lugar</strong>: {{ $item->from_name }}</p>
+                                                        </td>
+                                                        <td>
+                                                            <p><strong>Zona</strong>: {{ $item->destination->name }}</p>
+                                                            <p><strong>Lugar</strong>: {{ $item->to_name }}</p>
+                                                        </td>
+                                                        <td>{{ date("Y/m/d H:i", strtotime( $item->op_one_pickup )) }}</td>
+                                                        <td>
+                                                            @if(false)
+                                                                @switch($item->op_one_status)
+                                                                    @case('PENDING')
+                                                                        <span class="badge bg-secondary">PENDING</span>
+                                                                    @break
+                                                                    @case('CONFIRMED')
+                                                                        <span class="badge bg-success">CONFIRMED</span>
+                                                                    @break
+                                                                    @case('NOSHOW')
+                                                                        <span class="badge bg-warning">NOSHOW</span>
+                                                                    @break
+                                                                    @case('CANCELLED')
+                                                                        <span class="badge bg-danger">CANCELLED</span>
+                                                                    @break
+                                                                    @default
+                                                                @endswitch
+                                                            @endif
+                                                            <div class="btn-group btn-group-sm">
+                                                                @if (RoleTrait::hasPermission(68))
+                                                                    @php
+                                                                        $btn_op_one_type = 'btn-secondary';
+                                                                        switch ($item->op_one_status) {
+                                                                            case 'PENDING':
+                                                                                $btn_op_one_type = 'btn-secondary';
+                                                                                break;
+                                                                            case 'COMPLETED':
+                                                                                $btn_op_one_type = 'bg-success';
+                                                                                break;
+                                                                            case 'NOSHOW':
+                                                                                $btn_op_one_type = 'bg-warning';
+                                                                                break;
+                                                                            case 'CANCELLED':
+                                                                                $btn_op_one_type = 'bg-danger';
+                                                                                break;
+                                                                        }
+                                                                    @endphp
+                                                                    <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_one_status }}</button>
+                                                                    <div class="dropdown-menu" style="">
+                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
+                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event,  'arrival', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
+                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
+                                                                        <hr>
+                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
+                                                                    </div>    
+                                                                @else
+                                                                    @switch($item->op_one_status)
+                                                                        @case('PENDING')
+                                                                            <span class="badge bg-secondary">PENDING</span>
+                                                                        @break
+                                                                        @case('CONFIRMED')
+                                                                            <span class="badge bg-success">CONFIRMED</span>
+                                                                        @break
+                                                                        @case('NOSHOW')
+                                                                            <span class="badge bg-warning">NOSHOW</span>
+                                                                        @break
+                                                                        @case('CANCELLED')
+                                                                            <span class="badge bg-danger">CANCELLED</span>
+                                                                        @break
+                                                                        @default
+                                                                    @endswitch
+                                                                @endif
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            @if(false)
+                                                                <button class="btn btn-success" type="button"><i class="align-middle" data-feather="message-square"></i></button>
+                                                            @endif
+                                                            @if (RoleTrait::hasPermission(69))
+                                                                <button class="btn {{ (($item->op_one_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'arrival', {{ (($item->op_one_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})"><i class="align-middle" data-feather="check-circle"></i></button>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
 
-                                    <div>
-                                        <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
-                                            Confirmacion de llegada
-                                        </button>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Confirmacion de salida
-                                            </button>
-                                            <div class="dropdown-menu" style="">
-                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'departure')">Enviar en inglés</a>
-                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'departure')">Enviar en español</a>
-                                            </div>
+                                                    @if($item->is_round_trip == 1)
+                                                        <tr>
+                                                            <td>
+                                                                <p><strong>Zona</strong>: {{ $item->destination->name }}</p>
+                                                                <p><strong>Lugar</strong>: {{ $item->to_name }}</p>                                                                
+                                                            </td>
+                                                            <td>
+                                                                <p><strong>Zona</strong>: {{ $item->origin->name }}</p>
+                                                                <p><strong>Lugar</strong>: {{ $item->from_name }}</p>
+                                                            </td>
+                                                            <td>{{ date("Y/m/d H:i", strtotime( $item->op_two_pickup )) }}</td>
+                                                            <td>
+                                                                @if(false)
+                                                                    @switch($item->op_two_status)
+                                                                        @case('PENDING')
+                                                                            <span class="badge bg-secondary">PENDING</span>
+                                                                        @break
+                                                                        @case('CONFIRMED')
+                                                                            <span class="badge bg-success">CONFIRMED</span>
+                                                                        @break
+                                                                        @case('NOSHOW')
+                                                                            <span class="badge bg-warning">NOSHOW</span>
+                                                                        @break
+                                                                        @case('CANCELLED')
+                                                                            <span class="badge bg-danger">CANCELLED</span>
+                                                                        @break
+                                                                        @default
+                                                                    @endswitch
+                                                                @endif
+                                                                <div class="btn-group btn-group-sm">
+                                                                    @if (RoleTrait::hasPermission(68))
+                                                                        @php
+                                                                            $btn_op_two_type = 'btn-secondary';
+                                                                            switch ($item->op_two_status) {
+                                                                                case 'PENDING':
+                                                                                    $btn_op_two_type = 'btn-secondary';
+                                                                                    break;
+                                                                                case 'COMPLETED':
+                                                                                    $btn_op_two_type = 'bg-success';
+                                                                                    break;
+                                                                                case 'NOSHOW':
+                                                                                    $btn_op_two_type = 'bg-warning';
+                                                                                    break;
+                                                                                case 'CANCELLED':
+                                                                                    $btn_op_two_type = 'bg-danger';
+                                                                                    break;
+                                                                            }
+                                                                        @endphp
+                                                                        <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_two_status }}</button>
+                                                                        <div class="dropdown-menu" style="">
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event,  'departure', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
+                                                                            <hr>
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
+                                                                        </div>
+                                                                    @else
+                                                                        @switch($item->op_two_status)
+                                                                            @case('PENDING')
+                                                                                <span class="badge bg-secondary">PENDING</span>
+                                                                            @break
+                                                                            @case('CONFIRMED')
+                                                                                <span class="badge bg-success">CONFIRMED</span>
+                                                                            @break
+                                                                            @case('NOSHOW')
+                                                                                <span class="badge bg-warning">NOSHOW</span>
+                                                                            @break
+                                                                            @case('CANCELLED')
+                                                                                <span class="badge bg-danger">CANCELLED</span>
+                                                                            @break
+                                                                            @default
+                                                                        @endswitch
+                                                                    @endif
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                @if(false)
+                                                                    <button class="btn btn-success" type="button"><i class="align-middle" data-feather="message-square"></i></button>
+                                                                @endif
+                                                                @if (RoleTrait::hasPermission(69))
+                                                                    <button class="btn {{ (($item->op_two_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'departure', {{ (($item->op_two_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})"><i class="align-middle" data-feather="check-circle"></i></button>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endif
+
+                                                </tbody>
+                                            </table>
                                         </div>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Transfer recogida
-                                            </button>
-                                            <div class="dropdown-menu" style="">
-                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-pickup')">Enviar en inglés</a>
-                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-pickup')">Enviar en español</a>
-                                            </div>
-                                        </div>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Transfer regreso
-                                            </button>
-                                            <div class="dropdown-menu" style="">
-                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-return')">Enviar en inglés</a>
-                                                <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-return')">Enviar en español</a>
-                                            </div>
-                                        </div>
-                                        
-                                    </div>
-                                </div>                                
-                            </div>
-                            <input type="hidden" id="from_lat" value="{{ $item->from_lat }}">
-                            <input type="hidden" id="from_lng" value="{{ $item->from_lng }}">
-                            <input type="hidden" id="to_lat" value="{{ $item->to_lat }}">
-                            <input type="hidden" id="to_lng" value="{{ $item->to_lng }}">
+                                    </div>                                
+                                </div>
+                                
+                                <input type="hidden" id="from_lat" value="{{ $item->from_lat }}">
+                                <input type="hidden" id="from_lng" value="{{ $item->from_lng }}">
+                                <input type="hidden" id="to_lat" value="{{ $item->to_lat }}">
+                                <input type="hidden" id="to_lng" value="{{ $item->to_lng }}">
                             @endforeach
                         </div>
                         <div class="tab-pane" id="icon-tab-2" role="tabpanel">
