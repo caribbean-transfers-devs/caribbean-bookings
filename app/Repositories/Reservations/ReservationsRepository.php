@@ -250,7 +250,24 @@ class ReservationsRepository
             DB::rollBack();
             return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }    
+    }
+
+    public function enableReservation($request, $reservation)
+    {
+        try {            
+            DB::beginTransaction();
+            $reservation->is_cancelled = 0;
+            $reservation->is_duplicated = 0;
+            $reservation->items()->update(['op_one_status' => 'PENDING', 'op_two_status' => 'PENDING']);
+            $reservation->save();
+            $check = $this->create_followUps($reservation->id, 'Se ha activado la reservación por: '.auth()->user()->name, 'HISTORY', 'DUPLICADA');
+            DB::commit();
+            return response()->json(['message' => 'Reservation duplicated successfully'], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    } 
 
     public function follow_ups($request)
     {        

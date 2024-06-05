@@ -900,3 +900,190 @@ $( document ).delegate( ".deleteMedia", "click", function(e) {
     });    
 
 });
+
+function setStatus(event, type, status, item_id, rez_id){
+    event.preventDefault();
+    var clickedRow = event.target.closest('tr');
+    var statusCell = clickedRow.querySelector('td:nth-child(4)');
+    //statusCell.textContent = status;
+
+    let alert_type = 'btn-secondary';
+    switch (status) {
+        case 'PENDING':
+            alert_type = 'btn-secondary';
+            break;
+        case 'COMPLETED':
+            alert_type = 'btn-success';
+            break; 
+        case 'NOSHOW':
+            alert_type = 'btn-warning';
+            break;
+        case 'CANCELLED':
+            alert_type = 'btn-danger';
+            break;  
+        default:
+            alert_type = 'btn-secondary';
+            break;
+    }    
+
+    swal.fire({
+        title: '¿Está seguro de actualizar el estatus?',
+        text: "Esta acción no se puede revertir",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if(result.isConfirmed == true){
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });                
+            $.ajax({
+                url: `/operation/managment/update-status`,
+                type: 'PUT',
+                data: { rez_id:rez_id, item_id:item_id, type:type, status:status },
+                beforeSend: function() {        
+                    
+                },
+                success: function(resp) {
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        icon: 'success',
+                        html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
+                        timer: 1500,
+                        timerProgressBar: true,
+                        didOpen: () => {
+                            Swal.showLoading()
+                            const b = Swal.getHtmlContainer().querySelector('b')
+                            timerInterval = setInterval(() => {
+                                b.textContent = (Swal.getTimerLeft() / 1000)
+                                    .toFixed(0)
+                            }, 100)
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval)
+                        }
+                    }).then((result) => {
+                        location.reload();
+                    })
+
+                }
+            }).fail(function(xhr, status, error) {
+                    console.log(xhr);
+                    Swal.fire(
+                        '¡ERROR!',
+                        xhr.responseJSON.message,
+                        'error'
+                    );
+            });
+
+        }
+    });    
+   
+}
+
+function updateConfirmation(event, id, type, status, rez_id){
+    event.preventDefault();
+
+    swal.fire({
+        title: '¿Está seguro de actualizar el estatus?',
+        text: "Esta acción no se puede revertir",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if(result.isConfirmed == true){
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });                
+            $.ajax({
+                url: `/operation/confirmation/update-status`,
+                type: 'PUT',
+                data: { id, type, status, rez_id},
+                beforeSend: function() {        
+                    
+                },
+                success: function(resp) {
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        icon: 'success',
+                        html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
+                        timer: 2500,
+                        timerProgressBar: true,
+                        didOpen: () => {
+                            Swal.showLoading()
+                            const b = Swal.getHtmlContainer().querySelector('b')
+                            timerInterval = setInterval(() => {
+                                b.textContent = (Swal.getTimerLeft() / 1000)
+                                    .toFixed(0)
+                            }, 100)
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval)
+                        }
+                    }).then((result) => {
+                        location.reload();
+                    });
+                }
+            }).fail(function(xhr, status, error) {
+                    console.log(xhr);
+                    Swal.fire(
+                        '¡ERROR!',
+                        xhr.responseJSON.message,
+                        'error'
+                    );
+            });
+
+        }
+    });  
+}
+
+function enableReservation(id){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    swal.fire({
+        title: '¿Está seguro de activar la reservación?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        console.log(result, id);
+        if (result.isConfirmed) {
+            var url = "/reservationsEnable/"+id;
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                dataType: 'json',
+                success: function (data) {
+                    swal.fire({
+                        title: 'Reservación activada',
+                        text: '¡Verifica los estatus de operación!',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        location.reload();
+                    });
+                },
+                error: function (data) {
+                    swal.fire({
+                        title: 'Error',
+                        text: 'Ha ocurrido un error al marcar la reservación',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        }
+    });
+}
