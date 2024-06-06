@@ -37,6 +37,36 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     
     <script src="{{ mix('/assets/js/views/operation/spam.min.js') }}"></script>
+    <script>
+        var table = $('#reservations_table').DataTable({
+            dom: 'Bfrtip',
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
+            },
+            paging: false,
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: 'Exportar a Excel',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: -1, // Aquí puedes ajustar qué columnas son visibles/invisibles
+                    visible: true
+                }
+            ]
+        });
+
+        // Checkbox para seleccionar columnas
+        $('input.toggle-vis').on('change', function(e) {
+            var column = table.column($(this).attr('data-column'));
+            column.visible(!column.visible());
+        });
+    </script>
 @endpush
 
 @section('content')
@@ -52,15 +82,37 @@
             <div class="col-12 col-sm-12">
                 <div class="tab">
                     <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab">Servicios</a></li>                        
+                        <li class="nav-item"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab">Servicios</a></li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-1" role="tabpanel">
                             <h4 class="tab-title">Operación del día [ {{ $date }} ]</h4>
+                            <h4 class="mx-3">Selecciona los campos a importar</h4>
+                            <div>
+                                <label><input type="checkbox" class="toggle-vis" data-column="0" checked> Estatus</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="1" checked> Code</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="2" checked> # Llamadas aceptadas</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="3" checked> Sitio</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="4" checked> Pickup</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="5" checked> Tipo</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="6" checked> Operación</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="7" checked> Código</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="8" checked> Cliente</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="9" checked> Teléfono</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="10" checked> Correo</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="11" checked> Vehículo</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="12" checked> Pasajeros</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="13" checked> Desde</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="14" checked> Hacia</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="15" checked> Total</label>
+                                <label><input type="checkbox" class="toggle-vis" data-column="16" checked> Moneda</label>
+                            </div>                            
                             <table id="reservations_table" class="table table-striped table-sm">
                                 <thead>
                                     <tr>        
-                                        <th></th>                                                
+                                        <th></th>
+                                        <th>Code</th>
+                                        <th># Llamadas aceptadas</th>
                                         <th>Sitio</th>
                                         <th>Pickup</th>                           
                                         <th class="text-center">Tipo</th>
@@ -81,7 +133,7 @@
                                     @if(sizeof($items)>=1)
                                         @foreach($items as $key => $value)
                                             @if( in_array($value->final_service_type, ["ARRIVAL", "TRANSFER"]) )
-                                                @php                                                
+                                                @php
                                                     $confirmation_type = $value->op_one_confirmation;
                                                     if($value->operation_type == "departure"):
                                                         $confirmation_type = $value->op_two_confirmation;
@@ -155,6 +207,8 @@
                                                             </div>
                                                         </div>
                                                     </td>
+                                                    <td>{{ $value->id }}</td>
+                                                    <td>{{ $value->spam_count }}</td>
                                                     <td>{{ $value->site_name }}</td>
                                                     <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
                                                     <td>{{ $value->final_service_type }}</td>
@@ -182,7 +236,6 @@
                 </div>
             </div>
             <div class="col-12 col-sm-4 col-xs-12">
-
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title">Resumen de envío de SPAM</h5>
@@ -207,36 +260,31 @@
                         </table>
                     </div>
                 </div>
-
-            </div>
-        </div>
-
-    </div>
-
-
-<div class="modal" tabindex="-1" id="filterModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Filtro de reservaciones</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form class="row" action="" method="POST" id="formSearch">                    
-                    @csrf
-                    <div class="col-12 col-sm-6">
-                        <label class="form-label" for="lookup_date">Fecha de creación</label>
-                        <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" onclick="Search()" id="btnSearch">Buscar</button>
             </div>
         </div>
     </div>
-</div>
 
-
+    <div class="modal" tabindex="-1" id="filterModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Filtro de reservaciones</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="row" action="" method="POST" id="formSearch">                    
+                        @csrf
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="lookup_date">Fecha de creación</label>
+                            <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="Search()" id="btnSearch">Buscar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection

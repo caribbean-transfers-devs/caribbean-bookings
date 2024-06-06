@@ -286,7 +286,6 @@
 
             </div>
         </div>
-
     </div>
 
 <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" />    
