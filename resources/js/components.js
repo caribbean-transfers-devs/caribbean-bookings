@@ -20,7 +20,6 @@ const translations = {
 };
 
 let components = {
-
     getTranslation: function(item){
         return (translations[language][item]) ? translations[language][item] : 'Translate not found';
     },
@@ -299,11 +298,25 @@ let components = {
     }    
 }
 
+/**
+ * se utiliza para ejecutar código cuando el usuario está a punto de abandonar una página web. Esto incluye acciones como cerrar la ventana del navegador, 
+ * recargar la página o navegar a una página diferente. La propiedad beforeunload es un evento que se puede capturar y manipular para proporcionar al usuario 
+ * una advertencia o una confirmación antes de permitir que abandonen la página.
+ */
 window.addEventListener("beforeunload", function(event) {
     components.loadScreen();
 });
 
-window.addEventListener("DOMContentLoaded", function(event) {
+// Mostrar el indicador de carga cuando se navega hacia atrás o hacia adelante
+window.addEventListener('popstate', function (event) {
+    console.log("popstate");
+    components.removeLoadScreen();
+    // components.loadScreen();
+    components.removeLoadScreen();
+});
+
+window.addEventListener("DOMContentLoaded", function() {
+
     console.log("The page has fully loaded.");
     //OCULTAMOS LOADING CUANDO DOM ESTA CARGADO COMPLETAMENTE
     components.removeLoadScreen();
@@ -314,10 +327,6 @@ window.addEventListener("DOMContentLoaded", function(event) {
         },
         complete : function(xhr, status) {
             components.removeLoadScreen();
-            // let ___loading = ( __loading != null ? __loading : 'body' );
-            // setTimeout(() => {
-            //     components.waitMeHide(___loading);
-            // }, 1000);
         },
         error : function(xhr, status, error) {
             console.log(xhr, status, error);
@@ -330,4 +339,5 @@ window.addEventListener("DOMContentLoaded", function(event) {
             components.loadScreen();
         });
     }
+
 });
