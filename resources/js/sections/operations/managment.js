@@ -1,22 +1,28 @@
-$('.table').DataTable({
-    language: {
-        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
-    },
-    paging: false,
-    //ordering: false
+if( document.querySelector('.table-rendering') != null ){
+    components.actionTable($('.table-rendering'));
+}
+components.formReset();
+
+const picker = new easepick.create({
+    element: "#lookup_date",
+    css: [
+        'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+        'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+        'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
+    ],
+    zIndex: 10
 });
 
-$(function() {
-    const picker = new easepick.create({
-        element: "#lookup_date",        
-        css: [
-            'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-            'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-            'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-        ],
-        zIndex: 10
-    })
-});
+//DECLARACION DE VARIABLES
+const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
+const __title_modal = document.getElementById('filterModalLabel');
+
+//ACCION PARA CREAR
+if( __create != null ){
+    __create.addEventListener('click', function () {
+        __title_modal.innerHTML = this.dataset.title;
+    });
+}
 
 function setStatus(event, type, status, item_id, rez_id){
     event.preventDefault();
@@ -102,7 +108,19 @@ function setStatus(event, type, status, item_id, rez_id){
    
 }
 
-function Search(){
-    $("#btnSearch").text("Buscando....").attr("disabled", true);
-    $("#formSearch").submit();
+var inactivityTime = (5 * 60000); // 30 segundos en milisegundos
+var timeoutId;
+
+function resetTimer() {
+    clearTimeout(timeoutId);          
+    timeoutId = setTimeout(refreshPage, inactivityTime);
 }
+
+function refreshPage() {
+    location.reload();
+}
+    
+document.addEventListener('mousemove', resetTimer);
+document.addEventListener('keydown', resetTimer);
+        
+resetTimer();  

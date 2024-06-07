@@ -6,7 +6,7 @@
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/driver.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/driver.min.css') }}" rel="stylesheet" > 
+    <link href="{{ mix('/assets/css/sections/driver.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -70,7 +70,7 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>   
+            </div>
         </div>
     </div>
 @endsection

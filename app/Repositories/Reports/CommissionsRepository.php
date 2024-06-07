@@ -13,14 +13,14 @@ class CommissionsRepository
     
     public function index($request){       
         $search = [
-            "init_date" => date("Y-m-d")." 00:00:00",
-            "end_date" => date("Y-m-d")." 23:59:59",
+            "init" => date("Y-m-d")." 00:00:00",
+            "end" => date("Y-m-d")." 23:59:59",
         ];
 
         if(isset( $request->date )):
                 $new_date = explode(" - ", $request->date);
-                $search['init_date'] = $new_date[0]." 00:00:00";
-                $search['end_date'] = $new_date[1]." 23:59:59";
+                $search['init'] = $new_date[0]." 00:00:00";
+                $search['end'] = $new_date[1]." 23:59:59";
         endif;
 
         $items = [];
@@ -79,8 +79,8 @@ class CommissionsRepository
         WHERE rez.created_at BETWEEN :init_date_one AND :init_date_two
         AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.pay_at_arrival = 0
         GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id, it_counter.quantity, p.payment_type_name, emp.employee", [
-                                        "init_date_one" => $search['init_date'],
-                                        "init_date_two" => $search['end_date'],
+                                        "init_date_one" => $search['init'],
+                                        "init_date_two" => $search['end'],
                                     ]);
 
         $cash = DB::select("SELECT rez.id as reservation_id, CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name, rez.currency, rez.language, rez.is_cancelled, rez.is_commissionable, rez.pay_at_arrival, rez.created_at,
@@ -137,10 +137,10 @@ class CommissionsRepository
         WHERE (it.op_one_pickup BETWEEN :init_date_one AND :init_date_two OR it.op_two_pickup BETWEEN :init_date_three AND :init_date_four)
         AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.pay_at_arrival = 1
         GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id, it_counter.quantity, p.payment_type_name, emp.employee", [
-                                    "init_date_one" => $search['init_date'],
-                                    "init_date_two" => $search['end_date'],
-                                    "init_date_three" => $search['init_date'],
-                                    "init_date_four" => $search['end_date'],
+                                    "init_date_one" => $search['init'],
+                                    "init_date_two" => $search['end'],
+                                    "init_date_three" => $search['init'],
+                                    "init_date_four" => $search['end'],
                                 ]);
 
         if(sizeof($paid) >= 1):

@@ -2,79 +2,15 @@
         use App\Traits\RoleTrait;
     @endphp
     @php
-        $links = [
-            // [
-            //     'type' => 'single',
-            //     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
-            //     'code' => 'dashboard',
-            //     'name' => __('sidebar.Dashboard'),
-            //     'route' => route('dashboard.affiliates',["type" => "affiliate"]),
-            //     'active' => request()->routeIs('dashboard')
-            // ],
+        $links = []; //LINKS GENERALES
+        $links_dashboard = [];
+        $links_reports = [];
+        $links_selling_point = [];
+        $links_operations = [];
+        $links_settings = [];
+        $links_administration = [];
 
-            // [
-            //     'type' => 'multiple',
-            //     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
-            //     'code' => 'dashboard',
-            //     'name' => __('sidebar.Dashboard'),
-            //     'route' => null,
-            //     'active' => request()->routeIs('dashboard.*'),
-            //     'urls' => [
-            //         array(
-            //             'name' => __('sidebar.affiliate'),
-            //             'route' => route('dashboard.affiliates',["type" => "affiliate"]),
-            //             'active' => request()->is('dashboard/affiliate'),
-            //         ),
-            //         array(
-            //             'name' => __('sidebar.subaffiliates'),
-            //             'route' => route('dashboard.affiliates', ["type" => "subaffiliate"]),
-            //             'active' => request()->is('dashboard/subaffiliate'),
-            //         ),
-            //     ]
-            // ],
-
-            // [
-            //     'type' => 'single',
-            //     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>',
-            //     'code' => 'finances',
-            //     'name' => __('sidebar.Finance'),
-            //     'route' => route('finances'),
-            //     'active' => request()->routeIs('finances')
-            // ], 
-
-            // [
-            //     'type' => 'single',
-            //     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>',
-            //     'code' => 'tpv',
-            //     'name' => __('sidebar.TPV'),
-            //     'route' => ( app()->getLocale() == "es" ? route('tpv.book.es', ['locale' => app()->getLocale(), 'id' => Session('token_data')['id']]) : route('tpv.book', ['id' => Session('token_data')['id']]) ),
-            //     'active' => request()->routeIs('tpv.book')
-            // ],
-            // [
-            //     'type' => 'single',
-            //     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 80C0 53.5 21.5 32 48 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V80zM64 96v64h64V96H64zM0 336c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V336zm64 16v64h64V352H64zM304 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H304c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-48 48-48zm80 64H320v64h64V96zM256 304c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s7.2-16 16-16s16 7.2 16 16v96c0 8.8-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s-7.2-16-16-16s-16 7.2-16 16v64c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V304zM368 480a16 16 0 1 1 0-32 16 16 0 1 1 0 32zm64 0a16 16 0 1 1 0-32 16 16 0 1 1 0 32z" fill="#030305"/></svg>',
-            //     'code' => 'tpv',
-            //     'name' => __('sidebar.Scanme'),
-            //     'route' => route('tpv.qr', ['id' => Session('token_data')['id']]),
-            //     'active' => request()->routeIs('tpv.qr')
-            // ],
-            // [
-            //     'type' => 'single',
-            //     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>',
-            //     'code' => 'tools',
-            //     'name' => __('sidebar.Tools'),
-            //     'route' => route('tools', ['id' => Session('token_data')['id']]),
-            //     'active' => request()->routeIs('tools'),
-            // ],
-        ];
-
-        $links_dashboard = array();
-        $links_reports = array();
-        $links_selling_point = array();
-        $links_operations = array();
-        $links_settings = array();
-        $links_administration = array();
-
+        //DASHBOARD
         if(RoleTrait::hasPermission(42) || RoleTrait::hasPermission(62) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(63)):
             if(RoleTrait::hasPermission(42)):
                 $links_dashboard[] = [
@@ -108,6 +44,7 @@
             ]);
         endif;        
 
+        //REPORTES
         if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50)):
             if(RoleTrait::hasPermission(43)):
                 $links_reports[] = [
@@ -144,10 +81,11 @@
                 'name' => 'Reportes',
                 'route' => null,
                 'active' => request()->routeIs('reports.*'),
-                'urls' => $links_selling_point
+                'urls' => $links_reports
             ]);            
         endif;        
 
+        //TPV
         if(RoleTrait::hasPermission(26)):
             array_push($links,[
                 'type' => 'single',
@@ -159,6 +97,7 @@
             ]);        
         endif;        
 
+        //PUNTO DE VENTA
         if(RoleTrait::hasPermission(51) || RoleTrait::hasPermission(52) || RoleTrait::hasPermission(54) ):
             if(RoleTrait::hasPermission(51)):
                 $links_selling_point[] = [
@@ -192,6 +131,7 @@
             ]);            
         endif;
 
+        //OPERACION
         if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) ):
             if(RoleTrait::hasPermission(36)):
                 $links_operations[] = [
@@ -239,6 +179,7 @@
             ]);            
         endif;
 
+        //RESERVACIONES
         if(RoleTrait::hasPermission(10)):
             array_push($links,[
                 'type' => 'single',
@@ -250,6 +191,7 @@
             ]);        
         endif;
 
+        //CONFIGURACIONES
         if(RoleTrait::hasPermission(28) || RoleTrait::hasPermission(32)):
             if(RoleTrait::hasPermission(28)):
                 $links_settings[] = [
@@ -276,6 +218,7 @@
             ]);            
         endif;
 
+        //ADMINISTRACION
         if(RoleTrait::hasPermission(1) || RoleTrait::hasPermission(6)):
             if(RoleTrait::hasPermission(1)):
                 $links_administration[] = [
@@ -315,14 +258,8 @@
                 'active' => request()->routeIs('users.*','roles.*','enterprises.*','vehicles.*','drivers.*'),
                 'urls' => $links_administration
             ]);
-        endif;
-        
+        endif;        
     @endphp
-    {{-- <pre>
-        @php
-            print_r($links);
-        @endphp
-    </pre> --}}
     <!--  BEGIN SIDEBAR  -->
     <div class="sidebar-wrapper sidebar-theme">
         <nav id="sidebar">
@@ -377,7 +314,7 @@
                         </li>
                     @endif
                 @endforeach
-            </ul>            
+            </ul>
         </nav>
     </div>
     <!--  END SIDEBAR  -->

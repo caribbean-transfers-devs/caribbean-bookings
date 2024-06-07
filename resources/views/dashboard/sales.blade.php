@@ -29,7 +29,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.5.5/perfect-scrollbar.min.js"></script>
     <script>       
         let dashboard = {
             dataDay: @json(( isset($bookings_day) ? $bookings_day : [] )),
@@ -296,21 +295,8 @@
                 return seriesMonth;
             },
         }
-        // console.log(dashboard.seriesBookingsCurrencyMonth());
-        $(function() {
-            const picker = new easepick.create({
-                element: "#lookup_date",        
-                css: [
-                    'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-                    'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-                    'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-                ],
-                zIndex: 10,
-                plugins: ['RangePlugin'],
-            })
-        });
     </script>
-    <script src="{{ mix('/assets/js/views/dashboard/index.min.js') }}"></script>
+    <script src="{{ mix('/assets/js/sections/dashboard.min.js') }}"></script>
 @endpush
 
 @section('content')
@@ -328,12 +314,12 @@
                 <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
                     <div class="card-body">
                         <form action="" class="row" id="formFilter">
-                            <div class="col-12 col-sm-3 mb-3 mb-lg-0">
+                            <div class="col-12 col-sm-5 mb-3 mb-lg-0">
                                 <label class="form-label" for="lookup_date">Fecha de creación</label>
                                 <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $data['init'] }} - {{ $data['end'] }}">
                             </div>
-                            <div class="col-12 col-sm-3 align-self-bottom">
-                                <button type="submit" class="btn btn-lg btn-red btn-filter w-100">Filtrar</button>
+                            <div class="col-12 col-sm-3 align-self-end">
+                                <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
                             </div>
                         </form>
                     </div>
