@@ -38,13 +38,13 @@
     "/assets/js/views/reports/cash.min.js": "/assets/js/views/reports/cash.min.js?id=9ac963a4bcb5dcc40664403526d2bad6",
     "/assets/css/panel/panel.min.css": "/assets/css/panel/panel.min.css?id=10c3c347f19ddebb20cab89cde28f8aa",
     "/assets/js/core/core.min.js": "/assets/js/core/core.min.js?id=cbc6d6e4fa6a433ad49fac305c11aa9d",
-    "/assets/js/panel/panel.min.js": "/assets/js/panel/panel.min.js?id=ec9640b5b9ed68376d4dee1e62e2967d",
+    "/assets/js/panel/panel.min.js": "/assets/js/panel/panel.min.js?id=eba8e97214c18a8e42a219d2341e74bb",
     "/assets/js/sections/dashboard.min.js": "/assets/js/sections/dashboard.min.js?id=16849edaa670ff565120d41f088b4565",
-    "/assets/js/sections/operations/managment.min.js": "/assets/js/sections/operations/managment.min.js?id=ddc867881bc50a8462fa14f04f1412c6",
-    "/assets/js/sections/reservations/sales.min.js": "/assets/js/sections/reservations/sales.min.js?id=79c8dbb93b5726fcb040c1c6b0c925c2",
-    "/assets/js/sections/reports/commissions.min.js": "/assets/js/sections/reports/commissions.min.js?id=74d3c6e57a9b7a7fb160c117dfc5893f",
-    "/assets/js/sections/users.min.js": "/assets/js/sections/users.min.js?id=c386d90be898495201b6a4f327d07623",
-    "/assets/js/sections/enterprise.min.js": "/assets/js/sections/enterprise.min.js?id=4e86fd01991ab66e7854abbe7c64e8e7",
-    "/assets/js/sections/vehicle.min.js": "/assets/js/sections/vehicle.min.js?id=4e86fd01991ab66e7854abbe7c64e8e7",
-    "/assets/js/sections/driver.min.js": "/assets/js/sections/driver.min.js?id=4e86fd01991ab66e7854abbe7c64e8e7"
+    "/assets/js/sections/operations/managment.min.js": "/assets/js/sections/operations/managment.min.js?id=1b1ea032d55533b88a155b2dd9e41fc7",
+    "/assets/js/sections/reservations/sales.min.js": "/assets/js/sections/reservations/sales.min.js?id=be2a2773011651b691f7989752670d80",
+    "/assets/js/sections/reports/commissions.min.js": "/assets/js/sections/reports/commissions.min.js?id=3138a31d80be77cb6ab2b1f165aafb3a",
+    "/assets/js/sections/users.min.js": "/assets/js/sections/users.min.js?id=193b2493133f43366dbb0787d59bdd68",
+    "/assets/js/sections/enterprise.min.js": "/assets/js/sections/enterprise.min.js?id=8a967d2073ab70fc8e4a783e92244978",
+    "/assets/js/sections/vehicle.min.js": "/assets/js/sections/vehicle.min.js?id=8a967d2073ab70fc8e4a783e92244978",
+    "/assets/js/sections/driver.min.js": "/assets/js/sections/driver.min.js?id=8a967d2073ab70fc8e4a783e92244978"
 }

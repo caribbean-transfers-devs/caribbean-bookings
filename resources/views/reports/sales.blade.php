@@ -31,18 +31,21 @@
     @php
         $buttons = array(
             array(  
-                'text' => 'copy',
-                'type' => 'copy',
+                'extend' => 'copyHtml5',
+                'text' => 'Copiar',
+                'titleAttr' => 'Copiar datos',
                 'className' => 'btn btn-primary',
             ),
             array(  
-                'text' => 'csv',
-                // 'type' => 'csv',
+                'text' => 'CSV',
+                'extend' => 'csvHtml5',
+                'titleAttr' => 'Exportar como CSV',
                 'className' => 'btn btn-primary',
             ),
             array(  
-                'text' => 'excel',
-                // 'type' => 'excel',
+                'text' => 'Excel',
+                'extend' => 'excelHtml5',
+                'titleAttr' => 'Exportar como Excel',
                 'className' => 'btn btn-primary',
             ),
         );
