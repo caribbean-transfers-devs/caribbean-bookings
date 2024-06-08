@@ -180,6 +180,9 @@
                                                         case 'CONFIRMED':
                                                             $spam = 'btn-success';
                                                             break;
+                                                        case 'ACCEPT':
+                                                            $spam = 'btn-success';
+                                                            break;                                                            
                                                         case 'REJECTED':
                                                             $spam = 'btn-danger';
                                                             break;
@@ -205,6 +208,7 @@
                                                                 <a class="dropdown-item" href="#" onClick="updateSpam(event,{{$value->id}},'LATER','btn-warning')">LATER</a>
                                                                 <div class="dropdown-divider"></div>
                                                                 <a class="dropdown-item" href="#" onClick="updateSpam(event,{{$value->id}},'CONFIRMED','btn-success')">CONFIRMED</a>
+                                                                <a class="dropdown-item" href="#" onClick="updateSpam(event,{{$value->id}},'ACCEPT','btn-success')">ACCEPT</a>
                                                                 <a class="dropdown-item" href="#" onClick="updateSpam(event,{{$value->id}},'REJECTED','btn-danger')">REJECTED</a>
                                                             </div>
                                                         </div>
