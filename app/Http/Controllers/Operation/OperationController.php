@@ -13,7 +13,7 @@ class OperationController extends Controller
     use RoleTrait;
 
     public function index(Request $request, OperationRepository $operationRepository){
-        return $operationRepository->index($request);        
+        return $operationRepository->index($request);
     }
 
     public function managment(Request $request, OperationRepository $operationRepository){

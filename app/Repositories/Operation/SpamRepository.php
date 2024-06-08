@@ -11,10 +11,7 @@ use App\Models\ReservationFollowUp;
 class SpamRepository
 {
     public function index($request){
-        $date = date("Y-m-d");
-        if(isset( $request->date )):
-            $date = $request->date;
-        endif;
+        $date = ( isset( $request->date ) ?  $request->date : date("Y-m-d") );
 
         $search = [];
         $search['init_date'] = $date." 00:00:00";
@@ -102,13 +99,14 @@ class SpamRepository
                                         "init_date_two" => $search['end_date'],
                                         "init_date_three" => $search['init_date'],
                                         "init_date_four" => $search['end_date'],
-                                    ]);   
-        return view('operation.spam', compact('items','date'));      
+                                    ]);
+
+        // dd($items);
+        return view('operation.spam', compact('items','date'));
           
     }
 
     public function spamUpdate($request){
-
         try {
             DB::beginTransaction();
             
