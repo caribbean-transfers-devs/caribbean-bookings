@@ -327,7 +327,6 @@
                 </div>
             </div>
         </div>
-        {{-- <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</a>   --}}
 
         <div class="row mb-3">
             <div class="col-md-12">

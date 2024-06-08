@@ -19,7 +19,7 @@
             </div>
             <form action="" method="POST" id="formSearch">
                 @csrf
-                <div class="modal-body">                                    
+                <div class="modal-body">
                     <div class="col-12 col-sm-12">
                         <label class="form-label" for="lookup_date">Fecha de creación</label>
                         <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
