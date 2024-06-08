@@ -87,26 +87,28 @@
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-1" role="tabpanel">
                             <h4 class="tab-title">Operación del día [ {{ $date }} ]</h4>
-                            <h4 class="mx-3">Selecciona los campos a importar</h4>
-                            <div>
-                                <label><input type="checkbox" class="toggle-vis" data-column="0" checked> Estatus</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="1" checked> Code</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="2" checked> # Llamadas aceptadas</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="3" checked> Sitio</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="4" checked> Pickup</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="5" checked> Tipo</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="6" checked> Operación</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="7" checked> Código</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="8" checked> Cliente</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="9" checked> Teléfono</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="10" checked> Correo</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="11" checked> Vehículo</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="12" checked> Pasajeros</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="13" checked> Desde</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="14" checked> Hacia</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="15" checked> Total</label>
-                                <label><input type="checkbox" class="toggle-vis" data-column="16" checked> Moneda</label>
-                            </div>                            
+                            @if (RoleTrait::hasPermission(70))
+                                <h4 class="my-3">Selecciona los campos a importar</h4>                            
+                                <div>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="0" checked> Estatus</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="1" checked> Code</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="2" checked> # Llamadas aceptadas</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="3" checked> Sitio</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="4" checked> Pickup</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="5" checked> Tipo</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="6" checked> Operación</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="7" checked> Código</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="8" checked> Cliente</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="9" checked> Teléfono</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="10" checked> Correo</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="11" checked> Vehículo</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="12" checked> Pasajeros</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="13" checked> Desde</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="14" checked> Hacia</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="15" checked> Total</label>
+                                    <label><input type="checkbox" class="toggle-vis" data-column="16" checked> Moneda</label>
+                                </div>
+                            @endif
                             <table id="reservations_table" class="table table-striped table-sm">
                                 <thead>
                                     <tr>        
@@ -230,7 +232,7 @@
                                         @endforeach
                                     @endif
                                 </tbody>
-                            </table>
+                            </table>                            
                         </div>
                     </div>
                 </div>
