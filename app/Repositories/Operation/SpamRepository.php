@@ -33,9 +33,10 @@ class SpamRepository
         $search = [];
         $search['init'] = $date." 00:00:00";
         $search['end'] = $date." 23:59:59";
+        $search['language'] = $request->language;
 
-        // $items = $this->querySpam2($search, $request->language);
-        $items = $this->querySpam($search);
+        $items = $this->querySpam2($search);
+        // $items = $this->querySpam($search);
         // dd($items);
 
         // Crear una nueva hoja de cálculo
@@ -46,7 +47,7 @@ class SpamRepository
         $sheet->setCellValue('A1', 'code');
         $sheet->setCellValue('B1', 'name');
         $sheet->setCellValue('C1', 'phone');
-        $sheet->setCellValue('D1', 'language');
+        // $sheet->setCellValue('D1', 'language');
 
         $count = 2;
 
@@ -55,7 +56,7 @@ class SpamRepository
                 $sheet->setCellValue('A'.strval($count), $item->id);
                 $sheet->setCellValue('B'.strval($count), $item->client_first_name);
                 $sheet->setCellValue('C'.strval($count), $item->client_phone);
-                $sheet->setCellValue('D'.strval($count), $item->language);
+                // $sheet->setCellValue('D'.strval($count), $item->language);
                 $count = $count + 1;
             }
         }
@@ -156,7 +157,7 @@ class SpamRepository
                                     ]);
     }
 
-    public function querySpam2($search, $language){
+    public function querySpam2($search){
         return  DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, '' as messages,
                                                COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                                CASE
@@ -191,7 +192,7 @@ class SpamRepository
                                        FROM payments
                                        GROUP BY reservation_id
                                    ) as p ON p.reservation_id = rez.id
-                                   WHERE rez.language = 'es' AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
+                                   WHERE rez.language = :lang_one AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
                                    AND rez.is_cancelled = 0
                                    AND rez.is_duplicated = 0
                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
@@ -229,12 +230,13 @@ class SpamRepository
                                            FROM payments
                                            GROUP BY reservation_id
                                    ) as p ON p.reservation_id = rez.id
-                                   WHERE rez.language = 'es' AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
+                                   WHERE rez.language = :lang_two AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
                                    AND rez.is_cancelled = 0
                                    AND rez.is_duplicated = 0
                                    AND it.is_round_trip = 0
                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id",[
-                                       "lang" => $language,
+                                       "lang_one" => $search['language'],
+                                       "lang_two" => $search['language'],
                                        "init_date_one" => $search['init'],
                                        "init_date_two" => $search['end'],
                                        "init_date_three" => $search['init'],

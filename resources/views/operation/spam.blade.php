@@ -53,12 +53,12 @@
             //         }
             //     }
             // ],
-            columnDefs: [
-                {
-                    targets: -1, // Aquí puedes ajustar qué columnas son visibles/invisibles
-                    visible: true
-                }
-            ]
+            // columnDefs: [
+            //     {
+            //         targets: -1, // Aquí puedes ajustar qué columnas son visibles/invisibles
+            //         visible: true
+            //     }
+            // ]
         });
 
         // Checkbox para seleccionar columnas
@@ -96,7 +96,7 @@
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <th>Code</th>
+                                        {{-- <th>Code</th> --}}
                                         <th># Llamadas aceptadas</th>
                                         <th>Sitio</th>
                                         <th>Pickup</th>                           
@@ -196,7 +196,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td>{{ $value->id }}</td>
+                                                    {{-- <td>{{ $value->id }}</td> --}}
                                                     <td>{{ $value->spam_count }}</td>
                                                     <td>{{ $value->site_name }}</td>
                                                     <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
@@ -291,7 +291,7 @@
                                 <label class="form-label" for="lookup_date2">Fecha</label>
                                 <input type="text" name="date" id="lookup_date2" class="form-control" value="{{ $date }}">
                             </div>
-                            <div class="col-12 col-sm-6 d-none">
+                            <div class="col-12 col-sm-6">
                                 <label class="form-label" for="language">Idioma</label>
                                 <select name="language" id="language" class="form-control">
                                     <option value="es">Español</option>
