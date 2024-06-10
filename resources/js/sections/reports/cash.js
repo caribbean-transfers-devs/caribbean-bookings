@@ -1,5 +1,5 @@
 const picker = new easepick.create({
-    element: "#lookup_date",
+    element: "#lookup_date",        
     css: [
         'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
         'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
@@ -25,34 +25,12 @@ if( __create != null ){
     });
 }
 
-function setStatus(event, type, status, item_id, rez_id){
+function updateConfirmation(event, id, status){
     event.preventDefault();
-    var clickedRow = event.target.closest('tr');
-    var statusCell = clickedRow.querySelector('td:nth-child(4)');
-    //statusCell.textContent = status;
-
-    let alert_type = 'btn-secondary';
-    switch (status) {
-        case 'PENDING':
-            alert_type = 'btn-secondary';
-            break;
-        case 'COMPLETED':
-            alert_type = 'btn-success';
-            break; 
-        case 'NOSHOW':
-            alert_type = 'btn-warning';
-            break;
-        case 'CANCELLED':
-            alert_type = 'btn-danger';
-            break;  
-        default:
-            alert_type = 'btn-secondary';
-            break;
-    }    
 
     swal.fire({
-        title: '¿Está seguro de actualizar el estatus?',
-        text: "Esta acción no se puede revertir",
+        title: '¿Está seguro?',
+        text: "Estás a punto de cambiar el estatus de conciliación",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
@@ -66,9 +44,9 @@ function setStatus(event, type, status, item_id, rez_id){
                 }
             });                
             $.ajax({
-                url: `/operation/managment/update-status`,
+                url: `/reports/cash/update-status`,
                 type: 'PUT',
-                data: { rez_id:rez_id, item_id:item_id, type:type, status:status },
+                data: { id, status},
                 beforeSend: function() {        
                     
                 },
@@ -77,7 +55,7 @@ function setStatus(event, type, status, item_id, rez_id){
                         title: '¡Éxito!',
                         icon: 'success',
                         html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
-                        timer: 1500,
+                        timer: 2500,
                         timerProgressBar: true,
                         didOpen: () => {
                             Swal.showLoading()
@@ -91,9 +69,8 @@ function setStatus(event, type, status, item_id, rez_id){
                             clearInterval(timerInterval)
                         }
                     }).then((result) => {
-                        statusCell.innerHTML = `<span class="badge ${alert_type} rounded-pill">${status}</span>`;                        
-                    })
-
+                        location.reload();
+                    });
                 }
             }).fail(function(xhr, status, error) {
                     console.log(xhr);
@@ -105,23 +82,7 @@ function setStatus(event, type, status, item_id, rez_id){
             });
 
         }
-    });    
+    });
+
    
 }
-
-var inactivityTime = (5 * 60000); // 30 segundos en milisegundos
-var timeoutId;
-
-function resetTimer() {
-    clearTimeout(timeoutId);          
-    timeoutId = setTimeout(refreshPage, inactivityTime);
-}
-
-function refreshPage() {
-    location.reload();
-}
-    
-document.addEventListener('mousemove', resetTimer);
-document.addEventListener('keydown', resetTimer);
-        
-resetTimer();  

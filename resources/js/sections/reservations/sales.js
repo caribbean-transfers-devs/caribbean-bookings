@@ -1,8 +1,3 @@
-if( document.querySelector('.table-rendering') != null ){
-    components.actionTable($('.table-rendering'));
-}
-components.formReset();
-
 const picker = new easepick.create({
     element: "#lookup_date",        
     css: [
@@ -13,6 +8,11 @@ const picker = new easepick.create({
     zIndex: 10,
     plugins: ['RangePlugin'],
 });
+
+if( document.querySelector('.table-rendering') != null ){
+    components.actionTable($('.table-rendering'));
+}
+components.formReset();
 
 new TomSelect(document.getElementById('site'));
 

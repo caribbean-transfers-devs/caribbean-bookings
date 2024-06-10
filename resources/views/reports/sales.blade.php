@@ -292,5 +292,8 @@
         </div>
     </div>
 
+    @php
+        dump($data);
+    @endphp
     <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" />    
 @endsection

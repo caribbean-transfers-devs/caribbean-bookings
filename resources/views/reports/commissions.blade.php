@@ -8,17 +8,15 @@
 @push('Css')
     <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
-    <style>
-/* Ocultar el "Powered by PayPal" */
-.paypal-button-context iframe + div {
-    display: none;
-}
+@endpush
 
-/* Asegurar que el contenedor se renderiza */
-#paypal-button-container {
-    display: block;
-}
-    </style>
+@push('Js')
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="{{ mix('/assets/js/sections/reports/commissions.min.js') }}"></script>
 @endpush
 
 @section('content')
@@ -210,47 +208,9 @@
             </div>
         </div>
     </div>
-    <div id="paypal-button-container"></div>
 
+    @php
+        dump($search);
+    @endphp
     <x-modals.reservations.reports :data="$search" />
 @endsection
-
-@push('Js')
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    
-    <script src="https://www.paypal.com/sdk/js?client-id=ASGgN8z0Yc7y1F0e5E9wd46AEg1eLYrlo2DjeNVC5y4CeV2AeEoEcMJs9Wa3EabanstiseLJNZ3FK6KE&currency=MXN&funding-eligibility=card" sync></script>
-    
-    <script>
-        paypal.Buttons({
-            style: {
-                layout: 'vertical',
-                color:  'blue',
-                shape:  'rect',
-                disableMaxWidth: true,
-                tagline: false,
-                displayOnly: ['credit'],
-            },            
-            createOrder: function(data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: '0.01'  // Reemplaza con el monto que deseas cobrar
-                        }
-                    }]
-                });
-            },
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(details) {
-                    alert('Transaction completed by ' + details.payer.name.given_name);
-                    // Redireccionar o actualizar el UI según sea necesario
-                });
-            },
-        }).render('#paypal-button-container');
-    </script>
-    <script src="{{ mix('/assets/js/sections/reports/commissions.min.js') }}"></script>
-
-@endpush

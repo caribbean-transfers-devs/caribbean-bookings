@@ -1,8 +1,3 @@
-if( document.querySelector('.table-rendering') != null ){
-    components.actionTable($('.table-rendering'));
-}
-components.formReset();
-
 const picker = new easepick.create({
     element: "#lookup_date",
     css: [
@@ -10,8 +5,14 @@ const picker = new easepick.create({
         'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
         'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
     ],
-    zIndex: 10
+    zIndex: 10,
+    plugins: ['RangePlugin'],
 });
+
+if( document.querySelector('.table-rendering') != null ){
+    components.actionTable($('.table-rendering'));
+}
+components.formReset();
 
 //DECLARACION DE VARIABLES
 const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */

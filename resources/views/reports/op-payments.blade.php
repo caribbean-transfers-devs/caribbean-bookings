@@ -153,5 +153,8 @@
         </div>
     </div>
 
+    @php
+        dump($date);
+    @endphp
     <x-modals.reservations.reports :data="$date" />
 @endsection
