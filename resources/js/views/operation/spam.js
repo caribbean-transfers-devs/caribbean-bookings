@@ -16,12 +16,21 @@ $(function() {
             'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
         ],
         zIndex: 10
-    })
+    });
+
+    const picker2 = new easepick.create({
+        element: "#lookup_date2",        
+        css: [
+            'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+            'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+            'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
+        ],
+        zIndex: 10
+    });
 });
 
 function updateSpam(event, id, type, update){
     event.preventDefault();
-
     swal.fire({
         title: '¿Está seguro de actualizar el estatus?',
         text: "Esta acción no se puede revertir",
@@ -31,10 +40,7 @@ function updateSpam(event, id, type, update){
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if(result.isConfirmed == true){
-
-            var button = $('button[data-id="'+ id +'"]');
-            
-
+            var button = $('button[data-id="'+ id +'"]');        
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -68,11 +74,35 @@ function updateSpam(event, id, type, update){
                         'error'
                     );
             });
-
         }
-    });
+    });   
+}
 
-   
+if( document.getElementById('generateExcel') != null ){
+    document.getElementById('generateExcel').addEventListener('click', function() {
+        let date = document.getElementById('lookup_date2').value;
+        let language = document.getElementById('language').value;
+        let url = '/operation/spam/exportExcel?date=' + date + '&language=' + language;
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            },
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'spam_'+ date +'.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => console.error('Error:', error));
+    });
 }
 
 function Search(){

@@ -79,6 +79,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');
     Route::get('/operation/spam', [OperationController::class, 'spam'])->name('operation.spam');
     Route::post('/operation/spam', [OperationController::class, 'spam'])->name('operation.spam.search');
+    Route::get('/operation/spam/exportExcel', [OperationController::class, 'exportExcel'])->name('operation.spam.exportExcel');
     Route::put('/operation/spam/update-status', [OperationController::class, 'spamUpdate'])->name('operation.spam.update');
 
     //Reportes

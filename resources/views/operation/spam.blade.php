@@ -44,15 +44,15 @@
                 url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
             },
             paging: false,
-            buttons: [
-                {
-                    extend: 'excelHtml5',
-                    text: 'Exportar a Excel',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
-                }
-            ],
+            // buttons: [
+            //     {
+            //         extend: 'excelHtml5',
+            //         text: 'Exportar a Excel',
+            //         exportOptions: {
+            //             columns: ':visible'
+            //         }
+            //     }
+            // ],
             columnDefs: [
                 {
                     targets: -1, // Aquí puedes ajustar qué columnas son visibles/invisibles
@@ -62,22 +62,27 @@
         });
 
         // Checkbox para seleccionar columnas
-        $('input.toggle-vis').on('change', function(e) {
-            var column = table.column($(this).attr('data-column'));
-            column.visible(!column.visible());
-        });
+        // $('input.toggle-vis').on('change', function(e) {
+        //     var column = table.column($(this).attr('data-column'));
+        //     column.visible(!column.visible());
+        // });
     </script>
 @endpush
 
 @section('content')
     <div class="container-fluid p-0">
-        <h1 class="h3 mb-3 button_">
-            Gestión de envío de SPAM
-            @if (RoleTrait::hasPermission(41))
-                <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</a>
-            @endif
-        </h1>
-        
+        <div class="d-flex justify-content-between">
+            <h1 class="h3 mb-3 button_">Gestión de envío de SPAM</h1>
+            <div class="d-flex align-items-center gap-2">
+                @if (RoleTrait::hasPermission(41))
+                    <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</a>
+                @endif
+                @if (RoleTrait::hasPermission(70))
+                    <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModalExport">Exportar Excel</a>
+                @endif
+            </div>
+        </div>
+                
         <div class="row">
             <div class="col-12 col-sm-12">
                 <div class="tab">
@@ -87,31 +92,9 @@
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-1" role="tabpanel">
                             <h4 class="tab-title">Operación del día [ {{ $date }} ]</h4>
-                            @if (RoleTrait::hasPermission(70))
-                                <h4 class="my-3">Selecciona los campos a importar</h4>                            
-                                <div>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="0" checked> Estatus</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="1" checked> Code</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="2" checked> # Llamadas aceptadas</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="3" checked> Sitio</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="4" checked> Pickup</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="5" checked> Tipo</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="6" checked> Operación</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="7" checked> Código</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="8" checked> Cliente</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="9" checked> Teléfono</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="10" checked> Correo</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="11" checked> Vehículo</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="12" checked> Pasajeros</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="13" checked> Desde</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="14" checked> Hacia</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="15" checked> Total</label>
-                                    <label><input type="checkbox" class="toggle-vis" data-column="16" checked> Moneda</label>
-                                </div>
-                            @endif
                             <table id="reservations_table" class="table table-striped table-sm">
                                 <thead>
-                                    <tr>        
+                                    <tr>
                                         <th></th>
                                         <th>Code</th>
                                         <th># Llamadas aceptadas</th>
@@ -293,4 +276,35 @@
             </div>
         </div>
     </div>
+    @if (RoleTrait::hasPermission(70))
+        <div class="modal" tabindex="-1" id="filterModalExport">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Filtro de exportación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="row" action="" method="POST" id="formSearch">                    
+                            @csrf
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="lookup_date2">Fecha</label>
+                                <input type="text" name="date" id="lookup_date2" class="form-control" value="{{ $date }}">
+                            </div>
+                            <div class="col-12 col-sm-6 d-none">
+                                <label class="form-label" for="language">Idioma</label>
+                                <select name="language" id="language" class="form-control">
+                                    <option value="es">Español</option>
+                                    <option value="en">Ingles</option>
+                                </select>
+                            </div>                        
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="generateExcel">Exportar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
