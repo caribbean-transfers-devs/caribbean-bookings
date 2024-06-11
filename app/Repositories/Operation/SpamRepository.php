@@ -52,7 +52,7 @@ class SpamRepository
         $count = 2;
 
         foreach( $items as $key => $item ){
-            if( $item->op_one_status == "COMPLETED" ){
+            if( ( $item->op_one_status == "COMPLETED" && $item->site_name != "Taquilla | Llegadas" ) || ( $item->site_name == "Taquilla | Llegadas" ) ){
                 $sheet->setCellValue('A'.strval($count), $item->id);
                 $sheet->setCellValue('B'.strval($count), $item->client_first_name);
                 $sheet->setCellValue('C'.strval($count), $item->client_phone);
@@ -242,7 +242,7 @@ class SpamRepository
                                        "init_date_three" => $search['init'],
                                        "init_date_four" => $search['end'],
                                    ]);
-   }    
+    }    
 
     public function spamUpdate($request){
         try {
