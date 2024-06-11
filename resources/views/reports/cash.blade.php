@@ -71,7 +71,7 @@
                             @endforeach
                         </ul>
                     </div>
-                @endif                
+                @endif
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
@@ -215,7 +215,7 @@
     </div>
 
     @php
-        dump($date_search);
+        // dump($date_search);
     @endphp
     <x-modals.reservations.reports :data="$date_search" />
 @endsection

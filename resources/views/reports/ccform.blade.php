@@ -1,25 +1,20 @@
 @php
     $users = [];
 @endphp
-@extends('layout.master')
+@extends('layout.app')
 @section('title') Comisiones @endsection
 
-@push('up-stack')
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
-    <style>
-        table thead th{ font-size: 8pt; }
-        table tbody td{ font-size: 8pt; }
-        .button_{ display: flex; justify-content: space-between; }
-    </style>
+@push('Css')
+    <link href="{{ mix('/assets/css/sections/users.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/users.min.css') }}" rel="stylesheet" >
 @endpush
 
-@push('bootom-stack')
+@push('Js')
     <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-
     <script>
         $(function() {
             const picker = new easepick.create({
@@ -31,7 +26,7 @@
                     ],
                     zIndex: 10,
                     plugins: ['RangePlugin'],
-                });
+            });
             searchOne();
             searchTwo();
         });
@@ -77,27 +72,35 @@
             $("#btnSearch").text("Buscar").attr("disabled", false);
             $('#filterModal').modal('hide');
         }
-
     </script>
 @endpush
 
 @section('content')
-    <div class="container-fluid p-0">
-        <h1 class="h3 mb-3 button_">
-            Descarga de CCForm
-            <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</a>
-        </h1>
-
-        <div class="row">
-            <div class="col-12 col-sm-12">
-
-                <div class="tab">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab" id="placeholder_dates_one">{{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }} | LLEGADAS</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#tab-2" data-bs-toggle="tab" role="tab" id="placeholder_dates_two">{{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }} | SALIDAS</a></li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="tab-1" role="tabpanel">                                                                                
+    <div class="row layout-top-spacing">
+        <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
+            <div class="widget-four">
+                <div class="widget-heading">
+                    <div class="d-flex gap-3">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</button>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab" aria-selected="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                {{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }} | LLEGADAS
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" href="#tab-2" data-bs-toggle="tab" role="tab" aria-selected="false" tabindex="-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                {{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }} | SALIDAS
+                            </button>
+                        </li>
+                    </ul>                    
+                    <div class="tab-content" id="pills-tabContent">
+                        <div class="tab-pane fade show active" id="tab-1" role="tabpanel">                                                                                
                             <div id="iframeOneContainer"></div>
                         </div>
                         <div class="tab-pane" id="tab-2" role="tabpanel">                                                                                
@@ -105,32 +108,36 @@
                         </div>
                     </div>
                 </div>
-                
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filterModalLabel">Filtro de CCForm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <form class="form" action="" method="POST" id="formSearch">
+                    <div class="modal-body">
+                        @csrf
+                        <div class="row">
+                            <div class="col-12 col-sm-12">
+                                <label class="form-label" for="lookup_date">Seleccione el rango de fechas</label>
+                                <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $search['init_date']." - ".$search['end_date'] }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn btn-light-dark" data-bs-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+                        <button type="submit" class="btn btn-primary" onclick="searchOne(),searchTwo()" id="btnSearch">Buscar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 @endsection
-
-<div class="modal" tabindex="-1" id="filterModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Filtro de CCForm</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form class="row" action="" method="POST" id="formSearch">                    
-                    @csrf
-                    <div class="col-12 col-sm-12">
-                        <label class="form-label" for="lookup_date">Seleccione el rango de fechas</label>
-                        <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $search['init_date']." - ".$search['end_date'] }}">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" onclick="searchOne(),searchTwo()" id="btnSearch">Buscar</button>
-            </div>
-        </div>
-    </div>
-</div>

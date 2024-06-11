@@ -15,7 +15,7 @@
 
 @section('content')
     <div class="row layout-top-spacing">
-        <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
+        <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
             <div class="widget-four">
                 <div class="widget-heading">
                     <div class="d-flex gap-3">
@@ -24,8 +24,8 @@
                         @endif
                         @if(RoleTrait::hasPermission(5))
                             <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#whiteIPsModal">Ver IPs</button>
-                        @endif                      
-                    </div>                    
+                        @endif
+                    </div>
                 </div>
                 <div class="widget-content">
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -123,7 +123,7 @@
                                                 @endforeach
                                             </td>
                                             <td>
-                                                <div class="btn-group mb-2 me-4">
+                                                <div class="btn-group">
                                                     <button type="button" class="btn btn-primary">Acciones</button>
                                                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                                         <span class="visually-hidden ">Toggle Dropdown</span>

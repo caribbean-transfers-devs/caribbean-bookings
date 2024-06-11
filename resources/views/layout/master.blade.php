@@ -138,7 +138,7 @@
                             </a>
                             <ul id="operation" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                                 @if(RoleTrait::hasPermission(36))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.index') }}">Descargar</a></li>                           
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.download') }}">Descargar</a></li>                           
                                 @endif
                                 @if(RoleTrait::hasPermission(37))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.managment') }}">Gestión</a></li>

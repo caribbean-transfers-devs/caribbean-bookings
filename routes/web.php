@@ -77,7 +77,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reservations/upload/{id}', [ReservationsController::class, 'getMedia'])->name('reservations.upload.getmedia');
     Route::delete('/reservations/upload/{id}', [ReservationsController::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
 
-    Route::get('/operation', [OperationController::class, 'index'])->name('operation.index');
+    Route::get('/operation', [OperationController::class, 'index'])->name('operation.download');
     Route::get('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment');
     Route::post('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment.search');
     Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');

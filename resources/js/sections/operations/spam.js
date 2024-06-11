@@ -1,23 +1,30 @@
-$('.items_table').DataTable({
-    language: {
-        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
-    },
-    paging: false,
-    ordering: true,
-    "order": [[2, 'asc']] 
-});
-
-$(function() {
+if ( document.getElementById('lookup_date') != null ) {
     const picker = new easepick.create({
-        element: "#lookup_date",        
+        element: "#lookup_date",
         css: [
             'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
             'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
             'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
         ],
-        zIndex: 10
-    })
-});
+        zIndex: 10,
+    });   
+}
+
+if( document.querySelector('.table-rendering') != null ){
+    components.actionTable($('.table-rendering'));
+}
+components.formReset();
+
+//DECLARACION DE VARIABLES
+const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
+const __title_modal = document.getElementById('filterModalLabel');
+
+//ACCION PARA CREAR
+if( __create != null ){
+    __create.addEventListener('click', function () {
+        __title_modal.innerHTML = this.dataset.title;
+    });
+}
 
 function updateSpam(event, id, type, update){
     event.preventDefault();
@@ -31,10 +38,7 @@ function updateSpam(event, id, type, update){
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if(result.isConfirmed == true){
-
-            var button = $('button[data-id="'+ id +'"]');
-            
-
+            var button = $('button[data-id="'+ id +'"]');        
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -58,7 +62,6 @@ function updateSpam(event, id, type, update){
                     }).then((result) => {
                         location.reload();
                     });
-
                 }
             }).fail(function(xhr, status, error) {
                     console.log(xhr);
@@ -68,14 +71,8 @@ function updateSpam(event, id, type, update){
                         'error'
                     );
             });
-
         }
     });
 
    
-}
-
-function Search(){
-    $("#btnSearch").text("Buscando....").attr("disabled", true);
-    $("#formSearch").submit();
 }

@@ -226,11 +226,9 @@ class OperationRepository
         return view('operation.managment', compact('items','date'));
     }
 
-    public function statusUpdate($request){
-        
+    public function statusUpdate($request){        
         try {
-            DB::beginTransaction();
-            
+            DB::beginTransaction();            
             $item = ReservationsItem::find($request->item_id);
             if($request->type == "arrival"):
                 $item->op_one_status = $request->status;
@@ -254,7 +252,6 @@ class OperationRepository
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        } 
-        
+        }
     }
 }

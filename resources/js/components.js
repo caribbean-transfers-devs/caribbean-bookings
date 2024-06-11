@@ -307,15 +307,15 @@ let components = {
  * una advertencia o una confirmación antes de permitir que abandonen la página.
  */
 window.addEventListener("beforeunload", function(event) {
-    components.loadScreen();
+    // components.loadScreen();
 });
 
 // Mostrar el indicador de carga cuando se navega hacia atrás o hacia adelante
 window.addEventListener('popstate', function (event) {
     console.log("popstate");
-    components.removeLoadScreen();
+    // components.removeLoadScreen();
     // components.loadScreen();
-    components.removeLoadScreen();
+    // components.removeLoadScreen();
 });
 
 window.addEventListener("DOMContentLoaded", function() {

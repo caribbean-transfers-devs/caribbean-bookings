@@ -1,13 +1,15 @@
-const picker = new easepick.create({
-    element: "#lookup_date",
-    css: [
-        'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-        'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-        'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-    ],
-    zIndex: 10,
-    plugins: ['RangePlugin'],
-});
+if ( document.getElementById('lookup_date') != null ) {
+    const picker = new easepick.create({
+        element: "#lookup_date",
+        css: [
+            'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+            'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+            'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
+        ],
+        zIndex: 10,
+        plugins: ['RangePlugin'],
+    });   
+}
 
 if( document.querySelector('.table-rendering') != null ){
     components.actionTable($('.table-rendering'));
@@ -34,19 +36,19 @@ function setStatus(event, type, status, item_id, rez_id){
     let alert_type = 'btn-secondary';
     switch (status) {
         case 'PENDING':
-            alert_type = 'btn-secondary';
+            alert_type = 'secondary';
             break;
         case 'COMPLETED':
-            alert_type = 'btn-success';
+            alert_type = 'success';
             break; 
         case 'NOSHOW':
-            alert_type = 'btn-warning';
+            alert_type = 'warning';
             break;
         case 'CANCELLED':
-            alert_type = 'btn-danger';
+            alert_type = 'danger';
             break;  
         default:
-            alert_type = 'btn-secondary';
+            alert_type = 'secondary';
             break;
     }    
 
@@ -91,7 +93,7 @@ function setStatus(event, type, status, item_id, rez_id){
                             clearInterval(timerInterval)
                         }
                     }).then((result) => {
-                        statusCell.innerHTML = `<span class="badge ${alert_type} rounded-pill">${status}</span>`;                        
+                        statusCell.innerHTML = `<span class="badge badge-light-${alert_type} mb-2 me-4">${status}</span>`;
                     })
 
                 }

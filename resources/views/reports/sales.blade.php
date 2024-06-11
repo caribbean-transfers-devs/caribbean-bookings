@@ -30,19 +30,19 @@
 @section('content')
     @php
         $buttons = array(
-            array(  
+            array(
                 'extend' => 'copyHtml5',
                 'text' => 'Copiar',
                 'titleAttr' => 'Copiar datos',
                 'className' => 'btn btn-primary',
             ),
-            array(  
+            array(
                 'text' => 'CSV',
                 'extend' => 'csvHtml5',
                 'titleAttr' => 'Exportar como CSV',
                 'className' => 'btn btn-primary',
             ),
-            array(  
+            array(
                 'text' => 'Excel',
                 'extend' => 'excelHtml5',
                 'titleAttr' => 'Exportar como Excel',
@@ -129,15 +129,15 @@
                                             @if ($item->is_cancelled == 0)                                                                                                   
                                                 @switch($item->status)
                                                     @case('CONFIRMED')
-                                                        <span class="badge bg-success">Confirmado</span>
+                                                        <span class="badge badge-light-warning mb-2 me-4">Confirmado</span>
                                                         @break
                                                     @case('PENDING')
-                                                        <span class="badge bg-info">Pendiente</span>
+                                                        <span class="badge badge-light-info mb-2 me-4">Pendiente</span>
                                                         @break
                                                     @default                                                            
                                                 @endswitch
                                             @else
-                                                    <span class="badge bg-danger">Cancelado</span>
+                                                    <span class="badge badge-light-danger mb-2 me-4">Cancelado</span>
                                             @endif
                                         </td> 
                                         <td>{{ $item->client_full_name }}</td>                                           
@@ -293,7 +293,7 @@
     </div>
 
     @php
-        dump($data);
+        // dump($data);
     @endphp
     <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" />    
 @endsection

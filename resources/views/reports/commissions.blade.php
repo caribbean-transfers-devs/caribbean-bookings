@@ -210,7 +210,7 @@
     </div>
 
     @php
-        dump($search);
+        // dump($search);
     @endphp
     <x-modals.reservations.reports :data="$search" />
 @endsection

@@ -10,201 +10,151 @@
     $sites = [];
     $destinations = [];
 @endphp
-@extends('layout.master')
+@extends('layout.app')
 @section('title') Operación @endsection
 
-@push('up-stack')
-    <style>
-        table thead th{
-            font-size: 8pt;
-        }
-        table tbody td{
-            font-size: 8pt;
-        }
-        .button_{
-            display: flex;
-            justify-content: space-between;
-        }
-    </style>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+@push('Css')
+    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
 @endpush
 
-@push('bootom-stack')
-    <script src="{{ mix('assets/js/datatables.js') }}"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-
+@push('Js')
     <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    
-    <script src="{{ mix('/assets/js/views/operation/managment.min.js') }}"></script>
-    <script>        
-        var inactivityTime = (5 * 60000); // 30 segundos en milisegundos
-        var timeoutId;
-    
-        function resetTimer() {          
-            clearTimeout(timeoutId);          
-            timeoutId = setTimeout(refreshPage, inactivityTime);
-        }
-    
-        function refreshPage() {          
-            location.reload();
-        }
-            
-        document.addEventListener('mousemove', resetTimer);
-        document.addEventListener('keydown', resetTimer);
-                
-        resetTimer();
-    </script>
+    <script src="{{ mix('assets/js/sections/operations/managment.min.js') }}"></script>
 @endpush
 
 @section('content')
-    <div class="container-fluid p-0">
-        <h1 class="h3 mb-3 button_">
-            Gestión de operación
-            <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</a>        
-        </h1>
-        
-        <div class="row">
-            <div class="col-12 col-sm-12">
-                <div class="tab">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab">Servicios</a></li>                        
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="tab-1" role="tabpanel">
-                            <h4 class="tab-title">Listado de reservaciones a operar</h4>
-                            <table id="reservations_table" class="table table-striped table-sm">
-                                <thead>
-                                    <tr>                                                        
-                                        <th>Pickup</th>
-                                        <th>Sitio</th>
-                                        <th class="text-center">Tipo</th>
-                                        <th class="text-center">Estatus Op.</th>
-                                        <th>Código</th>
-                                        <th>Cliente</th>
-                                        <th>Vehículo</th>
-                                        <th>Pasajeros</th>
-                                        <th>Desde</th>
-                                        <th>Hacia</th>
-                                        <th>Pago</th>
-                                        <th>Total</th>
-                                        <th>Moneda</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if(sizeof($items)>=1)
-                                        @foreach($items as $key => $value)
-                                            
-                                                @php
-                                                    $payment = ( $value->total_sales - $value->total_payments );
-                                                    if($payment < 0) $payment = 0;
-
-                                                    $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
-                                                    $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
-                                                    $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
-                                                    $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
-
-                                                    switch ($operation_status) {
-                                                        case 'PENDING':
-                                                            $label = 'btn-secondary';
-                                                            break;
-                                                        case 'COMPLETED':
-                                                            $label = 'btn-success';
-                                                            break;
-                                                        case 'NOSHOW':
-                                                            $label = 'btn-warning';
-                                                            break;
-                                                        case 'CANCELLED':
-                                                            $label = 'btn-danger';
-                                                            break;
-                                                        default:
-                                                            $label = 'btn-secondary';
-                                                            break;
-                                                    }
-                                                @endphp
-                                                <tr>
-                                                    <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
-                                                    <td>{{ $value->site_name }}</td>
-                                                    <td>{{ $value->final_service_type }}</td>
-                                                    <td class="text-center"><span class="badge {{ $label }} rounded-pill">{{ $operation_status }}</span></td>
-                                                    <td>
-                                                        @if (RoleTrait::hasPermission(38))
-                                                            <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
-                                                        @else
-                                                            {{ $value->code }}
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        {{ $value->client_first_name }} {{ $value->client_last_name }}
-                                                        @if(!empty($value->reference))
-                                                            [{{ $value->reference }}]
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $value->service_name }}</td>
-                                                    <td class="text-center">{{ $value->passengers }}</td>
-                                                    <td>{{ $operation_from }}</td>
-                                                    <td>{{ $operation_to }}</td>
-                                                    <td class="text-center">{{ $value->status }}</td>
-                                                    <td class="text-end">{{ number_format($payment,2) }}</td>
-                                                    <td class="text-center">{{ $value->currency }}</td>
-                                                    <td class="text-center">
-                                                        <div class="btn-group btn-group-sm">
-                                                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                Operación
-                                                            </button>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }})">Pendiente</a>
-                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'COMPLETED',{{ $value->id }}, {{ $value->reservation_id }})">Completado</a>
-                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'NOSHOW',{{ $value->id }}, {{ $value->reservation_id }})">No show</a>
-                                                                <div class="dropdown-divider"></div>
-                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }})">Cancelado</a>                                                                
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
-                                        @endforeach
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
+    @php
+        $buttons = array(
+            array(  
+                'text' => 'Filtrar',
+                'className' => 'btn btn-primary __btn_create',
+                'attr' => array(
+                    'data-title' =>  "Filtro de reservaciones",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#filterModal'
+                )
+            ),
+        );
+        // dump($buttons);
+    @endphp
+    <div class="row layout-top-spacing">
+        <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
+            <div class="widget-content widget-content-area br-8">
+                @if ($errors->any())
+                    <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x close" data-bs-dismiss="alert"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
-                </div>
-            </div>
-        </div>
+                @endif
+                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                    <thead>
+                        <tr>
+                            <th>Pickup</th>
+                            <th>Sitio</th>
+                            <th class="text-center">Tipo</th>
+                            <th class="text-center">Estatus Op.</th>
+                            <th>Código</th>
+                            <th>Cliente</th>
+                            <th>Vehículo</th>
+                            <th>Pasajeros</th>
+                            <th>Desde</th>
+                            <th>Hacia</th>
+                            <th>Pago</th>
+                            <th>Total</th>
+                            <th>Moneda</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(sizeof($items)>=1)
+                            @foreach($items as $key => $value)                                
+                                @php
+                                    $payment = ( $value->total_sales - $value->total_payments );
+                                    if($payment < 0) $payment = 0;
 
-    </div>
+                                    $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
+                                    $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
+                                    $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
+                                    $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
 
-
-<div class="modal" tabindex="-1" id="filterModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Filtro de reservaciones</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form class="row" action="" method="POST" id="formSearch">                    
-                    @csrf
-                    <div class="col-12 col-sm-6">
-                        <label class="form-label" for="lookup_date">Fecha de creación</label>
-                        <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" onclick="Search()" id="btnSearch">Buscar</button>
+                                    switch ($operation_status) {
+                                        case 'PENDING':
+                                            $label = 'secondary';
+                                            break;
+                                        case 'COMPLETED':
+                                            $label = 'success';
+                                            break;
+                                        case 'NOSHOW':
+                                            $label = 'warning';
+                                            break;
+                                        case 'CANCELLED':
+                                            $label = 'danger';
+                                            break;
+                                        default:
+                                            $label = 'secondary';
+                                            break;
+                                    }
+                                @endphp
+                                <tr>
+                                    <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                    <td>{{ $value->site_name }}</td>
+                                    <td>{{ $value->final_service_type }}</td>
+                                    <td class="text-center"><span class="badge badge-light-{{ $label }} mb-2 me-4">{{ $operation_status }}</span></td>
+                                    <td>
+                                        @if (RoleTrait::hasPermission(38))
+                                            <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
+                                        @else
+                                            {{ $value->code }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ $value->client_first_name }} {{ $value->client_last_name }}
+                                        @if(!empty($value->reference))
+                                            [{{ $value->reference }}]
+                                        @endif
+                                    </td>
+                                    <td>{{ $value->service_name }}</td>
+                                    <td class="text-center">{{ $value->passengers }}</td>
+                                    <td>{{ $operation_from }}</td>
+                                    <td>{{ $operation_to }}</td>
+                                    <td class="text-center">{{ $value->status }}</td>
+                                    <td class="text-end">{{ number_format($payment,2) }}</td>
+                                    <td class="text-center">{{ $value->currency }}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group mb-2 me-4">
+                                            <button type="button" class="btn btn-primary">Acciones</button>
+                                            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                                <span class="visually-hidden ">Toggle Dropdown</span>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }})">Pendiente</a>
+                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'COMPLETED',{{ $value->id }}, {{ $value->reservation_id }})">Completado</a>
+                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'NOSHOW',{{ $value->id }}, {{ $value->reservation_id }})">No show</a>
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }})">Cancelado</a>                                                                
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-</div>
 
-
+    @php
+        // dump($date_search);
+    @endphp
+    <x-modals.reservations.reports :data="$date" />
 @endsection
