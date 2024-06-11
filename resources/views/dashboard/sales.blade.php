@@ -29,7 +29,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script>       
+    <script>
         let dashboard = {
             dataDay: @json(( isset($bookings_day) ? $bookings_day : [] )),
             dataSitesDay: @json($bookings_sites_day),
@@ -602,5 +602,4 @@
 
     <x-modals.reservations.bookings_day :bookings="$bookings_day" />
     <x-modals.reservations.bookings_month :bookings="$bookings_month" />
-    {{-- <x-modals.reservations.reports :data="$data" /> --}}
 @endsection

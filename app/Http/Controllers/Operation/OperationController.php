@@ -44,6 +44,13 @@ class OperationController extends Controller
         }
         return $spamRepository->index($request);
     }
+
+    public function exportExcel(Request $request, SpamRepository $spamRepository){
+        if(!$this->hasPermission(47)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+        return $spamRepository->exportExcel($request);
+    }    
     
     public function spamUpdate(Request $request, SpamRepository $spamRepository){
         if(!$this->hasPermission(47)){

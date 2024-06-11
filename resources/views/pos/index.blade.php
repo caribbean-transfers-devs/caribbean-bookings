@@ -12,7 +12,6 @@
     ];
     $sites = [];
     $destinations = [];
-
     function getShift($created_at) {
         $time = Carbon::parse($created_at)->format('H:i');
 

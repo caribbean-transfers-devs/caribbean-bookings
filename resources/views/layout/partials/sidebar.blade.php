@@ -187,7 +187,7 @@
                 'code' => 'bookings',
                 'name' => 'Reservaciones',
                 'route' => route('reservations.index'),
-                'active' => request()->routeIs('reservations.index')
+                'active' => request()->routeIs('reservations.index','reservations.search')
             ]);        
         endif;
 
@@ -197,14 +197,14 @@
                 $links_settings[] = [
                     'name' => 'Zonas',
                     'route' => route('config.zones'),
-                    'active' => request()->routeIs('config.zones'),
+                    'active' => request()->routeIs('config.zones','config.zones.getZones'),
                 ];
             endif;
             if(RoleTrait::hasPermission(32)):
                 $links_settings[] = [
                     'name' => 'Tarifas',
-                    'route' => route('config.ratesDestination'),
-                    'active' => request()->routeIs('config.ratesDestination'),
+                    'route' => route('config.ratesDestination','config.ratesZones'),
+                    'active' => request()->routeIs('config.ratesDestination','config.ratesZones'),
                 ];
             endif;
             array_push($links,[
@@ -213,7 +213,7 @@
                 'code' => 'settings',
                 'name' => 'Configuraciones',
                 'route' => null,
-                'active' => request()->routeIs('config.zones','config.ratesDestination'),
+                'active' => request()->routeIs('config.zones','config.zones.getZones','config.ratesDestination','config.ratesZones'),
                 'urls' => $links_settings
             ]);            
         endif;
