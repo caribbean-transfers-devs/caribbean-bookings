@@ -23,7 +23,7 @@ div.controls{
             }
             > div.information_data{
                 display: grid;
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
                 grid-column-gap: 5px;
                 grid-row-gap: 5px;
                 margin-bottom: 8px;
@@ -36,6 +36,19 @@ div.controls{
             }
             > div.flight_data{
                 margin-top: 8px;
+            }
+        }
+        > div.item-data{
+            table{
+                tbody{
+                    tr{
+                        td{
+                            > p{
+                                margin: 0px;
+                            }
+                        }
+                    }
+                }
             }
         }
     }

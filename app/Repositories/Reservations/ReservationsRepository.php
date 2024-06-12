@@ -88,7 +88,8 @@ class ReservationsRepository
                                     END AS status,
                                     site.name as site_name,
                                     GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
-                                    GROUP_CONCAT(DISTINCT it.zone_two_name ORDER BY it.zone_two_name ASC SEPARATOR ',') AS destination_name,
+                                    GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
+                                    GROUP_CONCAT(DISTINCT it.zone_two_name ORDER BY it.zone_two_name ASC SEPARATOR ',') AS destination_name_to,
                                     GROUP_CONCAT(DISTINCT it.zone_two_id ORDER BY it.zone_two_id ASC SEPARATOR ',') AS zone_two_id,
                                     GROUP_CONCAT(DISTINCT it.service_type_id ORDER BY it.service_type_id ASC SEPARATOR ',') AS service_type_id,
                                     GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
@@ -116,6 +117,7 @@ class ReservationsRepository
                                         SELECT  it.reservation_id, it.is_round_trip,
                                                 SUM(it.passengers) as passengers,
                                                 GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS code,
+                                                GROUP_CONCAT(DISTINCT zone_one.name ORDER BY zone_one.name ASC SEPARATOR ',') AS zone_one_name,
                                                 GROUP_CONCAT(DISTINCT zone_two.name ORDER BY zone_two.name ASC SEPARATOR ',') AS zone_two_name, 
                                                 GROUP_CONCAT(DISTINCT zone_two.id ORDER BY zone_two.id ASC SEPARATOR ',') AS zone_two_id, 
                                                 GROUP_CONCAT(DISTINCT dest.id ORDER BY dest.id ASC SEPARATOR ',') AS service_type_id, 
@@ -258,7 +260,24 @@ class ReservationsRepository
             DB::rollBack();
             return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }    
+    }
+
+    public function enableReservation($request, $reservation)
+    {
+        try {            
+            DB::beginTransaction();
+            $reservation->is_cancelled = 0;
+            $reservation->is_duplicated = 0;
+            $reservation->items()->update(['op_one_status' => 'PENDING', 'op_two_status' => 'PENDING']);
+            $reservation->save();
+            $check = $this->create_followUps($reservation->id, 'Se ha activado la reservación por: '.auth()->user()->name, 'HISTORY', 'DUPLICADA');
+            DB::commit();
+            return response()->json(['message' => 'Reservation duplicated successfully'], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    } 
 
     public function follow_ups($request)
     {        
