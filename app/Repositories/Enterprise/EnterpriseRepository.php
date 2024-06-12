@@ -16,8 +16,15 @@ class EnterpriseRepository
     public function index($request)
     {
         try {
+            $breadcrumbs = array(
+                array(
+                    "route" => "",
+                    "name" => "Listado de empresas",
+                    "active" => true
+                ),
+            );
             $enterprises = Enterprise::all();
-            return view('enterprises.index', compact('enterprises'));
+            return view('enterprises.index', compact('enterprises','breadcrumbs'));
         } catch (Exception $e) {
         }
     }
