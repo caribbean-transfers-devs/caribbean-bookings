@@ -14,6 +14,23 @@
 @endpush
 
 @section('content')
+    @php
+        $buttons = array(
+            array(  
+                'text' => 'CSV',
+                'extend' => 'csvHtml5',
+                'titleAttr' => 'Exportar como CSV',
+                'className' => 'btn btn-primary',
+            ),
+            array(  
+                'text' => 'Excel',
+                'extend' => 'excelHtml5',
+                'titleAttr' => 'Exportar como Excel',
+                'className' => 'btn btn-primary',
+            ),            
+        );
+        // dump($buttons);
+    @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
             <div class="widget-four">
@@ -44,7 +61,7 @@
                     </ul>
                     <div class="tab-content" id="pills-tabContent">
                         <div class="tab-pane fade show active" id="tab-1" role="tabpanel">
-                            <table id="active_users" class="table table-rendering dt-table-hover">
+                            <table id="active_users" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
@@ -95,7 +112,7 @@
                             </table>
                         </div>
                         <div class="tab-pane fade" id="tab-2" role="tabpanel">
-                            <table id="inactive_users" class="table table-rendering dt-table-hover">
+                            <table id="inactive_users" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>

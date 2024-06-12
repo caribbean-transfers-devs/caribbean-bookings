@@ -195,7 +195,15 @@ class CommissionsRepository
                         endif;
                 endforeach;
         endif;
+
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Reporte de comisiones del ". date("Y-m-d", strtotime($search['init'])) ." al ". date("Y-m-d", strtotime($search['end'])),
+                "active" => true
+            ),
+        );
         
-        return view('reports.commissions', compact('search', 'items'));
+        return view('reports.commissions', compact('search', 'items', 'breadcrumbs'));
     }
 }

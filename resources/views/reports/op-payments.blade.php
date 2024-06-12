@@ -27,6 +27,19 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="{{ mix('/assets/js/sections/operations/managment.min.js') }}"></script>
+    <script>
+        if ( document.getElementById('lookup_date') != null ) {
+            const picker = new easepick.create({
+                element: "#lookup_date",
+                css: [
+                    'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+                    'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+                    'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
+                ],
+                zIndex: 10,
+            });   
+        }        
+    </script>
 @endpush
 
 @section('content')
@@ -56,7 +69,7 @@
                             @endforeach
                         </ul>
                     </div>
-                @endif                
+                @endif
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>

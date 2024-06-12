@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Spatie\LaravelIgnition\Recorders\DumpRecorder\Dump;
 use Illuminate\Support\Str;
 use Faker\Factory as Faker;
+use Illuminate\Support\Arr;
 
 class DashboardRepository
 {
@@ -319,6 +320,14 @@ class DashboardRepository
             endforeach;
         }
         
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => ( $type == "online" ? "Ventas en linea" : ( $type == "online" ? "Ventas de Aereopuerto" : "Ventas generales" ) ),
+                "active" => true
+            ),
+        );
+
         return view('dashboard.sales', [
             'bookings_day' => $bookings_day, 
             'bookings_sites_day' => $bookings_sites_day,
@@ -326,7 +335,8 @@ class DashboardRepository
             'bookings_month' => $bookings_month,
             'bookings_sites_month' => $bookings_sites_month,
             'bookings_destinations_month' => $bookings_destinations_month,
-            'data' => $data
+            'data' => $data,
+            'breadcrumbs' => $breadcrumbs,
         ]);
     }
 

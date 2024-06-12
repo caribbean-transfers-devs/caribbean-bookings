@@ -32,12 +32,6 @@
                 )
             ),
             array(  
-                'extend' => 'copyHtml5',
-                'text' => 'Copiar',
-                'titleAttr' => 'Copiar datos',
-                'className' => 'btn btn-primary',
-            ),
-            array(  
                 'text' => 'CSV',
                 'extend' => 'csvHtml5',
                 'titleAttr' => 'Exportar como CSV',
@@ -150,7 +144,7 @@
                     </tbody>
                 </table>
                 <div class="mt-3 px-2">
-                    <h5>Resumen</h5>
+                    <h6>Resumen</h6>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>

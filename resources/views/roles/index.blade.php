@@ -10,17 +10,23 @@
 @endpush
 
 @push('Js')
-    <script src="{{ mix('assets/js/sections/vehicle.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/roles.min.js') }}"></script>
 @endpush
 
 @section('content')
     @php
-        $buttons = array();
+        $buttons = array(
+            // array(
+            //     'text' => 'Añadir Rol',
+            //     'className' => 'btn btn-primary ',
+            //     'url' => route('roles.create')
+            // )            
+        );
         if(RoleTrait::hasPermission(7)):
             array_push($buttons,array(
                 'text' => 'Añadir Rol',
-                'className' => 'btn btn-primary __btn_create',
-                'url' => route('roles.create')            
+                'className' => 'btn btn-primary ',
+                'url' => route('roles.create')
             ));
         endif;
         // dump($buttons);

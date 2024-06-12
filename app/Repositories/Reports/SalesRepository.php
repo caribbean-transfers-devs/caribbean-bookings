@@ -165,7 +165,15 @@ class SalesRepository
         // print_r($sites);
         // die();
 
-        return view('reports.sales', compact('bookings','services','zones','websites','data') );
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Reporte de reservacione del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
+                "active" => true
+            ),
+        );
+
+        return view('reports.sales', compact('bookings','services','zones','websites','data', 'breadcrumbs') );
 
         /*if(!$request->lookup_date){
             $from = date('Y-m-d');

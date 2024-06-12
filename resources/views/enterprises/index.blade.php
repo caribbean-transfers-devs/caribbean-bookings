@@ -18,7 +18,7 @@
         $buttons = array(
             array(  
                 'text' => 'Agregar una empresa',
-                'className' => 'btn btn-primary __btn_create',
+                'className' => 'btn btn-primary ',
                 'url' => route('enterprises.create')
             )
         );

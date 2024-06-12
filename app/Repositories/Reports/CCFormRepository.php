@@ -17,7 +17,15 @@ class CCFormRepository
             "end_date" => date("Y-m-d")
         ];
 
-        return view('reports.ccform', compact('search'));
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Descarga de CCForm",
+                "active" => true
+            ),
+        );
+
+        return view('reports.ccform', compact('search','breadcrumbs'));
     }
 
     public function createPDF($request){     

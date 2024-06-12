@@ -2,8 +2,8 @@
 @section('title') Tarifas @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/zones.min.css') }}" rel="preload" as="style">
-    <link href="{{ mix('/assets/css/sections/zones.min.css') }}" rel="stylesheet">
+    <link href="{{ mix('/assets/css/sections/rates.min.css') }}" rel="preload" as="style">
+    <link href="{{ mix('/assets/css/sections/rates.min.css') }}" rel="stylesheet">
 @endpush
 
 @push('Js')    
@@ -30,48 +30,42 @@
                 </div>
                 <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
                     <div class="card-body">
-                        <form action="" class="row search-container" method="GET" id="zoneForm">
-                            <div class="w-100 d-flex flex-wrap justify-content-between">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="w-50">
-                                        <select name="destinationID" class="form-control" id="destinationID">
-                                            <option value="0">Selecciona el destino</option>
-                                            <option value="1">Cancún</option>
-                                        </select>
-                                    </div>
-                                    <div class="w-50">
-                                        <select name="rateZoneOneId" class="form-control" id="rateZoneOneId">
-                                            <option value="0">Zona de origen</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    a
-                                </div>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="w-50">
-                                        <select name="rateZoneTwoId" class="form-control" id="rateZoneTwoId">
-                                            <option value="0">Zona de destino</option>
-                                        </select>
-                                    </div>
-                                    <div class="w-50">
-                                        <select name="rateServicesID" class="form-control" id="rateServicesID">
-                                            <option value="0">Selecciona el servicio</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <select name="rateGroupID" class="form-control" id="rateGroupID">
-                                        @if(sizeof($rate_groups) >= 1)
-                                            @foreach ($rate_groups as $value)
-                                                <option value="{{ $value->id }}">({{ $value->code }}) {{ $value->name }}</option>
-                                            @endforeach
-                                        @endif
+                        <form action="" class="search-container" method="GET" id="zoneForm">
+                            <div>
+                                <select name="destinationID" class="form-control" id="destinationID">
+                                    <option value="0">Selecciona el destino</option>
+                                    <option value="1">Cancún</option>
+                                </select>
+                            </div>
+                            <div class="two_">
+                                <div>
+                                    <select name="rateZoneOneId" class="form-control" id="rateZoneOneId">
+                                        <option value="0">Zona de origen</option>
                                     </select>
-                                </div>                            
-                                <div class="d-flex align-items-center align-self-end">
-                                    <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btnGetRates">Buscar</button>
                                 </div>
+                                <div class="label_">a</div>
+                                <div>
+                                    <select name="rateZoneTwoId" class="form-control" id="rateZoneTwoId">
+                                        <option value="0">Zona de destino</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <select name="rateServicesID" class="form-control" id="rateServicesID">
+                                    <option value="0">Selecciona el servicio</option>
+                                </select>
+                            </div>                                
+                            <div>
+                                <select name="rateGroupID" class="form-control" id="rateGroupID">
+                                    @if(sizeof($rate_groups) >= 1)
+                                        @foreach ($rate_groups as $value)
+                                            <option value="{{ $value->id }}">({{ $value->code }}) {{ $value->name }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>                            
+                            <div>
+                                <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btnGetRates">Buscar</button>
                             </div>
                         </form>
                     </div>
@@ -80,7 +74,7 @@
             </div>
         </div>
     
-        <div class="col-12 col-sm-12">            
+        <div class="col-12 col-sm-12">
             <div class="card">
                 <div class="card-body" id="rates-container"></div>
             </div>

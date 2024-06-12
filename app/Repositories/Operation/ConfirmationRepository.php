@@ -100,7 +100,15 @@ class ConfirmationRepository
                                         "init_date_four" => $search['end_date'],
                                     ]);
 
-        return view('operation.confirmation', compact('items','date'));
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Gestión de operación",
+                "active" => true
+            ),
+        );
+
+        return view('operation.confirmation', compact('items','date','breadcrumbs'));
     }
 
     public function statusUpdate($request){

@@ -34,6 +34,15 @@
     @php
         $buttons = array(
             array(
+                'text' => 'Filtrar',
+                'className' => 'btn btn-primary __btn_create',
+                'attr' => array(
+                    'data-title' =>  "Filtro de reservaciones",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#filterModal'
+                )
+            ),
+            array(
                 'text' => 'CSV',
                 'extend' => 'csvHtml5',
                 'titleAttr' => 'Exportar como CSV',
@@ -50,124 +59,124 @@
     @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-            <div class="widget widget-chart-three">
-                <div class="widget-heading">
-                    <div class="">
-                        <h5>Reservaciones - {{ date("Y-m-d", strtotime($data['init']))}} a {{ date("Y-m-d", strtotime($data['end']))}}</h5>
+            <div class="widget-content widget-content-area br-8">
+                @if ($errors->any())
+                    <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x close" data-bs-dismiss="alert"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
-                    <div class="task-action">
-                        <button class="btn btn-primary __btn_create" data-title="Filtro de reservaciones" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</button>
-                    </div>
-                </div>
-                <div class="widget-content">
-                    <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Sitio</th>
-                                <th>Código</th>
-                                <th>Estatus</th>
-                                <th>Cliente</th>
-                                <th>Servicio</th>
-                                <th>Pasajeros</th>
-                                <th>Total</th>
-                                <th>Moneda</th>
-                                <th>Pendiente</th>
-                                <th>Método</th>
-                                <th>Destino</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if(sizeof($bookings) >= 1)
-                                @foreach ($bookings as $item)
-                                    @php
-                                        if($item->is_cancelled == 0):
-                                            if($item->pay_at_arrival == 1):
-                                                $item->status = "CONFIRMED";
-                                            endif;
-                                            $resume['status'][$item->status][$item->currency] += $item->total_sales;
-                                            $resume['status'][$item->status]['count']++;
+                @endif
+                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Sitio</th>
+                            <th>Código</th>
+                            <th>Estatus</th>
+                            <th>Cliente</th>
+                            <th>Servicio</th>
+                            <th>Pasajeros</th>
+                            <th>Total</th>
+                            <th>Moneda</th>
+                            <th>Pendiente</th>
+                            <th>Método</th>
+                            <th>Destino</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(sizeof($bookings) >= 1)
+                            @foreach ($bookings as $item)
+                                @php
+                                    if($item->is_cancelled == 0):
+                                        if($item->pay_at_arrival == 1):
+                                            $item->status = "CONFIRMED";
+                                        endif;
+                                        $resume['status'][$item->status][$item->currency] += $item->total_sales;
+                                        $resume['status'][$item->status]['count']++;
 
-                                            //Si está confirmado, sumamos los totales por sitio...
-                                            if($item->status == "CONFIRMED"):
-                                                if(!isset( $sites[$item->site_name] )):
-                                                    $sites[$item->site_name] = [
-                                                        'USD' => 0,
-                                                        'MXN' => 0,
-                                                        'count' => 0
-                                                    ];
-                                                endif;                                                        
-                                                $sites[$item->site_name][$item->currency] += $item->total_sales;
-                                                $sites[$item->site_name]['count']++;
+                                        //Si está confirmado, sumamos los totales por sitio...
+                                        if($item->status == "CONFIRMED"):
+                                            if(!isset( $sites[$item->site_name] )):
+                                                $sites[$item->site_name] = [
+                                                    'USD' => 0,
+                                                    'MXN' => 0,
+                                                    'count' => 0
+                                                ];
+                                            endif;                                                        
+                                            $sites[$item->site_name][$item->currency] += $item->total_sales;
+                                            $sites[$item->site_name]['count']++;
 
-                                                if($item->affiliate_id != 0 ):
-                                                    if(!isset( $affiliates[$item->site_name] )):
-                                                        $affiliates[$item->site_name] = [
-                                                            'USD' => 0,
-                                                            'MXN' => 0,
-                                                            'count' => 0
-                                                        ];
-                                                    endif;
-                                                    $affiliates[$item->site_name][$item->currency] += $item->total_sales;
-                                                    $affiliates[$item->site_name]['count']++;
-                                                endif;
-
-                                                if(!isset( $destinations[$item->destination_name] )):
-                                                    $destinations[$item->destination_name] = [
+                                            if($item->affiliate_id != 0 ):
+                                                if(!isset( $affiliates[$item->site_name] )):
+                                                    $affiliates[$item->site_name] = [
                                                         'USD' => 0,
                                                         'MXN' => 0,
                                                         'count' => 0
                                                     ];
                                                 endif;
-                                                $destinations[$item->destination_name][$item->currency] += $item->total_sales;
-                                                $destinations[$item->destination_name]['count']++;
+                                                $affiliates[$item->site_name][$item->currency] += $item->total_sales;
+                                                $affiliates[$item->site_name]['count']++;
                                             endif;
 
-                                        else:
-                                            $resume['status']['CANCELLED'][$item->currency] += $item->total_sales;
-                                            $resume['status']['CANCELLED']['count']++;
-                                        endif;                                                
-                                        $total_pending = $item->total_sales - $item->total_payments;
-                                    @endphp
-                                    <tr>
-                                        <td class="text-end">
-                                            @if($item->is_today >= 1)
-                                                <i class="align-middle me-2" data-feather="alert-circle"></i>
-                                            @endif
-                                        </td>
-                                        <td>{{ $item->site_name }}</td>
-                                        <td>
-                                            <a href="reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a>
-                                        </td> 
-                                        <td class="text-center">
-                                            @if ($item->is_cancelled == 0)                                                                                                   
-                                                @switch($item->status)
-                                                    @case('CONFIRMED')
-                                                        <span class="badge badge-light-success">Confirmado</span>
-                                                        @break
-                                                    @case('PENDING')
-                                                        <span class="badge badge-light-info">Pendiente</span>
-                                                        @break
-                                                    @default                                                            
-                                                @endswitch
-                                            @else
-                                                    <span class="badge badge-light-danger">Cancelado</span>
-                                            @endif
-                                        </td> 
-                                        <td>{{ $item->client_full_name }}</td>                                           
-                                        <td>{{ $item->service_type_name }}</td>
-                                        <td class="text-center">{{ $item->passengers }}</td>
-                                        <td class="text-end">{{ $item->total_sales }}</td>
-                                        <td class="text-center">{{ $item->currency }}</td>
-                                        <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td>
-                                        <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td>
-                                        <td class="text-center">{{ $item->destination_name }}</td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
+                                            if(!isset( $destinations[$item->destination_name] )):
+                                                $destinations[$item->destination_name] = [
+                                                    'USD' => 0,
+                                                    'MXN' => 0,
+                                                    'count' => 0
+                                                ];
+                                            endif;
+                                            $destinations[$item->destination_name][$item->currency] += $item->total_sales;
+                                            $destinations[$item->destination_name]['count']++;
+                                        endif;
+
+                                    else:
+                                        $resume['status']['CANCELLED'][$item->currency] += $item->total_sales;
+                                        $resume['status']['CANCELLED']['count']++;
+                                    endif;                                                
+                                    $total_pending = $item->total_sales - $item->total_payments;
+                                @endphp
+                                <tr>
+                                    <td class="text-end">
+                                        @if($item->is_today >= 1)
+                                            <i class="align-middle me-2" data-feather="alert-circle"></i>
+                                        @endif
+                                    </td>
+                                    <td>{{ $item->site_name }}</td>
+                                    <td>
+                                        <a href="reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a>
+                                    </td> 
+                                    <td class="text-center">
+                                        @if ($item->is_cancelled == 0)                                                                                                   
+                                            @switch($item->status)
+                                                @case('CONFIRMED')
+                                                    <span class="badge badge-light-success">Confirmado</span>
+                                                    @break
+                                                @case('PENDING')
+                                                    <span class="badge badge-light-info">Pendiente</span>
+                                                    @break
+                                                @default                                                            
+                                            @endswitch
+                                        @else
+                                                <span class="badge badge-light-danger">Cancelado</span>
+                                        @endif
+                                    </td> 
+                                    <td>{{ $item->client_full_name }}</td>                                           
+                                    <td>{{ $item->service_type_name }}</td>
+                                    <td class="text-center">{{ $item->passengers }}</td>
+                                    <td class="text-end">{{ $item->total_sales }}</td>
+                                    <td class="text-center">{{ $item->currency }}</td>
+                                    <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td>
+                                    <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td>
+                                    <td class="text-center">{{ $item->destination_name }}</td>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="col-12 col-sm-4">

@@ -13,8 +13,11 @@
         
                         <nav class="breadcrumb-style-one" aria-label="breadcrumb">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Analytics</li>
+                                @if ( isset($breadcrumbs) )
+                                    @foreach ($breadcrumbs as $breadcrumb)
+                                        <li class="breadcrumb-item <?=( $breadcrumb['active'] ? 'active' : '' )?>" <?=( $breadcrumb['active'] ? 'aria-current="page"' : '' )?>><?=( $breadcrumb['active'] ? '<a href="#">'.$breadcrumb['name'].'</a>' : $breadcrumb['name'] )?></li>
+                                    @endforeach
+                                @endif
                             </ol>
                         </nav>
         

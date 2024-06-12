@@ -21,10 +21,18 @@ class SpamRepository
         $search['init'] = $date." 00:00:00";
         $search['end'] = $date." 23:59:59";
 
-        $items = $this->querySpam($search);
+        $items = $this->querySpam($search);        
         // dd($items);
-        return view('operation.spam', compact('items','date'));
-          
+
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Gestión de envío de SPAM",
+                "active" => true
+            ),
+        );
+
+        return view('operation.spam', compact('items','date','breadcrumbs'));          
     }
 
     public function exportExcel($request){

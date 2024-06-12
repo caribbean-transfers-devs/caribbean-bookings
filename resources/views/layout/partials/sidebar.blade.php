@@ -32,7 +32,7 @@
                     'route' => route('dashboard.sales',['airport']),
                     'active' => request()->is('dashboard/sales/airport'),
                 ];
-            endif;            
+            endif;
             array_push($links,[
                 'type' => 'multiple',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
@@ -50,28 +50,28 @@
                 $links_reports[] = [
                     'name' => 'Pagos',
                     'route' => route('reports.payment'),
-                    'active' => request()->routeIs('reports.payment'),
+                    'active' => request()->routeIs('reports.payment','reports.payment.action'),
                 ];
             endif;
             if(RoleTrait::hasPermission(44)):
                 $links_reports[] = [
                     'name' => 'Ventas',
                     'route' => route('reports.sales'),
-                    'active' => request()->routeIs('reports.sales'),
+                    'active' => request()->routeIs('reports.sales','reports.sales.action'),
                 ];
             endif;
             if(RoleTrait::hasPermission(45)):
                 $links_reports[] = [
                     'name' => 'Comisiones',
                     'route' => route('reports.commissions'),
-                    'active' => request()->routeIs('reports.commissions'),
+                    'active' => request()->routeIs('reports.commissions','reports.commissions.action'),
                 ];
             endif;
             if(RoleTrait::hasPermission(50)):
                 $links_reports[] = [
                     'name' => 'Efectivo',
                     'route' => route('reports.cash'),
-                    'active' => request()->routeIs('reports.cash'),
+                    'active' => request()->routeIs('reports.cash','reports.cash.action'),
                 ];
             endif;            
             array_push($links,[
@@ -80,7 +80,7 @@
                 'code' => 'reports',
                 'name' => 'Reportes',
                 'route' => null,
-                'active' => request()->routeIs('reports.payment','reports.sales','reports.commissions','reports.cash'),
+                'active' => request()->routeIs('reports.payment','reports.payment.action','reports.sales','reports.sales.action','reports.commissions','reports.commissions.action','reports.cash','reports.cash.action'),
                 'urls' => $links_reports
             ]);            
         endif;        
@@ -103,7 +103,7 @@
                 $links_selling_point[] = [
                     'name' => 'Ventas',
                     'route' => route('pos.index'),
-                    'active' => request()->routeIs('pos.index'),
+                    'active' => request()->routeIs('pos.index','pos.index.action'),
                 ];
             endif;
             if(RoleTrait::hasPermission(52)):
@@ -144,14 +144,14 @@
                 $links_operations[] = [
                     'name' => 'Gestión',
                     'route' => route('operation.managment'),
-                    'active' => request()->routeIs('operation.managment'),
+                    'active' => request()->routeIs('operation.managment','operation.managment.search'),
                 ];
             endif;
             if(RoleTrait::hasPermission(39)):
                 $links_operations[] = [
                     'name' => 'Confirmaciones',
                     'route' => route('operation.confirmation'),
-                    'active' => request()->routeIs('operation.confirmation'),
+                    'active' => request()->routeIs('operation.confirmation','operation.confirmation.search'),
                 ];
             endif;
             if(RoleTrait::hasPermission(46)):
@@ -165,9 +165,17 @@
                 $links_operations[] = [
                     'name' => 'SPAM',
                     'route' => route('operation.spam'),
-                    'active' => request()->routeIs('operation.spam'),
+                    'active' => request()->routeIs('operation.spam','operation.spam.search'),
                 ];
             endif;
+
+            if(RoleTrait::hasPermission(47)):
+                $links_operations[] = [
+                    'name' => 'Operaciones',
+                    'route' => route('operation.index'),
+                    'active' => request()->routeIs('operation.index','operation.index.search'),
+                ];
+            endif;            
             array_push($links,[
                 'type' => 'multiple',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
@@ -203,7 +211,7 @@
             if(RoleTrait::hasPermission(32)):
                 $links_settings[] = [
                     'name' => 'Tarifas',
-                    'route' => route('config.ratesDestination','config.ratesZones'),
+                    'route' => route('config.ratesDestination'),
                     'active' => request()->routeIs('config.ratesDestination','config.ratesZones'),
                 ];
             endif;

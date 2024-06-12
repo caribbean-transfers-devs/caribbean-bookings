@@ -177,7 +177,15 @@ class PosRepository
         FROM sites
         ORDER BY site_name ASC");
 
-        return view('pos.index', compact('bookings','services','zones','websites','data') );
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Ventas capturadas del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
+                "active" => true
+            ),
+        );        
+
+        return view('pos.index', compact('bookings','services','zones','websites','data','breadcrumbs') );
     }
 
     public function detail($request,$id){
@@ -396,7 +404,15 @@ class PosRepository
     public function vendors($request){
         $vendors = Vendor::all();
 
-        return view('pos.vendors', compact('vendors'));
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Listado de vendedores",
+                "active" => true
+            ),
+        );        
+
+        return view('pos.vendors', compact('vendors','breadcrumbs'));
     }
 
     public function createVendor($request){

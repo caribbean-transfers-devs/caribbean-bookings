@@ -101,7 +101,15 @@ class PaymentsRepository
                                         "init_date_four" => $search['end_date'],
                                     ]);
 
-        return view('reports.op-payments', compact('items','date'));
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Reporte de pagos",
+                "active" => true
+            ),
+        );
+
+        return view('reports.op-payments', compact('items','date','breadcrumbs'));
     }
 
 }

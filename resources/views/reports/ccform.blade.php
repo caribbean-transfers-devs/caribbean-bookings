@@ -36,7 +36,7 @@
             $("#btnSearch").text("Buscando....").attr("disabled", true);
 
             let date = $('#lookup_date').val();
-            $("#placeholder_dates_one").text(`${date} | LLEGADAS`);
+            $("#placeholder_dates_one span").text(`${date} | LLEGADAS`);
 
             var iframe = document.createElement('iframe');
             iframe.id = 'pdfIframe';
@@ -57,7 +57,7 @@
             $("#btnSearch").text("Buscando....").attr("disabled", true);
 
             let date = $('#lookup_date').val();
-            $("#placeholder_dates_two").text(`${date} | SALIDAS`);
+            $("#placeholder_dates_two span").text(`${date} | SALIDAS`);
 
             var iframe = document.createElement('iframe');
             iframe.id = 'pdfIframe';
@@ -87,15 +87,15 @@
                 <div class="widget-content">
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab" aria-selected="true">
+                            <button class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab" aria-selected="true" id="placeholder_dates_one">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                {{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }} | LLEGADAS
+                                <span>{{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }} | LLEGADAS</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" href="#tab-2" data-bs-toggle="tab" role="tab" aria-selected="false" tabindex="-1">
+                            <button class="nav-link" href="#tab-2" data-bs-toggle="tab" role="tab" aria-selected="false" tabindex="-1" id="placeholder_dates_two">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                {{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }} | SALIDAS
+                                <span>{{ date("Y-m-d", strtotime($search['init_date'])) }} al {{ date("Y-m-d", strtotime($search['end_date'])) }} | SALIDAS</span>
                             </button>
                         </li>
                     </ul>                    
@@ -121,9 +121,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
-                </div>
-                <form class="form" action="" method="POST" id="formSearch">
-                    <div class="modal-body">
+                </div>                
+                <div class="modal-body">
+                    <form class="form" action="" method="POST" id="formSearch">
                         @csrf
                         <div class="row">
                             <div class="col-12 col-sm-12">
@@ -131,12 +131,12 @@
                                 <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $search['init_date']." - ".$search['end_date'] }}">
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn btn-light-dark" data-bs-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
-                        <button type="submit" class="btn btn-primary" onclick="searchOne(),searchTwo()" id="btnSearch">Buscar</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn btn-light-dark" data-bs-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="searchOne(),searchTwo()" id="btnSearch">Buscar</button>
+                </div>
             </div>
         </div>
     </div>

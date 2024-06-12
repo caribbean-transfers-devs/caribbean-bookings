@@ -19,7 +19,15 @@ class RoleRepository
             
             $roles = Role::all();
 
-            return view('roles.index', compact('roles'));
+            $breadcrumbs = array(
+                array(
+                    "route" => "",
+                    "name" => "Listado de roles",
+                    "active" => true
+                ),
+            );            
+
+            return view('roles.index', compact('roles','breadcrumbs'));
             
         } catch (\Throwable $e) {
 

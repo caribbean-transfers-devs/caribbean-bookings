@@ -168,8 +168,16 @@ class ReservationsRepository
         if(sizeof( $bookings ) > 0):
             usort($bookings, array($this, 'orderByDateTime'));
         endif;
+
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Reservaciones del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
+                "active" => true
+            ),
+        );
         
-        return view('reservations.index', compact('bookings','services','zones','websites','data') );
+        return view('reservations.index', compact('bookings','services','zones','websites','data','breadcrumbs') );
 
         /*if(!$request->lookup_date){
             $from = date('Y-m-d');

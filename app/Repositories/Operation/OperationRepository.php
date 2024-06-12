@@ -112,8 +112,16 @@ class OperationRepository
                 $items->messages = $this->getMessages($items->reservation_id);                
             endforeach;
         endforeach;
+
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Operación",
+                "active" => true
+            ),
+        );          
  
-        return view('operation.index', compact('dates'));
+        return view('operation.index', compact('dates','breadcrumbs'));
     }
 
     public function getMessages($id){
@@ -223,7 +231,15 @@ class OperationRepository
                                         "init_date_four" => $search['end_date'],
                                     ]);
 
-        return view('operation.managment', compact('items','date'));
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Gestión de operación",
+                "active" => true
+            ),
+        );
+                                    
+        return view('operation.managment', compact('items','date','breadcrumbs'));
     }
 
     public function statusUpdate($request){        

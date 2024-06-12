@@ -5,7 +5,7 @@
 @if(sizeof($rates) >= 1)
     <form id="editPriceForm">
         @if (RoleTrait::hasPermission(34))
-            <button type="button" class="btn btn-sm btn-success btnUpdateRates">Actualizar Tarifas</button>
+            <button type="button" class="btn btn-success btnUpdateRates">Actualizar Tarifas</button>
         @endif
         @foreach($rates as $key => $value)
             @php
@@ -67,7 +67,7 @@
                             </div>
                         </div>
                         @if (RoleTrait::hasPermission(35))
-                            <button class="btn btn-sm btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
+                            <button class="btn btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
                         @endif
                     </div>
                 @endif
@@ -75,7 +75,7 @@
             </div>
         @endforeach
         @if (RoleTrait::hasPermission(34))
-            <button type="button" class="btn btn-sm btn-success btnUpdateRates">Actualizar Tarifas</button>
+            <button type="button" class="btn btn-success btnUpdateRates">Actualizar Tarifas</button>
         @endif
     </form>
 @else

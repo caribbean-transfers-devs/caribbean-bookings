@@ -2,7 +2,7 @@
     use App\Traits\RoleTrait;
     $resumen = [];
 @endphp
-@extends('layout.app')
+@extends('layout.custom')
 @section('title') SPAM @endsection
 
 @push('Css')
@@ -35,19 +35,6 @@
                 )
             );
         }
-        if (RoleTrait::hasPermission(70)){
-            array_push($buttons,
-                array(
-                    'text' => 'Exportar Excel',
-                    'className' => 'btn btn-primary __btn_export',
-                    'attr' => array(
-                        'data-title' =>  "Generar reporte de excel",
-                        'data-bs-toggle' => 'modal',
-                        'data-bs-target' => '#filterModalExport'
-                    )
-                )
-            );
-        }
         // dump($buttons);
     @endphp
     <div class="row layout-top-spacing">
@@ -66,7 +53,7 @@
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>        
-                            <th></th>                                                
+                            {{-- <th></th> --}}
                             <th>Sitio</th>
                             <th>Pickup</th>                           
                             <th class="text-center">Tipo</th>
@@ -146,7 +133,7 @@
                                         $resumen[ $value->spam ]++;
                                     @endphp
                                     <tr>
-                                        <td>
+                                        {{-- <td>
                                             <div class="btn-group">
                                                 <button type="button" class="btn {{ $spam }}">{{ $value->spam }}</button>
                                                 <button type="button" class="btn {{ $spam }} dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="{{$value->id}}">
@@ -162,7 +149,7 @@
                                                     <a class="dropdown-item" href="#" onClick="updateSpam(event,{{$value->id}},'REJECTED','btn-danger')">REJECTED</a>
                                                 </div>
                                             </div>                                 
-                                        </td>
+                                        </td> --}}
                                         <td>{{ $value->site_name }}</td>
                                         <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
                                         <td>{{ $value->final_service_type }}</td>
@@ -185,7 +172,7 @@
                         @endif
                     </tbody>
                 </table>
-                <div class="mt-3 px-2">
+                {{-- <div class="mt-3 px-2">
                     <h6>Resumen de envío de SPAM</h6>
                     <h6 class="text-info small">Aqui encontrarás el resumen conversiones generadas por los agentes.</h6>                        
                     <div class="table-responsive">
@@ -206,7 +193,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -216,5 +203,4 @@
         // dump($date);
     @endphp
     <x-modals.reservations.reports :data="$date" />
-    <x-modals.reservations.exports :data="$date" />
 @endsection

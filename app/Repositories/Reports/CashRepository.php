@@ -105,7 +105,15 @@ class CashRepository
                                         "init_date_four" => $search['end_date'],
                                     ]);
 
-        return view('reports.cash', compact('items','date_search'));
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Reporte de pagos en efectivo del ". date("Y-m-d", strtotime($search['init_date'])) ." al ". date("Y-m-d", strtotime($search['end_date'])),
+                "active" => true
+            ),
+        );
+
+        return view('reports.cash', compact('items','date_search','breadcrumbs'));
     }
 
     public function update($request){

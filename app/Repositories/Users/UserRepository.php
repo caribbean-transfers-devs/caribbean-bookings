@@ -20,7 +20,15 @@ class UserRepository
             $inactive_users = User::where('status', 0)->get();
             $valid_ips = WhitelistIp::all();
 
-            return view('users.index', compact('active_users', 'inactive_users', 'valid_ips'));
+            $breadcrumbs = array(
+                array(
+                    "route" => "",
+                    "name" => "Listado de usuarios",
+                    "active" => true
+                ),
+            );
+
+            return view('users.index', compact('active_users', 'inactive_users', 'valid_ips', 'breadcrumbs'));
             
         } catch (\Throwable $e) {
 

@@ -11,12 +11,26 @@ use App\Models\ZonesPoints;
 class ZonesRepository{
 
     public function index($request){
-        return view('configs.zones');
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Zonas",
+                "active" => true
+            ),
+        );
+        return view('configs.zones',compact('breadcrumbs'));
     }
     
     public function zones($request){
         $zones = Zones::all();
-        return view('configs.zones', compact('zones'));
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Zonas",
+                "active" => true
+            ),
+        );        
+        return view('configs.zones', compact('zones','breadcrumbs'));
     }
 
     public function points($request){

@@ -13,7 +13,14 @@ use App\Models\RatesTransfer;
 class RatesRepository{
     public function index($request){        
         $rate_groups = RatesGroup::all();
-        return view('configs.rates', compact('rate_groups'));
+        $breadcrumbs = array(
+            array(
+                "route" => "",
+                "name" => "Tarifas",
+                "active" => true
+            ),
+        );        
+        return view('configs.rates', compact('rate_groups','breadcrumbs'));
     }
 
     public function items($request){   

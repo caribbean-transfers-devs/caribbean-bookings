@@ -38,7 +38,9 @@ let components = {
             //     buttons.push(_btn);
             // });
 
+            console.log(_buttons);
             $.each(_buttons, function(index, button) {
+                console.log(button);
                 const __params = new Object();
                 ( button.hasOwnProperty('extend') ? __params.extend = button.extend : "" );
                 ( button.hasOwnProperty('text') ? __params.text = button.text : "" );
@@ -50,9 +52,10 @@ let components = {
                         window.location.href = button.url;
                     }
                 };
-                buttons.push(__params);
             });
         }
+
+        console.log(buttons);
 
         _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                         <'table-responsive'tr>

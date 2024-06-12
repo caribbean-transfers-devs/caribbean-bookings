@@ -44,6 +44,15 @@
 @section('content')
     @php
         $buttons = array(
+            array(  
+                'text' => 'Filtrar',
+                'className' => 'btn btn-primary __btn_create',
+                'attr' => array(
+                    'data-title' =>  "Filtro de reservaciones",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#filterModal'
+                )
+            ),            
             array(
                 'text' => 'CSV',
                 'extend' => 'csvHtml5',
@@ -61,103 +70,103 @@
     @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-            <div class="widget widget-chart-three">
-                <div class="widget-heading">
-                    <div class="">
-                        <h5>Ventas capturadas - {{ date("Y-m-d", strtotime($data['init']))}} a {{ date("Y-m-d", strtotime($data['end']))}}</h5>
+            <div class="widget-content widget-content-area br-8">
+                @if ($errors->any())
+                    <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x close" data-bs-dismiss="alert"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
-                    <div class="task-action">
-                        <button class="btn btn-primary __btn_create" data-title="Filtro de reservaciones" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</button>  
-                    </div>
-                </div>
-                <div class="widget-content">
-                    <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Vendedor</th>
-                                <th>Terminal</th>
-                                <th>Folio</th>
-                                <th>Venta</th>
-                                <th>Moneda</th>
-                                <th>Zona</th>
-                                <th>Unidad</th>
-                                <th>Moneda2</th>
-                                <th>Pax</th>
-                                <th>Servicio</th>
-                                <th>Turno</th>
-                                <th>Hora</th>
-                                <th>Observaciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if(sizeof($bookings) >= 1)
-                                @foreach ($bookings as $item)
-                                    @php                                         
-                                        if($item->is_cancelled == 0):
-                                            if($item->pay_at_arrival == 1):
-                                                $item->status = "CONFIRMED";
+                @endif                
+                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Vendedor</th>
+                            <th>Terminal</th>
+                            <th>Folio</th>
+                            <th>Venta</th>
+                            <th>Moneda</th>
+                            <th>Zona</th>
+                            <th>Unidad</th>
+                            <th>Moneda2</th>
+                            <th>Pax</th>
+                            <th>Servicio</th>
+                            <th>Turno</th>
+                            <th>Hora</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(sizeof($bookings) >= 1)
+                            @foreach ($bookings as $item)
+                                @php                                         
+                                    if($item->is_cancelled == 0):
+                                        if($item->pay_at_arrival == 1):
+                                            $item->status = "CONFIRMED";
+                                        endif;
+                                        $resume['status'][$item->status][$item->currency] += $item->total_sales;
+                                        $resume['status'][$item->status]['count']++;
+
+                                        //Si está confirmado, sumamos los totales por sitio...
+                                        if($item->status == "CONFIRMED"):
+                                            if(!isset( $sites[$item->site_name] )):
+                                                $sites[$item->site_name] = [
+                                                    'USD' => 0,
+                                                    'MXN' => 0,
+                                                    'count' => 0
+                                                ];
                                             endif;
-                                            $resume['status'][$item->status][$item->currency] += $item->total_sales;
-                                            $resume['status'][$item->status]['count']++;
+                                            $sites[$item->site_name][$item->currency] += $item->total_sales;
+                                            $sites[$item->site_name]['count']++;
 
-                                            //Si está confirmado, sumamos los totales por sitio...
-                                            if($item->status == "CONFIRMED"):
-                                                if(!isset( $sites[$item->site_name] )):
-                                                    $sites[$item->site_name] = [
-                                                        'USD' => 0,
-                                                        'MXN' => 0,
-                                                        'count' => 0
-                                                    ];
-                                                endif;
-                                                $sites[$item->site_name][$item->currency] += $item->total_sales;
-                                                $sites[$item->site_name]['count']++;
-
-                                                if(!isset( $destinations[$item->destination_name] )):
-                                                    $destinations[$item->destination_name] = [
-                                                        'USD' => 0,
-                                                        'MXN' => 0,
-                                                        'count' => 0
-                                                    ];
-                                                endif;
-                                                $destinations[$item->destination_name][$item->currency] += $item->total_sales;
-                                                $destinations[$item->destination_name]['count']++;
-
+                                            if(!isset( $destinations[$item->destination_name] )):
+                                                $destinations[$item->destination_name] = [
+                                                    'USD' => 0,
+                                                    'MXN' => 0,
+                                                    'count' => 0
+                                                ];
                                             endif;
+                                            $destinations[$item->destination_name][$item->currency] += $item->total_sales;
+                                            $destinations[$item->destination_name]['count']++;
 
-                                        else:
-                                            $resume['status']['CANCELLED'][$item->currency] += $item->total_sales;
-                                            $resume['status']['CANCELLED']['count']++;
-                                        endif;                                                
-                                        $total_pending = $item->total_sales - $item->total_payments;
-                                    @endphp
-                                    <tr>
-                                        <td>
-                                            @if(RoleTrait::hasPermission(53))
-                                                <a href="punto-de-venta/detail/{{ $item->id }}">{{ substr($item->created_at, 0, 10) }}</a>
-                                            @else
-                                                {{ substr($item->created_at, 0, 10) }}
-                                            @endif
-                                        </td>
-                                        <td>{{ $item->vendor }}</td>                                           
-                                        <td>{{ $item->terminal ? str_replace('T', 'Terminal ', $item->terminal) : 'No se capturó la terminal' }}</td>
-                                        <td>{{ $item->reference }}</td>
-                                        <td>{{ $item->total_sales }}</td>
-                                        <td>{{ $item->currency }}</td>
-                                        <td>{{ $item->destination_name }}</td>
-                                        <td>{{ $item->service_type_name }}</td>
-                                        <td>{{ ((empty($item->payment_type_name))? 'Efectivo' : str_replace(['CARD', 'CASH'], ['Tarjeta', 'Efectivo'], $item->payment_type_name) ) }}</td>
-                                        <td>{{ $item->passengers }}</td>
-                                        <td>{{ (( $item->site_id == 21 ) ? 'Llegada':'Salida') }}</td>
-                                        <td>{{ getShift($item->created_at) }}</td>
-                                        <td>{{ substr($item->created_at, -8, 5) }}</td>
-                                        <td>{{ $item->comments }}</td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>                    
-                </div>
+                                        endif;
+
+                                    else:
+                                        $resume['status']['CANCELLED'][$item->currency] += $item->total_sales;
+                                        $resume['status']['CANCELLED']['count']++;
+                                    endif;                                                
+                                    $total_pending = $item->total_sales - $item->total_payments;
+                                @endphp
+                                <tr>
+                                    <td>
+                                        @if(RoleTrait::hasPermission(53))
+                                            <a href="punto-de-venta/detail/{{ $item->id }}">{{ substr($item->created_at, 0, 10) }}</a>
+                                        @else
+                                            {{ substr($item->created_at, 0, 10) }}
+                                        @endif
+                                    </td>
+                                    <td>{{ $item->vendor }}</td>                                           
+                                    <td>{{ $item->terminal ? str_replace('T', 'Terminal ', $item->terminal) : 'No se capturó la terminal' }}</td>
+                                    <td>{{ $item->reference }}</td>
+                                    <td>{{ $item->total_sales }}</td>
+                                    <td>{{ $item->currency }}</td>
+                                    <td>{{ $item->destination_name }}</td>
+                                    <td>{{ $item->service_type_name }}</td>
+                                    <td>{{ ((empty($item->payment_type_name))? 'Efectivo' : str_replace(['CARD', 'CASH'], ['Tarjeta', 'Efectivo'], $item->payment_type_name) ) }}</td>
+                                    <td>{{ $item->passengers }}</td>
+                                    <td>{{ (( $item->site_id == 21 ) ? 'Llegada':'Salida') }}</td>
+                                    <td>{{ getShift($item->created_at) }}</td>
+                                    <td>{{ substr($item->created_at, -8, 5) }}</td>
+                                    <td>{{ $item->comments }}</td>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="col-12 col-sm-4">
