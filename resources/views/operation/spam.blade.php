@@ -77,9 +77,9 @@
                 @if (RoleTrait::hasPermission(41))
                     <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">Filtrar</a>
                 @endif
-                {{-- @if (RoleTrait::hasPermission(70)) --}}
+                @if (RoleTrait::hasPermission(70))
                     <a href="#" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModalExport">Exportar Excel</a>
-                {{-- @endif --}}
+                @endif
             </div>
         </div>
                 
@@ -276,7 +276,7 @@
             </div>
         </div>
     </div>
-    {{-- @if (RoleTrait::hasPermission(70)) --}}
+    @if (RoleTrait::hasPermission(70))
         <div class="modal" tabindex="-1" id="filterModalExport">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -306,5 +306,5 @@
                 </div>
             </div>
         </div>
-    {{-- @endif --}}
+    @endif
 @endsection
