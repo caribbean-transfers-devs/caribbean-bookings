@@ -84,6 +84,7 @@
                             <th>Moneda</th>
                             <th>Pendiente</th>
                             <th>Método</th>
+                            <th>Origen</th>
                             <th>Destino</th>
                         </tr>
                     </thead>
@@ -171,7 +172,8 @@
                                     <td class="text-center">{{ $item->currency }}</td>
                                     <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td>
                                     <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td>
-                                    <td class="text-center">{{ $item->destination_name }}</td>
+                                    <td class="text-center">{{ $item->destination_name_from }}</td>
+                                    <td class="text-center">{{ $item->destination_name_to }}</td>
                                 </tr>
                             @endforeach
                         @endif

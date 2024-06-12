@@ -66,7 +66,9 @@
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>        
-                            <th></th>                                                
+                            <th></th>
+                            <th>Code</th>
+                            <th># Llamadas aceptadas</th>                            
                             <th>Sitio</th>
                             <th>Pickup</th>                           
                             <th class="text-center">Tipo</th>
@@ -132,6 +134,9 @@
                                             case 'CONFIRMED':
                                                 $spam = 'btn-success';
                                                 break;
+                                            case 'ACCEPT':
+                                                $spam = 'btn-success';
+                                                break;                                                
                                             case 'REJECTED':
                                                 $spam = 'btn-danger';
                                                 break;
@@ -163,6 +168,8 @@
                                                 </div>
                                             </div>                                 
                                         </td>
+                                        <td>{{ $value->id }}</td>
+                                        <td>{{ $value->spam_count }}</td>                                        
                                         <td>{{ $value->site_name }}</td>
                                         <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
                                         <td>{{ $value->final_service_type }}</td>
@@ -216,5 +223,7 @@
         // dump($date);
     @endphp
     <x-modals.reservations.reports :data="$date" />
-    <x-modals.reservations.exports :data="$date" />
+    @if (RoleTrait::hasPermission(70))
+        <x-modals.reservations.exports :data="$date" />
+    @endif
 @endsection
