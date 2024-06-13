@@ -34,24 +34,35 @@ let components = {
             _buttons = table.data('button');
 
         if( _buttons != undefined && _buttons.length > 0 ){
-            _buttons.forEach(_btn => {
-                console.log(_btn);
-                if( _btn.hasOwnProperty('url') ){
-                    _btn.action = function(e, dt, node, config){
-                        window.location.href = _btn.url;
+            // _buttons.forEach(_btn => {
+            //     buttons.push(_btn);
+            // });
+
+            console.log(_buttons);
+            $.each(_buttons, function(index, button) {
+                console.log(button);
+                const __params = new Object();
+                ( button.hasOwnProperty('extend') ? __params.extend = button.extend : "" );
+                ( button.hasOwnProperty('text') ? __params.text = button.text : "" );
+                ( button.hasOwnProperty('className') ? __params.className = button.className : "" );
+                ( button.hasOwnProperty('titleAttr') ? __params.titleAttr = button.titleAttr : "" );
+                ( button.hasOwnProperty('attr') ? __params.attr = button.attr : "" );
+                if( button.hasOwnProperty('url') ){
+                    __params.action = function(e, dt, node, config){
+                        window.location.href = button.url;
                     }
                 };
-                buttons.push(_btn);
             });
         }
-        // console.log(buttons);
+
+        console.log(buttons);
 
         _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                         <'table-responsive'tr>
                         <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>`;                        
         _settings.deferRender = true;
         _settings.responsive = true;
-        _settings.buttons = buttons
+        _settings.buttons =  _buttons;        
         _settings.order = [[ 0, "DESC" ]];
         _settings.lengthMenu = [10, 20, 50];
         _settings.pageLength = 10;                

@@ -17,15 +17,8 @@ class DriverRepository
     public function index($request)
     {
         try {
-            $breadcrumbs = array(
-                array(
-                    "route" => "",
-                    "name" => "Listado de conductores",
-                    "active" => true
-                ),
-            );
             $drivers = Driver::with('enterprise','destination')->get();
-            return view('drivers.index', compact('drivers','breadcrumbs'));
+            return view('drivers.index', compact('drivers'));
         } catch (Exception $e) {
         }
     }
