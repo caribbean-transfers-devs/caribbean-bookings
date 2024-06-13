@@ -15,12 +15,18 @@
 
 @section('content')
     @php
-        $buttons = array();
+        $buttons = array(
+            // array(
+            //     'text' => 'Añadir Rol',
+            //     'className' => 'btn btn-primary ',
+            //     'url' => route('roles.create')
+            // )            
+        );
         if(RoleTrait::hasPermission(7)):
             array_push($buttons,array(
                 'text' => 'Añadir Rol',
-                'className' => 'btn btn-primary __btn_create',
-                'url' => route('roles.create')            
+                'className' => 'btn btn-primary ',
+                'url' => route('roles.create')
             ));
         endif;
         // dump($buttons);

@@ -17,16 +17,9 @@ class VehicleRepository
 {
     public function index($request)
     {
-        try {
-            $breadcrumbs = array(
-                array(
-                    "route" => "",
-                    "name" => "Listado de vehículos",
-                    "active" => true
-                ),
-            );
+        try {            
             $vehicles = Vehicle::with('enterprise','destination_service','destination')->get();
-            return view('vehicles.index', compact('vehicles','breadcrumbs'));
+            return view('vehicles.index', compact('vehicles'));
         } catch (Exception $e) {
         }
     }

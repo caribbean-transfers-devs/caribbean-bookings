@@ -12,16 +12,12 @@ use App\Http\Controllers\Tpv\TpvController;
 use App\Http\Controllers\Configs\ZonesController;
 use App\Http\Controllers\Configs\RatesController;
 use App\Http\Controllers\Operation\OperationController;
-use App\Http\Controllers\Operations\OperationsController as Operations;
 use App\Http\Controllers\Reports\PaymentsController as ReportPayment;
 use App\Http\Controllers\Reports\SalesController as ReportSales;
 use App\Http\Controllers\Reports\CommissionsController as ReportCommissions;
 use App\Http\Controllers\Reports\CashController as ReportCash;
 use App\Http\Controllers\Reports\CCFormController;
 use App\Http\Controllers\Pos\PosController;
-use App\Http\Controllers\Enterprise\EnterpriseController;
-use App\Http\Controllers\Vehicle\VehicleController;
-use App\Http\Controllers\Driver\DriverController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,11 +42,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
     Route::get('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('dashboard.sales');
     Route::post('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('reservations.sales.search');
-
-    Route::resource('/enterprises', EnterpriseController::class);
-    Route::resource('/vehicles', VehicleController::class);
-    Route::resource('/drivers', DriverController::class);
-
 
     Route::resource('/users', UserController::class);
     Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');
@@ -79,7 +70,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reservations/upload/{id}', [ReservationsController::class, 'getMedia'])->name('reservations.upload.getmedia');
     Route::delete('/reservations/upload/{id}', [ReservationsController::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
 
-    Route::get('/operation', [OperationController::class, 'index'])->name('operation.download');
+    Route::get('/operation', [OperationController::class, 'index'])->name('operation.index');
     Route::get('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment');
     Route::post('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment.search');
     Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
@@ -90,9 +81,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/operation/spam', [OperationController::class, 'spam'])->name('operation.spam.search');
     Route::get('/operation/spam/exportExcel', [OperationController::class, 'exportExcel'])->name('operation.spam.exportExcel');
     Route::put('/operation/spam/update-status', [OperationController::class, 'spamUpdate'])->name('operation.spam.update');
-
-    Route::get('/operation/operations', [Operations::class, 'spam'])->name('operation.index');
-    Route::post('/operation/operations', [Operations::class, 'spam'])->name('operation.index.search');
 
     //Reportes
     Route::get('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment');
