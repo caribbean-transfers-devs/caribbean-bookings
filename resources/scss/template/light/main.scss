@@ -6,7 +6,8 @@ html {
 body {
   color: #888ea8;
   height: 100%;
-  font-size: 0.875rem;
+  // font-size: 0.875rem;
+  font-size: 0.75rem;
   background: #f1f2f3;
   overflow-x: hidden;
   overflow-y: auto;
@@ -3767,10 +3768,11 @@ fieldset:disabled .btn {
 
       td {
         border: none;
-        padding: 10px 21px 10px 21px;
+        // padding: 10px 21px 10px 21px;
+        padding: 10px;
         vertical-align: middle;
         letter-spacing: normal;
-        white-space: nowrap;
+        // white-space: nowrap;
         font-weight: 400;
       }
     }

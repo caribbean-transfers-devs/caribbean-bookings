@@ -58,7 +58,7 @@
         // dump($buttons);
     @endphp
     <div class="row layout-top-spacing">
-        <div class="col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+        <div class="col-xl-9 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
                 @if ($errors->any())
                     <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
@@ -181,7 +181,7 @@
                 </table>
             </div>
         </div>
-        <div class="col-12 col-sm-4">
+        <div class="col-12 col-sm-3">
             <div class="widget widget-chart-three mb-3">
                 <div class="widget-heading">
                     <div class="">
