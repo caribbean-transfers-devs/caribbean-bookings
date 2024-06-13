@@ -10,7 +10,7 @@
             </ul>
             <ul class="navbar-item flex-row ms-lg-auto ms-0 action-area">
 
-                <li class="nav-item dropdown language-dropdown">
+                {{-- <li class="nav-item dropdown language-dropdown">
                     <a href="javascript:void(0);" class="nav-link dropdown-toggle" id="language-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <img src="/assets/img/1x1/{{ ((app()->getLocale() == 'en') ? 'us' : 'mx' ) }}.svg" class="flag-width" alt="flag">
                     </a>
@@ -21,7 +21,7 @@
                             <a class="dropdown-item d-flex" href=""><img src="/assets/img/1x1/us.svg" class="flag-width" alt="flag"> <span class="align-self-center">&nbsp;@lang('header.English')</span></a>    
                         @endif                        
                     </div>
-                </li>
+                </li> --}}
 
                 <li class="nav-item theme-toggle-item">
                     <a href="javascript:void(0);" class="nav-link theme-toggle">

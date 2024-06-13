@@ -33,29 +33,17 @@ let components = {
         const _settings = {},
             _buttons = table.data('button');
 
-        if( _buttons != undefined && _buttons.length > 0 ){
-            // _buttons.forEach(_btn => {
-            //     buttons.push(_btn);
-            // });
-
-            console.log(_buttons);
-            $.each(_buttons, function(index, button) {
-                console.log(button);
-                const __params = new Object();
-                ( button.hasOwnProperty('extend') ? __params.extend = button.extend : "" );
-                ( button.hasOwnProperty('text') ? __params.text = button.text : "" );
-                ( button.hasOwnProperty('className') ? __params.className = button.className : "" );
-                ( button.hasOwnProperty('titleAttr') ? __params.titleAttr = button.titleAttr : "" );
-                ( button.hasOwnProperty('attr') ? __params.attr = button.attr : "" );
-                if( button.hasOwnProperty('url') ){
-                    __params.action = function(e, dt, node, config){
-                        window.location.href = button.url;
+        if( _buttons != undefined && _buttons.length > 0 ){        
+            _buttons.forEach(_btn => {
+                if( _btn.hasOwnProperty('url') ){
+                    _btn.action = function(e, dt, node, config){
+                        window.location.href = _btn.url;
                     }
                 };
+                buttons.push(_btn);
             });
         }
-
-        console.log(buttons);
+        // console.log(buttons);
 
         _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                         <'table-responsive'tr>
