@@ -91,8 +91,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/operation/spam/exportExcel', [OperationController::class, 'exportExcel'])->name('operation.spam.exportExcel');
     Route::put('/operation/spam/update-status', [OperationController::class, 'spamUpdate'])->name('operation.spam.update');
 
-    Route::get('/operation/operations', [Operations::class, 'spam'])->name('operation.index');
-    Route::post('/operation/operations', [Operations::class, 'spam'])->name('operation.index.search');
+    Route::get('/operation/operations', [Operations::class, 'index'])->name('operation.index');
+    Route::post('/operation/operations', [Operations::class, 'index'])->name('operation.index.search');
+    Route::put('/operation/driver/set', [Operations::class, 'setDriver'])->name('operation.set.driver');
 
     //Reportes
     Route::get('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment');

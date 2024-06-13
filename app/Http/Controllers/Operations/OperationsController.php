@@ -6,13 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\Enterprise;
+use App\Models\Driver;
+use App\Models\Vehicle;
+
 class OperationsController extends Controller
 {
     
     public function index(Request $request){
         $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
 
-        $search = [];
         $search['init'] = $date." 00:00:00";
         $search['end'] = $date." 23:59:59";
 
@@ -26,7 +29,9 @@ class OperationsController extends Controller
             ),
         );
 
-        return view('operation.operations', compact('items','date','breadcrumbs'));                   
+        $drivers = Driver::All();
+
+        return view('operation.operations', compact('items','date','breadcrumbs','drivers'));
     }
 
     public function querySpam($search){
