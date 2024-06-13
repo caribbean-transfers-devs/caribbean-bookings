@@ -123,15 +123,15 @@
                                                 $affiliates[$item->site_name]['count']++;
                                             endif;
 
-                                            if(!isset( $destinations[$item->destination_name] )):
-                                                $destinations[$item->destination_name] = [
+                                            if(!isset( $destinations[$item->destination_name_to] )):
+                                                $destinations[$item->destination_name_to] = [
                                                     'USD' => 0,
                                                     'MXN' => 0,
                                                     'count' => 0
                                                 ];
                                             endif;
-                                            $destinations[$item->destination_name][$item->currency] += $item->total_sales;
-                                            $destinations[$item->destination_name]['count']++;
+                                            $destinations[$item->destination_name_to][$item->currency] += $item->total_sales;
+                                            $destinations[$item->destination_name_to]['count']++;
                                         endif;
 
                                     else:
