@@ -21,7 +21,8 @@ class DataController extends Controller
 
     private function sendToSocketIo($data)
     {
-        $ch = curl_init('http://127.0.0.1:8000/updateData');
+        $url = "http://localhost:3000/updateData";
+        $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

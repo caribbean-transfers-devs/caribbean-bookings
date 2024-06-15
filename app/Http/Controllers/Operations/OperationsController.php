@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Enterprise;
 use App\Models\Driver;
 use App\Models\Vehicle;
+use App\Models\ReservationsItem;
+
+// use App\Events\ValueUpdated;
 
 class OperationsController extends Controller
 {
@@ -29,13 +32,23 @@ class OperationsController extends Controller
             ),
         );
 
+        $vehicles = Vehicle::All();
         $drivers = Driver::All();
 
-        return view('operation.operations', compact('items','date','breadcrumbs','drivers'));
+        return view('operation.operations', compact('items','date','breadcrumbs','vehicles','drivers'));
     }
 
     public function querySpam($search){
-        return  DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, '' as messages,
+        return  DB::select("SELECT 
+                            rez.id as reservation_id, 
+                            rez.*, 
+                            it.*, 
+                            serv.name as service_name, 
+                            it.op_one_pickup as filtered_date, 
+                            'arrival' as operation_type,
+                            sit.name as site_name,
+                            'TYPE_ONE' as op_type,
+                            '' as messages,
                                                COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                                CASE
                                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
@@ -74,7 +87,7 @@ class OperationsController extends Controller
                                    AND rez.is_duplicated = 0
                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                                    UNION 
-                                   SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_two_pickup as filtered_date, 'departure' as operation_type, sit.name as site_name, '' as messages,
+                                   SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_two_pickup as filtered_date, 'departure' as operation_type, sit.name as site_name, 'TYPE_TWO' as op_type, '' as messages,
                                                COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                                CASE
                                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
@@ -117,6 +130,98 @@ class OperationsController extends Controller
                                        "init_date_three" => $search['init'],
                                        "init_date_four" => $search['end'],
                                    ]);
-    }    
+    }
+
+    public function setVehicle(Request $request){
+        try {
+            DB::beginTransaction();
+            $item = ReservationsItem::find($request->reservation_item_id);
+            $item->vehicle_id = $request->vehicle_id;
+            $item->save();
+
+            // Emitir evento
+            // event(new ValueUpdated($item));
+
+            DB::commit();
+            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error al actualizar el estatus'], 500);
+        }
+    }
+
+    public function setDriver(Request $request){
+        try {
+            DB::beginTransaction();
+            $item = ReservationsItem::find($request->reservation_item_id);
+            $item->driver_id = $request->driver_id;
+            $item->save();
+
+            // Emitir evento
+            // event(new ValueUpdated($item));
+
+            DB::commit();
+            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error al actualizar el estatus'], 500);
+        }
+    }
+
+    public function statusOperationUpdate(Request $request){
+        try {
+            DB::beginTransaction();            
+            $item = ReservationsItem::find($request->item_id);
+            if($request->type == "arrival"):
+                $item->op_one_status_operation = $request->status;
+            endif;
+            if($request->type == "departure"):
+                $item->op_two_status_operation = $request->status;
+            endif;
+            $item->save();
+            
+            // $follow_up_db = new ReservationFollowUp;
+            // $follow_up_db->name = auth()->user()->name;
+            // $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status;
+            // $follow_up_db->type = 'HISTORY';
+            // $follow_up_db->reservation_id = $request->rez_id;
+            // $follow_up_db->save();
+
+            DB::commit();
+            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error al actualizar el estatus'], 500);
+        }
+    }     
+
+    public function statusUpdate(Request $request){
+        try {
+            DB::beginTransaction();            
+            $item = ReservationsItem::find($request->item_id);
+            if($request->type == "arrival"):
+                $item->op_one_status = $request->status;
+            endif;
+            if($request->type == "departure"):
+                $item->op_two_status = $request->status;
+            endif;
+            $item->save();
+            
+            // $follow_up_db = new ReservationFollowUp;
+            // $follow_up_db->name = auth()->user()->name;
+            // $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status;
+            // $follow_up_db->type = 'HISTORY';
+            // $follow_up_db->reservation_id = $request->rez_id;
+            // $follow_up_db->save();
+
+            DB::commit();
+            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error al actualizar el estatus'], 500);
+        }
+    }
 
 }

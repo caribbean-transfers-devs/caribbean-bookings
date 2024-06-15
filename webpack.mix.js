@@ -1,5 +1,4 @@
 // webpack.mix.js
-
 let mix = require('laravel-mix');
 const data = {
     src: "resources/", // source files
@@ -10,6 +9,7 @@ const data = {
 if (mix.inProduction()) {
     mix.version();     
 }
+mix.js('resources/js/app.js', 'public/js');
 
 mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css");
 mix.copy('resources/css/base.min.css', data.assets + "css/base/base.min.css");
@@ -68,6 +68,7 @@ mix.sass('resources/scss/sections/driver_forms.scss', data.assets + "css/section
 
 mix.combine(['resources/plugins/global/vendors.min.js','resources/js/bootstrap.bundle.min.js','resources/plugins/sweetalerts2/sweetalerts2.min.js'], data.assets + '/js/core/core.min.js');//core scripts
 mix.combine(['resources/js/loader.js','resources/plugins/perfect-scrollbar/perfect-scrollbar.min.js','resources/plugins/mousetrap/mousetrap.min.js','resources/plugins/waves/waves.min.js','resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/waitMe/waitme.js', 'resources/js/caribbean.js','resources/js/components.js'], data.assets + '/js/panel/panel.min.js');//panel scripts
+mix.combine(['resources/js/loader.js','resources/plugins/perfect-scrollbar/perfect-scrollbar.min.js','resources/plugins/mousetrap/mousetrap.min.js','resources/plugins/waves/waves.min.js','resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/waitMe/waitme.js','resources/js/components.js'], data.assets + '/js/panel/panel_custom.min.js');//panel scripts
 //DASHBOARD
 mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard.js'], data.assets + "js/sections/dashboard.min.js");
 

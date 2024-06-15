@@ -9,6 +9,8 @@ use Illuminate\Http\Response;
 use App\Models\Enterprise;
 use App\Models\Driver;
 
+use App\Events\ValueUpdated;
+
 //FACADES
 use Illuminate\Support\Facades\DB;
 
@@ -41,6 +43,8 @@ class DriverRepository
             $driver->surnames = strtolower($request->surnames);
             $driver->phone = $request->phone;
             $driver->save();
+
+            event(new ValueUpdated($driver));
 
             DB::commit();
 

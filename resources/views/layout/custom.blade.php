@@ -54,7 +54,7 @@
     <!-- END MAIN CONTAINER -->
 
     <script src="{{ mix('/assets/js/core/core.min.js') }}"></script>
-    <script src="{{ mix('/assets/js/panel/panel.min.js') }}"></script>
+    <script src="{{ mix('/assets/js/panel/panel_custom.min.js') }}"></script>
 
     @stack('Js')
 </body>

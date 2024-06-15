@@ -99,10 +99,10 @@
             });
         }
 
-        function setStatus(event, type, status, item_id, rez_id){
+        function setStatusOperation(event, type, status, item_id, rez_id){
             event.preventDefault();
             var clickedRow = event.target.closest('tr');
-            var statusCell = clickedRow.querySelector('td:nth-child(4)');
+            var statusCell = clickedRow.querySelector('td:nth-child(11)');
             //statusCell.textContent = status;
 
             let alert_type = 'btn-secondary';
@@ -133,14 +133,13 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if(result.isConfirmed == true){
-
                     $.ajaxSetup({
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         }
                     });                
                     $.ajax({
-                        url: `/operation/managment/update-status`,
+                        url: `/operation/status/operation`,
                         type: 'PUT',
                         data: { rez_id:rez_id, item_id:item_id, type:type, status:status },
                         beforeSend: function() {        
@@ -179,58 +178,203 @@
                     });
 
                 }
-            });    
-        
-        }
-
-        function setDriver(event, item_id){
-            event.preventDefault();
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });                
-            $.ajax({
-                url: `/operation/managment/update-status`,
-                type: 'PUT',
-                data: { item_id : item_id },
-                success: function(resp) {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        icon: 'success',
-                        html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
-                        timer: 1500,
-                        timerProgressBar: true,
-                        didOpen: () => {
-                            Swal.showLoading()
-                            const b = Swal.getHtmlContainer().querySelector('b')
-                            timerInterval = setInterval(() => {
-                                b.textContent = (Swal.getTimerLeft() / 1000)
-                                    .toFixed(0)
-                            }, 100)
-                        },
-                        willClose: () => {
-                            clearInterval(timerInterval)
-                        }
-                    }).then((result) => {
-                        statusCell.innerHTML = `<span class="badge badge-light-${alert_type} mb-2 me-4">${status}</span>`;
-                    })
-
-                }
-            }).fail(function(xhr, status, error) {
-                    console.log(xhr);
-                    Swal.fire(
-                        '¡ERROR!',
-                        xhr.responseJSON.message,
-                        'error'
-                    );
             });        
         }        
-    </script>    
+
+        function setStatus(event, type, status, item_id, rez_id){
+            event.preventDefault();
+            var clickedRow = event.target.closest('tr');
+            var statusCell = clickedRow.querySelector('td:nth-child(11)');
+            //statusCell.textContent = status;
+
+            let alert_type = 'btn-secondary';
+            switch (status) {
+                case 'PENDING':
+                    alert_type = 'secondary';
+                    break;
+                case 'COMPLETED':
+                    alert_type = 'success';
+                    break; 
+                case 'NOSHOW':
+                    alert_type = 'warning';
+                    break;
+                case 'CANCELLED':
+                    alert_type = 'danger';
+                    break;  
+                default:
+                    alert_type = 'secondary';
+                    break;
+            }    
+
+            swal.fire({
+                title: '¿Está seguro de actualizar el estatus?',
+                text: "Esta acción no se puede revertir",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if(result.isConfirmed == true){
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });                
+                    $.ajax({
+                        url: `/operation/status/booking`,
+                        type: 'PUT',
+                        data: { rez_id:rez_id, item_id:item_id, type:type, status:status },
+                        beforeSend: function() {        
+                            
+                        },
+                        success: function(resp) {
+                            Swal.fire({
+                                title: '¡Éxito!',
+                                icon: 'success',
+                                html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
+                                timer: 1500,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                    const b = Swal.getHtmlContainer().querySelector('b')
+                                    timerInterval = setInterval(() => {
+                                        b.textContent = (Swal.getTimerLeft() / 1000)
+                                            .toFixed(0)
+                                    }, 100)
+                                },
+                                willClose: () => {
+                                    clearInterval(timerInterval)
+                                }
+                            }).then((result) => {
+                                statusCell.innerHTML = `<span class="badge badge-light-${alert_type} mb-2 me-4">${status}</span>`;
+                            })
+
+                        }
+                    }).fail(function(xhr, status, error) {
+                            console.log(xhr);
+                            Swal.fire(
+                                '¡ERROR!',
+                                xhr.responseJSON.message,
+                                'error'
+                            );
+                    });
+
+                }
+            });        
+        }
+
+        const __drivers = document.querySelectorAll('.drivers');
+        if (__drivers.length > 0) {
+            __drivers.forEach(__driver => {
+                __driver.addEventListener('change', function() {
+                    let _code = this.dataset.code;
+                    console.log(__driver.value, _code);
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+                    $.ajax({
+                        url: `/operation/driver/set`,
+                        type: 'PUT',
+                        data: { driver_id : __driver.value, reservation_item_id : _code },
+                        success: function(resp) {
+                        }
+                    }).fail(function(xhr, status, error) {
+                            console.log(xhr);
+                            Swal.fire(
+                                '¡ERROR!',
+                                xhr.responseJSON.message,
+                                'error'
+                            );
+                    });
+                });
+            });
+        }
+
+        const __vehicles = document.querySelectorAll('.vehicles');
+        if (__vehicles.length > 0) {
+            __vehicles.forEach(__vehicle => {
+                __vehicle.addEventListener('change', function() {
+                    let _code = this.dataset.code;
+                    console.log(__vehicle.value, _code);
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+                    $.ajax({
+                        url: `/operation/vehicle/set`,
+                        type: 'PUT',
+                        data: { vehicle_id : __vehicle.value, reservation_item_id : _code },
+                        success: function(resp) {
+                        }
+                    }).fail(function(xhr, status, error) {
+                            console.log(xhr);
+                            Swal.fire(
+                                '¡ERROR!',
+                                xhr.responseJSON.message,
+                                'error'
+                            );
+                    });
+                });
+            });
+        }        
+
+        // const socket = io(window.location.origin);
+        const socket = io('http://localhost:3000');
+
+        socket.on('dataUpdated', (data) => {
+            // Aquí actualizas tu tabla con los nuevos datos
+            console.log('Datos actualizados:', data);
+            // Actualizar tu tabla en consecuencia
+            updateTable(data);
+        });
+
+        function sendData(data) {
+            fetch('/update-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });        
+        }
+
+        function updateTable(data) {
+            // Implementar la lógica para actualizar la tabla con los nuevos datos
+        }
+
+        // // Ejemplo de uso
+        // const dataToSend = {
+        //     param1: 'valor1',
+        //     param2: 'valor2',
+        //     param3: 'valor3'
+        // };
+
+        // sendData(dataToSend);        
+
+        // window.Echo.channel('values')
+        // .listen('ValueUpdated', (e) => {
+        //     console.log('Value updated', e.value);
+        //     // Actualizar la tabla con el nuevo valor
+        //     // Asume que tienes una función updateTable que se encarga de actualizar la tabla
+        //     // updateTable(e.value);
+        // });        
+    </script>
 @endpush
 
 @section('content')
     @php
+        // dd($items);
         $buttons = array(
             array(  
                 'text' => 'Filtrar',
@@ -260,20 +404,23 @@
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th>Pickup</th>
-                            <th>Sitio</th>
-                            <th>Conductor</th>
-                            <th class="text-center">Tipo</th>
-                            <th class="text-center">Estatus Op.</th>
-                            <th>Código</th>
-                            <th>Cliente</th>
-                            <th>Vehículo</th>
-                            <th>Pasajeros</th>
-                            <th>Desde</th>
-                            <th>Hacia</th>
-                            <th>Pago</th>
-                            <th>Total</th>
-                            <th>Moneda</th>
+                            <th>#</th>
+                            <th>HORA</th>
+                            <th>CLIENTE</th>
+                            <th class="text-center">TIPO DE SERVICIO</th>
+                            <th>PAX</th>
+                            <th>ORIGEN</th>
+                            <th>DESTINO</th>
+                            <th>AGENCIA</th>
+                            <th>UNIDAD</th>
+                            <th>CONDUCTOR</th>
+                            <th class="text-center">ESTATUS OPERACIÓN</th>
+                            <th class="text-center">ESTATUS RESERVACIÓN</th>
+                            <th>CÓDIGO</th>
+                            <th>VEHÍCULO</th>
+                            <th>PAGO</th>
+                            <th>TOTAL</th>
+                            <th>MONEDA</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -284,7 +431,8 @@
                                     $payment = ( $value->total_sales - $value->total_payments );
                                     if($payment < 0) $payment = 0;
 
-                                    $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
+                                    $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status_operation : $value->op_two_status_operation );
+                                    $operation_booking = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
                                     $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
                                     $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
                                     $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
@@ -293,35 +441,74 @@
                                         case 'PENDING':
                                             $label = 'secondary';
                                             break;
-                                        case 'COMPLETED':
-                                            $label = 'success';
+                                        case 'E':
+                                            $label = 'info';
                                             break;
-                                        case 'NOSHOW':
+                                        case 'C':
                                             $label = 'warning';
                                             break;
-                                        case 'CANCELLED':
-                                            $label = 'danger';
+                                        case 'OK':
+                                            $label = 'success';
                                             break;
                                         default:
                                             $label = 'secondary';
                                             break;
                                     }
+
+                                    switch ($operation_booking) {
+                                        case 'PENDING':
+                                            $label2 = 'secondary';
+                                            break;
+                                        case 'COMPLETED':
+                                            $label2 = 'success';
+                                            break;
+                                        case 'NOSHOW':
+                                            $label2 = 'warning';
+                                            break;
+                                        case 'CANCELLED':
+                                            $label2 = 'danger';
+                                            break;
+                                        default:
+                                            $label2 = 'secondary';
+                                            break;
+                                    }
                                 @endphp
                                 <tr>
-                                    <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                    <td></td>
+                                    <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>                                    
+                                    <td>
+                                        {{ $value->client_first_name }} {{ $value->client_last_name }}
+                                        @if(!empty($value->reference))
+                                            [{{ $value->reference }}]
+                                        @endif
+                                    </td>
+                                    <td>{{ $value->final_service_type }}</td>
+                                    <td class="text-center">{{ $value->passengers }}</td>                                   
+                                    <td>{{ $operation_from }}</td>
+                                    <td>{{ $operation_to }}</td>
                                     <td>{{ $value->site_name }}</td>
                                     <td>
-                                        <select class="form-control" name="driver_id" id="driver_id">
+                                        <select class="form-control vehicles" name="vehicle_id" id="vehicle_id" data-code="{{ $value->id }}">
+                                            <option value="0">Selecciona un vehículo</option>
+                                            @if ( isset($vehicles) && count($vehicles) >= 1 )
+                                                @foreach ($vehicles as $vehicle)
+                                                    <option {{ ( isset($value->vehicle_id) && $value->vehicle_id == $vehicle->id ) ? 'selected' : '' }} value="{{ $vehicle->id }}">{{ $vehicle->unit_code }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </td>                                     
+                                    <td>
+                                        <select class="form-control drivers" name="driver_id" id="driver_id" data-code="{{ $value->id }}">
                                             <option value="0">Selecciona un conductor</option>
                                             @if ( isset($drivers) && count($drivers) >= 1 )
                                                 @foreach ($drivers as $driver)
-                                                    <option value="{{ $driver->id }}" onclick="setStatus(event, {{ $value->id }}">{{ $driver->names }}</option>
+                                                    <option {{ ( isset($value->driver_id) && $value->driver_id == $driver->id ) ? 'selected' : '' }} value="{{ $driver->id }}">{{ $driver->names }} {{ $driver->surnames }}</option>
                                                 @endforeach
                                             @endif
                                         </select>
                                     </td>
-                                    <td>{{ $value->final_service_type }}</td>
                                     <td class="text-center"><span class="badge badge-light-{{ $label }} mb-2 me-4">{{ $operation_status }}</span></td>
+                                    <td class="text-center"><span class="badge badge-light-{{ $label2 }} mb-2 me-4">{{ $operation_booking }}</span></td>
                                     <td>
                                         @if (RoleTrait::hasPermission(38))
                                             <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
@@ -329,22 +516,27 @@
                                             {{ $value->code }}
                                         @endif
                                     </td>
-                                    <td>
-                                        {{ $value->client_first_name }} {{ $value->client_last_name }}
-                                        @if(!empty($value->reference))
-                                            [{{ $value->reference }}]
-                                        @endif
-                                    </td>
-                                    <td>{{ $value->service_name }}</td>
-                                    <td class="text-center">{{ $value->passengers }}</td>
-                                    <td>{{ $operation_from }}</td>
-                                    <td>{{ $operation_to }}</td>
+                                    <td>{{ $value->service_name }}</td>                                    
                                     <td class="text-center">{{ $value->status }}</td>
                                     <td class="text-end">{{ number_format($payment,2) }}</td>
                                     <td class="text-center">{{ $value->currency }}</td>
                                     <td class="text-center">
                                         <div class="btn-group mb-2 me-4">
-                                            <button type="button" class="btn btn-primary">Acciones</button>
+                                            <button type="button" class="btn btn-primary">OPERACIÓN</button>
+                                            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                                <span class="visually-hidden ">Toggle Dropdown</span>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }})">Pendiente</a>
+                                                <a class="dropdown-item" href="#" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'E',{{ $value->id }}, {{ $value->reservation_id }})">E</a>
+                                                <a class="dropdown-item" href="#" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'C',{{ $value->id }}, {{ $value->reservation_id }})">C</a>
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'OK',{{ $value->id }}, {{ $value->reservation_id }})">Ok</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="btn-group mb-2 me-4">
+                                            <button type="button" class="btn btn-primary">RESERVA</button>
                                             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                                 <span class="visually-hidden ">Toggle Dropdown</span>
                                             </button>
@@ -355,7 +547,7 @@
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }})">Cancelado</a>                                                                
                                             </div>
-                                        </div>
+                                        </div>                                        
                                     </td>
                                 </tr>
                             @endforeach

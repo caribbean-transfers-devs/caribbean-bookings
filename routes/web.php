@@ -13,6 +13,7 @@ use App\Http\Controllers\Configs\ZonesController;
 use App\Http\Controllers\Configs\RatesController;
 use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
+use App\Http\Controllers\Operations\DataController;
 use App\Http\Controllers\Reports\PaymentsController as ReportPayment;
 use App\Http\Controllers\Reports\SalesController as ReportSales;
 use App\Http\Controllers\Reports\CommissionsController as ReportCommissions;
@@ -93,7 +94,11 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/operation/operations', [Operations::class, 'index'])->name('operation.index');
     Route::post('/operation/operations', [Operations::class, 'index'])->name('operation.index.search');
+    Route::put('/operation/vehicle/set', [Operations::class, 'setVehicle'])->name('operation.set.vehicle');
     Route::put('/operation/driver/set', [Operations::class, 'setDriver'])->name('operation.set.driver');
+    Route::put('/operation/status/operation', [Operations::class, 'statusOperationUpdate'])->name('operation.status.operation');
+    Route::put('/operation/status/booking', [Operations::class, 'statusUpdate'])->name('operation.status.booking');
+    Route::post('/update-data', [DataController::class, 'updateData']);
 
     //Reportes
     Route::get('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment');
