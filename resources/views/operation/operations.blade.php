@@ -25,7 +25,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    {{-- <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script> --}}
     <script>
         let managment = {
             /**
@@ -69,6 +69,14 @@
 
                 table.DataTable( _settings );
             },
+
+            bsPopover: function() {
+                var bsPopover = document.querySelectorAll('.bs-popover');
+                console.log(bsPopover);
+                for (let index = 0; index < bsPopover.length; index++) {
+                    var popover = new bootstrap.Popover(bsPopover[index])
+                }
+            },
         };
 
         if ( document.getElementById('lookup_date') != null ) {
@@ -86,11 +94,15 @@
         if( document.querySelector('.table-rendering') != null ){
             managment.actionTable($('.table-rendering'));
         }
+        managment.bsPopover();
         components.formReset();
 
         //DECLARACION DE VARIABLES
         const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
+        const __open_modal_comments = document.querySelectorAll('.__open_modal_comment');
         const __title_modal = document.getElementById('filterModalLabel');
+
+        const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
 
         //ACCION PARA CREAR
         if( __create != null ){
@@ -98,6 +110,30 @@
                 __title_modal.innerHTML = this.dataset.title;
             });
         }
+
+        if( __open_modal_comments.length > 0 ){
+            __open_modal_comments.forEach(__open_modal_comment => {
+                __open_modal_comment.addEventListener('click', function(){
+                    console.log(this.dataset.code, this.dataset.type);
+                    document.getElementById('code_item').value = this.dataset.code;
+                    document.getElementById('type_item').value = this.dataset.type;
+                });
+            });
+        }
+
+        //ACCION DE FORMULARIO
+        __button_form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let _params = components.serialize(this,'object');
+
+            if( _params != null ){
+                components.request_exec_ajax( _LOCAL_URL + "/operation/comment/add", "POST", _params);
+            }else{
+                event.stopPropagation();
+                components.sweetAlert({"status": "error", "message": "No esta inidcando la url"});
+            }
+        });        
 
         function setStatusOperation(event, type, status, item_id, rez_id){
             event.preventDefault();
@@ -322,36 +358,36 @@
         }        
 
         // const socket = io(window.location.origin);
-        const socket = io('http://localhost:3000');
+        // const socket = io('http://localhost:3000');
 
-        socket.on('dataUpdated', (data) => {
-            // Aquí actualizas tu tabla con los nuevos datos
-            console.log('Datos actualizados:', data);
-            // Actualizar tu tabla en consecuencia
-            updateTable(data);
-        });
+        // socket.on('dataUpdated', (data) => {
+        //     // Aquí actualizas tu tabla con los nuevos datos
+        //     console.log('Datos actualizados:', data);
+        //     // Actualizar tu tabla en consecuencia
+        //     updateTable(data);
+        // });
 
-        function sendData(data) {
-            fetch('/update-data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });        
-        }
+        // function sendData(data) {
+        //     fetch('/update-data', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        //         },
+        //         body: JSON.stringify(data)
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         console.log('Success:', data);
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error:', error);
+        //     });        
+        // }
 
-        function updateTable(data) {
-            // Implementar la lógica para actualizar la tabla con los nuevos datos
-        }
+        // function updateTable(data) {
+        //     // Implementar la lógica para actualizar la tabla con los nuevos datos
+        // }
 
         // // Ejemplo de uso
         // const dataToSend = {
@@ -405,6 +441,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>INDICADORES</th>
                             <th>HORA</th>
                             <th>CLIENTE</th>
                             <th class="text-center">TIPO DE SERVICIO</th>
@@ -436,6 +473,9 @@
                                     $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
                                     $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
                                     $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
+
+                                    $flag_comment = ( ($value->operation_type == 'arrival') && $value->op_one_comments != "" ? true : ( ($value->operation_type == 'departure') && $value->op_two_comments != "" ? true : false ) );
+                                    $comment = (($value->operation_type == 'arrival')? $value->op_one_comments : $value->op_two_comments );
 
                                     switch ($operation_status) {
                                         case 'PENDING':
@@ -475,6 +515,11 @@
                                 @endphp
                                 <tr>
                                     <td></td>
+                                    <td>
+                                        @if ( $flag_comment )
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="{{ $comment }}"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                        @endif
+                                    </td>
                                     <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>                                    
                                     <td>
                                         {{ $value->client_first_name }} {{ $value->client_last_name }}
@@ -547,7 +592,10 @@
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item" href="#" onclick="setStatus(event, '{{ $value->operation_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }})">Cancelado</a>                                                                
                                             </div>
-                                        </div>                                        
+                                        </div>
+                                        @if ( !$flag_comment )
+                                            <div class="btn btn-primary __open_modal_comment" data-bs-toggle="modal" data-bs-target="#messageModal" data-code="{{ $value->id }}" data-type="{{ $value->operation_type }}">Agregar comentario</div>                                            
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -562,4 +610,5 @@
         // dump($date_search);
     @endphp
     <x-modals.reservations.reports :data="$date" />
+    <x-modals.reservations.comments />
 @endsection

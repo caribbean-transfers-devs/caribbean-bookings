@@ -98,6 +98,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/operation/driver/set', [Operations::class, 'setDriver'])->name('operation.set.driver');
     Route::put('/operation/status/operation', [Operations::class, 'statusOperationUpdate'])->name('operation.status.operation');
     Route::put('/operation/status/booking', [Operations::class, 'statusUpdate'])->name('operation.status.booking');
+    Route::post('/operation/comment/add', [Operations::class, 'addComment'])->name('operation.comment.add');
     Route::post('/update-data', [DataController::class, 'updateData']);
 
     //Reportes

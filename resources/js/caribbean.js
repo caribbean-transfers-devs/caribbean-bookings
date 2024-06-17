@@ -268,7 +268,8 @@ var App = function() {
             }
         },
         bsPopover: function() {
-            var bsPopover = document.querySelectorAll('.bs-popover')
+            var bsPopover = document.querySelectorAll('.bs-popover');
+            console.log(bsPopover);
             for (let index = 0; index < bsPopover.length; index++) {
                 var popover = new bootstrap.Popover(bsPopover[index])
             }

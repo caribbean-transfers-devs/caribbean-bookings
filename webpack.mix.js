@@ -9,7 +9,7 @@ const data = {
 if (mix.inProduction()) {
     mix.version();     
 }
-mix.js('resources/js/app.js', 'public/js');
+// mix.js('resources/js/app.js', 'public/js');
 
 mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css");
 mix.copy('resources/css/base.min.css', data.assets + "css/base/base.min.css");

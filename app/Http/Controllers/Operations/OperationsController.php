@@ -10,6 +10,7 @@ use App\Models\Enterprise;
 use App\Models\Driver;
 use App\Models\Vehicle;
 use App\Models\ReservationsItem;
+use App\Models\ReservationFollowUp;
 
 // use App\Events\ValueUpdated;
 
@@ -180,12 +181,12 @@ class OperationsController extends Controller
             endif;
             $item->save();
             
-            // $follow_up_db = new ReservationFollowUp;
-            // $follow_up_db->name = auth()->user()->name;
-            // $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status;
-            // $follow_up_db->type = 'HISTORY';
-            // $follow_up_db->reservation_id = $request->rez_id;
-            // $follow_up_db->save();
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->save();
 
             DB::commit();
             return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
@@ -208,12 +209,12 @@ class OperationsController extends Controller
             endif;
             $item->save();
             
-            // $follow_up_db = new ReservationFollowUp;
-            // $follow_up_db->name = auth()->user()->name;
-            // $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status;
-            // $follow_up_db->type = 'HISTORY';
-            // $follow_up_db->reservation_id = $request->rez_id;
-            // $follow_up_db->save();
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->text = "Actualización de estatus de reservación (".$request->type.") por ".$request->status;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->save();           
 
             DB::commit();
             return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
@@ -223,5 +224,33 @@ class OperationsController extends Controller
             return response()->json(['message' => 'Error al actualizar el estatus'], 500);
         }
     }
+
+    public function addComment(Request $request){
+        try {
+            DB::beginTransaction();            
+            $item = ReservationsItem::find($request->code);
+            if($request->type == "arrival"):
+                $item->op_one_comments = $request->comment;
+            endif;
+            if($request->type == "departure"):
+                $item->op_two_comments = $request->comment;
+            endif;
+            $item->save();
+            
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->text = "Se agrego un comentario al servicio: ".$request->code;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->save();
+
+            DB::commit();
+            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error al actualizar el estatus'], 500);
+        }
+    }    
 
 }
