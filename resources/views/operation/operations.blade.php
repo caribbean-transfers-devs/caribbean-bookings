@@ -398,7 +398,7 @@
 
         // sendData(dataToSend);        
 
-        // window.Echo.channel('values')
+        // window.Echo.channel('data-updated')
         // .listen('ValueUpdated', (e) => {
         //     console.log('Value updated', e.value);
         //     // Actualizar la tabla con el nuevo valor
