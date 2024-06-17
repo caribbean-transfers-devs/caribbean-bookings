@@ -80,6 +80,7 @@
                                                         <th class="text-center">Tipo</th>
                                                         <th>Código</th>
                                                         <th>Cliente</th>
+                                                        <th>Teléfono</th>
                                                         <th>Pickup</th>
                                                         <th>Vehículo</th>
                                                         <th>Pasajeros</th>
@@ -104,6 +105,7 @@
                                                                 <td>{{ $valueItem->final_service_type }}</td>
                                                                 <td>{{ $valueItem->code }}</td>
                                                                 <td>{{ $valueItem->client_first_name }} {{ $valueItem->client_last_name }}</td>
+                                                                <td>{{ $valueItem->client_phone }}</td>
                                                                 <td>{{ date("H:i", strtotime($valueItem->filtered_date)) }}</td>
                                                                 <td>{{ $valueItem->service_name }}</td>
                                                                 <td>{{ $valueItem->passengers }}</td>
