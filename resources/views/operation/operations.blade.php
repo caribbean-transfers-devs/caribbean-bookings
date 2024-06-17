@@ -24,8 +24,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>
-    {{-- <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script> --}}
+    {{-- <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script> --}}
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>    
+    {{-- <script src="{{ mix('js/app.js') }}"></script> --}}
     <script>
         let managment = {
             /**
@@ -103,6 +105,10 @@
         const __title_modal = document.getElementById('filterModalLabel');
 
         const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
+
+        // const socket = io(window.location.origin);
+        let socket = io('https://ct-bookings-dev.up.railway.app:3000');
+        // socket.io("connection");
 
         //ACCION PARA CREAR
         if( __create != null ){
@@ -305,25 +311,28 @@
                 __driver.addEventListener('change', function() {
                     let _code = this.dataset.code;
                     console.log(__driver.value, _code);
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
-                    $.ajax({
-                        url: `/operation/driver/set`,
-                        type: 'PUT',
-                        data: { driver_id : __driver.value, reservation_item_id : _code },
-                        success: function(resp) {
-                        }
-                    }).fail(function(xhr, status, error) {
-                            console.log(xhr);
-                            Swal.fire(
-                                '¡ERROR!',
-                                xhr.responseJSON.message,
-                                'error'
-                            );
-                    });
+
+                    socket.emit("setDriverReservationServer", _code);
+
+                    // $.ajaxSetup({
+                    //     headers: {
+                    //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    //     }
+                    // });
+                    // $.ajax({
+                    //     url: `/operation/driver/set`,
+                    //     type: 'PUT',
+                    //     data: { driver_id : __driver.value, reservation_item_id : _code },
+                    //     success: function(resp) {
+                    //     }
+                    // }).fail(function(xhr, status, error) {
+                    //         console.log(xhr);
+                    //         Swal.fire(
+                    //             '¡ERROR!',
+                    //             xhr.responseJSON.message,
+                    //             'error'
+                    //         );
+                    // });
                 });
             });
         }
@@ -355,10 +364,11 @@
                     });
                 });
             });
-        }        
+        }
 
-        // const socket = io(window.location.origin);
-        // const socket = io('http://localhost:3000');
+        socket.on("setDriverReservationClient", function(driver_id){
+            console.log(driver_id);
+        });
 
         // socket.on('dataUpdated', (data) => {
         //     // Aquí actualizas tu tabla con los nuevos datos

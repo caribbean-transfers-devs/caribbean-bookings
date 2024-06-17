@@ -6,16 +6,18 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: "http://127.0.0.1:8001",
-        methods: ["GET", "POST"]
+        // origin: "http://127.0.0.1:8001",
+        // methods: ["GET", "POST"]
+        origin: "*"
     }
 });
 
 io.on('connection', (socket) => {
   console.log('Nuevo cliente conectado');
 
-  socket.on('updateData', (data) => {
-    io.emit('dataUpdated', data);
+  socket.on('setDriverReservationServer', (driver_id) => {
+    console.log(driver_id);
+    io.emit('setDriverReservationClient', driver_id);
   });
 
   socket.on('disconnect', () => {

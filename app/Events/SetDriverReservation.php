@@ -10,20 +10,16 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-use App\Models\Driver;
-
-class ValueUpdated
+class SetDriverReservation implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    public $data;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Driver $data)
+    public function __construct()
     {
-        $this->data = $data;
+        //
     }
 
     /**
@@ -31,8 +27,10 @@ class ValueUpdated
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn()
+    public function broadcastOn(): array
     {
-        return new Channel('data-updated');
+        return [
+            new PrivateChannel('channel-name'),
+        ];
     }
 }
