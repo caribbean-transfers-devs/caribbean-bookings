@@ -24,10 +24,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    {{-- <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script> --}}
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
     <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>    
-    {{-- <script src="{{ mix('js/app.js') }}"></script> --}}
     <script>
         let managment = {
             /**
@@ -74,7 +72,6 @@
 
             bsPopover: function() {
                 var bsPopover = document.querySelectorAll('.bs-popover');
-                console.log(bsPopover);
                 for (let index = 0; index < bsPopover.length; index++) {
                     var popover = new bootstrap.Popover(bsPopover[index])
                 }
@@ -107,12 +104,13 @@
         const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
 
         const __btn = document.getElementById('btn_test');
-        console.log(__btn);
 
         // const socket = io(window.location.origin);
-        const socket = io('https://socket-production-bed1.up.railway.app:3000');
+        const socket = io('http://socket-production-bed1.up.railway.app:3000');
+        // const socket = io('https://socket-production-bed1.up.railway.app:3000');
         // const socket = io('https://ct-bookings-dev.up.railway.app:3000');
         // socket.io("connection");
+        socket.on('connection');
 
         //ACCION PARA CREAR
         if( __create != null ){
