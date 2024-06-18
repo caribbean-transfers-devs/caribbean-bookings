@@ -11,14 +11,6 @@
 
 @push('Js')
     <script src="{{ mix('assets/js/sections/driver.min.js') }}"></script>
-    <script src="{{ mix('js/app.js') }}"></script>
-    <script>
-        window.Echo.channel('data-updated')
-        .listen('DataUpdated', (e) => {
-            console.log('Data updated: ', e.data);
-            updateTable(e.data);
-        });
-    </script>
 @endpush
 
 @section('content')

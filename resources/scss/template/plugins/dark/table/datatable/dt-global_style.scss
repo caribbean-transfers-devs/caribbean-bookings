@@ -19,11 +19,13 @@ body.dark {
   }
 
   .dt--top-section {
-    margin: 20px 21px 20px 21px;
+    // margin: 20px 21px 20px 21px;
+    margin: 10px;
   }
 
   .dt--bottom-section {
-    padding: 15px;
+    // padding: 15px;
+    padding: 10px;
   }
 
   .table-form {
@@ -36,7 +38,8 @@ body.dark {
 
       label {
         color: #888ea8;
-        font-size: 14px;
+        // font-size: 14px;
+        font-size: 10px;
         align-self: center;
       }
 
@@ -141,11 +144,11 @@ body.dark {
         // -webkit-transition: all 0.1s ease;
         // transition: all 0.1s ease;
         // padding: 10px 21px 10px 21px;
-        padding: 8px;
+        padding: 5px;
         color: #bfc9d4;
         font-weight: 600;
         // font-size: 14px;
-        font-size: 11px;
+        font-size: 10px;
         // letter-spacing: 1px;
         // white-space: nowrap;
       }
@@ -174,11 +177,11 @@ body.dark {
 
         > td {
           // font-size: 14px;
-          font-size: 11px;
+          font-size: 10px;
           border: none;
           padding: 0;
           // padding: 10px 21px 10px 21px;
-          padding: 8px;
+          padding: 5px;
           color: #888ea8;
           // letter-spacing: 1px;
           // white-space: nowrap;
@@ -257,7 +260,8 @@ body.dark {
     box-shadow: none;
     border-radius: 6px;
     border: 1px solid #1b2e4b;
-    font-size: 14px;
+    // font-size: 14px;
+    font-size: 10px;
     padding: 7px 16px;
     height: calc(1.3em + 1.3rem + 2px);
     transition: none;
@@ -300,7 +304,8 @@ body.dark {
     }
 
     &.dataTables_length label {
-      font-size: 14px;
+      // font-size: 14px;
+      font-size: 10px;
       margin-bottom: 0;
     }
   }

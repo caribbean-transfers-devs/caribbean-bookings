@@ -26,14 +26,14 @@
     @include('layout.partials.loader')
 
     <!--  BEGIN MAIN CONTAINER  -->
-    <div class="main-container" id="container">
+    <div class="main-container px-3" id="container">
 
         <div class="overlay"></div>
         <div class="search-overlay"></div>
 
         <!--  BEGIN CONTENT AREA  -->
         <div id="content" class="main-content ms-0 mt-0">
-            <div class="layout-px-spacing">
+            <div class="layout-px-spacing" style="padding: 0 !important;">
 
                 <div class="middle-content">
                     

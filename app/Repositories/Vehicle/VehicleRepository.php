@@ -40,6 +40,7 @@ class VehicleRepository
             $vehicle = new Vehicle();
             $vehicle->enterprise_id = $request->enterprise_id;
             $vehicle->destination_service_id = $request->destination_service_id;
+            $vehicle->name = $request->name;
             $vehicle->unit_code = $request->unit_code;
             $vehicle->plate_number = $request->plate_number;
             $vehicle->save();
@@ -72,6 +73,7 @@ class VehicleRepository
             $vehicle = Vehicle::find($id);
             $vehicle->enterprise_id = $request->enterprise_id;
             $vehicle->destination_service_id = $request->destination_service_id;
+            $vehicle->name = $request->name;
             $vehicle->unit_code = $request->unit_code;
             $vehicle->plate_number = $request->plate_number;
             $vehicle->save();

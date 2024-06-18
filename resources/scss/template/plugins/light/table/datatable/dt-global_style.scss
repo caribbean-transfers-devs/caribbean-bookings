@@ -18,11 +18,13 @@
 }
 
 .dt--top-section {
-  margin: 20px 21px 20px 21px;
+  // margin: 20px 21px 20px 21px;
+  margin: 10px;
 }
 
 .dt--bottom-section {
-  padding: 15px;
+  // padding: 15px;
+  padding: 10px;
 }
 
 .table-form {
@@ -35,7 +37,8 @@
 
     label {
       color: #888ea8;
-      font-size: 14px;
+      // font-size: 14px;
+      font-size: 10px;
       align-self: center;
     }
 
@@ -138,11 +141,11 @@ table.dataTable {
       padding-bottom: 0;
       padding-left: 0;
       // padding: 10px 21px 10px 21px;
-      padding: 8px;
+      padding: 5px;
       color: #515365;
       font-weight: 600;
       // font-size: 14px;
-      font-size: 11px;
+      font-size: 10px;
       // letter-spacing: 1px;
       // white-space: nowrap;
     }
@@ -170,11 +173,11 @@ table.dataTable {
 
       > td {
         // font-size: 14px;
-        font-size: 11px;
+        font-size: 10px;
         border: none;
         padding: 0;
         // padding: 10px 21px 10px 21px;
-        padding: 8px;
+        padding: 5px;
         color: #515365;
         // letter-spacing: 1px;
         // white-space: nowrap;
@@ -252,7 +255,8 @@ div.dataTables_wrapper div {
   box-shadow: none;
   border-radius: 6px;
   border: 1px solid #e0e6ed;
-  font-size: 14px;
+  // font-size: 14px;
+  font-size: 10px;
   padding: 7px 16px;
   height: calc(1.3em + 1.3rem + 2px);
   transition: none;
@@ -295,7 +299,8 @@ div.dataTables_wrapper div {
   }
 
   &.dataTables_length label {
-    font-size: 14px;
+    // font-size: 14px;
+    font-size: 10px;
     margin-bottom: 0;
   }
 }

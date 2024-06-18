@@ -12,7 +12,7 @@ use App\Models\Vehicle;
 use App\Models\ReservationsItem;
 use App\Models\ReservationFollowUp;
 
-// use App\Events\ValueUpdated;
+use App\Traits\RoleTrait;
 
 class OperationsController extends Controller
 {
@@ -37,6 +37,186 @@ class OperationsController extends Controller
         $drivers = Driver::All();
 
         return view('operation.operations', compact('items','date','breadcrumbs','vehicles','drivers'));
+    }
+
+    public function dataOperations(Request $request){
+        //DECLARACIÓN DE VARIABLES
+        $data["data"] = array();        
+        $date = ( isset( $request->data->date ) ? $request->data->date : date("Y-m-d") );
+        $search['init'] = $date." 00:00:00";
+        $search['end'] = $date." 23:59:59";
+
+        $items = $this->querySpam($search);
+
+        //CONSULTAMOS LOS VEHICULOS Y VENDEDORES
+        $vehicles = Vehicle::All();
+        $drivers = Driver::All();
+
+        if( sizeof($items)>=1 ):
+            foreach($items as $key => $value):
+                $payment = ( $value->total_sales - $value->total_payments );
+                if($payment < 0) $payment = 0;
+
+                $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status_operation : $value->op_two_status_operation );
+                $operation_booking = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
+                $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
+                $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
+                $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
+
+                $flag_comment = ( ($value->operation_type == 'arrival') && $value->op_one_comments != "" ? true : ( ($value->operation_type == 'departure') && $value->op_two_comments != "" ? true : false ) );
+                $comment = (($value->operation_type == 'arrival')? $value->op_one_comments : $value->op_two_comments );
+
+                switch ($operation_status) {
+                    case 'PENDING':
+                        $label = 'secondary';
+                        break;
+                    case 'E':
+                        $label = 'info';
+                        break;
+                    case 'C':
+                        $label = 'warning';
+                        break;
+                    case 'OK':
+                        $label = 'success';
+                        break;
+                    default:
+                        $label = 'secondary';
+                        break;
+                }
+
+                switch ($operation_booking) {
+                    case 'PENDING':
+                        $label2 = 'secondary';
+                        break;
+                    case 'COMPLETED':
+                        $label2 = 'success';
+                        break;
+                    case 'NOSHOW':
+                        $label2 = 'warning';
+                        break;
+                    case 'CANCELLED':
+                        $label2 = 'danger';
+                        break;
+                    default:
+                        $label2 = 'secondary';
+                        break;
+                }
+                // <tr>
+                //     <td></td>
+                //     <td>
+                //         @if ( $flag_comment )
+                //             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="{{ $comment }}"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                //         @endif
+                //     </td>
+                //     <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>                                    
+                //     <td>
+                //         {{ $value->client_first_name }} {{ $value->client_last_name }}
+                //         @if(!empty($value->reference))
+                //             [{{ $value->reference }}]
+                //         @endif
+                //     </td>
+                //     <td>{{ $value->final_service_type }}</td>
+                //     <td class="text-center">{{ $value->passengers }}</td>
+                //     <td>{{ $operation_from }}</td>
+                //     <td>{{ $operation_to }}</td>
+                //     <td>{{ $value->site_name }}</td>
+                //     <td>
+                //         <select class="form-control vehicles " data-live-search="true" name="vehicle_id" id="vehicle_id" data-code="{{ $value->id }}">
+                //             <option value="0">Selecciona un vehículo</option>
+                //             @if ( isset($vehicles) && count($vehicles) >= 1 )
+                //                 @foreach ($vehicles as $vehicle)
+                //                     <option {{ ( isset($value->vehicle_id) && $value->vehicle_id == $vehicle->id ) ? 'selected' : '' }} value="{{ $vehicle->id }}">{{ $vehicle->name }}</option>
+                //                 @endforeach
+                //             @endif
+                //         </select>
+                //     </td>
+                //     <td>
+                //         <select class="form-control drivers " data-live-search="true" name="driver_id" id="driver_id" data-code="{{ $value->id }}">
+                //             <option value="0">Selecciona un conductor</option>
+                //             @if ( isset($drivers) && count($drivers) >= 1 )
+                //                 @foreach ($drivers as $driver)
+                //                     <option {{ ( isset($value->driver_id) && $value->driver_id == $driver->id ) ? 'selected' : '' }} value="{{ $driver->id }}">{{ $driver->names }} {{ $driver->surnames }}</option>
+                //                 @endforeach
+                //             @endif
+                //         </select>
+                //     </td>
+                //     <td class="text-center">
+                //         <div class="btn-group" role="group">
+                //             <button id="optionsOperation" type="button" class="btn btn-{{ $label }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                //                 {{ $operation_status }}
+                //                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                //             </button>
+                //             <div class="dropdown-menu" aria-labelledby="optionsOperation">
+                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'E',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
+                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'C',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
+                //                 <div class="dropdown-divider"></div>
+                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'OK',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
+                //             </div>
+                //         </div>
+                //     </td>
+                //     <td class="text-center">
+                //         <div class="btn-group" role="group">
+                //             <button id="optionsBooking" type="button" class="btn btn-{{ $label2 }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                //                 {{ $operation_booking }}
+                //                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                //             </button>
+                //             <div class="dropdown-menu" aria-labelledby="optionsBooking">
+                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'COMPLETED',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
+                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'NOSHOW',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
+                //                 <div class="dropdown-divider"></div>
+                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>                                                                
+                //             </div>
+                //         </div>                                     
+                //     </td>
+                //     <td>
+                //         @if (RoleTrait::hasPermission(38))
+                //             <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
+                //         @else
+                //             {{ $value->code }}
+                //         @endif
+                //     </td>
+                //     <td>{{ $value->service_name }}</td>                                    
+                //     <td class="text-center">{{ $value->status }}</td>
+                //     <td class="text-end">{{ number_format($payment,2) }}</td>
+                //     <td class="text-center">{{ $value->currency }}</td>
+                //     <td class="text-center">
+                //         <div class="d-flex">    
+                //             @if ( !$flag_comment )
+                //                 <div class="btn btn-primary __open_modal_comment" data-bs-toggle="modal" data-bs-target="#messageModal" data-code="{{ $value->id }}" data-type="{{ $value->operation_type }}">
+                //                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                //                 </div>
+                //             @endif
+                //         </div>
+                //     </td>
+                // </tr>
+
+                $data["data"][] = array(
+                    '',
+                    ( $flag_comment ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'.$comment.'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' : '' ),
+                    date("H:i", strtotime($operation_pickup)),
+                    $value->client_first_name.' '.$value->client_last_name . ( !empty($value->reference) ? '['.$value->reference.']' : '' ),
+                    $value->final_service_type,
+                    $value->passengers,
+                    $operation_from,
+                    $operation_to,
+                    $value->site_name,
+                    '',
+                    '',
+                    '',
+                    '',
+                    ( RoleTrait::hasPermission(38) ? '<a href="/reservations/detail/'.$value->reservation_id.'">'.$value->code.'</a>' : $value->code ),
+                    $value->service_name,
+                    $value->status,
+                    number_format($payment,2),
+                    $value->currency,
+                    ( !$flag_comment ? '<div class="btn btn-primary __open_modal_comment" data-bs-toggle="modal" data-bs-target="#messageModal" data-code="'.$value->id.'" data-type="'.$value->operation_type.'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>' : '' ),
+                );
+            endforeach;
+        endif;
+
+        return response()->json($data, 200);
     }
 
     public function querySpam($search){
@@ -251,6 +431,6 @@ class OperationsController extends Controller
             DB::rollBack();
             return response()->json(['message' => 'Error al actualizar el estatus'], 500);
         }
-    }    
+    }
 
 }

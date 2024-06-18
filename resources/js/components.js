@@ -83,6 +83,7 @@ let components = {
      * @returns 
      */
     serialize: function(_this = null, _type = "array"){
+        console.log(_this);
         let _params = ( _type == "object" ? {} : [] );
         if( _this != null ){
             for (let i = 0; i < _this.elements.length; i++) {
