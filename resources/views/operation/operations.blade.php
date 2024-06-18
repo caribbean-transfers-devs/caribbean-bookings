@@ -105,8 +105,7 @@
 
         const __btn = document.getElementById('btn_test');
 
-        // const socket = io(window.location.origin);
-        const socket = io('https://socket-production-bed1.up.railway.app:3000');
+        const socket = io('https://socket-production-bed1.up.railway.app');
         // const socket = io('https://socket-production-bed1.up.railway.app:3000');
         // const socket = io('https://ct-bookings-dev.up.railway.app:3000');
         // socket.io("connection");
