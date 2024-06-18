@@ -15,9 +15,9 @@ const io = socketIo(server, {
 io.on('connection', (socket) => {
   console.log('Nuevo cliente conectado');
 
-  socket.on('setDriverReservationServer', (driver_id) => {
-    console.log(driver_id);
-    io.emit('setDriverReservationClient', driver_id);
+  socket.on('setDriverReservationServer', (driver_id, reservation_item_id) => {
+    console.log(driver_id, reservation_item_id);
+    io.emit('setDriverReservationClient', driver_id, reservation_item_id);
   });
 
   socket.on('disconnect', () => {

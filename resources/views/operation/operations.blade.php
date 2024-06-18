@@ -106,8 +106,12 @@
 
         const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
 
+        const __btn = document.getElementById('btn_test');
+        console.log(__btn);
+
         // const socket = io(window.location.origin);
-        let socket = io('https://ct-bookings-dev.up.railway.app:3000');
+        const socket = io('https://socket-production-bed1.up.railway.app:3000');
+        // const socket = io('https://ct-bookings-dev.up.railway.app:3000');
         // socket.io("connection");
 
         //ACCION PARA CREAR
@@ -311,8 +315,7 @@
                 __driver.addEventListener('change', function() {
                     let _code = this.dataset.code;
                     console.log(__driver.value, _code);
-
-                    socket.emit("setDriverReservationServer", _code);
+                    socket.emit("setDriverReservationServer", __driver.value, _code);
 
                     // $.ajaxSetup({
                     //     headers: {
@@ -366,8 +369,10 @@
             });
         }
 
-        socket.on("setDriverReservationClient", function(driver_id){
-            console.log(driver_id);
+        socket.on("setDriverReservationClient", function(driver_id, reservation_item_id){
+            console.log("nueva solicitud");
+            console.log(driver_id, reservation_item_id);
+            __btn.style.fontSize = ( reservation_item_id == 7760 ? "24px" : "50px" );
         });
 
         // socket.on('dataUpdated', (data) => {
@@ -426,6 +431,7 @@
                 'text' => 'Filtrar',
                 'className' => 'btn btn-primary __btn_create',
                 'attr' => array(
+                    'id' =>  "btn_test",
                     'data-title' =>  "Filtro de reservaciones",
                     'data-bs-toggle' => 'modal',
                     'data-bs-target' => '#filterModal'

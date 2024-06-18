@@ -12,14 +12,5 @@
         "resolve-url-loader": "^5.0.0",
         "sass": "^1.66.1",
         "sass-loader": "^12.6.0"
-    },
-    "dependencies": {
-        "axios": "^1.7.2",
-        "express": "^4.19.2",
-        "laravel-echo": "^1.16.1",
-        "laravel-echo-server": "^1.6.3",
-        "pusher-js": "^8.4.0-rc2",
-        "socket.io": "^4.7.5",
-        "socket.io-client": "^4.7.5"
     }
 }
