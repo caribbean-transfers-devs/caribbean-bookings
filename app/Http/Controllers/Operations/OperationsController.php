@@ -13,6 +13,7 @@ use App\Models\ReservationsItem;
 use App\Models\ReservationFollowUp;
 
 use App\Traits\RoleTrait;
+use Exception;
 
 class OperationsController extends Controller
 {
@@ -101,96 +102,20 @@ class OperationsController extends Controller
                         $label2 = 'secondary';
                         break;
                 }
-                // <tr>
-                //     <td></td>
-                //     <td>
-                //         @if ( $flag_comment )
-                //             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="{{ $comment }}"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                //         @endif
-                //     </td>
-                //     <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>                                    
-                //     <td>
-                //         {{ $value->client_first_name }} {{ $value->client_last_name }}
-                //         @if(!empty($value->reference))
-                //             [{{ $value->reference }}]
-                //         @endif
-                //     </td>
-                //     <td>{{ $value->final_service_type }}</td>
-                //     <td class="text-center">{{ $value->passengers }}</td>
-                //     <td>{{ $operation_from }}</td>
-                //     <td>{{ $operation_to }}</td>
-                //     <td>{{ $value->site_name }}</td>
-                //     <td>
-                //         <select class="form-control vehicles " data-live-search="true" name="vehicle_id" id="vehicle_id" data-code="{{ $value->id }}">
-                //             <option value="0">Selecciona un vehículo</option>
-                //             @if ( isset($vehicles) && count($vehicles) >= 1 )
-                //                 @foreach ($vehicles as $vehicle)
-                //                     <option {{ ( isset($value->vehicle_id) && $value->vehicle_id == $vehicle->id ) ? 'selected' : '' }} value="{{ $vehicle->id }}">{{ $vehicle->name }}</option>
-                //                 @endforeach
-                //             @endif
-                //         </select>
-                //     </td>
-                //     <td>
-                //         <select class="form-control drivers " data-live-search="true" name="driver_id" id="driver_id" data-code="{{ $value->id }}">
-                //             <option value="0">Selecciona un conductor</option>
-                //             @if ( isset($drivers) && count($drivers) >= 1 )
-                //                 @foreach ($drivers as $driver)
-                //                     <option {{ ( isset($value->driver_id) && $value->driver_id == $driver->id ) ? 'selected' : '' }} value="{{ $driver->id }}">{{ $driver->names }} {{ $driver->surnames }}</option>
-                //                 @endforeach
-                //             @endif
-                //         </select>
-                //     </td>
-                //     <td class="text-center">
-                //         <div class="btn-group" role="group">
-                //             <button id="optionsOperation" type="button" class="btn btn-{{ $label }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                //                 {{ $operation_status }}
-                //                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                //             </button>
-                //             <div class="dropdown-menu" aria-labelledby="optionsOperation">
-                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'E',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
-                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'C',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
-                //                 <div class="dropdown-divider"></div>
-                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'OK',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
-                //             </div>
-                //         </div>
-                //     </td>
-                //     <td class="text-center">
-                //         <div class="btn-group" role="group">
-                //             <button id="optionsBooking" type="button" class="btn btn-{{ $label2 }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                //                 {{ $operation_booking }}
-                //                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                //             </button>
-                //             <div class="dropdown-menu" aria-labelledby="optionsBooking">
-                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'COMPLETED',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
-                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'NOSHOW',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
-                //                 <div class="dropdown-divider"></div>
-                //                 <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>                                                                
-                //             </div>
-                //         </div>                                     
-                //     </td>
-                //     <td>
-                //         @if (RoleTrait::hasPermission(38))
-                //             <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
-                //         @else
-                //             {{ $value->code }}
-                //         @endif
-                //     </td>
-                //     <td>{{ $value->service_name }}</td>                                    
-                //     <td class="text-center">{{ $value->status }}</td>
-                //     <td class="text-end">{{ number_format($payment,2) }}</td>
-                //     <td class="text-center">{{ $value->currency }}</td>
-                //     <td class="text-center">
-                //         <div class="d-flex">    
-                //             @if ( !$flag_comment )
-                //                 <div class="btn btn-primary __open_modal_comment" data-bs-toggle="modal" data-bs-target="#messageModal" data-code="{{ $value->id }}" data-type="{{ $value->operation_type }}">
-                //                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                //                 </div>
-                //             @endif
-                //         </div>
-                //     </td>
-                // </tr>
+
+                $vehicle_items = "";
+                if ( isset($vehicles) && count($vehicles) >= 1 ):
+                    foreach ($vehicles as $vehicle):
+                        $vehicle_items = '<option '.( isset($value->vehicle_id) && $value->vehicle_id == $vehicle->id ? 'selected' : '' ).' value="'.$vehicle->id.'">'.$vehicle->name.'</option>';
+                    endforeach;
+                endif;
+
+                $driver_items = "";
+                if ( isset($drivers) && count($drivers) >= 1 ):
+                    foreach ($drivers as $driver):
+                        $driver_items = '<option '.( isset($value->driver_id) && $value->driver_id == $driver->id ? 'selected' : '' ).' value="'.$driver->id.'">'.$driver->names.' '.$driver->surnames.'</option>';
+                    endforeach;
+                endif;
 
                 $data["data"][] = array(
                     '',
@@ -202,10 +127,48 @@ class OperationsController extends Controller
                     $operation_from,
                     $operation_to,
                     $value->site_name,
-                    '',
-                    '',
-                    '',
-                    '',
+                    '
+                        <select class="form-control vehicles " data-live-search="true" name="vehicle_id" id="vehicle_id" data-code="'.$value->id.'">
+                            <option value="0">Selecciona un vehículo</option>
+                            '.$vehicle_items.'
+                        </select>
+                    ',
+                    '
+                        <select class="form-control drivers " data-live-search="true" name="driver_id" id="driver_id" data-code="'.$value->id.'">
+                            <option value="0">Selecciona un conductor</option>
+                            '.$driver_items.'
+                        </select>
+                    ',
+                    '
+                        <div class="btn-group" role="group">
+                            <button id="optionsOperation" type="button" class="btn btn-'.$label.' dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                '.$operation_status.'
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="optionsOperation">
+                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '.$value->operation_type.', "PENDING", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '.$value->operation_type.', "E", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
+                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '.$value->operation_type.', "C", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '.$value->operation_type.', "OK", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
+                            </div>
+                        </div>                    
+                    ',
+                    '
+                        <div class="btn-group" role="group">
+                            <button id="optionsBooking" type="button" class="btn btn-'.$label2.' dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                '.$operation_booking.'
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="optionsBooking">
+                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '.$value->operation_type.', "PENDING", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '.$value->operation_type.', "COMPLETED", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
+                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '.$value->operation_type.', "NOSHOW", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '.$value->operation_type.', "CANCELLED", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>                                                                
+                            </div>
+                        </div>                    
+                    ',
                     ( RoleTrait::hasPermission(38) ? '<a href="/reservations/detail/'.$value->reservation_id.'">'.$value->code.'</a>' : $value->code ),
                     $value->service_name,
                     $value->status,
@@ -316,40 +279,88 @@ class OperationsController extends Controller
     public function setVehicle(Request $request){
         try {
             DB::beginTransaction();
+            //OBTENEMOS INFORMACION
             $item = ReservationsItem::find($request->reservation_item_id);
+            $vehicle_current = Vehicle::find($item->vehicle_id);
+            $vehicle_new = Vehicle::find($request->vehicle_id);
+
+            //ACTUALIZAMOS INFORMACION
             $item->vehicle_id = $request->vehicle_id;
             $item->save();
 
-            // Emitir evento
-            // event(new ValueUpdated($item));
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->text = "Se asigno la unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$item->id.", por ".auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->save();
 
             DB::commit();
-            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
+            return response()->json([
+                'success' => true,
+                'message' => 'Se asigno correctamente la unidad',
+                'data' => array(
+                    "item"  => $request->item,
+                    "value"  => $request->vehicle_id,
+                    "message" => "Se asigno la unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$item->id.", por ".auth()->user()->name
+                )
+            ], 200);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al actualizar el estatus'], 500);
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
     public function setDriver(Request $request){
         try {
             DB::beginTransaction();
+            //OBTENEMOS INFORMACION
             $item = ReservationsItem::find($request->reservation_item_id);
-            $item->driver_id = $request->driver_id;
-            $item->save();
+            $driver_current = Driver::find($item->driver_id);
+            $driver_new = Driver::find($request->driver_id);
 
-            // Emitir evento
-            // event(new ValueUpdated($item));
+            //ACTUALIZAMOS INFORMACION
+            $item->driver_id = $request->driver_id;
+            $item->save();            
+
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->text = "Se asigno al conductor (".( isset($driver_current->names) ? $driver_current->names." ".$driver_current->surnames : "NULL" ).") por ".$driver_new->names." ".$driver_new->surnames. " al servicio: ".$item->id.", por ".auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->save();
 
             DB::commit();
-            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
-        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Se asigno correctamente el conductor',
+                'data' => array(
+                    "item"  => $request->item,
+                    "value"  => $request->driver_id,                    
+                    "message" => "Se asigno al conductor (".( isset($driver_current->names) ? $driver_current->names." ".$driver_current->surnames : "NULL" ).") por ".$driver_new->names." ".$driver_new->surnames. " al servicio: ".$item->id.", por ".auth()->user()->name        
+                )
+            ], 200);
+        } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al actualizar el estatus'], 500);
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
-    public function statusOperationUpdate(Request $request){
+    public function updateStatusOperation(Request $request){
         try {
             DB::beginTransaction();            
             $item = ReservationsItem::find($request->item_id);
@@ -369,15 +380,28 @@ class OperationsController extends Controller
             $follow_up_db->save();
 
             DB::commit();
-            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
-
+            return response()->json([
+                'success' => true,
+                'message' => 'Estatus de operación, actualizado con éxito',
+                'data' => array(
+                    "item"  => $request->item,
+                    "value"  => $request->status,
+                    "message" => "Actualización de estatus de operación (".$request->type.") por ".$request->status." al servicio: ".$item->id.", por ".auth()->user()->name
+                )
+            ], 200);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al actualizar el estatus'], 500);
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
         }
     }     
 
-    public function statusUpdate(Request $request){
+    public function updateStatusBooking(Request $request){
         try {
             DB::beginTransaction();            
             $item = ReservationsItem::find($request->item_id);
@@ -394,21 +418,35 @@ class OperationsController extends Controller
             $follow_up_db->text = "Actualización de estatus de reservación (".$request->type.") por ".$request->status;
             $follow_up_db->type = 'HISTORY';
             $follow_up_db->reservation_id = $item->reservation_id;
-            $follow_up_db->save();           
+            $follow_up_db->save();
 
             DB::commit();
-            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
-
+            return response()->json([
+                'success' => true,
+                'message' => 'Estatus de reservación, actualizado con éxito',
+                'data' => array(
+                    "item"  => $request->item,
+                    "value"  => $request->status,
+                    "message" => "Actualización de estatus de reservación (".$request->type.") por ".$request->status." al servicio: ".$item->id.", por ".auth()->user()->name
+                )
+            ], 200);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al actualizar el estatus'], 500);
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
     public function addComment(Request $request){
         try {
-            DB::beginTransaction();            
+            DB::beginTransaction();
             $item = ReservationsItem::find($request->code);
+            $action = ( ($request->type == "arrival" && $item->op_one_comments == "") || ($request->type == "departure" && $item->op_two_comments == "") ? "agrego" : ( ($request->type == "arrival" && $item->op_one_comments != "") || ($request->type == "departure" && $item->op_two_comments != "") ? "actualizo" : "" ) );
             if($request->type == "arrival"):
                 $item->op_one_comments = $request->comment;
             endif;
@@ -419,14 +457,22 @@ class OperationsController extends Controller
             
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Se agrego un comentario al servicio: ".$request->code;
+            $follow_up_db->text = "Se agrego un comentario al servicio: ".$request->code.", por ".auth()->user()->name;
             $follow_up_db->type = 'HISTORY';
             $follow_up_db->reservation_id = $item->reservation_id;
             $follow_up_db->save();
 
             DB::commit();
-            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], 200);
-
+            return response()->json([
+                'success' => true,
+                'message' => 'Se '.$action.' comentario exitosamente...',
+                'data' => array(
+                    "item"  => $request->id,
+                    "value"  => $request->comment,
+                    "status"  => 1,
+                    "message" => "Se agrego un comentario al servicio: ".$request->code.", por ".auth()->user()->name
+                )
+            ], 200);
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json(['message' => 'Error al actualizar el estatus'], 500);

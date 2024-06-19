@@ -79,11 +79,36 @@ let components = {
 
     /**
      * 
+     * @param {*} element 
+     * @param {*} selector 
+     * @returns 
+     */
+    closest: function(element, selector) {
+        // Verificar si el elemento actual cumple con el selector
+        if (element.matches(selector)) {
+            return element;
+        }
+
+        // Recorrer los ancestros del elemento actual
+        while (element !== document.body) {
+            element = element.parentNode;
+
+            // Verificar si el ancestro cumple con el selector
+            if (element && element.matches(selector)) {
+                return element;
+            }
+        }
+
+        // Si no se encuentra ningún ancestro que cumpla con el selector, devolver null
+        return null;
+    },
+
+    /**
+     * 
      * @param {*} _this 
      * @returns 
      */
     serialize: function(_this = null, _type = "array"){
-        console.log(_this);
         let _params = ( _type == "object" ? {} : [] );
         if( _this != null ){
             for (let i = 0; i < _this.elements.length; i++) {

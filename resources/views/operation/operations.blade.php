@@ -23,10 +23,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>    
     <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>    
-    <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
     <script>
         let managment = {
@@ -35,7 +33,6 @@
              * @param {*} table //tabla a renderizar
             */
             actionTable: function(table, param = ""){
-                console.log(table, param);
                 let buttons = [];
                 const _settings = {},
                     _buttons = table.data('button');
@@ -54,39 +51,36 @@
                 _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                                 <'table-responsive'tr>
                                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>`;                        
-            _settings.destroy = true;
-            _settings.ajax = {
-                type: 'GET',
-                dataType: 'json',
-                url: '/operation/dataOperations',
-                "data": function ( d ) {
-                    // d.action = _action;
-                    if( typeof param != 'undefined' && param != '' ){ d.data = param; }else{
-                        if( table.data("action") != "all_products" ){
-                            d.data = {
-                                "filter" : {
-                                    "start" : moment().subtract(29, 'days').format("DD/MM/YYYY"),
-                                    "end" : moment().format("DD/MM/YYYY")
-                                }
-                            }
-                        }
-                    }
-                    console.log(d);
-                    return JSON.stringify( d );
-                    // return ( d );
-                },
-                contentType: 'application/json; charset=utf-8',
-            };                                   
+                // _settings.destroy = true;
+                // _settings.ajax = {
+                //     type: 'GET',
+                //     dataType: 'json',
+                //     url: '/operation/dataOperations',
+                //     "data": function ( d ) {
+                //         if( typeof param != 'undefined' && param != '' ){ d.data = param; }else{}
+                //         // console.log(d);
+                //         return JSON.stringify( d );
+                //         // return ( d );
+                //     },
+                //     contentType: 'application/json; charset=utf-8',
+                // };                                   
                 _settings.deferRender = true;
                 _settings.responsive = true;
                 _settings.buttons =  _buttons;
                 _settings.paging = false;
                 _settings.oLanguage = {
-                    "oPaginate": { "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>', "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' },
-                    "sInfo": components.getTranslation("table.pagination") + " _PAGE_ " + components.getTranslation("table.of") + " _PAGES_",
+                    "sProcessing": "Procesando...",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",                    
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
                     "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
                     "sSearchPlaceholder": components.getTranslation("table.search") + "...",
                     "sLengthMenu": components.getTranslation("table.results") + " :  _MENU_",
+                    "oPaginate": { 
+                        "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>', 
+                        "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' 
+                    },
                 };
 
                 table.DataTable( _settings );
@@ -98,6 +92,33 @@
                     var popover = new bootstrap.Popover(bsPopover[index])
                 }
             },
+
+            setStatus: function(_status){
+                let alert_type = 'btn-secondary';
+                switch (_status) {
+                    case 'PENDING':
+                        alert_type = 'btn-secondary';
+                        break;
+                    case 'COMPLETED':
+                    case 'OK':
+                        alert_type = 'btn-success';
+                        break;
+                    case 'NOSHOW':
+                    case 'C':
+                        alert_type = 'btn-warning';
+                        break;
+                    case 'CANCELLED':
+                        alert_type = 'btn-danger';
+                        break;
+                    case 'E':
+                        alert_type = 'btn-info';
+                        break;                        
+                    default:
+                        alert_type = 'btn-secondary';
+                        break;
+                }
+                return alert_type;
+            }            
         };
 
         if ( document.getElementById('lookup_date') != null ) {
@@ -113,79 +134,90 @@
         }
 
         if( document.querySelector('.table-rendering') != null ){
-            // managment.actionTable($('.table-rendering'));
-            managment.actionTable( $(".table-rendering"), components.serialize(document.getElementById('formSearch'),'object') );
+            managment.actionTable($('.table-rendering'));
+            // managment.actionTable( $(".table-rendering"), components.serialize(document.getElementById('formSearch'),'object') );
         }
         managment.bsPopover();
         components.formReset();
         
-
         //DECLARACION DE VARIABLES
-        const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
+        const __vehicles = document.querySelectorAll('.vehicles'); //* ===== SELECT VEHICLES ===== */
+        const __drivers = document.querySelectorAll('.drivers'); //* ===== SELECT DRIVERS ===== */
         const __open_modal_comments = document.querySelectorAll('.__open_modal_comment');
         const __title_modal = document.getElementById('filterModalLabel');
-
         const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
-        const __btn = document.getElementById('btn_test');
 
+        //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
         const socket = io( (_LOCAL_URL == 'http://127.0.0.1:8000' ) ? 'http://localhost:3000': 'https://socket-production-bed1.up.railway.app' );
         socket.on('connection');
 
-        //ACCION PARA CREAR
-        if( __create != null ){
-            __create.addEventListener('click', function () {
-                __title_modal.innerHTML = this.dataset.title;
-            });
-        }
-
-        if( __open_modal_comments.length > 0 ){
-            __open_modal_comments.forEach(__open_modal_comment => {
-                __open_modal_comment.addEventListener('click', function(){
-                    console.log(this.dataset.code, this.dataset.type);
-                    document.getElementById('code_item').value = this.dataset.code;
-                    document.getElementById('type_item').value = this.dataset.type;
+        if (__vehicles.length > 0) {
+            __vehicles.forEach(__vehicle => {
+                __vehicle.addEventListener('change', function(event) {
+                    event.preventDefault();                    
+                    const { id, item, code } = this.dataset;
+                    $.ajax({
+                        url: `/operation/vehicle/set`,
+                        type: 'PUT',
+                        data: { item : item, vehicle_id : __vehicle.value, reservation_item_id : code },
+                        success: function(resp) {
+                            console.log(resp);
+                            if( resp.success ){
+                                Swal.fire({
+                                    icon: "success",
+                                    text: resp.message,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                socket.emit("setVehicleReservationServer", resp.data);
+                            }                            
+                        }
+                    }).fail(function(xhr, status, error) {
+                        console.log(xhr);
+                        Swal.fire(
+                            '¡ERROR!',
+                            xhr.responseJSON.message,
+                            'error'
+                        );
+                    });
                 });
             });
         }
 
-        //ACCION DE FORMULARIO
-        __button_form.addEventListener('submit', function (event) {
+        if (__drivers.length > 0) {
+            __drivers.forEach(__driver => {
+                __driver.addEventListener('change', function() {
+                    const { id, item, code } = this.dataset;
+                    $.ajax({
+                        url: `/operation/driver/set`,
+                        type: 'PUT',
+                        data: { item : item, driver_id : __driver.value, reservation_item_id : code },
+                        success: function(resp) {
+                            console.log(resp);
+                            if( resp.success ){
+                                Swal.fire({
+                                    icon: "success",
+                                    text: resp.message,
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                                socket.emit("setDriverReservationServer", resp.data);
+                            }
+                        }
+                    }).fail(function(xhr, status, error) {
+                            console.log(xhr, status, error);
+                            Swal.fire(
+                                '¡ERROR!',
+                                xhr.responseJSON.message,
+                                'error'
+                            );
+                    });
+                });
+            });
+        }
+
+        function updateStatusOperation(event, type, status, item_id, rez_id, id){
             event.preventDefault();
-
-            let _params = components.serialize(this,'object');
-
-            if( _params != null ){
-                components.request_exec_ajax( _LOCAL_URL + "/operation/comment/add", "POST", _params);
-            }else{
-                event.stopPropagation();
-                components.sweetAlert({"status": "error", "message": "No esta inidcando la url"});
-            }
-        });        
-
-        function setStatusOperation(event, type, status, item_id, rez_id){
-            event.preventDefault();
-            var clickedRow = event.target.closest('tr');
-            var statusCell = clickedRow.querySelector('td:nth-child(11)');
-            //statusCell.textContent = status;
-
-            let alert_type = 'btn-secondary';
-            switch (status) {
-                case 'PENDING':
-                    alert_type = 'secondary';
-                    break;
-                case 'COMPLETED':
-                    alert_type = 'success';
-                    break; 
-                case 'NOSHOW':
-                    alert_type = 'warning';
-                    break;
-                case 'CANCELLED':
-                    alert_type = 'danger';
-                    break;  
-                default:
-                    alert_type = 'secondary';
-                    break;
-            }    
 
             swal.fire({
                 title: '¿Está seguro de actualizar el estatus?',
@@ -196,17 +228,11 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if(result.isConfirmed == true){
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });                
                     $.ajax({
                         url: `/operation/status/operation`,
                         type: 'PUT',
-                        data: { rez_id:rez_id, item_id:item_id, type:type, status:status },
-                        beforeSend: function() {        
-                            
+                        data: { item: id, rez_id: rez_id, item_id: item_id, type: type, status: status },
+                        beforeSend: function() {
                         },
                         success: function(resp) {
                             Swal.fire({
@@ -227,47 +253,24 @@
                                     clearInterval(timerInterval)
                                 }
                             }).then((result) => {
-                                statusCell.innerHTML = `<span class="badge badge-light-${alert_type} mb-2 me-4">${status}</span>`;
+                                // statusCell.innerHTML = `<span class="badge badge-light-${alert_type} mb-2 me-4">${status}</span>`;
+                                socket.emit("updateStatusOperationServer", resp.data);
                             })
-
                         }
                     }).fail(function(xhr, status, error) {
-                            console.log(xhr);
-                            Swal.fire(
-                                '¡ERROR!',
-                                xhr.responseJSON.message,
-                                'error'
-                            );
+                        console.log(xhr);
+                        Swal.fire(
+                            '¡ERROR!',
+                            xhr.responseJSON.message,
+                            'error'
+                        );
                     });
-
                 }
             });        
-        }        
+        }
 
-        function setStatus(event, type, status, item_id, rez_id){
+        function updateStatusBooking(event, type, status, item_id, rez_id, id){
             event.preventDefault();
-            var clickedRow = event.target.closest('tr');
-            var statusCell = clickedRow.querySelector('td:nth-child(11)');
-            //statusCell.textContent = status;
-
-            let alert_type = 'btn-secondary';
-            switch (status) {
-                case 'PENDING':
-                    alert_type = 'secondary';
-                    break;
-                case 'COMPLETED':
-                    alert_type = 'success';
-                    break; 
-                case 'NOSHOW':
-                    alert_type = 'warning';
-                    break;
-                case 'CANCELLED':
-                    alert_type = 'danger';
-                    break;  
-                default:
-                    alert_type = 'secondary';
-                    break;
-            }    
 
             swal.fire({
                 title: '¿Está seguro de actualizar el estatus?',
@@ -277,118 +280,242 @@
                 confirmButtonText: 'Aceptar',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
-                if(result.isConfirmed == true){
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });                
+                if(result.isConfirmed == true){      
                     $.ajax({
                         url: `/operation/status/booking`,
                         type: 'PUT',
-                        data: { rez_id:rez_id, item_id:item_id, type:type, status:status },
+                        data: { item: id, rez_id: rez_id, item_id: item_id, type: type, status: status },
                         beforeSend: function() {                            
                         },
                         success: function(resp) {
-                            // Swal.fire({
-                            //     title: '¡Éxito!',
-                            //     icon: 'success',
-                            //     html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
-                            //     timer: 1500,
-                            //     timerProgressBar: true,
-                            //     didOpen: () => {
-                            //         Swal.showLoading()
-                            //         const b = Swal.getHtmlContainer().querySelector('b')
-                            //         timerInterval = setInterval(() => {
-                            //             b.textContent = (Swal.getTimerLeft() / 1000)
-                            //                 .toFixed(0)
-                            //         }, 100)
-                            //     },
-                            //     willClose: () => {
-                            //         clearInterval(timerInterval)
-                            //     }
-                            // }).then((result) => {
-                            //     statusCell.innerHTML = `<span class="badge badge-light-${alert_type} mb-2 me-4">${status}</span>`;
-                            // })
+                            Swal.fire({
+                                title: '¡Éxito!',
+                                icon: 'success',
+                                html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
+                                timer: 1500,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                    const b = Swal.getHtmlContainer().querySelector('b')
+                                    timerInterval = setInterval(() => {
+                                        b.textContent = (Swal.getTimerLeft() / 1000)
+                                            .toFixed(0)
+                                    }, 100)
+                                },
+                                willClose: () => {
+                                    clearInterval(timerInterval)
+                                }
+                            }).then((result) => {
+                                // statusCell.innerHTML = `<span class="badge badge-light-${alert_type} mb-2 me-4">${status}</span>`;
+                                socket.emit("updateStatusBookingServer", resp.data);
+                            })
                         }
                     }).fail(function(xhr, status, error) {
-                            console.log(xhr);
-                            Swal.fire(
-                                '¡ERROR!',
-                                xhr.responseJSON.message,
-                                'error'
-                            );
+                        console.log(xhr);
+                        Swal.fire(
+                            '¡ERROR!',
+                            xhr.responseJSON.message,
+                            'error'
+                        );
                     });
 
                 }
             });        
-        }
+        }        
 
-        const __drivers = document.querySelectorAll('.drivers');
-        if (__drivers.length > 0) {
-            __drivers.forEach(__driver => {
-                __driver.addEventListener('change', function() {
-                    let _code = this.dataset.code;
-                    // socket.emit("setDriverReservationServer", __driver.value, _code);
-
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
-                    $.ajax({
-                        url: `/operation/driver/set`,
-                        type: 'PUT',
-                        data: { driver_id : __driver.value, reservation_item_id : _code },
-                        success: function(resp) {
-                        }
-                    }).fail(function(xhr, status, error) {
-                            console.log(xhr);
-                            Swal.fire(
-                                '¡ERROR!',
-                                xhr.responseJSON.message,
-                                'error'
-                            );
-                    });
+        //ACCION PARA ABRIR MODAL PARA AÑADIR UN COMENTARIO
+        if( __open_modal_comments.length > 0 ){
+            __open_modal_comments.forEach(__open_modal_comment => {
+                __open_modal_comment.addEventListener('click', function(){
+                    console.log(this.dataset.code, this.dataset.type);
+                    document.getElementById('id_item').value = this.dataset.id;
+                    document.getElementById('code_item').value = this.dataset.code;
+                    document.getElementById('type_item').value = this.dataset.type;
                 });
             });
         }
 
-        const __vehicles = document.querySelectorAll('.vehicles');
-        if (__vehicles.length > 0) {
-            __vehicles.forEach(__vehicle => {
-                __vehicle.addEventListener('change', function() {
-                    let _code = this.dataset.code;
-                    console.log(__vehicle.value, _code);
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
-                    $.ajax({
-                        url: `/operation/vehicle/set`,
-                        type: 'PUT',
-                        data: { vehicle_id : __vehicle.value, reservation_item_id : _code },
-                        success: function(resp) {
-                        }
-                    }).fail(function(xhr, status, error) {
-                            console.log(xhr);
-                            Swal.fire(
-                                '¡ERROR!',
-                                xhr.responseJSON.message,
-                                'error'
-                            );
-                    });
+        //ACCION DE FORMULARIO
+        __button_form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            let _params = components.serialize(this,'object');
+            if( _params != null ){
+                $.ajax({
+                    type: "POST", // Método HTTP de la solicitud
+                    url: _LOCAL_URL + "/operation/comment/add", // Ruta del archivo PHP que manejará la solicitud
+                    data: JSON.stringify(_params), // Datos a enviar al servidor
+                    dataType: "json", // Tipo de datos que se espera en la respuesta del servidor
+                    contentType: 'application/json; charset=utf-8',
+                    beforeSend: function(){
+                        components.loadScreen();
+                    },
+                    success: function(response) {
+                        // Manejar la respuesta exitosa del servidor
+                        $("#messageModal").modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                            willClose: () => {
+                                socket.emit("addCommentServer", response.data);
+                            }
+                        })
+                    }
                 });
-            });
-        }
+            }else{
+                event.stopPropagation();
+                components.sweetAlert({"status": "error", "message": "No se definieron parametros"});
+            }
+        });
+    
+        // $(document).delegate(".drivers",'change', function (e) {
+        //     e.preventDefault();
+        //     let _params = new Object({});
+        //     let _code = ( typeof $(this).data("code") != 'undefined' ? $(this).data("code") : "" );
+            
+        //     _params.driver_id = $(this).val();
+        //     _params.reservation_item_id = _code;
+        //     console.log(_params);
 
-
+        //     $.ajax({
+        //         type : 'PUT',
+        //         url : '/operation/driver/set',
+        //         data : _params,
+        //         beforeSend: function(){
+        //         },
+        //         success : function(resp) {
+        //             console.log(resp);
+        //             if( resp.success ){
+        //                 Swal.fire({
+        //                     icon: "success",
+        //                     text: resp.message,
+        //                     showConfirmButton: false,
+        //                     timer: 1000
+        //                 });
+        //                 socket.emit("setDriverReservationServer", resp.data);
+        //             }
+        //         }
+        //     }).fail(function(xhr, status, error) {
+        //         console.log(xhr, status, error);
+        //         Swal.fire(
+        //             '¡ERROR!',
+        //             xhr.responseJSON.message,
+        //             'error'
+        //         );
+        //     });
+        // });
+        
         //EVENTOS SOCKET IO, ESCUCHAN DE LADO DEL CLIENTE
-        socket.on("setDriverReservationClient", function(driver_id, reservation_item_id){
-            console.log("nueva solicitud");
-            console.log(driver_id, reservation_item_id);
-            __btn.style.fontSize = ( reservation_item_id == 7760 ? "24px" : "50px" );
+        socket.on("setVehicleReservationClient", function(data){
+            console.log("nueva asignación de unidad");
+            console.log(data);
+            //DECLARACION DE VARIABLES
+            const __select_vehicle = document.getElementById('vehicle_id_' + data.item);
+            if( __select_vehicle != null ){
+                const __Row = ( __select_vehicle != null ? components.closest(__select_vehicle, 'tr') : null );
+                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(10)') : null );
+                console.log(__select_vehicle, __Row, __Cell);                
+                __select_vehicle.value = data.value;
+            }
+            
+            Snackbar.show({ 
+                text: data.message, 
+                duration: 5000, 
+                pos: 'top-right',
+                actionTextColor: '#fff',
+                backgroundColor: '#2196f3'
+            });
+        });
+
+        socket.on("setDriverReservationClient", function(data){
+            console.log("nueva asignación de conductor");
+            console.log(data);
+            //DECLARACION DE VARIABLES
+            const __select_driver = document.getElementById('driver_id_' + data.item);
+            if( __select_driver != null ){
+                const __Row = ( __select_driver != null ? components.closest(__select_driver, 'tr') : null );
+                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(11)') : "" );
+                console.log(__select_vehicle, __Row, __Cell);                
+                __select_driver.value = data.value;
+            }
+                        
+            Snackbar.show({ 
+                text: data.message, 
+                duration: 5000, 
+                pos: 'top-right',
+                actionTextColor: '#fff',
+                backgroundColor: '#2196f3'
+            });
+        });
+
+        socket.on("updateStatusOperationClient", function(data){
+            console.log("operación");
+            console.log(data);
+            //DECLARACION DE VARIABLES
+            const __status_operation = document.getElementById('optionsOperation' + data.item);
+            if( __status_operation != null ){
+                const __Row = ( __status_operation != null ? components.closest(__status_operation, 'tr') : null );
+                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(12)') : "" );
+                console.log(__status_operation, __Row, __Cell);                
+                __status_operation.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
+                __status_operation.classList.add(managment.setStatus(data.value));
+                __status_operation.querySelector('span').innerText = data.value;
+            }
+                        
+            Snackbar.show({ 
+                text: data.message,
+                duration: 5000, 
+                pos: 'top-right',
+                actionTextColor: '#fff',
+                backgroundColor: '#2196f3'
+            });
+        });
+
+        socket.on("updateStatusBookingClient", function(data){
+            console.log("reservación");
+            console.log(data);
+            //DECLARACION DE VARIABLES
+            const __status_booking = document.getElementById('optionsBooking' + data.item);
+            if( __status_booking != null ){
+                const __Row = ( __status_booking != null ? components.closest(__status_booking, 'tr') : null );
+                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(13)') : "" );
+                console.log(__status_booking, __Row, __Cell);                
+                __status_booking.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
+                __status_booking.classList.add(managment.setStatus(data.value));
+                __status_booking.querySelector('span').innerText = data.value;
+            }
+                        
+            Snackbar.show({
+                text: data.message,
+                duration: 5000, 
+                pos: 'top-right',
+                actionTextColor: '#fff',
+                backgroundColor: '#2196f3'
+            });
+        });
+
+        socket.on("addCommentClient", function(data){
+            console.log("comentario");
+            console.log(data);
+            //DECLARACION DE VARIABLES
+            const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
+            if( __btn_comment != null ){
+                const __Row = ( __btn_comment != null ? components.closest(__btn_comment, 'tr') : null );
+                const __indicators = ( __Row != null ? __Row.querySelector('td:nth-child(2)') : "" );
+                const __btn_open_modal_comment = ( __Row != null ? __Row.querySelector('td:nth-child(19)') : "" );
+                console.log(__btn_comment, __Row, __indicators, __btn_open_modal_comment);
+                __btn_comment.dataset.status = data.status;
+                __indicators.innerText = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'+ data.value +'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
+            }
+                        
+            Snackbar.show({
+                text: data.message,
+                duration: 5000, 
+                pos: 'top-right',
+                actionTextColor: '#fff',
+                backgroundColor: '#2196f3'
+            });
         });
     </script>
 @endpush
@@ -463,7 +590,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- @if(sizeof($items)>=1)
+                    @if(sizeof($items)>=1)
                         @foreach($items as $key => $value)                                
                             @php
                                 $payment = ( $value->total_sales - $value->total_payments );
@@ -514,7 +641,7 @@
                                         break;
                                 }
                             @endphp
-                            <tr>
+                            <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}">
                                 <td></td>
                                 <td>
                                     @if ( $flag_comment )
@@ -534,7 +661,7 @@
                                 <td>{{ $operation_to }}</td>
                                 <td>{{ $value->site_name }}</td>
                                 <td>
-                                    <select class="form-control vehicles " data-live-search="true" name="vehicle_id" id="vehicle_id" data-code="{{ $value->id }}">
+                                    <select class="form-control vehicles " data-live-search="true" name="vehicle_id" id="vehicle_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}">
                                         <option value="0">Selecciona un vehículo</option>
                                         @if ( isset($vehicles) && count($vehicles) >= 1 )
                                             @foreach ($vehicles as $vehicle)
@@ -544,7 +671,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select class="form-control drivers " data-live-search="true" name="driver_id" id="driver_id" data-code="{{ $value->id }}">
+                                    <select class="form-control drivers " data-live-search="true" name="driver_id" id="driver_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}">
                                         <option value="0">Selecciona un conductor</option>
                                         @if ( isset($drivers) && count($drivers) >= 1 )
                                             @foreach ($drivers as $driver)
@@ -555,31 +682,31 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
-                                        <button id="optionsOperation" type="button" class="btn btn-{{ $label }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {{ $operation_status }}
+                                        <button id="optionsOperation{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" type="button" class="btn btn-{{ $label }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span>{{ $operation_status }}</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </button>
-                                        <div class="dropdown-menu" aria-labelledby="optionsOperation">
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'E',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'C',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
+                                        <div class="dropdown-menu" aria-labelledby="optionsOperation{{ $key.$value->id }}">
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->operation_type }}', 'E',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->operation_type }}', 'C',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
                                             <div class="dropdown-divider"></div>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '{{ $value->operation_type }}', 'OK',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->operation_type }}', 'OK',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
-                                        <button id="optionsBooking" type="button" class="btn btn-{{ $label2 }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {{ $operation_booking }}
+                                        <button id="optionsBooking{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" type="button" class="btn btn-{{ $label2 }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span>{{ $operation_booking }}</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </button>
-                                        <div class="dropdown-menu" aria-labelledby="optionsBooking">
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'COMPLETED',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'NOSHOW',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
+                                        <div class="dropdown-menu" aria-labelledby="optionsBooking{{ $key.$value->id }}">
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->operation_type }}', 'COMPLETED',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->operation_type }}', 'NOSHOW',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
                                             <div class="dropdown-divider"></div>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '{{ $value->operation_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }})"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>                                                                
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->operation_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>
                                         </div>
                                     </div>                                     
                                 </td>
@@ -596,16 +723,16 @@
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex">    
-                                        @if ( !$flag_comment )
-                                            <div class="btn btn-primary __open_modal_comment" data-bs-toggle="modal" data-bs-target="#messageModal" data-code="{{ $value->id }}" data-type="{{ $value->operation_type }}">
+                                        {{-- @if ( !$flag_comment ) --}}
+                                            <div class="btn btn-primary __open_modal_comment" id="btn_add_modal_{{ $key.$value->id }}" data-bs-toggle="modal" data-bs-target="#messageModal" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-type="{{ $value->operation_type }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                             </div>
-                                        @endif
+                                        {{-- @endif --}}
                                     </div>
                                 </td>
                             </tr>
                         @endforeach
-                    @endif --}}
+                    @endif
                 </tbody>
             </table>
         </div>
