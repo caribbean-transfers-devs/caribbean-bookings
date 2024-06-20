@@ -574,3 +574,14 @@ $("#btn_edit_item").on('click', function(){
         $("#btn_edit_item").prop('disabled', false);
     });
 });
+
+function copyPaymentLink(event, email, code, lang){
+    event.preventDefault();
+
+    let URL = `https://caribbean-transfers.com/easy-payment?code=${code}&email=${email}`;
+    if(lang == "es"){
+        URL = `https://caribbean-transfers.com/es/easy-payment?code=${code}&email=${email}`;
+    }
+
+    console.log(URL);
+}

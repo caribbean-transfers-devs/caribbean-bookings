@@ -174,6 +174,16 @@
                     @if (RoleTrait::hasPermission(67) && ($reservation->is_cancelled == 1 || $reservation->is_duplicated == 1) )
                         <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> Activar</button>
                     @endif
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Copiar Link de pago
+                        </button>
+                        <div class="dropdown-menu" style="">
+                            <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'en')">Inglés</a>
+                            <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'es')">Español</a>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="tab">
