@@ -147,7 +147,7 @@
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.confirmation') }}">Confirmaciones</a></li>
                                 @endif
                                 @if(RoleTrait::hasPermission(46))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.ccform') }}">CC Form</a></li>
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.ccform') }}">CC Form</a></li>
                                 @endif
                                 @if(RoleTrait::hasPermission(47))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.spam') }}">SPAM</a></li>

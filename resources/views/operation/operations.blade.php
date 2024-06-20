@@ -393,43 +393,6 @@
                 components.sweetAlert({"status": "error", "message": "No se definieron parametros"});
             }
         });
-    
-        // $(document).delegate(".drivers",'change', function (e) {
-        //     e.preventDefault();
-        //     let _params = new Object({});
-        //     let _code = ( typeof $(this).data("code") != 'undefined' ? $(this).data("code") : "" );
-            
-        //     _params.driver_id = $(this).val();
-        //     _params.reservation_item_id = _code;
-        //     console.log(_params);
-
-        //     $.ajax({
-        //         type : 'PUT',
-        //         url : '/operation/driver/set',
-        //         data : _params,
-        //         beforeSend: function(){
-        //         },
-        //         success : function(resp) {
-        //             console.log(resp);
-        //             if( resp.success ){
-        //                 Swal.fire({
-        //                     icon: "success",
-        //                     text: resp.message,
-        //                     showConfirmButton: false,
-        //                     timer: 1000
-        //                 });
-        //                 socket.emit("setDriverReservationServer", resp.data);
-        //             }
-        //         }
-        //     }).fail(function(xhr, status, error) {
-        //         console.log(xhr, status, error);
-        //         Swal.fire(
-        //             '¡ERROR!',
-        //             xhr.responseJSON.message,
-        //             'error'
-        //         );
-        //     });
-        // });
         
         //EVENTOS SOCKET IO, ESCUCHAN DE LADO DEL CLIENTE
         socket.on("setVehicleReservationClient", function(data){
@@ -565,13 +528,16 @@
             <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
                 <div class="card-body">
                     <form action="" class="row" method="POST" id="formSearch">
-                        <div class="col-12 col-sm-5 mb-3 mb-lg-0">
+                        <div class="col-12 col-sm-4 mb-3 mb-lg-0">
                             <label class="form-label" for="lookup_date">Fecha de creación</label>
                             <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
                         </div>
-                        <div class="col-12 col-sm-3 align-self-end">
+                        <div class="col-12 col-sm-2 align-self-end">
                             <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
                         </div>
+                        <div class="col-12 col-sm-2 align-self-end">
+                            <button type="button" class="btn btn-primary btn-lg btn-filter w-100">Pre-asignación</button>
+                        </div>                        
                     </form>
                 </div>
             </div>

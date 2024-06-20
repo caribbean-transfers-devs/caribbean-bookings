@@ -14,8 +14,8 @@
 @section('title') Operación @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/management.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/management.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -24,7 +24,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="{{ mix('assets/js/sections/operations/managment.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/operations/management.min.js') }}"></script>
     <script>
         if ( document.getElementById('lookup_date') != null ) {
             const picker = new easepick.create({

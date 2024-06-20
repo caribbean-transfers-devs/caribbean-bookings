@@ -121,7 +121,7 @@ class OperationRepository
             ),
         );          
  
-        return view('operation.index', compact('dates','breadcrumbs'));
+        return view('operation.download', compact('dates','breadcrumbs'));
     }
 
     public function getMessages($id){
@@ -239,7 +239,7 @@ class OperationRepository
             ),
         );
                                     
-        return view('operation.managment', compact('items','date','breadcrumbs'));
+        return view('operation.management', compact('items','date','breadcrumbs'));
     }
 
     public function statusUpdate($request){        

@@ -55,10 +55,16 @@ mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resource
 mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
 mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css"); //DASHBOARD
 mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //REPORTS
+
+mix.sass('resources/scss/sections/download.scss', data.assets + "css/sections/download.min.css"); //DOWNLOAD
+mix.sass('resources/scss/sections/management.scss', data.assets + "css/sections/management.min.css"); //MANAGEMENT
+mix.sass('resources/scss/sections/confirmation.scss', data.assets + "css/sections/confirmation.min.css"); //CONFIRMATION
+mix.sass('resources/scss/sections/ccform.scss', data.assets + "css/sections/ccform.min.css"); //CCFORM
+mix.sass('resources/scss/sections/spam.scss', data.assets + "css/sections/spam.min.css"); //SPAM
 mix.sass('resources/scss/sections/operations.scss', data.assets + "css/sections/operations.min.css"); //OPERATIONS
-mix.sass('resources/scss/sections/spam.scss', data.assets + "css/sections/spam.min.css"); //OPERATIONS
+
 mix.sass('resources/scss/sections/zones.scss', data.assets + "css/sections/zones.min.css"); //ZONES
-mix.sass('resources/scss/sections/rates.scss', data.assets + "css/sections/rates.min.css"); //ZONES
+mix.sass('resources/scss/sections/rates.scss', data.assets + "css/sections/rates.min.css"); //RATES
 mix.sass('resources/scss/sections/users.scss', data.assets + "css/sections/users.min.css"); //USERS
 mix.sass('resources/scss/sections/enterprise.scss', data.assets + "css/sections/enterprise.min.css");
 mix.sass('resources/scss/sections/enterprise_forms.scss', data.assets + "css/sections/enterprise_forms.min.css");
@@ -85,6 +91,7 @@ mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugi
 
 //OPERATION
 mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/download.js'], data.assets + "js/sections/operations/download.min.js");
+mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/management.js'], data.assets + "js/sections/operations/management.min.js");
 mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/confirmation.js'], data.assets + "js/sections/operations/confirmation.min.js");
 mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/spam.js'], data.assets + "js/sections/operations/spam.min.js");
 mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/bootstrap-select/bootstrap-select.js'], data.assets + "js/sections/operations/operations.min.js");

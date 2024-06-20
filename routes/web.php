@@ -80,21 +80,22 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reservations/upload/{id}', [ReservationsController::class, 'getMedia'])->name('reservations.upload.getmedia');
     Route::delete('/reservations/upload/{id}', [ReservationsController::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
 
-    Route::get('/operation', [OperationController::class, 'index'])->name('operation.download');
+    //OPERACIONES
+    Route::get('/download', [OperationController::class, 'index'])->name('operation.download');
     Route::get('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment');
     Route::post('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment.search');
     Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
     Route::get('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation');
     Route::post('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation.search');
-    Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');
+    Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');    
+    Route::get('/reports/ccform', [CCFormController::class, 'index'])->name('operation.ccform');
+    Route::get('/reports/ccform/pdf', [CCFormController::class, 'createPDF'])->name('operation.ccform.createPDF');
     Route::get('/operation/spam', [OperationController::class, 'spam'])->name('operation.spam');
     Route::post('/operation/spam', [OperationController::class, 'spam'])->name('operation.spam.search');
     Route::get('/operation/spam/exportExcel', [OperationController::class, 'exportExcel'])->name('operation.spam.exportExcel');
     Route::put('/operation/spam/update-status', [OperationController::class, 'spamUpdate'])->name('operation.spam.update');
-
-    Route::get('/operation/operations', [Operations::class, 'index'])->name('operation.index');
-    Route::post('/operation/operations', [Operations::class, 'index'])->name('operation.index.search');
-
+    Route::get('/operations', [Operations::class, 'index'])->name('operation.index');
+    Route::post('/operations', [Operations::class, 'index'])->name('operation.index.search');
     Route::put('/operation/vehicle/set', [Operations::class, 'setVehicle'])->name('operation.set.vehicle');
     Route::put('/operation/driver/set', [Operations::class, 'setDriver'])->name('operation.set.driver');    
     Route::put('/operation/status/operation', [Operations::class, 'updateStatusOperation'])->name('operation.status.operation');
@@ -104,15 +105,13 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::post('/update-data', [DataController::class, 'updateData']);
 
-    //Reportes
+    //REPORTES
     Route::get('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment');
     Route::post('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment.action');
     Route::get('/reports/sales', [ReportSales::class, 'index'])->name('reports.sales');
     Route::post('/reports/sales', [ReportSales::class, 'index'])->name('reports.sales.action');
     Route::get('/reports/commissions', [ReportCommissions::class, 'index'])->name('reports.commissions');
     Route::post('/reports/commissions', [ReportCommissions::class, 'index'])->name('reports.commissions.action');
-    Route::get('/reports/ccform', [CCFormController::class, 'index'])->name('reports.ccform');
-    Route::get('/reports/ccform/pdf', [CCFormController::class, 'createPDF'])->name('reports.ccform.createPDF');
     Route::get('/reports/cash', [ReportCash::class, 'index'])->name('reports.cash');
     Route::post('/reports/cash', [ReportCash::class, 'index'])->name('reports.cash.action');
     Route::put('/reports/cash/update-status', [ReportCash::class, 'update'])->name('reports.cash.action.update');

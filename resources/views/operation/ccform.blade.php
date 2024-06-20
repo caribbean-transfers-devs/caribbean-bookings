@@ -5,8 +5,8 @@
 @section('title') Comisiones @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/users.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/users.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/ccform.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/ccform.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')

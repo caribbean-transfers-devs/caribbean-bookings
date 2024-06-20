@@ -157,8 +157,8 @@
             if(RoleTrait::hasPermission(46)):
                 $links_operations[] = [
                     'name' => 'CC Form',
-                    'route' => route('reports.ccform'),
-                    'active' => request()->routeIs('reports.ccform'),
+                    'route' => route('operation.ccform'),
+                    'active' => request()->routeIs('operation.ccform'),
                 ];
             endif;
             if(RoleTrait::hasPermission(47)):
@@ -182,7 +182,7 @@
                 'code' => 'operations',
                 'name' => 'Operación',
                 'route' => null,
-                'active' => request()->routeIs('operation.*','reports.ccform'),
+                'active' => request()->routeIs('operation.*'),
                 'urls' => $links_operations
             ]);
         endif;

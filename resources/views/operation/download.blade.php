@@ -13,8 +13,8 @@
 @section('title') Operación @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/download.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/download.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
