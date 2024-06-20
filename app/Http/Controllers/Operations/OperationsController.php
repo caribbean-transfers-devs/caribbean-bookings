@@ -306,7 +306,7 @@ class OperationsController extends Controller
                     "message" => "Se asigno la unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$item->id.", por ".auth()->user()->name
                 )
             ], 200);
-        } catch (\Throwable $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'errors' => [
@@ -389,7 +389,7 @@ class OperationsController extends Controller
                     "message" => "Actualización de estatus de operación (".$request->type.") por ".$request->status." al servicio: ".$item->id.", por ".auth()->user()->name
                 )
             ], 200);
-        } catch (\Throwable $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'errors' => [
@@ -430,7 +430,7 @@ class OperationsController extends Controller
                     "message" => "Actualización de estatus de reservación (".$request->type.") por ".$request->status." al servicio: ".$item->id.", por ".auth()->user()->name
                 )
             ], 200);
-        } catch (\Throwable $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'errors' => [
@@ -473,10 +473,34 @@ class OperationsController extends Controller
                     "message" => "Se agrego un comentario al servicio: ".$request->code.", por ".auth()->user()->name
                 )
             ], 200);
-        } catch (\Throwable $e) {
+        } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al actualizar el estatus'], 500);
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
+
+    public function getComment(Request $request){
+        try {
+            $item = ReservationsItem::find($request->item_id);
+            return response()->json([
+                'success' => true,
+                'message' => ( $request->type == "arrival" ? $item->op_one_comments : $item->op_two_comments ),
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }    
 
 }

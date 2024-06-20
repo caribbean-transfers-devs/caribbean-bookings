@@ -138,7 +138,7 @@
             // managment.actionTable( $(".table-rendering"), components.serialize(document.getElementById('formSearch'),'object') );
         }
         managment.bsPopover();
-        components.formReset();
+        components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
         
         //DECLARACION DE VARIABLES
         const __vehicles = document.querySelectorAll('.vehicles'); //* ===== SELECT VEHICLES ===== */
@@ -327,10 +327,35 @@
         if( __open_modal_comments.length > 0 ){
             __open_modal_comments.forEach(__open_modal_comment => {
                 __open_modal_comment.addEventListener('click', function(){
-                    console.log(this.dataset.code, this.dataset.type);
+
+                    //DECLARACION DE VARIABLES
+                    const __modal = document.getElementById('messageModal');
+                    const __title_modal = document.getElementById('messageModalLabel');
+                    const __form_label = __modal.querySelector('.form-label');
+
+                    //SETEAMOS VALORES EN EL MODAL
+                    __title_modal.innerHTML = ( this.dataset.status == 0 ? "Agregar comentario" : "Editar comentario" );
+                    __form_label.innerHTML = ( this.dataset.status == 0 ? "Ingresa el comentario" : "Editar el comentario" );
                     document.getElementById('id_item').value = this.dataset.id;
                     document.getElementById('code_item').value = this.dataset.code;
                     document.getElementById('type_item').value = this.dataset.type;
+
+                    if (this.dataset.status == 1) {
+                        $.ajax({
+                            url: `/operation/comment/get`,
+                            type: 'GET',
+                            data: { item_id: this.dataset.code, type: this.dataset.type },
+                            // beforeSend: function() {
+                            //     components.loadScreen();
+                            // },
+                            success: function(resp) {
+                                document.getElementById('comment_item').value = resp.message;
+                                $(__modal).modal('show');
+                            }
+                        });
+                    }else{
+                        $(__modal).modal('show');
+                    }
                 });
             });
         }
@@ -508,7 +533,8 @@
                 __btn_comment.dataset.status = data.status;
                 __indicators.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'+ data.value +'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
             }
-                        
+            managment.bsPopover();
+
             Snackbar.show({
                 text: data.message,
                 duration: 5000, 
@@ -724,7 +750,7 @@
                                 <td class="text-center">
                                     <div class="d-flex">    
                                         {{-- @if ( !$flag_comment ) --}}
-                                            <div class="btn btn-primary __open_modal_comment" id="btn_add_modal_{{ $key.$value->id }}" data-bs-toggle="modal" data-bs-target="#messageModal" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-type="{{ $value->operation_type }}">
+                                            <div class="btn btn-primary __open_modal_comment" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-type="{{ $value->operation_type }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                             </div>
                                         {{-- @endif --}}

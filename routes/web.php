@@ -94,13 +94,14 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/operation/operations', [Operations::class, 'index'])->name('operation.index');
     Route::post('/operation/operations', [Operations::class, 'index'])->name('operation.index.search');
+
     Route::put('/operation/vehicle/set', [Operations::class, 'setVehicle'])->name('operation.set.vehicle');
-    Route::put('/operation/driver/set', [Operations::class, 'setDriver'])->name('operation.set.driver');
+    Route::put('/operation/driver/set', [Operations::class, 'setDriver'])->name('operation.set.driver');    
     Route::put('/operation/status/operation', [Operations::class, 'updateStatusOperation'])->name('operation.status.operation');
     Route::put('/operation/status/booking', [Operations::class, 'updateStatusBooking'])->name('operation.status.booking');
     Route::post('/operation/comment/add', [Operations::class, 'addComment'])->name('operation.comment.add');
+    Route::get('/operation/comment/get', [Operations::class, 'getComment'])->name('operation.comment.get');
 
-    Route::get('/operation/dataOperations', [Operations::class, 'dataOperations']);
     Route::post('/update-data', [DataController::class, 'updateData']);
 
     //Reportes
