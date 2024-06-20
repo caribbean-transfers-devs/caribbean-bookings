@@ -11,14 +11,14 @@
 <div class="modal fade" id="filterModalExport" tabindex="-1" role="dialog" aria-labelledby="filterModalExportLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="filterModalExportLabel"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
-            <form action="" method="POST" id="formSearch">
+            <form method="POST" id="formSearch" enctype="multipart/form-data">
                 @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filterModalExportLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-12 col-sm-6">
@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" id="generateExcel">Exportar</button>                    
+                    <button type="button" class="btn btn-primary" id="generateExcel">Exportar</button>                    
                 </div>
             </form>
         </div>

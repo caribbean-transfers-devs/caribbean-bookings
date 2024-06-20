@@ -56,6 +56,7 @@ mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");
 mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css"); //DASHBOARD
 mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //REPORTS
 mix.sass('resources/scss/sections/operations.scss', data.assets + "css/sections/operations.min.css"); //OPERATIONS
+mix.sass('resources/scss/sections/spam.scss', data.assets + "css/sections/spam.min.css"); //OPERATIONS
 mix.sass('resources/scss/sections/zones.scss', data.assets + "css/sections/zones.min.css"); //ZONES
 mix.sass('resources/scss/sections/rates.scss', data.assets + "css/sections/rates.min.css"); //ZONES
 mix.sass('resources/scss/sections/users.scss', data.assets + "css/sections/users.min.css"); //USERS

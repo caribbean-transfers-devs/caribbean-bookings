@@ -18,7 +18,6 @@ let confirmation = {
                 buttons.push(_btn);
             });
         }
-        // console.log(buttons);
 
         _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                         <'table-responsive'tr>
@@ -26,13 +25,10 @@ let confirmation = {
         _settings.deferRender = true;
         _settings.responsive = true;
         _settings.buttons =  _buttons;
-        _settings.order = [];
-        // _settings.lengthMenu = [];
-        // _settings.pageLength = 10;
         _settings.paging = false;
         _settings.oLanguage = {
             "oPaginate": { "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>', "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' },
-            "sInfo": components.getTranslation("table.pagination") + " _PAGE_ " + components.getTranslation("table.of") + " _PAGES_",
+            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
             "sSearchPlaceholder": components.getTranslation("table.search") + "...",
             "sLengthMenu": components.getTranslation("table.results") + " :  _MENU_",

@@ -6,8 +6,8 @@
 @section('title') SPAM @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/spam.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/spam.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
