@@ -118,7 +118,42 @@
                         break;
                 }
                 return alert_type;
-            }            
+            },
+
+            setPreassignment: function(_operation){
+                let alert_type = 'btn-success';
+                switch (_status) {
+                    case 'ARRIVAL':
+                        alert_type = 'btn-success';
+                        break;
+                    case 'DEPARTURE':
+                        alert_type = 'btn-primary';
+                        break;
+                    case 'TRANSFER':
+                        alert_type = 'btn-info';
+                        break;
+                    default:
+                        alert_type = 'btn-success';
+                        break;
+                }
+                return alert_type;                
+            },
+
+            getDate: function(){
+                // Obtener la fecha actual
+                let fechaActual = new Date(document.getElementById('lookup_date').value);
+
+                // Sumar un día a la fecha actual
+                fechaActual.setDate(fechaActual.getDate() + 1);
+
+                // Mostrar la nueva fecha en el formato YYYY-MM-DD
+                let dia = String(fechaActual.getDate()).padStart(2, '0');
+                let mes = String(fechaActual.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript van de 0 a 11
+                let anio = fechaActual.getFullYear();
+
+                let fechaFormateada = `${anio}-${mes}-${dia}`;
+                return fechaFormateada;
+            }
         };
 
         if ( document.getElementById('lookup_date') != null ) {
@@ -141,15 +176,93 @@
         components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
         
         //DECLARACION DE VARIABLES
+        const __add_preassignments = document.querySelectorAll('.add_preassignment'); //* ===== BUTTONS PRE ASSIGNMENT ===== */
         const __vehicles = document.querySelectorAll('.vehicles'); //* ===== SELECT VEHICLES ===== */
         const __drivers = document.querySelectorAll('.drivers'); //* ===== SELECT DRIVERS ===== */
         const __open_modal_comments = document.querySelectorAll('.__open_modal_comment');
         const __title_modal = document.getElementById('filterModalLabel');
         const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
+        const __btn_preassignment = document.getElementById('btn_preassignment') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
 
         //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
+        console.log(_LOCAL_URL);
         const socket = io( (_LOCAL_URL == 'http://127.0.0.1:8000' ) ? 'http://localhost:3000': 'https://socket-production-bed1.up.railway.app' );
         socket.on('connection');
+
+        if( __btn_preassignment != null ){
+            __btn_preassignment.addEventListener('click', function() {
+                swal.fire({
+                    title: '¿Está seguro de pre-asignar los servicio del ' + document.getElementById('lookup_date_next').value + '?',
+                    text: "Esta acción no se puede revertir",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Aceptar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if(result.isConfirmed == true){
+                        $.ajax({
+                            type: "POST",
+                            url: _LOCAL_URL + "/operation/preassignments",
+                            dataType: "json",
+                            contentType: 'application/json; charset=utf-8',
+                            beforeSend: function(){
+                                components.loadScreen();
+                            },
+                            success: function(response) {
+                                // Manejar la respuesta exitosa del servidor
+                                Swal.fire({
+                                    icon: 'success',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1500,
+                                });
+                            }
+                        });
+                    }
+                });               
+            });
+        }
+
+        console.log(__add_preassignments);
+        if (__add_preassignments.length > 0) {
+            __add_preassignments.forEach(__add_preassignment => {
+                __add_preassignment.addEventListener('click', function(event) {
+                    event.preventDefault();                    
+                    const { id, code, operation, service } = this.dataset;
+                    const __date = document.getElementById('lookup_date');
+                    swal.fire({
+                        title: '¿Está seguro de pre-asignar el servicio ?',
+                        text: "Esta acción no se puede revertir",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Aceptar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if(result.isConfirmed == true){
+                            $.ajax({
+                                url: _LOCAL_URL + "/operation/preassignment",
+                                type: 'PUT',
+                                data: { date : __date.value, id : id, code : code, operation : operation },
+                                beforeSend: function() {
+                                    components.loadScreen();
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        text: response.message,
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                        willClose: () => {
+                                            socket.emit("addPreassignmentServer", response.data);
+                                        }
+                                    });                            
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+        }        
 
         if (__vehicles.length > 0) {
             __vehicles.forEach(__vehicle => {
@@ -321,7 +434,7 @@
 
                 }
             });        
-        }        
+        }
 
         //ACCION PARA ABRIR MODAL PARA AÑADIR UN COMENTARIO
         if( __open_modal_comments.length > 0 ){
@@ -395,6 +508,30 @@
         });
         
         //EVENTOS SOCKET IO, ESCUCHAN DE LADO DEL CLIENTE
+        socket.on("addPreassignmentClient", function(data){
+            console.log("asignacion");
+            console.log(data);
+            //DECLARACION DE VARIABLES
+            const __btn_preassignment = document.getElementById('btn_preassignment_' + data.item);
+            if( __btn_preassignment != null ){
+                const __Row = ( __btn_preassignment != null ? components.closest(__btn_preassignment, 'tr') : null );
+                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(1)') : "" );
+                console.log(__btn_preassignment, __Row, __Cell);
+                __btn_preassignment.classList.remove('btn-primary');
+                __btn_preassignment.classList.add(managment.setPreassignment(data.operation));
+                __btn_preassignment.innerHTML = data.value;
+                // __Cell.innerHTML = '<button type="button" class="btn btn-'+ managment.setPreassignment(data.operation) +' text-uppercase">'+ data.value +'</button>';
+            }
+
+            Snackbar.show({
+                text: data.message,
+                duration: 5000, 
+                pos: 'top-right',
+                actionTextColor: '#fff',
+                backgroundColor: '#2196f3'
+            });
+        });
+
         socket.on("setVehicleReservationClient", function(data){
             console.log("nueva asignación de unidad");
             console.log(data);
@@ -511,7 +648,7 @@
 
 @section('content')
     @php
-        // dump(count($items));
+        // dd($items);
         $buttons = array();
         // dump($buttons);
     @endphp
@@ -528,6 +665,8 @@
             <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
                 <div class="card-body">
                     <form action="" class="row" method="POST" id="formSearch">
+                        @csrf
+                        <input type="hidden" id="lookup_date_next" value="{{ $nexDate }}" required>
                         <div class="col-12 col-sm-4 mb-3 mb-lg-0">
                             <label class="form-label" for="lookup_date">Fecha de creación</label>
                             <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
@@ -536,7 +675,7 @@
                             <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
                         </div>
                         <div class="col-12 col-sm-2 align-self-end">
-                            <button type="button" class="btn btn-primary btn-lg btn-filter w-100">Pre-asignación</button>
+                            <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_preassignment">Pre-asignación</button>
                         </div>                        
                     </form>
                 </div>
@@ -588,6 +727,9 @@
                                 $payment = ( $value->total_sales - $value->total_payments );
                                 if($payment < 0) $payment = 0;
 
+                                $flag_preassignment = ( ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') ) && $value->op_one_preassignment != "" ? true : ( $value->final_service_type == 'DEPARTURE' && ( ($value->is_round_trip == 1 && $value->op_two_preassignment != "") || ($value->is_round_trip == 0 && $value->op_one_preassignment != "") ) ? true : false ) );
+                                $preassignment = ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_preassignment : $value->op_two_preassignment );
+
                                 $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status_operation : $value->op_two_status_operation );
                                 $operation_booking = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
                                 $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
@@ -633,8 +775,14 @@
                                         break;
                                 }
                             @endphp
-                            <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}">
-                                <td></td>
+                            <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">
+                                <td>
+                                    @if ( $flag_preassignment )
+                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> text-uppercase">{{ $preassignment }}</button>
+                                    @else
+                                        <button type="button" class="btn btn-primary text-uppercase add_preassignment" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->operation_type }}" data-service="{{ $value->final_service_type }}">add</button>
+                                    @endif
+                                </td>
                                 <td>
                                     @if ( $flag_comment )
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="{{ $comment }}"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>

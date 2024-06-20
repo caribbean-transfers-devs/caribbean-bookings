@@ -20,6 +20,7 @@ class OperationsController extends Controller
     
     public function index(Request $request){
         $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
+        $nexDate = date('Y-m-d', strtotime($request->date . ' +1 day'));
 
         $search['init'] = $date." 00:00:00";
         $search['end'] = $date." 23:59:59";
@@ -37,7 +38,7 @@ class OperationsController extends Controller
         $vehicles = Vehicle::All();
         $drivers = Driver::All();
 
-        return view('operation.operations', compact('items','date','breadcrumbs','vehicles','drivers'));
+        return view('operation.operations', compact('items', 'date', 'nexDate', 'breadcrumbs', 'vehicles', 'drivers'));
     }
 
     public function dataOperations(Request $request){
@@ -182,17 +183,82 @@ class OperationsController extends Controller
         return response()->json($data, 200);
     }
 
+    public function preassignments(Request $request){
+        try {
+            //DECLARAMOS VARIABLES
+            $date = date('Y-m-d', strtotime(date("Y-m-d") . ' +1 day'));
+            $search['init'] = $date." 00:00:00";
+            $search['end'] = $date." 23:59:59";
+            $arrival_counter = 1;
+            $transfer_counter = 1;
+            $departure_counter = 1;
+    
+            //CONSULTAMOS SERVICIOS
+            $items = $this->querySpam($search);
+    
+            //RECORREMOS LOS SERVICIOS PARA PODER REALISAR LA PREASIGNACION
+            if( sizeof($items)>=1 ):
+                foreach($items as $key => $item):
+                    $preassignment = "";
+                    $service = ReservationsItem::find($item->id);
+                    if( $item->final_service_type == 'ARRIVAL' ){
+                        $preassignment = "L".$arrival_counter;
+                        $service->op_one_preassignment = $preassignment;
+                        $arrival_counter ++;                        
+                    }
+                    if( $item->final_service_type == 'TRANSFER' ){
+                        $preassignment = "T".$transfer_counter;
+                        $service->op_one_preassignment = $preassignment;
+                        $transfer_counter ++;
+                    }
+                    if( $item->final_service_type == 'DEPARTURE' && $item->is_round_trip == 1 ){
+                        $preassignment = "S".$departure_counter;
+                        $service->op_two_preassignment = $preassignment;
+                        $departure_counter ++;
+                    }
+                    if( $item->final_service_type == 'DEPARTURE' && $item->is_round_trip == 0 ){
+                        $preassignment = "S".$departure_counter;
+                        $service->op_one_preassignment = $preassignment;
+                        $departure_counter ++;
+                    }
+                    $service->save();
+
+                    //CREAMOS UN LOG
+                    $follow_up_db = new ReservationFollowUp;
+                    $follow_up_db->name = auth()->user()->name;
+                    $follow_up_db->text = "Se pre-asigno de (NULL) por ".$preassignment. " al servicio: ".$item->id.", por ".auth()->user()->name;
+                    $follow_up_db->type = 'HISTORY';
+                    $follow_up_db->reservation_id = $item->reservation_id;
+                    $follow_up_db->save();
+                endforeach;
+            endif;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Se pre-asignaron los servicios de manera correcta...',
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function querySpam($search){
         return  DB::select("SELECT 
-                            rez.id as reservation_id, 
-                            rez.*, 
-                            it.*, 
-                            serv.name as service_name, 
-                            it.op_one_pickup as filtered_date, 
-                            'arrival' as operation_type,
-                            sit.name as site_name,
-                            'TYPE_ONE' as op_type,
-                            '' as messages,
+                                    rez.id as reservation_id, 
+                                    rez.*, 
+                                    it.*, 
+                                    serv.name as service_name, 
+                                    it.op_one_pickup as filtered_date, 
+                                    'arrival' as operation_type,
+                                    sit.name as site_name,
+                                    'TYPE_ONE' as op_type,
+                                    '' as messages,
                                                COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                                CASE
                                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
@@ -231,7 +297,16 @@ class OperationsController extends Controller
                                    AND rez.is_duplicated = 0
                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                                    UNION 
-                                   SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_two_pickup as filtered_date, 'departure' as operation_type, sit.name as site_name, 'TYPE_TWO' as op_type, '' as messages,
+                                   SELECT 
+                                   rez.id as reservation_id, 
+                                   rez.*, 
+                                   it.*, 
+                                   serv.name as service_name, 
+                                   it.op_two_pickup as filtered_date, 
+                                   'departure' as operation_type, 
+                                   sit.name as site_name, 
+                                   'TYPE_TWO' as op_type, 
+                                   '' as messages,
                                                COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                                CASE
                                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
@@ -275,6 +350,92 @@ class OperationsController extends Controller
                                        "init_date_four" => $search['end'],
                                    ]);
     }
+
+    public function preassignment(Request $request){
+        try {
+            DB::beginTransaction();
+            //DECLARAMOS VARIABLES
+            $search['init'] = $request->date." 00:00:00";
+            $search['end'] = $request->date." 23:59:59";
+            $arrival_counter = 0;
+            $transfer_counter = 0;
+            $departure_counter = 0;
+
+            //CONSULTAMOS SERVICIOS
+            $items = $this->querySpam($search);
+
+            //RECORREMOS LOS SERVICIOS PARA PODER INDENTIFICAR LA CONTINUIDAD DE LA PREASIGNACION
+            if( sizeof($items)>=1 ):
+                foreach($items as $key => $item):
+                    if( $item->final_service_type == 'ARRIVAL' ){
+                        $arrival_counter ++;
+                    }
+                    if( $item->final_service_type == 'TRANSFER' ){
+                        $transfer_counter ++;
+                    }
+                    if( $item->final_service_type == 'DEPARTURE' && $item->is_round_trip == 1 ){
+                        $departure_counter ++;
+                    }
+                    if( $item->final_service_type == 'DEPARTURE' && $item->is_round_trip == 0 ){
+                        $departure_counter ++;
+                    }                    
+                endforeach;
+            endif;            
+                        
+            $preassignment = "";
+            //OBTENEMOS INFORMACION DEL SERVICIO
+            $service = ReservationsItem::find($request->code);
+            //REALIZAMOS LA PREASIGNACION DEPENDIENDO DE LA OPERACION
+            if( $request->operation == 'ARRIVAL' ){
+                $preassignment = "L".( $arrival_counter == 0 ? 1 : $arrival_counter );
+                $service->op_one_preassignment = $preassignment;
+            }
+            if( $request->operation == 'TRANSFER' ){
+                $preassignment = "T".( $transfer_counter == 0 ? 1 : $transfer_counter );
+                $service->op_one_preassignment = $preassignment;
+            }
+            if( $request->operation == 'DEPARTURE' && $service->is_round_trip == 1 ){
+                $preassignment = "S".( $departure_counter == 0 ? 1 : $departure_counter );
+                $service->op_two_preassignment = $preassignment;
+                $departure_counter ++;
+            }
+            if( $request->operation == 'DEPARTURE' && $service->is_round_trip == 0 ){
+                $preassignment = "S".( $departure_counter == 0 ? 1 : $departure_counter );
+                $service->op_one_preassignment = $preassignment;
+                $departure_counter ++;
+            }
+            $service->save();
+
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->text = "Se pre-asigno de (NULL) por ".$preassignment. " al servicio: ".$service->id.", por ".auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $service->reservation_id;
+            $follow_up_db->save();
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Se pre-asigno el servicio de manera correcta...',
+                'data' => array(
+                    "item"  => $request->id,
+                    "operation"  => $request->operation,
+                    "value"  => $preassignment,
+                    "message" => "Se pre-asigno de (NULL) por ".$preassignment. " al servicio: ".$service->id.", por ".auth()->user()->name
+                )
+            ], 200);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }    
 
     public function setVehicle(Request $request){
         try {
@@ -399,7 +560,7 @@ class OperationsController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
-    }     
+    }
 
     public function updateStatusBooking(Request $request){
         try {
@@ -501,6 +662,6 @@ class OperationsController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
-    }    
+    }
 
 }
