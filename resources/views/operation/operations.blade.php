@@ -580,17 +580,17 @@
 
         socket.on("addCommentClient", function(data){
             console.log("comentario");
-            console.log(data);
+            // console.log(data);
             //DECLARACION DE VARIABLES
             const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
             if( __btn_comment != null ){
                 const __Row = ( __btn_comment != null ? components.closest(__btn_comment, 'tr') : null );
                 const __indicators = ( __Row != null ? __Row.querySelector('td:nth-child(2)') : "" );
                 const __btn_open_modal_comment = ( __Row != null ? __Row.querySelector('td:nth-child(19)') : "" );
-                console.log(__btn_comment);
-                console.log(__Row);
-                console.log(__indicators);
-                console.log(__btn_open_modal_comment);
+                // console.log(__btn_comment);
+                // console.log(__Row);
+                // console.log(__indicators);
+                // console.log(__btn_open_modal_comment);
                 __btn_comment.dataset.status = data.status;
                 __indicators.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'+ data.value +'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
             }
@@ -685,25 +685,28 @@
                     @if(sizeof($items)>=1)
                         @foreach($items as $key => $value)                                
                             @php
+                                //DECLARAMOS VARIABLES DE IDENTIFICADORES
+                                $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "e6f4ff" : "eceffe" ) ).";";
+
                                 $payment = ( $value->total_sales - $value->total_payments );
                                 if($payment < 0) $payment = 0;
 
+                                //PREASIGNACION
                                 $flag_preassignment = ( ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') ) && $value->op_one_preassignment != "" ? true : ( $value->final_service_type == 'DEPARTURE' && ( ($value->is_round_trip == 1 && $value->op_two_preassignment != "") || ($value->is_round_trip == 0 && $value->op_one_preassignment != "") ) ? true : false ) );
                                 $preassignment = ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_preassignment : $value->op_two_preassignment );
+                                //ESTATUS
+                                $status_operation = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_status_operation : $value->op_two_status_operation );
+                                $status_booking = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_status : $value->op_two_status );
 
-                                $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status_operation : $value->op_two_status_operation );
-                                $operation_booking = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
+
                                 $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
                                 $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
                                 $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
-
+                                //COMENTARIO
                                 $flag_comment = ( ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') ) && $value->op_one_comments != "" ? true : ( $value->final_service_type == 'DEPARTURE' && ( ($value->is_round_trip == 1 && $value->op_two_comments != "") || ($value->is_round_trip == 0 && $value->op_one_comments != "") ) ? true : false ) );
                                 $comment = ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_comments : $value->op_two_comments );
 
-                                switch ($operation_status) {
-                                    case 'PENDING':
-                                        $label = 'secondary';
-                                        break;
+                                switch ($status_operation) {
                                     case 'E':
                                         $label = 'info';
                                         break;
@@ -718,10 +721,7 @@
                                         break;
                                 }
 
-                                switch ($operation_booking) {
-                                    case 'PENDING':
-                                        $label2 = 'secondary';
-                                        break;
+                                switch ($status_booking) {
                                     case 'COMPLETED':
                                         $label2 = 'success';
                                         break;
@@ -736,7 +736,7 @@
                                         break;
                                 }
                             @endphp
-                            <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">
+                            <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" style="{{ $background_color }}">
                                 <td>
                                     @if ( $flag_preassignment )
                                         <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> text-uppercase">{{ $preassignment }}</button>
@@ -784,7 +784,7 @@
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
                                         <button id="optionsOperation{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" type="button" class="btn btn-{{ $label }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <span>{{ $operation_status }}</span>
+                                            <span>{{ $status_operation }}</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="optionsOperation{{ $key.$value->id }}">
@@ -799,7 +799,7 @@
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
                                         <button id="optionsBooking{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" type="button" class="btn btn-{{ $label2 }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <span>{{ $operation_booking }}</span>
+                                            <span>{{ $status_booking }}</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="optionsBooking{{ $key.$value->id }}">

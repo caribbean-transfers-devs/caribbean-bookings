@@ -442,20 +442,39 @@ class OperationsController extends Controller
         try {
             DB::beginTransaction();
             //OBTENEMOS INFORMACION
-            $item = ReservationsItem::find($request->reservation_item_id);
-            $vehicle_current = Vehicle::find($item->vehicle_id);
+            $service = ReservationsItem::find($request->reservation_item_id);
+            $vehicle_current = Vehicle::find($service->vehicle_id);
             $vehicle_new = Vehicle::find($request->vehicle_id);
 
             //ACTUALIZAMOS INFORMACION
-            $item->vehicle_id = $request->vehicle_id;
-            $item->save();
+            $service->vehicle_id = $request->vehicle_id;
+            if( $request->operation == 'ARRIVAL' ){
+                $service->op_one_operating_cost = $request->value;
+            }
+            if( $request->operation == 'TRANSFER' ){
+                $service->op_one_operating_cost = $request->value;
+            }
+            if( $request->operation == 'DEPARTURE' && $service->is_round_trip == 1 ){
+                $service->op_two_operating_cost = $request->value;
+            }
+            if( $request->operation == 'DEPARTURE' && $service->is_round_trip == 0 ){
+                $service->op_two_operating_cost = $request->value;
+            }            
+            $service->save();
 
             //CREAMOS UN LOG
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Se asigno la unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$item->id.", por ".auth()->user()->name;
+            $follow_up_db->text = "Se asigno la unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$service->id.", por ".auth()->user()->name;
             $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->reservation_id = $service->reservation_id;
+            $follow_up_db->save();
+
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->text = "Se asigno el costo operativo por ".$request->value. " al servicio: ".$service->id.", por ".auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $service->reservation_id;
             $follow_up_db->save();
 
             DB::commit();
@@ -465,7 +484,7 @@ class OperationsController extends Controller
                 'data' => array(
                     "item"  => $request->item,
                     "value"  => $request->vehicle_id,
-                    "message" => "Se asigno la unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$item->id.", por ".auth()->user()->name
+                    "message" => "Se asigno la unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$service->id.", por ".auth()->user()->name
                 )
             ], 200);
         } catch (Exception $e) {
