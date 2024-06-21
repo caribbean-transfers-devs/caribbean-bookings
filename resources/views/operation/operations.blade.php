@@ -15,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>    
-    <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>    
+    <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
     <script>
         let managment = {
@@ -61,10 +61,9 @@
                 _settings.paging = false;
                 _settings.oLanguage = {
                     "sProcessing": "Procesando...",
-                    "sZeroRecords": "No se encontraron resultados",
-                    "sEmptyTable": "Ningún dato disponible en esta tabla",                    
-                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sZeroRecords": "No se encontraron resultados",             
+                    "sInfo": "Mostrando _TOTAL_ registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
                     "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
                     "sSearchPlaceholder": components.getTranslation("table.search") + "...",
                     "sLengthMenu": components.getTranslation("table.results") + " :  _MENU_",
@@ -169,8 +168,18 @@
         if( __btn_preassignment != null ){
             __btn_preassignment.addEventListener('click', function() {
                 swal.fire({
-                    text: '¿Está seguro de pre-asignar los servicio del ' + document.getElementById('lookup_date_next').value + '?',
+                    text: '¿Está seguro de pre-asignar los servicios?',
                     icon: 'warning',
+                    inputLabel: "Selecciona la fecha que pre-asignara",
+                    input: "date",
+                    inputValue: document.getElementById('lookup_date').value,
+                    inputValidator: (result) => {
+                        return !result && "Selecciona un fecha";
+                    },
+                    didOpen: () => {
+                        const today = (new Date()).toISOString();
+                        Swal.getInput().min = today.split("T")[0];
+                    },
                     showCancelButton: true,
                     confirmButtonText: 'Aceptar',
                     cancelButtonText: 'Cancelar'
@@ -179,8 +188,9 @@
                         $.ajax({
                             type: "POST",
                             url: _LOCAL_URL + "/operation/preassignments",
+                            data: JSON.stringify({ date: result.value }), // Datos a enviar al servidor                            
                             dataType: "json",
-                            contentType: 'application/json; charset=utf-8',
+                            contentType: 'application/json; charset=utf-8',   
                             beforeSend: function(){
                                 components.loadScreen();
                             },
@@ -245,12 +255,13 @@
                     const { id, item, code, operation } = this.dataset;
                     swal.fire({
                         inputLabel: "Ingresa el costo operativo",
-                        input: "text",                        
+                        inputPlaceholder: "Ingresa el costo operativo",
+                        input: "text",
                         icon: 'info',
                         showCancelButton: true,
                         confirmButtonText: 'Aceptar',
                         cancelButtonText: 'Cancelar',
-                        showLoaderOnConfirm: true,
+                        // showLoaderOnConfirm: true,
                         preConfirm: async (login) => {
                             try {
                                 if (login == "") {
@@ -264,7 +275,7 @@
                                 `);
                             }
                         },
-                        allowOutsideClick: () => !Swal.isLoading()
+                        // allowOutsideClick: () => !Swal.isLoading()
                     }).then((result) => {
                         if(result.isConfirmed == true){
                             $.ajax({
@@ -325,27 +336,34 @@
 
         function updateStatusOperation(event, type, status, item_id, rez_id, id){
             event.preventDefault();
+            let _settings = {};
+            _settings.text = "¿Está seguro de actualizar el estatus de operación?";
+            _settings.icon = 'warning';
+            _settings.showCancelButton = true;
+            _settings.confirmButtonText = 'Aceptar';
+            _settings.cancelButtonText = 'Cancelar';
+            if (status == "OK") {
+                _settings.inputLabel = "Ingresa la hora de abordaje";
+                _settings.input = "time";
+                _settings.inputValidator = (result) => {
+                    return !result && "Selecciona un horario";
+                }
+            }
 
-            swal.fire({
-                text: "¿Está seguro de actualizar el estatus?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
+            swal.fire(_settings).then((result) => {
                 if(result.isConfirmed == true){
+                    // console.log(result);
                     $.ajax({
                         url: `/operation/status/operation`,
                         type: 'PUT',
-                        data: { item: id, rez_id: rez_id, item_id: item_id, type: type, status: status },
+                        data: { id: id, rez_id: rez_id, item_id: item_id, type: type, status: status, time: result.value },
                         beforeSend: function() {
                             components.loadScreen();
                         },
                         success: function(resp) {
                             Swal.fire({
-                                title: '¡Éxito!',
                                 icon: 'success',
-                                html: 'Servicio actualizado con éxito.',
+                                text: 'Servicio actualizado con éxito.',
                                 showConfirmButton: false,
                                 timer: 1500,
                                 willClose: () => {
@@ -362,34 +380,45 @@
             event.preventDefault();
 
             swal.fire({
-                text: "¿Está seguro de actualizar el estatus?",
+                text: "¿Está seguro de actualizar el estatus de reservación?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Aceptar',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
-                if(result.isConfirmed == true){      
-                    $.ajax({
-                        url: `/operation/status/booking`,
-                        type: 'PUT',
-                        data: { item: id, rez_id: rez_id, item_id: item_id, type: type, status: status },
-                        beforeSend: function() {    
-                            components.loadScreen();
-                        },
-                        success: function(resp) {
-                            Swal.fire({
-                                title: '¡Éxito!',
-                                icon: 'success',
-                                html: 'Servicio actualizado con éxito.',
-                                showConfirmButton: false,
-                                timer: 1500,
-                                willClose: () => {
-                                    socket.emit("updateStatusBookingServer", resp.data);
-                                }
-                            });
-                        }
-                    });
-
+                if(result.isConfirmed == true){
+                    const __vehicle = document.getElementById('vehicle_id_' + id);
+                    const __driver = document.getElementById('driver_id_' + id);
+                    
+                    if ( ( __vehicle.value == 0 && __driver.value == 0 ) || ( __vehicle.value == 0 ) || ( __driver.value == 0 ) ) {
+                        Swal.fire({
+                            text: 'Valida la seleccion de unidad y conductor.',
+                            icon: 'error',
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });                        
+                    }else{
+                        $.ajax({
+                            url: `/operation/status/booking`,
+                            type: 'PUT',
+                            data: { id: id, rez_id: rez_id, item_id: item_id, type: type, status: status },
+                            beforeSend: function() {    
+                                components.loadScreen();
+                            },
+                            success: function(resp) {
+                                Swal.fire({
+                                    title: '¡Éxito!',
+                                    icon: 'success',
+                                    html: 'Servicio actualizado con éxito.',
+                                    showConfirmButton: false,
+                                    timer: 1500,
+                                    willClose: () => {
+                                        socket.emit("updateStatusBookingServer", resp.data);
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }
             });        
         }
@@ -539,11 +568,13 @@
             const __status_operation = document.getElementById('optionsOperation' + data.item);
             if( __status_operation != null ){
                 const __Row = ( __status_operation != null ? components.closest(__status_operation, 'tr') : null );
-                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(12)') : "" );
-                // console.log(__status_operation, __Row, __Cell);
+                const __CellStatus = ( __Row != null ? __Row.querySelector('td:nth-child(12)') : "" );
+                const __CellTime = ( __Row != null ? __Row.querySelector('td:nth-child(13)') : "" );
+                // console.log(__status_operation, __Row, __CellStatus);
                 __status_operation.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
                 __status_operation.classList.add(managment.setStatus(data.value));
                 __status_operation.querySelector('span').innerText = data.value;
+                __CellTime.innerHTML = data.time;
             }
                         
             Snackbar.show({ 
@@ -562,7 +593,7 @@
             const __status_booking = document.getElementById('optionsBooking' + data.item);
             if( __status_booking != null ){
                 const __Row = ( __status_booking != null ? components.closest(__status_booking, 'tr') : null );
-                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(13)') : "" );
+                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(14)') : "" );
                 // console.log(__status_booking, __Row, __Cell);
                 __status_booking.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
                 __status_booking.classList.add(managment.setStatus(data.value));
@@ -586,7 +617,7 @@
             if( __btn_comment != null ){
                 const __Row = ( __btn_comment != null ? components.closest(__btn_comment, 'tr') : null );
                 const __indicators = ( __Row != null ? __Row.querySelector('td:nth-child(2)') : "" );
-                const __btn_open_modal_comment = ( __Row != null ? __Row.querySelector('td:nth-child(19)') : "" );
+                const __btn_open_modal_comment = ( __Row != null ? __Row.querySelector('td:nth-child(20)') : "" );
                 // console.log(__btn_comment);
                 // console.log(__Row);
                 // console.log(__indicators);
@@ -672,11 +703,12 @@
                         <th>UNIDAD</th>
                         <th>CONDUCTOR</th>
                         <th class="text-center">ESTATUS OPERACIÓN</th>
+                        <th class="text-center">HORA OPERACIÓN</th>
                         <th class="text-center">ESTATUS RESERVACIÓN</th>
-                        <th>CÓDIGO</th>
+                        {{-- <th>CÓDIGO</th>
                         <th>VEHÍCULO</th>
                         <th>PAGO</th>
-                        <th>TOTAL</th>
+                        <th>TOTAL</th> --}}
                         <th>MONEDA</th>
                         <th></th>
                     </tr>
@@ -696,6 +728,7 @@
                                 $preassignment = ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_preassignment : $value->op_two_preassignment );
                                 //ESTATUS
                                 $status_operation = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_status_operation : $value->op_two_status_operation );
+                                $time_operation = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_time_operation : $value->op_two_time_operation );
                                 $status_booking = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_status : $value->op_two_status );
 
 
@@ -796,6 +829,7 @@
                                         </div>
                                     </div>
                                 </td>
+                                <td class="text-center">{{ ( $time_operation != NULL )  ? date("H:i", strtotime($time_operation)) : $time_operation }}</td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
                                         <button id="optionsBooking{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" type="button" class="btn btn-{{ $label2 }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -811,7 +845,7 @@
                                         </div>
                                     </div>                                     
                                 </td>
-                                <td>
+                                {{-- <td>
                                     @if (RoleTrait::hasPermission(38))
                                         <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
                                     @else
@@ -820,7 +854,7 @@
                                 </td>
                                 <td>{{ $value->service_name }}</td>                                    
                                 <td class="text-center">{{ $value->status }}</td>
-                                <td class="text-end">{{ number_format($payment,2) }}</td>
+                                <td class="text-end">{{ number_format($payment,2) }}</td> --}}
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex">    

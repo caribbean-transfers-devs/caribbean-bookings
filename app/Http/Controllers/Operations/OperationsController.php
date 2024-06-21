@@ -186,7 +186,7 @@ class OperationsController extends Controller
     public function preassignments(Request $request){
         try {
             //DECLARAMOS VARIABLES
-            $date = date('Y-m-d', strtotime(date("Y-m-d") . ' +1 day'));
+            $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
             $search['init'] = $date." 00:00:00";
             $search['end'] = $date." 23:59:59";
             $arrival_counter = 1;
@@ -367,16 +367,16 @@ class OperationsController extends Controller
             //RECORREMOS LOS SERVICIOS PARA PODER INDENTIFICAR LA CONTINUIDAD DE LA PREASIGNACION
             if( sizeof($items)>=1 ):
                 foreach($items as $key => $item):
-                    if( $item->final_service_type == 'ARRIVAL' ){
+                    if( $item->final_service_type == 'ARRIVAL' && $item->op_one_preassignment != "" ){
                         $arrival_counter ++;
                     }
-                    if( $item->final_service_type == 'TRANSFER' ){
+                    if( $item->final_service_type == 'TRANSFER' && $item->op_one_preassignment != "" ){
                         $transfer_counter ++;
                     }
-                    if( $item->final_service_type == 'DEPARTURE' && $item->is_round_trip == 1 ){
+                    if( $item->final_service_type == 'DEPARTURE' && $item->is_round_trip == 1 && $item->op_two_preassignment != "" ){
                         $departure_counter ++;
                     }
-                    if( $item->final_service_type == 'DEPARTURE' && $item->is_round_trip == 0 ){
+                    if( $item->final_service_type == 'DEPARTURE' && $item->is_round_trip == 0 && $item->op_one_preassignment != "" ){
                         $departure_counter ++;
                     }                    
                 endforeach;
@@ -438,6 +438,7 @@ class OperationsController extends Controller
         }
     }    
 
+    //SETEMOS LA UNIDAD E INGRESAMOS EL MONTO OPERATIVO, DEL SERVICIO
     public function setVehicle(Request $request){
         try {
             DB::beginTransaction();
@@ -465,14 +466,14 @@ class OperationsController extends Controller
             //CREAMOS UN LOG
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Se asigno la unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$service->id.", por ".auth()->user()->name;
+            $follow_up_db->text = "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$service->id.", por ".auth()->user()->name;
             $follow_up_db->type = 'HISTORY';
             $follow_up_db->reservation_id = $service->reservation_id;
             $follow_up_db->save();
 
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Se asigno el costo operativo por ".$request->value. " al servicio: ".$service->id.", por ".auth()->user()->name;
+            $follow_up_db->text = "Actualización de costo operativo por ".$request->value. " al servicio: ".$service->id.", por ".auth()->user()->name;
             $follow_up_db->type = 'HISTORY';
             $follow_up_db->reservation_id = $service->reservation_id;
             $follow_up_db->save();
@@ -484,7 +485,7 @@ class OperationsController extends Controller
                 'data' => array(
                     "item"  => $request->item,
                     "value"  => $request->vehicle_id,
-                    "message" => "Se asigno la unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$service->id.", por ".auth()->user()->name
+                    "message" => "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " y costo de operación ".$request->value." al servicio: ".$service->id.", por ".auth()->user()->name
                 )
             ], 200);
         } catch (Exception $e) {
@@ -541,6 +542,7 @@ class OperationsController extends Controller
         }
     }
 
+    //ACTUALIZAMOS EL ESTATUS E INGRESAMOS LA HORA OPERATIVA, DEL SERVICIO
     public function updateStatusOperation(Request $request){
         try {
             DB::beginTransaction();            
@@ -548,30 +550,41 @@ class OperationsController extends Controller
 
             if( $request->type == "ARRIVAL" || $request->type == "TRANSFER" ):
                 $service->op_one_status_operation = $request->status;
+                $service->op_one_time_operation = $request->time;
             endif;
             if( $request->type == "DEPARTURE" && $service->is_round_trip == 0 ):
                 $service->op_one_status_operation = $request->status;
+                $service->op_one_time_operation = $request->time;
             endif;
             if( $request->type == "DEPARTURE" && $service->is_round_trip == 1 ):
                 $service->op_two_status_operation = $request->status;
+                $service->op_two_time_operation = $request->time;
             endif;
             $service->save();
             
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status;
+            $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status.", por ".auth()->user()->name;
             $follow_up_db->type = 'HISTORY';
             $follow_up_db->reservation_id = $service->reservation_id;
             $follow_up_db->save();
+
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->text = "Actualización de hora operación (".$request->type.") por ".$request->time.", por ".auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $service->reservation_id;
+            $follow_up_db->save();            
 
             DB::commit();
             return response()->json([
                 'success' => true,
                 'message' => 'Estatus de operación, actualizado con éxito',
                 'data' => array(
-                    "item"  => $request->item,
+                    "item"  => $request->id,
                     "value"  => $request->status,
-                    "message" => "Actualización de estatus de operación (".$request->type.") por ".$request->status." al servicio: ".$service->id.", por ".auth()->user()->name
+                    "time"  => date("H:i", strtotime($request->time)),
+                    "message" => "Actualización de estatus y horario de operación (".$request->type.") por ".$request->status." y ".$request->time." al servicio: ".$service->id.", por ".auth()->user()->name
                 )
             ], 200);
         } catch (Exception $e) {
@@ -614,7 +627,7 @@ class OperationsController extends Controller
                 'success' => true,
                 'message' => 'Estatus de reservación, actualizado con éxito',
                 'data' => array(
-                    "item"  => $request->item,
+                    "item"  => $request->id,
                     "value"  => $request->status,
                     "message" => "Actualización de estatus de reservación (".$request->type.") por ".$request->status." al servicio: ".$service->id.", por ".auth()->user()->name
                 )
