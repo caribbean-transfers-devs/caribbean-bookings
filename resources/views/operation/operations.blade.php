@@ -161,7 +161,8 @@
 
         //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
         console.log(_LOCAL_URL);
-        const socket = io( (_LOCAL_URL == 'http://127.0.0.1:8000' ) ? 'http://localhost:3000': 'https://socket-production-bed1.up.railway.app' );
+        // const socket = io( (_LOCAL_URL == 'http://127.0.0.1:8000' ) ? 'http://localhost:3000': 'https://socket-production-bed1.up.railway.app' );
+        const socket = io('https://socket-production-bed1.up.railway.app');
         socket.on('connection');
 
         if( __btn_preassignment != null ){
@@ -466,7 +467,7 @@
         //EVENTOS SOCKET IO, ESCUCHAN DE LADO DEL CLIENTE
         socket.on("addPreassignmentClient", function(data){
             console.log("asignacion");
-            console.log(data);
+            // console.log(data);
             //DECLARACION DE VARIABLES
             const __btn_preassignment = document.getElementById('btn_preassignment_' + data.item);
             if( __btn_preassignment != null ){
@@ -490,16 +491,16 @@
 
         socket.on("setVehicleReservationClient", function(data){
             console.log("nueva asignación de unidad");
-            console.log(data);
+            // console.log(data);
             //DECLARACION DE VARIABLES
             const __select_vehicle = document.getElementById('vehicle_id_' + data.item);
             if( __select_vehicle != null ){
                 const __Row = ( __select_vehicle != null ? components.closest(__select_vehicle, 'tr') : null );
                 const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(10)') : null );
-                console.log(__select_vehicle, __Row, __Cell);                
+                // console.log(__select_vehicle, __Row, __Cell);
                 __select_vehicle.value = data.value;
             }
-            
+
             Snackbar.show({ 
                 text: data.message, 
                 duration: 5000, 
@@ -511,16 +512,16 @@
 
         socket.on("setDriverReservationClient", function(data){
             console.log("nueva asignación de conductor");
-            console.log(data);
+            // console.log(data);
             //DECLARACION DE VARIABLES
             const __select_driver = document.getElementById('driver_id_' + data.item);
             if( __select_driver != null ){
                 const __Row = ( __select_driver != null ? components.closest(__select_driver, 'tr') : null );
                 const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(11)') : "" );
-                console.log(__select_driver, __Row, __Cell);                
+                // console.log(__select_driver, __Row, __Cell);
                 __select_driver.value = data.value;
             }
-                        
+
             Snackbar.show({ 
                 text: data.message, 
                 duration: 5000, 
@@ -532,13 +533,13 @@
 
         socket.on("updateStatusOperationClient", function(data){
             console.log("operación");
-            console.log(data);
+            // console.log(data);
             //DECLARACION DE VARIABLES
             const __status_operation = document.getElementById('optionsOperation' + data.item);
             if( __status_operation != null ){
                 const __Row = ( __status_operation != null ? components.closest(__status_operation, 'tr') : null );
                 const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(12)') : "" );
-                console.log(__status_operation, __Row, __Cell);                
+                // console.log(__status_operation, __Row, __Cell);
                 __status_operation.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
                 __status_operation.classList.add(managment.setStatus(data.value));
                 __status_operation.querySelector('span').innerText = data.value;
@@ -555,18 +556,18 @@
 
         socket.on("updateStatusBookingClient", function(data){
             console.log("reservación");
-            console.log(data);
+            // console.log(data);
             //DECLARACION DE VARIABLES
             const __status_booking = document.getElementById('optionsBooking' + data.item);
             if( __status_booking != null ){
                 const __Row = ( __status_booking != null ? components.closest(__status_booking, 'tr') : null );
                 const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(13)') : "" );
-                console.log(__status_booking, __Row, __Cell);                
+                // console.log(__status_booking, __Row, __Cell);
                 __status_booking.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
                 __status_booking.classList.add(managment.setStatus(data.value));
                 __status_booking.querySelector('span').innerText = data.value;
             }
-                        
+
             Snackbar.show({
                 text: data.message,
                 duration: 5000, 
@@ -578,14 +579,14 @@
 
         socket.on("addCommentClient", function(data){
             console.log("comentario");
-            console.log(data);
+            // console.log(data);
             //DECLARACION DE VARIABLES
             const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
             if( __btn_comment != null ){
                 const __Row = ( __btn_comment != null ? components.closest(__btn_comment, 'tr') : null );
                 const __indicators = ( __Row != null ? __Row.querySelector('td:nth-child(2)') : "" );
                 const __btn_open_modal_comment = ( __Row != null ? __Row.querySelector('td:nth-child(19)') : "" );
-                console.log(__btn_comment, __Row, __indicators, __btn_open_modal_comment);
+                // console.log(__btn_comment, __Row, __indicators, __btn_open_modal_comment);
                 __btn_comment.dataset.status = data.status;
                 __indicators.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'+ data.value +'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
             }
