@@ -1,14 +1,5 @@
 @php
     use App\Traits\RoleTrait;
-    $resume = [
-        'status' => [
-            'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-            'CONFIRMED' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-            'CANCELLED' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-        ]
-    ];
-    $sites = [];
-    $destinations = [];
 @endphp
 @extends('layout.custom')
 @section('title') Operación @endsection
@@ -122,7 +113,7 @@
 
             setPreassignment: function(_operation){
                 let alert_type = 'btn-success';
-                switch (_status) {
+                switch (_operation) {
                     case 'ARRIVAL':
                         alert_type = 'btn-success';
                         break;
@@ -138,22 +129,6 @@
                 }
                 return alert_type;                
             },
-
-            getDate: function(){
-                // Obtener la fecha actual
-                let fechaActual = new Date(document.getElementById('lookup_date').value);
-
-                // Sumar un día a la fecha actual
-                fechaActual.setDate(fechaActual.getDate() + 1);
-
-                // Mostrar la nueva fecha en el formato YYYY-MM-DD
-                let dia = String(fechaActual.getDate()).padStart(2, '0');
-                let mes = String(fechaActual.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript van de 0 a 11
-                let anio = fechaActual.getFullYear();
-
-                let fechaFormateada = `${anio}-${mes}-${dia}`;
-                return fechaFormateada;
-            }
         };
 
         if ( document.getElementById('lookup_date') != null ) {
@@ -192,8 +167,7 @@
         if( __btn_preassignment != null ){
             __btn_preassignment.addEventListener('click', function() {
                 swal.fire({
-                    title: '¿Está seguro de pre-asignar los servicio del ' + document.getElementById('lookup_date_next').value + '?',
-                    text: "Esta acción no se puede revertir",
+                    text: '¿Está seguro de pre-asignar los servicio del ' + document.getElementById('lookup_date_next').value + '?',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Aceptar',
@@ -223,7 +197,6 @@
             });
         }
 
-        console.log(__add_preassignments);
         if (__add_preassignments.length > 0) {
             __add_preassignments.forEach(__add_preassignment => {
                 __add_preassignment.addEventListener('click', function(event) {
@@ -231,8 +204,7 @@
                     const { id, code, operation, service } = this.dataset;
                     const __date = document.getElementById('lookup_date');
                     swal.fire({
-                        title: '¿Está seguro de pre-asignar el servicio ?',
-                        text: "Esta acción no se puede revertir",
+                        text: '¿Está seguro de pre-asignar el servicio ?',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Aceptar',
@@ -268,30 +240,53 @@
             __vehicles.forEach(__vehicle => {
                 __vehicle.addEventListener('change', function(event) {
                     event.preventDefault();                    
-                    const { id, item, code } = this.dataset;
-                    $.ajax({
-                        url: `/operation/vehicle/set`,
-                        type: 'PUT',
-                        data: { item : item, vehicle_id : __vehicle.value, reservation_item_id : code },
-                        success: function(resp) {
-                            console.log(resp);
-                            if( resp.success ){
-                                Swal.fire({
-                                    icon: "success",
-                                    text: resp.message,
-                                    showConfirmButton: false,
-                                    timer: 1500
-                                });
-                                socket.emit("setVehicleReservationServer", resp.data);
-                            }                            
+                    const { id, item, code, operation } = this.dataset;
+                    swal.fire({
+                        inputLabel: "Ingresa el costo operativo",
+                        input: "text",                        
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Aceptar',
+                        cancelButtonText: 'Cancelar',
+                        showLoaderOnConfirm: true,
+                        preConfirm: async (login) => {
+                            try {
+                                if (login == "") {
+                                    return Swal.showValidationMessage(`
+                                        "Por favor, ingresa el costo operativo"
+                                    `);
+                                }
+                            } catch (error) {
+                                Swal.showValidationMessage(`
+                                    Request failed: ${error}
+                                `);
+                            }
+                        },
+                        allowOutsideClick: () => !Swal.isLoading()
+                    }).then((result) => {
+                        if(result.isConfirmed == true){
+                            $.ajax({
+                                url: `/operation/vehicle/set`,
+                                type: 'PUT',
+                                data: { item : item, vehicle_id : __vehicle.value, reservation_item_id : code, operation : operation, value : result.value },
+                                beforeSend: function() {
+                                    components.loadScreen();
+                                },
+                                success: function(resp) {
+                                    if( resp.success ){
+                                        Swal.fire({
+                                            icon: "success",
+                                            text: resp.message,
+                                            showConfirmButton: false,
+                                            timer: 1500,
+                                            willClose: () => {
+                                                socket.emit("setVehicleReservationServer", resp.data);
+                                            }
+                                        });
+                                    }                            
+                                }
+                            });
                         }
-                    }).fail(function(xhr, status, error) {
-                        console.log(xhr);
-                        Swal.fire(
-                            '¡ERROR!',
-                            xhr.responseJSON.message,
-                            'error'
-                        );
                     });
                 });
             });
@@ -305,25 +300,22 @@
                         url: `/operation/driver/set`,
                         type: 'PUT',
                         data: { item : item, driver_id : __driver.value, reservation_item_id : code },
+                        beforeSend: function() {
+                            components.loadScreen();
+                        },
                         success: function(resp) {
-                            console.log(resp);
                             if( resp.success ){
                                 Swal.fire({
                                     icon: "success",
                                     text: resp.message,
                                     showConfirmButton: false,
-                                    timer: 1000
-                                });
-                                socket.emit("setDriverReservationServer", resp.data);
+                                    timer: 1500,
+                                    willClose: () => {
+                                        socket.emit("setDriverReservationServer", resp.data);
+                                    }
+                                });                                
                             }
                         }
-                    }).fail(function(xhr, status, error) {
-                            console.log(xhr, status, error);
-                            Swal.fire(
-                                '¡ERROR!',
-                                xhr.responseJSON.message,
-                                'error'
-                            );
                     });
                 });
             });
@@ -333,8 +325,7 @@
             event.preventDefault();
 
             swal.fire({
-                title: '¿Está seguro de actualizar el estatus?',
-                text: "Esta acción no se puede revertir",
+                text: "¿Está seguro de actualizar el estatus?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Aceptar',
@@ -346,37 +337,20 @@
                         type: 'PUT',
                         data: { item: id, rez_id: rez_id, item_id: item_id, type: type, status: status },
                         beforeSend: function() {
+                            components.loadScreen();
                         },
                         success: function(resp) {
                             Swal.fire({
                                 title: '¡Éxito!',
                                 icon: 'success',
-                                html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
+                                html: 'Servicio actualizado con éxito.',
+                                showConfirmButton: false,
                                 timer: 1500,
-                                timerProgressBar: true,
-                                didOpen: () => {
-                                    Swal.showLoading()
-                                    const b = Swal.getHtmlContainer().querySelector('b')
-                                    timerInterval = setInterval(() => {
-                                        b.textContent = (Swal.getTimerLeft() / 1000)
-                                            .toFixed(0)
-                                    }, 100)
-                                },
                                 willClose: () => {
-                                    clearInterval(timerInterval)
+                                    socket.emit("updateStatusOperationServer", resp.data);
                                 }
-                            }).then((result) => {
-                                // statusCell.innerHTML = `<span class="badge badge-light-${alert_type} mb-2 me-4">${status}</span>`;
-                                socket.emit("updateStatusOperationServer", resp.data);
-                            })
+                            });
                         }
-                    }).fail(function(xhr, status, error) {
-                        console.log(xhr);
-                        Swal.fire(
-                            '¡ERROR!',
-                            xhr.responseJSON.message,
-                            'error'
-                        );
                     });
                 }
             });        
@@ -386,8 +360,7 @@
             event.preventDefault();
 
             swal.fire({
-                title: '¿Está seguro de actualizar el estatus?',
-                text: "Esta acción no se puede revertir",
+                text: "¿Está seguro de actualizar el estatus?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Aceptar',
@@ -398,38 +371,21 @@
                         url: `/operation/status/booking`,
                         type: 'PUT',
                         data: { item: id, rez_id: rez_id, item_id: item_id, type: type, status: status },
-                        beforeSend: function() {                            
+                        beforeSend: function() {    
+                            components.loadScreen();
                         },
                         success: function(resp) {
                             Swal.fire({
                                 title: '¡Éxito!',
                                 icon: 'success',
-                                html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
+                                html: 'Servicio actualizado con éxito.',
+                                showConfirmButton: false,
                                 timer: 1500,
-                                timerProgressBar: true,
-                                didOpen: () => {
-                                    Swal.showLoading()
-                                    const b = Swal.getHtmlContainer().querySelector('b')
-                                    timerInterval = setInterval(() => {
-                                        b.textContent = (Swal.getTimerLeft() / 1000)
-                                            .toFixed(0)
-                                    }, 100)
-                                },
                                 willClose: () => {
-                                    clearInterval(timerInterval)
+                                    socket.emit("updateStatusBookingServer", resp.data);
                                 }
-                            }).then((result) => {
-                                // statusCell.innerHTML = `<span class="badge badge-light-${alert_type} mb-2 me-4">${status}</span>`;
-                                socket.emit("updateStatusBookingServer", resp.data);
-                            })
+                            });
                         }
-                    }).fail(function(xhr, status, error) {
-                        console.log(xhr);
-                        Swal.fire(
-                            '¡ERROR!',
-                            xhr.responseJSON.message,
-                            'error'
-                        );
                     });
 
                 }
@@ -561,7 +517,7 @@
             if( __select_driver != null ){
                 const __Row = ( __select_driver != null ? components.closest(__select_driver, 'tr') : null );
                 const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(11)') : "" );
-                console.log(__select_vehicle, __Row, __Cell);                
+                console.log(__select_driver, __Row, __Cell);                
                 __select_driver.value = data.value;
             }
                         
@@ -736,8 +692,8 @@
                                 $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
                                 $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
 
-                                $flag_comment = ( ($value->operation_type == 'arrival') && $value->op_one_comments != "" ? true : ( ($value->operation_type == 'departure') && $value->op_two_comments != "" ? true : false ) );
-                                $comment = (($value->operation_type == 'arrival')? $value->op_one_comments : $value->op_two_comments );
+                                $flag_comment = ( ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') ) && $value->op_one_comments != "" ? true : ( $value->final_service_type == 'DEPARTURE' && ( ($value->is_round_trip == 1 && $value->op_two_comments != "") || ($value->is_round_trip == 0 && $value->op_one_comments != "") ) ? true : false ) );
+                                $comment = ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_comments : $value->op_two_comments );
 
                                 switch ($operation_status) {
                                     case 'PENDING':
@@ -780,7 +736,7 @@
                                     @if ( $flag_preassignment )
                                         <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> text-uppercase">{{ $preassignment }}</button>
                                     @else
-                                        <button type="button" class="btn btn-primary text-uppercase add_preassignment" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->operation_type }}" data-service="{{ $value->final_service_type }}">add</button>
+                                        <button type="button" class="btn btn-primary text-uppercase add_preassignment" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">ADD</button>
                                     @endif
                                 </td>
                                 <td>
@@ -801,7 +757,7 @@
                                 <td>{{ $operation_to }}</td>
                                 <td>{{ $value->site_name }}</td>
                                 <td>
-                                    <select class="form-control vehicles " data-live-search="true" name="vehicle_id" id="vehicle_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}">
+                                    <select class="form-control vehicles " data-live-search="true" name="vehicle_id" id="vehicle_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">
                                         <option value="0">Selecciona un vehículo</option>
                                         @if ( isset($vehicles) && count($vehicles) >= 1 )
                                             @foreach ($vehicles as $vehicle)
@@ -827,11 +783,11 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="optionsOperation{{ $key.$value->id }}">
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->operation_type }}', 'E',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->operation_type }}', 'C',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->final_service_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->final_service_type }}', 'E',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->final_service_type }}', 'C',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
                                             <div class="dropdown-divider"></div>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->operation_type }}', 'OK',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->final_service_type }}', 'OK',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
                                         </div>
                                     </div>
                                 </td>
@@ -842,11 +798,11 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="optionsBooking{{ $key.$value->id }}">
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->operation_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->operation_type }}', 'COMPLETED',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->operation_type }}', 'NOSHOW',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->final_service_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->final_service_type }}', 'COMPLETED',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->final_service_type }}', 'NOSHOW',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
                                             <div class="dropdown-divider"></div>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->operation_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>
+                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->final_service_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>
                                         </div>
                                     </div>                                     
                                 </td>
@@ -863,11 +819,9 @@
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex">    
-                                        {{-- @if ( !$flag_comment ) --}}
-                                            <div class="btn btn-primary __open_modal_comment" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-type="{{ $value->operation_type }}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                            </div>
-                                        {{-- @endif --}}
+                                        <div class="btn btn-primary __open_modal_comment" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-type="{{ $value->final_service_type }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

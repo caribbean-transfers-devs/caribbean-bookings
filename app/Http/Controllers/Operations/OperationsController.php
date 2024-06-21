@@ -380,27 +380,28 @@ class OperationsController extends Controller
                         $departure_counter ++;
                     }                    
                 endforeach;
-            endif;            
+            endif;
                         
             $preassignment = "";
             //OBTENEMOS INFORMACION DEL SERVICIO
             $service = ReservationsItem::find($request->code);
+            // dd($request, $service);
             //REALIZAMOS LA PREASIGNACION DEPENDIENDO DE LA OPERACION
             if( $request->operation == 'ARRIVAL' ){
-                $preassignment = "L".( $arrival_counter == 0 ? 1 : $arrival_counter );
+                $preassignment = "L".( $arrival_counter == 0 ? 1 : ($arrival_counter + 1) );
                 $service->op_one_preassignment = $preassignment;
             }
             if( $request->operation == 'TRANSFER' ){
-                $preassignment = "T".( $transfer_counter == 0 ? 1 : $transfer_counter );
+                $preassignment = "T".( $transfer_counter == 0 ? 1 : ($transfer_counter + 1) );
                 $service->op_one_preassignment = $preassignment;
             }
             if( $request->operation == 'DEPARTURE' && $service->is_round_trip == 1 ){
-                $preassignment = "S".( $departure_counter == 0 ? 1 : $departure_counter );
+                $preassignment = "S".( $departure_counter == 0 ? 1 : ($departure_counter + 1) );
                 $service->op_two_preassignment = $preassignment;
                 $departure_counter ++;
             }
             if( $request->operation == 'DEPARTURE' && $service->is_round_trip == 0 ){
-                $preassignment = "S".( $departure_counter == 0 ? 1 : $departure_counter );
+                $preassignment = "S".( $departure_counter == 0 ? 1 : ($departure_counter + 1) );
                 $service->op_one_preassignment = $preassignment;
                 $departure_counter ++;
             }
@@ -524,20 +525,24 @@ class OperationsController extends Controller
     public function updateStatusOperation(Request $request){
         try {
             DB::beginTransaction();            
-            $item = ReservationsItem::find($request->item_id);
-            if($request->type == "arrival"):
-                $item->op_one_status_operation = $request->status;
+            $service = ReservationsItem::find($request->item_id);
+
+            if( $request->type == "ARRIVAL" || $request->type == "TRANSFER" ):
+                $service->op_one_status_operation = $request->status;
             endif;
-            if($request->type == "departure"):
-                $item->op_two_status_operation = $request->status;
+            if( $request->type == "DEPARTURE" && $service->is_round_trip == 0 ):
+                $service->op_one_status_operation = $request->status;
             endif;
-            $item->save();
+            if( $request->type == "DEPARTURE" && $service->is_round_trip == 1 ):
+                $service->op_two_status_operation = $request->status;
+            endif;
+            $service->save();
             
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = auth()->user()->name;
             $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status;
             $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->reservation_id = $service->reservation_id;
             $follow_up_db->save();
 
             DB::commit();
@@ -547,7 +552,7 @@ class OperationsController extends Controller
                 'data' => array(
                     "item"  => $request->item,
                     "value"  => $request->status,
-                    "message" => "Actualización de estatus de operación (".$request->type.") por ".$request->status." al servicio: ".$item->id.", por ".auth()->user()->name
+                    "message" => "Actualización de estatus de operación (".$request->type.") por ".$request->status." al servicio: ".$service->id.", por ".auth()->user()->name
                 )
             ], 200);
         } catch (Exception $e) {
@@ -565,20 +570,24 @@ class OperationsController extends Controller
     public function updateStatusBooking(Request $request){
         try {
             DB::beginTransaction();            
-            $item = ReservationsItem::find($request->item_id);
-            if($request->type == "arrival"):
-                $item->op_one_status = $request->status;
+            $service = ReservationsItem::find($request->item_id);
+
+            if( $request->type == "ARRIVAL" || $request->type == "TRANSFER" ):
+                $service->op_one_status = $request->status;
             endif;
-            if($request->type == "departure"):
-                $item->op_two_status = $request->status;
+            if( $request->type == "DEPARTURE" && $service->is_round_trip == 0 ):
+                $service->op_one_status = $request->status;
             endif;
-            $item->save();
+            if( $request->type == "DEPARTURE" && $service->is_round_trip == 1 ):
+                $service->op_two_status = $request->status;
+            endif;
+            $service->save();
             
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = auth()->user()->name;
             $follow_up_db->text = "Actualización de estatus de reservación (".$request->type.") por ".$request->status;
             $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->reservation_id = $service->reservation_id;
             $follow_up_db->save();
 
             DB::commit();
@@ -588,7 +597,7 @@ class OperationsController extends Controller
                 'data' => array(
                     "item"  => $request->item,
                     "value"  => $request->status,
-                    "message" => "Actualización de estatus de reservación (".$request->type.") por ".$request->status." al servicio: ".$item->id.", por ".auth()->user()->name
+                    "message" => "Actualización de estatus de reservación (".$request->type.") por ".$request->status." al servicio: ".$service->id.", por ".auth()->user()->name
                 )
             ], 200);
         } catch (Exception $e) {
@@ -606,21 +615,24 @@ class OperationsController extends Controller
     public function addComment(Request $request){
         try {
             DB::beginTransaction();
-            $item = ReservationsItem::find($request->code);
-            $action = ( ($request->type == "arrival" && $item->op_one_comments == "") || ($request->type == "departure" && $item->op_two_comments == "") ? "agrego" : ( ($request->type == "arrival" && $item->op_one_comments != "") || ($request->type == "departure" && $item->op_two_comments != "") ? "actualizo" : "" ) );
-            if($request->type == "arrival"):
-                $item->op_one_comments = $request->comment;
+            $service = ReservationsItem::find($request->code);
+            $action = ( ( ( $request->type == "ARRIVAL" || $request->type == "TRANSFER" ) && $service->op_one_comments == "" ) || ( $request->type == "DEPARTURE" && $service->is_round_trip == 0 && $service->op_one_comments == "" ) || ( $request->type == "DEPARTURE" && $service->is_round_trip == 1 && $service->op_two_comments == "" ) ? "agrego" : ( ( ( $request->type == "ARRIVAL" || $request->type == "TRANSFER" ) && $service->op_one_comments != "" ) || ( $request->type == "DEPARTURE" && $service->is_round_trip == 0 && $service->op_one_comments != "" ) || ( $request->type == "DEPARTURE" && $service->is_round_trip == 1 && $service->op_two_comments != "" ) ? "actualizo" : "" ) );
+            if( $request->type == "ARRIVAL" || $request->type == "TRANSFER" ):
+                $service->op_one_comments = $request->comment;
             endif;
-            if($request->type == "departure"):
-                $item->op_two_comments = $request->comment;
+            if( $request->type == "DEPARTURE" && $service->is_round_trip == 0 ):
+                $service->op_one_comments = $request->comment;
             endif;
-            $item->save();
+            if( $request->type == "DEPARTURE" && $service->is_round_trip == 1 ):
+                $service->op_two_comments = $request->comment;
+            endif;
+            $service->save();
             
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = auth()->user()->name;
             $follow_up_db->text = "Se agrego un comentario al servicio: ".$request->code.", por ".auth()->user()->name;
             $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->reservation_id = $service->reservation_id;
             $follow_up_db->save();
 
             DB::commit();
@@ -648,10 +660,23 @@ class OperationsController extends Controller
 
     public function getComment(Request $request){
         try {
-            $item = ReservationsItem::find($request->item_id);
+            //DECLARACION DE VARIABLES
+            $message = "";
+
+            $service = ReservationsItem::find($request->item_id);
+            if( $request->type == "ARRIVAL" || $request->type == "TRANSFER" ):
+                $message = $service->op_one_comments;
+            endif;
+            if( $request->type == "DEPARTURE" && $service->is_round_trip == 0 ):
+                $message = $service->op_one_comments;
+            endif;
+            if( $request->type == "DEPARTURE" && $service->is_round_trip == 1 ):
+                $message = $service->op_two_comments;
+            endif;
+
             return response()->json([
                 'success' => true,
-                'message' => ( $request->type == "arrival" ? $item->op_one_comments : $item->op_two_comments ),
+                'message' => $message,
             ], 200);
         } catch (Exception $e) {
             return response()->json([
