@@ -389,6 +389,7 @@
                 if(result.isConfirmed == true){
                     const __vehicle = document.getElementById('vehicle_id_' + id);
                     const __driver = document.getElementById('driver_id_' + id);
+                    console.log(__vehicle, __driver);
                     
                     if ( ( __vehicle.value == 0 && __driver.value == 0 ) || ( __vehicle.value == 0 ) || ( __driver.value == 0 ) ) {
                         Swal.fire({
