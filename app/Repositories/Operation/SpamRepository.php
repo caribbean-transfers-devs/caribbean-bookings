@@ -16,15 +16,25 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class SpamRepository
 {
     public function index($request){
-        $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
+        // dd($request->input());
+        //$date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
+        $data = [
+            "init" => date("Y-m-d") . " 00:00:00",
+            "end" => date("Y-m-d") . " 23:59:59",
+        ];
 
-        $search = [];
-        $search['init'] = $date." 00:00:00";
-        $search['end'] = $date." 23:59:59";
+        if(isset( $request->date ) && !empty( $request->date )){
+            $tmp_date = explode(" - ", $request->date);
+            $data['init'] = $tmp_date[0]." 00:00:00";
+            $data['end'] = $tmp_date[1]." 23:59:59";            
+        }
 
-        $items = $this->querySpam($search);
+        // $search['init'] = $date[0]." 00:00:00";
+        // $search['end'] = $date[1]." 23:59:59";
+
+        $items = $this->querySpam($data);
         // dd($items);
-        return view('operation.spam', compact('items','date'));
+        return view('operation.spam', compact('items','data'));
           
     }
 
@@ -73,7 +83,7 @@ class SpamRepository
     }
 
     public function querySpam($search){
-         return  DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, '' as messages,
+        return  DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, '' as messages,
                                                 COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                                 CASE
                                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
@@ -110,6 +120,7 @@ class SpamRepository
                                     WHERE it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
                                     AND rez.is_cancelled = 0
                                     AND rez.is_duplicated = 0
+                                    AND it.is_round_trip = 0
                                     GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                                     UNION 
                                     SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_two_pickup as filtered_date, 'departure' as operation_type, sit.name as site_name, '' as messages,
@@ -195,6 +206,7 @@ class SpamRepository
                                    WHERE rez.language = :lang_one AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
                                    AND rez.is_cancelled = 0
                                    AND rez.is_duplicated = 0
+                                   AND it.is_round_trip = 0
                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                                    UNION 
                                    SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_two_pickup as filtered_date, 'departure' as operation_type, sit.name as site_name, '' as messages,
