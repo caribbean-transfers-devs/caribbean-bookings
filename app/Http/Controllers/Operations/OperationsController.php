@@ -550,15 +550,15 @@ class OperationsController extends Controller
 
             if( $request->type == "ARRIVAL" || $request->type == "TRANSFER" ):
                 $service->op_one_status_operation = $request->status;
-                $service->op_one_time_operation = $request->time;
+                ( isset($request->time) ? $service->op_one_time_operation = $request->time : "" );
             endif;
             if( $request->type == "DEPARTURE" && $service->is_round_trip == 0 ):
                 $service->op_one_status_operation = $request->status;
-                $service->op_one_time_operation = $request->time;
+                ( isset($request->time) ? $service->op_one_time_operation = $request->time : "" );
             endif;
             if( $request->type == "DEPARTURE" && $service->is_round_trip == 1 ):
                 $service->op_two_status_operation = $request->status;
-                $service->op_two_time_operation = $request->time;
+                ( isset($request->time) ? $service->op_two_time_operation = $request->time : "" );
             endif;
             $service->save();
             
