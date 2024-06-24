@@ -583,7 +583,7 @@ class OperationsController extends Controller
                 'data' => array(
                     "item"  => $request->id,
                     "value"  => $request->status,
-                    "time"  => date("H:i", strtotime($request->time)),
+                    "time"  => ( $request->time != "" ? date("H:i", strtotime($request->time)) : NULL ),
                     "message" => "Actualización de estatus y horario de operación (".$request->type.") por ".$request->status." y ".$request->time." al servicio: ".$service->id.", por ".auth()->user()->name
                 )
             ], 200);

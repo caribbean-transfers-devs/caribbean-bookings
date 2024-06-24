@@ -128,6 +128,12 @@
                 }
                 return alert_type;                
             },
+
+            isTime: function(hora) {
+                // Expresión regular para validar formato HH:MM
+                const regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+                return regex.test(hora);
+            }
         };
 
         if ( document.getElementById('lookup_date') != null ) {
@@ -161,8 +167,8 @@
         //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
         console.log(_LOCAL_URL);
         // const socket = io( (_LOCAL_URL == 'http://127.0.0.1:8000' ) ? 'http://localhost:3000': 'https://socket-production-bed1.up.railway.app' );
-        // const socket = io('http://localhost:3000');
-        const socket = io('https://socket-production-bed1.up.railway.app');
+        const socket = io('http://localhost:3000');
+        // const socket = io('https://socket-production-bed1.up.railway.app');
         socket.on('connection');
 
         if( __btn_preassignment != null ){
@@ -352,11 +358,11 @@
 
             swal.fire(_settings).then((result) => {
                 if(result.isConfirmed == true){
-                    // console.log(result);
+                    console.log(result);
                     $.ajax({
                         url: `/operation/status/operation`,
                         type: 'PUT',
-                        data: { id: id, rez_id: rez_id, item_id: item_id, type: type, status: status, time: result.value },
+                        data: { id: id, rez_id: rez_id, item_id: item_id, type: type, status: status, time: ( managment.isTime(result.value) ? result.value : "" ) },
                         beforeSend: function() {
                             components.loadScreen();
                         },
@@ -379,6 +385,7 @@
         function updateStatusBooking(event, type, status, item_id, rez_id, id){
             event.preventDefault();
 
+            console.log(id);
             swal.fire({
                 text: "¿Está seguro de actualizar el estatus de reservación?",
                 icon: 'warning',
@@ -387,6 +394,7 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if(result.isConfirmed == true){
+                    console.log(id);
                     const __vehicle = document.getElementById('vehicle_id_' + id);
                     const __driver = document.getElementById('driver_id_' + id);
                     console.log(__vehicle, __driver);
@@ -706,10 +714,10 @@
                         <th class="text-center">ESTATUS OPERACIÓN</th>
                         <th class="text-center">HORA OPERACIÓN</th>
                         <th class="text-center">ESTATUS RESERVACIÓN</th>
-                        {{-- <th>CÓDIGO</th>
+                        <th>CÓDIGO</th>
                         <th>VEHÍCULO</th>
                         <th>PAGO</th>
-                        <th>TOTAL</th> --}}
+                        <th>TOTAL</th>
                         <th>MONEDA</th>
                         <th></th>
                     </tr>
@@ -846,7 +854,7 @@
                                         </div>
                                     </div>                                     
                                 </td>
-                                {{-- <td>
+                                <td>
                                     @if (RoleTrait::hasPermission(38))
                                         <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
                                     @else
@@ -855,7 +863,7 @@
                                 </td>
                                 <td>{{ $value->service_name }}</td>                                    
                                 <td class="text-center">{{ $value->status }}</td>
-                                <td class="text-end">{{ number_format($payment,2) }}</td> --}}
+                                <td class="text-end">{{ number_format($payment,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex">    
