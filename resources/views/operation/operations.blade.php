@@ -802,8 +802,8 @@
                                 <td>
                                     <div class="d-flex w-100">
                                         <div class="comment-default">
-                                            @if ( !empty($value->messages) )
-                                                {{ $value->messages }}
+                                            @if ( !empty($value->messages) )                                                
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="{{ $value->messages }}"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                             @endif
                                         </div>
                                         <div class="comment_new" id="comment_new_{{ $key.$value->id }}">
