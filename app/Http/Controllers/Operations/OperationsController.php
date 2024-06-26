@@ -485,6 +485,7 @@ class OperationsController extends Controller
                 'data' => array(
                     "item"  => $request->item,
                     "value"  => $request->vehicle_id,
+                    "cost"  => $request->value,
                     "message" => "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " y costo de operación ".$request->value." al servicio: ".$service->id.", por ".auth()->user()->name
                 )
             ], 200);
@@ -601,7 +602,7 @@ class OperationsController extends Controller
 
     public function updateStatusBooking(Request $request){
         try {
-            DB::beginTransaction();            
+            DB::beginTransaction();
             $service = ReservationsItem::find($request->item_id);
 
             if( $request->type == "ARRIVAL" || $request->type == "TRANSFER" ):

@@ -163,11 +163,13 @@
         const __title_modal = document.getElementById('filterModalLabel');
         const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
         const __btn_preassignment = document.getElementById('btn_preassignment') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
+        const __btn_update_status_operations = document.querySelectorAll('.btn_update_status_operation');
+        const __btn_update_status_bookings = document.querySelectorAll('.btn_update_status_booking');
 
         //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
         console.log(_LOCAL_URL);
         // const socket = io( (_LOCAL_URL == 'http://127.0.0.1:8000' ) ? 'http://localhost:3000': 'https://socket-production-bed1.up.railway.app' );
-        const socket = io('http://localhost:3000');
+        const socket = io('http://localhost:4000');
         // const socket = io('https://socket-production-bed1.up.railway.app');
         socket.on('connection');
 
@@ -340,96 +342,103 @@
             });
         }
 
-        function updateStatusOperation(event, type, status, item_id, rez_id, id){
-            event.preventDefault();
-            let _settings = {};
-            _settings.text = "¿Está seguro de actualizar el estatus de operación?";
-            _settings.icon = 'warning';
-            _settings.showCancelButton = true;
-            _settings.confirmButtonText = 'Aceptar';
-            _settings.cancelButtonText = 'Cancelar';
-            if (status == "OK") {
-                _settings.inputLabel = "Ingresa la hora de abordaje";
-                _settings.input = "time";
-                _settings.inputValidator = (result) => {
-                    return !result && "Selecciona un horario";
-                }
-            }
-
-            swal.fire(_settings).then((result) => {
-                if(result.isConfirmed == true){
-                    console.log(result);
-                    $.ajax({
-                        url: `/operation/status/operation`,
-                        type: 'PUT',
-                        data: { id: id, rez_id: rez_id, item_id: item_id, type: type, status: status, time: ( managment.isTime(result.value) ? result.value : "" ) },
-                        beforeSend: function() {
-                            components.loadScreen();
-                        },
-                        success: function(resp) {
-                            Swal.fire({
-                                icon: 'success',
-                                text: 'Servicio actualizado con éxito.',
-                                showConfirmButton: false,
-                                timer: 1500,
-                                willClose: () => {
-                                    socket.emit("updateStatusOperationServer", resp.data);
+        if (__btn_update_status_operations.length > 0) {
+            __btn_update_status_operations.forEach(__btn_update_status_operation => {
+                __btn_update_status_operation.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    let _settings = {};
+                    const { operation, status, item, booking, key } = this.dataset;
+                    console.log(operation, status, item, booking, key);
+                    _settings.text = "¿Está seguro de actualizar el estatus de operación?";
+                    _settings.icon = 'warning';
+                    _settings.showCancelButton = true;
+                    _settings.confirmButtonText = 'Aceptar';
+                    _settings.cancelButtonText = 'Cancelar';
+                    if (status == "OK") {
+                        _settings.inputLabel = "Ingresa la hora de abordaje";
+                        _settings.input = "time";
+                        _settings.inputValidator = (result) => {
+                            return !result && "Selecciona un horario";
+                        }
+                    }
+                    swal.fire(_settings).then((result) => {
+                        if(result.isConfirmed == true){
+                            $.ajax({
+                                url: `/operation/status/operation`,
+                                type: 'PUT',
+                                data: { id: key, rez_id: booking, item_id: item, type: operation, status: status, time: ( managment.isTime(result.value) ? result.value : "" ) },
+                                beforeSend: function() {
+                                    components.loadScreen();
+                                },
+                                success: function(resp) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        text: 'Servicio actualizado con éxito.',
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                        willClose: () => {
+                                            socket.emit("updateStatusOperationServer", resp.data);
+                                        }
+                                    });
                                 }
                             });
                         }
                     });
-                }
-            });        
+                });
+            });
         }
 
-        function updateStatusBooking(event, type, status, item_id, rez_id, id){
-            event.preventDefault();
-
-            console.log(id);
-            swal.fire({
-                text: "¿Está seguro de actualizar el estatus de reservación?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if(result.isConfirmed == true){
-                    console.log(id);
-                    const __vehicle = document.getElementById('vehicle_id_' + id);
-                    const __driver = document.getElementById('driver_id_' + id);
-                    console.log(__vehicle, __driver);
-                    
-                    if ( ( __vehicle.value == 0 && __driver.value == 0 ) || ( __vehicle.value == 0 ) || ( __driver.value == 0 ) ) {
-                        Swal.fire({
-                            text: 'Valida la seleccion de unidad y conductor.',
-                            icon: 'error',
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });                        
-                    }else{
-                        $.ajax({
-                            url: `/operation/status/booking`,
-                            type: 'PUT',
-                            data: { id: id, rez_id: rez_id, item_id: item_id, type: type, status: status },
-                            beforeSend: function() {    
-                                components.loadScreen();
-                            },
-                            success: function(resp) {
+        if (__btn_update_status_bookings.length > 0) {
+            __btn_update_status_bookings.forEach(__btn_update_status_booking => {
+                __btn_update_status_booking.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const { operation, status, item, booking, key } = this.dataset;
+                    console.log(operation, status, item, booking, key);
+                    swal.fire({
+                        text: "¿Está seguro de actualizar el estatus de reservación?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Aceptar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if(result.isConfirmed == true){
+                            const __vehicle = document.getElementById('vehicle_id_' + key);
+                            const __driver = document.getElementById('driver_id_' + key);
+                            console.log(__vehicle, __driver);
+                            
+                            if ( ( __vehicle.value == 0 && __driver.value == 0 ) || ( __vehicle.value == 0 ) || ( __driver.value == 0 ) ) {
                                 Swal.fire({
-                                    title: '¡Éxito!',
-                                    icon: 'success',
-                                    html: 'Servicio actualizado con éxito.',
+                                    text: 'Valida la seleccion de unidad y conductor.',
+                                    icon: 'error',
                                     showConfirmButton: false,
                                     timer: 1500,
-                                    willClose: () => {
-                                        socket.emit("updateStatusBookingServer", resp.data);
+                                });                        
+                            }else{
+                                $.ajax({
+                                    url: `/operation/status/booking`,
+                                    type: 'PUT',
+                                    data: { id: key, rez_id: booking, item_id: item, type: operation, status: status },
+                                    beforeSend: function() {
+                                        components.loadScreen();
+                                    },
+                                    success: function(resp) {
+                                        Swal.fire({
+                                            title: '¡Éxito!',
+                                            icon: 'success',
+                                            html: 'Servicio actualizado con éxito.',
+                                            showConfirmButton: false,
+                                            timer: 1500,
+                                            willClose: () => {
+                                                socket.emit("updateStatusBookingServer", resp.data);
+                                            }
+                                        });
                                     }
                                 });
                             }
-                        });
-                    }
-                }
-            });        
+                        }
+                    });
+                });
+            });
         }
 
         //ACCION PARA ABRIR MODAL PARA AÑADIR UN COMENTARIO
@@ -535,9 +544,11 @@
             const __select_vehicle = document.getElementById('vehicle_id_' + data.item);
             if( __select_vehicle != null ){
                 const __Row = ( __select_vehicle != null ? components.closest(__select_vehicle, 'tr') : null );
-                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(10)') : null );
-                // console.log(__select_vehicle, __Row, __Cell);
+                const __CellVehicle = ( __Row != null ? __Row.querySelector('td:nth-child(10)') : null );
+                const __CellCost = ( __Row != null ? __Row.querySelector('td:nth-child(14)') : null );
+                // console.log(__select_vehicle, __Row, __CellVehicle, __CellCost);
                 __select_vehicle.value = data.value;
+                __CellCost.innerHTML = data.cost;
             }
 
             Snackbar.show({ 
@@ -572,14 +583,14 @@
 
         socket.on("updateStatusOperationClient", function(data){
             console.log("operación");
-            // console.log(data);
+            console.log(data);
             //DECLARACION DE VARIABLES
             const __status_operation = document.getElementById('optionsOperation' + data.item);
             if( __status_operation != null ){
                 const __Row = ( __status_operation != null ? components.closest(__status_operation, 'tr') : null );
                 const __CellStatus = ( __Row != null ? __Row.querySelector('td:nth-child(12)') : "" );
                 const __CellTime = ( __Row != null ? __Row.querySelector('td:nth-child(13)') : "" );
-                // console.log(__status_operation, __Row, __CellStatus);
+                console.log(__status_operation, __Row, __CellStatus);
                 __status_operation.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
                 __status_operation.classList.add(managment.setStatus(data.value));
                 __status_operation.querySelector('span').innerText = data.value;
@@ -602,7 +613,7 @@
             const __status_booking = document.getElementById('optionsBooking' + data.item);
             if( __status_booking != null ){
                 const __Row = ( __status_booking != null ? components.closest(__status_booking, 'tr') : null );
-                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(14)') : "" );
+                const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(15)') : "" );
                 // console.log(__status_booking, __Row, __Cell);
                 __status_booking.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
                 __status_booking.classList.add(managment.setStatus(data.value));
@@ -626,13 +637,14 @@
             if( __btn_comment != null ){
                 const __Row = ( __btn_comment != null ? components.closest(__btn_comment, 'tr') : null );
                 const __indicators = ( __Row != null ? __Row.querySelector('td:nth-child(2)') : "" );
-                const __btn_open_modal_comment = ( __Row != null ? __Row.querySelector('td:nth-child(20)') : "" );
+                const __btn_open_modal_comment = ( __Row != null ? __Row.querySelector('td:nth-child(21)') : "" );
+                const __comment_new = document.getElementById('comment_new_' + data.item);
                 // console.log(__btn_comment);
                 // console.log(__Row);
-                // console.log(__indicators);
+                console.log(__indicators);
                 // console.log(__btn_open_modal_comment);
                 __btn_comment.dataset.status = data.status;
-                __indicators.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'+ data.value +'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
+                __comment_new.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'+ data.value +'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
             }
             managment.bsPopover();
 
@@ -713,6 +725,7 @@
                         <th>CONDUCTOR</th>
                         <th class="text-center">ESTATUS OPERACIÓN</th>
                         <th class="text-center">HORA OPERACIÓN</th>
+                        <th class="text-center">COSTO OPERATIVO</th>
                         <th class="text-center">ESTATUS RESERVACIÓN</th>
                         <th>CÓDIGO</th>
                         <th>VEHÍCULO</th>
@@ -724,7 +737,7 @@
                 </thead>
                 <tbody>
                     @if(sizeof($items)>=1)
-                        @foreach($items as $key => $value)                                
+                        @foreach($items as $key => $value)
                             @php
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
                                 $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "e6f4ff" : "eceffe" ) ).";";
@@ -738,8 +751,8 @@
                                 //ESTATUS
                                 $status_operation = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_status_operation : $value->op_two_status_operation );
                                 $time_operation = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_time_operation : $value->op_two_time_operation );
+                                $cost_operation = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_operating_cost : $value->op_two_operating_cost );
                                 $status_booking = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_status : $value->op_two_status );
-
 
                                 $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
                                 $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
@@ -787,9 +800,18 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if ( $flag_comment )
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="{{ $comment }}"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                    @endif
+                                    <div class="d-flex w-100">
+                                        <div class="comment-default">
+                                            @if ( !empty($value->messages) )
+                                                {{ $value->messages }}
+                                            @endif
+                                        </div>
+                                        <div class="comment_new" id="comment_new_{{ $key.$value->id }}">
+                                            @if ( $flag_comment )
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="{{ $comment }}"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>                                    
                                 <td>
@@ -830,15 +852,16 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="optionsOperation{{ $key.$value->id }}">
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->final_service_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->final_service_type }}', 'E',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->final_service_type }}', 'C',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-status="PENDING" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-status="E" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-status="C" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
                                             <div class="dropdown-divider"></div>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusOperation(event, '{{ $value->final_service_type }}', 'OK',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-status="OK" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-center">{{ ( $time_operation != NULL )  ? date("H:i", strtotime($time_operation)) : $time_operation }}</td>
+                                <td class="text-center">{{ $cost_operation }}</td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
                                         <button id="optionsBooking{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" type="button" class="btn btn-{{ $label2 }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -846,11 +869,11 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="optionsBooking{{ $key.$value->id }}">
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->final_service_type }}', 'PENDING',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->final_service_type }}', 'COMPLETED',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->final_service_type }}', 'NOSHOW',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-status="PENDING" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-status="COMPLETED" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-status="NOSHOW'" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
                                             <div class="dropdown-divider"></div>
-                                            <a href="javascript:void(0);" class="dropdown-item" onclick="updateStatusBooking(event, '{{ $value->final_service_type }}', 'CANCELLED',{{ $value->id }}, {{ $value->reservation_id }}, {{ $key.$value->id }})"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-status="CANCELLED" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>
                                         </div>
                                     </div>                                     
                                 </td>
