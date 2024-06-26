@@ -18,6 +18,8 @@ use App\Http\Controllers\Reports\SalesController as ReportSales;
 use App\Http\Controllers\Reports\CommissionsController as ReportCommissions;
 use App\Http\Controllers\Reports\CashController as ReportCash;
 use App\Http\Controllers\Reports\CCFormController;
+use App\Http\Controllers\Reports\CancellationsController as ReportCancellations;
+
 use App\Http\Controllers\Pos\PosController;
 use App\Http\Controllers\Enterprise\EnterpriseController;
 use App\Http\Controllers\Vehicle\VehicleController;
@@ -106,6 +108,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reports/cash', [ReportCash::class, 'index'])->name('reports.cash');
     Route::post('/reports/cash', [ReportCash::class, 'index'])->name('reports.cash.action');
     Route::put('/reports/cash/update-status', [ReportCash::class, 'update'])->name('reports.cash.action.update');
+
+    Route::get('/reports/cancellations', [ReportCancellations::class, 'index'])->name('reports.cancellations');
+    Route::post('/reports/cancellations', [ReportCancellations::class, 'index'])->name('reports.cancellations.post');
 
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);
