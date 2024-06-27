@@ -38,7 +38,7 @@ class CancellationsRepository
                                     INNER JOIN sites as sit ON sit.id = rez.site_id
                                     INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                     INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
-                                    INNER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
+                                    LEFT JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
                                     LEFT JOIN (
                                         SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                         FROM sales
@@ -77,7 +77,7 @@ class CancellationsRepository
                                     INNER JOIN sites as sit ON sit.id = rez.site_id
                                     INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
 				                    INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
-                                    INNER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
+                                    LEFT JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
                                     LEFT JOIN (
                                             SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                             FROM sales

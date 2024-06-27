@@ -109,7 +109,7 @@
                                     if($operation_status != "CANCELLED"):
                                         continue;
                                     endif;
-
+                                    
                                     switch ($operation_status) {
                                         case 'PENDING':
                                             $label = 'secondary';
