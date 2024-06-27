@@ -106,6 +106,10 @@
                                     $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
                                     $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
 
+                                    if($operation_status != "CANCELLED"):
+                                        continue;
+                                    endif;
+
                                     switch ($operation_status) {
                                         case 'PENDING':
                                             $label = 'secondary';
