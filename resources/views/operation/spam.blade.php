@@ -34,11 +34,19 @@
                     )
                 )
             );
+
+            array_push($buttons,
+                array(
+                    'text' => 'Exportar reporte de excel',
+                    'className' => 'btn btn-primary',
+                    'extend' => 'excelHtml5',
+                )
+            );
         }
         if (RoleTrait::hasPermission(70)){
             array_push($buttons,
                 array(
-                    'text' => 'Exportar Excel',
+                    'text' => 'Exportar teléfonia de boxi plan',
                     'className' => 'btn btn-primary __btn_export',
                     'attr' => array(
                         'data-title' =>  "Generar reporte de excel",
