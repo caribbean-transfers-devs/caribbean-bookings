@@ -105,6 +105,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/operation/comment/get', [Operations::class, 'getComment'])->name('operation.comment.get');
     Route::post('/operation/preassignments', [Operations::class, 'preassignments'])->name('operation.preassignments');
     Route::put('/operation/preassignment', [Operations::class, 'preassignment'])->name('operation.preassignment');
+    Route::post('/operation/capture/service', [Operations::class, 'createService'])->name('operation.capture.service');
 
     Route::post('/update-data', [DataController::class, 'updateData']);
 

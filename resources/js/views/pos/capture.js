@@ -346,6 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+//VENDEDORES
 const fetchVendor = () => {
     if( !$("#vendorForm")[0].checkValidity() ) {
         $("#vendorForm")[0].reportValidity();
@@ -412,7 +413,7 @@ $(function() {
     });
 });
 
-let setup = {        
+let setup = {
     lang: 'es',
     currency: 'USD',
     deeplink: '/resultados',

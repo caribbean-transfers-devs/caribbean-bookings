@@ -163,6 +163,8 @@
         const __title_modal = document.getElementById('filterModalLabel');
         const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
         const __btn_preassignment = document.getElementById('btn_preassignment') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
+        const __btn_addservice = document.getElementById('btn_addservice') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
+
         const __btn_update_status_operations = document.querySelectorAll('.btn_update_status_operation');
         const __btn_update_status_bookings = document.querySelectorAll('.btn_update_status_booking');
 
@@ -172,6 +174,13 @@
         const socket = io('http://localhost:4000');
         // const socket = io('https://socket-production-bed1.up.railway.app');
         socket.on('connection');
+
+        if ( __btn_addservice != null ) {
+            __btn_addservice.addEventListener('click', function(event) {
+                event.preventDefault();
+                $("#operationModal").modal('show');
+            });
+        }
 
         if( __btn_preassignment != null ){
             __btn_preassignment.addEventListener('click', function() {
@@ -656,6 +665,38 @@
                 backgroundColor: '#2196f3'
             });
         });
+
+        socket.on("addServiceClient", function(data){
+            console.log("nuevo servicio");
+            // console.log(data);
+            //DECLARACION DE VARIABLES
+            const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
+            if( data.success ){
+                if( data.today ){
+                    Swal.fire({
+                        text: data.message,
+                        showDenyButton: true,
+                        showCancelButton: false,
+                        confirmButtonText: "Confirmar recargar pagina",
+                        denyButtonText: "Cancelar"
+                    }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            location.reload();
+                        } else if (result.isDenied) {
+                        }
+                    });
+                }else{
+                    Snackbar.show({
+                        text: data.message,
+                        duration: 5000, 
+                        pos: 'top-right',
+                        actionTextColor: '#fff',
+                        backgroundColor: '#2196f3'
+                    });
+                }
+            }
+        });        
     </script>
 @endpush
 
@@ -668,31 +709,34 @@
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
         <div id="filters" class="accordion">
             <div class="card">
-            <div class="card-header" id="headingOne1">
-                <section class="mb-0 mt-0">
-                    <div role="menu" class="" data-bs-toggle="collapse" data-bs-target="#defaultAccordionOne" aria-expanded="true" aria-controls="defaultAccordionOne">
-                        Filtros <div class="icons"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
-                    </div>
-                </section>
-            </div>
-            <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
-                <div class="card-body">
-                    <form action="" class="row" method="POST" id="formSearch">
-                        @csrf
-                        <input type="hidden" id="lookup_date_next" value="{{ $nexDate }}" required>
-                        <div class="col-12 col-sm-4 mb-3 mb-lg-0">
-                            <label class="form-label" for="lookup_date">Fecha de creación</label>
-                            <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
+                <div class="card-header" id="headingOne1">
+                    <section class="mb-0 mt-0">
+                        <div role="menu" class="" data-bs-toggle="collapse" data-bs-target="#defaultAccordionOne" aria-expanded="true" aria-controls="defaultAccordionOne">
+                            Filtros <div class="icons"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
                         </div>
-                        <div class="col-12 col-sm-2 align-self-end">
-                            <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
-                        </div>
-                        <div class="col-12 col-sm-2 align-self-end">
-                            <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_preassignment">Pre-asignación</button>
-                        </div>                        
-                    </form>
+                    </section>
                 </div>
-            </div>
+                <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
+                    <div class="card-body">
+                        <form action="" class="row" method="POST" id="formSearch">
+                            @csrf
+                            <input type="hidden" id="lookup_date_next" value="{{ $nexDate }}" required>
+                            <div class="col-12 col-sm-4 mb-3 mb-lg-0">
+                                <label class="form-label" for="lookup_date">Fecha de creación</label>
+                                <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
+                            </div>
+                            <div class="col-12 col-sm-2 align-self-end">
+                                <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
+                            </div>
+                            <div class="col-12 col-sm-2 align-self-end">
+                                <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_addservice">Agregar nuevo servicio</button>
+                            </div>
+                            <div class="col-12 col-sm-2 align-self-end">
+                                <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_preassignment">Pre-asignación</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -904,4 +948,5 @@
     </div>
 
     <x-modals.reservations.comments />
+    <x-modals.reservations.operation :websites="$websites" :zones="$zones" :services="$services" />
 @endsection

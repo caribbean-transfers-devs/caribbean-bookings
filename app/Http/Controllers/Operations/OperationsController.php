@@ -4,20 +4,32 @@ namespace App\Http\Controllers\Operations;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
 
 use App\Models\Enterprise;
 use App\Models\Driver;
 use App\Models\Vehicle;
+use App\Models\Reservation;
 use App\Models\ReservationsItem;
+use App\Models\Sale;
 use App\Models\ReservationFollowUp;
+use App\Models\Zones;
+use App\Models\Destination;
+use App\Models\DestinationService;
 
 use App\Traits\RoleTrait;
+use App\Traits\CodeTrait;
+
 use Exception;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use DateTime;
 
 class OperationsController extends Controller
 {
-    
+    use CodeTrait, RoleTrait;
+
     public function index(Request $request){
         $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
         $nexDate = date('Y-m-d', strtotime($request->date . ' +1 day'));
@@ -37,8 +49,11 @@ class OperationsController extends Controller
 
         $vehicles = Vehicle::All();
         $drivers = Driver::All();
+        $zones = Zones::all();
+        $services =  DestinationService::all();
+        $websites = DB::select("SELECT id, name as site_name FROM sites ORDER BY site_name ASC");
 
-        return view('operation.operations', compact('items', 'date', 'nexDate', 'breadcrumbs', 'vehicles', 'drivers'));
+        return view('operation.operations', compact('items', 'date', 'nexDate', 'breadcrumbs', 'vehicles', 'drivers', 'zones', 'services', 'websites'));
     }
 
     public function dataOperations(Request $request){
@@ -645,6 +660,166 @@ class OperationsController extends Controller
         }
     }
 
+    public function createService(Request $request){
+        try {
+            DB::beginTransaction();
+
+            $validator = Validator::make($request->all(), [
+                'reference' => 'required|string|max:255',
+                'site_id' => 'required|integer|exists:sites,id',
+                'language' => 'required|in:en,es',
+
+                'client_first_name' => 'required|string|max:255',
+                'client_last_name' => 'required|string|max:255',
+
+                'from_zone_id' => 'required|integer|exists:zones,id',
+                'from_name' => 'required|string|max:255',
+                'to_zone_id' => 'required|integer|exists:zones,id',
+                'to_name' => 'required|string|max:255',
+
+                'passengers' => 'required|integer|max:255',
+                'departure_date' => 'required|date_format:Y-m-d H:i',
+                'destination_service_id' => 'required|integer|exists:destination_services,id',
+                'comments' => 'string|max:255',
+
+                'sold_in_currency' => 'required|in:MXN,USD',
+                'total' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => [
+                        'code' => 'required_params',
+                        'message' =>  $validator->errors()->all() 
+                    ],
+                    'message' => $validator->errors()->all()
+                ], Response::HTTP_BAD_REQUEST);
+            }            
+
+            //VALIDAMOS SI LA REFERENCIA YA EXISTE
+            $duplicated_reservation = Reservation::where('reference', $request->reference)->count();
+            if( $duplicated_reservation ) {
+                return response()->json([
+                    'errors' => [
+                        'code' => 'required_params',
+                    ],
+                    'message' => 'Ese folio ya ha sido registrado',
+                ], Response::HTTP_BAD_REQUEST); 
+            }
+
+            //FORMATEAMOS LA FECHA DEL SERVICIO PARA PODER VER SI ACTUALIZAREMOS LA TABLA
+            // Crear una instancia de DateTime a partir de la cadena de fecha y hora
+            $dateTime = new DateTime($request->departure_date);            
+            // Obtener solo la fecha en el formato deseado
+            $departure_date = $dateTime->format('Y-m-d');
+            $departure_date_today = ( $departure_date == date('Y-m-d') ? true : false );
+
+    
+            $default_destination_id = 1; // Considerando que el id corresponde a: "Cancún"
+            $destination = Destination::find( $default_destination_id );
+    
+            $from_coordinates = $this->getLatLngByZoneId( $request->from_zone_id );
+            $to_coordinates = $this->getLatLngByZoneId( $request->to_zone_id );
+    
+            $from_lat = $from_coordinates['lat'];
+            $from_lng = $from_coordinates['lng'];
+            $to_lat = $to_coordinates['lat'];
+            $to_lng = $to_coordinates['lng'];
+    
+            $from_zone = Zones::find( $request->from_zone_id );
+            $to_zone = Zones::find( $request->to_zone_id );
+    
+            $destination_service = DestinationService::find( $request->destination_service_id );
+            if( !$destination_service ){
+                return response()->json([
+                    'errors' => [
+                        'code' => 'required_params',
+                    ],                
+                    'message' => 'No se encontró el vehículo',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Creando reservación
+            $reservation = new Reservation;
+            $reservation->client_first_name = $request->client_first_name;
+            $reservation->client_last_name = $request->client_last_name;
+            $reservation->client_email = $request->client_email ? $request->client_email : null;
+            $reservation->client_phone = $request->client_phone ? $request->client_phone : null;
+            $reservation->currency = $request->sold_in_currency;
+            $reservation->language = $request->language;
+            $reservation->rate_group = '0B842B8C';
+            $reservation->is_commissionable = 0;
+            $reservation->pay_at_arrival = 1;
+            $reservation->site_id = $request->site_id;
+            $reservation->destination_id = $destination ? $default_destination_id : null;
+            $reservation->user_id = auth()->user()->id;
+            $reservation->reference = $request->reference;
+            $reservation->created_at = Carbon::now();
+            $reservation->updated_at = Carbon::now();
+            $reservation->comments = $request->comments;
+            $reservation->save();
+
+            // Creando follow_up
+            $follow_up = new ReservationFollowUp();
+            $follow_up->reservation_id = $reservation->id;
+            $follow_up->name = auth()->user()->name;
+            $follow_up->text = 'Se capturó la venta por: '.auth()->user()->name;
+            $follow_up->type = 'HISTORY';
+            $follow_up->save();
+
+            $item = new ReservationsItem();
+            $item->reservation_id = $reservation->id;
+            $item->code = $this->generateCode();
+            $item->destination_service_id = $request->destination_service_id;
+            $item->from_name = $request->from_name ? $request->from_name : $from_zone->name;
+            $item->from_lat = $from_lat;
+            $item->from_lng = $from_lng;
+            $item->from_zone = $request->from_zone_id;
+            $item->to_name = $request->to_name ? $request->to_name : $to_zone->name;
+            $item->to_lat = $to_lat;
+            $item->to_lng = $to_lng;
+            $item->to_zone = $request->to_zone_id;
+            $item->distance_time = $to_zone->time ? $this->timeToSeconds( $to_zone->time ) : 0;
+            $item->distance_km = $to_zone->distance ? $to_zone->distance : '';
+            $item->is_round_trip = 0;
+            $item->passengers = $request->passengers;
+            $item->op_one_status = 'PENDING';
+            $item->op_one_pickup = $request->departure_date;
+            $item->op_two_status = 'PENDING';
+            $item->created_at = Carbon::now();
+            $item->updated_at = Carbon::now();
+            $item->save();
+
+            // Creando Sale
+            $sale = new Sale();
+            $sale->reservation_id = $reservation->id;
+            $sale->description = $destination_service->name . ' | ' . 'One Way';
+            $sale->quantity = 1;
+            $sale->total = $request->total;
+            $sale->created_at = Carbon::now();
+            $sale->updated_at = Carbon::now();
+            $sale->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'date' => $departure_date,
+                'today' => $departure_date_today,
+                'message' => 'Se agrego servicio correctamente, para '.(  $departure_date_today ? " el día de hoy, es necesario recargar la pagina para actualizar la información " : " la fecha ".$departure_date ),
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => 'Internal Server'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function addComment(Request $request){
         try {
             DB::beginTransaction();
@@ -721,5 +896,128 @@ class OperationsController extends Controller
             ], 500);
         }
     }
+
+    private function timeToSeconds($time) {
+        $parts = explode(' ', $time);
+        
+        $hours = 0;
+        $minutes = 0;
+        
+        foreach ($parts as $key => $part) {
+            if ($part == 'H') {
+                $hours = (int)$parts[$key - 1];
+            } elseif ($part == 'Min') {
+                $minutes = (int)$parts[$key - 1];
+            }
+        }
+        
+        $seconds = $hours * 3600 + $minutes * 60;
+        
+        return $seconds;
+    }    
+
+    private function getLatLngByZoneId($zone_id) {
+        $equivalences = [
+            1 => [
+                'lat' => 21.0442754,
+                'lng' => -86.8772972,
+            ],
+            2 => [
+                'lat' => 21.135166,
+                'lng' => -86.746224,
+            ],
+            3 => [
+                'lat' => 21.1831607,
+                'lng' => -86.8087541,
+            ],
+            4 => [
+                'lat' => 21.2217215,
+                'lng' => -86.8029101,
+            ],
+            5 => [
+                'lat' => 20.8471632,
+                'lng' => -86.8803245,
+            ],
+            6 => [
+                'lat' => 20.644799,
+                'lng' => -87.0917467,
+            ],
+            7 => [
+                'lat' => 21.0815015,
+                'lng' => -86.8546508,
+            ],
+            8 => [
+                'lat' => 20.5067138,
+                'lng' => -87.2386847,
+            ],
+            9 => [
+                'lat' => 20.4027428,
+                'lng' => -87.3193673,
+            ],
+            10 => [
+                'lat' => 20.214244,
+                'lng' => -87.4559179,
+            ],
+            11 => [
+                'lat' => 20.187102,
+                'lng' => -87.443475,
+            ],
+            12 => [
+                'lat' => 20.3618852,
+                'lng' => -87.3327632,
+            ],
+            13 => [
+                'lat' => 20.7612258,
+                'lng' => -86.9612859,
+            ],
+            14 => [
+                'lat' => 20.8704582,
+                'lng' => -87.0702105,
+            ],
+            15 => [
+                'lat' => 20.0311617,
+                'lng' => -87.4780201,
+            ],
+            16 => [
+                'lat' => 20.689586,
+                'lng' => -88.2047133,
+            ],
+            17 => [
+                'lat' => 21.4323185,
+                'lng' => -87.3375753,
+            ],
+            18 => [
+                'lat' => 20.6787816,
+                'lng' => -88.5733424,
+            ],
+            19 => [
+                'lat' => 20.9776327,
+                'lng' => -89.6322621,
+            ],
+            20 => [
+                'lat' => 18.526777,
+                'lng' => -88.3300811,
+            ],
+            21 => [
+                'lat' => 21.2440641,
+                'lng' => -86.8119526,
+            ],
+            22 => [
+                'lat' => 20.1695036,
+                'lng' => -87.6847257,
+            ],
+            23 => [
+                'lat' => 20.199593,
+                'lng' => -87.49902,
+            ],
+        ];
+
+        if( !isset($equivalences[$zone_id]) ) return ['lat' => '', 'lng' => ''];
+
+        $lat = $equivalences[$zone_id]['lat'];
+        $lng = $equivalences[$zone_id]['lng'];
+
+        return ['lat' => $lat, 'lng' => $lng];
+    }    
 
 }
