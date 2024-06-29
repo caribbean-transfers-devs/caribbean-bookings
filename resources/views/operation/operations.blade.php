@@ -171,8 +171,8 @@
         //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
         console.log(_LOCAL_URL);
         // const socket = io( (_LOCAL_URL == 'http://127.0.0.1:8000' ) ? 'http://localhost:3000': 'https://socket-production-bed1.up.railway.app' );
-        const socket = io('http://localhost:4000');
-        // const socket = io('https://socket-production-bed1.up.railway.app');
+        // const socket = io('http://localhost:4000');
+        const socket = io('https://socket-production-bed1.up.railway.app');
         socket.on('connection');
 
         if ( __btn_addservice != null ) {
