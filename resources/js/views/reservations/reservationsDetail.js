@@ -1087,3 +1087,36 @@ function enableReservation(id){
         }
     });
 }
+
+function copyPaymentLink(event, code, email, lang){
+    event.preventDefault();
+
+    let URL = `https://caribbean-transfers.com/easy-payment?code=${code}&email=${email}`;
+    if(lang == "es"){
+        URL = `https://caribbean-transfers.com/es/easy-payment?code=${code}&email=${email}`;
+    }
+
+    navigator.clipboard.writeText(URL).then(function() {
+
+        Swal.fire({
+            title: '¡Éxito!',
+            icon: 'success',
+            html: `Se ha copiado la URL (${lang}) al porta papeles`,
+            timer: 1500,
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading()
+                const b = Swal.getHtmlContainer().querySelector('b')
+                timerInterval = setInterval(() => {
+                }, 100)
+            },
+            willClose: () => {
+                clearInterval(timerInterval)
+            }
+        }).then((result) => {
+            location.reload();
+        })
+    }).catch(function(error) {
+        console.error('Error al copiar el texto al portapapeles: ', error);
+    });    
+}

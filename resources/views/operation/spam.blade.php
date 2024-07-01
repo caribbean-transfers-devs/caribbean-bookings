@@ -34,11 +34,19 @@
                     )
                 )
             );
+
+            array_push($buttons,
+                array(
+                    'text' => 'Exportar reporte de excel',
+                    'className' => 'btn btn-primary',
+                    'extend' => 'excelHtml5',
+                )
+            );
         }
         if (RoleTrait::hasPermission(70)){
             array_push($buttons,
                 array(
-                    'text' => 'Exportar Excel',
+                    'text' => 'Exportar teléfonia de boxi plan',
                     'className' => 'btn btn-primary __btn_export',
                     'attr' => array(
                         'data-title' =>  "Generar reporte de excel",
@@ -72,6 +80,7 @@
                             <th>Sitio</th>
                             <th>Pickup</th>                           
                             <th class="text-center">Tipo</th>
+                            <th class="text-center">Round Trip</th>
                             <th class="text-center">Operación</th>
                             <th>Código</th>
                             <th>Cliente</th>
@@ -89,7 +98,7 @@
                         @if(sizeof($items)>=1)
                             @foreach($items as $key => $value)
                                 @if( in_array($value->final_service_type, ["ARRIVAL", "TRANSFER"]) )
-                                    @php                                                
+                                    @php
                                         $confirmation_type = $value->op_one_confirmation;
                                         if($value->operation_type == "departure"):
                                             $confirmation_type = $value->op_two_confirmation;
@@ -172,6 +181,13 @@
                                         <td>{{ $value->site_name }}</td>
                                         <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
                                         <td>{{ $value->final_service_type }}</td>
+                                        <td>
+                                            @if ( $value->is_round_trip == 1 )
+                                                Si
+                                            @else
+                                                No
+                                            @endif
+                                        </td>
                                         <td class="text-center"><span class="badge badge-light-{{ $label }} mb-2 me-4">{{ $operation_status }}</span></td>
                                         <td>
                                             <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>                                                        
@@ -221,8 +237,8 @@
     @php
         // dump($date);
     @endphp
-    <x-modals.reservations.reports :data="$date" />
+    <x-modals.reservations.reports :data="$data" />
     @if (RoleTrait::hasPermission(70))
-        <x-modals.reservations.exports :data="$date" />
+        <x-modals.reservations.exports :data="$data" />
     @endif
 @endsection

@@ -48,6 +48,7 @@ if ( document.getElementById('lookup_date') != null ) {
             'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
         ],
         zIndex: 10,
+        plugins: ['RangePlugin'],
     });
 }
 
@@ -60,6 +61,7 @@ if ( document.getElementById('lookup_date2') != null ) {
             'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
         ],
         zIndex: 10,
+        plugins: ['RangePlugin'],
     });
 }
 
