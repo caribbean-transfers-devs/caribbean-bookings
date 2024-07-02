@@ -29,11 +29,15 @@
                                         @endforeach
                                     </ul>
                                 </div>
-                            @endif
-
+                            @endif                            
                             @if (session('success'))
-                                <div class="alert alert-light-success alert-dismissible fade show border-0 mb-4" role="alert">a     
+                                <div class="alert alert-light-success alert-dismissible fade show border-0 mb-4" role="alert">
                                     {{ session('success') }}
+                                </div>
+                            @endif
+                            @if (session('danger'))
+                                <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
+                                    {{ session('danger') }}
                                 </div>
                             @endif
                             <form action="{{ isset($vehicle) ? route('vehicles.update', $vehicle->id) : route('vehicles.store') }}" method="POST" enctype="multipart/form-data">

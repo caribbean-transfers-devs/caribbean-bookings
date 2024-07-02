@@ -56,7 +56,7 @@ class EnterpriseRepository
             //     'status' => Response::HTTP_INTERNAL_SERVER_ERROR
             // ]);
 
-            return redirect()->route('enterprises.create')->with('errors', 'Error al crear la empresa.');
+            return redirect()->route('enterprises.create')->with('danger', 'Error al crear la empresa.');
         }
     }
 
@@ -95,7 +95,7 @@ class EnterpriseRepository
             //     'status' => Response::HTTP_INTERNAL_SERVER_ERROR
             // ]);
 
-            return redirect()->route('enterprises.update', $id)->with('errors', 'Error al actualizar la empresa.');
+            return redirect()->route('enterprises.update', $id)->with('danger', 'Error al actualizar la empresa.');
         }
     }
 

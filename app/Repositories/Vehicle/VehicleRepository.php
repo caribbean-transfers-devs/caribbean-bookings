@@ -26,7 +26,7 @@ class VehicleRepository
 
     public function create($request){
         try {
-            $enterprises = Enterprise::all();           
+            $enterprises = Enterprise::all();
             $services = DestinationService::all();
             return view('vehicles.new', compact('enterprises', 'services'));
         } catch (Exception $e) {
@@ -52,7 +52,7 @@ class VehicleRepository
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('vehicles.create')->with('errors', 'Error al crear el vehículo.');
+            return redirect()->route('vehicles.create')->with('danger', 'Error al crear el vehículo.');
         }
     }
 
@@ -85,7 +85,7 @@ class VehicleRepository
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('vehicles.edit', [$id])->with('errors', 'Error al actualizar el vehículo.');
+            return redirect()->route('vehicles.edit', [$id])->with('danger', 'Error al actualizar el vehículo.');
         }
     }
 
