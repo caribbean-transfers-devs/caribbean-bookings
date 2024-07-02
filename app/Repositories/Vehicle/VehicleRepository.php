@@ -85,7 +85,7 @@ class VehicleRepository
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('vehicles.update', $id)->with('errors', 'Error al actualizar el vehículo.');
+            return redirect()->route(route('vehicles.edit', [$id]))->with('errors', 'Error al actualizar el vehículo.');
         }
     }
 
