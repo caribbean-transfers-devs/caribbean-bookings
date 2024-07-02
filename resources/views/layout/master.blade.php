@@ -155,6 +155,9 @@
                                 @if(RoleTrait::hasPermission(47))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.spam') }}">SPAM</a></li>
                                 @endif
+                                @if(RoleTrait::hasPermission(47))
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.index') }}">Operaciones</a></li>
+                                @endif                                
                             </ul>
                         </li>
                     @endif
