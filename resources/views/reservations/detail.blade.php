@@ -98,12 +98,18 @@
                                     <th>Referencia</th>
                                     <td>{{ $reservation->reference }}</td>
                                 </tr>
+                                @if( $reservation->open_credit == 1 )
+                                    <tr>
+                                        <th>Crédito Abierto</th>
+                                        <td><span class="badge bg-success">ACEPTADO</span></td>
+                                    </tr>
+                                @endif
                                 @if( isset( $reservation->cancellationType->name_es ) )
                                     <tr>
                                         <th>Motivo de cancelación</th>
                                         <td>{{ $reservation->cancellationType->name_es }}</td>
                                     </tr>
-                                @endif
+                                @endif                                
                             </tbody>
                         </table>
                         @if (RoleTrait::hasPermission(25))
@@ -173,6 +179,9 @@
                     @endif
                     @if (RoleTrait::hasPermission(67) && ($reservation->is_cancelled == 1 || $reservation->is_duplicated == 1) )
                         <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> Activar</button>
+                    @endif
+                    @if (RoleTrait::hasPermission(72) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->open_credit == 0 )
+                        <button class="btn btn-warning btn-sm" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Crédito Abierto</button>
                     @endif
 
                     <div class="btn-group btn-group-sm">
