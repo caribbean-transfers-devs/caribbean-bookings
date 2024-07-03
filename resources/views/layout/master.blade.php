@@ -134,7 +134,7 @@
                         </li>
                     @endif
 
-                    @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) )
+                    @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(76) )
                         <li class="sidebar-item">
                             <a href="#operation" data-bs-toggle="collapse" class="sidebar-link collapsed">
                                 <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Operación</span>
@@ -155,7 +155,7 @@
                                 @if(RoleTrait::hasPermission(47))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.spam') }}">SPAM</a></li>
                                 @endif
-                                @if(RoleTrait::hasPermission(47))
+                                @if(RoleTrait::hasPermission(76))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.index') }}">Operaciones</a></li>
                                 @endif                                
                             </ul>
@@ -186,7 +186,7 @@
                         </li>
                     @endif
 
-                    @if(RoleTrait::hasPermission(1) || RoleTrait::hasPermission(6))
+                    @if(RoleTrait::hasPermission(1) || RoleTrait::hasPermission(6) || RoleTrait::hasPermission(73) || RoleTrait::hasPermission(74) || RoleTrait::hasPermission(75))
                         <li class="sidebar-item @if(request()->is('users') || request()->is('roles')) active @endif">
                             <a href="#auth" data-bs-toggle="collapse" class="sidebar-link collapsed">
                                 <i class="align-middle" data-feather="users"></i> <span class="align-middle">Administración</span>
@@ -199,9 +199,15 @@
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('roles.index') }}">Roles</a></li>
                                 @endif
 
-                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('enterprises.index') }}">Empresas</a></li>
-                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('vehicles.index') }}">Vehiculos</a></li>
-                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('drivers.index') }}">Conductores</a></li>
+                                @if(RoleTrait::hasPermission(73))
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('enterprises.index') }}">Empresas</a></li>
+                                @endif
+                                @if(RoleTrait::hasPermission(74))
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('vehicles.index') }}">Vehiculos</a></li>
+                                @endif
+                                @if(RoleTrait::hasPermission(75))
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('drivers.index') }}">Conductores</a></li>
+                                @endif
                             </ul>
                         </li>
                     @endif
