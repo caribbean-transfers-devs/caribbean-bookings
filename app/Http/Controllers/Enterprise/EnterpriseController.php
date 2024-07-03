@@ -11,6 +11,8 @@ use App\Http\Requests\EnterpriseRequest;
 //REPOSITORY
 use App\Repositories\Enterprise\EnterpriseRepository;
 
+use App\Traits\RoleTrait;
+
 class EnterpriseController extends Controller
 {
     private $EnterpriseRepository;

@@ -11,6 +11,8 @@ use App\Http\Requests\DriverRequest;
 //REPOSITORY
 use App\Repositories\Driver\DriverRepository;
 
+use App\Traits\RoleTrait;
+
 class DriverController extends Controller
 {
     private $DriverRepository;
