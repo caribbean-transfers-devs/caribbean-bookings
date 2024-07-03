@@ -150,7 +150,6 @@
 
         if( document.querySelector('.table-rendering') != null ){
             managment.actionTable($('.table-rendering'));
-            // managment.actionTable( $(".table-rendering"), components.serialize(document.getElementById('formSearch'),'object') );
         }
         managment.bsPopover();
         components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
@@ -172,7 +171,7 @@
         console.log(_LOCAL_URL);
         // const socket = io( (_LOCAL_URL == 'http://127.0.0.1:8000' ) ? 'http://localhost:3000': 'https://socket-production-bed1.up.railway.app' );
         // const socket = io('http://localhost:4000');
-        const socket = io('https://socket-production-bed1.up.railway.app');
+        const socket = io('https://socket-caribbean-transfers.up.railway.app');
         socket.on('connection');
 
         if ( __btn_addservice != null ) {
