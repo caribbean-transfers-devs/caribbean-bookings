@@ -1120,3 +1120,46 @@ function copyPaymentLink(event, code, email, lang){
         console.error('Error al copiar el texto al portapapeles: ', error);
     });    
 }
+
+function openCredit(id){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    swal.fire({
+        title: '¿Está seguro de marcar como crédito abierto?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        console.log(result, id);
+        if (result.isConfirmed) {
+            var url = "/reservationsOpenCredit/"+id;
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                dataType: 'json',
+                success: function (data) {
+                    swal.fire({
+                        title: 'Reservación actualizada',
+                        text: 'La reservación ha sido marcada como Crédito Abierto',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        location.reload();
+                    });
+                },
+                error: function (data) {
+                    swal.fire({
+                        title: 'Error',
+                        text: 'Ha ocurrido un error al marcar como Crédito Abierto',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        }
+    });
+}
