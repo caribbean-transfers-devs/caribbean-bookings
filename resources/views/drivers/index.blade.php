@@ -55,7 +55,7 @@
                                 <td>{{ $driver->destination->name }}</td>
                                 <td>{{ $driver->names }}</td>
                                 <td>{{ $driver->surnames }}</td>
-                                <td>{{ $driver->pgone }}</td>
+                                <td>{{ $driver->phone }}</td>
                                 <td>
                                     <div class="d-flex gap-3">
                                         <a class="btn btn-primary" href="{{ route('drivers.edit', [$driver->id]) }}">Editar</a>
