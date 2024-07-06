@@ -180,10 +180,8 @@ let setup = {
 //DECLARACION DE VARIABLES
 const from_autocomplete = document.getElementById('from_name');
 const to_autocomplete = document.getElementById('to_name');
-
 const sold_in_currency_select = document.getElementById('sold_in_currency');
 const currency_span = document.getElementById('currency_span');
-// const total = document.getElementById('total');
 const form = document.getElementById('posForm');
 const submitBtn = document.getElementById('submitBtn');
 
@@ -264,6 +262,74 @@ form.addEventListener('submit', function (event) {
             }
         }
     });
+});
+
+// Agregar evento de clic a los botones de extracción
+$('#zero-config').on('click', '.extract_whatsapp', function() {
+    // Obtener la fila en la que se encuentra el botón
+    var fila = $(this).closest('tr');
+
+    // Extraer la información de las celdas de la fila
+    var hora = fila.find('td').eq(2).text();
+    var cliente = fila.find('td').eq(3).find('span').text();
+    var tipo_servicio = fila.find('td').eq(4).text();
+    var pax = fila.find('td').eq(5).text();
+    var origin = fila.find('td').eq(6).text();
+    var destination = fila.find('td').eq(7).text();
+    var agency = fila.find('td').eq(8).text();
+    var vehicle = fila.find('td').eq(9).find('select').val();
+    var driver = fila.find('td').eq(10).find('select').val();
+    var status_operation = fila.find('td').eq(11).find('.btn-group button span').text();
+    var time_operation = fila.find('td').eq(12).text();
+    var status_booking = fila.find('td').eq(14).find('.btn-group button span').text();
+    if( fila.find('td').eq(15).find('a') ){
+      var code = fila.find('td').eq(15).find('a').text();
+    }else{
+      var code = fila.find('td').eq(15).text();
+    }
+    
+    var unit = fila.find('td').eq(16).text();
+    var payment = fila.find('td').eq(17).text();
+    var total = fila.find('td').eq(18).text();
+    var currency = fila.find('td').eq(19).text();
+
+    // Mostrar la información (puedes realizar otras acciones aquí)
+    // console.log('Hora:', hora);
+    // console.log('Cliente:', cliente);
+    // console.log('Tipo de servicio:', tipo_servicio);
+    // console.log('Pax:', pax);
+    // console.log('Origen:', origin);
+    // console.log('Destino:', destination);
+    // console.log('Agencia:', agency);
+    // console.log('Unidad:', vehicle);
+    // console.log('Conductor:', driver);
+    // console.log('Estatus de operación:', status_operation);
+    // console.log('Hora de operación:', time_operation);
+    // console.log('Estatus de reservación:', status_booking);
+    // console.log('Código:', code);
+    // console.log('Vehículo:', unit);
+    // console.log('Pago:', payment);
+    // console.log('Total:', total + ' ' + currency);
+
+    let message = 'Hora: ' + hora + ' | ' +
+                  'Cliente: ' + cliente + ' | ' +
+                  'Tipo de servicio: ' + tipo_servicio + ' | ' +
+                  'Pax: ' + pax + ' | ' +
+                  'Origen: ' + origin + ' | ' +
+                  'Destino: ' + destination + ' | ' +
+                  'Agencia: ' + agency + ' | ' +
+                  'Unidad: ' + vehicle + ' | ' +
+                  'Conductor: ' + driver + ' | ' +
+                  'Estatus de operación: ' + status_operation + ' | ' +
+                  'Hora de operación: ' + time_operation + ' | ' +
+                  'Estatus de reservación: ' + status_booking + ' | ' +
+                  'Código: ' + code + ' | ' +
+                  'Vehículo: ' + unit + ' | ' +
+                  'Pago: ' + payment + ' | ' +
+                  'Total: ' + total + ' ' + currency;
+
+    let text = "https://api.whatsapp.com/send?phone=5219982127069&text=" + message;
+    window.location.href = text;
 });
 
 var inactivityTime = (5 * 60000); // 30 segundos en milisegundos

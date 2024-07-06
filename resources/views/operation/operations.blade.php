@@ -7,6 +7,7 @@
 @push('Css')
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="stylesheet" >
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">
 @endpush
 
 @push('Js')
@@ -14,7 +15,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/fixedheader/3.1.2/js/dataTables.fixedHeader.min.js"></script>
     <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
     <script>
@@ -41,20 +43,7 @@
 
                 _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                                 <'table-responsive'tr>
-                                <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>`;                        
-                // _settings.destroy = true;
-                // _settings.ajax = {
-                //     type: 'GET',
-                //     dataType: 'json',
-                //     url: '/operation/dataOperations',
-                //     "data": function ( d ) {
-                //         if( typeof param != 'undefined' && param != '' ){ d.data = param; }else{}
-                //         // console.log(d);
-                //         return JSON.stringify( d );
-                //         // return ( d );
-                //     },
-                //     contentType: 'application/json; charset=utf-8',
-                // };                                   
+                                <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>`;
                 _settings.deferRender = true;
                 _settings.responsive = true;
                 _settings.buttons =  _buttons;
@@ -74,6 +63,7 @@
                 };
 
                 table.DataTable( _settings );
+                // new $.fn.dataTable.FixedHeader(render);
             },
 
             bsPopover: function() {
@@ -133,7 +123,14 @@
                 // Expresión regular para validar formato HH:MM
                 const regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
                 return regex.test(hora);
-            }
+            },
+
+            obtenerHoraActual: function() {
+                const ahora = new Date();
+                const horas = String(ahora.getHours()).padStart(2, '0');
+                const minutos = String(ahora.getMinutes()).padStart(2, '0');
+                return `${horas}:${minutos}`;
+            }            
         };
 
         if ( document.getElementById('lookup_date') != null ) {
@@ -365,6 +362,7 @@
                     if (status == "OK") {
                         _settings.inputLabel = "Ingresa la hora de abordaje";
                         _settings.input = "time";
+                        _settings.inputValue = managment.obtenerHoraActual();
                         _settings.inputValidator = (result) => {
                             return !result && "Selecciona un horario";
                         }
@@ -783,7 +781,7 @@
                         @foreach($items as $key => $value)
                             @php
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
-                                $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "e6f4ff" : "eceffe" ) ).";";
+                                $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "d9edfc" : "dbe0f9" ) ).";";
 
                                 $payment = ( $value->total_sales - $value->total_payments );
                                 if($payment < 0) $payment = 0;
@@ -858,7 +856,7 @@
                                 </td>
                                 <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>                                    
                                 <td>
-                                    {{ $value->client_first_name }} {{ $value->client_last_name }}
+                                    <span>{{ $value->client_first_name }} {{ $value->client_last_name }}</span>
                                     @if(!empty($value->reference))
                                         [{{ $value->reference }}]
                                     @endif
@@ -927,15 +925,18 @@
                                         {{ $value->code }}
                                     @endif
                                 </td>
-                                <td>{{ $value->service_name }}</td>                                    
-                                <td class="text-center">{{ $value->status }}</td>
-                                <td class="text-end">{{ number_format($payment,2) }}</td>
+                                <td>{{ $value->service_name }}</td>
+                                <td class="text-center" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:red;color:#fff;' : '' ) }}">{{ $value->status }}</td>
+                                <td class="text-end" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:red;color:#fff;' : '' ) }}">{{ number_format($payment,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
-                                    <div class="d-flex">    
+                                    <div class="d-flex gap-3">
                                         <div class="btn btn-primary __open_modal_comment" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-type="{{ $value->final_service_type }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                         </div>
+                                        <div class="btn btn-primary extract_whatsapp" id="extract_whatsapp{{ $key.$value->id }}">
+                                            <i class="far fa-whatsapp"></i>
+                                        </div>                                        
                                     </div>
                                 </td>
                             </tr>

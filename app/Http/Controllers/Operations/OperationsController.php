@@ -309,7 +309,7 @@ class OperationsController extends Controller
                                    ) as p ON p.reservation_id = rez.id
                                    WHERE it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
                                    AND rez.is_cancelled = 0
-                                   AND rez.is_duplicated = 0
+                                   AND rez.is_duplicated = 0                                   
                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                                    UNION 
                                    SELECT 
@@ -358,7 +358,8 @@ class OperationsController extends Controller
                                    AND rez.is_cancelled = 0
                                    AND rez.is_duplicated = 0
                                    AND it.is_round_trip = 0
-                                   GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id",[
+                                   GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
+                                   ORDER BY filtered_date ASC",[
                                        "init_date_one" => $search['init'],
                                        "init_date_two" => $search['end'],
                                        "init_date_three" => $search['init'],
@@ -451,7 +452,7 @@ class OperationsController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
-    }    
+    }
 
     //SETEMOS LA UNIDAD E INGRESAMOS EL MONTO OPERATIVO, DEL SERVICIO
     public function setVehicle(Request $request){
