@@ -453,9 +453,6 @@ class ReservationsRepository
                     <p>*In case you require additional assistance, please send a message to the number $item->transactional_phone</p>
                     <p>Tips not included</p>
                     <p>All company personnel are identified with badges and uniforms, please do not pay attention to scam attempts as these payments will not be reimbursed</p>
-                    <p><strong>Important:</strong></p>
-                    <p>Due to the current situation in the state of Quintana Roo, which is on precautionary alert due to the proximity of <strong>Hurricane Berly</strong>, Cancun International Airport invites you to be in contact with your airline to receive the current status of your flights and to check if the service is confirmed and verified with your airline.</p>
-                    <p>The airport is not certified as a shelter for these phenomena.</p>
             EOF;
         else:
             return <<<EOF
@@ -470,9 +467,6 @@ class ReservationsRepository
                 <p>*En caso de requerir ayuda adicional, envíe un mensaje al número $item->transactional_phone</p>
                 <p>Propinas no incluidas</p>
                 <p>Todo el personal de la empresa está identificado con gafete y uniforme por favor no haga caso de intentos de estafa ya que estos pagos no serán reembolsados.</p>
-                <p><strong>Importante:</strong></p>
-                <p>Debido a la situación actual en el estado de Quintana Roo que se encuentra en alerta preventiva por la proximidad del <strong>huracán Berly</strong>, el Aeropuerto Internacional de Cancún los invita a estar en contacto con su aerolínea para recibir el estatus actual de sus vuelos y presentarse si dicho servicio esta confirmado y verificado con su aerolínea.</p>
-                <p>El aeropuerto no este certificado como refugio para estos fenómenos.</p>
             EOF;            
         endif;
     }
@@ -583,9 +577,6 @@ class ReservationsRepository
                     $message     
                     <p>You can also confirm by phone: $item->transactional_phone</p>
                     <p>Tips not included</p>
-                    <p><strong>Important:</strong></p>
-                    <p>Due to the current situation in the state of Quintana Roo, which is on precautionary alert due to the proximity of <strong>Hurricane Berly</strong>, Cancun International Airport invites you to be in contact with your airline to receive the current status of your flights and to check if the service is confirmed and verified with your airline.</p>
-                    <p>The airport is not certified as a shelter for these phenomena.</p>
                 EOF; 
         else:
             return <<<EOF
@@ -595,9 +586,6 @@ class ReservationsRepository
                     $message     
                     <p>También puedes confirmar por teléfono: $item->transactional_phone</p>
                     <p>Propinas no incluidas</p>
-                    <p><strong>Importante:</strong></p>
-                    <p>Debido a la situación actual en el estado de Quintana Roo que se encuentra en alerta preventiva por la proximidad del <strong>huracán Berly</strong>, el Aeropuerto Internacional de Cancún los invita a estar en contacto con su aerolínea para recibir el estatus actual de sus vuelos y presentarse si dicho servicio esta confirmado y verificado con su aerolínea.</p>
-                    <p>El aeropuerto no este certificado como refugio para estos fenómenos.</p>
                 EOF;           
         endif;
     }
