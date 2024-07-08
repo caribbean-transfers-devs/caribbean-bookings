@@ -270,6 +270,11 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
     var fila = $(this).closest('tr');
 
     // Extraer la información de las celdas de la fila
+    if( fila.find('td').eq(0).find('button').text() == "ADD" ){
+      var identificator = "NO DEFINIDO";
+    }else{
+      var identificator = fila.find('td').eq(0).find('button').text();
+    }    
     var hora = fila.find('td').eq(2).text();
     var cliente = fila.find('td').eq(3).find('span').text();
     var tipo_servicio = fila.find('td').eq(4).text();
@@ -287,13 +292,13 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
     }else{
       var code = fila.find('td').eq(15).text();
     }
-    
     var unit = fila.find('td').eq(16).text();
     var payment = fila.find('td').eq(17).text();
     var total = fila.find('td').eq(18).text();
     var currency = fila.find('td').eq(19).text();
 
     // Mostrar la información (puedes realizar otras acciones aquí)
+    // console.log('#:', identificator);
     // console.log('Hora:', hora);
     // console.log('Cliente:', cliente);
     // console.log('Tipo de servicio:', tipo_servicio);
@@ -311,7 +316,8 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
     // console.log('Pago:', payment);
     // console.log('Total:', total + ' ' + currency);
 
-    let message = 'Hora: ' + hora + ' | ' +
+    let message = 'Número: ' + identificator + ' | ' +
+                  'Hora: ' + hora + ' | ' +
                   'Cliente: ' + cliente + ' | ' +
                   'Tipo de servicio: ' + tipo_servicio + ' | ' +
                   'Pax: ' + pax + ' | ' +
@@ -328,7 +334,7 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
                   'Pago: ' + payment + ' | ' +
                   'Total: ' + total + ' ' + currency;
 
-    let text = "https://api.whatsapp.com/send?phone=5219982127069&text=" + message;
+    let text = "https://api.whatsapp.com/send?phone=5219982127069&text=" + decodeURIComponent(message);
     window.location.href = text;
 });
 

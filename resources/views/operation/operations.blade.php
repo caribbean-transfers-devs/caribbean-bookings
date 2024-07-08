@@ -7,7 +7,7 @@
 @push('Css')
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="stylesheet" >
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">
+    {{-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css"> --}}
 @endpush
 
 @push('Js')
@@ -16,7 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/fixedheader/3.1.2/js/dataTables.fixedHeader.min.js"></script>
+    {{-- <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/fixedheader/3.1.2/js/dataTables.fixedHeader.min.js"></script> --}}
     <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
     <script>
@@ -47,6 +47,8 @@
                 _settings.deferRender = true;
                 _settings.responsive = true;
                 _settings.buttons =  _buttons;
+                _settings.scrollY = "800px";
+                _settings.scrollCollapse = true;
                 _settings.paging = false;
                 _settings.oLanguage = {
                     "sProcessing": "Procesando...",
@@ -64,6 +66,13 @@
 
                 table.DataTable( _settings );
                 // new $.fn.dataTable.FixedHeader(render);
+            },
+
+            bsTooltip: function() {
+                var bsTooltip = document.querySelectorAll('.bs-tooltip')
+                for (let index = 0; index < bsTooltip.length; index++) {
+                    var tooltip = new bootstrap.Tooltip(bsTooltip[index])
+                }
             },
 
             bsPopover: function() {
@@ -149,6 +158,7 @@
             managment.actionTable($('.table-rendering'));
         }
         managment.bsPopover();
+        managment.bsTooltip();
         components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
         
         //DECLARACION DE VARIABLES
@@ -781,7 +791,10 @@
                         @foreach($items as $key => $value)
                             @php
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
-                                $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "d9edfc" : "dbe0f9" ) ).";";
+                                    //SABER SI SON ARRIVAL, DEPARTURE O TRANSFER, MEDIANTE UN COLOR DE FONDO
+                                    $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "d9edfc" : "dbe0f9" ) ).";";
+                                    //SABER EL NIVEL DE CUT OFF
+                                    $cut_off_zone = ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->zone_one_cut_off : $value->zone_two_cut_off );
 
                                 $payment = ( $value->total_sales - $value->total_payments );
                                 if($payment < 0) $payment = 0;
@@ -835,9 +848,9 @@
                             <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" style="{{ $background_color }}">
                                 <td>
                                     @if ( $flag_preassignment )
-                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> text-uppercase">{{ $preassignment }}</button>
+                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase">{{ $preassignment }}</button>
                                     @else
-                                        <button type="button" class="btn btn-primary text-uppercase add_preassignment" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">ADD</button>
+                                        <button type="button" class="btn btn-primary text-uppercase add_preassignment btn_operations" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">ADD</button>
                                     @endif
                                 </td>
                                 <td>
@@ -863,7 +876,7 @@
                                 </td>
                                 <td>{{ $value->final_service_type }}</td>
                                 <td class="text-center">{{ $value->passengers }}</td>
-                                <td>{{ $operation_from }}</td>
+                                <td style="{{ ( $cut_off_zone >= 3 ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $operation_from }}</td>
                                 <td>{{ $operation_to }}</td>
                                 <td>{{ $value->site_name }}</td>
                                 <td>
@@ -926,16 +939,16 @@
                                     @endif
                                 </td>
                                 <td>{{ $value->service_name }}</td>
-                                <td class="text-center" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:red;color:#fff;' : '' ) }}">{{ $value->status }}</td>
-                                <td class="text-end" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:red;color:#fff;' : '' ) }}">{{ number_format($payment,2) }}</td>
+                                <td class="text-center" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;color:#fff;' : '' ) }}">{{ $value->status }}</td>
+                                <td class="text-end" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;color:#fff;' : '' ) }}">{{ number_format($payment,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
-                                        <div class="btn btn-primary __open_modal_comment" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-type="{{ $value->final_service_type }}">
+                                        <div class="btn btn-primary btn_operations __open_modal_comment bs-tooltip" title="{{ ( $flag_comment ) ? 'Modificar comentario' : 'Agregar comentario' }}" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-type="{{ $value->final_service_type }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                         </div>
-                                        <div class="btn btn-primary extract_whatsapp" id="extract_whatsapp{{ $key.$value->id }}">
-                                            <i class="far fa-whatsapp"></i>
+                                        <div class="btn btn-primary btn_operations extract_whatsapp bs-tooltip" title="Enviar información por whatsApp" id="extract_whatsapp{{ $key.$value->id }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-navigation"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
                                         </div>                                        
                                     </div>
                                 </td>
