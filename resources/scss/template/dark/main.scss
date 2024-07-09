@@ -3742,7 +3742,8 @@ body.dark {
   
   thead {
     color: #bfc9d4;
-    letter-spacing: 1px;
+    // letter-spacing: 1px;
+    letter-spacing: normal;
 
     tr {
       th {

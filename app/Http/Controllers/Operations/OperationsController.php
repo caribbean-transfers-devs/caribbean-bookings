@@ -48,7 +48,7 @@ class OperationsController extends Controller
         );
 
         $vehicles = Vehicle::All();
-        $drivers = Driver::All();
+        $drivers = Driver::orderBy('names','ASC')->get();
         $zones = Zones::all();
         $services =  DestinationService::all();
         $websites = DB::select("SELECT id, name as site_name FROM sites ORDER BY site_name ASC");

@@ -138,7 +138,7 @@ table.dataTable thead {
   .sorting {
     &:before, &:after {
       position: absolute;
-      bottom: 0.9em;
+      // bottom: 0.9em;
       display: block;
       opacity: 0.4;
     }
@@ -147,7 +147,7 @@ table.dataTable thead {
   .sorting_asc {
     &:before, &:after {
       position: absolute;
-      bottom: 0.9em;
+      // bottom: 0.9em;
       display: block;
       opacity: 0.4;
     }
@@ -156,7 +156,7 @@ table.dataTable thead {
   .sorting_desc {
     &:before, &:after {
       position: absolute;
-      bottom: 0.9em;
+      // bottom: 0.9em;
       display: block;
       opacity: 0.4;
     }
@@ -165,7 +165,7 @@ table.dataTable thead {
   .sorting_asc_disabled {
     &:before, &:after {
       position: absolute;
-      bottom: 0.9em;
+      // bottom: 0.9em;
       display: block;
       opacity: 0.4;
     }
@@ -174,7 +174,7 @@ table.dataTable thead {
   .sorting_desc_disabled {
     &:before, &:after {
       position: absolute;
-      bottom: 0.9em;
+      // bottom: 0.9em;
       display: block;
       opacity: 0.4;
     }

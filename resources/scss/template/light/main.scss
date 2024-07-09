@@ -3729,7 +3729,8 @@ fieldset:disabled .btn {
   
   thead {
     color: #515365;
-    letter-spacing: 1px;
+    // letter-spacing: 1px;
+    letter-spacing: normal;
 
     tr {
       th {

@@ -68,7 +68,8 @@ table {
         height: 14px;
         content: '';
         right: .3rem;
-        top: .5rem;
+        // top: .5rem;
+        top: 0;
       }
 
       .sorting:after, .sorting_asc:after, .sorting_asc_disabled:after, .sorting_desc:after, .sorting_desc_disabled:after {
@@ -80,7 +81,8 @@ table {
         height: 14px;
         content: '';
         right: .3rem;
-        top: 1.3rem;
+        // top: 1.3rem;
+        bottom: 0;
       }
 
       .sorting_asc:before, .sorting_desc:after {

@@ -1128,7 +1128,8 @@ body {
 
   * {
     overflow: hidden;
-    white-space: nowrap;
+    // white-space: nowrap;
+    white-space: unset;
   }
 
   ul.menu-categories {
@@ -1241,7 +1242,8 @@ body {
       display: flex;
       justify-content: space-between;
       cursor: pointer;
-      font-size: 14px;
+      // font-size: 14px;
+      font-size: 10px;
       color: #191e3a;
       padding: 10.2px 16px;
       font-weight: 600;
@@ -1397,7 +1399,8 @@ body {
     padding: 10px 12px 10px 48px;
     padding-left: 24px;
     margin-left: 36px;
-    font-size: 14px;
+    // font-size: 14px;
+    font-size: 10px;
     color: #515365;
   }
 
@@ -1410,7 +1413,8 @@ body {
         position: absolute;
         height: 3px;
         width: 3px;
-        top: 18.5px;
+        // top: 18.5px;
+        top: 14.3px;
         left: 13px;
         border-radius: 50%;
         
