@@ -67,7 +67,7 @@ class OperationsController extends Controller
 
         //CONSULTAMOS LOS VEHICULOS Y VENDEDORES
         $vehicles = Vehicle::All();
-        $drivers = Driver::All();
+        $drivers = Driver::All()->orderBy('id', 'ASC');
 
         if( sizeof($items)>=1 ):
             foreach($items as $key => $value):
@@ -357,7 +357,7 @@ class OperationsController extends Controller
                                    WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
                                    AND rez.is_cancelled = 0
                                    AND rez.is_duplicated = 0
-                                   AND it.is_round_trip = 0
+                                   AND it.is_round_trip = 1
                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                                    ORDER BY filtered_date ASC",[
                                        "init_date_one" => $search['init'],

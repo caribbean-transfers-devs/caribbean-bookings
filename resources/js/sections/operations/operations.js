@@ -354,3 +354,15 @@ document.addEventListener('mousemove', resetTimer);
 document.addEventListener('keydown', resetTimer);
         
 resetTimer(); 
+
+window.addEventListener('scroll', function() {
+  var table = document.getElementById('zero-config');
+  var thead = table.querySelector('thead');
+  var offset = table.getBoundingClientRect().top;
+
+  if (window.scrollY > offset) {
+    thead.classList.add('fixed-header');
+  } else {
+    thead.classList.remove('fixed-header');
+  }
+});

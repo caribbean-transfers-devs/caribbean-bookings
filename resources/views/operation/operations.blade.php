@@ -7,7 +7,6 @@
 @push('Css')
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="stylesheet" >
-    {{-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css"> --}}
 @endpush
 
 @push('Js')
@@ -16,7 +15,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    {{-- <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/fixedheader/3.1.2/js/dataTables.fixedHeader.min.js"></script> --}}
     <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
     <script>
@@ -42,13 +40,13 @@
                 }
 
                 _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
-                                <'table-responsive'tr>
+                                <''tr>
                                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>`;
                 _settings.deferRender = true;
                 _settings.responsive = true;
                 _settings.buttons =  _buttons;
-                _settings.scrollY = "800px";
-                _settings.scrollCollapse = true;
+                // _settings.scrollY = "800px";
+                // _settings.scrollCollapse = true;
                 _settings.paging = false;
                 _settings.oLanguage = {
                     "sProcessing": "Procesando...",
@@ -880,7 +878,7 @@
                                 <td>{{ $operation_to }}</td>
                                 <td>{{ $value->site_name }}</td>
                                 <td>
-                                    <select class="form-control vehicles " data-live-search="true" name="vehicle_id" id="vehicle_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">
+                                    <select class="form-control vehicles selectpicker" data-live-search="true" name="vehicle_id" id="vehicle_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">
                                         <option value="0">Selecciona un vehículo</option>
                                         @if ( isset($vehicles) && count($vehicles) >= 1 )
                                             @foreach ($vehicles as $vehicle)
@@ -890,7 +888,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <select class="form-control drivers " data-live-search="true" name="driver_id" id="driver_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}">
+                                    <select class="form-control drivers selectpicker" data-live-search="true" name="driver_id" id="driver_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}">
                                         <option value="0">Selecciona un conductor</option>
                                         @if ( isset($drivers) && count($drivers) >= 1 )
                                             @foreach ($drivers as $driver)
@@ -949,7 +947,7 @@
                                         </div>
                                         <div class="btn btn-primary btn_operations extract_whatsapp bs-tooltip" title="Enviar información por whatsApp" id="extract_whatsapp{{ $key.$value->id }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-navigation"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
-                                        </div>                                        
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
