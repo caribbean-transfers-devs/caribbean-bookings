@@ -681,7 +681,7 @@ class OperationsController extends Controller
                 'passengers' => 'required|integer|max:255',
                 'departure_date' => 'required|date_format:Y-m-d H:i',
                 'destination_service_id' => 'required|integer|exists:destination_services,id',
-                'comments' => 'string|max:255',
+                // 'comments' => 'string|max:255',
 
                 'sold_in_currency' => 'required|in:MXN,USD',
                 'total' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
@@ -695,7 +695,7 @@ class OperationsController extends Controller
                     ],
                     'message' => $validator->errors()->all()
                 ], Response::HTTP_BAD_REQUEST);
-            }            
+            }
 
             //VALIDAMOS SI LA REFERENCIA YA EXISTE
             $duplicated_reservation = Reservation::where('reference', $request->reference)->count();

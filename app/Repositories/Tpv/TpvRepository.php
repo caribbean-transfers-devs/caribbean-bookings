@@ -135,7 +135,7 @@ class TpvRepository
             ]
         ];
         
-        if($request->payment_method == "CASH"):            
+        if($request->payment_method == "CASH"):
             $data['pay_at_arrival'] = 1;
         endif;
         

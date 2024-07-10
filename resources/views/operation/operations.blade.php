@@ -267,7 +267,7 @@
                     });
                 });
             });
-        }        
+        }
 
         if (__vehicles.length > 0) {
             __vehicles.forEach(__vehicle => {
