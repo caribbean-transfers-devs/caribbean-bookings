@@ -140,7 +140,7 @@ class PosRepository
                 INNER JOIN destination_services as dest ON dest.id = it.destination_service_id
                 GROUP BY it.reservation_id, it.is_round_trip
             ) as it ON it.reservation_id = rez.id
-            LEFT JOIN (
+            LEFT OUTER JOIN (
                 SELECT vr.id, vr.name
                 FROM vendors as vr
             ) as vr ON rez.vendor_id = vr.id

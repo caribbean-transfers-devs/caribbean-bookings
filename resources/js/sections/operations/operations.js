@@ -282,8 +282,8 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
     var origin = fila.find('td').eq(6).text();
     var destination = fila.find('td').eq(7).text();
     var agency = fila.find('td').eq(8).text();
-    var vehicle = fila.find('td').eq(9).find('select').val();
-    var driver = fila.find('td').eq(10).find('select').val();
+    var vehicle = fila.find('td').eq(9).find('button .filter-option .filter-option-inner .filter-option-inner-inner').text();
+    var driver = fila.find('td').eq(10).find('button .filter-option .filter-option-inner .filter-option-inner-inner').text();
     var status_operation = fila.find('td').eq(11).find('.btn-group button span').text();
     var time_operation = fila.find('td').eq(12).text();
     var status_booking = fila.find('td').eq(14).find('.btn-group button span').text();
@@ -298,7 +298,7 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
     var currency = fila.find('td').eq(19).text();
 
     // Mostrar la información (puedes realizar otras acciones aquí)
-    // console.log('#:', identificator);
+    // console.log('Número:', identificator);
     // console.log('Hora:', hora);
     // console.log('Cliente:', cliente);
     // console.log('Tipo de servicio:', tipo_servicio);
@@ -316,26 +316,46 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
     // console.log('Pago:', payment);
     // console.log('Total:', total + ' ' + currency);
 
-    let message = 'Número: ' + identificator + ' | ' +
-                  'Hora: ' + hora + ' | ' +
-                  'Cliente: ' + cliente + ' | ' +
-                  'Tipo de servicio: ' + tipo_servicio + ' | ' +
-                  'Pax: ' + pax + ' | ' +
-                  'Origen: ' + origin + ' | ' +
-                  'Destino: ' + destination + ' | ' +
-                  'Agencia: ' + agency + ' | ' +
-                  'Unidad: ' + vehicle + ' | ' +
-                  'Conductor: ' + driver + ' | ' +
-                  'Estatus de operación: ' + status_operation + ' | ' +
-                  'Hora de operación: ' + time_operation + ' | ' +
-                  'Estatus de reservación: ' + status_booking + ' | ' +
-                  'Código: ' + code + ' | ' +
-                  'Vehículo: ' + unit + ' | ' +
-                  'Pago: ' + payment + ' | ' +
-                  'Total: ' + total + ' ' + currency;
+    // let message = 'Número: ' + identificator + '</p> \n ' +
+    //               'Código: ' + code + '</p> \n ' +
+    //               'Hora: ' + hora + '</p> \n ' +
+    //               'Cliente: ' + cliente + '</p> \n ' +
+    //               'Tipo de servicio: ' + tipo_servicio + '</p> \n ' +
+    //               'Pax: ' + pax + '</p> \n ' +
+    //               'Origen: ' + origin + '</p> \n ' +
+    //               'Destino: ' + destination + '</p> \n ' +
+    //               'Agencia: ' + agency + '</p> \n ' +
+    //               'Unidad: ' + vehicle + '</p> \n ' +
+    //               'Conductor: ' + driver + '</p> \n ' +
+    //               'Estatus de operación: ' + status_operation + '</p> \n ' +
+    //               'Hora de operación: ' + time_operation + '</p> \n ' +
+    //               'Estatus de reservación: ' + status_booking + '</p> \n ' +                  
+    //               'Vehículo: ' + unit + '</p> \n ' +
+    //               'Pago: ' + payment + '</p> \n ' +
+    //               'Total: ' + total + ' ' + currency;
 
-    let text = "https://api.whatsapp.com/send?phone=5219982127069&text=" + decodeURIComponent(message);
-    window.location.href = text;
+   let message =  '<p class="m-0">Número: ' + identificator + '</p> \n ' +
+                  '<p class="m-0">Código: ' + code + '</p> \n ' +
+                  '<p class="m-0">Hora: ' + hora + '</p> \n ' +
+                  '<p class="m-0">Cliente: ' + cliente + '</p> \n ' +
+                  '<p class="m-0">Tipo de servicio: ' + tipo_servicio + '</p> \n ' +
+                  '<p class="m-0">Pax: ' + pax + '</p> \n ' +
+                  '<p class="m-0">Origen: ' + origin + '</p> \n ' +
+                  '<p class="m-0">Destino: ' + destination + '</p> \n ' +
+                  '<p class="m-0">Agencia: ' + agency + '</p> \n ' +
+                  '<p class="m-0">Unidad: ' + vehicle + '</p> \n ' +
+                  '<p class="m-0">Conductor: ' + driver + '</p> \n ' +
+                  '<p class="m-0">Estatus de operación: ' + status_operation + '</p> \n ' +
+                  '<p class="m-0">Hora de operación: ' + time_operation + '</p> \n ' +
+                  '<p class="m-0">Estatus de reservación: ' + status_booking + '</p> \n ' +                  
+                  '<p class="m-0">Vehículo: ' + unit + '</p> \n ' +
+                  '<p class="m-0">Pago: ' + payment + '</p> \n ' +
+                  '<p class="m-0">Total: ' + total + ' ' + currency;    
+
+    document.getElementById('wrapper_whatsApp').innerHTML = message;
+
+    // let text = "https://api.whatsapp.com/send?phone=5219982127069&text=" + decodeURIComponent(message);
+    // window.location.href = text;
 });
 
 var inactivityTime = (5 * 60000); // 30 segundos en milisegundos

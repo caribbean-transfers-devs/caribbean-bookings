@@ -53,6 +53,7 @@ mix.copy('resources/js/views/reports/cash.js', data.assets + "js/views/reports/c
 mix.sass('resources/scss/core.scss', data.assets + '/css/core/core.min.css');//core styles
 mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resources/plugins/font-icons/fontawesome/css/fontawesome.css'], data.assets + '/css/panel/panel.min.css');//panel styles
 mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
+
 mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css"); //DASHBOARD
 mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //REPORTS
 
