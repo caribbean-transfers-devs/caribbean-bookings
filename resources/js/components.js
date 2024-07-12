@@ -51,7 +51,7 @@ let components = {
         _settings.deferRender = true;
         _settings.responsive = true;
         _settings.buttons =  _buttons;        
-        _settings.order = [[ 0, "DESC" ]];
+        // _settings.order = [[ 0, "DESC" ]];
         _settings.lengthMenu = [10, 20, 50];
         _settings.pageLength = 10;                
         _settings.oLanguage = {
@@ -258,7 +258,7 @@ let components = {
         value instanceof Date ||
         value instanceof Boolean ||
         value === null;
-    },    
+    },
 
     /**
      * global loading method
