@@ -39,6 +39,10 @@ class OperationsController extends Controller
 
         $items = $this->querySpam($search);
 
+        foreach($items as $key => $item):
+                $item->messages = $this->getMessages($item->reservation_id);
+        endforeach;        
+
         $breadcrumbs = array(
             array(
                 "route" => "",
@@ -758,6 +762,7 @@ class OperationsController extends Controller
             $reservation->created_at = Carbon::now();
             $reservation->updated_at = Carbon::now();
             $reservation->comments = $request->comments;
+            // $reservation->is_complete = ( $request->site_id == 11 || $request->site_id == 21 ? 0 : 1 );
             $reservation->save();
 
             // Creando follow_up
@@ -1019,6 +1024,23 @@ class OperationsController extends Controller
         $lng = $equivalences[$zone_id]['lng'];
 
         return ['lat' => $lat, 'lng' => $lng];
+    }
+
+    public function getMessages($id){
+        $xHTML  = '';
+
+        $messages = DB::select("SELECT fup.id, fup.text, fup.type FROM reservations_follow_up as fup
+                                 WHERE fup.type IN ('CLIENT','OPERATION') 
+                                    AND fup.reservation_id = :id 
+                                    AND fup.text IS NOT NULL 
+                                    AND fup.text != '' ", ["id" => $id]);
+        if( sizeof($messages) >= 1 ):
+            foreach($messages as $key => $value):
+                $xHTML .= '[('.$value->type.') '. $value->text.'] ';
+            endforeach;
+        endif;
+
+        return $xHTML;
     }    
 
 }

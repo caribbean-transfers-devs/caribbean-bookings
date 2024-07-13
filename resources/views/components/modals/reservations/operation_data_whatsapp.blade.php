@@ -13,7 +13,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn btn-light-dark __close" data-bs-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+                <button type="button" class="btn btn btn-light-dark" data-bs-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
             </div>
         </div>
     </div>

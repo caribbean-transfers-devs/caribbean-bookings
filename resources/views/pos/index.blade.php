@@ -67,6 +67,7 @@
             ),
         );
         // dump($buttons);
+        // dump($bookings);
     @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
@@ -85,6 +86,7 @@
                     <thead>
                         <tr>
                             <th>Fecha</th>
+                            {{-- <th>Codigo</th> --}}
                             <th>Vendedor</th>
                             <th>Terminal</th>
                             <th>Folio</th>
@@ -103,7 +105,7 @@
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
-                                @php                                         
+                                @php
                                     if($item->is_cancelled == 0):
                                         if($item->pay_at_arrival == 1):
                                             $item->status = "CONFIRMED";
@@ -149,6 +151,7 @@
                                             {{ substr($item->created_at, 0, 10) }}
                                         @endif
                                     </td>
+                                    {{-- <td>{{ $item->reservation_codes }}</td> --}}
                                     <td>{{ $item->vendor }}</td>                                           
                                     <td>{{ $item->terminal ? str_replace('T', 'Terminal ', $item->terminal) : 'No se capturó la terminal' }}</td>
                                     <td>{{ $item->reference }}</td>

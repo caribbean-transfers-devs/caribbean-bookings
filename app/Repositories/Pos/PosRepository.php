@@ -47,7 +47,7 @@ class PosRepository
             'end' => date("Y-m-d") . " 23:59:59",
         ];
 
-        if(isset( $request->date ) && !empty( $request->date )){            
+        if(isset( $request->date ) && !empty( $request->date )){
             $tmp_date = explode(" - ", $request->date);
             $data['init'] = $tmp_date[0];
             $data['end'] = $tmp_date[1];
@@ -88,6 +88,7 @@ class PosRepository
         
         $bookings = DB::select("SELECT 
             rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, rez.comments, rez.site_id,
+            -- rez.is_complete, 
             rez.pay_at_arrival,
             COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
             CASE
@@ -124,6 +125,7 @@ class PosRepository
                 FROM payments
                 GROUP BY reservation_id
             ) as p ON p.reservation_id = rez.id
+            -- ) as p ON ( p.reservation_id = rez.id OR p.reservation_id IS NULL )
             LEFT JOIN (
                 SELECT  it.reservation_id, it.is_round_trip,
                         SUM(it.passengers) as passengers,
@@ -140,7 +142,7 @@ class PosRepository
                 INNER JOIN destination_services as dest ON dest.id = it.destination_service_id
                 GROUP BY it.reservation_id, it.is_round_trip
             ) as it ON it.reservation_id = rez.id
-            LEFT OUTER JOIN (
+            LEFT JOIN (
                 SELECT vr.id, vr.name
                 FROM vendors as vr
             ) as vr ON rez.vendor_id = vr.id
