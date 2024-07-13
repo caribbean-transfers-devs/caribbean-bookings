@@ -101,6 +101,9 @@
                 <tbody>
                     @if(sizeof($items)>=1)
                         @foreach($items as $key => $value)
+                            {{-- @if ( $value->id == 25252 )
+                                @dump($value)
+                            @endif --}}
                             @php
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
                                     //SABER SI SON ARRIVAL, DEPARTURE O TRANSFER, MEDIANTE UN COLOR DE FONDO
@@ -112,20 +115,25 @@
                                 if($payment < 0) $payment = 0;
 
                                 //PREASIGNACION
-                                $flag_preassignment = ( ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') ) && $value->op_one_preassignment != "" ? true : ( $value->final_service_type == 'DEPARTURE' && ( ($value->is_round_trip == 1 && $value->op_two_preassignment != "") || ($value->is_round_trip == 0 && $value->op_one_preassignment != "") ) ? true : false ) );
-                                $preassignment = ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_preassignment : $value->op_two_preassignment );
+                                $flag_preassignment = ( $value->operation_type == 'arrival' && $value->op_one_preassignment != "" ? true : ( $value->operation_type == 'departure' && $value->op_two_preassignment != "" ? true : false ) );
+                                $preassignment = ( $value->final_service_type == 'ARRIVAL' || ( $value->final_service_type == 'TRANSFER' && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_preassignment : $value->op_two_preassignment );
+
                                 //ESTATUS
-                                $status_operation = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_status_operation : $value->op_two_status_operation );
-                                $time_operation = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_time_operation : $value->op_two_time_operation );
-                                $cost_operation = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_operating_cost : $value->op_two_operating_cost );
-                                $status_booking = ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') || ($value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0) ? $value->op_one_status : $value->op_two_status );
+                                $status_operation = ( $value->final_service_type == 'ARRIVAL' || ( $value->final_service_type == 'TRANSFER' && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_status_operation : $value->op_two_status_operation );
+                                $time_operation = ( $value->final_service_type == 'ARRIVAL' || ( $value->final_service_type == 'TRANSFER' && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_time_operation : $value->op_two_time_operation );
+                                $cost_operation = ( $value->final_service_type == 'ARRIVAL' || ( $value->final_service_type == 'TRANSFER' && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_operating_cost : $value->op_two_operating_cost );
+                                $status_booking = ( $value->final_service_type == 'ARRIVAL' || ( $value->final_service_type == 'TRANSFER' && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_status : $value->op_two_status );
 
                                 $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
                                 $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
                                 $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
+
+                                $vehicle_d = ( $value->operation_type == 'arrival'  ? $value->vehicle_id_one : $value->vehicle_id_two );
+                                $driver_d = ( $value->operation_type == 'arrival' ? $value->driver_id_one : $value->driver_id_two );
+
                                 //COMENTARIO
-                                $flag_comment = ( ( ($value->final_service_type == 'ARRIVAL') || ($value->final_service_type == 'TRANSFER') ) && $value->op_one_comments != "" ? true : ( $value->final_service_type == 'DEPARTURE' && ( ($value->is_round_trip == 1 && $value->op_two_comments != "") || ($value->is_round_trip == 0 && $value->op_one_comments != "") ) ? true : false ) );
-                                $comment = ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_comments : $value->op_two_comments );
+                                $flag_comment = ( $value->operation_type == 'arrival' && $value->op_one_comments != "" ? true : ( $value->operation_type == 'departure' && $value->op_two_comments != "" ? true : false ) );
+                                $comment = ( $value->final_service_type == 'ARRIVAL' || ( $value->final_service_type == 'TRANSFER' && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) || ( $value->final_service_type == 'DEPARTURE' && $value->is_round_trip == 0 ) ? $value->op_one_comments : $value->op_two_comments );
 
                                 switch ($status_operation) {
                                     case 'E':
@@ -162,7 +170,7 @@
                                     @if ( $flag_preassignment )
                                         <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase">{{ $preassignment }}</button>
                                     @else
-                                        <button type="button" class="btn btn-primary text-uppercase add_preassignment btn_operations" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">ADD</button>
+                                        <button type="button" class="btn btn-danger text-uppercase add_preassignment btn_operations" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">ADD</button>
                                     @endif
                                 </td>
                                 <td>
@@ -192,21 +200,21 @@
                                 <td>{{ $operation_to }}</td>
                                 <td>{{ $value->site_name }}</td>
                                 <td>
-                                    <select class="form-control vehicles selectpicker" data-live-search="true" name="vehicle_id" id="vehicle_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}">
+                                    <select class="form-control vehicles selectpicker" data-live-search="true" name="vehicle_id" id="vehicle_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}">
                                         <option value="0">Selecciona un vehículo</option>
                                         @if ( isset($vehicles) && count($vehicles) >= 1 )
                                             @foreach ($vehicles as $vehicle)
-                                                <option {{ ( isset($value->vehicle_id) && $value->vehicle_id == $vehicle->id ) ? 'selected' : '' }} value="{{ $vehicle->id }}">{{ $vehicle->name }} - {{ $vehicle->destination_service->name }} - {{ $vehicle->enterprise->names }}</option>
+                                                <option {{ ( $vehicle_d != NULL && $vehicle_d == $vehicle->id ) ? 'selected' : '' }} value="{{ $vehicle->id }}">{{ $vehicle->name }} - {{ $vehicle->destination_service->name }} - {{ $vehicle->enterprise->names }}</option>
                                             @endforeach
                                         @endif
                                     </select>
                                 </td>
                                 <td>
-                                    <select class="form-control drivers selectpicker" data-live-search="true" name="driver_id" id="driver_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}">
+                                    <select class="form-control drivers selectpicker" data-live-search="true" name="driver_id" id="driver_id_{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}">
                                         <option value="0">Selecciona un conductor</option>
                                         @if ( isset($drivers) && count($drivers) >= 1 )
                                             @foreach ($drivers as $driver)
-                                                <option {{ ( isset($value->driver_id) && $value->driver_id == $driver->id ) ? 'selected' : '' }} value="{{ $driver->id }}">{{ $driver->names }} {{ $driver->surnames }}</option>
+                                                <option {{ ( $driver_d != NULL && $driver_d == $driver->id ) ? 'selected' : '' }} value="{{ $driver->id }}">{{ $driver->names }} {{ $driver->surnames }}</option>
                                             @endforeach
                                         @endif
                                     </select>
@@ -218,11 +226,11 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="optionsOperation{{ $key.$value->id }}">
-                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-status="PENDING" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-status="E" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
-                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-status="C" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-status="PENDING" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-status="E" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-status="C" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
                                             <div class="dropdown-divider"></div>
-                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-status="OK" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-status="OK" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
                                         </div>
                                     </div>
                                 </td>
@@ -235,11 +243,11 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="optionsBooking{{ $key.$value->id }}">
-                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-status="PENDING" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-status="COMPLETED" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
-                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-status="NOSHOW" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-status="PENDING" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-status="COMPLETED" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-status="NOSHOW" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
                                             <div class="dropdown-divider"></div>
-                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-status="CANCELLED" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>
+                                            <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-status="CANCELLED" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>
                                         </div>
                                     </div>                                     
                                 </td>

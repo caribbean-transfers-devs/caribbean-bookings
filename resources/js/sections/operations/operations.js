@@ -606,7 +606,7 @@ if (__vehicles.length > 0) {
   __vehicles.forEach(__vehicle => {
       __vehicle.addEventListener('change', function(event) {
           event.preventDefault();                    
-          const { id, item, code, operation } = this.dataset;
+          const { id, item, code, operation, service } = this.dataset;
           swal.fire({
               inputLabel: "Ingresa el costo operativo",
               inputPlaceholder: "Ingresa el costo operativo",
@@ -635,7 +635,7 @@ if (__vehicles.length > 0) {
                   $.ajax({
                       url: `/operation/vehicle/set`,
                       type: 'PUT',
-                      data: { item : item, vehicle_id : __vehicle.value, reservation_item_id : code, operation : operation, value : result.value },
+                      data: { item : item, vehicle_id : __vehicle.value, reservation_item_id : code, operation : operation, service : service, value : result.value },
                       beforeSend: function() {
                           components.loadScreen();
                       },
@@ -662,11 +662,11 @@ if (__vehicles.length > 0) {
 if (__drivers.length > 0) {
   __drivers.forEach(__driver => {
       __driver.addEventListener('change', function() {
-          const { id, item, code } = this.dataset;
+          const { id, item, code, operation, service } = this.dataset;
           $.ajax({
               url: `/operation/driver/set`,
               type: 'PUT',
-              data: { item : item, driver_id : __driver.value, reservation_item_id : code },
+              data: { item : item, driver_id : __driver.value, reservation_item_id : code, operation : operation, service : service },
               beforeSend: function() {
                   components.loadScreen();
               },
@@ -693,8 +693,8 @@ if (__btn_update_status_operations.length > 0) {
       __btn_update_status_operation.addEventListener('click', function(event) {
           event.preventDefault();
           let _settings = {};
-          const { operation, status, item, booking, key } = this.dataset;
-          console.log(operation, status, item, booking, key);
+          const { operation, service, status, item, booking, key } = this.dataset;
+          console.log(operation, service, status, item, booking, key);
           _settings.text = "¿Está seguro de actualizar el estatus de operación?";
           _settings.icon = 'warning';
           _settings.showCancelButton = true;
@@ -713,7 +713,7 @@ if (__btn_update_status_operations.length > 0) {
                   $.ajax({
                       url: `/operation/status/operation`,
                       type: 'PUT',
-                      data: { id: key, rez_id: booking, item_id: item, type: operation, status: status, time: ( setup.isTime(result.value) ? result.value : "" ) },
+                      data: { id: key, rez_id: booking, item_id: item, operation: operation, service: service, status: status, time: ( setup.isTime(result.value) ? result.value : "" ) },
                       beforeSend: function() {
                           components.loadScreen();
                       },
@@ -739,8 +739,8 @@ if (__btn_update_status_bookings.length > 0) {
   __btn_update_status_bookings.forEach(__btn_update_status_booking => {
       __btn_update_status_booking.addEventListener('click', function(event) {
           event.preventDefault();
-          const { operation, status, item, booking, key } = this.dataset;
-          console.log(operation, status, item, booking, key);
+          const { operation, service, status, item, booking, key } = this.dataset;
+          console.log(operation, service, status, item, booking, key);
           swal.fire({
               text: "¿Está seguro de actualizar el estatus de reservación?",
               icon: 'warning',
@@ -764,7 +764,7 @@ if (__btn_update_status_bookings.length > 0) {
                       $.ajax({
                           url: `/operation/status/booking`,
                           type: 'PUT',
-                          data: { id: key, rez_id: booking, item_id: item, type: operation, status: status },
+                          data: { id: key, rez_id: booking, item_id: item, operation: operation, service: service, status: status },
                           beforeSend: function() {
                               components.loadScreen();
                           },

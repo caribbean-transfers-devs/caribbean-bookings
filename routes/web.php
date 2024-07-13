@@ -54,7 +54,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('/vehicles', VehicleController::class);
     Route::resource('/drivers', DriverController::class);
 
-
     Route::resource('/users', UserController::class);
     Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');
     Route::put('/ChangeStatus/{user}', [UserController::class, 'change_status'])->name('users.change_status');
