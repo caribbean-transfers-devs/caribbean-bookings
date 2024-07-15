@@ -104,6 +104,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/operation/status/booking', [Operations::class, 'updateStatusBooking'])->name('operation.status.booking');
     Route::post('/operation/comment/add', [Operations::class, 'addComment'])->name('operation.comment.add');
     Route::get('/operation/comment/get', [Operations::class, 'getComment'])->name('operation.comment.get');
+    Route::get('/operation/history/get', [Operations::class, 'getHistory'])->name('operation.history.get');
     Route::post('/operation/preassignments', [Operations::class, 'preassignments'])->name('operation.preassignments');
     Route::put('/operation/preassignment', [Operations::class, 'preassignment'])->name('operation.preassignment');
     Route::post('/operation/capture/service', [Operations::class, 'createService'])->name('operation.capture.service');

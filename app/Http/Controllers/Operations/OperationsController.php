@@ -28,6 +28,7 @@ use DateTime;
 
 class OperationsController extends Controller
 {
+    
     use CodeTrait, RoleTrait;
 
     public function index(Request $request){
@@ -40,7 +41,7 @@ class OperationsController extends Controller
         $items = $this->querySpam($search);
 
         foreach($items as $key => $item):
-                $item->messages = $this->getMessages($item->reservation_id);
+                $item->messages = $this->validateMessages($item->reservation_id);
         endforeach;        
 
         $breadcrumbs = array(
@@ -424,11 +425,11 @@ class OperationsController extends Controller
                 $service->op_one_preassignment = $preassignment;
             }
 
-            if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
+            if( $request->operation == 'TRANSFER' && $request->service == 'arrival' ){
                 $preassignment = "T".( $transfer_counter == 0 ? 1 : ($transfer_counter + 1) );
                 $service->op_one_preassignment = $preassignment;
             }
-            if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
+            if( $request->operation == 'TRANSFER' && $request->service == 'departure' ){
                 $preassignment = "T".( $transfer_counter == 0 ? 1 : ($transfer_counter + 1) );
                 $service->op_two_preassignment = $preassignment;
             }            
@@ -972,6 +973,26 @@ class OperationsController extends Controller
         }
     }
 
+    public function getHistory(Request $request){
+        try {
+            //DECLARACION DE VARIABLES
+            $message = $this->getMessages($request->code);
+
+            return response()->json([
+                'success' => ( !empty($message) ? true : false ),
+                'message' => $message,
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }    
+
     private function timeToSeconds($time) {
         $parts = explode(' ', $time);
         
@@ -1095,6 +1116,15 @@ class OperationsController extends Controller
         return ['lat' => $lat, 'lng' => $lng];
     }
 
+    public function validateMessages($id){
+        $messages = DB::select("SELECT fup.id, fup.text, fup.type FROM reservations_follow_up as fup
+                                 WHERE fup.type IN ('CLIENT','OPERATION') 
+                                    AND fup.reservation_id = :id 
+                                    AND fup.text IS NOT NULL 
+                                    AND fup.text != '' ", ["id" => $id]);
+        return count($messages);
+    }
+
     public function getMessages($id){
         $xHTML  = '';
 
@@ -1105,11 +1135,11 @@ class OperationsController extends Controller
                                     AND fup.text != '' ", ["id" => $id]);
         if( sizeof($messages) >= 1 ):
             foreach($messages as $key => $value):
-                $xHTML .= '[('.$value->type.') '. $value->text.'] ';
+                $xHTML .= '[('.$value->type.') '. $value->text.'] <br>';
             endforeach;
         endif;
 
         return $xHTML;
-    }    
+    }
 
 }

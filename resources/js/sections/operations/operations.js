@@ -305,6 +305,7 @@ const submitBtn = document.getElementById('submitBtn'); //* ===== BUTTON CREATE 
 const __add_preassignments = document.querySelectorAll('.add_preassignment'); //* ===== BUTTONS PRE ASSIGNMENT ===== */
 const __vehicles = document.querySelectorAll('.vehicles'); //* ===== SELECT VEHICLES ===== */
 const __drivers = document.querySelectorAll('.drivers'); //* ===== SELECT DRIVERS ===== */
+const __open_modal_historys = document.querySelectorAll('.__open_modal_history');
 const __open_modal_comments = document.querySelectorAll('.__open_modal_comment');
 const __title_modal = document.getElementById('filterModalLabel');
 const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
@@ -312,6 +313,9 @@ const __btn_preassignment = document.getElementById('btn_preassignment') //* ===
 const __btn_addservice = document.getElementById('btn_addservice') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
 const __btn_update_status_operations = document.querySelectorAll('.btn_update_status_operation');
 const __btn_update_status_bookings = document.querySelectorAll('.btn_update_status_booking');
+
+const __copy_whatsapp = document.querySelector('.copy_whatsapp');
+const __copy_history = document.querySelector('.copy_history');
 
 //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
 const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhost:4000': 'https://socket-caribbean-transfers.up.railway.app' );
@@ -580,7 +584,7 @@ if (__add_preassignments.length > 0) {
                   $.ajax({
                       url: _LOCAL_URL + "/operation/preassignment",
                       type: 'PUT',
-                      data: { date : __date.value, id : id, code : code, operation : operation },
+                      data: { date : __date.value, id : id, code : code, operation : operation, service : service },
                       beforeSend: function() {
                           components.loadScreen();
                       },
@@ -788,6 +792,30 @@ if (__btn_update_status_bookings.length > 0) {
   });
 }
 
+if( __open_modal_historys.length > 0 ){
+    __open_modal_historys.forEach(__open_modal_history => {
+        __open_modal_history.addEventListener('click', function(){
+  
+            //DECLARACION DE VARIABLES
+            const __modal = document.getElementById('historyModal');
+  
+            $.ajax({
+                url: `/operation/history/get`,
+                type: 'GET',
+                data: { code: this.dataset.code },
+                success: function(resp) {
+                    if ( resp.success ) {
+                        const content = document.getElementById('wrapper_history');
+                        content.innerHTML = resp.message;
+                        $(__modal).modal('show');
+                    }                                        
+                }
+            });
+            // $(__modal).modal('show');
+        });
+    });
+}
+
 //ACCION PARA ABRIR MODAL PARA AÑADIR UN COMENTARIO
 if( __open_modal_comments.length > 0 ){
   __open_modal_comments.forEach(__open_modal_comment => {
@@ -859,6 +887,43 @@ __button_form.addEventListener('submit', function (event) {
   }
 });
 
+if ( __copy_whatsapp != null ) {
+    __copy_whatsapp.addEventListener('click', function(){
+        // Obtiene el div por su ID
+        var div = document.getElementById('wrapper_whatsApp');
+        // console.log(div);
+        // Obtiene el contenido del div y elimina los espacios
+        // var contenido = div.textContent.replace(/\s+/g, '');
+        var contenido = div.textContent;
+        // Usa la API del portapapeles para copiar el contenido
+        navigator.clipboard.writeText(contenido).then(function() {
+            // Notifica al usuario que el contenido se ha copiado
+            // alert('Contenido copiado: ' + contenido);
+        }, function(err) {
+            // Notifica al usuario en caso de error
+            console.error('No se pudo copiar el contenido: ', err);
+        });
+    });
+}
+
+if ( __copy_history != null ) {
+    __copy_history.addEventListener('click', function(){
+        // Obtiene el div por su ID
+        var div = document.getElementById('wrapper_history');
+        // console.log(div);
+        // Obtiene el contenido del div y elimina los espacios
+        // var contenido = div.textContent.replace(/\s+/g, '');
+        var contenido = div.textContent;
+        // Usa la API del portapapeles para copiar el contenido
+        navigator.clipboard.writeText(contenido).then(function() {
+            // Notifica al usuario que el contenido se ha copiado
+            // alert('Contenido copiado: ' + contenido);
+        }, function(err) {
+            // Notifica al usuario en caso de error
+            console.error('No se pudo copiar el contenido: ', err);
+        });
+    });    
+}
 
 //FUNCIONALIDAD QUE RECARGA LA PAGINA, CUANDO ESTA DETACTA INACTIVIDAD POR 5 MINUTOS
 var inactivityTime = (5 * 60000); // 30 segundos en milisegundos
@@ -900,7 +965,7 @@ socket.on("addPreassignmentClient", function(data){
         const __Row = ( __btn_preassignment != null ? components.closest(__btn_preassignment, 'tr') : null );
         const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(1)') : "" );
         console.log(__btn_preassignment, __Row, __Cell);
-        __btn_preassignment.classList.remove('btn-primary');
+        __btn_preassignment.classList.remove('btn-danger');
         __btn_preassignment.classList.add(setup.setPreassignment(data.operation));
         __btn_preassignment.innerHTML = data.value;
         // __Cell.innerHTML = '<button type="button" class="btn btn-'+ setup.setPreassignment(data.operation) +' text-uppercase">'+ data.value +'</button>';
