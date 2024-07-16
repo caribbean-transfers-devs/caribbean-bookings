@@ -28,7 +28,7 @@ use DateTime;
 
 class OperationsController extends Controller
 {
-    
+
     use CodeTrait, RoleTrait;
 
     public function index(Request $request){
@@ -832,7 +832,7 @@ class OperationsController extends Controller
             $reservation->created_at = Carbon::now();
             $reservation->updated_at = Carbon::now();
             $reservation->comments = $request->comments;
-            // $reservation->is_complete = ( $request->site_id == 11 || $request->site_id == 21 ? 0 : 1 );
+            $reservation->is_complete = ( $request->site_id == 11 || $request->site_id == 21 ? 0 : 1 );
             $reservation->save();
 
             // Creando follow_up

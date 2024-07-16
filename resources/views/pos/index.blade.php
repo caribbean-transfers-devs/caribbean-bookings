@@ -81,12 +81,12 @@
                             @endforeach
                         </ul>
                     </div>
-                @endif                
+                @endif
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th>Fecha</th>
-                            {{-- <th>Codigo</th> --}}
+                            <th>Codigo</th>
+                            <th>Fecha</th>                            
                             <th>Vendedor</th>
                             <th>Terminal</th>
                             <th>Folio</th>
@@ -143,16 +143,15 @@
                                     endif;                                                
                                     $total_pending = $item->total_sales - $item->total_payments;
                                 @endphp
-                                <tr>
+                                <tr class="{{ ( $item->is_complete == 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_complete == 0 ? 'Reservación creada desde operaciones favor de darle seguimiento' : '' ) }}" style="{{ ( $item->is_complete == 0 ? 'background-color: #fbeced;' : '' ) }}" data-code="{{ $item->is_complete }}">
                                     <td>
                                         @if(RoleTrait::hasPermission(53))
-                                            <a href="punto-de-venta/detail/{{ $item->id }}">{{ substr($item->created_at, 0, 10) }}</a>
+                                            <a href="punto-de-venta/detail/{{ $item->id }}">{{ $item->reservation_codes }}</a>
                                         @else
-                                            {{ substr($item->created_at, 0, 10) }}
+                                            {{ $item->reservation_codes }}
                                         @endif
-                                    </td>
-                                    {{-- <td>{{ $item->reservation_codes }}</td> --}}
-                                    <td>{{ $item->vendor }}</td>                                           
+                                    <td>{{ substr($item->created_at, 0, 10) }}</td>                                    
+                                    <td>{{ $item->vendor ? $item->vendor : 'No se capturó el vendedor' }}</td>
                                     <td>{{ $item->terminal ? str_replace('T', 'Terminal ', $item->terminal) : 'No se capturó la terminal' }}</td>
                                     <td>{{ $item->reference }}</td>
                                     <td>{{ $item->total_sales }}</td>
@@ -271,5 +270,5 @@
         </div>
     </div>
 
-    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" />    
+    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" />
 @endsection

@@ -139,6 +139,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/punto-de-venta/detail/{id}', [PosController::class, 'detail'])->where('id', '[0-9]+');
     Route::get('/punto-de-venta/capture', [PosController::class, 'capture'])->name('pos.capture');
     Route::post('/punto-de-venta/capture/create', [PosController::class, 'create'])->name('pos.capture.create');
+    Route::post('/punto-de-venta/capture/update', [PosController::class, 'update'])->name('pos.capture.update');
     Route::get('/punto-de-venta/vendors', [PosController::class, 'vendors'])->name('pos.vendors');
     Route::post('/punto-de-venta/vendors/create', [PosController::class, 'createVendor'])->name('pos.vendors.create');
     Route::put('/punto-de-venta/vendors/edit', [PosController::class, 'editVendor'])->name('pos.vendors.edit');

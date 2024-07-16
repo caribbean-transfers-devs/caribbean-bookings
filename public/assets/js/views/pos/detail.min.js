@@ -790,3 +790,295 @@ document.getElementById('modifyCreatedAt')?.addEventListener('click', () => {
         submitBtn.innerText = 'Modificar';
     });
 })
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    const terminalSelect = document.getElementById('terminal');
+    const total = document.getElementById('total');//TOTAL DE LA RESERVACION
+    const sold_in_currency_select = document.getElementById('sold_in_currency');//MODENA DE LA RESERVACION
+    const openPaymentModalBtn = document.getElementById('openPaymentModal');
+    const formaDePagoSelect = document.getElementById('payment_method');
+    const clipContainer = document.getElementById('clip_container');
+    const tipoCambioSelect = document.getElementById('tipo_cambio_select');
+    const addPaymentBtn = document.getElementById('addPayment');//
+    const formComplet = document.getElementById('formComplet');
+    const submitBtn = document.getElementById('submitBtn');
+
+    //EVENTO CUANDO SE SELECCIONA UNA TERMINAL
+    if (terminalSelect != null) {
+        terminalSelect.addEventListener('change', () => {
+            const number_of_rows = $('#payments_table tbody').children().length;
+            if( number_of_rows === 0 ) return;
+            $('#payments_table tbody').html('');
+            $('#previous_total').text('0');
+            $('.total_remaining').text( $('#total').text() );
+            $('#payments_table').hide();
+            // $('#sold_in_currency').prop('disabled', false);
+            // $('#total').prop('disabled', false);
+        });
+    }
+
+    //EVENTO AL ABRIR EL MODAL
+    if (openPaymentModalBtn != null) {
+        openPaymentModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            $('#payment_method').val('CASH').trigger('change');
+            $('#reference_container').hide();
+            $('#clip_container').hide();
+            $('#paid_in_currency').val(sold_in_currency_select.innerText).prop('disabled', false);
+            $('.total_remaining').text(total.innerText);
+            $('.total-currency').text(sold_in_currency_select.innerText);
+        });
+    }
+
+    if (formaDePagoSelect != null) {
+        formaDePagoSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'CASH') {
+                clipContainer.style.display = "none";
+                $('#paid_in_currency').prop('disabled', false);
+                $('#reference_container').hide();
+                return;
+            }
+            clipContainer.style.display = "block";
+            $('#paid_in_currency').val('MXN').prop('disabled', true).trigger('change');
+            $('#reference_container').show();
+        });       
+    }
+
+    if (tipoCambioSelect != null) {
+        tipoCambioSelect?.addEventListener('change', (e) => {
+            if( $(tipoCambioSelect).val() === '1' ) $('#tipo_cambio_container').show();
+            else $('#tipo_cambio_container').hide();
+        })   
+    }
+
+    const assignDeleteRowEvent = () => {
+        $('#payments_table button').last().click(function (e) {
+            e.preventDefault();
+            const total_to_pay = Number($('#total_original').val());
+            const payment = Number($(e.target).parent().parent().find('.payment').text());
+            const origin_currency = $(e.target).parent().parent().find('.currency').text();
+            const destination_currency = $('#sold_in_currency').text();
+            const terminal = $('#terminal').val();
+            const custom_currency_exchange = Number($(e.target).parent().parent().find('.custom_currency_exchange').val());
+            const currency_exchange = currency_exchange_data.find(currency_exchange => (
+                currency_exchange.origin == origin_currency &&
+                currency_exchange.destination == destination_currency &&
+                currency_exchange.terminal == terminal
+            ));
+            let total;
+            if( custom_currency_exchange ) {
+                total = payment * custom_currency_exchange;
+            }
+            else {
+                if( currency_exchange.operation === 'multiplication' ) total = payment * currency_exchange.exchange_rate;
+                else total = total = payment / currency_exchange.exchange_rate;
+            }
+            const previous_total = Number($('#previous_total').text());
+            total = previous_total - total;
+            total = total.toFixed(2);
+            const total_remaining = (total_to_pay - total).toFixed(2);
+
+            $('#previous_total').text(total);
+            $('.total_remaining').text(total_remaining);
+            if( total >= total_to_pay ) {
+                $('.color-total-container').addClass('success');
+                $('.color-total-container').removeClass('red');
+            }else {
+                $('.color-total-container').addClass('red');
+                $('.color-total-container').removeClass('success');
+            }
+            $(e.target).parent().parent().remove();
+            const number_of_rows = $('#payments_table tbody').children().length;
+            if( number_of_rows === 0 ) {
+                $('#payments_table').hide();
+                // $('#sold_in_currency').prop('disabled', false);
+                // $('#total').prop('disabled', false);
+            }
+        })        
+    }
+
+    if (addPaymentBtn != null) {
+        addPaymentBtn.addEventListener('click', () => {
+            const $alert = $('#addPaymentModal .alert-danger');
+            const payment = Number($('#payment').val());
+            const total_to_pay = Number($('#total_original').val());
+            let custom_currency_exchange = 0;
+            $alert.hide();
+            if( !payment || payment <= 0 ) {
+                $alert.text('Escribe una cantidad correcta');
+                return $alert.show();
+            }
+            if( tipoCambioSelect && $(tipoCambioSelect).val() === '1' ) {
+                if( Number($('#tipo_cambio').val()) <= 0 ) {
+                    $alert.text('Escribe el tipo de cambio');
+                    return $alert.show();
+                }
+                custom_currency_exchange = Number($('#tipo_cambio').val());
+            }
+            const payment_method = $('#payment_method').val();
+            const reference = payment_method === 'CARD' ? $('#reference').val() : '';
+            const clip_id = $('#clip_id').val();
+            const origin_currency = $('#paid_in_currency').val();
+            const destination_currency = $('#sold_in_currency').text();
+            const terminal = $('#terminal').val();
+
+            if( payment_method === 'CARD' && reference.length < 3 ) {
+                $alert.text('Escribe la referencia de pago. Mínimo 4 caracteres');
+                return $alert.show();
+            }
+            const currency_exchange = currency_exchange_data.find(currency_exchange => (
+                currency_exchange.origin == origin_currency &&
+                currency_exchange.destination == destination_currency &&
+                currency_exchange.terminal == terminal
+            ));
+            if( !custom_currency_exchange && !currency_exchange ) {
+                $alert.text(`Lo sentimos, no se encontró la conversión de moneda de ${origin_currency} -> ${destination_currency} para la Terminal ${terminal.replace('T', '')}. Quizá tengas que añadir este caso, o pedirle a algún administrador que lo haga`);
+                return $alert.show();
+            }
+
+            let total;
+            if( custom_currency_exchange ) {
+                total = payment * custom_currency_exchange;
+            }else {
+                if( currency_exchange.operation === 'multiplication' ) total = payment * currency_exchange.exchange_rate;
+                else total = total = payment / currency_exchange.exchange_rate;
+            }
+
+            const previous_total = Number($('#previous_total').text());
+            total = previous_total + total;
+            total = total.toFixed(2);
+            const total_remaining = (total_to_pay - total).toFixed(2);
+            $('#previous_total').text(total);
+            $('.total_remaining').text(total_remaining);
+            const number_of_rows = $('#payments_table tbody').children().length;
+            
+            const new_row = `
+                <tr>
+                    <td class="payment">${payment}</td>
+                    <td class="currency">${origin_currency}</td>
+                    <td class="reference">${reference || 'No aplica'}</td>
+                    <td align="center">
+                        <button class="btn btn-danger btn-sm">Eliminar</button>
+                    </td>
+                    <input type="hidden" class="hidden_reference" name="reference_${number_of_rows}" value="${reference}">
+                    <input type="hidden" class="hidden_payment_method" name="payment_method_${number_of_rows}" value="${payment_method}">
+                    <input type="hidden" class="hidden_clip_id" name="clip_id_${number_of_rows}" value="${clip_id}">
+                    <input type="hidden" class="hidden_payment" name="payment_${number_of_rows}" value="${payment}">
+                    <input type="hidden" class="hidden_currency" name="currency_${number_of_rows}" value="${origin_currency}">            
+                    <input type="hidden" class="custom_currency_exchange" name="custom_currency_exchange_${number_of_rows}" value="${custom_currency_exchange}">
+                </tr>
+            `;
+            
+            $('#payments_table tbody').append(new_row);
+            $('#payments_table').show();
+
+            assignDeleteRowEvent();
+            
+            if( total >= total_to_pay ) {
+                $('.color-total-container').addClass('success');
+                $('.color-total-container').removeClass('red');
+            }else {
+                $('.color-total-container').addClass('red');
+                $('.color-total-container').removeClass('success');
+            }
+
+            $('#sold_in_currency').prop('disabled', true);
+            $('#total').prop('disabled', true);
+
+            $('#reference').val("");
+            $('#payment').val("");
+            $('#addPaymentModal').modal('hide');
+        })
+    }
+
+    formComplet.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const number_of_rows = $('#payments_table tbody').children().length;
+
+        if( number_of_rows === 0 ) return Swal.fire({
+            title: 'Faltan campos por rellenar',
+            icon: 'warning',
+            html: 'Tienes que agregar al menos 1 pago',
+            timer: 5000,
+        });
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Cargando...';
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+            }
+        });
+
+        $('#payments_table tbody').children().each(function(index) {
+            $(this).find('.hidden_reference').attr('name', `reference_${index}`);
+            $(this).find('.hidden_payment_method').attr('name', `payment_method_${index}`);
+            $(this).find('.hidden_clip_id').attr('name', `clip_id_${index}`);
+            $(this).find('.hidden_payment').attr('name', `payment_${index}`);
+            $(this).find('.hidden_currency').attr('name', `currency_${index}`);
+            $(this).find('.custom_currency_exchange').attr('name', `custom_currency_exchange_${index}`);
+        });
+
+        let frm_data = $("#formComplet").serializeArray();
+        frm_data.push({name: 'number_of_payments', value: number_of_rows});
+        frm_data.push({name: 'reservation_id', value: reservation_id});
+        console.log(frm_data);
+
+        $.ajax({
+            url: '/punto-de-venta/capture/update',
+            type: 'POST',
+            data: frm_data,
+            success: function(resp) {
+                if ( typeof resp === 'object' && 'success' in resp && resp.success ) {
+                    window.onbeforeunload = null;
+                    let timerInterval
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        icon: 'success',
+                        html: 'Datos guardados con éxito. Será redirigido en <b></b>',
+                        timer: 2500,
+                        timerProgressBar: true,
+                        didOpen: () => {
+                            Swal.showLoading()
+                            const b = Swal.getHtmlContainer().querySelector('b')
+                            timerInterval = setInterval(() => {
+                                b.textContent = (Swal.getTimerLeft() / 1000)
+                                    .toFixed(0)
+                            }, 100)
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval)
+                        }
+                    }).then((result) => {
+                        location.reload();
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Oops!',
+                        icon: 'error',
+                        html: 'Ocurrió un error inesperado',
+                        timer: 2500,
+                    });
+                    $('#sold_in_currency').prop('disabled', true);
+                    $('#total').prop('disabled', true);
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Generar venta';
+                }
+            }
+        }).fail(function(xhr, status, error) {
+            Swal.fire(
+                '¡ERROR!',
+                xhr.responseJSON.message,
+                'error'
+            );
+            $('#sold_in_currency').prop('disabled', true);
+                    $('#total').prop('disabled', true);
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Generar venta';
+        });
+    });
+
+});

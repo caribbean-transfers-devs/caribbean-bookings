@@ -18,13 +18,16 @@
 <script>
     var reservation_id = <?= $reservation->id ?>;
 </script>
+<script>
+    var currency_exchange_data = <?= $currency_exchange_data ?>;
+</script>
 
 @section('content')
     <div class="container-fluid p-0">
         @csrf
 
         <div class="mb-3">
-            <h1 class="h3 d-inline align-middle">Detalle de venta</h1>            
+            <h1 class="h3 d-inline align-middle">Detalle de venta</h1>
         </div>
 
         <div class="row justify-content-center">
@@ -34,7 +37,10 @@
                     <div class="card-header">
                         <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
                     </div>
-                    <div class="card-body">                        
+                    <div class="card-body">
+                        @php
+                            // dump($reservation);
+                        @endphp
                         <div class="button-list">
                             @if(RoleTrait::hasPermission(59))
                                 <a href="#" class="btn btn-info change-date-btn" data-bs-toggle="modal" data-bs-target="#modify_pos_created_at">Cambiar fecha de creación</a>
@@ -42,6 +48,10 @@
                             @if(RoleTrait::hasPermission(61))
                                 <a href="/reservations/detail/{{ $reservation->id }}" class="btn btn-primary">Actualización general</a>
                             @endif
+
+                            @if( RoleTrait::hasPermission(61) && $reservation->is_complete == 0 && ( $reservation->site_id == 11 || $reservation->site_id == 21 ) )
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#completBookingModal">Completar reservación</button>
+                            @endif                            
                         </div>
 
                         <table class="table table-sm mt-2 mb-4">
@@ -90,11 +100,11 @@
                                 </tr>
                                 <tr>
                                     <th>Vendedor</th>
-                                    <td>{{ $reservation->vendor->name }}</td>
+                                    <td>{{ ( isset($reservation->vendor->name) ? $reservation->vendor->name : 'NO DEFINIDO' ) }}</td>
                                 </tr>
                                 <tr>
                                     <th>Capturista</th>
-                                    <td>{{ $reservation->user->name }}</td>
+                                    <td>{{ ( isset($reservation->user->name) ? $reservation->user->name : 'NO DEFINIDO' ) }}</td>
                                 </tr>
                                 <tr>
                                     <th>Observaciones</th>
@@ -170,8 +180,7 @@
                                     <span class="float-end text-muted text-sm">{{ $time }} ago</span>
                                     <p>{{ $followUp->text }}</p>
                                 </li>  
-                            @endforeach
-                           
+                            @endforeach                           
                         </ul>
                         @endif
                     </div>
@@ -183,5 +192,9 @@
     </div>
 
     <x-modals.modify_pos_created_at />
+    @if( RoleTrait::hasPermission(61) && $reservation->is_complete == 0 && ( $reservation->site_id == 11 || $reservation->site_id == 21 ) )
+        <x-modals.complet_post_booking :reservation="$reservation" :data="$data" :clips="$clips" :vendors="$vendors" :currencyexchangedata="$currency_exchange_data" />
+        <x-modals.add_payment :clips="$clips" />
+    @endif 
 
 @endsection
