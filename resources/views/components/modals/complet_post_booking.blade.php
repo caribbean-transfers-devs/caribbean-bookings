@@ -19,7 +19,7 @@
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="vendor_id">Apellidos</label>
-                            <input type="text" name="client_first_name" class="form-control" value="{{ $reservation->client_first_name }}" required>
+                            <input type="text" name="client_last_name" class="form-control" value="{{ $reservation->client_last_name }}" required>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="terminal">Correo</label>
