@@ -307,7 +307,7 @@ class PosRepository
 
             $terminal_exchange_rate = TerminalPaymentExchangeRate::where('terminal', $request->terminal)
             ->where('origin', $request->$currency_variable)
-            ->where('destination', $request->currency)
+            ->where('destination', $request->sold_in_currency)
             ->first();
             if( !$terminal_exchange_rate && !$terminal_exchange_rate ) return response()->json(['message' => 'No se pudo convertir el cambio de monera, posiblemente necesites agregar el caso de conversión que estás solicitando','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
 
@@ -421,8 +421,6 @@ class PosRepository
     public function update($request){
         try {
             DB::beginTransaction();
-            $booking = Reservation::find($request->reservation_id);
-            if( empty($booking) ) return response()->json(['message' => 'No se encontro la reservacion','success' => false], Response::HTTP_BAD_REQUEST);
     
             // Obteniendo pagos
             $payments = [];
@@ -441,7 +439,7 @@ class PosRepository
     
                 $terminal_exchange_rate = TerminalPaymentExchangeRate::where('terminal', $request->terminal)
                 ->where('origin', $request->$currency_variable)
-                ->where('destination', $request->sold_in_currency)
+                ->where('destination', $request->currency)
                 ->first();
                 if( !$terminal_exchange_rate && !$terminal_exchange_rate ) return response()->json(['message' => 'No se pudo convertir el cambio de monera, posiblemente necesites agregar el caso de conversión que estás solicitando','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
     
@@ -464,12 +462,15 @@ class PosRepository
             if( $total_paid < $request->total ) return response()->json(['message' => 'La cantidad pagada no cubre el total de la venta','success' => false], Response::HTTP_BAD_REQUEST);            
             
             // Creando reservación
+            $booking = Reservation::find($request->reservation_id);
+            if( empty($booking) ) return response()->json(['message' => 'No se encontro la reservacion','success' => false], Response::HTTP_BAD_REQUEST);
             $booking->client_first_name = $request->client_first_name;
             $booking->client_last_name = $request->client_last_name;
             $booking->client_email = $request->client_email ? $request->client_email : null;
             $booking->client_phone = $request->client_phone ? $request->client_phone : null;
             $booking->vendor_id = $request->vendor_id;
             $booking->terminal = $request->terminal;
+            $booking->is_complete = 1;
             $booking->save();
 
             // Creando Payments
@@ -495,7 +496,7 @@ class PosRepository
             return response()->json(['message' => 'sale update successfully','success' => true], Response::HTTP_OK);
         } catch(Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Ocurrió un error al insertar la información a la base de datos','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => $e->getMessage(),'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
         }        
     }    
 

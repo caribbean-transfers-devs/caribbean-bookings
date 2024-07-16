@@ -23,11 +23,11 @@
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="terminal">Correo</label>
-                            <input type="text" name="client_email" class="form-control" value="{{ $reservation->client_email }}" required>
+                            <input type="text" name="client_email" class="form-control" value="{{ $reservation->client_email }}" >
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="vendor_id">Teléfono</label>
-                            <input type="text" name="client_phone" class="form-control" value="{{ $reservation->client_phone }}" required>
+                            <input type="text" name="client_phone" class="form-control" value="{{ $reservation->client_phone }}" >
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="terminal">Terminal</label>
@@ -75,8 +75,8 @@
                                 </div>
                             </div>
                             
-                            <input type="hidden" value="{{ round($data['total_sales'], 2) }}" id="total_original" required>
-                            <input type="hidden" value="{{ $reservation->currency }}" required>
+                            <input type="hidden" name="total" value="{{ round($data['total_sales'], 2) }}" id="total_original" required>
+                            <input type="hidden" name="currency" value="{{ $reservation->currency }}" required>
                             <button type="button" class="btn btn-success btn-sm" id="openPaymentModal" data-bs-toggle="modal" data-bs-target="#addPaymentModal"><i class="align-middle" data-feather="plus"></i> Agregar pago</button>
                         </div>
                     </div>
