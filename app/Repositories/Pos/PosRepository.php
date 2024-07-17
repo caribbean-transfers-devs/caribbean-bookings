@@ -42,7 +42,7 @@ class PosRepository
         ];
         
         //Query DB
-        $query = ' AND rez.created_at BETWEEN :init AND :end';
+        $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.site_id IN (11,21) ';
         $queryData = [
             'init' => date("Y-m-d") . " 00:00:00",
             'end' => date("Y-m-d") . " 23:59:59",
@@ -67,11 +67,6 @@ class PosRepository
             $queryData['zone'] = $data['zone'];
             $query .= " AND FIND_IN_SET(:zone, zone_two_id) > 0";
         }
-        if(isset( $request->site ) && $request->site != 0){
-            $data['site'] = $request->site;
-            $query .= ' AND site.id = :site';
-            $queryData['site'] = $data['site'];
-        }
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
             $data['payment_method'] = $request->payment_method;
         }
@@ -86,7 +81,6 @@ class PosRepository
                 ( it.code like '".$data['filter_text']."' )
             )";            
         }
-        // $query = ' AND rez.site_id IN (11,21) ';
 
         // dd($query);
         
@@ -155,7 +149,7 @@ class PosRepository
                 SELECT vr.id, vr.name
                 FROM vendors as vr
             ) as vr ON rez.vendor_id = vr.id
-            WHERE 1=1 AND vendor_id IS NULL {$query}
+            WHERE 1=1 AND (rez.vendor_id IS NULL OR rez.vendor_id IS NOT NULL) {$query}
             GROUP BY rez.id, site.name, vr.vendor",
         $queryData);
 
@@ -184,10 +178,6 @@ class PosRepository
             endforeach;            
         endif;
 
-        $websites = DB::select("SELECT id, name as site_name
-        FROM sites
-        ORDER BY site_name ASC");
-
         $breadcrumbs = array(
             array(
                 "route" => "",
@@ -196,7 +186,7 @@ class PosRepository
             ),
         );        
 
-        return view('pos.index', compact('bookings','services','zones','websites','data','breadcrumbs') );
+        return view('pos.index', compact('bookings','services','zones','data','breadcrumbs') );
     }
 
     public function detail($request,$id){

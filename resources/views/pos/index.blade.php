@@ -43,6 +43,7 @@
 
 @section('content')
     @php
+        // dump($bookings);
         $buttons = array(
             array(  
                 'text' => 'Filtrar',
@@ -85,8 +86,8 @@
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th>Codigo</th>
-                            <th>Fecha</th>                            
+                            <th>Fecha</th>
+                            {{-- <th>Codigo</th> --}}                            
                             <th>Vendedor</th>
                             <th>Terminal</th>
                             <th>Folio</th>
@@ -143,14 +144,14 @@
                                     endif;                                                
                                     $total_pending = $item->total_sales - $item->total_payments;
                                 @endphp
-                                <tr class="{{ ( $item->is_complete == 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_complete == 0 ? 'Reservación creada desde operaciones favor de darle seguimiento' : '' ) }}" style="{{ ( $item->is_complete == 0 ? 'background-color: #fbeced;' : '' ) }}" data-code="{{ $item->is_complete }}">
+                                <tr class="{{ ( $item->is_complete == 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_complete == 0 ? 'Reservación creada desde operaciones favor de darle seguimiento' : '' ) }}" style="{{ ( $item->is_complete == 0 ? 'background-color: #fbeced;' : '' ) }}" data-code="{{ $item->is_complete }}" data-id="{{ $item->id }}" data-site="{{ $item->site_id }}">
                                     <td>
                                         @if(RoleTrait::hasPermission(53))
-                                            <a href="punto-de-venta/detail/{{ $item->id }}">{{ $item->reservation_codes }}</a>
+                                            <a href="punto-de-venta/detail/{{ $item->id }}">{{ substr($item->created_at, 0, 10) }}</a>
                                         @else
-                                            {{ $item->reservation_codes }}
+                                            {{ substr($item->created_at, 0, 10) }}
                                         @endif
-                                    <td>{{ substr($item->created_at, 0, 10) }}</td>                                    
+                                    {{-- <td>{{ substr($item->created_at, 0, 10) }}</td> --}}
                                     <td>{{ $item->vendor ? $item->vendor : 'No se capturó el vendedor' }}</td>
                                     <td>{{ $item->terminal ? str_replace('T', 'Terminal ', $item->terminal) : 'No se capturó la terminal' }}</td>
                                     <td>{{ $item->reference }}</td>
@@ -270,5 +271,5 @@
         </div>
     </div>
 
-    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" />
+    <x-modals.reports.post :data="$data" :services="$services" :zones="$zones" />
 @endsection
