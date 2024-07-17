@@ -49,7 +49,7 @@
                                 <a href="/reservations/detail/{{ $reservation->id }}" class="btn btn-primary">Actualización general</a>
                             @endif
 
-                            @if( RoleTrait::hasPermission(61) && $reservation->is_complete == 0 && ( $reservation->site_id == 11 || $reservation->site_id == 21 ) )
+                            @if( RoleTrait::hasPermission(77) && $reservation->is_complete == 0 && ( $reservation->site_id == 11 || $reservation->site_id == 21 ) )
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#completBookingModal">Completar reservación</button>
                             @endif                            
                         </div>
@@ -192,7 +192,7 @@
     </div>
 
     <x-modals.modify_pos_created_at />
-    @if( RoleTrait::hasPermission(61) && $reservation->is_complete == 0 && ( $reservation->site_id == 11 || $reservation->site_id == 21 ) )
+    @if( RoleTrait::hasPermission(77) && $reservation->is_complete == 0 && ( $reservation->site_id == 11 || $reservation->site_id == 21 ) )
         <x-modals.complet_post_booking :reservation="$reservation" :data="$data" :clips="$clips" :vendors="$vendors" :currencyexchangedata="$currency_exchange_data" />
         <x-modals.add_payment :clips="$clips" />
     @endif 
