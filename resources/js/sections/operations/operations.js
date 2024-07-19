@@ -319,6 +319,7 @@ const __copy_history = document.querySelector('.copy_history');
 
 //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
 const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhost:4000': 'https://socket-caribbean-transfers.up.railway.app' );
+console.log(socket);
 socket.on('connection');
 
 //FUNCIONALIDAD DEL AUTOCOMPLET
@@ -968,7 +969,6 @@ socket.on("addPreassignmentClient", function(data){
         __btn_preassignment.classList.remove('btn-danger');
         __btn_preassignment.classList.add(setup.setPreassignment(data.operation));
         __btn_preassignment.innerHTML = data.value;
-        // __Cell.innerHTML = '<button type="button" class="btn btn-'+ setup.setPreassignment(data.operation) +' text-uppercase">'+ data.value +'</button>';
     }
 
     Snackbar.show({
@@ -982,15 +982,16 @@ socket.on("addPreassignmentClient", function(data){
 
 socket.on("setVehicleReservationClient", function(data){
     console.log("nueva asignación de unidad");
-    // console.log(data);
+    console.log(data);
     //DECLARACION DE VARIABLES
     const __select_vehicle = document.getElementById('vehicle_id_' + data.item);
     if( __select_vehicle != null ){
         const __Row = ( __select_vehicle != null ? components.closest(__select_vehicle, 'tr') : null );
         const __CellVehicle = ( __Row != null ? __Row.querySelector('td:nth-child(10)') : null );
         const __CellCost = ( __Row != null ? __Row.querySelector('td:nth-child(14)') : null );
-        // console.log(__select_vehicle, __Row, __CellVehicle, __CellCost);
+        console.log(__select_vehicle, __Row, __CellVehicle, __CellCost);
         __select_vehicle.value = data.value;
+        $('#vehicle_id_' + data.item).selectpicker('val', data.value);
         __CellCost.innerHTML = data.cost;
     }
 
@@ -1005,14 +1006,15 @@ socket.on("setVehicleReservationClient", function(data){
 
 socket.on("setDriverReservationClient", function(data){
     console.log("nueva asignación de conductor");
-    // console.log(data);
+    console.log(data);
     //DECLARACION DE VARIABLES
     const __select_driver = document.getElementById('driver_id_' + data.item);
     if( __select_driver != null ){
         const __Row = ( __select_driver != null ? components.closest(__select_driver, 'tr') : null );
         const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(11)') : "" );
-        // console.log(__select_driver, __Row, __Cell);
+        console.log(__select_driver, __Row, __Cell);
         __select_driver.value = data.value;
+        $('#driver_id_' + data.item).selectpicker('val', data.value);
     }
 
     Snackbar.show({ 
@@ -1033,7 +1035,7 @@ socket.on("updateStatusOperationClient", function(data){
         const __Row = ( __status_operation != null ? components.closest(__status_operation, 'tr') : null );
         const __CellStatus = ( __Row != null ? __Row.querySelector('td:nth-child(12)') : "" );
         const __CellTime = ( __Row != null ? __Row.querySelector('td:nth-child(13)') : "" );
-        console.log(__status_operation, __Row, __CellStatus);
+        console.log(__status_operation, __Row, __CellStatus, __CellTime);
         __status_operation.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
         __status_operation.classList.add(setup.setStatus(data.value));
         __status_operation.querySelector('span').innerText = data.value;
@@ -1051,13 +1053,13 @@ socket.on("updateStatusOperationClient", function(data){
 
 socket.on("updateStatusBookingClient", function(data){
     console.log("reservación");
-    // console.log(data);
+    console.log(data);
     //DECLARACION DE VARIABLES
     const __status_booking = document.getElementById('optionsBooking' + data.item);
     if( __status_booking != null ){
         const __Row = ( __status_booking != null ? components.closest(__status_booking, 'tr') : null );
         const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(15)') : "" );
-        // console.log(__status_booking, __Row, __Cell);
+        console.log(__status_booking, __Row, __Cell);
         __status_booking.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
         __status_booking.classList.add(setup.setStatus(data.value));
         __status_booking.querySelector('span').innerText = data.value;
@@ -1074,7 +1076,7 @@ socket.on("updateStatusBookingClient", function(data){
 
 socket.on("addCommentClient", function(data){
     console.log("comentario");
-    // console.log(data);
+    console.log(data);
     //DECLARACION DE VARIABLES
     const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
     if( __btn_comment != null ){
@@ -1102,7 +1104,7 @@ socket.on("addCommentClient", function(data){
 
 socket.on("addServiceClient", function(data){
     console.log("nuevo servicio");
-    // console.log(data);
+    console.log(data);
     //DECLARACION DE VARIABLES
     const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
     if( data.success ){
