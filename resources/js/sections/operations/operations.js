@@ -571,7 +571,7 @@ if (__add_preassignments.length > 0) {
   __add_preassignments.forEach(__add_preassignment => {
       __add_preassignment.addEventListener('click', function(event) {
           event.preventDefault();                    
-          const { id, code, operation, service } = this.dataset;
+          const { id, reservation, item, operation, service, type } = this.dataset;
           const __date = document.getElementById('lookup_date');
           swal.fire({
               text: '¿Está seguro de pre-asignar el servicio ?',
@@ -584,7 +584,7 @@ if (__add_preassignments.length > 0) {
                   $.ajax({
                       url: _LOCAL_URL + "/operation/preassignment",
                       type: 'PUT',
-                      data: { date : __date.value, id : id, code : code, operation : operation, service : service },
+                      data: { date : __date.value, id : id, reservation : reservation, reservation_item : item, operation : operation, service : service, type : type },
                       beforeSend: function() {
                           components.loadScreen();
                       },
@@ -610,7 +610,7 @@ if (__vehicles.length > 0) {
   __vehicles.forEach(__vehicle => {
       __vehicle.addEventListener('change', function(event) {
           event.preventDefault();                    
-          const { id, item, code, operation, service } = this.dataset;
+          const { id, reservation, item, operation, service, type } = this.dataset;
           swal.fire({
               inputLabel: "Ingresa el costo operativo",
               inputPlaceholder: "Ingresa el costo operativo",
@@ -639,7 +639,7 @@ if (__vehicles.length > 0) {
                   $.ajax({
                       url: `/operation/vehicle/set`,
                       type: 'PUT',
-                      data: { item : item, vehicle_id : __vehicle.value, reservation_item_id : code, operation : operation, service : service, value : result.value },
+                      data: { id : id, reservation : reservation, reservation_item : item, operation : operation, service : service, vehicle_id : __vehicle.value, type : type, operating_cost : result.value },
                       beforeSend: function() {
                           components.loadScreen();
                       },
@@ -666,11 +666,11 @@ if (__vehicles.length > 0) {
 if (__drivers.length > 0) {
   __drivers.forEach(__driver => {
       __driver.addEventListener('change', function() {
-          const { id, item, code, operation, service } = this.dataset;
+          const { id, reservation, item, operation, service, type } = this.dataset;
           $.ajax({
               url: `/operation/driver/set`,
               type: 'PUT',
-              data: { item : item, driver_id : __driver.value, reservation_item_id : code, operation : operation, service : service },
+              data: { id : id, reservation : reservation, reservation_item : item, operation : operation, service : service, driver_id : __driver.value, type : type },
               beforeSend: function() {
                   components.loadScreen();
               },
@@ -697,7 +697,7 @@ if (__btn_update_status_operations.length > 0) {
       __btn_update_status_operation.addEventListener('click', function(event) {
           event.preventDefault();
           let _settings = {};
-          const { operation, service, status, item, booking, key } = this.dataset;
+          const { operation, service, type, status, item, booking, key } = this.dataset;
           console.log(operation, service, status, item, booking, key);
           _settings.text = "¿Está seguro de actualizar el estatus de operación?";
           _settings.icon = 'warning';
@@ -717,7 +717,7 @@ if (__btn_update_status_operations.length > 0) {
                   $.ajax({
                       url: `/operation/status/operation`,
                       type: 'PUT',
-                      data: { id: key, rez_id: booking, item_id: item, operation: operation, service: service, status: status, time: ( setup.isTime(result.value) ? result.value : "" ) },
+                      data: { id: key, rez_id: booking, item_id: item, operation: operation, service: service, type: type, status: status, time: ( setup.isTime(result.value) ? result.value : "" ) },
                       beforeSend: function() {
                           components.loadScreen();
                       },
@@ -743,8 +743,7 @@ if (__btn_update_status_bookings.length > 0) {
   __btn_update_status_bookings.forEach(__btn_update_status_booking => {
       __btn_update_status_booking.addEventListener('click', function(event) {
           event.preventDefault();
-          const { operation, service, status, item, booking, key } = this.dataset;
-          console.log(operation, service, status, item, booking, key);
+          const { operation, service, type, status, item, booking, key } = this.dataset;
           swal.fire({
               text: "¿Está seguro de actualizar el estatus de reservación?",
               icon: 'warning',
@@ -768,7 +767,7 @@ if (__btn_update_status_bookings.length > 0) {
                       $.ajax({
                           url: `/operation/status/booking`,
                           type: 'PUT',
-                          data: { id: key, rez_id: booking, item_id: item, operation: operation, service: service, status: status },
+                          data: { id: key, rez_id: booking, item_id: item, operation: operation, service: service, type: type, status: status },
                           beforeSend: function() {
                               components.loadScreen();
                           },
@@ -831,13 +830,14 @@ if( __open_modal_comments.length > 0 ){
           __form_label.innerHTML = ( this.dataset.status == 0 ? "Ingresa el comentario" : "Editar el comentario" );
           document.getElementById('id_item').value = this.dataset.id;
           document.getElementById('code_item').value = this.dataset.code;
+          document.getElementById('operation_item').value = this.dataset.operation;
           document.getElementById('type_item').value = this.dataset.type;
 
           if (this.dataset.status == 1) {
               $.ajax({
                   url: `/operation/comment/get`,
                   type: 'GET',
-                  data: { item_id: this.dataset.code, type: this.dataset.type },
+                  data: { item_id: this.dataset.code, operation: this.dataset.operation, type: this.dataset.type },
                   // beforeSend: function() {
                   //     components.loadScreen();
                   // },

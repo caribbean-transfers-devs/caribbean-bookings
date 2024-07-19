@@ -13,6 +13,7 @@
                 <div class="modal-body">
                     <input type="hidden" name="id" id="id_item" required>
                     <input type="hidden" name="code" id="code_item" required>
+                    <input type="hidden" name="operation" id="operation_item" required>
                     <input type="hidden" name="type" id="type_item" required>
                     <div class="col-12 col-sm-12">
                         <label class="form-label" for="comment_item">Ingresa el comentario</label>
