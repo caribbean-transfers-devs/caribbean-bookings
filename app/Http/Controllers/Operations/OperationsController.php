@@ -224,7 +224,7 @@ class OperationsController extends Controller
                     if( $item->final_service_type == 'ARRIVAL' ){
                         $preassignment = "L".$arrival_counter;
                         $service->op_one_preassignment = $preassignment;
-                        $arrival_counter ++;                        
+                        $arrival_counter ++;
                     }
 
                     if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){

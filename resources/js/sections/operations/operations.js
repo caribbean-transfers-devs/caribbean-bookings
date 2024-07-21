@@ -322,6 +322,9 @@ const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhos
 console.log(socket);
 socket.on('connection');
 
+// setup.bsPopover();
+setup.bsTooltip();
+
 //FUNCIONALIDAD DEL AUTOCOMPLET
 function affDelayAutocomplete(callback, ms) {
     var timer = 0;
@@ -512,8 +515,6 @@ if( document.querySelector('.table-rendering') != null ){
   setup.actionTable($('.table-rendering'));
 }
 
-setup.bsPopover();
-setup.bsTooltip();
 components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
 
 //ABRE EL MODAL PARA PODER AGREGAR UN NUEVO SERVICIO
