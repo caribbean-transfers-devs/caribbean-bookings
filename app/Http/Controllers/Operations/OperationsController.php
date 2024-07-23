@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Operations;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Response as ResponseFile;
 
 use App\Models\Enterprise;
 use App\Models\Driver;
@@ -25,6 +26,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use DateTime;
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class OperationsController extends Controller
 {
@@ -1008,6 +1012,26 @@ class OperationsController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function getDataCustomer(Request $request){
+        try {
+            //DECLARACION DE VARIABLES
+            $booking = Reservation::where('id',$request->code)->first();
+
+            return response()->json([
+                'success' => ( !empty($booking) ? true : false ),
+                'data' => $booking,
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }    
 
     private function timeToSeconds($time) {
@@ -1027,7 +1051,7 @@ class OperationsController extends Controller
         $seconds = $hours * 3600 + $minutes * 60;
         
         return $seconds;
-    }    
+    }
 
     private function getLatLngByZoneId($zone_id) {
         $equivalences = [
@@ -1159,4 +1183,170 @@ class OperationsController extends Controller
         return $xHTML;
     }
 
+    public function exportExcelBoard(Request $request){
+        $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
+        $search['init'] = $date." 00:00:00";
+        $search['end'] = $date." 23:59:59";
+
+        $items = $this->querySpam($search);
+
+        // Crear una nueva hoja de cálculo
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Rellenar con datos
+        $sheet->setCellValue('A1', '#');
+        $sheet->setCellValue('B1', 'Código');
+        $sheet->setCellValue('C1', 'Hora');
+        $sheet->setCellValue('D1', 'Cliente');
+        $sheet->setCellValue('E1', 'Tipo de servicios');
+        $sheet->setCellValue('F1', 'Folio');
+        $sheet->setCellValue('G1', 'Pax');
+        $sheet->setCellValue('H1', 'Origen');
+        $sheet->setCellValue('I1', 'Destino');
+        $sheet->setCellValue('J1', 'Agencia');
+        $sheet->setCellValue('K1', 'Unidad');
+        $sheet->setCellValue('L1', 'Conductor');
+        $sheet->setCellValue('M1', 'Estatus de operación');
+        $sheet->setCellValue('N1', 'Hora de operación');
+        $sheet->setCellValue('O1', 'Costo operativo');
+        $sheet->setCellValue('P1', 'Estatus de reservación');
+        $sheet->setCellValue('Q1', 'Vehículo');
+        $sheet->setCellValue('R1', 'Estatus de pago');
+        $sheet->setCellValue('S1', 'Total');
+        $sheet->setCellValue('T1', 'Moneda');
+
+        $count = 2;
+
+        foreach( $items as $key => $item ){
+            $payment = ( $item->total_sales - $item->total_payments );
+            if($payment < 0) $payment = 0;
+
+            $flag_preassignment = ( ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ) && $item->op_one_preassignment != "" ? true : ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && ( $item->is_round_trip == 1 ) && $item->op_two_preassignment != "" ? true : false ) );
+            $preassignment = ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_preassignment : $item->op_two_preassignment );
+
+            $status_operation = ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_status_operation : $item->op_two_status_operation );
+            $time_operation =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_time_operation : $item->op_two_time_operation );
+            $cost_operation =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_operating_cost : $item->op_two_operating_cost );
+            $status_booking =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_status : $item->op_two_status );            
+
+            $operation_pickup = (($item->operation_type == 'arrival')? $item->op_one_pickup : $item->op_two_pickup );
+            $operation_from = (($item->operation_type == 'arrival')? $item->from_name.((!empty($item->flight_number))? ' ('.$item->flight_number.')' :'')  : $item->to_name );
+            $operation_to = (($item->operation_type == 'arrival')? $item->to_name : $item->from_name );
+            $vehicle_d = ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? Vehicle::find($item->vehicle_id_one) : Vehicle::find($item->vehicle_id_two) );
+            $driver_d =  ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? Driver::find($item->driver_id_one) : Driver::find($item->driver_id_two) );
+
+
+            $sheet->setCellValue('A'.strval($count), ( $preassignment != "" ? $preassignment : "ADD" ));
+            $sheet->setCellValue('B'.strval($count), $item->code);
+            $sheet->setCellValue('C'.strval($count), date("H:i", strtotime($operation_pickup)));
+            $sheet->setCellValue('D'.strval($count), $item->client_first_name.' '.$item->client_last_name);
+            $sheet->setCellValue('E'.strval($count), $item->final_service_type);
+            $sheet->setCellValue('F'.strval($count), $item->reference);
+            $sheet->setCellValue('G'.strval($count), $item->passengers);
+            $sheet->setCellValue('H'.strval($count), $operation_from);
+            $sheet->setCellValue('I'.strval($count), $operation_to);
+            $sheet->setCellValue('J'.strval($count), $item->site_name);
+            $sheet->setCellValue('K'.strval($count), ( isset($vehicle_d->name) ? $vehicle_d->name : 'Selecciona vehículo' ));
+            $sheet->setCellValue('L'.strval($count), ( isset($driver_d->names) ? $driver_d->names.' '.$driver_d->surnames : 'Selecciona conductor' ));
+            $sheet->setCellValue('M'.strval($count), $status_operation);
+            $sheet->setCellValue('N'.strval($count), ( $time_operation != NULL )  ? date("H:i", strtotime($time_operation)) : $time_operation);
+            $sheet->setCellValue('O'.strval($count), $cost_operation);
+            $sheet->setCellValue('P'.strval($count), $status_booking);
+            $sheet->setCellValue('Q'.strval($count), $item->service_name);
+            $sheet->setCellValue('R'.strval($count), $item->status);
+            $sheet->setCellValue('S'.strval($count), number_format($payment,2));
+            $sheet->setCellValue('T'.strval($count), $item->currency);
+            $count = $count + 1;
+        }
+
+        // Crear un escritor de archivos Excel
+        $writer = new Xlsx($spreadsheet);
+
+        // Crear una respuesta HTTP para la descarga del archivo
+        $fileName = 'operation_board_'.$request->date.'.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+        $writer->save($temp_file);
+
+        return ResponseFile::download($temp_file, $fileName)->deleteFileAfterSend(true);        
+    }
+
+    public function exportExcelBoardCommision(Request $request){
+        $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
+        $search['init'] = $date." 00:00:00";
+        $search['end'] = $date." 23:59:59";
+
+        $items = $this->querySpam($search);
+
+        // Crear una nueva hoja de cálculo
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Rellenar con datos
+        $sheet->setCellValue('A1', '#');
+        $sheet->setCellValue('B1', 'Hora');
+        $sheet->setCellValue('C1', 'Cliente');
+        $sheet->setCellValue('D1', 'Tipo de servicios');
+        $sheet->setCellValue('E1', 'Folio');
+        $sheet->setCellValue('F1', 'Pax');
+        $sheet->setCellValue('G1', 'Origen');
+        $sheet->setCellValue('H1', 'Destino');
+        $sheet->setCellValue('I1', 'Agencia');
+        $sheet->setCellValue('J1', 'Unidad');
+        $sheet->setCellValue('K1', 'Conductor');
+        $sheet->setCellValue('L1', 'Hora de operación');
+        $sheet->setCellValue('M1', 'Costo operativo');
+        $sheet->setCellValue('N1', 'Total');
+        $sheet->setCellValue('O1', 'Comisión');
+
+        $count = 2;
+
+        foreach( $items as $key => $item ){
+            $payment = ( $item->total_sales - $item->total_payments );
+            if($payment < 0) $payment = 0;
+
+            $preassignment = ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_preassignment : $item->op_two_preassignment );
+
+            $status_operation = ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_status_operation : $item->op_two_status_operation );
+            $time_operation =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_time_operation : $item->op_two_time_operation );
+            $cost_operation =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_operating_cost : $item->op_two_operating_cost );
+            $status_booking =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_status : $item->op_two_status );            
+
+            $operation_pickup = (($item->operation_type == 'arrival')? $item->op_one_pickup : $item->op_two_pickup );
+            $operation_from = (($item->operation_type == 'arrival')? $item->from_name.((!empty($item->flight_number))? ' ('.$item->flight_number.')' :'')  : $item->to_name );
+            $operation_to = (($item->operation_type == 'arrival')? $item->to_name : $item->from_name );
+            $vehicle_d = ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? Vehicle::find($item->vehicle_id_one) : Vehicle::find($item->vehicle_id_two) );
+            $driver_d =  ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? Driver::find($item->driver_id_one) : Driver::find($item->driver_id_two) );
+            $porcentaje = ( $item->site_id == 21 ? 0.04 : 0.05 );
+            $commission = ( $item->site_id == 21 ? ( $payment * $porcentaje ) : ( $cost_operation * $porcentaje ) );
+
+
+            $sheet->setCellValue('A'.strval($count), ( $preassignment != "" ? $preassignment : "ADD" ));
+            $sheet->setCellValue('B'.strval($count), date("H:i", strtotime($operation_pickup)));
+            $sheet->setCellValue('C'.strval($count), $item->client_first_name.' '.$item->client_last_name);
+            $sheet->setCellValue('D'.strval($count), $item->final_service_type);
+            $sheet->setCellValue('E'.strval($count), $item->reference);
+            $sheet->setCellValue('F'.strval($count), $item->passengers);
+            $sheet->setCellValue('G'.strval($count), $operation_from);
+            $sheet->setCellValue('H'.strval($count), $operation_to);
+            $sheet->setCellValue('I'.strval($count), $item->site_name);
+            $sheet->setCellValue('J'.strval($count), ( isset($vehicle_d->name) ? $vehicle_d->name : 'Selecciona vehículo' ));
+            $sheet->setCellValue('K'.strval($count), ( isset($driver_d->names) ? $driver_d->names.' '.$driver_d->surnames : 'Selecciona conductor' ));
+            $sheet->setCellValue('L'.strval($count), ( $time_operation != NULL )  ? date("H:i", strtotime($time_operation)) : $time_operation);
+            $sheet->setCellValue('M'.strval($count), number_format($cost_operation,2));
+            $sheet->setCellValue('N'.strval($count), number_format($payment,2));
+            $sheet->setCellValue('O'.strval($count), $commission);
+            $count = $count + 1;
+        }
+
+        // Crear un escritor de archivos Excel
+        $writer = new Xlsx($spreadsheet);
+
+        // Crear una respuesta HTTP para la descarga del archivo
+        $fileName = 'operation_board_comission_'.$request->date.'.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+        $writer->save($temp_file);
+
+        return ResponseFile::download($temp_file, $fileName)->deleteFileAfterSend(true);        
+    }    
 }

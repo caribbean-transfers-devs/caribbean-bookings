@@ -6,6 +6,7 @@ use App\Models\Reservation;
 use App\Models\ReservationFollowUp;
 use App\Models\ReservationsItem;
 use App\Models\ReservationsService;
+use App\Models\Payment;
 use App\Models\ContactPoints;
 use Exception;
 use Illuminate\Http\Response;
@@ -213,6 +214,8 @@ class ReservationsRepository
     public function update($request,$reservation){
         try{
             DB::beginTransaction();
+            $payments = Payment::where('reservation_id', $reservation->id)->get();
+
             $reservation->client_first_name = $request->client_first_name;
             $reservation->client_last_name = $request->client_last_name;
             $reservation->client_email = $request->client_email;
@@ -220,6 +223,9 @@ class ReservationsRepository
             $reservation->site_id = $request->site_id;
             $reservation->reference = $request->reference;
             $reservation->currency = $request->currency;
+            if ( ($request->site_id == 11 || $request->site_id == 21) && $request->vendor_id == NULL && $request->terminal == NULL && count($payments) == 0 ) {
+                $reservation->is_complete = 0;
+            }
             $reservation->save();
             $check = $this->create_followUps($reservation->id, 'Se editaron datos de la reserva por '.auth()->user()->name, 'HISTORY', 'EDICIÓN');
             DB::commit();

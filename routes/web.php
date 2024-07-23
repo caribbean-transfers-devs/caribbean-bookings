@@ -96,7 +96,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/operation/spam/exportExcel', [OperationController::class, 'exportExcel'])->name('operation.spam.exportExcel');
     Route::put('/operation/spam/update-status', [OperationController::class, 'spamUpdate'])->name('operation.spam.update');
     Route::get('/operation/board', [Operations::class, 'index'])->name('operation.index');
-    Route::post('/operation/board', [Operations::class, 'index'])->name('operation.index.search');
+    Route::post('/operation/board', [Operations::class, 'index'])->name('operation.index.search');    
 
     Route::put('/operation/vehicle/set', [Operations::class, 'setVehicle'])->name('operation.set.vehicle');
     Route::put('/operation/driver/set', [Operations::class, 'setDriver'])->name('operation.set.driver');    
@@ -105,9 +105,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/operation/comment/add', [Operations::class, 'addComment'])->name('operation.comment.add');
     Route::get('/operation/comment/get', [Operations::class, 'getComment'])->name('operation.comment.get');
     Route::get('/operation/history/get', [Operations::class, 'getHistory'])->name('operation.history.get');
+    Route::get('/operation/data/customer/get', [Operations::class, 'getDataCustomer'])->name('operation.data.customer.get');
     Route::post('/operation/preassignments', [Operations::class, 'preassignments'])->name('operation.preassignments');
     Route::put('/operation/preassignment', [Operations::class, 'preassignment'])->name('operation.preassignment');
     Route::post('/operation/capture/service', [Operations::class, 'createService'])->name('operation.capture.service');
+    Route::get('/operation/board/exportExcel', [Operations::class, 'exportExcelBoard'])->name('operation.board.exportExcel');
+    Route::get('/operation/board/exportExcelCommission', [Operations::class, 'exportExcelBoardCommision'])->name('operation.board.exportExcelComission');
 
     Route::post('/update-data', [DataController::class, 'updateData']);
 

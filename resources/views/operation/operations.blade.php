@@ -40,18 +40,30 @@
                         <form action="" class="row" method="POST" id="formSearch">
                             @csrf
                             <input type="hidden" id="lookup_date_next" value="{{ $nexDate }}" required>
+
+                            <div class="col-12 col-sm-12 mb-3">
+                                <div class="row">
+                                    <div class="col-12 col-sm-2 align-self-end">
+                                        <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_addservice">Agregar nuevo servicio</button>
+                                    </div>
+                                    <div class="col-12 col-sm-2 align-self-end">
+                                        <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_preassignment">Pre-asignación</button>
+                                    </div>
+                                    <div class="col-12 col-sm-2 align-self-end">
+                                        <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_dowload_operation">Descargar operación</button>
+                                    </div>
+                                    <div class="col-12 col-sm-2 align-self-end">
+                                        <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_dowload_operation_comission">Descargar comisiones de operación</button>
+                                    </div>                                    
+                                </div>
+                            </div>
+
                             <div class="col-12 col-sm-4 mb-3 mb-lg-0">
                                 <label class="form-label" for="lookup_date">Fecha de creación</label>
                                 <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
                             </div>
                             <div class="col-12 col-sm-2 align-self-end">
                                 <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
-                            </div>
-                            <div class="col-12 col-sm-2 align-self-end">
-                                <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_addservice">Agregar nuevo servicio</button>
-                            </div>
-                            <div class="col-12 col-sm-2 align-self-end">
-                                <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_preassignment">Pre-asignación</button>
                             </div>
                         </form>
                     </div>
@@ -180,6 +192,9 @@
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                                 </div>
                                             @endif
+                                            <div class="btn btn-primary btn_operations __open_modal_customer bs-tooltip" title="Ver datos del cliente" data-code="{{ $value->reservation_id }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            </div>                                            
                                         </div>
                                         <div class="comment_new" id="comment_new_{{ $key.$value->id }}">
                                             @if ( $flag_comment )
@@ -200,7 +215,7 @@
                                 <td style="{{ ( $cut_off_zone >= 3 ? 'background-color:#e2a03f;color:#fff;' : ( $cut_off_zone >= 2 && $cut_off_zone < 3 ? 'background-color:#805dca;color:#fff;' : '' ) ) }}">{{ $operation_from }}</td>
                                 <td>{{ $operation_to }}</td>
                                 <td>{{ $value->site_name }}</td>
-                                <td>
+                                <td data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}">
                                     <select class="form-control vehicles selectpicker" data-live-search="true" id="vehicle_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
                                         <option value="0">Selecciona un vehículo</option>
                                         @if ( isset($vehicles) && count($vehicles) >= 1 )
@@ -210,7 +225,7 @@
                                         @endif
                                     </select>
                                 </td>
-                                <td>
+                                <td data-order="{{ ( $driver_d != NULL ) ? $driver_d : 0 }}">
                                     <select class="form-control drivers selectpicker" data-live-search="true" id="driver_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
                                         <option value="0">Selecciona un conductor</option>
                                         @if ( isset($drivers) && count($drivers) >= 1 )
@@ -284,5 +299,6 @@
     <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :services="$services" />
     <x-modals.reservations.comments />
     <x-modals.reservations.operation_messages_history />
+    <x-modals.reservations.operation_data_customer />
     <x-modals.reservations.operation_data_whatsapp />    
 @endsection

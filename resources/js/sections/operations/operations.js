@@ -306,6 +306,7 @@ const __add_preassignments = document.querySelectorAll('.add_preassignment'); //
 const __vehicles = document.querySelectorAll('.vehicles'); //* ===== SELECT VEHICLES ===== */
 const __drivers = document.querySelectorAll('.drivers'); //* ===== SELECT DRIVERS ===== */
 const __open_modal_historys = document.querySelectorAll('.__open_modal_history');
+const __open_modal_customers = document.querySelectorAll('.__open_modal_customer');
 const __open_modal_comments = document.querySelectorAll('.__open_modal_comment');
 const __title_modal = document.getElementById('filterModalLabel');
 const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
@@ -316,13 +317,14 @@ const __btn_update_status_bookings = document.querySelectorAll('.btn_update_stat
 
 const __copy_whatsapp = document.querySelector('.copy_whatsapp');
 const __copy_history = document.querySelector('.copy_history');
+const __copy_data_customer = document.querySelector('.copy_data_customer');
 
 //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
 const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhost:4000': 'https://socket-caribbean-transfers.up.railway.app' );
 console.log(socket);
 socket.on('connection');
 
-// setup.bsPopover();
+setup.bsPopover();
 setup.bsTooltip();
 
 //FUNCIONALIDAD DEL AUTOCOMPLET
@@ -817,6 +819,33 @@ if( __open_modal_historys.length > 0 ){
     });
 }
 
+if( __open_modal_customers.length > 0 ){
+    __open_modal_customers.forEach(__open_modal_customer => {
+        __open_modal_customer.addEventListener('click', function(){
+  
+            //DECLARACION DE VARIABLES
+            const __modal = document.getElementById('customerDataModal');
+  
+            $.ajax({
+                url: `/operation/data/customer/get`,
+                type: 'GET',
+                data: { code: this.dataset.code },
+                success: function(resp) {
+                    if ( resp.success ) {
+                        let message =  '<p class="m-0">Nombre: ' + resp.data.client_first_name + ' ' + resp.data.client_last_name + '</p> \n ' +
+                        '<p class="m-0">Correo: ' + resp.data.client_email + '</p> \n ' +
+                        '<p class="m-0">Teléfono: ' + resp.data.client_phone + '</p> \n ';
+
+                        const content = document.getElementById('wrapper_data_customer');
+                        content.innerHTML = message;
+                        $(__modal).modal('show');
+                    }                                        
+                }
+            });
+        });
+    });
+}
+
 //ACCION PARA ABRIR MODAL PARA AÑADIR UN COMENTARIO
 if( __open_modal_comments.length > 0 ){
   __open_modal_comments.forEach(__open_modal_comment => {
@@ -927,6 +956,25 @@ if ( __copy_history != null ) {
     });    
 }
 
+if ( __copy_data_customer != null ) {
+    __copy_data_customer.addEventListener('click', function(){
+        // Obtiene el div por su ID
+        var div = document.getElementById('wrapper_data_customer');
+        // console.log(div);
+        // Obtiene el contenido del div y elimina los espacios
+        // var contenido = div.textContent.replace(/\s+/g, '');
+        var contenido = div.textContent;
+        // Usa la API del portapapeles para copiar el contenido
+        navigator.clipboard.writeText(contenido).then(function() {
+            // Notifica al usuario que el contenido se ha copiado
+            // alert('Contenido copiado: ' + contenido);
+        }, function(err) {
+            // Notifica al usuario en caso de error
+            console.error('No se pudo copiar el contenido: ', err);
+        });
+    });    
+}
+
 //FUNCIONALIDAD QUE RECARGA LA PAGINA, CUANDO ESTA DETACTA INACTIVIDAD POR 5 MINUTOS
 var inactivityTime = (5 * 60000); // 30 segundos en milisegundos
 var timeoutId;
@@ -956,6 +1004,69 @@ window.addEventListener('scroll', function() {
     thead.classList.remove('fixed-header');
   }
 });
+
+//BOTONES 
+if( document.getElementById('btn_dowload_operation') != null ){
+    document.getElementById('btn_dowload_operation').addEventListener('click', function() {
+        let date = document.getElementById('lookup_date').value;
+        let url = '/operation/board/exportExcel?date=' + date ;
+        components.loadScreen();
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            },
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            components.removeLoadScreen();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'spam_'+ date +'.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            components.removeLoadScreen();
+            console.error('Error:', error);
+        });
+    });
+}
+
+if( document.getElementById('btn_dowload_operation_comission') != null ){
+    document.getElementById('btn_dowload_operation_comission').addEventListener('click', function() {
+        let date = document.getElementById('lookup_date').value;
+        let url = '/operation/board/exportExcelCommission?date=' + date ;
+        components.loadScreen();
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            },
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            components.removeLoadScreen();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'spam_'+ date +'.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            components.removeLoadScreen();
+            console.error('Error:', error);
+        });
+    });
+}
 
 //EVENTOS SOCKET IO, ESCUCHAN DE LADO DEL CLIENTE
 socket.on("addPreassignmentClient", function(data){
