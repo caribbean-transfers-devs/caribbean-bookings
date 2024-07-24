@@ -44,16 +44,16 @@
                             <div class="col-12 col-sm-12 mb-3">
                                 <div class="row">
                                     <div class="col-12 col-sm-2 align-self-end">
-                                        <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_addservice">Agregar nuevo servicio</button>
+                                        <button type="button" class="btn btn-primary btn-lg w-100" id="btn_addservice">Agregar nuevo servicio</button>
                                     </div>
                                     <div class="col-12 col-sm-2 align-self-end">
-                                        <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_preassignment">Pre-asignación</button>
+                                        <button type="button" class="btn btn-primary btn-lg w-100" id="btn_preassignment">Pre-asignación</button>
                                     </div>
                                     <div class="col-12 col-sm-2 align-self-end">
-                                        <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_dowload_operation">Descargar operación</button>
+                                        <button type="button" class="btn btn-primary btn-lg w-100" id="btn_dowload_operation">Descargar operación</button>
                                     </div>
                                     <div class="col-12 col-sm-2 align-self-end">
-                                        <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btn_dowload_operation_comission">Descargar comisiones de operación</button>
+                                        <button type="button" class="btn btn-primary btn-lg w-100" id="btn_dowload_operation_comission">Descargar comisiones de operación</button>
                                     </div>                                    
                                 </div>
                             </div>
@@ -145,6 +145,8 @@
 
                                 $vehicle_d = ( ($value->final_service_type == 'ARRIVAL') || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->vehicle_id_one : $value->vehicle_id_two );
                                 $driver_d =  ( ($value->final_service_type == 'ARRIVAL') || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->driver_id_one : $value->driver_id_two );
+                                // $close_operation = ( ($value->final_service_type == 'ARRIVAL') || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_operation_close : $value->op_two_operation_close );
+                                $close_operation = 0;
 
                                 switch ($status_operation) {
                                     case 'E':
@@ -179,26 +181,29 @@
                             <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" style="{{ $background_color }}">
                                 <td>
                                     @if ( $flag_preassignment )
-                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase">{{ $preassignment }}</button>
+                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase {{ $close_operation == 1 ? 'disabled' : '' }}">{{ $preassignment }}</button>
                                     @else
-                                        <button type="button" class="btn btn-danger text-uppercase add_preassignment btn_operations" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
+                                        <button type="button" class="btn btn-danger text-uppercase add_preassignment btn_operations {{ $close_operation == 1 ? 'disabled' : '' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="d-flex w-100">
-                                        <div class="comment-default">
+                                    <div class="d-flex gap-2 w-100">
+                                        <div class="d-flex gap-2 comment-default">
                                             @if ( !empty($value->messages) )
-                                                <div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver historial de reservación" data-code="{{ $value->reservation_id }}">
+                                                <div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver historial de reservación" data-type="history" data-code="{{ $value->reservation_id }}">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                                 </div>
                                             @endif
                                             <div class="btn btn-primary btn_operations __open_modal_customer bs-tooltip" title="Ver datos del cliente" data-code="{{ $value->reservation_id }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                            </div>                                            
+                                            </div>
                                         </div>
                                         <div class="comment_new" id="comment_new_{{ $key.$value->id }}">
                                             @if ( $flag_comment )
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="{{ $comment }}"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                                <div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver mensaje de operaciones" data-type="comment" data-comment="{{ $comment }}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                                </div>
+                                                {{-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="{{ $comment }}"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> --}}
                                             @endif
                                         </div>
                                     </div>

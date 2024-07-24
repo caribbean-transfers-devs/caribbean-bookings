@@ -327,6 +327,40 @@ socket.on('connection');
 setup.bsPopover();
 setup.bsTooltip();
 
+function history(){
+    setup.bsTooltip();
+    if( __open_modal_historys.length > 0 ){
+        __open_modal_historys.forEach(__open_modal_history => {
+            __open_modal_history.addEventListener('click', function(){
+      
+                //DECLARACION DE VARIABLES
+                const __type = this.dataset.type;
+                const __comment = ( this.dataset.comment != undefined ? this.dataset.comment : '' );
+                const __modal = document.getElementById('historyModal');
+    
+                if (__type == "history") {
+                    $.ajax({
+                        url: `/operation/history/get`,
+                        type: 'GET',
+                        data: { code: this.dataset.code },
+                        success: function(resp) {
+                            if ( resp.success ) {
+                                const content = document.getElementById('wrapper_history');
+                                content.innerHTML = resp.message;
+                                $(__modal).modal('show');
+                            }
+                        }
+                    });
+                }else{
+                    const content = document.getElementById('wrapper_history');
+                    content.innerHTML = __comment;
+                    $(__modal).modal('show');
+                }
+            });
+        });
+    }    
+}
+
 //FUNCIONALIDAD DEL AUTOCOMPLET
 function affDelayAutocomplete(callback, ms) {
     var timer = 0;
@@ -795,29 +829,7 @@ if (__btn_update_status_bookings.length > 0) {
   });
 }
 
-if( __open_modal_historys.length > 0 ){
-    __open_modal_historys.forEach(__open_modal_history => {
-        __open_modal_history.addEventListener('click', function(){
-  
-            //DECLARACION DE VARIABLES
-            const __modal = document.getElementById('historyModal');
-  
-            $.ajax({
-                url: `/operation/history/get`,
-                type: 'GET',
-                data: { code: this.dataset.code },
-                success: function(resp) {
-                    if ( resp.success ) {
-                        const content = document.getElementById('wrapper_history');
-                        content.innerHTML = resp.message;
-                        $(__modal).modal('show');
-                    }                                        
-                }
-            });
-            // $(__modal).modal('show');
-        });
-    });
-}
+history();
 
 if( __open_modal_customers.length > 0 ){
     __open_modal_customers.forEach(__open_modal_customer => {
@@ -1201,9 +1213,11 @@ socket.on("addCommentClient", function(data){
         console.log(__indicators);
         // console.log(__btn_open_modal_comment);
         __btn_comment.dataset.status = data.status;
-        __comment_new.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'+ data.value +'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
+        __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver mensaje de operaciones" data-type="comment" data-comment="'+ data.value +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>'
+        // __comment_new.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'+ data.value +'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
     }
-    setup.bsPopover();
+    // setup.bsPopover();
+    history();
 
     Snackbar.show({
         text: data.message,

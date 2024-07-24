@@ -1,4 +1,4 @@
-@if(false)
+{{-- @if(false) --}}
 <!-- BEGIN LOADER -->
     <div id="load_screen" class="d-none"> <div class="loader"> <div class="loader-content">
         {{-- <div class="spinner-grow align-self-center"></div> --}}
@@ -7,4 +7,4 @@
         <p class="text-white mb-0" style="font-size: 16px;">Un momento por favor...</p>
     </div></div></div>
     <!--  END LOADER -->
-@endif
+{{-- @endif --}}
