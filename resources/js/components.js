@@ -306,14 +306,14 @@ let components = {
         // __div.setAttribute('id', 'load_screen');
         // __div.innerHTML = '<div class="loader"> <div class="loader-content"><img src="/assets/img/logos/brand_white.png" alt="loading" class="img-fluid" width="220"><img src="/assets/img/loader.gif" alt="loading"><p class="text-white mb-0" style="font-size: 16px;">' + this.getTranslation('loading.message') + '</p></div></div>';
         // __body.insertBefore(__div, __body.firstChild);
-        __load_screen.classList.remove('d-none');
+        //__load_screen.classList.remove('d-none');
     },
 
     removeLoadScreen(){
         // let __load_screen = document.getElementById("load_screen");
         if( __load_screen != null ){
             // document.body.removeChild(load_screen);
-            __load_screen.classList.add('d-none');
+            //__load_screen.classList.add('d-none');
         }
     }    
 }
