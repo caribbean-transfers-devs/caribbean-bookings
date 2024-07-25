@@ -44,10 +44,6 @@ class OperationsController extends Controller
 
         $items = $this->querySpam($search);
 
-        foreach($items as $key => $item):
-                $item->messages = $this->validateMessages($item->reservation_id);
-        endforeach;        
-
         $breadcrumbs = array(
             array(
                 "route" => "",
@@ -63,148 +59,6 @@ class OperationsController extends Controller
         $websites = DB::select("SELECT id, name as site_name FROM sites ORDER BY site_name ASC");
 
         return view('operation.operations', compact('items', 'date', 'nexDate', 'breadcrumbs', 'vehicles', 'drivers', 'zones', 'services', 'websites'));
-    }
-
-    public function dataOperations(Request $request){
-        //DECLARACIÓN DE VARIABLES
-        $data["data"] = array();        
-        $date = ( isset( $request->data->date ) ? $request->data->date : date("Y-m-d") );
-        $search['init'] = $date." 00:00:00";
-        $search['end'] = $date." 23:59:59";
-
-        $items = $this->querySpam($search);
-
-        //CONSULTAMOS LOS VEHICULOS Y VENDEDORES
-        $vehicles = Vehicle::All();
-        $drivers = Driver::All()->orderBy('id', 'ASC');
-
-        if( sizeof($items)>=1 ):
-            foreach($items as $key => $value):
-                $payment = ( $value->total_sales - $value->total_payments );
-                if($payment < 0) $payment = 0;
-
-                $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status_operation : $value->op_two_status_operation );
-                $operation_booking = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
-                $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
-                $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
-                $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
-
-                $flag_comment = ( ($value->operation_type == 'arrival') && $value->op_one_comments != "" ? true : ( ($value->operation_type == 'departure') && $value->op_two_comments != "" ? true : false ) );
-                $comment = (($value->operation_type == 'arrival')? $value->op_one_comments : $value->op_two_comments );
-
-                switch ($operation_status) {
-                    case 'PENDING':
-                        $label = 'secondary';
-                        break;
-                    case 'E':
-                        $label = 'info';
-                        break;
-                    case 'C':
-                        $label = 'warning';
-                        break;
-                    case 'OK':
-                        $label = 'success';
-                        break;
-                    default:
-                        $label = 'secondary';
-                        break;
-                }
-
-                switch ($operation_booking) {
-                    case 'PENDING':
-                        $label2 = 'secondary';
-                        break;
-                    case 'COMPLETED':
-                        $label2 = 'success';
-                        break;
-                    case 'NOSHOW':
-                        $label2 = 'warning';
-                        break;
-                    case 'CANCELLED':
-                        $label2 = 'danger';
-                        break;
-                    default:
-                        $label2 = 'secondary';
-                        break;
-                }
-
-                $vehicle_items = "";
-                if ( isset($vehicles) && count($vehicles) >= 1 ):
-                    foreach ($vehicles as $vehicle):
-                        $vehicle_items = '<option '.( isset($value->vehicle_id) && $value->vehicle_id == $vehicle->id ? 'selected' : '' ).' value="'.$vehicle->id.'">'.$vehicle->name.'</option>';
-                    endforeach;
-                endif;
-
-                $driver_items = "";
-                if ( isset($drivers) && count($drivers) >= 1 ):
-                    foreach ($drivers as $driver):
-                        $driver_items = '<option '.( isset($value->driver_id) && $value->driver_id == $driver->id ? 'selected' : '' ).' value="'.$driver->id.'">'.$driver->names.' '.$driver->surnames.'</option>';
-                    endforeach;
-                endif;
-
-                $data["data"][] = array(
-                    '',
-                    ( $flag_comment ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'.$comment.'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' : '' ),
-                    date("H:i", strtotime($operation_pickup)),
-                    $value->client_first_name.' '.$value->client_last_name . ( !empty($value->reference) ? '['.$value->reference.']' : '' ),
-                    $value->final_service_type,
-                    $value->passengers,
-                    $operation_from,
-                    $operation_to,
-                    $value->site_name,
-                    '
-                        <select class="form-control vehicles " data-live-search="true" name="vehicle_id" id="vehicle_id" data-code="'.$value->id.'">
-                            <option value="0">Selecciona un vehículo</option>
-                            '.$vehicle_items.'
-                        </select>
-                    ',
-                    '
-                        <select class="form-control drivers " data-live-search="true" name="driver_id" id="driver_id" data-code="'.$value->id.'">
-                            <option value="0">Selecciona un conductor</option>
-                            '.$driver_items.'
-                        </select>
-                    ',
-                    '
-                        <div class="btn-group" role="group">
-                            <button id="optionsOperation" type="button" class="btn btn-'.$label.' dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                '.$operation_status.'
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="optionsOperation">
-                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '.$value->operation_type.', "PENDING", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '.$value->operation_type.', "E", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
-                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '.$value->operation_type.', "C", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
-                                <div class="dropdown-divider"></div>
-                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatusOperation(event, '.$value->operation_type.', "OK", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
-                            </div>
-                        </div>                    
-                    ',
-                    '
-                        <div class="btn-group" role="group">
-                            <button id="optionsBooking" type="button" class="btn btn-'.$label2.' dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                '.$operation_booking.'
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="optionsBooking">
-                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '.$value->operation_type.', "PENDING", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '.$value->operation_type.', "COMPLETED", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
-                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '.$value->operation_type.', "NOSHOW", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
-                                <div class="dropdown-divider"></div>
-                                <a href="javascript:void(0);" class="dropdown-item" onclick="setStatus(event, '.$value->operation_type.', "CANCELLED", '.$value->id.', '.$value->reservation_id.')"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>                                                                
-                            </div>
-                        </div>                    
-                    ',
-                    ( RoleTrait::hasPermission(38) ? '<a href="/reservations/detail/'.$value->reservation_id.'">'.$value->code.'</a>' : $value->code ),
-                    $value->service_name,
-                    $value->status,
-                    number_format($payment,2),
-                    $value->currency,
-                    ( !$flag_comment ? '<div class="btn btn-primary __open_modal_comment" data-bs-toggle="modal" data-bs-target="#messageModal" data-code="'.$value->id.'" data-type="'.$value->operation_type.'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>' : '' ),
-                );
-            endforeach;
-        endif;
-
-        return response()->json($data, 200);
     }
 
     public function preassignments(Request $request){
@@ -279,6 +133,56 @@ class OperationsController extends Controller
         }
     }
 
+    public function closeOperation(Request $request){
+        try {
+            //DECLARAMOS VARIABLES
+            $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
+            $search['init'] = $date." 00:00:00";
+            $search['end'] = $date." 23:59:59";
+    
+            //CONSULTAMOS SERVICIOS
+            $items = $this->querySpam($search);
+    
+            //RECORREMOS LOS SERVICIOS PARA PODER REALISAR LA PREASIGNACION
+            if( sizeof($items)>=1 ):
+                foreach($items as $key => $item):
+                    $service = ReservationsItem::find($item->id);
+                    if( $item->final_service_type == 'ARRIVAL' ){
+                        $service->op_one_operation_close = 1;
+                    }
+
+                    if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
+                        $service->op_one_operation_close = 1;
+                    }
+                    if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
+                        $service->op_two_operation_close = 1;
+                    }
+
+                    if( $item->final_service_type == 'DEPARTURE' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
+                        $service->op_one_operation_close = 1;
+                    }
+                    if( $item->final_service_type == 'DEPARTURE' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
+                        $service->op_two_operation_close = 1;
+                    }
+                    $service->save();
+                endforeach;
+            endif;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Se cerro la operación correctamente',
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }    
+
     public function querySpam($search){
         return  DB::select("SELECT 
                                     rez.id as reservation_id, 
@@ -289,25 +193,47 @@ class OperationsController extends Controller
                                     'arrival' as operation_type,
                                     sit.name as site_name,
                                     'TYPE_ONE' as op_type,
-                                    '' as messages,
-                                               COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
-                                               CASE
-                                                   WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
-                                                   ELSE 'CONFIRMADO'
-                                               END AS status,
-                                               zone_one.id as zone_one_id, zone_one.name as zone_one_name, zone_one.is_primary as zone_one_is_primary, zone_one.cut_off as zone_one_cut_off,
-                                               zone_two.id as zone_two_id, zone_two.name as zone_two_name, zone_two.is_primary as zone_two_is_primary, zone_two.cut_off as zone_two_cut_off,
-                                               CASE 
-                                                   WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
-                                                   WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 1 THEN 'DEPARTURE'
-                                                   WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
-                                               END AS final_service_type
+                                    CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+                                    -- CASE 
+                                    --     WHEN rfu.reservation_id IS NOT NULL AND (rfu.type = 'CLIENT' OR rfu.type = 'OPERATION') 
+                                    --     THEN 1 
+                                    --     ELSE 0 
+                                    -- END as messages,
+                                    COALESCE(SUM(s.total_sales), 0) as total_sales, 
+                                    COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                    CASE
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
+                                        ELSE 'CONFIRMADO'
+                                    END AS status,
+                                    zone_one.id as zone_one_id, 
+                                    zone_one.name as zone_one_name, 
+                                    zone_one.is_primary as zone_one_is_primary, 
+                                    zone_one.cut_off as zone_one_cut_off,
+                                    zone_two.id as zone_two_id, 
+                                    zone_two.name as zone_two_name, 
+                                    zone_two.is_primary as zone_two_is_primary, 
+                                    zone_two.cut_off as zone_two_cut_off,
+                                    CASE 
+                                        WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
+                                        WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 1 THEN 'DEPARTURE'
+                                        WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                    END AS final_service_type,
+                                    vehicle_one.name as vehicle_one_name,
+                                    vehicle_two.name as vehicle_two_name,
+                                    CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
+                                    CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name
                                    FROM reservations_items as it
-                                   INNER JOIN reservations as rez ON rez.id = it.reservation_id
+                                   INNER JOIN reservations as rez ON rez.id = it.reservation_id                                   
                                    INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
                                    INNER JOIN sites as sit ON sit.id = rez.site_id
                                    INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                    INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
+                                   LEFT OUTER JOIN vehicles as vehicle_one ON vehicle_one.id = it.vehicle_id_one
+                                   LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
+                                   LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
+                                   LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+                                   LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id
+                                --    LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND (rfu.type = 'CLIENT' OR rfu.type = 'OPERATION')
                                    LEFT JOIN (
                                        SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                        FROM sales
@@ -337,24 +263,39 @@ class OperationsController extends Controller
                                    'departure' as operation_type, 
                                    sit.name as site_name, 
                                    'TYPE_TWO' as op_type, 
-                                   '' as messages,
-                                               COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
-                                               CASE
-                                                       WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
-                                                       ELSE 'CONFIRMADO'
-                                               END AS status,
-                                               zone_one.id as zone_one_id, zone_one.name as zone_one_name, zone_one.is_primary as zone_one_is_primary, zone_one.cut_off as zone_one_cut_off,
-                                               zone_two.id as zone_two_id, zone_two.name as zone_two_name, zone_two.is_primary as zone_two_is_primary, zone_two.cut_off as zone_two_cut_off,
-                                               CASE
-                                                   WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
-                                                   WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
-                                               END AS final_service_type
+                                    CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+                                    -- CASE 
+                                    --     WHEN rfu.reservation_id IS NOT NULL AND (rfu.type = 'CLIENT' OR rfu.type = 'OPERATION') 
+                                    --     THEN 1 
+                                    --     ELSE 0 
+                                    -- END as messages,
+                                    COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                    CASE
+                                            WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
+                                            ELSE 'CONFIRMADO'
+                                    END AS status,
+                                    zone_one.id as zone_one_id, zone_one.name as zone_one_name, zone_one.is_primary as zone_one_is_primary, zone_one.cut_off as zone_one_cut_off,
+                                    zone_two.id as zone_two_id, zone_two.name as zone_two_name, zone_two.is_primary as zone_two_is_primary, zone_two.cut_off as zone_two_cut_off,
+                                    CASE
+                                        WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
+                                        WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                    END AS final_service_type,
+                                    vehicle_one.name as vehicle_one_name,
+                                    vehicle_two.name as vehicle_two_name,
+                                    CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
+                                    CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name
                                    FROM reservations_items as it
-                                   INNER JOIN reservations as rez ON rez.id = it.reservation_id
+                                   INNER JOIN reservations as rez ON rez.id = it.reservation_id                                   
                                    INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
                                    INNER JOIN sites as sit ON sit.id = rez.site_id
                                    INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                    INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
+                                   LEFT OUTER JOIN vehicles as vehicle_one ON vehicle_one.id = it.vehicle_id_one
+                                   LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
+                                   LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
+                                   LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+                                   LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id
+                                    -- LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND (rfu.type = 'CLIENT' OR rfu.type = 'OPERATION')
                                    LEFT JOIN (
                                            SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales                                            
                                            FROM sales
@@ -541,6 +482,7 @@ class OperationsController extends Controller
                 'data' => array(
                     "item"  => $request->id,
                     "value"  => $request->vehicle_id,
+                    "name" => $vehicle_new->name,
                     "cost"  => $request->operating_cost,
                     "message" => "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " y costo de operación ".$request->operating_cost." al servicio: ".$service->id.", por ".auth()->user()->name
                 )
@@ -603,7 +545,8 @@ class OperationsController extends Controller
                 'message' => 'Se asigno correctamente el conductor',
                 'data' => array(
                     "item"  => $request->id,
-                    "value"  => $request->driver_id,                    
+                    "value"  => $request->driver_id,
+                    "name" => $driver_new->names." ".$driver_new->surnames,
                     "message" => "Se asigno al conductor (".( isset($driver_current->names) ? $driver_current->names." ".$driver_current->surnames : "NULL" ).") por ".$driver_new->names." ".$driver_new->surnames. " al servicio: ".$service->id.", por ".auth()->user()->name
                 )
             ], 200);
@@ -1157,15 +1100,6 @@ class OperationsController extends Controller
         return ['lat' => $lat, 'lng' => $lng];
     }
 
-    public function validateMessages($id){
-        $messages = DB::select("SELECT fup.id, fup.text, fup.type FROM reservations_follow_up as fup
-                                 WHERE fup.type IN ('CLIENT','OPERATION') 
-                                    AND fup.reservation_id = :id 
-                                    AND fup.text IS NOT NULL 
-                                    AND fup.text != '' ", ["id" => $id]);
-        return count($messages);
-    }
-
     public function getMessages($id){
         $xHTML  = '';
 
@@ -1219,8 +1153,9 @@ class OperationsController extends Controller
         $count = 2;
 
         foreach( $items as $key => $item ){
-            $payment = ( $item->total_sales - $item->total_payments );
-            if($payment < 0) $payment = 0;
+            // $payment = ( $item->total_sales - $item->total_payments );
+            // if($payment < 0) $payment = 0;
+            $payment = $item->total_sales;
 
             $flag_preassignment = ( ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ) && $item->op_one_preassignment != "" ? true : ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && ( $item->is_round_trip == 1 ) && $item->op_two_preassignment != "" ? true : false ) );
             $preassignment = ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_preassignment : $item->op_two_preassignment );
@@ -1302,8 +1237,9 @@ class OperationsController extends Controller
         $count = 2;
 
         foreach( $items as $key => $item ){
-            $payment = ( $item->total_sales - $item->total_payments );
-            if($payment < 0) $payment = 0;
+            // $payment = ( $item->total_sales - $item->total_payments );
+            // if($payment < 0) $payment = 0;
+            $payment = $item->total_sales;
 
             $preassignment = ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_preassignment : $item->op_two_preassignment );
 

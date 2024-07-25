@@ -305,13 +305,15 @@ const submitBtn = document.getElementById('submitBtn'); //* ===== BUTTON CREATE 
 const __add_preassignments = document.querySelectorAll('.add_preassignment'); //* ===== BUTTONS PRE ASSIGNMENT ===== */
 const __vehicles = document.querySelectorAll('.vehicles'); //* ===== SELECT VEHICLES ===== */
 const __drivers = document.querySelectorAll('.drivers'); //* ===== SELECT DRIVERS ===== */
-const __open_modal_historys = document.querySelectorAll('.__open_modal_history');
+
 const __open_modal_customers = document.querySelectorAll('.__open_modal_customer');
 const __open_modal_comments = document.querySelectorAll('.__open_modal_comment');
 const __title_modal = document.getElementById('filterModalLabel');
 const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
 const __btn_preassignment = document.getElementById('btn_preassignment') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
 const __btn_addservice = document.getElementById('btn_addservice') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
+const __btn_close_operation = document.getElementById('btn_close_operation') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
+
 const __btn_update_status_operations = document.querySelectorAll('.btn_update_status_operation');
 const __btn_update_status_bookings = document.querySelectorAll('.btn_update_status_booking');
 
@@ -329,6 +331,8 @@ setup.bsTooltip();
 
 function history(){
     setup.bsTooltip();
+    const __open_modal_historys = document.querySelectorAll('.__open_modal_history');
+    // console.log(__open_modal_historys);
     if( __open_modal_historys.length > 0 ){
         __open_modal_historys.forEach(__open_modal_history => {
             __open_modal_history.addEventListener('click', function(){
@@ -605,6 +609,53 @@ if( __btn_preassignment != null ){
   });
 }
 
+if( __btn_close_operation != null ){
+    __btn_close_operation.addEventListener('click', function() {
+        swal.fire({
+            text: '¿Está seguro que desea cerrar la operación',
+            icon: 'warning',
+            inputLabel: "Selecciona la fecha de operación que desea cerrar",
+            input: "date",
+            inputValue: document.getElementById('lookup_date').value,
+            inputValidator: (result) => {
+                return !result && "Selecciona un fecha";
+            },
+            didOpen: () => {
+                const today = (new Date()).toISOString();
+                Swal.getInput().min = today.split("T")[0];
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if(result.isConfirmed == true){
+                $.ajax({
+                    type: "POST",
+                    url: _LOCAL_URL + "/operation/closeOperation",
+                    data: JSON.stringify({ date: result.value }), // Datos a enviar al servidor                            
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',   
+                    beforeSend: function(){
+                        components.loadScreen();
+                    },
+                    success: function(response) {
+                        // Manejar la respuesta exitosa del servidor
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                            willClose: () => {
+                                socket.emit("addPreassignmentServer", response.data);
+                            }                            
+                        });
+                    }
+                });
+            }
+        });               
+    });
+}
+
 if (__add_preassignments.length > 0) {
   __add_preassignments.forEach(__add_preassignment => {
       __add_preassignment.addEventListener('click', function(event) {
@@ -619,25 +670,26 @@ if (__add_preassignments.length > 0) {
               cancelButtonText: 'Cancelar'
           }).then((result) => {
               if(result.isConfirmed == true){
-                  $.ajax({
-                      url: _LOCAL_URL + "/operation/preassignment",
-                      type: 'PUT',
-                      data: { date : __date.value, id : id, reservation : reservation, reservation_item : item, operation : operation, service : service, type : type },
-                      beforeSend: function() {
-                          components.loadScreen();
-                      },
-                      success: function(response) {
-                          Swal.fire({
-                              icon: "success",
-                              text: response.message,
-                              showConfirmButton: false,
-                              timer: 1500,
-                              willClose: () => {
-                                  socket.emit("addPreassignmentServer", response.data);
-                              }
-                          });                            
-                      }
-                  });
+                $.ajax({
+                    url: _LOCAL_URL + "/operation/preassignment",
+                    type: 'PUT',
+                    data: { date : __date.value, id : id, reservation : reservation, reservation_item : item, operation : operation, service : service, type : type },
+                    beforeSend: function() {
+                        components.loadScreen();
+                    },
+                    success: function(response) {
+                        // Manejar la respuesta exitosa del servidor
+                        Swal.fire({
+                            icon: "success",
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                            willClose: () => {
+                                socket.emit("addPreassignmentServer", response.data);
+                            }
+                        });
+                    }
+                });
               }
           });
       });
@@ -1114,6 +1166,8 @@ socket.on("setVehicleReservationClient", function(data){
         const __CellVehicle = ( __Row != null ? __Row.querySelector('td:nth-child(10)') : null );
         const __CellCost = ( __Row != null ? __Row.querySelector('td:nth-child(14)') : null );
         console.log(__select_vehicle, __Row, __CellVehicle, __CellCost);
+        __CellVehicle.dataset.order = data.value;
+        __CellVehicle.dataset.name = data.name;
         __select_vehicle.value = data.value;
         $('#vehicle_id_' + data.item).selectpicker('val', data.value);
         __CellCost.innerHTML = data.cost;
@@ -1135,8 +1189,10 @@ socket.on("setDriverReservationClient", function(data){
     const __select_driver = document.getElementById('driver_id_' + data.item);
     if( __select_driver != null ){
         const __Row = ( __select_driver != null ? components.closest(__select_driver, 'tr') : null );
-        const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(11)') : "" );
-        console.log(__select_driver, __Row, __Cell);
+        const __CellDriver = ( __Row != null ? __Row.querySelector('td:nth-child(11)') : "" );
+        console.log(__select_driver, __Row, __CellDriver);
+        __CellDriver.dataset.order = data.value;
+        __CellDriver.dataset.name = data.name;
         __select_driver.value = data.value;
         $('#driver_id_' + data.item).selectpicker('val', data.value);
     }
@@ -1210,7 +1266,7 @@ socket.on("addCommentClient", function(data){
         const __comment_new = document.getElementById('comment_new_' + data.item);
         // console.log(__btn_comment);
         // console.log(__Row);
-        console.log(__indicators);
+        // console.log(__indicators);
         // console.log(__btn_open_modal_comment);
         __btn_comment.dataset.status = data.status;
         __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver mensaje de operaciones" data-type="comment" data-comment="'+ data.value +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>'
