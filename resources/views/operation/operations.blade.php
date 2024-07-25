@@ -116,9 +116,6 @@
                 <tbody>
                     @if(sizeof($items)>=1)
                         @foreach($items as $key => $value)
-                            {{-- @if ( $value->id == 25252 )
-                                @dump($value)
-                            @endif --}}
                             @php
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
                                     //SABER SI SON ARRIVAL, DEPARTURE O TRANSFER, MEDIANTE UN COLOR DE FONDO
@@ -126,8 +123,8 @@
                                     //SABER EL NIVEL DE CUT OFF
                                     $cut_off_zone = ( $value->final_service_type == 'ARRIVAL' || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->zone_one_cut_off : $value->zone_two_cut_off );
 
-                                $payment = ( $value->total_sales - $value->total_payments );
-                                if($payment < 0) $payment = 0;
+                                // $payment = ( $value->total_sales - $value->total_payments );
+                                // if($payment < 0) $payment = 0;
                                 // $payment = $value->total_sales;
 
                                 //PREASIGNACION
@@ -153,7 +150,6 @@
 
                                 $vehicle_name = ( ($value->final_service_type == 'ARRIVAL') || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? ( $value->vehicle_one_name != null ? $value->vehicle_one_name : 'Selecciona un vehículo' ) : ( $value->vehicle_two_name != null ? $value->vehicle_two_name : 'Selecciona un vehículo' ) );
                                 $driver_name =  ( ($value->final_service_type == 'ARRIVAL') || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? ( $value->driver_one_name != null ? $value->driver_one_name : 'Selecciona un conductor' ) : ( $value->driver_two_name != null ? $value->driver_two_name : 'Selecciona un conductor' ) );
-                                // $close_operation = 0;
 
                                 switch ($status_operation) {
                                     case 'E':
@@ -312,7 +308,7 @@
                                 </td>
                                 <td>{{ $value->service_name }}</td>
                                 <td class="text-center" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ $value->status }}</td>
-                                <td class="text-end" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($payment,2) }}</td>
+                                <td class="text-end" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($value->total_sales,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
