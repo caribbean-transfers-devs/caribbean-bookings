@@ -312,7 +312,7 @@
                                 </td>
                                 <td>{{ $value->service_name }}</td>
                                 <td class="text-center" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ $value->status }}</td>
-                                <td class="text-end" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format(,2) }}</td>
+                                <td class="text-end" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($payment,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
