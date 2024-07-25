@@ -126,9 +126,9 @@
                                     //SABER EL NIVEL DE CUT OFF
                                     $cut_off_zone = ( $value->final_service_type == 'ARRIVAL' || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->zone_one_cut_off : $value->zone_two_cut_off );
 
-                                // $payment = ( $value->total_sales - $value->total_payments );
-                                // if($payment < 0) $payment = 0;
-                                $payment = $value->total_sales;
+                                $payment = ( $value->total_sales - $value->total_payments );
+                                if($payment < 0) $payment = 0;
+                                // $payment = $value->total_sales;
 
                                 //PREASIGNACION
                                 $flag_preassignment = ( ( ( $value->final_service_type == 'ARRIVAL' ) || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ) && $value->op_one_preassignment != "" ? true : ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && ( $value->is_round_trip == 1 ) && $value->op_two_preassignment != "" ? true : false ) );
@@ -312,7 +312,7 @@
                                 </td>
                                 <td>{{ $value->service_name }}</td>
                                 <td class="text-center" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ $value->status }}</td>
-                                <td class="text-end" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($payment,2) }}</td>
+                                <td class="text-end" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format(,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
