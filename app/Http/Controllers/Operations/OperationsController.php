@@ -193,7 +193,7 @@ class OperationsController extends Controller
                                     'arrival' as operation_type,
                                     sit.name as site_name,
                                     'TYPE_ONE' as op_type,
-                                    CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+                                    -- CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
                                     -- CASE 
                                     --     WHEN rfu.reservation_id IS NOT NULL AND (rfu.type = 'CLIENT' OR rfu.type = 'OPERATION') 
                                     --     THEN 1 
@@ -232,7 +232,7 @@ class OperationsController extends Controller
                                    LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
                                    LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                    LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
-                                   LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id
+                                --    LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id
                                 --    LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND (rfu.type = 'CLIENT' OR rfu.type = 'OPERATION')
                                    LEFT JOIN (
                                        SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
@@ -263,7 +263,7 @@ class OperationsController extends Controller
                                    'departure' as operation_type, 
                                    sit.name as site_name, 
                                    'TYPE_TWO' as op_type, 
-                                    CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+                                    -- CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
                                     -- CASE 
                                     --     WHEN rfu.reservation_id IS NOT NULL AND (rfu.type = 'CLIENT' OR rfu.type = 'OPERATION') 
                                     --     THEN 1 
@@ -294,7 +294,7 @@ class OperationsController extends Controller
                                    LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
                                    LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                    LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
-                                   LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id
+                                --    LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id
                                     -- LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND (rfu.type = 'CLIENT' OR rfu.type = 'OPERATION')
                                    LEFT JOIN (
                                            SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales                                            
