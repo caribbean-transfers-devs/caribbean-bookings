@@ -21,7 +21,6 @@ if( __update != null ){
     __update.addEventListener('click', function (event) {
         event.preventDefault();
         const { title, id, name, email, phone, status } = this.dataset;
-        console.log( id, name, email, phone, status );
         __title_modal.innerHTML = title;
         document.getElementById('id').value = id.replace(/'/g, "");
         document.getElementById('name').value = name.replace(/'/g, "");

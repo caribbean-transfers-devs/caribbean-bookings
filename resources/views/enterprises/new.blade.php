@@ -32,10 +32,15 @@
                             @endif
 
                             @if (session('success'))
-                                <div class="alert alert-light-success alert-dismissible fade show border-0 mb-4" role="alert">a     
+                                <div class="alert alert-light-success alert-dismissible fade show border-0 mb-4" role="alert"> 
                                     {{ session('success') }}
                                 </div>
                             @endif
+                            @if (session('danger'))
+                                <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
+                                    {{ session('danger') }}
+                                </div>
+                            @endif                            
                             <form action="{{ isset($enterprise) ? route('enterprises.update', $enterprise->id) : route('enterprises.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @if ( isset($enterprise) )

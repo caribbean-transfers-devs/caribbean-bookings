@@ -24,7 +24,8 @@ class VehicleRequest extends FormRequest
         return [
             'enterprise_id' => 'required|integer|exists:enterprises,id',
             'destination_service_id' => 'required|integer|exists:destination_services,id',
-            'unit_code' => 'required|string',
+            'name' => 'required|string',
+            'unit_code' => 'required|integer',
             'plate_number' => 'required|string',
         ];
     }
@@ -34,8 +35,10 @@ class VehicleRequest extends FormRequest
         return [
             'enterprise_id.required' => 'Por favor, seleccione una empresa',
             'destination_service_id.required' => 'Por favor, selecciona un servicio',
+            'name.required' => 'Por favor, ingresa el nombre de la unidad',
+            'name.string' => 'El campo nombre de la unidad debe ser una cadena de texto',            
             'unit_code.required' => 'Por favor, ingresa el código de la unidad',
-            'unit_code.string' => 'El campo código de la unidad debe ser una cadena de texto',
+            'unit_code.integer' => 'El campo código de la unidad debe ser una un valor númerico',
             'plate_number.required' => 'Por favor, ingresa el número de placa',
             'plate_number.string' => 'El campo número de placa debe ser una cadena de texto',
         ];

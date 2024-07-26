@@ -51,7 +51,7 @@ let components = {
         _settings.deferRender = true;
         _settings.responsive = true;
         _settings.buttons =  _buttons;        
-        _settings.order = [[ 0, "DESC" ]];
+        // _settings.order = [[ 0, "DESC" ]];
         _settings.lengthMenu = [10, 20, 50];
         _settings.pageLength = 10;                
         _settings.oLanguage = {
@@ -75,6 +75,32 @@ let components = {
                 });
             });
         }
+    },
+
+    /**
+     * 
+     * @param {*} element 
+     * @param {*} selector 
+     * @returns 
+     */
+    closest: function(element, selector) {
+        // Verificar si el elemento actual cumple con el selector
+        if (element.matches(selector)) {
+            return element;
+        }
+
+        // Recorrer los ancestros del elemento actual
+        while (element !== document.body) {
+            element = element.parentNode;
+
+            // Verificar si el ancestro cumple con el selector
+            if (element && element.matches(selector)) {
+                return element;
+            }
+        }
+
+        // Si no se encuentra ningún ancestro que cumpla con el selector, devolver null
+        return null;
     },
 
     /**
@@ -232,7 +258,7 @@ let components = {
         value instanceof Date ||
         value instanceof Boolean ||
         value === null;
-    },    
+    },
 
     /**
      * global loading method

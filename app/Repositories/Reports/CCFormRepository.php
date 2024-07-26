@@ -25,10 +25,10 @@ class CCFormRepository
             ),
         );
 
-        return view('reports.ccform', compact('search','breadcrumbs'));
+        return view('operation.ccform', compact('search','breadcrumbs'));
     }
 
-    public function createPDF($request){     
+    public function createPDF($request){
         
 
         $search = [

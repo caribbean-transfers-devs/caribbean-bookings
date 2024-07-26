@@ -11,6 +11,8 @@ use App\Http\Requests\VehicleRequest;
 //REPOSITORY
 use App\Repositories\Vehicle\VehicleRepository;
 
+use App\Traits\RoleTrait;
+
 class VehicleController extends Controller
 {
     private $VehicleRepository;

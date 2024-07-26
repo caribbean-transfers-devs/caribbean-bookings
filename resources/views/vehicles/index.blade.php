@@ -43,6 +43,7 @@
                             <th>Empresa</th>
                             <th>Servicio</th>
                             <th>destino</th>
+                            <th>Nombre</th>
                             <th>Código de la unidad</th>
                             <th>Número de placa</th>
                             <th></th>
@@ -54,6 +55,7 @@
                                 <td>{{ $vehicle->enterprise->names }}</td>
                                 <td>{{ $vehicle->destination_service->name }}</td>
                                 <td>{{ $vehicle->destination->name }}</td>
+                                <td>{{ $vehicle->name }}</td>
                                 <td>{{ $vehicle->unit_code }}</td>
                                 <td>{{ $vehicle->plate_number }}</td>
                                 <td>

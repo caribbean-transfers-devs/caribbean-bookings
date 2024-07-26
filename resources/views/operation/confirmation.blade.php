@@ -14,8 +14,8 @@
 @section('title') Operación @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/confirmation.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/confirmation.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')

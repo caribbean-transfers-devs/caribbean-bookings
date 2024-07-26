@@ -43,6 +43,7 @@
 
 @section('content')
     @php
+        // dump($bookings);
         $buttons = array(
             array(  
                 'text' => 'Filtrar',
@@ -67,6 +68,7 @@
             ),
         );
         // dump($buttons);
+        // dump($bookings);
     @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
@@ -80,11 +82,12 @@
                             @endforeach
                         </ul>
                     </div>
-                @endif                
+                @endif
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
                             <th>Fecha</th>
+                            {{-- <th>Codigo</th> --}}                            
                             <th>Vendedor</th>
                             <th>Terminal</th>
                             <th>Folio</th>
@@ -104,7 +107,7 @@
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
-                                @php                                         
+                                @php
                                     if($item->is_cancelled == 0):
                                         if($item->pay_at_arrival == 1):
                                             $item->status = "CONFIRMED";
@@ -142,15 +145,15 @@
                                     endif;                                                
                                     $total_pending = $item->total_sales - $item->total_payments;
                                 @endphp
-                                <tr>
+                                <tr class="{{ ( $item->is_complete == 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_complete == 0 ? 'Reservación creada desde operaciones favor de darle seguimiento' : '' ) }}" style="{{ ( $item->is_complete == 0 ? 'background-color: #fbeced;' : '' ) }}" data-code="{{ $item->is_complete }}" data-id="{{ $item->id }}" data-site="{{ $item->site_id }}">
                                     <td>
                                         @if(RoleTrait::hasPermission(53))
                                             <a href="punto-de-venta/detail/{{ $item->id }}">{{ substr($item->created_at, 0, 10) }}</a>
                                         @else
                                             {{ substr($item->created_at, 0, 10) }}
                                         @endif
-                                    </td>
-                                    <td>{{ $item->vendor }}</td>                                           
+                                    {{-- <td>{{ substr($item->created_at, 0, 10) }}</td> --}}
+                                    <td>{{ $item->vendor ? $item->vendor : 'No se capturó el vendedor' }}</td>
                                     <td>{{ $item->terminal ? str_replace('T', 'Terminal ', $item->terminal) : 'No se capturó la terminal' }}</td>
                                     <td>{{ $item->reference }}</td>
                                     <td>{{ $item->reservation_codes }}</td>
@@ -270,5 +273,5 @@
         </div>
     </div>
 
-    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" />    
+    <x-modals.reports.post :data="$data" :services="$services" :zones="$zones" />
 @endsection

@@ -23,6 +23,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Traits\CodeTrait;
 use App\Traits\RoleTrait;
+use Exception;
 
 class PosRepository
 {
@@ -41,13 +42,13 @@ class PosRepository
         ];
         
         //Query DB
-        $query = ' AND rez.created_at BETWEEN :init AND :end';
+        $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.site_id IN (11,21) ';
         $queryData = [
             'init' => date("Y-m-d") . " 00:00:00",
             'end' => date("Y-m-d") . " 23:59:59",
         ];
 
-        if(isset( $request->date ) && !empty( $request->date )){            
+        if(isset( $request->date ) && !empty( $request->date )){
             $tmp_date = explode(" - ", $request->date);
             $data['init'] = $tmp_date[0];
             $data['end'] = $tmp_date[1];
@@ -66,15 +67,10 @@ class PosRepository
             $queryData['zone'] = $data['zone'];
             $query .= " AND FIND_IN_SET(:zone, zone_two_id) > 0";
         }
-        if(isset( $request->site ) && $request->site != 0){
-            $data['site'] = $request->site;
-            $query .= ' AND site.id = :site';
-            $queryData['site'] = $data['site'];
-        }
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
             $data['payment_method'] = $request->payment_method;
         }
-        if(isset( $request->filter_text ) && !empty( $request->filter_text )){            
+        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
             $data['filter_text'] = $request->filter_text;
             $queryData = [];
             $query  = " AND (
@@ -84,10 +80,19 @@ class PosRepository
                 ( rez.reference like '%".$data['filter_text']."%') OR
                 ( it.code like '".$data['filter_text']."' )
             )";            
-        }         
+        }
+
+        // dd($query);
         
         $bookings = DB::select("SELECT 
-            rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, rez.comments, rez.site_id,
+            rez.id, rez.created_at, 
+            CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, 
+            rez.client_email, 
+            rez.currency, 
+            rez.is_cancelled, 
+            rez.comments, 
+            rez.site_id,
+            rez.is_complete, 
             rez.pay_at_arrival,
             COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
             CASE
@@ -123,7 +128,7 @@ class PosRepository
                 GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
                 FROM payments
                 GROUP BY reservation_id
-            ) as p ON p.reservation_id = rez.id
+            ) as p ON p.reservation_id = rez.id            
             LEFT JOIN (
                 SELECT  it.reservation_id, it.is_round_trip,
                         SUM(it.passengers) as passengers,
@@ -144,7 +149,7 @@ class PosRepository
                 SELECT vr.id, vr.name
                 FROM vendors as vr
             ) as vr ON rez.vendor_id = vr.id
-            WHERE 1=1 AND vendor_id IS NOT NULL {$query}
+            WHERE 1=1 AND (rez.vendor_id IS NULL OR rez.vendor_id IS NOT NULL) {$query}
             GROUP BY rez.id, site.name, vr.vendor",
         $queryData);
 
@@ -173,10 +178,6 @@ class PosRepository
             endforeach;            
         endif;
 
-        $websites = DB::select("SELECT id, name as site_name
-        FROM sites
-        ORDER BY site_name ASC");
-
         $breadcrumbs = array(
             array(
                 "route" => "",
@@ -185,12 +186,18 @@ class PosRepository
             ),
         );        
 
-        return view('pos.index', compact('bookings','services','zones','websites','data','breadcrumbs') );
+        return view('pos.index', compact('bookings','services','zones','data','breadcrumbs') );
     }
 
     public function detail($request,$id){
-        $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site', 'user', 'vendor')->with('payments.clip')->whereNotNull('vendor_id')->where('id', $id)->first();
+        $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site', 'user', 'vendor')->with('payments.clip')->where('id', $id)->first();
         if( !$reservation ) abort(404);
+
+        $destination_services =  DestinationService::all();
+        $vendors =  Vendor::where('status', 1)->get();
+        $clips =  Clip::where('status', 1)->get();
+        $currency_exchange_data = TerminalPaymentExchangeRate::all();
+        $currency_exchange_data = json_encode($currency_exchange_data->toArray());        
 
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
         $sellers = User::whereIn('id', $users_ids)->get();
@@ -232,7 +239,7 @@ class PosRepository
 
         // return $reservation;
 
-        return view('pos.detail', compact('reservation','sellers','sales_types', 'from_zone', 'to_zone','services_types','data','sites'));
+        return view('pos.detail', compact('reservation','sellers','sales_types', 'from_zone', 'to_zone','services_types','data','sites',  'destination_services', 'clips', 'vendors', 'currency_exchange_data'));
     }
 
     public function capture($request){
@@ -400,6 +407,88 @@ class PosRepository
 
         return response()->json(['message' => 'sale created successfully','success' => true], Response::HTTP_OK);
     }
+
+    public function update($request){
+        try {
+            DB::beginTransaction();
+    
+            // Obteniendo pagos
+            $payments = [];
+            for($i = 0; $i < $request->number_of_payments; $i++) {
+                $reference_variable = "reference_$i";
+                $payment_method_variable = "payment_method_$i";
+                $clip_id_variable = "clip_id_$i";
+                $payment_variable = "payment_$i";
+                $currency_variable = "currency_$i";
+                $custom_currency_exchange_variable = "custom_currency_exchange_$i";
+    
+                $custom_currency_exchange = 0;
+                if( RoleTrait::hasPermission(58) && $request->$custom_currency_exchange_variable ) {
+                    $custom_currency_exchange = $request->$custom_currency_exchange_variable;
+                }
+    
+                $terminal_exchange_rate = TerminalPaymentExchangeRate::where('terminal', $request->terminal)
+                ->where('origin', $request->$currency_variable)
+                ->where('destination', $request->currency)
+                ->first();
+                if( !$terminal_exchange_rate && !$terminal_exchange_rate ) return response()->json(['message' => 'No se pudo convertir el cambio de monera, posiblemente necesites agregar el caso de conversión que estás solicitando','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+    
+                $payments[] = [
+                    'reference' => $request->$payment_method_variable === 'CARD' ? $request->$reference_variable : null,
+                    'payment_method' => $request->$payment_method_variable,
+                    'clip_id' => $request->$clip_id_variable,
+                    'total' => $request->$payment_variable,
+                    'operation' => $custom_currency_exchange ? 'multiplication' : $terminal_exchange_rate->operation,
+                    'exchange_rate' => $custom_currency_exchange ? $custom_currency_exchange : $terminal_exchange_rate->exchange_rate,
+                ];
+            }
+            if( sizeof($payments) === 0 ) return response()->json(['message' => 'Se necesitan agregar pagos para la captura','success' => false], Response::HTTP_BAD_REQUEST);
+    
+            $total_paid = collect($payments)->sum(function($payment) {
+                if( $payment['operation'] === 'multiplication' ) return $payment['total'] * $payment['exchange_rate'];
+                return round($payment['total'] / $payment['exchange_rate'], 2);
+            });
+    
+            if( $total_paid < $request->total ) return response()->json(['message' => 'La cantidad pagada no cubre el total de la venta','success' => false], Response::HTTP_BAD_REQUEST);            
+            
+            // Creando reservación
+            $booking = Reservation::find($request->reservation_id);
+            if( empty($booking) ) return response()->json(['message' => 'No se encontro la reservacion','success' => false], Response::HTTP_BAD_REQUEST);
+            $booking->client_first_name = $request->client_first_name;
+            $booking->client_last_name = $request->client_last_name;
+            $booking->client_email = $request->client_email ? $request->client_email : null;
+            $booking->client_phone = $request->client_phone ? $request->client_phone : null;
+            $booking->vendor_id = $request->vendor_id;
+            $booking->terminal = $request->terminal;
+            $booking->is_complete = 1;
+            $booking->save();
+
+            // Creando Payments
+            foreach($payments as $_payment) {
+                $payment = new Payment();
+                $payment->description = 'Panel';
+                $payment->total = $_payment['total'];
+                $payment->exchange_rate = $_payment['exchange_rate'];
+                $payment->status = 0;
+                $payment->operation = $_payment['operation'];
+                $payment->payment_method = $_payment['payment_method'];
+                $payment->currency = $booking->currency;
+                $payment->clip_id = $_payment['payment_method'] === 'CARD' ? $_payment['clip_id'] : null;
+                $payment->reservation_id = $booking->id;
+                $payment->reference = $_payment['reference'];
+                $payment->created_at = Carbon::now();
+                $payment->updated_at = Carbon::now();
+                $payment->save();
+            }
+
+            DB::commit();
+
+            return response()->json(['message' => 'sale update successfully','success' => true], Response::HTTP_OK);
+        } catch(Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage(),'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }        
+    }    
 
     public function vendors($request){
         $vendors = Vendor::all();

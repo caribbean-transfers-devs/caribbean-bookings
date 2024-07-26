@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('enterprise_id')->index();
             $table->unsignedBigInteger('destination_service_id')->index();
             $table->unsignedBigInteger('destination_id')->default(1)->index();
+            $table->string('name');
             $table->integer('unit_code');
             $table->string('plate_number')->index();
             $table->timestamps();

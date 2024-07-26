@@ -161,19 +161,18 @@
                                     @endphp
                                     <tr>
                                         <td>
-                                            <div class="btn-group">
-                                                <button type="button" class="btn {{ $spam }}">{{ $value->spam }}</button>
-                                                <button type="button" class="btn {{ $spam }} dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="{{$value->id}}">
+                                            <div class="btn-group" role="group">
+                                                <button id="actions" type="button" class="btn {{ $spam }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="{{$value->id}}">
+                                                    {{ $value->spam }}
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                                    <span class="visually-hidden ">Toggle Dropdown</span>
                                                 </button>                                                
                                                 <div class="dropdown-menu" aria-labelledby="actions">
-                                                    <a class="dropdown-item" href="#" onClick="updateSpam(event,{{$value->id}},'PENDING','btn-secondary')">PENDING</a>
-                                                    <a class="dropdown-item" href="#" onClick="updateSpam(event,{{$value->id}},'SENT','btn-info')">SENT</a>
-                                                    <a class="dropdown-item" href="#" onClick="updateSpam(event,{{$value->id}},'LATER','btn-warning')">LATER</a>
+                                                    <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'PENDING','btn-secondary')"><i class="flaticon-home-fill-1 mr-1"></i> PENDING</a>
+                                                    <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'SENT','btn-info')"><i class="flaticon-home-fill-1 mr-1"></i> SENT</a>
+                                                    <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'LATER','btn-warning')"><i class="flaticon-home-fill-1 mr-1"></i> LATER</a>
                                                     <div class="dropdown-divider"></div>
-                                                    <a class="dropdown-item" href="#" onClick="updateSpam(event,{{$value->id}},'CONFIRMED','btn-success')">CONFIRMED</a>
-                                                    <a class="dropdown-item" href="#" onClick="updateSpam(event,{{$value->id}},'REJECTED','btn-danger')">REJECTED</a>
+                                                    <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'CONFIRMED','btn-success')"><i class="flaticon-home-fill-1 mr-1"></i> CONFIRMED</a>
+                                                    <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'REJECTED','btn-danger')"><i class="flaticon-home-fill-1 mr-1"></i> REJECTED</a>
                                                 </div>
                                             </div>                                 
                                         </td>

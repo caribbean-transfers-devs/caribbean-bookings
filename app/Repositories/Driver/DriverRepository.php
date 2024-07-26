@@ -49,7 +49,7 @@ class DriverRepository
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('drivers.create')->with('errors', 'Error al crear el conductor.');
+            return redirect()->route('drivers.create')->with('danger', 'Error al crear el conductor.');
         }
     }
 
@@ -80,7 +80,7 @@ class DriverRepository
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('drivers.update', $id)->with('errors', 'Error al actualizar el conductor.');
+            return redirect()->route('drivers.update', $id)->with('danger', 'Error al actualizar el conductor.');
         }
     }
 

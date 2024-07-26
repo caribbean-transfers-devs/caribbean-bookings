@@ -79,7 +79,7 @@
                             } else {
                                 $permits = [];
                             }
-                        @endphp                     
+                        @endphp
                     </div>
                     <div class="card-body">
                         <form id="frm_role">
@@ -101,6 +101,9 @@
                                 </ul>
                                 <div class="tab-content">
                                     @foreach ($modules as $module)
+                                        @php
+                                            // dump($module);
+                                        @endphp
                                         <div class="tab-pane @if ($loop->first) active show @endif" id="tab-{{ $module->id }}" role="tabpanel">
                                             <div class="row mt-2">
                                                 @foreach ($module->submodules as $submodule)

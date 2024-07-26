@@ -217,8 +217,7 @@
                                     <textarea class="form-control" name="comments" row="4"></textarea>
                                 </div>
                             </div>
-                        </div>
-    
+                        </div>    
                     </div>
 
                     <div class="button-container">

@@ -13,6 +13,7 @@ use App\Http\Controllers\Configs\ZonesController;
 use App\Http\Controllers\Configs\RatesController;
 use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
+use App\Http\Controllers\Operations\DataController;
 use App\Http\Controllers\Reports\PaymentsController as ReportPayment;
 use App\Http\Controllers\Reports\SalesController as ReportSales;
 use App\Http\Controllers\Reports\CommissionsController as ReportCommissions;
@@ -53,7 +54,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('/vehicles', VehicleController::class);
     Route::resource('/drivers', DriverController::class);
 
-
     Route::resource('/users', UserController::class);
     Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');
     Route::put('/ChangeStatus/{user}', [UserController::class, 'change_status'])->name('users.change_status');
@@ -82,30 +82,47 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reservations/upload/{id}', [ReservationsController::class, 'getMedia'])->name('reservations.upload.getmedia');
     Route::delete('/reservations/upload/{id}', [ReservationsController::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
 
-    Route::get('/operation', [OperationController::class, 'index'])->name('operation.download');
+    //OPERACIONES
+    Route::get('/download', [OperationController::class, 'index'])->name('operation.download');
     Route::get('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment');
     Route::post('/operation/managment', [OperationController::class, 'managment'])->name('operation.managment.search');
     Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
     Route::get('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation');
     Route::post('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation.search');
-    Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');
+    Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');    
+    Route::get('/reports/ccform', [CCFormController::class, 'index'])->name('operation.ccform');
+    Route::get('/reports/ccform/pdf', [CCFormController::class, 'createPDF'])->name('operation.ccform.createPDF');
     Route::get('/operation/spam', [OperationController::class, 'spam'])->name('operation.spam');
     Route::post('/operation/spam', [OperationController::class, 'spam'])->name('operation.spam.search');
     Route::get('/operation/spam/exportExcel', [OperationController::class, 'exportExcel'])->name('operation.spam.exportExcel');
     Route::put('/operation/spam/update-status', [OperationController::class, 'spamUpdate'])->name('operation.spam.update');
+    Route::get('/operation/board', [Operations::class, 'index'])->name('operation.index');
+    Route::post('/operation/board', [Operations::class, 'index'])->name('operation.index.search');    
 
-    Route::get('/operation/operations', [Operations::class, 'spam'])->name('operation.index');
-    Route::post('/operation/operations', [Operations::class, 'spam'])->name('operation.index.search');
+    Route::put('/operation/vehicle/set', [Operations::class, 'setVehicle'])->name('operation.set.vehicle');
+    Route::put('/operation/driver/set', [Operations::class, 'setDriver'])->name('operation.set.driver');    
+    Route::put('/operation/status/operation', [Operations::class, 'updateStatusOperation'])->name('operation.status.operation');
+    Route::put('/operation/status/booking', [Operations::class, 'updateStatusBooking'])->name('operation.status.booking');
+    Route::post('/operation/comment/add', [Operations::class, 'addComment'])->name('operation.comment.add');
+    Route::get('/operation/comment/get', [Operations::class, 'getComment'])->name('operation.comment.get');
+    Route::get('/operation/history/get', [Operations::class, 'getHistory'])->name('operation.history.get');
+    Route::get('/operation/data/customer/get', [Operations::class, 'getDataCustomer'])->name('operation.data.customer.get');
+    Route::post('/operation/preassignments', [Operations::class, 'preassignments'])->name('operation.preassignments');
+    Route::post('/operation/closeOperation', [Operations::class, 'closeOperation'])->name('operation.close.operation');
+    Route::put('/operation/preassignment', [Operations::class, 'preassignment'])->name('operation.preassignment');
+    Route::post('/operation/capture/service', [Operations::class, 'createService'])->name('operation.capture.service');
+    Route::get('/operation/board/exportExcel', [Operations::class, 'exportExcelBoard'])->name('operation.board.exportExcel');
+    Route::get('/operation/board/exportExcelCommission', [Operations::class, 'exportExcelBoardCommision'])->name('operation.board.exportExcelComission');
 
-    //Reportes
+    Route::post('/update-data', [DataController::class, 'updateData']);
+
+    //REPORTES
     Route::get('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment');
     Route::post('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment.action');
     Route::get('/reports/sales', [ReportSales::class, 'index'])->name('reports.sales');
     Route::post('/reports/sales', [ReportSales::class, 'index'])->name('reports.sales.action');
     Route::get('/reports/commissions', [ReportCommissions::class, 'index'])->name('reports.commissions');
     Route::post('/reports/commissions', [ReportCommissions::class, 'index'])->name('reports.commissions.action');
-    Route::get('/reports/ccform', [CCFormController::class, 'index'])->name('reports.ccform');
-    Route::get('/reports/ccform/pdf', [CCFormController::class, 'createPDF'])->name('reports.ccform.createPDF');
     Route::get('/reports/cash', [ReportCash::class, 'index'])->name('reports.cash');
     Route::post('/reports/cash', [ReportCash::class, 'index'])->name('reports.cash.action');
     Route::put('/reports/cash/update-status', [ReportCash::class, 'update'])->name('reports.cash.action.update');
@@ -127,6 +144,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/punto-de-venta/detail/{id}', [PosController::class, 'detail'])->where('id', '[0-9]+');
     Route::get('/punto-de-venta/capture', [PosController::class, 'capture'])->name('pos.capture');
     Route::post('/punto-de-venta/capture/create', [PosController::class, 'create'])->name('pos.capture.create');
+    Route::post('/punto-de-venta/capture/update', [PosController::class, 'update'])->name('pos.capture.update');
     Route::get('/punto-de-venta/vendors', [PosController::class, 'vendors'])->name('pos.vendors');
     Route::post('/punto-de-venta/vendors/create', [PosController::class, 'createVendor'])->name('pos.vendors.create');
     Route::put('/punto-de-venta/vendors/edit', [PosController::class, 'editVendor'])->name('pos.vendors.edit');

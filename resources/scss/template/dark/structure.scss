@@ -12,7 +12,7 @@ body.dark {
   background: #060818;
   overflow-x: hidden;
   overflow-y: auto;
-  letter-spacing: 0.0312rem;
+  // letter-spacing: 0.0312rem;
   font-family: 'Nunito', sans-serif;
 }
 
@@ -1119,7 +1119,8 @@ body.dark {
 
   * {
     overflow: hidden;
-    white-space: nowrap;
+    // white-space: nowrap;
+    white-space: unset;
   }
 
   ul.menu-categories {
@@ -1232,7 +1233,8 @@ body.dark {
       display: flex;
       justify-content: space-between;
       cursor: pointer;
-      font-size: 14px;
+      // font-size: 14px;
+      font-size: 10px;
       color: #506690;
       padding: 10.2px 16px;
       font-weight: 600;
@@ -1393,7 +1395,8 @@ body.dark {
     padding: 10px 12px 10px 48px;
     padding-left: 24px;
     margin-left: 36px;
-    font-size: 14px;
+    // font-size: 14px;
+    font-size: 10px;
     color: #888ea8;
   }
 
@@ -1406,7 +1409,8 @@ body.dark {
         position: absolute;
         height: 3px;
         width: 3px;
-        top: 18.5px;
+        // top: 18.5px;
+        top: 14.3px;
         left: 13px;
         border-radius: 50%;
         

@@ -29,11 +29,15 @@
                                         @endforeach
                                     </ul>
                                 </div>
-                            @endif
-
+                            @endif                            
                             @if (session('success'))
-                                <div class="alert alert-light-success alert-dismissible fade show border-0 mb-4" role="alert">a     
+                                <div class="alert alert-light-success alert-dismissible fade show border-0 mb-4" role="alert">
                                     {{ session('success') }}
+                                </div>
+                            @endif
+                            @if (session('danger'))
+                                <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
+                                    {{ session('danger') }}
                                 </div>
                             @endif
                             <form action="{{ isset($vehicle) ? route('vehicles.update', $vehicle->id) : route('vehicles.store') }}" method="POST" enctype="multipart/form-data">
@@ -62,13 +66,19 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="name">Nombre de la unidad</label>
+                                            <input type="text" id="name" name="name" class="form-control mb-3" placeholder="Nombre de la unidad" value="{{ ( isset($vehicle->name) ? $vehicle->name : '' ) }}">
+                                        </div>
+                                    </div>                                    
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="unit_code">Código de la unidad</label>
                                             <input type="text" id="unit_code" name="unit_code" class="form-control mb-3" placeholder="Código de la unidad" value="{{ ( isset($vehicle->unit_code) ? $vehicle->unit_code : '' ) }}">
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="plate_number">Número de placa</label>
                                             <input type="text" id="plate_number" name="plate_number" class="form-control mb-3" placeholder="Número de placa" value="{{ ( isset($vehicle->plate_number) ? $vehicle->plate_number : '' ) }}">

@@ -1,5 +1,4 @@
 // webpack.mix.js
-
 let mix = require('laravel-mix');
 const data = {
     src: "resources/", // source files
@@ -10,6 +9,7 @@ const data = {
 if (mix.inProduction()) {
     mix.version();     
 }
+// mix.js('resources/js/app.js', 'public/js');
 
 mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css");
 mix.copy('resources/css/base.min.css', data.assets + "css/base/base.min.css");
@@ -53,12 +53,19 @@ mix.copy('resources/js/views/reports/cash.js', data.assets + "js/views/reports/c
 mix.sass('resources/scss/core.scss', data.assets + '/css/core/core.min.css');//core styles
 mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resources/plugins/font-icons/fontawesome/css/fontawesome.css'], data.assets + '/css/panel/panel.min.css');//panel styles
 mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
+
 mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css"); //DASHBOARD
 mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //REPORTS
+
+mix.sass('resources/scss/sections/download.scss', data.assets + "css/sections/download.min.css"); //DOWNLOAD
+mix.sass('resources/scss/sections/management.scss', data.assets + "css/sections/management.min.css"); //MANAGEMENT
+mix.sass('resources/scss/sections/confirmation.scss', data.assets + "css/sections/confirmation.min.css"); //CONFIRMATION
+mix.sass('resources/scss/sections/ccform.scss', data.assets + "css/sections/ccform.min.css"); //CCFORM
+mix.sass('resources/scss/sections/spam.scss', data.assets + "css/sections/spam.min.css"); //SPAM
 mix.sass('resources/scss/sections/operations.scss', data.assets + "css/sections/operations.min.css"); //OPERATIONS
-mix.sass('resources/scss/sections/spam.scss', data.assets + "css/sections/spam.min.css"); //OPERATIONS
+
 mix.sass('resources/scss/sections/zones.scss', data.assets + "css/sections/zones.min.css"); //ZONES
-mix.sass('resources/scss/sections/rates.scss', data.assets + "css/sections/rates.min.css"); //ZONES
+mix.sass('resources/scss/sections/rates.scss', data.assets + "css/sections/rates.min.css"); //RATES
 mix.sass('resources/scss/sections/users.scss', data.assets + "css/sections/users.min.css"); //USERS
 mix.sass('resources/scss/sections/enterprise.scss', data.assets + "css/sections/enterprise.min.css");
 mix.sass('resources/scss/sections/enterprise_forms.scss', data.assets + "css/sections/enterprise_forms.min.css");
@@ -67,8 +74,9 @@ mix.sass('resources/scss/sections/vehicle_forms.scss', data.assets + "css/sectio
 mix.sass('resources/scss/sections/driver.scss', data.assets + "css/sections/driver.min.css");
 mix.sass('resources/scss/sections/driver_forms.scss', data.assets + "css/sections/driver_forms.min.css");
 
-mix.combine(['resources/plugins/global/vendors.min.js','resources/js/bootstrap.bundle.min.js','resources/plugins/sweetalerts2/sweetalerts2.min.js'], data.assets + '/js/core/core.min.js');//core scripts
+mix.combine(['resources/plugins/global/vendors.min.js','resources/js/bootstrap.bundle.min.js','resources/plugins/font-icons/feather/feather.min.js','resources/plugins/sweetalerts2/sweetalerts22.min.js'], data.assets + '/js/core/core.min.js');//core scripts
 mix.combine(['resources/js/loader.js','resources/plugins/perfect-scrollbar/perfect-scrollbar.min.js','resources/plugins/mousetrap/mousetrap.min.js','resources/plugins/waves/waves.min.js','resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/waitMe/waitme.js', 'resources/js/caribbean.js','resources/js/components.js'], data.assets + '/js/panel/panel.min.js');//panel scripts
+mix.combine(['resources/js/loader.js','resources/plugins/perfect-scrollbar/perfect-scrollbar.min.js','resources/plugins/mousetrap/mousetrap.min.js','resources/plugins/waves/waves.min.js','resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/waitMe/waitme.js','resources/js/components.js'], data.assets + '/js/panel/panel_custom.min.js');//panel scripts
 //DASHBOARD
 mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard.js'], data.assets + "js/sections/dashboard.min.js");
 
@@ -84,8 +92,10 @@ mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugi
 
 //OPERATION
 mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/download.js'], data.assets + "js/sections/operations/download.min.js");
+mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/management.js'], data.assets + "js/sections/operations/management.min.js");
 mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/confirmation.js'], data.assets + "js/sections/operations/confirmation.min.js");
 mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/spam.js'], data.assets + "js/sections/operations/spam.min.js");
+mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/bootstrap-select/bootstrap-select.js', 'resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/operations/operations.js'], data.assets + "js/sections/operations/operations.min.js");
 
 //BOOKINGS
 mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/tomSelect/tom-select.base.js', 'resources/js/sections/reservations/bookings.js'], data.assets + "js/sections/reservations/bookings.min.js");
