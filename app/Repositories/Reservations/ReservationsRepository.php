@@ -81,7 +81,7 @@ class ReservationsRepository
         
         $bookings = DB::select("SELECT 
                                     rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, rez.is_duplicated, rez.affiliate_id, 
-                                    rez.pay_at_arrival,
+                                    rez.pay_at_arrival, rez.open_credit,
                                     COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     CASE
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
@@ -268,6 +268,21 @@ class ReservationsRepository
         }
     }
 
+    public function openCredit($request, $reservation)
+    {
+        try {            
+            DB::beginTransaction();
+            $reservation->open_credit = 1;
+            $reservation->save();
+            $check = $this->create_followUps($reservation->id, 'Se marco como Crédito Abierto por '.auth()->user()->name, 'HISTORY', 'CRÉDITO ABIERTO');
+            DB::commit();
+            return response()->json(['message' => 'Update successfully completed'], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error marking as open credit'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function enableReservation($request, $reservation)
     {
         try {            
@@ -450,7 +465,7 @@ class ReservationsRepository
                 <p>Confirmación de llegada</p>
                 <p>Antes de abordar se le solicitará la identificación con fotografía del titular de la tarjeta con la que se realizó el pago</p>
                 <p>Este es su comprobante de reserva, verifique que la información detallada a continuación sea correcta.</p>
-                <p>Estimado/a $item->client_first_name | Reservación No: $item->code</p>
+                <p>Estimado/a $item->client_first_name | Reservación No: $item->code</p>                
                 <p>Gracias por elegir a Caribbean Transfers, agradecemos su confianza, la información escrita a continuación facilitará su contacto con nuestro staff en el Aeropuerto, el vuelo $item->flight_number aterriza en $point->point_name el día $arrival_date hrs por lo tanto nuestro representante lo estará esperando en $point->point_description con un identificador de Caribbean Transfers</p>
                 <p>Para facilitar el contacto encienda su celular tan pronto como aterrice, puede usar la red gratuita del WIFI en el aeropuerto para poder contactarnos. Avísenos cuando esté listo para abordar su unidad (después de pasar aduana y recolectar sus maletas), un representante estará listo para recibirle y acercarlo a la unidad asignada.</p>
                 <p>Por favor confirme de recibido</p>

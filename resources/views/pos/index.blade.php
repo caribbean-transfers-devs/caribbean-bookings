@@ -91,6 +91,7 @@
                             <th>Vendedor</th>
                             <th>Terminal</th>
                             <th>Folio</th>
+                            <th>Código</th>
                             <th>Venta</th>
                             <th>Moneda</th>
                             <th>Zona</th>
@@ -155,6 +156,7 @@
                                     <td>{{ $item->vendor ? $item->vendor : 'No se capturó el vendedor' }}</td>
                                     <td>{{ $item->terminal ? str_replace('T', 'Terminal ', $item->terminal) : 'No se capturó la terminal' }}</td>
                                     <td>{{ $item->reference }}</td>
+                                    <td>{{ $item->reservation_codes }}</td>
                                     <td>{{ $item->total_sales }}</td>
                                     <td>{{ $item->currency }}</td>
                                     <td>{{ $item->destination_name }}</td>

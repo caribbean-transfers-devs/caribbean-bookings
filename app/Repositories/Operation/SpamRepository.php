@@ -127,6 +127,7 @@ class SpamRepository
                                     WHERE it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
                                     AND rez.is_cancelled = 0
                                     AND rez.is_duplicated = 0
+                                    AND rez.open_credit = 0
                                     AND it.is_round_trip = 0
                                     GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                                     UNION
@@ -166,6 +167,7 @@ class SpamRepository
                                     WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
                                     AND rez.is_cancelled = 0
                                     AND rez.is_duplicated = 0
+                                    AND rez.open_credit = 0
                                     AND it.is_round_trip = 0
                                     GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id",[
                                         "init_date_one" => $search['init'],
@@ -213,6 +215,7 @@ class SpamRepository
                                    WHERE rez.language = :lang_one AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
                                    AND rez.is_cancelled = 0
                                    AND rez.is_duplicated = 0
+                                   AND rez.open_credit = 0
                                    AND it.is_round_trip = 0
                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                                    UNION
@@ -252,6 +255,7 @@ class SpamRepository
                                    WHERE rez.language = :lang_two AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
                                    AND rez.is_cancelled = 0
                                    AND rez.is_duplicated = 0
+                                   AND rez.open_credit = 0
                                    AND it.is_round_trip = 0
                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id",[
                                        "lang_one" => $search['language'],

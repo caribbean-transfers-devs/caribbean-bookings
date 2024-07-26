@@ -15,6 +15,7 @@
                                 <option value="PAYPAL">PayPal</option>
                                 <option value="CARD">Tarjeta</option>
                                 <option value="TRANSFER">Transferencia</option>
+                                <option value="MIFEL">MIFEL</option>
                             </select>
                         </div>
                         <div class="col-sm-12 col-md-6">

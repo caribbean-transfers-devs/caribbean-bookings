@@ -151,16 +151,20 @@
                                         <a href="reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a>
                                     </td> 
                                     <td class="text-center">
-                                        @if ($item->is_cancelled == 0)                                                                                                   
-                                            @switch($item->status)
-                                                @case('CONFIRMED')
-                                                    <span class="badge badge-light-success">Confirmado</span>
-                                                    @break
-                                                @case('PENDING')
-                                                    <span class="badge badge-light-info">Pendiente</span>
-                                                    @break
-                                                @default                                                            
-                                            @endswitch
+                                        @if ($item->is_cancelled == 0)
+                                            @if($item->open_credit == 1)
+                                                <span class="badge badge-light-warning">Crédito Abierto</span>
+                                            @else
+                                                @switch($item->status)
+                                                    @case('CONFIRMED')
+                                                        <span class="badge badge-light-success">Confirmado</span>
+                                                        @break
+                                                    @case('PENDING')
+                                                        <span class="badge badge-light-info">Pendiente</span>
+                                                        @break
+                                                    @default                                                            
+                                                @endswitch
+                                            @endif                                            
                                         @else
                                                 <span class="badge badge-light-danger">Cancelado</span>
                                         @endif

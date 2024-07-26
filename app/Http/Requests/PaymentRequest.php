@@ -25,7 +25,7 @@ class PaymentRequest extends FormRequest
             'reservation_id' => 'required|exists:reservations,id',
             'total' => 'required|numeric',
             'exchange_rate' => 'required|numeric',
-            'payment_method' => 'required|in:CASH,PAYPAL,CARD,TRANSFER',
+            'payment_method' => 'required|in:CASH,PAYPAL,CARD,TRANSFER,MIFEL',
             'currency' => 'required|in:USD,MXN',
             'reference' => 'required|string|max:255',
         ];
