@@ -598,7 +598,7 @@ class ReservationsRepository
 
     public function sendPaymentRequest($request){
 
-        $item = DB::select("SELECT sit.payment_domain, sit.transactional_phone, rez.client_email, rez.client_first_name, rez.id as reservation_id
+        $item = DB::select("SELECT sit.payment_domain, sit.transactional_phone, rez.client_email, rez.client_first_name, rez.id as reservation_id, sit.success_payment_url, sit.cancel_payment_url
                             FROM reservations as rez 
                                 INNER JOIN sites as sit ON sit.id = rez.site_id
                             WHERE rez.id = :id", ['id' => $request['item_id'] ]);
@@ -606,26 +606,48 @@ class ReservationsRepository
         $lang = $request['lang'];
         $message = '';
 
+        $paypal_URL = $this->makePaymentURL( $request, $item, 'PAYPAL' );
+        $stripe_URL = $this->makePaymentURL( $request, $item, 'STRIPE' );
+
         if($lang == "en"):
             $message = <<<EOF
-                    <p>Hi again,</p>
-                    <p>We have detected that your reservation has not been completed. Book now and take advantage of our online prices</p>
-                    <p>To complete your purchase click on $item->payment_domain then go to “My Reservation” and access to complete your payment.</p>
-                    <p>If you have any questions, our team can help you, contact us: $item->transactional_phone </p>
-                    <p>We’re open from 7AM to 11PM</p>
-                    <p>We hope to see you soon</p>
+                    <p>Hello again!</p>
+                    <p>We have noticed that your reservation has not been confirmed yet, don't miss the opportunity to secure your transfer with us and enjoy our special online prices!</p>
+                    <p>Why pay now?</p>
+                    <ul>
+                        <li><strong>Guaranteed security:</strong> By pre-paying, you are assured to have your transportation ready and waiting for your arrival.</li>
+                        <li><strong>Time saving:</strong> Avoid long waits and complications at the airport.</li>
+                        <li><strong>Total peace of mind:</strong> Enjoy your trip knowing that everything is organized and worry-free.</li>
+                        <li><strong>Secure payment:</strong> We use HTTPS to guarantee the security of your data, and we work with the best payment platforms such as PayPal and Stripe.</li>
+                    </ul>
+                    
+                    <p>To pay with STRIPE, click <a href="$stripe_URL" title="Pay with Stripe">here</a></p>                    
+                    <p>To pay with PayPal, click <a href="$paypal_URL" title="Pay with PayPal">here</a></p>
+
+                    <p>If you have any questions, our team is ready to assist you. Contact us at: $item->transactional_phone </p>
+                    <p><strong>Business hours:</strong> From 7:00 am to 11:00 pm.</p>
+                    <p>We look forward to seeing you soon and providing you with exceptional service</p>
                 EOF;
         else:
             $message = <<<EOF
-                    <p>Hola de nuevo,</p>
-                    <p>Hemos detectado que su reservación no ha sido confirmada. Reserva ahora y aprovéchate de nuestros precios online</p>
-                    <p>Para completar su compra haga clic en $item->payment_domain y luego vaya a "Mi Reserva" y acceda para completar su pago.</p>
-                    <p>Si tiene alguna duda, nuestro equipo puede ayudarle, póngase en contacto con nosotros: $item->transactional_phone </p>
-                    <p>Abrimos de 7.00 a 23.00 h.</p>
-                    <p>Esperamos verle pronto</p>
-                EOF;
-        endif;
+                    <p>¡Hola de nuevo!</p>
+                    <p>Hemos notado que su reservación aún no ha sido confirmada. ¡No pierda la oportunidad de asegurar su traslado con nosotros y disfrutar de nuestros precios especiales en línea!</p>
+                    <p>¿Por qué pagar ahora?</p>
+                    <ul>
+                        <li><strong>Seguridad garantizada:</strong> Al pre-pagar, se asegura de tener su transporte listo y esperando a su llegada.</li>
+                        <li><strong>Ahorro de tiempo:</strong> Evite largas esperas y complicaciones en el aeropuerto.</li>
+                        <li><strong>Tranquilidad total:</strong> Disfrute de su viaje sabiendo que todo está organizado y sin preocupaciones.</li>
+                        <li><strong>Pago seguro:</strong> Utilizamos HTTPS para garantizar la seguridad de sus datos, y trabajamos con las mejores plataformas de pago como PayPal y Stripe.</li>
+                    </ul>
+                    
+                    <p>Para pagar con STRIPE, de click <a href="$stripe_URL" title="Paga con Stripe">aquí</a></p>                    
+                    <p>Para pagar con PayPal, de click <a href="$paypal_URL" title="Paga con PayPal">aquí</a></p>
 
+                    <p>Si tiene alguna pregunta, nuestro equipo está listo para asistirle. Contáctenos al: $item->transactional_phone </p>
+                    <p><strong>Horario de atención:</strong> De 7:00 a 23:00 h.</p>
+                    <p>Esperamos verle pronto y brindarle un servicio excepcional.</p>
+                EOF;
+        endif;        
 
         //Data to send in confirmation..
         $email_data = array(
@@ -686,6 +708,20 @@ class ReservationsRepository
 
     private function orderByDateTime($a, $b) {
         return strtotime($b->created_at) - strtotime($a->created_at);
+    }
+
+    private function makePaymentURL($request, $item, $type = "STRIPE"){        
+
+        $data = [
+            "type" => $type,
+            "id" => $request->item_id,
+            "language" => $request->lang,
+            "success_url" => $item->success_payment_url,
+            "cancel_url" => $item->cancel_payment_url,
+            "redirect" => 1
+        ];
+
+        return 'https://api.caribbean-transfers.com/api/v1/reservation/payment/handler?'.http_build_query($data);        
     }
 
 }
