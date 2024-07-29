@@ -1227,13 +1227,14 @@ class OperationsController extends Controller
         $sheet->setCellValue('M1', 'Costo operativo');
         $sheet->setCellValue('N1', 'Total');
         $sheet->setCellValue('O1', 'Comisión');
+        $sheet->setCellValue('P1', 'Monenda Comisión');
 
         $count = 2;
 
         foreach( $items as $key => $item ){
             // $payment = ( $item->total_sales - $item->total_payments );
             // if($payment < 0) $payment = 0;
-            $payment = $item->total_sales;
+            $payment = ( $item->site_id == 21 ? ( $item->currency == "USD" ? ( $item->total_sales * 16 ) : $item->total_sales ) : $item->total_sales );
 
             $preassignment = ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_preassignment : $item->op_two_preassignment );
 
@@ -1266,6 +1267,7 @@ class OperationsController extends Controller
             $sheet->setCellValue('M'.strval($count), number_format($cost_operation,2));
             $sheet->setCellValue('N'.strval($count), number_format($payment,2));
             $sheet->setCellValue('O'.strval($count), $commission);
+            $sheet->setCellValue('P'.strval($count), 'MXN');
             $count = $count + 1;
         }
 

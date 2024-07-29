@@ -118,10 +118,10 @@
                         @foreach($items as $key => $value)
                             @php
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
-                                    //SABER SI SON ARRIVAL, DEPARTURE O TRANSFER, MEDIANTE UN COLOR DE FONDO
-                                    $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "f2eafa" : "dbe0f9" ) ).";";
-                                    //SABER EL NIVEL DE CUT OFF
-                                    $cut_off_zone = ( $value->final_service_type == 'ARRIVAL' || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->zone_one_cut_off : $value->zone_two_cut_off );
+                                //SABER SI SON ARRIVAL, DEPARTURE O TRANSFER, MEDIANTE UN COLOR DE FONDO
+                                $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "f2eafa" : "dbe0f9" ) ).";";
+                                //SABER EL NIVEL DE CUT OFF
+                                $cut_off_zone = ( $value->final_service_type == 'ARRIVAL' || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->zone_one_cut_off : $value->zone_two_cut_off );
 
                                 // $payment = ( $value->total_sales - $value->total_payments );
                                 // if($payment < 0) $payment = 0;
