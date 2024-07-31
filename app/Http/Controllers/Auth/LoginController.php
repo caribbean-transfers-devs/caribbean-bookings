@@ -19,7 +19,7 @@ class LoginController extends Controller
             $request->authenticate();
             $request->session()->regenerate();
             session(['roles' => RoleTrait::getRolesAndSubmodules()]);
-            return redirect()->intended('dashboard');
+            return redirect()->intended('dashboard.admin');
         }
     }
 

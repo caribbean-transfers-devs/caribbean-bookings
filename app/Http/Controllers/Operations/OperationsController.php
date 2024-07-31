@@ -34,6 +34,9 @@ class OperationsController extends Controller
 {
 
     use CodeTrait, RoleTrait;
+    // if(!$this->hasPermission(39)){
+    //     abort(403, 'NO TIENE AUTORIZACIÓN.');
+    // }    
 
     public function index(Request $request){
         $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );

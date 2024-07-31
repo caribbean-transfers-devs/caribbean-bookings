@@ -132,7 +132,7 @@
         endif;
 
         //OPERACION
-        if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(76) ):
+        if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) ):
             if(RoleTrait::hasPermission(36)):
                 $links_operations[] = [
                     'name' => 'Descargar',
@@ -168,7 +168,7 @@
                     'active' => request()->routeIs('operation.spam','operation.spam.search'),
                 ];
             endif;
-            if(RoleTrait::hasPermission(76)):
+            if(RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79)):
                 $links_operations[] = [
                     'name' => 'Operaciones',
                     'route' => route('operation.index'),
