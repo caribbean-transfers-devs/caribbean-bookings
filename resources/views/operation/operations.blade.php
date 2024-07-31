@@ -320,7 +320,7 @@
                                         {{ $value->code }}
                                     @endif
                                 </td>
-                                <td>{{ $value->service_name }}</td>
+                                <td style="{{ ( $value->service_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_name }}</td>
                                 <td class="text-center" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ $value->status }}</td>
                                 <td class="text-end" style="{{ ( $value->status == "PENDIENTE" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($value->total_sales,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
