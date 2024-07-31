@@ -43,21 +43,35 @@
 
                             <div class="col-12 col-sm-12 mb-3">
                                 <div class="row">
-                                    <div class="col-12 col-sm-2 align-self-end">
-                                        <button type="button" class="btn btn-primary btn-lg w-100" id="btn_addservice">Agregar nuevo servicio</button>
-                                    </div>
-                                    <div class="col-12 col-sm-2 align-self-end">
-                                        <button type="button" class="btn btn-primary btn-lg w-100" id="btn_preassignment">Pre-asignación</button>
-                                    </div>
-                                    <div class="col-12 col-sm-2 align-self-end">
-                                        <button type="button" class="btn btn-primary btn-lg w-100" id="btn_dowload_operation">Descargar operación</button>
-                                    </div>
-                                    <div class="col-12 col-sm-2 align-self-end">
-                                        <button type="button" class="btn btn-primary btn-lg w-100" id="btn_dowload_operation_comission">Descargar comisiones de operación</button>
-                                    </div>
-                                    <div class="col-12 col-sm-2 align-self-end">
-                                        <button type="button" class="btn btn-danger btn-lg w-100" id="btn_close_operation">Cerrar operación</button>
-                                    </div>
+                                    @if (RoleTrait::hasPermission(80))
+                                        <div class="col-12 col-sm-2 align-self-end">
+                                            <button type="button" class="btn btn-primary btn-lg w-100" id="btn_addservice">Agregar nuevo servicio</button>
+                                        </div>
+                                    @endif
+
+                                    @if (RoleTrait::hasPermission(82))
+                                        <div class="col-12 col-sm-2 align-self-end">
+                                            <button type="button" class="btn btn-primary btn-lg w-100" id="btn_preassignment">Pre-asignación</button>
+                                        </div>
+                                    @endif
+
+                                    @if (RoleTrait::hasPermission(83))
+                                        <div class="col-12 col-sm-2 align-self-end">
+                                            <button type="button" class="btn btn-primary btn-lg w-100" id="btn_dowload_operation">Descargar operación</button>
+                                        </div>
+                                    @endif
+
+                                    @if (RoleTrait::hasPermission(84))
+                                        <div class="col-12 col-sm-2 align-self-end">
+                                            <button type="button" class="btn btn-primary btn-lg w-100" id="btn_dowload_operation_comission">Descargar comisiones de operación</button>
+                                        </div>
+                                    @endif
+
+                                    @if (RoleTrait::hasPermission(85))
+                                        <div class="col-12 col-sm-2 align-self-end">
+                                            <button type="button" class="btn btn-danger btn-lg w-100" id="btn_close_operation">Cerrar operación</button>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 
@@ -184,9 +198,9 @@
                             <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
                                 <td>
                                     @if ( $flag_preassignment )
-                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase {{ $close_operation == 1 ? 'disabled' : '' }}">{{ $preassignment }}</button>
+                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : '' }}">{{ $preassignment }}</button>
                                     @else
-                                        <button type="button" class="btn btn-danger text-uppercase btn_operations {{ $close_operation == 1 ? 'disabled' : 'add_preassignment' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
+                                        <button type="button" class="btn btn-danger text-uppercase btn_operations {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : 'add_preassignment' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
                                     @endif
                                 </td>
                                 <td>
@@ -224,7 +238,7 @@
                                 <td>{{ $operation_to }}</td>
                                 <td>{{ $value->site_name }}</td>
                                 <td data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}" data-name="{{ $vehicle_name }}">
-                                    @if ( $close_operation == 1 )
+                                    @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
                                         {{ $vehicle_name }}
                                     @else
                                         <select class="form-control vehicles selectpicker" data-live-search="true" id="vehicle_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
@@ -238,7 +252,7 @@
                                     @endif
                                 </td>
                                 <td data-order="{{ ( $driver_d != NULL ) ? $driver_d : 0 }}" data-name="{{ $driver_name }}">
-                                    @if ( $close_operation == 1 )
+                                    @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
                                         {{ $driver_name }}
                                     @else
                                         <select class="form-control drivers selectpicker" data-live-search="true" id="driver_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
@@ -252,9 +266,9 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if ( $close_operation == 1 )
+                                    @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
                                         <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-{{ $label }} dropdown-toggle btn_status_action {{ $close_operation == 1 ? 'disabled' : '' }}">
+                                            <button id="optionsOperation{{ $key.$value->id }}" type="button" class="btn btn-{{ $label }} dropdown-toggle btn_status_action {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : '' }}">
                                                 <span>{{ $status_operation }}</span>
                                             </button>
                                         </div>                                      
@@ -277,9 +291,9 @@
                                 <td class="text-center">{{ ( $time_operation != NULL )  ? date("H:i", strtotime($time_operation)) : $time_operation }}</td>
                                 <td class="text-center">{{ $cost_operation }}</td>
                                 <td class="text-center">
-                                    @if ( $close_operation == 1 )
+                                    @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
                                         <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-{{ $label2 }} dropdown-toggle btn_status_action {{ $close_operation == 1 ? 'disabled' : '' }}">
+                                            <button id="optionsBooking{{ $key.$value->id }}" type="button" class="btn btn-{{ $label2 }} dropdown-toggle btn_status_action {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : '' }}">
                                                 <span>{{ $status_booking }}</span>
                                             </button>
                                         </div>
@@ -312,7 +326,7 @@
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
-                                        <div class="btn btn-primary btn_operations {{ $close_operation == 1 ? 'disabled' : '__open_modal_comment' }} bs-tooltip" title="{{ ( $flag_comment ) ? 'Modificar comentario' : 'Agregar comentario' }}" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}">
+                                        <div class="btn btn-primary btn_operations {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : '__open_modal_comment' }} bs-tooltip" title="{{ ( $flag_comment ) ? 'Modificar comentario' : 'Agregar comentario' }}" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                         </div>
                                         <div class="btn btn-primary btn_operations extract_whatsapp bs-tooltip" title="Ver información para enviar por whatsApp" id="extract_whatsapp{{ $key.$value->id }}" data-bs-toggle="modal" data-bs-target="#operationWhatsAppModal">

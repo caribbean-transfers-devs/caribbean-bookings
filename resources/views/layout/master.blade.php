@@ -134,7 +134,7 @@
                         </li>
                     @endif
 
-                    @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(76) )
+                    @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) )
                         <li class="sidebar-item">
                             <a href="#operation" data-bs-toggle="collapse" class="sidebar-link collapsed">
                                 <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Operación</span>
@@ -155,9 +155,9 @@
                                 @if(RoleTrait::hasPermission(47))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.spam') }}">SPAM</a></li>
                                 @endif
-                                @if(RoleTrait::hasPermission(76))
+                                @if(RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.index') }}">Operaciones</a></li>
-                                @endif                                
+                                @endif
                             </ul>
                         </li>
                     @endif

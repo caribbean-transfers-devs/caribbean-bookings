@@ -463,8 +463,8 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
     var origin = fila.find('td').eq(6).text();
     var destination = fila.find('td').eq(7).text();
     var agency = fila.find('td').eq(8).text();
-    var vehicle = fila.find('td').eq(9).find('button .filter-option .filter-option-inner .filter-option-inner-inner').text();
-    var driver = fila.find('td').eq(10).find('button .filter-option .filter-option-inner .filter-option-inner-inner').text();
+    var vehicle = ( fila.find('td').eq(9).find('button').length > 0 ? fila.find('td').eq(9).find('button .filter-option .filter-option-inner .filter-option-inner-inner').text() : fila.find('td').eq(9).text() );
+    var driver = ( fila.find('td').eq(10).find('button').length > 0 ? fila.find('td').eq(10).find('button .filter-option .filter-option-inner .filter-option-inner-inner').text() : fila.find('td').eq(10).text() );
     var status_operation = fila.find('td').eq(11).find('.btn-group button span').text();
     var time_operation = fila.find('td').eq(12).text();
     var status_booking = fila.find('td').eq(14).find('.btn-group button span').text();
@@ -1135,7 +1135,7 @@ if( document.getElementById('btn_dowload_operation_comission') != null ){
 //EVENTOS SOCKET IO, ESCUCHAN DE LADO DEL CLIENTE
 socket.on("addPreassignmentClient", function(data){
     console.log("asignacion");
-    // console.log(data);
+    console.log(data);
     //DECLARACION DE VARIABLES
     const __btn_preassignment = document.getElementById('btn_preassignment_' + data.item);
     if( __btn_preassignment != null ){
@@ -1159,20 +1159,22 @@ socket.on("addPreassignmentClient", function(data){
 socket.on("setVehicleReservationClient", function(data){
     console.log("nueva asignación de unidad");
     console.log(data);
-    //DECLARACION DE VARIABLES
+    //DECLARACION DE CONSTANTES
+    const __Row = document.getElementById('item-' + data.item);//ROW ES EL TR, DONDE ESTAMOS TRABAJANDO CON EL SELECT DEL VEHICULO
+    const __CellVehicle = ( __Row != null ? __Row.querySelector('td:nth-child(10)') : null );//ES LA CELDA DONDE SETEAMOS O IMPRIMIMOS EL VALOR DE VEHICULO
     const __select_vehicle = document.getElementById('vehicle_id_' + data.item);
-    if( __select_vehicle != null ){
-        const __Row = ( __select_vehicle != null ? components.closest(__select_vehicle, 'tr') : null );
-        const __CellVehicle = ( __Row != null ? __Row.querySelector('td:nth-child(10)') : null );
-        const __CellCost = ( __Row != null ? __Row.querySelector('td:nth-child(14)') : null );
-        console.log(__select_vehicle, __Row, __CellVehicle, __CellCost);
-        __CellVehicle.dataset.order = data.value;
-        __CellVehicle.dataset.name = data.name;
-        __select_vehicle.value = data.value;
-        $('#vehicle_id_' + data.item).selectpicker('val', data.value);
-        __CellCost.innerHTML = data.cost;
-    }
-
+    const __CellCost = ( __Row != null ? __Row.querySelector('td:nth-child(14)') : null );//ES LA CELDA DONDE SETEAMOS O IMPRIMIMOS EL COSTO OPERATIVO
+    
+    ( __CellVehicle != null ?  __CellVehicle.dataset.order = data.value : "" );
+    ( __CellVehicle != null ?  __CellVehicle.dataset.name = data.name : "" );
+    ( __select_vehicle == null && __CellVehicle != null ?  __CellVehicle.innerHTML = data.name : "" );
+    
+    ( __select_vehicle != null ? __select_vehicle.value = data.value : "" );
+    ( __select_vehicle != null ? $('#vehicle_id_' + data.item).selectpicker('val', data.value) : "" );
+    
+    ( __CellCost != null ? __CellCost.innerHTML = data.cost : "" );
+    
+    console.log(__select_vehicle, __Row, __CellVehicle, __CellCost);
     Snackbar.show({ 
         text: data.message, 
         duration: 5000, 
@@ -1185,18 +1187,19 @@ socket.on("setVehicleReservationClient", function(data){
 socket.on("setDriverReservationClient", function(data){
     console.log("nueva asignación de conductor");
     console.log(data);
-    //DECLARACION DE VARIABLES
+    //DECLARACION DE CONSTANTES
+    const __Row = document.getElementById('item-' + data.item);//ROW ES EL TR, DONDE ESTAMOS TRABAJANDO CON EL SELECT DEL CONDUCTOR
+    const __CellDriver = ( __Row != null ? __Row.querySelector('td:nth-child(11)') : "" );
     const __select_driver = document.getElementById('driver_id_' + data.item);
-    if( __select_driver != null ){
-        const __Row = ( __select_driver != null ? components.closest(__select_driver, 'tr') : null );
-        const __CellDriver = ( __Row != null ? __Row.querySelector('td:nth-child(11)') : "" );
-        console.log(__select_driver, __Row, __CellDriver);
-        __CellDriver.dataset.order = data.value;
-        __CellDriver.dataset.name = data.name;
-        __select_driver.value = data.value;
-        $('#driver_id_' + data.item).selectpicker('val', data.value);
-    }
+        
+    ( __CellDriver != null ?  __CellDriver.dataset.order = data.value : "" );
+    ( __CellDriver != null ?  __CellDriver.dataset.name = data.name : "" );
+    ( __select_driver == null && __CellDriver != null ?  __CellDriver.innerHTML = data.name : "" );
 
+    ( __select_driver != null ? __select_driver.value = data.value : "" );
+    ( __select_driver != null ? $('#driver_id_' + data.item).selectpicker('val', data.value) : "" );
+
+    console.log(__select_driver, __Row, __CellDriver);
     Snackbar.show({ 
         text: data.message, 
         duration: 5000, 
@@ -1209,19 +1212,19 @@ socket.on("setDriverReservationClient", function(data){
 socket.on("updateStatusOperationClient", function(data){
     console.log("operación");
     console.log(data);
-    //DECLARACION DE VARIABLES
+    //DECLARACION DE CONSTANTES
+    const __Row = document.getElementById('item-' + data.item);//ROW ES EL TR, DONDE ESTAMOS TRABAJANDO CON EL SELECT DEL ESTATUS DE OPERACIÓN
+    const __CellStatusOperation = ( __Row != null ? __Row.querySelector('td:nth-child(12)') : "" );
     const __status_operation = document.getElementById('optionsOperation' + data.item);
-    if( __status_operation != null ){
-        const __Row = ( __status_operation != null ? components.closest(__status_operation, 'tr') : null );
-        const __CellStatus = ( __Row != null ? __Row.querySelector('td:nth-child(12)') : "" );
-        const __CellTime = ( __Row != null ? __Row.querySelector('td:nth-child(13)') : "" );
-        console.log(__status_operation, __Row, __CellStatus, __CellTime);
-        __status_operation.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
-        __status_operation.classList.add(setup.setStatus(data.value));
-        __status_operation.querySelector('span').innerText = data.value;
-        __CellTime.innerHTML = data.time;
-    }
-                
+    const __CellTime = ( __Row != null ? __Row.querySelector('td:nth-child(13)') : "" );
+            
+    ( __status_operation != null ? __status_operation.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger') : "" );
+    ( __status_operation != null ? __status_operation.classList.add(setup.setStatus(data.value)) : "" );
+    ( __status_operation != null ? __status_operation.querySelector('span').innerText = data.value : "" );
+
+    ( __CellTime != null ? __CellTime.innerHTML = data.time : "" );
+
+    console.log(__status_operation, __Row, __CellStatusOperation, __CellTime);
     Snackbar.show({ 
         text: data.message,
         duration: 5000, 
@@ -1235,16 +1238,15 @@ socket.on("updateStatusBookingClient", function(data){
     console.log("reservación");
     console.log(data);
     //DECLARACION DE VARIABLES
+    const __Row = document.getElementById('item-' + data.item);//ROW ES EL TR, DONDE ESTAMOS TRABAJANDO CON EL SELECT DEL ESTATUS DE RESERVACIÓN
+    const __CellStatusBooking = ( __Row != null ? __Row.querySelector('td:nth-child(15)') : "" );
     const __status_booking = document.getElementById('optionsBooking' + data.item);
-    if( __status_booking != null ){
-        const __Row = ( __status_booking != null ? components.closest(__status_booking, 'tr') : null );
-        const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(15)') : "" );
-        console.log(__status_booking, __Row, __Cell);
-        __status_booking.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger');
-        __status_booking.classList.add(setup.setStatus(data.value));
-        __status_booking.querySelector('span').innerText = data.value;
-    }
+        
+    ( __status_booking != null ? __status_booking.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger') : "" );
+    ( __status_booking != null ? __status_booking.classList.add(setup.setStatus(data.value)) : "" );
+    ( __status_booking != null ? __status_booking.querySelector('span').innerText = data.value : "" );
 
+    console.log(__status_booking, __Row, __CellStatusBooking);
     Snackbar.show({
         text: data.message,
         duration: 5000, 
@@ -1257,24 +1259,14 @@ socket.on("updateStatusBookingClient", function(data){
 socket.on("addCommentClient", function(data){
     console.log("comentario");
     console.log(data);
+
     //DECLARACION DE VARIABLES
     const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
-    if( __btn_comment != null ){
-        const __Row = ( __btn_comment != null ? components.closest(__btn_comment, 'tr') : null );
-        const __indicators = ( __Row != null ? __Row.querySelector('td:nth-child(2)') : "" );
-        const __btn_open_modal_comment = ( __Row != null ? __Row.querySelector('td:nth-child(21)') : "" );
-        const __comment_new = document.getElementById('comment_new_' + data.item);
-        // console.log(__btn_comment);
-        // console.log(__Row);
-        // console.log(__indicators);
-        // console.log(__btn_open_modal_comment);
-        __btn_comment.dataset.status = data.status;
-        __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver mensaje de operaciones" data-type="comment" data-comment="'+ data.value +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>'
-        // __comment_new.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square bs-popover" data-bs-container="body" data-bs-trigger="hover" data-bs-content="'+ data.value +'"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
-    }
-    // setup.bsPopover();
-    history();
+    ( __btn_comment != null ?  __btn_comment.dataset.status = data.status : "" );
+    const __comment_new = document.getElementById('comment_new_' + data.item);
+    __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver mensaje de operaciones" data-type="comment" data-comment="'+ data.value +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>'
 
+    history();
     Snackbar.show({
         text: data.message,
         duration: 5000, 
