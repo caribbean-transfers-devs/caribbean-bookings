@@ -127,8 +127,10 @@
                                             $label = 'secondary';
                                             break;
                                     }
+
+                                    $message_round_trip = ( $value->is_round_trip == 1 ? "Esta reservación es un Round Trip, con un total de ".$payment." ".$value->currency : "" );
                                 @endphp
-                                <tr>
+                                <tr style="{{ $value->is_round_trip == 1 ? 'background-color: #fcf5e9;' : '' }}" class="{{ $value->is_round_trip == 1 ? 'bs-tooltip' : '' }}" title="{{ $message_round_trip }}">
                                     <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
                                     <td>{{ $value->site_name }}</td>
                                     <td>{{ $value->final_service_type }}</td>
@@ -151,9 +153,9 @@
                                     <td>{{ $operation_from }}</td>
                                     <td>{{ $operation_to }}</td>
                                     <td class="text-center">{{ $value->status }}</td>
-                                    <td class="text-end">{{ number_format($payment,2) }}</td>
+                                    <td class="text-end">{{ number_format(( $value->is_round_trip == 1 ? ( $payment / 2 ) : $payment ),2) }}</td>
                                     <td class="text-center">{{ $value->currency }}</td>
-                                    <td>{{ $value->cancellation_type_name }}</td>
+                                    <td>{{ !empty($value->cancellation_type_name) ? $value->cancellation_type_name : "NO SHOW" }}</td>
                                 </tr>
                             @endforeach
                         @endif

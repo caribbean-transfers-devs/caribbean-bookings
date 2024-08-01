@@ -18,7 +18,7 @@ class PosController extends Controller
     }
 
     public function generals(Request $request, PosRepository $posRepository){
-        if( !RoleTrait::hasPermission(51) ) abort(403, 'NO TIENE AUTORIZACIÓN.');
+        if( !RoleTrait::hasPermission(91) ) abort(403, 'NO TIENE AUTORIZACIÓN.');
 
         return $posRepository->generals($request);
     }    

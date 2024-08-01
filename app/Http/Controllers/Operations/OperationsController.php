@@ -1187,7 +1187,7 @@ class OperationsController extends Controller
             $sheet->setCellValue('P'.strval($count), $status_booking);
             $sheet->setCellValue('Q'.strval($count), $item->service_name);
             $sheet->setCellValue('R'.strval($count), $item->status);
-            $sheet->setCellValue('S'.strval($count), number_format($payment,2));
+            $sheet->setCellValue('S'.strval($count), number_format(( $item->is_round_trip == 1 ? ( $payment / 2 ) : $payment ),2));
             $sheet->setCellValue('T'.strval($count), $item->currency);
             $count = $count + 1;
         }

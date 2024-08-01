@@ -109,7 +109,7 @@ class CancellationsRepository
                 "active" => true
             ),
         );
-                                    
+
         return view('reports.cancellations', compact('items','date','breadcrumbs'));
     }
 }
