@@ -179,7 +179,7 @@
                                                 //$commission = 8750;
                                                 $commission = 0.05 * $total;
                                             endif;
-                                            if($total >= 200000):
+                                            if($total >= 175000):
                                                 //$commission = 100000;
                                                 $commission = 0.05 * $total;
                                             endif;
