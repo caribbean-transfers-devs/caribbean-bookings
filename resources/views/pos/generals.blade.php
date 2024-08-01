@@ -1,8 +1,4 @@
 @php
-    use App\Traits\RoleTrait;
-    use Carbon\Carbon;
-@endphp
-@php
     $resume = [
         'status' => [
             'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
@@ -11,21 +7,14 @@
         ]
     ];
     $sites = [];
+    $affiliates = [];
     $destinations = [];
-    function getShift($created_at) {
-        $time = Carbon::parse($created_at)->format('H:i');
-
-        if ($time >= '08:30' && $time <= '15:00') {
-            return 'Matutino';
-        } elseif ($time >= '15:01' && $time <= '21:00') {
-            return 'Vespertino';
-        } else {
-            return 'Guardia';
-        }
-    }
+    $resume_total = 0;
+    $resume_total_mxn = 0;
+    $resume_total_usd = 0;
 @endphp
 @extends('layout.app')
-@section('title') Ventas capturadas @endsection
+@section('title') Reservaciones @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
@@ -38,14 +27,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="{{ mix('assets/js/sections/pos/sales.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/reservations/bookings.min.js') }}"></script>
 @endpush
 
 @section('content')
     @php
-        // dump($bookings);
         $buttons = array(
-            array(  
+            array(
                 'text' => 'Filtrar',
                 'className' => 'btn btn-primary __btn_create',
                 'attr' => array(
@@ -53,7 +41,7 @@
                     'data-bs-toggle' => 'modal',
                     'data-bs-target' => '#filterModal'
                 )
-            ),            
+            ),
             array(
                 'text' => 'CSV',
                 'extend' => 'csvHtml5',
@@ -68,7 +56,6 @@
             ),
         );
         // dump($buttons);
-        // dump($bookings);
     @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-9 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
@@ -86,21 +73,20 @@
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Fecha</th>
-                            <th>Folio</th>
+                            <th>Sitio</th>
                             <th>Código</th>
-                            <th>Vendedor</th>
-                            <th>Terminal</th>
-                            <th>Venta</th>
-                            <th>Moneda</th>
-                            <th>Zona</th>
-                            <th>Unidad</th>
-                            <th>Moneda2</th>
-                            <th>Pax</th>
+                            <th>Estatus</th>
+                            <th>Cliente</th>
                             <th>Servicio</th>
-                            <th>Turno</th>
-                            <th>Hora</th>
-                            <th>Observaciones</th>
+                            <th>Pasajeros</th>
+                            <th>Total</th>
+                            <th>Moneda</th>
+                            <th>Pendiente</th>
+                            <th>Método</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -122,20 +108,31 @@
                                                     'MXN' => 0,
                                                     'count' => 0
                                                 ];
-                                            endif;
+                                            endif;                                                        
                                             $sites[$item->site_name][$item->currency] += $item->total_sales;
                                             $sites[$item->site_name]['count']++;
 
-                                            if(!isset( $destinations[$item->destination_name] )):
-                                                $destinations[$item->destination_name] = [
+                                            if($item->affiliate_id != 0 ):
+                                                if(!isset( $affiliates[$item->site_name] )):
+                                                    $affiliates[$item->site_name] = [
+                                                        'USD' => 0,
+                                                        'MXN' => 0,
+                                                        'count' => 0
+                                                    ];
+                                                endif;
+                                                $affiliates[$item->site_name][$item->currency] += $item->total_sales;
+                                                $affiliates[$item->site_name]['count']++;
+                                            endif;
+
+                                            if(!isset( $destinations[$item->destination_name_to] )):
+                                                $destinations[$item->destination_name_to] = [
                                                     'USD' => 0,
                                                     'MXN' => 0,
                                                     'count' => 0
                                                 ];
                                             endif;
-                                            $destinations[$item->destination_name][$item->currency] += $item->total_sales;
-                                            $destinations[$item->destination_name]['count']++;
-
+                                            $destinations[$item->destination_name_to][$item->currency] += $item->total_sales;
+                                            $destinations[$item->destination_name_to]['count']++;
                                         endif;
 
                                     else:
@@ -144,28 +141,45 @@
                                     endif;                                                
                                     $total_pending = $item->total_sales - $item->total_payments;
                                 @endphp
-                                <tr class="{{ ( $item->is_complete == 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_complete == 0 ? 'Reservación creada desde operaciones favor de darle seguimiento' : '' ) }}" style="{{ ( $item->is_complete == 0 ? 'background-color: #fbeced;' : '' ) }}" data-code="{{ $item->is_complete }}" data-id="{{ $item->id }}" data-site="{{ $item->site_id }}">
-                                    <td>{{ substr($item->created_at, 0, 10) }}</td>
-                                    <td>{{ $item->reference }}</td>
-                                    <td>
-                                        @if(RoleTrait::hasPermission(53))
-                                            <a href="punto-de-venta/detail/{{ $item->id }}">{{ $item->reservation_codes }}</a>
-                                        @else
-                                            {{ $item->reservation_codes }}
+                                <tr>
+                                    <td class="text-end">
+                                        @if($item->is_today >= 1)
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                                         @endif
-                                    </td>                                    
-                                    <td>{{ $item->vendor ? $item->vendor : 'No se capturó el vendedor' }}</td>
-                                    <td>{{ $item->terminal ? str_replace('T', 'Terminal ', $item->terminal) : 'No se capturó la terminal' }}</td>
-                                    <td>{{ $item->total_sales }}</td>
-                                    <td>{{ $item->currency }}</td>
-                                    <td>{{ $item->destination_name }}</td>
+                                    </td>
+                                    <td>{{ substr($item->created_at, 0, 10) }}</td>
+                                    <td>{{ $item->site_name }}</td>
+                                    <td>
+                                        <a href="reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a>
+                                    </td> 
+                                    <td class="text-center">
+                                        @if ($item->is_cancelled == 0)
+                                            @if($item->open_credit == 1)
+                                                <span class="badge badge-light-warning">Crédito Abierto</span>
+                                            @else
+                                                @switch($item->status)
+                                                    @case('CONFIRMED')
+                                                        <span class="badge badge-light-success">Confirmado</span>
+                                                        @break
+                                                    @case('PENDING')
+                                                        <span class="badge badge-light-info">Pendiente</span>
+                                                        @break
+                                                    @default                                                            
+                                                @endswitch
+                                            @endif                                            
+                                        @else
+                                                <span class="badge badge-light-danger">Cancelado</span>
+                                        @endif
+                                    </td> 
+                                    <td>{{ $item->client_full_name }}</td>
                                     <td>{{ $item->service_type_name }}</td>
-                                    <td>{{ ((empty($item->payment_type_name))? 'Efectivo' : str_replace(['CARD', 'CASH'], ['Tarjeta', 'Efectivo'], $item->payment_type_name) ) }}</td>
-                                    <td>{{ $item->passengers }}</td>
-                                    <td>{{ (( $item->site_id == 21 ) ? 'Llegada':'Salida') }}</td>
-                                    <td>{{ getShift($item->created_at) }}</td>
-                                    <td>{{ substr($item->created_at, -8, 5) }}</td>
-                                    <td>{{ $item->comments }}</td>
+                                    <td class="text-center">{{ $item->passengers }}</td>
+                                    <td class="text-end">{{ $item->total_sales }}</td>
+                                    <td class="text-center">{{ $item->currency }}</td>
+                                    <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td>
+                                    <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td>
+                                    <td class="text-center">{{ $item->destination_name_from }}</td>
+                                    <td class="text-center">{{ $item->destination_name_to }}</td>
                                 </tr>
                             @endforeach
                         @endif
@@ -193,6 +207,13 @@
                             </thead>
                             <tbody>
                                 @foreach($resume['status'] as $key => $value)
+                                @php
+                                    if( $key == "PENDING" || $key == "CONFIRMED" ):
+                                        $resume_total = $resume_total + $value['count'];
+                                        $resume_total_mxn = $resume_total_mxn + $value['USD'];
+                                        $resume_total_usd = $resume_total_usd + $value['MXN'];
+                                    endif;
+                                @endphp
                                 <tr>
                                     <td>{{ strtolower( $key) }}</td>
                                     <td class="text-center">{{ $value['count'] }}</td>
@@ -201,6 +222,14 @@
                                 </tr>
                                 @endforeach
                             </tbody>
+                            <tfooter>
+                                <tr>
+                                    <td>Total</td>
+                                    <td class="text-center">{{ $resume_total }}</td>                                    
+                                    <td class="text-end">{{ $resume_total_mxn }}</td>
+                                    <td class="text-end">{{ $resume_total_usd }}</td>
+                                </tr>
+                            </tfooter>                             
                         </table>
                     </div>
                 </div>
@@ -217,7 +246,7 @@
                         <table class="table dt-table-hover">
                             <thead>
                                 <tr>
-                                    <th style="width:35%;">Destino</th>
+                                    <th style="width:35%;">Estatus</th>
                                     <th style="width:25%">Cantidad</th>
                                     <th class="text-center">USD</th>
                                     <th class="text-center">MXN</th>
@@ -269,8 +298,40 @@
                     </div>
                 </div>
             </div>
+
+            <div class="widget widget-chart-three mb-3">
+                <div class="widget-heading">
+                    <div class="">
+                        <h5>Resumen afiliados</h5>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="table-responsive">
+                        <table class="table dt-table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Estatus</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($affiliates as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" />
+    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" />
 @endsection

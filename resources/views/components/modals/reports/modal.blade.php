@@ -47,14 +47,16 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-12 col-sm-12">
-                            <label class="form-label" for="site">Sitio</label>
-                            <select class="form-select mb-3" placeholder="Selecciona un sitio" name="site[]" id="site" multiple>                            
-                                @foreach ($websites as $key => $value)
-                                    <option value="{{ $value->id }}" {{ (($data['site'] == $value->id)?'selected':'') }}>{{ $value->site_name }}</option> 
-                                @endforeach
-                            </select>
-                        </div>
+                        @if ( !empty($websites) )
+                            <div class="col-12 col-sm-12">
+                                <label class="form-label" for="site">Sitio</label>
+                                <select class="form-select mb-3" placeholder="Selecciona un sitio" name="site[]" id="site" multiple>                            
+                                    @foreach ($websites as $key => $value)
+                                        <option value="{{ $value->id }}" {{ (($data['site'] == $value->id)?'selected':'') }}>{{ $value->site_name }}</option> 
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <div class="modal-footer">

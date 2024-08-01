@@ -98,12 +98,19 @@
         endif;
 
         //PUNTO DE VENTA
-        if(RoleTrait::hasPermission(51) || RoleTrait::hasPermission(52) || RoleTrait::hasPermission(54) ):
+        if(RoleTrait::hasPermission(51) || RoleTrait::hasPermission(91) || RoleTrait::hasPermission(52) || RoleTrait::hasPermission(54) ):
             if(RoleTrait::hasPermission(51)):
                 $links_selling_point[] = [
                     'name' => 'Ventas',
                     'route' => route('pos.index'),
                     'active' => request()->routeIs('pos.index','pos.index.action'),
+                ];
+            endif;
+            if(RoleTrait::hasPermission(91)):
+                $links_selling_point[] = [
+                    'name' => 'Ventas generales',
+                    'route' => route('pos.generals.index'),
+                    'active' => request()->routeIs('pos.generals.index','pos.generals.action'),
                 ];
             endif;
             if(RoleTrait::hasPermission(52)):

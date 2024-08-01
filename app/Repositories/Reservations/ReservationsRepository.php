@@ -26,19 +26,15 @@ class ReservationsRepository
             "product_type" => 0,
             "zone" => 0,
             "site" => 0,
-            "is_duplicated" => 0,
             "payment_method" => NULL
         ];
         
         //Query DB
-        $query = ' AND rez.site_id NOT IN(21) AND rez.created_at BETWEEN :init AND :end';
+        $query = ' AND rez.site_id NOT IN(21) AND rez.created_at BETWEEN :init AND :end AND rez.is_duplicated = 0 ';
         $queryData = [
             'init' => date("Y-m-d") . " 00:00:00",
             'end' => date("Y-m-d") . " 23:59:59",
         ];
-
-        $query .= ' AND rez.is_duplicated = :is_duplicated ';
-        $queryData['is_duplicated'] = $data['is_duplicated'];
 
         if(isset( $request->date ) && !empty( $request->date )){
             $tmp_date = explode(" - ", $request->date);
@@ -67,7 +63,7 @@ class ReservationsRepository
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
             $data['payment_method'] = $request->payment_method;
         }
-        if(isset( $request->filter_text ) && !empty( $request->filter_text )){            
+        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
             $data['filter_text'] = $request->filter_text;
             $queryData = [];
             $query  = " AND (
@@ -80,8 +76,15 @@ class ReservationsRepository
         }         
         
         $bookings = DB::select("SELECT 
-                                    rez.id, rez.created_at, CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, rez.client_email, rez.currency, rez.is_cancelled, rez.is_duplicated, rez.affiliate_id, 
-                                    rez.pay_at_arrival, rez.open_credit,
+            rez.id, rez.created_at, 
+            CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, 
+            rez.client_email, 
+            rez.currency,
+            rez.is_cancelled, 
+            rez.is_duplicated, 
+            rez.affiliate_id, 
+            rez.pay_at_arrival, 
+            rez.open_credit,
                                     COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     CASE
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
@@ -134,9 +137,6 @@ class ReservationsRepository
                                 WHERE 1=1 {$query}
                                 GROUP BY rez.id, site.name",
                                     $queryData);
-        // echo "<pre>";
-        // print_r($bookings);
-        // die();
 
         $services = [];
         $db_services = DB::select("SELECT ds.id, dest.name as destination_name, IFNULL(dest_trans.translation, ds.name) AS service_name
