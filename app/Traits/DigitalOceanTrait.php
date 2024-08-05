@@ -63,8 +63,20 @@ trait DigitalOceanTrait
 
             $repo = new ReservationsRepository();
             $repo->create_followUps($request->input('folder'), 'Se ha agregado un archivo multimedia por '.auth()->user()->name, 'HISTORY', 'MEDIA');
-
-            return response()->json(['message' => 'Image uploaded successfully', 'url' => $result['ObjectURL']]);
+            
+            if( isset($request->type_action) && $request->type_action == "upload" ){
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Image uploaded successfully',
+                    'data' => array(
+                        "item"  => $request->id,
+                        "status"  => 1,
+                        "message" => "Se agrego una imagen a la reserva: ".$request->folder.", por ".auth()->user()->name
+                    )
+                ]);
+            }else{
+                return response()->json(['message' => 'Image uploaded successfully', 'url' => $result['ObjectURL']]);
+            }
         } catch (Aws\Exception\AwsException $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }

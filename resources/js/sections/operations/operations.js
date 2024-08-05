@@ -294,6 +294,38 @@ let setup = {
     }
 };
 
+//CONFIGURACION DE DROPZONE
+Dropzone.options.uploadForm = {    
+    maxFilesize: 5, // Tamaño máximo del archivo en MB
+    acceptedFiles: 'image/*,.pdf', // Solo permitir imágenes y archivos PDF
+    dictDefaultMessage: 'Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...',
+    addRemoveLinks: false,
+    autoProcessQueue: true,
+    uploadMultiple: false,
+    headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    init: function() {        
+        this.on("success", function(file, response) {
+            console.log(response);
+            if (response.hasOwnProperty('success') && response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 1500,
+                    willClose: () => {
+                        socket.emit("uploadBookingServer", response.data);
+                    }
+                })
+            }
+        });
+        this.on("error", function(file, errorMessage) {
+            console.log('Error al subir el archivo:', errorMessage);
+        });
+    }
+};
+
 //DECLARACION DE VARIABLES
 const from_autocomplete = document.getElementById('from_name'); //* ===== INPUT AUTOCOMPLETE ORIGIN ===== */
 const to_autocomplete = document.getElementById('to_name'); //* ===== INPUT AUTOCOMPLETE DESTINATION ===== */
@@ -921,12 +953,16 @@ if( __open_modal_comments.length > 0 ){
           const __form_label = __modal.querySelector('.form-label');
 
           //SETEAMOS VALORES EN EL MODAL
-          __title_modal.innerHTML = ( this.dataset.status == 0 ? "Agregar comentario" : "Editar comentario" );
+        //   __title_modal.innerHTML = ( this.dataset.status == 0 ? "Agregar comentario" : "Editar comentario" );
           __form_label.innerHTML = ( this.dataset.status == 0 ? "Ingresa el comentario" : "Editar el comentario" );
           document.getElementById('id_item').value = this.dataset.id;
           document.getElementById('code_item').value = this.dataset.code;
           document.getElementById('operation_item').value = this.dataset.operation;
           document.getElementById('type_item').value = this.dataset.type;
+
+          document.getElementById('id').value = this.dataset.id;
+          document.getElementById('reservation_id').value = this.dataset.reservation;
+          document.getElementById('reservation_item').value = this.dataset.code;
 
           if (this.dataset.status == 1) {
               $.ajax({
@@ -1269,7 +1305,25 @@ socket.on("addCommentClient", function(data){
     history();
     Snackbar.show({
         text: data.message,
-        duration: 5000, 
+        duration: 5000,
+        pos: 'top-right',
+        actionTextColor: '#fff',
+        backgroundColor: '#2196f3'
+    });
+});
+
+socket.on("uploadBookingClient", function(data){
+    console.log("upload");
+    console.log(data);
+
+    //DECLARACION DE VARIABLES
+    const __comment_new = document.getElementById('upload_new_' + data.item);
+    __comment_new.innerHTML = '<div class="btn btn-primary btn_operations bs-tooltip" title="Esta reservación tiene imagenes"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>'
+
+    setup.bsTooltip();
+    Snackbar.show({
+        text: data.message,
+        duration: 5000,
         pos: 'top-right',
         actionTextColor: '#fff',
         backgroundColor: '#2196f3'
