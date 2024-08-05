@@ -45,7 +45,7 @@
                                 </div>
                             </form>                        
                         </div>
-                        @if (RoleTrait::hasPermission(65))
+                        @if (RoleTrait::hasPermission(64))
                             <div class="tab-pane" id="icon-tab-2" role="tabpanel">
                                 @if (RoleTrait::hasPermission(64))
                                     <form id="upload-form" class="dropzone" action="/reservations/upload">
