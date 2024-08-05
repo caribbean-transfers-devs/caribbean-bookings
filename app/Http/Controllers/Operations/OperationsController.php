@@ -202,6 +202,7 @@ class OperationsController extends Controller
                                     'arrival' as operation_type,
                                     sit.name as site_name,
                                     'TYPE_ONE' as op_type,
+                                    CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                     -- CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
                                     COALESCE(SUM(s.total_sales), 0) as total_sales, 
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
@@ -209,7 +210,7 @@ class OperationsController extends Controller
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
                                         ELSE 'CONFIRMADO'
                                     END AS status,
-                                    zone_one.id as zone_one_id, 
+                                    zone_one.id as zone_one_id,
                                     zone_one.name as zone_one_name, 
                                     zone_one.is_primary as zone_one_is_primary, 
                                     zone_one.cut_off as zone_one_cut_off,
@@ -227,7 +228,7 @@ class OperationsController extends Controller
                                     CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
                                     CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name
                                    FROM reservations_items as it
-                                   INNER JOIN reservations as rez ON rez.id = it.reservation_id                                   
+                                   INNER JOIN reservations as rez ON rez.id = it.reservation_id
                                    INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
                                    INNER JOIN sites as sit ON sit.id = rez.site_id
                                    INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
@@ -236,6 +237,7 @@ class OperationsController extends Controller
                                    LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
                                    LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                    LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+                                   LEFT OUTER JOIN  reservations_media as upload ON upload.reservation_id = rez.id
                                 --    LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id
                                    LEFT JOIN (
                                        SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
@@ -266,8 +268,10 @@ class OperationsController extends Controller
                                    'departure' as operation_type, 
                                    sit.name as site_name, 
                                    'TYPE_TWO' as op_type, 
+                                   CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                     -- CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
-                                    COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                    COALESCE(SUM(s.total_sales), 0) as total_sales, 
+                                    COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     CASE
                                             WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
                                             ELSE 'CONFIRMADO'
@@ -292,6 +296,7 @@ class OperationsController extends Controller
                                    LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
                                    LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                    LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+                                   LEFT OUTER JOIN  reservations_media as upload ON upload.reservation_id = rez.id
                                 --    LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id
                                    LEFT JOIN (
                                            SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales                                            
@@ -1146,6 +1151,7 @@ class OperationsController extends Controller
         $sheet->setCellValue('R1', 'Estatus de pago');
         $sheet->setCellValue('S1', 'Total');
         $sheet->setCellValue('T1', 'Moneda');
+        $sheet->setCellValue('U1', 'Tipo');
 
         $count = 2;
 
@@ -1189,6 +1195,7 @@ class OperationsController extends Controller
             $sheet->setCellValue('R'.strval($count), $item->status);
             $sheet->setCellValue('S'.strval($count), number_format(( $item->is_round_trip == 1 ? ( $payment / 2 ) : $payment ),2));
             $sheet->setCellValue('T'.strval($count), $item->currency);
+            $sheet->setCellValue('U'.strval($count), ( $item->is_round_trip == 1 ? 'Round Trip' : 'One Way' ));
             $count = $count + 1;
         }
 
