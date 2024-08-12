@@ -13,7 +13,6 @@ use App\Http\Controllers\Configs\ZonesController;
 use App\Http\Controllers\Configs\RatesController;
 use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
-use App\Http\Controllers\Operations\DataController;
 use App\Http\Controllers\Reports\PaymentsController as ReportPayment;
 use App\Http\Controllers\Reports\SalesController as ReportSales;
 use App\Http\Controllers\Reports\CommissionsController as ReportCommissions;
@@ -113,8 +112,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/operation/capture/service', [Operations::class, 'createService'])->name('operation.capture.service');
     Route::get('/operation/board/exportExcel', [Operations::class, 'exportExcelBoard'])->name('operation.board.exportExcel');
     Route::get('/operation/board/exportExcelCommission', [Operations::class, 'exportExcelBoardCommision'])->name('operation.board.exportExcelComission');
-
-    Route::post('/update-data', [DataController::class, 'updateData']);
 
     //REPORTES
     Route::get('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment');

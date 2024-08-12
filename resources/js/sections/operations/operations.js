@@ -364,7 +364,6 @@ setup.bsTooltip();
 function history(){
     setup.bsTooltip();
     const __open_modal_historys = document.querySelectorAll('.__open_modal_history');
-    // console.log(__open_modal_historys);
     if( __open_modal_historys.length > 0 ){
         __open_modal_historys.forEach(__open_modal_history => {
             __open_modal_history.addEventListener('click', function(){

@@ -203,7 +203,7 @@ class OperationsController extends Controller
                                     sit.name as site_name,
                                     'TYPE_ONE' as op_type,
                                     CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
-                                    -- CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+                                    CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
                                     COALESCE(SUM(s.total_sales), 0) as total_sales, 
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     CASE
@@ -238,7 +238,7 @@ class OperationsController extends Controller
                                    LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                    LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
                                    LEFT OUTER JOIN  reservations_media as upload ON upload.reservation_id = rez.id
-                                --    LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id
+                                   LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND rfu.type IN ('CLIENT', 'OPERATION')
                                    LEFT JOIN (
                                        SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                        FROM sales
@@ -269,7 +269,7 @@ class OperationsController extends Controller
                                    sit.name as site_name, 
                                    'TYPE_TWO' as op_type, 
                                    CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
-                                    -- CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+                                    CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
                                     COALESCE(SUM(s.total_sales), 0) as total_sales, 
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     CASE
@@ -297,7 +297,7 @@ class OperationsController extends Controller
                                    LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                    LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
                                    LEFT OUTER JOIN  reservations_media as upload ON upload.reservation_id = rez.id
-                                --    LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id
+                                   LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND rfu.type IN ('CLIENT', 'OPERATION')
                                    LEFT JOIN (
                                            SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales                                            
                                            FROM sales
@@ -1152,6 +1152,7 @@ class OperationsController extends Controller
         $sheet->setCellValue('S1', 'Total');
         $sheet->setCellValue('T1', 'Moneda');
         $sheet->setCellValue('U1', 'Tipo');
+        $sheet->setCellValue('V1', 'Mensajes');
 
         $count = 2;
 
@@ -1159,6 +1160,11 @@ class OperationsController extends Controller
             // $payment = ( $item->total_sales - $item->total_payments );
             // if($payment < 0) $payment = 0;
             $payment = $item->total_sales;
+            $messages_text = $this->getMessages($item->reservation_id);
+            $message = ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_comments : $item->op_two_comments );
+            if( !empty($message) ){
+                $messages_text .= $message;
+            }
 
             $flag_preassignment = ( ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ) && $item->op_one_preassignment != "" ? true : ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && ( $item->is_round_trip == 1 ) && $item->op_two_preassignment != "" ? true : false ) );
             $preassignment = ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_preassignment : $item->op_two_preassignment );
@@ -1196,6 +1202,7 @@ class OperationsController extends Controller
             $sheet->setCellValue('S'.strval($count), number_format(( $item->is_round_trip == 1 ? ( $payment / 2 ) : $payment ),2));
             $sheet->setCellValue('T'.strval($count), $item->currency);
             $sheet->setCellValue('U'.strval($count), ( $item->is_round_trip == 1 ? 'Round Trip' : 'One Way' ));
+            $sheet->setCellValue('V'.strval($count), $messages_text);
             $count = $count + 1;
         }
 
