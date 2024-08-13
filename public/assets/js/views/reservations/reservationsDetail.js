@@ -1045,6 +1045,66 @@ function updateConfirmation(event, id, type, status, rez_id){
     });  
 }
 
+function updateUnlock(event, id, type, rez_id){
+    event.preventDefault();
+
+    swal.fire({
+        title: '¿Está seguro de desbloquear el cierre de operación de este servicio?',
+        text: "Esta acción no se puede revertir",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if(result.isConfirmed == true){
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });                
+            $.ajax({
+                url: `/operation/unlock/service`,
+                type: 'PUT',
+                data: { id, type, rez_id},
+                beforeSend: function() {        
+                    
+                },
+                success: function(resp) {
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        icon: 'success',
+                        html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
+                        timer: 2500,
+                        timerProgressBar: true,
+                        didOpen: () => {
+                            Swal.showLoading()
+                            const b = Swal.getHtmlContainer().querySelector('b')
+                            timerInterval = setInterval(() => {
+                                b.textContent = (Swal.getTimerLeft() / 1000)
+                                    .toFixed(0)
+                            }, 100)
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval)
+                        }
+                    }).then((result) => {
+                        location.reload();
+                    });
+                }
+            }).fail(function(xhr, status, error) {
+                    console.log(xhr);
+                    Swal.fire(
+                        '¡ERROR!',
+                        xhr.responseJSON.message,
+                        'error'
+                    );
+            });
+
+        }
+    });  
+}
+
 function enableReservation(id){
     $.ajaxSetup({
         headers: {

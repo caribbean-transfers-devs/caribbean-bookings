@@ -88,7 +88,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
     Route::get('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation');
     Route::post('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation.search');
-    Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');    
+    Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');
+
+    Route::put('/operation/unlock/service', [OperationController::class, 'updateUnlock'])->name('operation.unlock.update');
+
     Route::get('/reports/ccform', [CCFormController::class, 'index'])->name('operation.ccform');
     Route::get('/reports/ccform/pdf', [CCFormController::class, 'createPDF'])->name('operation.ccform.createPDF');
     Route::get('/operation/spam', [OperationController::class, 'spam'])->name('operation.spam');
