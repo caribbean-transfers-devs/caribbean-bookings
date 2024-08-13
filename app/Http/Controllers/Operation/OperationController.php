@@ -38,6 +38,13 @@ class OperationController extends Controller
         return $operationRepository->statusUpdate($request);        
     }
 
+    public function updateUnlock(Request $request, ConfirmationRepository $operationRepository){
+        if(!$this->hasPermission(92)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+        return $operationRepository->updateUnlock($request);        
+    }
+
     public function spam(Request $request, SpamRepository $spamRepository){
         if(!$this->hasPermission(47)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');

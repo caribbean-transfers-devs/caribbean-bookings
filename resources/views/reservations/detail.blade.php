@@ -231,7 +231,7 @@
                             </div>                            
                             @foreach ($reservation->items as $item)
                                 @php
-                                    //dd( $item->op_one_confirmation );
+                                    //dump( $item );
                                 @endphp
                                 <div class="services-container">
                                     <h3>{{ $item->code }}</h3>
@@ -345,7 +345,7 @@
                                                                         <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
                                                                         <hr>
                                                                         <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
-                                                                    </div>    
+                                                                    </div>
                                                                 @else
                                                                     @switch($item->op_one_status)
                                                                         @case('PENDING')
@@ -371,6 +371,10 @@
                                                             @endif
                                                             @if (RoleTrait::hasPermission(69))
                                                                 <button class="btn {{ (($item->op_one_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'arrival', {{ (($item->op_one_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})"><i class="align-middle" data-feather="check-circle"></i></button>
+                                                            @endif
+
+                                                            @if (RoleTrait::hasPermission(92) && $item->op_one_operation_close == 1 )
+                                                                <button class="btn btn-danger" type="button" onclick="updateUnlock(event, {{ $item->reservations_item_id }}, 'arrival', {{ $item->reservation_id }})"><i class="align-middle" data-feather="unlock"></i></button>
                                                             @endif
                                                         </td>
                                                     </tr>
@@ -457,6 +461,10 @@
                                                                 @if (RoleTrait::hasPermission(69))
                                                                     <button class="btn {{ (($item->op_two_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'departure', {{ (($item->op_two_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})"><i class="align-middle" data-feather="check-circle"></i></button>
                                                                 @endif
+
+                                                                @if (RoleTrait::hasPermission(92) && $item->op_two_operation_close == 1 )
+                                                                    <button class="btn btn-danger" type="button" onclick="updateUnlock(event, {{ $item->reservations_item_id }}, 'departure', {{ $item->reservation_id }})"><i class="align-middle" data-feather="unlock"></i></button>
+                                                                @endif                                                                
                                                             </td>
                                                         </tr>
                                                     @endif
