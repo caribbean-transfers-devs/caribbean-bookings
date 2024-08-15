@@ -93,6 +93,7 @@
 
                 table.DataTable( _settings );
             },
+
             seriesBookingsDay: function() {
                 let object = {
                     USD: 0,
@@ -294,13 +295,32 @@
 
 @section('content')
     <div class="row layout-top-spacing">
-
+        
         <div class="col-xxl-12 col-sm-12">
-            <select name="status" id="status" class="form-control w-25 mb-3">
-                <option value="day" selected>Día</option>
-                <option value="month">Mes</option>
-            </select>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <form action="" class="row" id="formFilter">
+                        <div class="col-12 col-sm-5 mb-3 mb-lg-0">
+                            <label class="form-label" for="lookup_date">Fecha de creación</label>
+                            <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $data['init'] }} - {{ $data['end'] }}">
+                        </div>
+                        <div class="col-12 col-sm-3 align-self-end">
+                            <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
+                        </div>
+                        <div class="col-12 col-sm-3 mb-3 mb-lg-0">
+                            <label class="form-label" for="">Selecciona una opción</label>
+                            <select name="status" id="status" class="form-control">
+                                @if ( !$flag_month )
+                                    <option value="day" selected>Día</option>    
+                                @endif                                
+                                <option value="month" <?=( $flag_month ? 'selected' : '' )?>>Mes</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
+
         @foreach ($bookings_day['status'] as $key => $status)
             <div class="col-xxl-4 col-sm-6">
                 <div class="card_status <?=$key?>">
@@ -328,12 +348,12 @@
                 <div class="body">
                     <h4 class="header-title mb-4 float-sm-start">Resumen de ventas</h4>
                     <div class="float-sm-end">
-                        <ul class="nav nav-pills">
+                        <ul class="nav nav-pills" id="items">
                             <li class="nav-item">
-                                <a class="nav-link active" href="#">Día</a>
+                                <a class="nav-link active" id="item_day" href="javascript:void(0);">Día</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Mes</a>
+                                <a class="nav-link" id="item_month" href="javascript:void(0);">Mes</a>
                             </li>
                         </ul>
                     </div>
@@ -353,7 +373,7 @@
                                       </span>
                                    </div>
                                    <div class="media-body ps-3">
-                                      <h4 class="font-size-20">$2354</h4>
+                                      <h4 class="font-size-20" id="total_sales_usd"></h4>
                                       <p class="text-muted"> <a href="#" class="text-primary">USD <i class="mdi mdi-arrow-right"></i></a>
                                       </p>
                                    </div>
@@ -365,11 +385,43 @@
                                       </span>
                                    </div>
                                    <div class="media-body ps-3">
-                                      <h4 class="font-size-20">$1598</h4>
+                                      <h4 class="font-size-20" id="total_sales_mxn"></h4>
                                       <p class="text-muted"> <a href="#" class="text-primary">MXN <i class="mdi mdi-arrow-right"></i></a></p>
                                    </div>
                                 </div>
                              </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xxl-12 col-sm-12">
+            <div class="card_sales">
+                <div class="body">
+                    <h4 class="header-title mb-4 float-sm-start">Historial</h4>
+                    <div class="float-sm-end">
+                        <ul class="nav nav-pills align-items-center" id="itemsOptions">
+                            <li class="me-2">
+                                <select name="option" id="option" class="form-control">
+                                    <option value="sites" selected>Sitios</option>
+                                    <option value="destinations">Destinos</option>
+                                </select>                                
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" id="itemOption_day" href="javascript:void(0);">Día</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="itemOption_month" href="javascript:void(0);">Mes</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="row align-items-start">
+                        <div class="col-xl-12">
+                            <div>
+                                <div id="stacked-column-chart2" class="apex-charts" dir="ltr"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -411,142 +463,5 @@
                 </div>
             </div>
         </div>
-
-
-        {{-- <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-            <div id="filters" class="accordion">
-                <div class="card">
-                <div class="card-header" id="headingOne1">
-                    <section class="mb-0 mt-0">
-                        <div role="menu" class="" data-bs-toggle="collapse" data-bs-target="#defaultAccordionOne" aria-expanded="true" aria-controls="defaultAccordionOne">
-                            Filtro de reportes <div class="icons"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
-                        </div>
-                    </section>
-                </div>
-                <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
-                    <div class="card-body">
-                        <form action="" class="row" id="formFilter">
-                            <div class="col-12 col-sm-5 mb-3 mb-lg-0">
-                                <label class="form-label" for="lookup_date">Fecha de creación</label>
-                                <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $data['init'] }} - {{ $data['end'] }}">
-                            </div>
-                            <div class="col-12 col-sm-3 align-self-end">
-                                <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                </div>
-            </div>
-        </div> --}}
-
-        <div class="row mb-3 d-none">
-            <div class="col-md-12">
-                <ul class="nav nav-pills" id="animateLine" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" data-action="day" id="animated-underline-day-tab" data-bs-toggle="tab" href="#animated-underline-day" role="tab" aria-controls="animated-underline-day" aria-selected="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> 
-                            Reservas de día
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-action="month" id="animated-underline-month-tab" data-bs-toggle="tab" href="#animated-underline-month" role="tab" aria-controls="animated-underline-month" aria-selected="false" tabindex="-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> 
-                            Reservas del mes
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        @php
-            // dump($bookings_month['status']);
-        @endphp
-        <div class="tab-content d-none" id="animateLineContent-4">
-            <div class="tab-pane fade show active" id="animated-underline-day" role="tabpanel" aria-labelledby="animated-underline-day-tab">
-                <div class="row">
-                    <div class="col-xl-12 col-lg-12 col-md-12 layout-spacing">
-                        <div class="section general-info">
-                            <div class="row info">
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-                                    <div class="widget widget-chart-three">
-                                        <div class="widget-heading">
-                                            <h5 class="">Historial de reservas por sitio del día</h5>
-                                        </div>        
-                                        <div class="widget-content">
-                                            <div id="bookingsAnalyticsSitesDay"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-                                    <div class="widget widget-chart-three">
-                                        <div class="widget-heading">
-                                            <h5 class="">Historial de reservas por destino del día</h5>
-                                        </div>        
-                                        <div class="widget-content">
-                                            <div id="bookingsAnalyticsDestinationsDay"></div>
-                                        </div>
-                                    </div>
-                                </div>                            
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="animated-underline-month" role="tabpanel" aria-labelledby="animated-underline-month-tab">
-                <div class="row">
-                    <div class="col-xl-12 col-lg-12 col-md-12 layout-spacing">
-                        <div class="section general-info">
-                            <div class="row info">
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-                                    <div class="widget widget-chart-one">
-                                        <div class="widget-heading">
-                                            <h5 class="">Historial de reservas y ganancias del més</h5>
-                                        </div>
-                                        <div class="widget-content">
-                                            <div id="bookingsAnalyticsMonth"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-                                    <div class="widget widget-chart-three">
-                                        <div class="widget-heading">
-                                            <h5 class="">Historial de reservas por divisas del més</h5>
-                                        </div>        
-                                        <div class="widget-content">
-                                            <div id="bookingsAnalyticsCurrencyMonth"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-                                    <div class="widget widget-chart-three">
-                                        <div class="widget-heading">
-                                            <h5 class="">Historial de reservas por sitio del més</h5>
-                                        </div>        
-                                        <div class="widget-content">
-                                            <div id="bookingsAnalyticsSitesMonth"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-                                    <div class="widget widget-chart-three">
-                                        <div class="widget-heading">
-                                            <h5 class="">Historial de reservas por destino del més</h5>
-                                        </div>        
-                                        <div class="widget-content">
-                                            <div id="bookingsAnalyticsDestinationsMonth"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>                                   
-                </div>
-            </div>
-        </div>
     </div>
-
-    <x-modals.reservations.bookings_day :bookings="$bookings_day" />
-    <x-modals.reservations.bookings_month :bookings="$bookings_month" />
 @endsection
