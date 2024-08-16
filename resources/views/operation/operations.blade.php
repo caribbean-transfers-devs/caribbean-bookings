@@ -39,6 +39,9 @@
         $buttons = array();
         // dump($buttons);
     @endphp
+    @if (RoleTrait::hasPermission(79))
+        <input type="hidden" class="" id="permission_reps" value="true" required>
+    @endif
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
         <div id="filters" class="accordion">
             <div class="card">
