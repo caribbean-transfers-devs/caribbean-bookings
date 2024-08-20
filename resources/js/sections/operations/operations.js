@@ -1334,29 +1334,32 @@ socket.on("addServiceClient", function(data){
     console.log(data);
     //DECLARACION DE VARIABLES
     const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
-    if( data.success ){
-        if( data.today ){
-            Swal.fire({
-                text: data.message,
-                showDenyButton: true,
-                showCancelButton: false,
-                confirmButtonText: "Confirmar recargar pagina",
-                denyButtonText: "Cancelar"
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                    location.reload();
-                } else if (result.isDenied) {
-                }
-            });
-        }else{
-            Snackbar.show({
-                text: data.message,
-                duration: 5000, 
-                pos: 'top-right',
-                actionTextColor: '#fff',
-                backgroundColor: '#2196f3'
-            });
-        }
+    const __permission = document.getElementById('permission_reps');
+    if (__permission == null) {
+        if( data.success ){
+            if( data.today ){
+                Swal.fire({
+                    text: data.message,
+                    showDenyButton: true,
+                    showCancelButton: false,
+                    confirmButtonText: "Confirmar recargar pagina",
+                    denyButtonText: "Cancelar"
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        location.reload();
+                    } else if (result.isDenied) {
+                    }
+                });
+            }else{
+                Snackbar.show({
+                    text: data.message,
+                    duration: 5000, 
+                    pos: 'top-right',
+                    actionTextColor: '#fff',
+                    backgroundColor: '#2196f3'
+                });
+            }
+        }   
     }
 });
