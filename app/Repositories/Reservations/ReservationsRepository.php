@@ -19,6 +19,7 @@ class ReservationsRepository
     
     public function index($request)
     {
+        // dump($request->input());
         $data = [
             "init" => date("Y-m-d") . " 00:00:00",
             "end" => date("Y-m-d") . " 23:59:59",
@@ -26,7 +27,8 @@ class ReservationsRepository
             "product_type" => 0,
             "zone" => 0,
             "site" => 0,
-            "payment_method" => NULL
+            "payment_method" => NULL,
+            "is_today" => 0
         ];
         
         //Query DB
@@ -35,6 +37,12 @@ class ReservationsRepository
             'init' => date("Y-m-d") . " 00:00:00",
             'end' => date("Y-m-d") . " 23:59:59",
         ];
+
+        $query2 = '';
+        if(isset( $request->is_today ) && !empty( $request->is_today)){
+            $data['is_today'] = $request->is_today;            
+            $query2 = ' HAVING is_today != 0 ';
+        }
 
         if(isset( $request->date ) && !empty( $request->date )){
             $tmp_date = explode(" - ", $request->date);
@@ -73,18 +81,18 @@ class ReservationsRepository
                         ( rez.reference like '%".$data['filter_text']."%') OR
                         ( it.code like '".$data['filter_text']."' )
                     )";            
-        }         
+        }
         
         $bookings = DB::select("SELECT 
-            rez.id, rez.created_at, 
-            CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, 
-            rez.client_email, 
-            rez.currency,
-            rez.is_cancelled, 
-            rez.is_duplicated, 
-            rez.affiliate_id, 
-            rez.pay_at_arrival, 
-            rez.open_credit,
+                            rez.id, rez.created_at, 
+                            CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, 
+                            rez.client_email, 
+                            rez.currency,
+                            rez.is_cancelled, 
+                            rez.is_duplicated, 
+                            rez.affiliate_id, 
+                            rez.pay_at_arrival, 
+                            rez.open_credit,
                                     COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     CASE
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
@@ -99,7 +107,7 @@ class ReservationsRepository
                                     GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
                                     SUM(it.passengers) as passengers,
                                     GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-                                    COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_one_pickup_today), 0) as is_today                                     
+                                    COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_one_pickup_today), 0) as is_today
                                 FROM reservations as rez
                                     INNER JOIN sites as site ON site.id = rez.site_id
                                     LEFT JOIN (
@@ -135,7 +143,8 @@ class ReservationsRepository
                                         GROUP BY it.reservation_id, it.is_round_trip
                                     ) as it ON it.reservation_id = rez.id
                                 WHERE 1=1 {$query}
-                                GROUP BY rez.id, site.name",
+                                GROUP BY rez.id, site.name
+                                {$query2}",
                                     $queryData);
 
         $services = [];
@@ -181,34 +190,6 @@ class ReservationsRepository
         );
         
         return view('reservations.index', compact('bookings','services','zones','websites','data','breadcrumbs') );
-
-        /*if(!$request->lookup_date){
-            $from = date('Y-m-d');
-            $to = date('Y-m-d');
-
-            $services = ReservationsService::select('reservation_item_id')->whereDate('pickup', '>=', $from)
-                ->whereDate('pickup', '<=', $to)
-                ->pluck('reservation_item_id');
-            $items = ReservationsItem::select('reservation_id')->whereIn('id', $services)->pluck('reservation_id');
-            $reservations = Reservation::whereIn('id',$items)->with('destination', 'items')->get();
-            return view('reservations.index', compact('reservations','from','to'));
-        }else{
-            if(strlen($request->lookup_date) <= 10){
-                $from = $request->lookup_date;
-                $to = $request->lookup_date;
-            }else{
-                $dates = explode(' a ', $request->lookup_date);
-                $from = $dates[0];
-                $to = $dates[1];
-            }          
-
-            $services = ReservationsService::select('reservation_item_id')->whereDate('pickup', '>=', $from)
-                ->whereDate('pickup', '<=', $to)
-                ->pluck('reservation_item_id');
-            $items = ReservationsItem::select('reservation_id')->whereIn('id', $services)->pluck('reservation_id');
-            $reservations = Reservation::whereIn('id',$items)->with('destination', 'items')->get();
-            return view('reservations.index', compact('reservations','from','to'));
-        } */
     }
 
     public function update($request,$reservation){

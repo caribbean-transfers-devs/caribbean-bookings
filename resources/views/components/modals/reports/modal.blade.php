@@ -1,4 +1,4 @@
-@props(['data','services','zones','websites'])
+@props(['data','services','zones','websites','istoday'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -57,6 +57,16 @@
                                 </select>
                             </div>
                         @endif
+                        @if ( isset($istoday) )
+                            <div class="col-12 col-sm-12">
+                                <label class="form-label" for="site">Operadas para hoy</label>
+                                <select class="form-select mb-3" name="is_today" id="is_today">
+                                    <option {{ $data['is_today'] == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                    <option {{ $data['is_today'] == '0' ? 'selected' : '' }} value="0">No</option>
+                                </select>
+                            </div>
+                        @endif
+
                     </div>
                 </div>
                 <div class="modal-footer">
