@@ -78,7 +78,7 @@
                             <th>Código</th>
                             <th>Estatus</th>
                             <th>Cliente</th>
-                            <th>Servicio</th>
+                            <th>Vehículo</th>
                             <th>Pasajeros</th>
                             <th>Total</th>
                             <th>Moneda</th>
@@ -166,10 +166,15 @@
                                                 @endswitch
                                             @endif                                            
                                         @else
-                                                <span class="badge badge-light-danger">Cancelado</span>
+                                            <span class="badge badge-light-danger">Cancelado</span>
                                         @endif
                                     </td> 
-                                    <td>{{ $item->client_full_name }}</td>
+                                    <td>
+                                        <span>{{ $item->client_full_name }}</span>
+                                        @if(!empty($item->reference))
+                                            [{{ $item->reference }}]
+                                        @endif
+                                    </td>
                                     <td>{{ $item->service_type_name }}</td>
                                     <td class="text-center">{{ $item->passengers }}</td>
                                     <td class="text-end">{{ $item->total_sales }}</td>

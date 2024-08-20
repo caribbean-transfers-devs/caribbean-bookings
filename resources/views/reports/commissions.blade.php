@@ -62,15 +62,15 @@
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>                                                        
-                            <th>Fecha</th>
+                            {{-- <th>Fecha</th> --}}
                             <th>Sitio</th>
                             <th>Código</th>
                             <th>Estatus</th>
                             <th>Cliente</th>
-                            <th>Servicio</th>
-                            <th>Pasajeros</th>
-                            <th>MXN</th>
-                            <th>USD</th>
+                            <th>Vehículo</th>
+                            <th>Tipo de servicio</th>
+                            <th>Total</th>
+                            <th>Moneda</th>
                             <th>Vendedor</th>
                             <th>Método de pago</th>
                             <th>Destino</th>
@@ -79,7 +79,7 @@
                     <tbody>
                         @if(sizeof($items) >= 1)
                             @foreach($items as $key => $value)
-                                @php                                                
+                                @php
                                     $status = $value->status;
                                     if(!isset( $users[ $value->employee ] )):
                                         $users[ $value->employee ] = ['USD' => 0, 'MXN' => 0, 'QUANTITY' => 0];
@@ -96,13 +96,27 @@
                                     $users[ $value->employee ]['QUANTITY']++;
                                 @endphp
                                 <tr>
-                                    <td>{{ date("m/d", strtotime($value->created_at)) }}</td>
+                                    {{-- <td>{{ date("m/d", strtotime($value->created_at)) }}</td> --}}
                                     <td>{{ $value->site_name }}</td>
                                     <td><a href="/reservations/detail/{{ $value->reservation_id }}" target="_blank"> {{ $value->code }}</a></td>
-                                    <td>                                                   
-                                        {{ $status }}
+                                    <td>
+                                        {{-- {{ $status }} --}}
+                                        @if ($value->is_cancelled == 0)
+                                            @if($value->open_credit == 1)
+                                                <span class="badge badge-light-warning">Crédito Abierto</span>
+                                            @else
+                                                <span class="badge badge-light-{{ $value->status == "CONFIRMADO" || $value->status == "COMPLETADO" ? 'success' : 'info' }}">{{ $value->status }}</span>
+                                            @endif                                            
+                                        @else
+                                            <span class="badge badge-light-danger">Cancelado</span>
+                                        @endif                                        
                                     </td>
-                                    <td>{{ ucwords(strtolower($value->full_name)) }}</td>
+                                    <td>
+                                        <span>{{ $value->full_name }}</span>
+                                        @if(!empty($value->reference))
+                                            [{{ $value->reference }}]
+                                        @endif                                        
+                                    </td>
                                     <td>{{ $value->service_name }}</td>
                                     <td>
                                         @if ($value->is_round_trip == 1)
@@ -111,20 +125,8 @@
                                             {{ $value->final_service_type }}
                                         @endif                                                    
                                     </td>
-                                    <td>
-                                        @if( $value->currency == "MXN" )
-                                            {{ number_format($value->total_sales,2,".","") }}
-                                        @else
-                                            0.00
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if( $value->currency == "USD" )
-                                            {{ number_format($value->total_sales,2,".","") }}
-                                        @else
-                                            0.00
-                                        @endif
-                                    </td>
+                                    <td>{{ number_format($value->total_sales,2,".","") }}</td>
+                                    <td>{{ $value->currency }}</td>
                                     <td>{{ $value->employee }}</td>
                                     <td>{{ $value->payment_type_name }}</td>
                                     <td>
