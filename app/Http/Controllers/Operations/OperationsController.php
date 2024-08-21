@@ -82,11 +82,16 @@ class OperationsController extends Controller
                 foreach($items as $key => $item):
                     $preassignment = "";
                     $service = ReservationsItem::find($item->id);
-                    if( $item->final_service_type == 'ARRIVAL' ){
+                    if( $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
                         $preassignment = "L".$arrival_counter;
                         $service->op_one_preassignment = $preassignment;
                         $arrival_counter ++;
                     }
+                    if( $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
+                        $preassignment = "L".$arrival_counter;
+                        $service->op_two_preassignment = $preassignment;
+                        $arrival_counter ++;
+                    }                                     
 
                     if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
                         $preassignment = "T".$transfer_counter;
@@ -259,8 +264,9 @@ class OperationsController extends Controller
                                    AND rez.is_duplicated = 0                                   
                             GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
 
-                                UNION 
-                                   SELECT 
+                            UNION
+
+                            SELECT 
                                    rez.id as reservation_id,
                                    CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
                                    rez.*, 
@@ -283,6 +289,7 @@ class OperationsController extends Controller
                                     CASE
                                         WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
                                         WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                        ELSE 'ARRIVAL'
                                     END AS final_service_type,
                                     vehicle_one.name as vehicle_one_name,
                                     vehicle_two.name as vehicle_two_name,
@@ -344,7 +351,10 @@ class OperationsController extends Controller
             //RECORREMOS LOS SERVICIOS PARA PODER INDENTIFICAR LA CONTINUIDAD DE LA PREASIGNACION
             if( sizeof($items)>=1 ):
                 foreach($items as $key => $item):
-                    if( $item->final_service_type == 'ARRIVAL' && $item->op_one_preassignment != "" ){
+                    if( $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) && $item->op_one_preassignment != "" ){
+                        $arrival_counter ++;
+                    }
+                    if( $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) && $item->op_two_preassignment != "" ){
                         $arrival_counter ++;
                     }
 
@@ -369,9 +379,13 @@ class OperationsController extends Controller
             $service = ReservationsItem::find($request->reservation_item);
             // dd($request, $service);
             //REALIZAMOS LA PREASIGNACION DEPENDIENDO DE LA OPERACION
-            if( $request->operation == 'ARRIVAL' ){
+            if( $request->operation == 'ARRIVAL' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
                 $preassignment = "L".( $arrival_counter == 0 ? 1 : ($arrival_counter + 1) );
                 $service->op_one_preassignment = $preassignment;
+            }
+            if( $request->operation == 'ARRIVAL' && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ){
+                $preassignment = "L".( $arrival_counter == 0 ? 1 : ($arrival_counter + 1) );
+                $service->op_two_preassignment = $preassignment;
             }
 
             if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
@@ -435,10 +449,15 @@ class OperationsController extends Controller
             $vehicle_new = Vehicle::find($request->vehicle_id);
 
             //ACTUALIZAMOS INFORMACION         
-            if( $request->operation == 'ARRIVAL' ){
+            if( $request->operation == 'ARRIVAL' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
                 $vehicle_current = Vehicle::find($service->vehicle_id_one);
                 $service->vehicle_id_one = $request->vehicle_id;
                 $service->op_one_operating_cost = $request->operating_cost;
+            }
+            if( $request->operation == 'ARRIVAL' && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ){
+                $vehicle_current = Vehicle::find($service->vehicle_id_two);
+                $service->vehicle_id_two = $request->vehicle_id;
+                $service->op_two_operating_cost = $request->operating_cost;
             }
 
             if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
@@ -511,9 +530,13 @@ class OperationsController extends Controller
             $driver_new = Driver::find($request->driver_id);
 
             //ACTUALIZAMOS INFORMACION
-            if( $request->operation == 'ARRIVAL' ){
+            if( $request->operation == 'ARRIVAL' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
                 $driver_current = Driver::find($service->driver_id_one);
                 $service->driver_id_one = $request->driver_id;
+            }
+            if( $request->operation == 'ARRIVAL' && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ){
+                $driver_current = Driver::find($service->driver_id_two);
+                $service->driver_id_two = $request->driver_id;
             }
 
             if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
@@ -572,9 +595,13 @@ class OperationsController extends Controller
             DB::beginTransaction();            
             $service = ReservationsItem::find($request->item_id);
 
-            if( $request->operation == "ARRIVAL" ):
+            if( $request->operation == "ARRIVAL" && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ):
                 $service->op_one_status_operation = $request->status;
                 ( isset($request->time) ? $service->op_one_time_operation = $request->time : "" );
+            endif;
+            if( $request->operation == "ARRIVAL" && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ):
+                $service->op_two_status_operation = $request->status;
+                ( isset($request->time) ? $service->op_two_time_operation = $request->time : "" );
             endif;
 
             if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
@@ -638,9 +665,12 @@ class OperationsController extends Controller
             DB::beginTransaction();
             $service = ReservationsItem::find($request->item_id);
 
-            if( $request->operation == "ARRIVAL" ):
+            if( $request->operation == "ARRIVAL" && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ):
                 $service->op_one_status = $request->status;
             endif;
+            if( $request->operation == "ARRIVAL" && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ):
+                $service->op_two_status = $request->status;
+            endif;            
 
             if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
                 $service->op_one_status = $request->status;
@@ -790,7 +820,7 @@ class OperationsController extends Controller
             $follow_up = new ReservationFollowUp();
             $follow_up->reservation_id = $reservation->id;
             $follow_up->name = auth()->user()->name;
-            $follow_up->text = 'Se capturó la venta por: '.auth()->user()->name;
+            $follow_up->text = 'SE CAPTURÓ LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES';
             $follow_up->type = 'HISTORY';
             $follow_up->save();
 
@@ -817,6 +847,13 @@ class OperationsController extends Controller
             $item->updated_at = Carbon::now();
             $item->save();
 
+            $follow_up = new ReservationFollowUp();
+            $follow_up->reservation_id = $reservation->id;
+            $follow_up->name = auth()->user()->name;
+            $follow_up->text = 'SE CREO EL SERVICIO: '.$item->code.' PARA LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES';
+            $follow_up->type = 'HISTORY';
+            $follow_up->save();
+
             // Creando Sale
             $sale = new Sale();
             $sale->reservation_id = $reservation->id;
@@ -826,6 +863,13 @@ class OperationsController extends Controller
             $sale->created_at = Carbon::now();
             $sale->updated_at = Carbon::now();
             $sale->save();
+
+            $follow_up = new ReservationFollowUp();
+            $follow_up->reservation_id = $reservation->id;
+            $follow_up->name = auth()->user()->name;
+            $follow_up->text = 'SE CAPTURO EL MONTO: '.$request->total.' PARA LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES';
+            $follow_up->type = 'HISTORY';
+            $follow_up->save();
 
             DB::commit();
 
@@ -853,9 +897,12 @@ class OperationsController extends Controller
             $service = ReservationsItem::find($request->code);
             $action = ( ( ( $request->type == "ARRIVAL" ) && $service->op_one_comments == "" ) || ( ( $request->operation == 'TRANSFER' || $request->type == "DEPARTURE" ) && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) && $service->op_one_comments == "" ) || ( ( $request->operation == 'TRANSFER' || $request->type == "DEPARTURE" ) && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) && $service->op_two_comments == "" ) ? "agrego" : ( ( ( $request->type == "ARRIVAL" ) && $service->op_one_comments != "" ) || ( ( $request->operation == 'TRANSFER' || $request->type == "DEPARTURE" ) && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) && $service->op_one_comments != "" ) || ( ( $request->operation == 'TRANSFER' || $request->type == "DEPARTURE" ) && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) && $service->op_two_comments != "" ) ? "actualizo" : "" ) );
 
-            if( $request->operation == "ARRIVAL" ):
+            if( $request->operation == "ARRIVAL" && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ):
                 $service->op_one_comments = $request->comment;
             endif;
+            if( $request->operation == "ARRIVAL" && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ):
+                $service->op_two_comments = $request->comment;
+            endif;            
 
             if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
                 $service->op_one_comments = $request->comment;
