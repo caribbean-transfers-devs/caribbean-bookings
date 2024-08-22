@@ -69,6 +69,10 @@ if ( document.getElementById('site') != null ) {
     new TomSelect(document.getElementById('site'));   
 }
 
+if ( document.getElementById('origin') != null ) {
+    new TomSelect(document.getElementById('origin'));   
+}
+
 //DECLARACION DE VARIABLES
 const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
 const __title_modal = document.getElementById('filterModalLabel');

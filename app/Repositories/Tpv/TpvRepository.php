@@ -11,12 +11,13 @@ use App\Traits\ApiTrait;
 use App\Models\Site;
 use App\Models\UserRole;
 use App\Models\User;
+use App\Models\OriginalSale;
 
 class TpvRepository
 {
     use ApiTrait;
 
-    public function handler($request){        
+    public function handler($request){
         Session::forget('tpv');
         $uuid = Str::uuid()->toString();
 
@@ -108,11 +109,12 @@ class TpvRepository
         endif;
 
         $sites = Site::all();
+        $original_sales = OriginalSale::where('status',1)->get();
 
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
         $agents = User::whereIn('id', $users_ids)->get();        
 
-        return view('tpv.form', compact('quotation','sites','agents'));
+        return view('tpv.form', compact('quotation','sites','original_sales','agents'));
     }
 
     public function create($request){
@@ -124,8 +126,9 @@ class TpvRepository
             'email_address' => $request->email_address,
             'phone' => str_replace(' ', '', $request->phone),
             'flight_number' => $request->flight_number,
-            'special_request' => $request->special_request,            
+            'special_request' => $request->special_request,
             'site_id' => $request->site_id,
+            'original_sale_id' => $request->original_sale_id,
             'call_center_agent' => $request->call_center_agent,
             'data' => [
                 'callcenter' => [
