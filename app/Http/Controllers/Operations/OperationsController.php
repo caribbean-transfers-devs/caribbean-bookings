@@ -207,8 +207,8 @@ class OperationsController extends Controller
                                 COALESCE(SUM(s.total_sales), 0) as total_sales, 
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 CASE
-                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
-                                ELSE 'CONFIRMED'
+                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
+                                ELSE 'CONFIRMADO'
                                 END AS status,
                                 zone_one.id as zone_one_id,
                                 zone_one.name as zone_one_name, 
@@ -223,6 +223,7 @@ class OperationsController extends Controller
                                     WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 1 THEN 'DEPARTURE'
                                     WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
                                 END AS final_service_type,
+                                GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                 vehicle_one.name as vehicle_one_name,
                                 vehicle_two.name as vehicle_two_name,
                                 CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
@@ -250,14 +251,14 @@ class OperationsController extends Controller
                                     GROUP BY reservation_id
                                 ) as s ON s.reservation_id = rez.id
                                 LEFT JOIN (
-                                        SELECT 
-                                            reservation_id,
-                                            ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
-                                                    WHEN operation = 'division' THEN total / exchange_rate
-                                                    ELSE total END), 2) AS total_payments,
-                                            GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
-                                        FROM payments
-                                            GROUP BY reservation_id
+                                    SELECT 
+                                        reservation_id,
+                                        ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                WHEN operation = 'division' THEN total / exchange_rate
+                                                ELSE total END), 2) AS total_payments,
+                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
+                                    FROM payments
+                                        GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
                                    AND rez.is_cancelled = 0
@@ -267,23 +268,23 @@ class OperationsController extends Controller
                             UNION
 
                             SELECT 
-                                   rez.id as reservation_id,
-                                   CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
-                                   rez.*, 
-                                   it.*, 
-                                   serv.name as service_name, 
-                                   it.op_two_pickup as filtered_date, 
-                                   'departure' as operation_type, 
-                                   sit.name as site_name, 
-                                   'TYPE_TWO' as op_type, 
-                                   CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
-                                    CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
-                                    COALESCE(SUM(s.total_sales), 0) as total_sales, 
-                                    COALESCE(SUM(p.total_payments), 0) as total_payments,
-                                    CASE
-                                            WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
-                                            ELSE 'CONFIRMADO'
-                                    END AS status,
+                                rez.id as reservation_id,
+                                CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
+                                rez.*, 
+                                it.*, 
+                                serv.name as service_name, 
+                                it.op_two_pickup as filtered_date,
+                                'departure' as operation_type, 
+                                sit.name as site_name, 
+                                'TYPE_TWO' as op_type,
+                                CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
+                                CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+                                COALESCE(SUM(s.total_sales), 0) as total_sales, 
+                                COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                CASE
+                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
+                                ELSE 'CONFIRMADO'
+                                END AS status,
                                     zone_one.id as zone_one_id, zone_one.name as zone_one_name, zone_one.is_primary as zone_one_is_primary, zone_one.cut_off as zone_one_cut_off,
                                     zone_two.id as zone_two_id, zone_two.name as zone_two_name, zone_two.is_primary as zone_two_is_primary, zone_two.cut_off as zone_two_cut_off,
                                     CASE
@@ -291,6 +292,7 @@ class OperationsController extends Controller
                                         WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
                                         ELSE 'ARRIVAL'
                                     END AS final_service_type,
+                                    GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                     vehicle_one.name as vehicle_one_name,
                                     vehicle_two.name as vehicle_two_name,
                                     CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
@@ -1200,8 +1202,9 @@ class OperationsController extends Controller
         $sheet->setCellValue('R1', 'Estatus de pago');
         $sheet->setCellValue('S1', 'Total');
         $sheet->setCellValue('T1', 'Moneda');
-        $sheet->setCellValue('U1', 'Tipo');
-        $sheet->setCellValue('V1', 'Mensajes');
+        $sheet->setCellValue('U1', 'Metodo de pago');
+        $sheet->setCellValue('V1', 'Tipo');
+        $sheet->setCellValue('W1', 'Mensajes');
 
         $count = 2;
 
@@ -1250,8 +1253,9 @@ class OperationsController extends Controller
             $sheet->setCellValue('R'.strval($count), $item->status);
             $sheet->setCellValue('S'.strval($count), number_format(( $item->is_round_trip == 1 ? ( $payment / 2 ) : $payment ),2));
             $sheet->setCellValue('T'.strval($count), $item->currency);
-            $sheet->setCellValue('U'.strval($count), ( $item->is_round_trip == 1 ? 'Round Trip' : 'One Way' ));
-            $sheet->setCellValue('V'.strval($count), $messages_text);
+            $sheet->setCellValue('U'.strval($count), ( !empty($item->payment_type_name) ? $item->payment_type_name : "PENDIENTE DE PAGO" ));
+            $sheet->setCellValue('V'.strval($count), ( $item->is_round_trip == 1 ? 'Round Trip' : 'One Way' ));
+            $sheet->setCellValue('W'.strval($count), $messages_text);
             $count = $count + 1;
         }
 

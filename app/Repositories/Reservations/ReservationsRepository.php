@@ -43,7 +43,6 @@ class ReservationsRepository
             $data['is_today'] = $request->is_today;            
             $query2 = ' HAVING is_today != 0 ';
         }
-
         if(isset( $request->date ) && !empty( $request->date )){
             $tmp_date = explode(" - ", $request->date);
             $data['init'] = $tmp_date[0];
