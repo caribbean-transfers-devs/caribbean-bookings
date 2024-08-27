@@ -428,40 +428,5 @@
             </div>
         </div>
 
-        <div class="col-xxl-12 col-sm-12">
-            <div class="card_bookings">
-                <div class="p-3">
-                    <h5 class="header-title mb-0">Reservaciones</h5>
-                </div>
-                <div class="w-100">
-                    <div class="table-responsive mt-container-ra w-100 bookings_day">
-                        <table class="table table-nowrap table-hover mb-0 w-100">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Nombre</th>
-                                    <th>Monto</th>
-                                    <th>Estatus</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{-- <div class="mt-container-ra w-100 bookings_day" > --}}
-                                @if ( isset($bookings_month['bookings']) )
-                                    @foreach ($bookings_month['bookings'] as $key => $booking)
-                                        <tr>
-                                            <td><a href="{{ route('reservations.details',['id' => $booking->id]) }}">{{ $booking->reservation_codes }}</a></td>
-                                            <td>{{ $booking->client_full_name }}</td>
-                                            <td>$ {{ number_format($booking->total_sales,2) }} {{ $booking->currency }}</td>
-                                            <td><span class="badge bg-{{ strtolower($booking->status) }}-subtle text-{{ strtolower($booking->status) }}">{{ strtolower($booking->status) }}</span></td>
-                                        </tr>                                    
-                                    @endforeach
-                                @endif
-                                {{-- </div> --}}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 @endsection
