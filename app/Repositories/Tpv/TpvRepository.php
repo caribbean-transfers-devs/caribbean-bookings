@@ -11,7 +11,7 @@ use App\Traits\ApiTrait;
 use App\Models\Site;
 use App\Models\UserRole;
 use App\Models\User;
-use App\Models\OriginalSale;
+use App\Models\OriginSale;
 
 class TpvRepository
 {
@@ -109,12 +109,12 @@ class TpvRepository
         endif;
 
         $sites = Site::all();
-        $original_sales = OriginalSale::where('status',1)->get();
+        $origin_sales = OriginSale::where('status',1)->get();
 
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
         $agents = User::whereIn('id', $users_ids)->get();        
 
-        return view('tpv.form', compact('quotation','sites','original_sales','agents'));
+        return view('tpv.form', compact('quotation','sites','origin_sales','agents'));
     }
 
     public function create($request){
@@ -128,7 +128,7 @@ class TpvRepository
             'flight_number' => $request->flight_number,
             'special_request' => $request->special_request,
             'site_id' => $request->site_id,
-            'original_sale_id' => $request->original_sale_id,
+            'origin_sale_id' => $request->origin_sale_id,
             'call_center_agent' => $request->call_center_agent,
             'data' => [
                 'callcenter' => [

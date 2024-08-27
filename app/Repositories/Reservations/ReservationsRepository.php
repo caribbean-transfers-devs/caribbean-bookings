@@ -7,7 +7,7 @@ use App\Models\ReservationFollowUp;
 use App\Models\ReservationsItem;
 use App\Models\ReservationsService;
 use App\Models\Payment;
-use App\Models\OriginalSale;
+use App\Models\OriginSale;
 use App\Models\ContactPoints;
 use Exception;
 use Illuminate\Http\Response;
@@ -106,7 +106,7 @@ class ReservationsRepository
                                         ELSE 'CONFIRMED'
                                     END AS status,
                                     site.name as site_name,
-                                    original.code as original_code,
+                                    origin.code as origin_code,
                                     GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
                                     GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
                                     GROUP_CONCAT(DISTINCT it.zone_two_name ORDER BY it.zone_two_name ASC SEPARATOR ',') AS destination_name_to,
@@ -118,7 +118,7 @@ class ReservationsRepository
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today
                                 FROM reservations as rez
                                     INNER JOIN sites as site ON site.id = rez.site_id
-                                    LEFT OUTER JOIN original_sales as original ON original.id = rez.original_sale_id
+                                    LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
                                     LEFT JOIN (
                                         SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                         FROM sales
@@ -188,7 +188,7 @@ class ReservationsRepository
                                 FROM sites
                                 ORDER BY site_name ASC");
 
-        $original_sales = OriginalSale::All();                                
+        $origin_sales = OriginSale::All();
 
         
         if(sizeof( $bookings ) > 0):
@@ -203,7 +203,7 @@ class ReservationsRepository
             ),
         );
         
-        return view('reservations.index', compact('bookings','services','zones','websites','original_sales','data','breadcrumbs') );
+        return view('reservations.index', compact('bookings','services','zones','websites','origin_sales','data','breadcrumbs') );
     }
 
     public function update($request,$reservation){

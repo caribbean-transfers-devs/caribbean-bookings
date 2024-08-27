@@ -97,11 +97,11 @@
                     </select>
                 </div>
                 <div>
-                    <label class="form-label" for="formSite">Origen de venta</label>
-                    <select class="form-control" id="formOriginSale" name="original_sale_id">
-                        @if (isset( $original_sales ) && sizeof($original_sales) >= 1)
-                            @foreach ($original_sales as $original_sale)
-                                <option value="{{ $original_sale->id }}">{{ $original_sale->code }}</option>
+                    <label class="form-label" for="formOriginSale">Origen de venta</label>
+                    <select class="form-control" id="formOriginSale" name="origin_sale_id">
+                        @if (isset( $origin_sales ) && sizeof($origin_sales) >= 1)
+                            @foreach ($origin_sales as $origin_sale)
+                                <option value="{{ $origin_sale->id }}">{{ $origin_sale->code }}</option>
                             @endforeach
                         @endif
                     </select>                    

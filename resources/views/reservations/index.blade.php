@@ -342,5 +342,5 @@
         </div>
     </div>
 
-    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" :originalsales="$original_sales" :istoday="1" />
+    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" :originsales="$origin_sales" :istoday="1" />
 @endsection

@@ -1,4 +1,4 @@
-@props(['data','services','zones','websites','originalsales','istoday'])
+@props(['data','services','zones','websites','originsales','istoday'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -57,13 +57,13 @@
                                 </select>
                             </div>
                         @endif
-                        @if ( !empty($originalsales) )
+                        @if ( !empty($originsales) )
                             <div class="col-12 col-sm-6">
                                 <label class="form-label" for="origin">Origen de venta</label>
                                 <select class="form-select mb-3" placeholder="Selecciona un origen" name="origin" >
                                     <option value="0">Selecciona un origen</option>
-                                    @foreach ($originalsales as $key => $originalsale)
-                                        <option value="{{ $originalsale->id }}" {{ (($data['origin'] == $originalsale->id)?'selected':'') }}>{{ $originalsale->code }}</option> 
+                                    @foreach ($originsales as $key => $originsale)
+                                        <option value="{{ $originsale->id }}" {{ (($data['origin'] == $originsale->id)?'selected':'') }}>{{ $originsale->code }}</option> 
                                     @endforeach
                                 </select>
                             </div>
