@@ -97,6 +97,16 @@
                     </select>
                 </div>
                 <div>
+                    <label class="form-label" for="formOriginSale">Origen de venta</label>
+                    <select class="form-control" id="formOriginSale" name="origin_sale_id">
+                        @if (isset( $origin_sales ) && sizeof($origin_sales) >= 1)
+                            @foreach ($origin_sales as $origin_sale)
+                                <option value="{{ $origin_sale->id }}">{{ $origin_sale->code }}</option>
+                            @endforeach
+                        @endif
+                    </select>                    
+                </div>
+                <div>
                     <label class="form-label" for="formReference">Referencia</label>
                     <input class="form-control" type="text" name="data[callcenter][reference]" id="formReference" autocomplete="off">                                    
                 </div>

@@ -1,4 +1,4 @@
-@props(['data','services','zones','websites','istoday'])
+@props(['data','services','zones','websites','originsales','istoday'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -48,7 +48,7 @@
                             </select>
                         </div>
                         @if ( !empty($websites) )
-                            <div class="col-12 col-sm-12">
+                            <div class="col-12 col-sm-6">
                                 <label class="form-label" for="site">Sitio</label>
                                 <select class="form-select mb-3" placeholder="Selecciona un sitio" name="site[]" id="site" multiple>                            
                                     @foreach ($websites as $key => $value)
@@ -57,8 +57,19 @@
                                 </select>
                             </div>
                         @endif
+                        @if ( !empty($originsales) )
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label" for="origin">Origen de venta</label>
+                                <select class="form-select mb-3" placeholder="Selecciona un origen" name="origin" >
+                                    <option value="0">Selecciona un origen</option>
+                                    @foreach ($originsales as $key => $originsale)
+                                        <option value="{{ $originsale->id }}" {{ (($data['origin'] == $originsale->id)?'selected':'') }}>{{ $originsale->code }}</option> 
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif                        
                         @if ( isset($istoday) )
-                            <div class="col-12 col-sm-12">
+                            <div class="col-12 col-sm-6">
                                 <label class="form-label" for="site">Operadas para hoy</label>
                                 <select class="form-select mb-3" name="is_today" id="is_today">
                                     <option {{ $data['is_today'] == '1' ? 'selected' : '' }} value="1">Sí</option>
@@ -66,7 +77,6 @@
                                 </select>
                             </div>
                         @endif
-
                     </div>
                 </div>
                 <div class="modal-footer">

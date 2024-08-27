@@ -75,7 +75,10 @@
                         <tr>
                             <th></th>
                             <th>Sitio</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
                             <th>Código</th>
+                            <th>Origen de venta</th>
                             <th>Estatus</th>
                             <th>Cliente</th>
                             <th>Vehículo</th>
@@ -147,9 +150,12 @@
                                         @endif
                                     </td>
                                     <td>{{ $item->site_name }}</td>
+                                    <td>{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
+                                    <td>{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td>
                                         <a href="reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a>
                                     </td> 
+                                    <td>{{ !empty($item->original_code) ? $item->original_code : 'NO APLICA' }}</td>
                                     <td class="text-center">
                                         @if ($item->is_cancelled == 0)
                                             @if($item->open_credit == 1)
@@ -336,5 +342,5 @@
         </div>
     </div>
 
-    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" :istoday="1" />
+    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" :originsales="$origin_sales" :istoday="1" />
 @endsection

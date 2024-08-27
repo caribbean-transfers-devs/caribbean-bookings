@@ -7,6 +7,7 @@ use App\Models\ReservationFollowUp;
 use App\Models\ReservationsItem;
 use App\Models\ReservationsService;
 use App\Models\Payment;
+use App\Models\OriginSale;
 use App\Models\ContactPoints;
 use Exception;
 use Illuminate\Http\Response;
@@ -27,8 +28,9 @@ class ReservationsRepository
             "product_type" => 0,
             "zone" => 0,
             "site" => 0,
+            "origin" => 0,
             "payment_method" => NULL,
-            "is_today" => 0
+            "is_today" => 0,
         ];
         
         //Query DB
@@ -67,6 +69,11 @@ class ReservationsRepository
             $query .= ' AND site.id = :site';
             $queryData['site'] = $data['site'];
         }
+        if(isset( $request->origin ) && $request->origin != 0){
+            $data['origin'] = $request->origin;
+            $query .= ' AND original.id = :origin';
+            $queryData['origin'] = $data['origin'];
+        }        
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
             $data['payment_method'] = $request->payment_method;
         }
@@ -99,6 +106,7 @@ class ReservationsRepository
                                         ELSE 'CONFIRMED'
                                     END AS status,
                                     site.name as site_name,
+                                    origin.code as origin_code,
                                     GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
                                     GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
                                     GROUP_CONCAT(DISTINCT it.zone_two_name ORDER BY it.zone_two_name ASC SEPARATOR ',') AS destination_name_to,
@@ -110,6 +118,7 @@ class ReservationsRepository
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today
                                 FROM reservations as rez
                                     INNER JOIN sites as site ON site.id = rez.site_id
+                                    LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
                                     LEFT JOIN (
                                         SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                         FROM sales
@@ -179,6 +188,8 @@ class ReservationsRepository
                                 FROM sites
                                 ORDER BY site_name ASC");
 
+        $origin_sales = OriginSale::All();
+
         
         if(sizeof( $bookings ) > 0):
             usort($bookings, array($this, 'orderByDateTime'));
@@ -192,7 +203,7 @@ class ReservationsRepository
             ),
         );
         
-        return view('reservations.index', compact('bookings','services','zones','websites','data','breadcrumbs') );
+        return view('reservations.index', compact('bookings','services','zones','websites','origin_sales','data','breadcrumbs') );
     }
 
     public function update($request,$reservation){
@@ -285,7 +296,7 @@ class ReservationsRepository
     } 
 
     public function follow_ups($request)
-    {        
+    {
         $check = $this->create_followUps($request->reservation_id, $request->text, $request->type, $request->name);
         if($check){
             return response()->json(['message' => 'Follow up created successfully','success' => true], Response::HTTP_OK);
