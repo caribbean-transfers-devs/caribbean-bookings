@@ -213,7 +213,7 @@
                                 }
                             @endphp
                             @php
-                                // if ($value->reservation_id == "32613") {
+                                // if ($value->final_service_type == "ARRIVAL") {
                                 //     dump($value);
                                 // }
                             @endphp
@@ -260,7 +260,12 @@
                                         [{{ $value->reference }}]
                                     @endif
                                 </td>
-                                <td>{{ $value->final_service_type }}</td>
+                                <td>
+                                    {{ $value->final_service_type }}
+                                    @if ( $value->final_service_type == "ARRIVAL" )
+                                        <span class="badge badge-{{ $value->is_round_trip == 0 ? 'success' : 'danger' }} mb-2 me-4">{{ $value->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
+                                    @endif                                    
+                                </td>
                                 <td class="text-center">{{ $value->passengers }}</td>
                                 <td style="{{ ( $cut_off_zone >= 3 ? 'background-color:#e2a03f;color:#fff;' : ( $cut_off_zone >= 2 && $cut_off_zone < 3 ? 'background-color:#805dca;color:#fff;' : '' ) ) }}">{{ $operation_from }}</td>
                                 <td>{{ $operation_to }}</td>
