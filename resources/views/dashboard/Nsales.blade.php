@@ -293,6 +293,16 @@
     <div class="row layout-top-spacing">
         {{-- @dump($bookingsData); --}}
         <div class="statbox widget box box-shadow">
+            <form action="" method="POST" class="row mb-3" id="formFilter">
+                <div class="col-12 col-sm-4 mb-3 mb-lg-0">
+                    <label class="form-label" for="lookup_date">Fecha de creación</label>
+                    <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $data['init'] }} - {{ $data['end'] }}">
+                </div>
+                <div class="col-12 col-sm-2 align-self-end">
+                    <button type="submit" class="btn btn-primary btn-lg btn-filter w-100 _effect--ripple waves-effect waves-light">Filtrar</button>
+                </div>
+            </form>
+            
             <div class="report_sale">
                 <div>
                     <table class="table table-bordered">

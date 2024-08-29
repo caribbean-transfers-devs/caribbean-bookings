@@ -60,10 +60,8 @@ class DashboardRepository
     
     public function sales($request, $type){
         $data = [
-            // "init" => date("Y-m-d") . " 00:00:00",
-            // "end" => date("Y-m-d") . " 23:59:59",
-            "init" => "2024-08-15 00:00:00",
-            "end" => "2024-08-15 23:59:59",
+            "init" => date("Y-m-d") . " 00:00:00",
+            "end" => date("Y-m-d") . " 23:59:59",
         ];
 
         $bookingsData = [
@@ -117,19 +115,13 @@ class DashboardRepository
         }
         
         $tmp_date = ( isset( $request->date ) && !empty( $request->date ) ? explode(" - ", $request->date) : array() );
-        // $data['init'] = ( isset($tmp_date[0]) ? $tmp_date[0] : date("Y-m-d") . " 00:00:00" );
-        // $data['end'] = ( isset($tmp_date[1]) ? $tmp_date[1] : date("Y-m-d") . " 23:59:59" );
-
-        $data['init'] = ( isset($tmp_date[0]) ? $tmp_date[0] : "2024-08-15 00:00:00" );
-        $data['end'] = ( isset($tmp_date[1]) ? $tmp_date[1] : "2024-08-15 23:59:59" );
-
-        $queryData['init'] =  ( isset($tmp_date[0]) ? $tmp_date[0] : '2024-08-15' ).' 00:00:00';
-        $queryData['end'] = ( isset($tmp_date[1]) ? $tmp_date[1] : '2024-08-15' ).' 23:59:59';
-
+        $data['init'] = ( isset($tmp_date[0]) ? $tmp_date[0] : date("Y-m-d") . " 00:00:00" );
+        $data['end'] = ( isset($tmp_date[1]) ? $tmp_date[1] : date("Y-m-d") . " 23:59:59" );
+        $queryData['init'] =  ( isset($tmp_date[0]) ? $tmp_date[0] : date("Y-m-d") ).' 00:00:00';
+        $queryData['end'] = ( isset($tmp_date[1]) ? $tmp_date[1] : date("Y-m-d") ).' 23:59:59';
         $bookings = $this->dataBooking($query, $queryData);
 
         // dd($bookings);
-
         if(sizeof( $bookings ) >= 1){
             foreach ($bookings as $key => $booking) {
                 if( ( $booking->is_cancelled == 0 && ($booking->pay_at_arrival == 0 || $booking->pay_at_arrival == 1) && $booking->status == "CONFIRMED" ) || ( $booking->is_cancelled == 0 && $booking->pay_at_arrival == 1 && $booking->status == "PENDING" ) ){
@@ -303,160 +295,6 @@ class DashboardRepository
                 ////////////////////////////////////////////////////////////////////////////////////////
             }
         }
-
-        // dd($bookingsData);
-
-        // if(sizeof( $bookings_data_day ) >= 1){
-        //     foreach($bookings_data_day as $bookingsDay):
-        //         // $bookingsDay->status = ( $bookingsDay->pay_at_arrival == 1 || $bookingsDay->status == "CONFIRMED"  ? "CONFIRMED" : $bookingsDay->status ) ;//MODIFICAMOS EL TEXTO DE LOS ESTATUS EN BASE AL IDIOMA
-        //         // $bookingsDay->status = ( $bookingsDay->is_cancelled == 1 ? "CANCELED" : ( ($bookingsDay->pay_at_arrival == 0 && $bookingsDay->is_cancelled == 0 && $bookingsDay->status == "PENDING") ? "PENDING" : "CONFIRMED" ) ) ;//MODIFICAMOS EL TEXTO DE LOS ESTATUS EN BASE AL IDIOMA
-
-        //         if( ( $bookingsDay->is_cancelled == 0 && ($bookingsDay->pay_at_arrival == 0 || $bookingsDay->pay_at_arrival == 1) && $bookingsDay->status == "CONFIRMED" ) || ( $bookingsDay->is_cancelled == 0 && $bookingsDay->pay_at_arrival == 1 && $bookingsDay->status == "PENDING" ) ){
-        //             $bookingsDay->status = "CONFIRMED";
-        //         }
-
-        //         if( ( $bookingsDay->pay_at_arrival == 0 && $bookingsDay->is_cancelled == 0 && $bookingsDay->status == "PENDING" ) ){
-        //             $bookingsDay->status = "PENDING";
-        //         }
-
-        //         if( $bookingsDay->is_cancelled == 1 && ( $bookingsDay->pay_at_arrival == 0 || $bookingsDay->pay_at_arrival == 1 ) ){
-        //             $bookingsDay->status = "CANCELED";
-        //         }
-
-        //         $date_ = date("Y-m-d", strtotime( $bookingsDay->created_at ));
-
-        //         $bookings_day[$bookingsDay->currency]["total"] += $bookingsDay->total_sales;
-        //         $bookings_day[$bookingsDay->currency]["counter"]++;
-        //         $bookings_day['counter']++;
-        //         $bookings_day["bookings"][] = $bookingsDay;
-
-        //         if( isset( $bookings_day["bookings_day"][ $date_ ] ) ){
-        //             if( ( $bookingsDay->status == "CONFIRMED" || $bookingsDay->status == "PENDING" ) ){
-        //                 $bookings_day["bookings_day"][ $date_ ]['bookings_day'][] = $bookingsDay;
-        //                 $bookings_day["bookings_day"][ $date_ ]['counter']++;
-        //                 $bookings_day["bookings_day"][ $date_ ][$bookingsDay->currency] += $bookingsDay->total_sales;
-        //             }
-        //         }
-
-        //         if( isset( $bookings_day["status"][ Str::slug($bookingsDay->status) ] ) ){  
-        //             $bookings_day["status"][ Str::slug($bookingsDay->status) ][$bookingsDay->currency] += $bookingsDay->total_sales;
-        //             $bookings_day["status"][ Str::slug($bookingsDay->status) ]['counter']++;
-        //             $bookings_day["status"][ Str::slug($bookingsDay->status) ]['percentage'] = ($bookings_day["status"][ Str::slug($bookingsDay->status) ]['counter'] / $bookings_day["counter"]) * 100;
-        //         }
-
-        //         if( ( $bookingsDay->status == "CONFIRMED" || $bookingsDay->status == "PENDING" ) ){
-        //             //ALIMENTAMOS LAS VENTAS DEL MES POR SITIO
-        //             if(!isset( $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)] )):
-        //                 $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)] = [
-        //                     'name' => '',
-        //                     'USD' => 0,
-        //                     'MXN' => 0,                        
-        //                     'counter' => 0                        
-        //                 ];
-        //             endif;
-        //             $bookings_sites_day[$bookingsDay->currency] += $bookingsDay->total_sales;
-        //             $bookings_sites_day['counter']++;
-        //             $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)]['name'] = $bookingsDay->site_name;
-        //             $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)][$bookingsDay->currency] += $bookingsDay->total_sales;
-        //             $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)]['counter']++;
-
-        //             //ALIMENTAMOS LAS VENTAS DEL MES POR DESTINO
-        //             if(!isset( $bookings_destinations_day['data'][Str::slug($bookingsDay->destination_name)] )):
-        //                 $faker = Faker::create();
-        //                 $cadenaAleatoria = $faker->regexify('[A-F0-9]{6}');
-        //                 $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))] = [
-        //                     'name' => '',
-        //                     'USD' => 0,
-        //                     'MXN' => 0,
-        //                     'counter' => 0,
-        //                     'color' => '#' . $cadenaAleatoria
-        //                 ];
-        //             endif;
-        //             $bookings_destinations_day[$bookingsDay->currency] += $bookingsDay->total_sales;
-        //             $bookings_destinations_day['counter']++;
-        //             $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))]['name'] = ($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido");
-        //             $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))][$bookingsDay->currency] += $bookingsDay->total_sales;
-        //             $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))]['counter']++;
-        //         }
-
-        //     endforeach;
-        // }
-
-        // if(sizeof( $bookings_data_month ) >= 1){
-        //     foreach($bookings_data_month as $value):
-        //         // $value->status = (( $value->pay_at_arrival == 1 && $value->is_cancelled == 0 ) || $value->status == "CONFIRMED"  ? "CONFIRMED" : ( $value->pay_at_arrival == 0 && $value->is_cancelled == 0 ? "PENDING" : "CANCELED" ) ) ;//MODIFICAMOS EL TEXTO DE LOS ESTATUS EN BASE AL IDIOMA
-        //         // $value->status = ( $value->is_cancelled == 1 ? "CANCELED" : ( ($value->pay_at_arrival == 0 && $value->is_cancelled == 0 && $value->status == "PENDING") ? "PENDING" : "CONFIRMED" ) ) ;//MODIFICAMOS EL TEXTO DE LOS ESTATUS EN BASE AL IDIOMA
-
-        //         if( ( $value->is_cancelled == 0 && ($value->pay_at_arrival == 0 || $value->pay_at_arrival == 1) && $value->status == "CONFIRMED" ) || ( $value->is_cancelled == 0 && $value->pay_at_arrival == 1 && $value->status == "PENDING" ) ){
-        //             $value->status = "CONFIRMED";
-        //         }
-
-        //         if( ( $value->pay_at_arrival == 0 && $value->is_cancelled == 0 && $value->status == "PENDING" ) ){
-        //             $value->status = "PENDING";
-        //         }
-
-        //         if( $value->is_cancelled == 1 && ( $value->pay_at_arrival == 0 || $value->pay_at_arrival == 1 ) ){
-        //             $value->status = "CANCELED";
-        //         }
-
-        //         $date_ = date("Y-m-d", strtotime( $value->created_at ));
-
-        //         $bookings_month[$value->currency]["total"] += $value->total_sales;
-        //         $bookings_month[$value->currency]["counter"]++;
-        //         $bookings_month['counter']++;
-        //         $bookings_month["bookings"][] = $value;
-
-        //         if( isset( $bookings_month["bookings_day"][ $date_ ] ) ){
-        //             if( ( $value->status == "CONFIRMED" || $value->status == "PENDING" ) ){
-        //                 $bookings_month["bookings_day"][ $date_ ]['bookings_day'][] = $value;
-        //                 $bookings_month["bookings_day"][ $date_ ]['counter']++;
-        //                 $bookings_month["bookings_day"][ $date_ ][$value->currency] += $value->total_sales;
-        //             }
-        //         }
-
-        //         if( isset( $bookings_month["status"][ Str::slug($value->status) ] ) ){
-        //             $bookings_month["status"][ Str::slug($value->status) ][$value->currency] += $value->total_sales;
-        //             $bookings_month["status"][ Str::slug($value->status) ]['counter']++;
-        //             $bookings_month["status"][ Str::slug($value->status) ]['percentage'] = ($bookings_month["status"][ Str::slug($value->status) ]['counter'] / $bookings_month["counter"]) * 100;
-        //         }
-
-        //         if( ( $value->status == "CONFIRMED" || $value->status == "PENDING" ) ){
-        //             //ALIMENTAMOS LAS VENTAS DEL MES POR SITIO
-        //             if(!isset( $bookings_sites_month['data'][Str::slug($value->site_name)] )):
-        //                 $bookings_sites_month['data'][Str::slug($value->site_name)] = [
-        //                     'name' => '',
-        //                     'USD' => 0,
-        //                     'MXN' => 0,                        
-        //                     'counter' => 0                        
-        //                 ];
-        //             endif;
-        //             $bookings_sites_month[$value->currency] += $value->total_sales;
-        //             $bookings_sites_month['counter']++;
-        //             $bookings_sites_month['data'][Str::slug($value->site_name)]['name'] = $value->site_name;
-        //             $bookings_sites_month['data'][Str::slug($value->site_name)][$value->currency] += $value->total_sales;
-        //             $bookings_sites_month['data'][Str::slug($value->site_name)]['counter']++;
-
-        //             //ALIMENTAMOS LAS VENTAS DEL MES POR DESTINO
-        //             if(!isset( $bookings_destinations_month['data'][Str::slug($value->destination_name)] )):
-        //                 $faker = Faker::create();
-        //                 $cadenaAleatoria = $faker->regexify('[A-F0-9]{6}');
-        //                 $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))] = [
-        //                     'name' => '',
-        //                     'USD' => 0,
-        //                     'MXN' => 0,
-        //                     'counter' => 0,
-        //                     'color' => '#' . $cadenaAleatoria
-        //                 ];
-        //             endif;
-        //             $bookings_destinations_month[$value->currency] += $value->total_sales;
-        //             $bookings_destinations_month['counter']++;
-        //             $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))]['name'] = ($value->destination_name != "" ? $value->destination_name : "Indefinido");
-        //             $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))][$value->currency] += $value->total_sales;
-        //             $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))]['counter']++;
-        //         }
-                
-        //     endforeach;
-        // }
         
         $breadcrumbs = array(
             array(
