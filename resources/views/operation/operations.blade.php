@@ -212,12 +212,12 @@
                                         break;
                                 }
                             @endphp
-                            {{-- @php
-                                if ($value->reservation_id == "33404") {
-                                    dump($value);
-                                }
-                            @endphp --}}
-                            <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
+                            @php
+                                // if ($value->reservation_id == "32613") {
+                                //     dump($value);
+                                // }
+                            @endphp
+                            <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
                                 <td>
                                     @if ( $flag_preassignment )
                                         <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : '' }}">{{ $preassignment }}</button>
@@ -349,8 +349,8 @@
                                     @endif
                                 </td>
                                 <td style="{{ ( $value->service_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_name }}</td>
-                                <td class="text-center" style="{{ ( $value->status == "PENDING" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ $value->status }}</td>
-                                <td class="text-end" style="{{ ( $value->status == "PENDING" ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($value->total_sales,2) }}</td>
+                                <td class="text-center" style="{{ ( $value->status == "PENDING" || $value->status == "PENDIENTE" || ( $value->status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ $value->status }}</td>
+                                <td class="text-end" style="{{ ( $value->status == "PENDING" || $value->status == "PENDIENTE" || ( $value->status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($value->total_sales,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
