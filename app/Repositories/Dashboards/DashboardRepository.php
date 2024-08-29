@@ -67,11 +67,42 @@ class DashboardRepository
         ];
 
         $bookingsData = [
-            "total_amount" => 0,
-            "total_count" => 0,
-            // "PLATFORM" => [],
-            // "CALLCENTER" => [],
-            // "AGENCY" => [],
+            'accumulated' => [
+                "total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "counter" => 0,
+            ],
+            'confirmed' => [
+                "total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "counter" => 0,
+            ],
+            'cancelled' => [
+                "total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "counter" => 0,
+            ],
         ];
         
         //Query DB
@@ -113,27 +144,167 @@ class DashboardRepository
                     $booking->status = "CANCELED";
                 }
 
-                if( !isset( $bookingsData['data'][$booking->type_site][Str::slug($booking->site_name)] )):
-                    $bookingsData['data'][$booking->type_site][Str::slug($booking->site_name)] = [
+                if( !isset( $bookingsData['data'][$booking->type_site] )):
+                    $bookingsData['data'][$booking->type_site] = [
+                        'background' => '',
+                        'color' => '',
                         'name' => '',
-                        'total' => 0,
-                        'counter' => 0
+                        'accumulated' => [
+                            "total" => 0,
+                            "USD" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "MXN" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "counter" => 0,
+                        ],
+                        'confirmed' => [
+                            "total" => 0,
+                            "USD" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "MXN" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "counter" => 0,
+                        ],
+                        'cancelled' => [
+                            "total" => 0,
+                            "USD" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "MXN" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "counter" => 0,
+                        ],
+                        'items' => []
                     ];
-                else:
-                    if( ( $booking->status == "CONFIRMED" || $booking->status == "PENDING" ) ){
-                        $bookingsData['data'][$booking->type_site][Str::slug($booking->site_name)]['name'] = $booking->site_name;
-                        $bookingsData['data'][$booking->type_site][Str::slug($booking->site_name)]['total'] += ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales );
-                        // $bookingsData[$booking->type_site][Str::slug($booking->site_name)]['total'] += $booking->total_sales;
-                        $bookingsData['data'][$booking->type_site][Str::slug($booking->site_name)]['counter']++;
+                endif;
 
-                        $bookingsData['total_amount'] += ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales );
-                        $bookingsData['total_count']++;
-                    }
-                endif;                   
+                if( !isset( $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)] )):
+                    $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)] = [
+                        'name' => '',                        
+                        'accumulated' => [
+                            "total" => 0,
+                            "USD" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "MXN" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "counter" => 0,
+                        ],
+                        'confirmed' => [
+                            "total" => 0,
+                            "USD" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "MXN" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "counter" => 0,
+                        ],
+                        'cancelled' => [
+                            "total" => 0,
+                            "USD" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "MXN" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "counter" => 0,
+                        ],
+                    ];
+                endif;
+
+                ////////////////////////////////////////////////////////////////////////////////////////
+                    $bookingsData['accumulated']['total'] += ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales );
+                    $bookingsData['accumulated'][$booking->currency]['total'] += $booking->total_sales;
+                    $bookingsData['accumulated'][$booking->currency]['counter']++;
+                    $bookingsData['accumulated']['counter']++;
+
+                    $bookingsData['confirmed']['total'] += ( $booking->status == "CONFIRMED" || $booking->status == "PENDING" ? ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales ) : 0 );
+                    $bookingsData['confirmed'][$booking->currency]['total'] += ( $booking->status == "CONFIRMED" || $booking->status == "PENDING" ? $booking->total_sales : 0 );
+                    if( $booking->status == "CONFIRMED" || $booking->status == "PENDING" ):
+                        $bookingsData['confirmed'][$booking->currency]['counter']++;
+                        $bookingsData['confirmed']['counter']++;
+                    endif;
+
+                    $bookingsData['cancelled']['total'] += ( $booking->status == "CANCELED" ? ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales ) : 0 );
+                    $bookingsData['cancelled'][$booking->currency]['total'] += ( $booking->status == "CANCELED" ? $booking->total_sales : 0 );
+                    if( $booking->status == "CANCELED" ):
+                        $bookingsData['cancelled'][$booking->currency]['counter']++;
+                        $bookingsData['cancelled']['counter']++;
+                    endif;
+                ////////////////////////////////////////////////////////////////////////////////////////
+
+                ////////////////////////////////////////////////////////////////////////////////////////
+                    $bookingsData['data'][$booking->type_site]['background'] = ( $booking->type_site == "PLATFORM" ? "#e95f2b" : ( $booking->type_site == "CALLCENTER" ? "#009688" : ( $booking->type_site == "AGENCY" ? "#2196f3" : "#304aca" ) ) );
+                    $bookingsData['data'][$booking->type_site]['color'] = ( $booking->type_site == "PLATFORM" ? "#000000" : ( $booking->type_site == "CALLCENTER" ? "#ffffff" : ( $booking->type_site == "AGENCY" ? "#000000" : "#ffffff" ) ) );
+                    $bookingsData['data'][$booking->type_site]['name'] = ( $booking->type_site == "PLATFORM" ? "PLATAFORMAS" : ( $booking->type_site == "CALLCENTER" ? "CALL CENTER" : ( $booking->type_site == "AGENCY" ? "AGENCIA" : "TAQUILLA" ) ) );                
+
+                    $bookingsData['data'][$booking->type_site]['accumulated']['total'] += ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales );
+                    $bookingsData['data'][$booking->type_site]['accumulated'][$booking->currency]['total'] += $booking->total_sales;
+                    $bookingsData['data'][$booking->type_site]['accumulated'][$booking->currency]['counter']++;
+                    $bookingsData['data'][$booking->type_site]['accumulated']['counter']++;
+
+                    $bookingsData['data'][$booking->type_site]['confirmed']['total'] += ( $booking->status == "CONFIRMED" || $booking->status == "PENDING" ? ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales ) : 0 );
+                    $bookingsData['data'][$booking->type_site]['confirmed'][$booking->currency]['total'] += ( $booking->status == "CONFIRMED" || $booking->status == "PENDING" ? $booking->total_sales : 0 );
+                    if( $booking->status == "CONFIRMED" || $booking->status == "PENDING" ):
+                        $bookingsData['data'][$booking->type_site]['confirmed'][$booking->currency]['counter']++;
+                        $bookingsData['data'][$booking->type_site]['confirmed']['counter']++;
+                    endif;
+
+                    $bookingsData['data'][$booking->type_site]['cancelled']['total'] += ( $booking->status == "CANCELED" ? ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales ) : 0 );
+                    $bookingsData['data'][$booking->type_site]['cancelled'][$booking->currency]['total'] += ( $booking->status == "CANCELED" ? $booking->total_sales : 0 );
+                    if( $booking->status == "CANCELED" ):
+                        $bookingsData['data'][$booking->type_site]['cancelled'][$booking->currency]['counter']++;
+                        $bookingsData['data'][$booking->type_site]['cancelled']['counter']++;
+                    endif;
+                ////////////////////////////////////////////////////////////////////////////////////////
+
+                ////////////////////////////////////////////////////////////////////////////////////////
+                    $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['name'] = $booking->site_name;
+                    //GUARDAMOS EL ACUMULADO EN GENERAL DE RESERVAS CONFIRMADAS, PENDIENTES, CANCELADAS, POR SITIO
+                    $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['accumulated']['total'] += ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales );
+                    $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['accumulated'][$booking->currency]['total'] += $booking->total_sales;
+                    $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['accumulated'][$booking->currency]['counter']++;
+                    $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['accumulated']['counter']++;
+
+                    //GUARDAMOS EL ACUMULADO DE RESERVAS CONFIRMADAS, PENDIENTES, POR SITIO
+                    $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['confirmed']['total'] += ( $booking->status == "CONFIRMED" || $booking->status == "PENDING" ? ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales ) : 0 );
+                    $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['confirmed'][$booking->currency]['total'] += ( $booking->status == "CONFIRMED" || $booking->status == "PENDING" ? $booking->total_sales : 0 );
+                    if( $booking->status == "CONFIRMED" || $booking->status == "PENDING" ):
+                        $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['confirmed'][$booking->currency]['counter']++;
+                        $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['confirmed']['counter']++;
+                    endif;
+
+                    //GUARDAMOS EL ACUMULADO DE RESERVAS CANCELADAS, POR SITIO
+                    $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['cancelled']['total'] += ( $booking->status == "CANCELED" ? ( $booking->currency == "USD" ? ($booking->total_sales * 18) : $booking->total_sales ) : 0 );
+                    $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['cancelled'][$booking->currency]['total'] += ( $booking->status == "CANCELED" ? $booking->total_sales : 0 );
+                    if( $booking->status == "CANCELED" ):
+                        $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['cancelled'][$booking->currency]['counter']++;
+                        $bookingsData['data'][$booking->type_site]['items'][Str::slug($booking->site_name)]['cancelled']['counter']++;
+                    endif;
+                ////////////////////////////////////////////////////////////////////////////////////////
             }
         }
 
-        dd($bookingsData);
+        // dd($bookingsData);
 
         // if(sizeof( $bookings_data_day ) >= 1){
         //     foreach($bookings_data_day as $bookingsDay):
@@ -296,12 +467,7 @@ class DashboardRepository
         );
 
         return view('dashboard.Nsales', [
-            'bookings_day' => $bookings_day, 
-            'bookings_sites_day' => $bookings_sites_day,
-            'bookings_destinations_day' => $bookings_destinations_day,
-            'bookings_month' => $bookings_month,
-            'bookings_sites_month' => $bookings_sites_month,
-            'bookings_destinations_month' => $bookings_destinations_month,
+            'bookingsData' => $bookingsData, 
             'data' => $data,
             'breadcrumbs' => $breadcrumbs,
         ]);
