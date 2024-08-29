@@ -25,6 +25,10 @@
 // @import '../template/light/widgets/_widgets/widget-chart-two';
 // @import '../template/dark/widgets/_widgets/widget-chart-two';
 
+.secondary-nav{
+    top: 0;
+}
+
 .table:not(.dataTable).table-bordered thead tr th{ border: 1px solid #000000; padding: 10px; }
 .table:not(.dataTable).table-bordered > tbody > tr td{ border: 1px solid #000000; }
 
