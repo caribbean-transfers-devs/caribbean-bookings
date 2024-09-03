@@ -312,7 +312,6 @@ class DashboardRepository
     }
 
     public function sales2($request, $type){
-
         $bookings_day = [
             "USD" => [
                 "total" => 0,
@@ -496,10 +495,10 @@ class DashboardRepository
                 $bookings_sites_day['data'][Str::slug($bookingsDay->site_name)]['counter']++;
 
                 //ALIMENTAMOS LAS VENTAS DEL MES POR DESTINO
-                if(!isset( $bookings_destinations_day['data'][Str::slug($bookingsDay->destination_name)] )):
+                if(!isset( $bookings_destinations_day['data'][Str::slug($bookingsDay->destination_name_from)] )):
                     $faker = Faker::create();
                     $cadenaAleatoria = $faker->regexify('[A-F0-9]{6}');
-                    $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))] = [
+                    $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name_from != "" ? $bookingsDay->destination_name_from : "Indefinido"))] = [
                         'name' => '',
                         'USD' => 0,
                         'MXN' => 0,
@@ -509,9 +508,9 @@ class DashboardRepository
                 endif;
                 $bookings_destinations_day[$bookingsDay->currency] += $bookingsDay->total_sales;
                 $bookings_destinations_day['counter']++;
-                $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))]['name'] = ($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido");
-                $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))][$bookingsDay->currency] += $bookingsDay->total_sales;
-                $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name != "" ? $bookingsDay->destination_name : "Indefinido"))]['counter']++;
+                $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name_from != "" ? $bookingsDay->destination_name_from : "Indefinido"))]['name'] = ($bookingsDay->destination_name_from != "" ? $bookingsDay->destination_name_from : "Indefinido");
+                $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name_from != "" ? $bookingsDay->destination_name_from : "Indefinido"))][$bookingsDay->currency] += $bookingsDay->total_sales;
+                $bookings_destinations_day['data'][Str::slug(($bookingsDay->destination_name_from != "" ? $bookingsDay->destination_name_from : "Indefinido"))]['counter']++;
 
             endforeach;
         }
@@ -553,10 +552,10 @@ class DashboardRepository
                 $bookings_sites_month['data'][Str::slug($value->site_name)]['counter']++;
 
                 //ALIMENTAMOS LAS VENTAS DEL MES POR DESTINO
-                if(!isset( $bookings_destinations_month['data'][Str::slug($value->destination_name)] )):
+                if(!isset( $bookings_destinations_month['data'][Str::slug($value->destination_name_from)] )):
                     $faker = Faker::create();
                     $cadenaAleatoria = $faker->regexify('[A-F0-9]{6}');
-                    $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))] = [
+                    $bookings_destinations_month['data'][Str::slug(($value->destination_name_from != "" ? $value->destination_name_from : "Indefinido"))] = [
                         'name' => '',
                         'USD' => 0,
                         'MXN' => 0,
@@ -566,9 +565,9 @@ class DashboardRepository
                 endif;
                 $bookings_destinations_month[$value->currency] += $value->total_sales;
                 $bookings_destinations_month['counter']++;
-                $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))]['name'] = ($value->destination_name != "" ? $value->destination_name : "Indefinido");
-                $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))][$value->currency] += $value->total_sales;
-                $bookings_destinations_month['data'][Str::slug(($value->destination_name != "" ? $value->destination_name : "Indefinido"))]['counter']++;
+                $bookings_destinations_month['data'][Str::slug(($value->destination_name_from != "" ? $value->destination_name_from : "Indefinido"))]['name'] = ($value->destination_name_from != "" ? $value->destination_name_from : "Indefinido");
+                $bookings_destinations_month['data'][Str::slug(($value->destination_name_from != "" ? $value->destination_name_from : "Indefinido"))][$value->currency] += $value->total_sales;
+                $bookings_destinations_month['data'][Str::slug(($value->destination_name_from != "" ? $value->destination_name_from : "Indefinido"))]['counter']++;
                 
             endforeach;
         }

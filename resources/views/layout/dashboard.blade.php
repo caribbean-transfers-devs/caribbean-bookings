@@ -51,14 +51,26 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                                         <span>Ventas generales</span>
                                     </a>
+                                    <a href="{{ route('dashboard.sales.old',['general']) }}" class="btn btn-{{ request()->is('dashboard/salesOld/general') ? 'success' : 'primary' }}" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                        <span>Ventas generales anterior</span>
+                                    </a>
                                     <a href="{{ route('dashboard.sales',['online']) }}" class="btn btn-{{ request()->is('dashboard/sales/online') ? 'success' : 'primary' }}" >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                                         <span>Ventas en linea</span>
                                     </a>
+                                    <a href="{{ route('dashboard.sales.old',['online']) }}" class="btn btn-{{ request()->is('dashboard/salesOld/online') ? 'success' : 'primary' }}" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                        <span>Ventas en linea anterior</span>
+                                    </a>                                    
                                     <a href="{{ route('dashboard.sales',['airport']) }}" class="btn btn-{{ request()->is('dashboard/sales/airport') ? 'success' : 'primary' }}" >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                                         <span>Ventas de Aereopuerto</span>
                                     </a>
+                                    <a href="{{ route('dashboard.sales.old',['airport']) }}" class="btn btn-{{ request()->is('dashboard/salesOld/airport') ? 'success' : 'primary' }}" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                        <span>Ventas de Aereopuerto anterior</span>
+                                    </a>                                    
                                 </div>
                                 <div>
                                     <a href="{{ route('logout') }}" class="btn btn-primary __logouts">

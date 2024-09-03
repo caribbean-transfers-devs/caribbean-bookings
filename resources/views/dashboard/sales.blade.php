@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layout.dashboard')
 @section('title') Admin Dashboard @endsection
 
 @push('Css')
@@ -300,7 +300,7 @@
 @endpush
 
 @section('content')
-    <div class="row layout-top-spacing">
+
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div id="filters" class="accordion">
                 <div class="card">
@@ -347,9 +347,6 @@
             </div>
         </div>
 
-        @php
-            // dump($data);
-        @endphp
         <div class="tab-content" id="animateLineContent-4">
             <div class="tab-pane fade show active" id="animated-underline-day" role="tabpanel" aria-labelledby="animated-underline-day-tab">
                 <div class="row">
@@ -410,7 +407,7 @@
                                                                     <div class="t-dot" data-original-title="" title="">
                                                                     </div>
                                                                     <div class="t-text">
-                                                                        <p><span>{{ $booking->client_full_name }}</span> <a href="{{ route('reservations.details',['id' => $booking->id]) }}">{{ $booking->reservation_codes }}</a></p>
+                                                                        <p><span>{{ $booking->full_name }}</span> <a href="{{ route('reservations.details',['id' => $booking->id]) }}">{{ $booking->reservation_codes }}</a></p>
                                                                         <span class="badge">{{ strtolower($booking->status) }}</span>
                                                                         <p class="t-time">$ {{ number_format($booking->total_sales,2) }} {{ $booking->currency }}</p>
                                                                     </div>
@@ -523,7 +520,7 @@
                                                                     <div class="t-dot" data-original-title="" title="">
                                                                     </div>
                                                                     <div class="t-text">
-                                                                        <p><span>{{ $booking->client_full_name }}</span> <a href="{{ route('reservations.details',['id' => $booking->id]) }}">{{ $booking->reservation_codes }}</a></p>
+                                                                        <p><span>{{ $booking->full_name }}</span> <a href="{{ route('reservations.details',['id' => $booking->id]) }}">{{ $booking->reservation_codes }}</a></p>
                                                                         <span class="badge">{{ strtolower($booking->status) }}</span>
                                                                         <p class="t-time">$ {{ number_format($booking->total_sales,2) }} {{ $booking->currency }}</p>
                                                                     </div>
@@ -598,7 +595,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    
 
     <x-modals.reservations.bookings_day :bookings="$bookings_day" />
     <x-modals.reservations.bookings_month :bookings="$bookings_month" />

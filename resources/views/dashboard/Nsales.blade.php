@@ -318,9 +318,7 @@
     </div>    
 
     <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
-        {{-- @dump($bookingsData); --}}
-        <div class="statbox widget box box-shadow">
-            
+        <div class="statbox widget box box-shadow">            
             <div class="report_sale">
                 <div>
                     <table class="table table-bordered">

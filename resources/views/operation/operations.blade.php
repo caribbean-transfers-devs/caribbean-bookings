@@ -30,18 +30,34 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script> 
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
-    <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>    
+    <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>
 @endpush
 
 @section('content')
     @php
-        // dd($items);
+        $total_close = 0;
         $buttons = array();
         // dump($buttons);
+        if( sizeof($items) >= 1 ):
+            foreach ($items as $operation) {
+                $close_operation = ( ( ( $operation->final_service_type == 'ARRIVAL' || $operation->final_service_type == 'TRANSFER' || $operation->final_service_type == 'DEPARTURE' ) && $operation->op_type == "TYPE_ONE" && ( $operation->is_round_trip == 0 || $operation->is_round_trip == 1 ) ) ? $operation->op_one_operation_close : $operation->op_two_operation_close );
+                ( $close_operation == 1 ? $total_close++ : "" );
+            }
+        endif;
     @endphp
     @if (RoleTrait::hasPermission(79))
         <input type="hidden" class="" id="permission_reps" value="true" required>
     @endif
+
+    @if ( sizeof($items) >= 1 )
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="alert alert-arrow-right alert-icon-right alert-light-{{ sizeof($items) == $total_close ? 'success' : 'danger' }} mb-4" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>
+                {{ sizeof($items) == $total_close ? 'La operación ya se encuentra cerrada' : 'La operación esta activa' }}.
+            </div>
+        </div>
+    @endif
+
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
         <div id="filters" class="accordion">
             <div class="card">
