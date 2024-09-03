@@ -28,9 +28,9 @@
                                             <span><strong>ID:</strong> {{ $item->id }}</span><br>
                                             <span>#<a class="text-primary" href="reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a></span><br>                                                
                                             <span><strong>Canal:</strong> {{ $item->site_name }}</span><br>
-                                            <span><strong>Cliente:</strong> {{ ucwords( strtolower( $item->client_full_name ) ) }}</span><br>
+                                            <span><strong>Cliente:</strong> {{ ucwords( strtolower( $item->full_name ) ) }}</span><br>
                                             <span><strong>Servicio:</strong> {{ $item->service_type_name }}</span><br>
-                                            <span><strong>Destino:</strong> {{ $item->destination_name }}</span>
+                                            <span><strong>Destino:</strong> {{ $item->destination_name_from }}</span>
                                         </td>
                                         <td class="text-center">
                                             <span class="badge badge-">{{ strtolower($item->status) }}</span>
