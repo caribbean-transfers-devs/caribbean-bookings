@@ -3,12 +3,14 @@
 namespace App\Repositories\Reservations;
 
 use App\Models\Reservation;
+use App\Models\DestinationService;
 use App\Models\ReservationFollowUp;
 use App\Models\ReservationsItem;
 use App\Models\ReservationsService;
 use App\Models\Payment;
 use App\Models\OriginSale;
 use App\Models\ContactPoints;
+use App\Models\Zones;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -90,24 +92,30 @@ class ReservationsRepository
         }
         
         $bookings = DB::select("SELECT 
-                                    rez.id, 
+                                    rez.id as reservation_id, 
                                     CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name, 
                                     rez.client_email, 
                                     rez.currency, 
-                                    rez.is_cancelled, 
-                                    rez.is_duplicated, 
-                                    rez.affiliate_id, 
-                                    rez.pay_at_arrival, 
+                                    rez.is_cancelled,
+                                    rez.site_id,
+                                    rez.pay_at_arrival,
+                                    rez.reference,
+                                    rez.affiliate_id,
+                                    rez.terminal,
+                                    rez.comments,
                                     rez.open_credit,
-                                    rez.created_at, 
+                                    rez.is_complete,
+                                    rez.created_at,
+                                    site.name as site_name,
+                                    origin.code as origin_code,
+
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     CASE
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         ELSE 'CONFIRMED'
-                                    END AS status,                                    
-                                    site.name as site_name,
-                                    origin.code as origin_code,
+                                    END AS status,
+
                                     GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
                                     GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
                                     GROUP_CONCAT(DISTINCT it.zone_one_id ORDER BY it.zone_one_id ASC SEPARATOR ',') AS zone_one_id,
@@ -117,7 +125,8 @@ class ReservationsRepository
                                     GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
                                     SUM(it.passengers) as passengers,
                                     GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-                                    COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today
+                                    COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
+                                    SUM(it.is_round_trip) as is_round_trip
                                 FROM reservations as rez
                                     INNER JOIN sites as site ON site.id = rez.site_id
                                     LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
@@ -143,7 +152,7 @@ class ReservationsRepository
                                             SUM(it.passengers) as passengers,
                                             GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS code,
                                             GROUP_CONCAT(DISTINCT zone_one.name ORDER BY zone_one.name ASC SEPARATOR ',') AS zone_one_name,
-                                            GROUP_CONCAT(DISTINCT zone_one.id ORDER BY zone_one.id ASC SEPARATOR ',') AS zone_one_id, 
+                                            GROUP_CONCAT(DISTINCT zone_one.id ORDER BY zone_one.id ASC SEPARATOR ',') AS zone_one_id,
                                             GROUP_CONCAT(DISTINCT zone_two.name ORDER BY zone_two.name ASC SEPARATOR ',') AS zone_two_name, 
                                             GROUP_CONCAT(DISTINCT zone_two.id ORDER BY zone_two.id ASC SEPARATOR ',') AS zone_two_id, 
                                             GROUP_CONCAT(DISTINCT dest.id ORDER BY dest.id ASC SEPARATOR ',') AS service_type_id, 
@@ -158,9 +167,8 @@ class ReservationsRepository
                                         GROUP BY it.reservation_id, it.is_round_trip
                                     ) as it ON it.reservation_id = rez.id
                                 WHERE 1=1 {$query}
-                                GROUP BY rez.id, site.name, site.type_site
-                                {$query2}",
-                                    $queryData);
+                                GROUP BY rez.id, site.name {$query2}",
+                                $queryData);
 
         $services = [];
         $db_services = DB::select("SELECT ds.id, dest.name as destination_name, IFNULL(dest_trans.translation, ds.name) AS service_name
@@ -192,7 +200,6 @@ class ReservationsRepository
                                 ORDER BY site_name ASC");
 
         $origin_sales = OriginSale::All();
-
         
         if(sizeof( $bookings ) > 0):
             usort($bookings, array($this, 'orderByDateTime'));
@@ -332,29 +339,202 @@ class ReservationsRepository
     {
         try {
             DB::beginTransaction();
+            $this->logReservation($request, $item);
             $item->destination_service_id = $request->destination_service_id;
             $item->passengers = $request->passengers;
+            $item->flight_number = $request->flight_number;
+            
             $item->from_name = $request->from_name;
             $item->to_name = $request->to_name;
-            $item->flight_number = $request->flight_number;
+        
             $item->from_zone = $request->from_zone_id;
             if($request->from_lat){
                 $item->from_lat = $request->from_lat;
                 $item->from_lng = $request->from_lng;
             }
+
             $item->to_zone = $request->to_zone_id;
             if($request->to_lat){
                 $item->to_lat = $request->to_lat;
                 $item->to_lng = $request->to_lng;
             }
+
             $item->op_one_pickup = $request->op_one_pickup;
             $item->op_two_pickup = $request->op_two_pickup ?? null;
             $item->save();
             DB::commit();
-            return response()->json(['message' => 'Item updated successfully', 'success' => true], Response::HTTP_OK);
+            return response()->json([
+                'message' => 'Item updated successfully', 
+                'success' => true
+            ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error updating item', 'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json([
+                'message' => 'Error updating item', 
+                'success' => false
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function logReservation($request, $item){
+        //LOG DE TIPO DE VEHÍVULO
+        if( $request->destination_service_id != $item->destination_service_id ){
+            $destination_old = DestinationService::find($item->destination_service_id);
+            $destination_new = DestinationService::find($request->destination_service_id);
+
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;            
+            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo el tipo de Vehículo de: ".$destination_old->name." a ".$destination_new->name;
+            $follow_up_db->save();
+        }
+
+        //LOG DE NUMERO DE PASAJEROS
+        if( $request->passengers != $item->passengers  ){
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo el número de pasajeros de: ".$item->passengers." a ".$request->passengers;
+            $follow_up_db->save();
+        }
+
+        //LOG DE NÚMERO DE VUELO
+        if( $request->flight_number != $item->flight_number  ){
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;            
+            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo el numéro de vuelo de: ".$item->flight_number." a ".$request->flight_number;
+            $follow_up_db->save();
+        }
+
+        //LOG DE ZONA DESDE
+        if( $request->from_zone_id != $item->from_zone ){
+            $zone_old = Zones::find($item->from_zone);            
+            $zone_new = Zones::find($request->from_zone_id);
+
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la zona Desde de: ".$zone_old->name." a ".$zone_new->name;
+            $follow_up_db->save();
+        }
+
+        if( $request->from_name != $item->from_name ){
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo Desde de: ".$item->from_name." a ".$request->from_name;
+            $follow_up_db->save();
+        }
+
+        if( $request->from_lat != $item->from_lat ){
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo las coordenadas Desde lat: ".$item->from_lat." a ".$request->from_lat.", lng: ".$item->from_lng." a ".$request->from_lng;
+            $follow_up_db->save();
+        }
+
+        //LOG DE ZONA HACIA
+        if( $request->to_zone_id != $item->to_zone ){
+            $zone_old = Zones::find($item->to_zone);
+            $zone_new = Zones::find($request->to_zone_id);
+
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;
+            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la zona Hacia de: ".$zone_old->name." a ".$zone_new->name;
+            $follow_up_db->save();
+        }
+
+        if( $request->to_name != $item->to_name ){
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;            
+            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo Hacia de: ".$item->to_name." a ".$request->to_name;
+            $follow_up_db->save();
+        }
+
+        if( $request->to_lat != $item->to_lat ){
+            //CREAMOS UN LOG
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = auth()->user()->name;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $item->reservation_id;            
+            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo las coordenadas Hacias lat: ".$item->to_lat." a ".$request->to_lat.", lng: ".$item->to_lng." a ".$request->to_lng;
+            $follow_up_db->save();
+        }
+
+        //LOG DE FECHA Y HORA DE RECOGIDA
+        if( $request->op_one_pickup != $item->op_one_pickup ){
+            $one_pickup_request_date = date("Y-m-d", strtotime($request->op_one_pickup));
+            $one_pickup_request_time = date("H:i", strtotime($request->op_one_pickup));
+            $one_pickup_item_date = date("Y-m-d", strtotime($item->op_one_pickup));
+            $one_pickup_item_time = date("H:i", strtotime($item->op_one_pickup));
+
+            if( $one_pickup_request_date != $one_pickup_item_date ){
+                //CREAMOS UN LOG
+                $follow_up_db = new ReservationFollowUp;
+                $follow_up_db->name = auth()->user()->name;
+                $follow_up_db->type = 'HISTORY';
+                $follow_up_db->reservation_id = $item->reservation_id;
+                $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la fecha de recogida de: ".$one_pickup_item_date." a ".$one_pickup_request_date;
+                $follow_up_db->save();
+            }
+
+            if( $one_pickup_request_time != $one_pickup_item_time ){
+                //CREAMOS UN LOG
+                $follow_up_db = new ReservationFollowUp;
+                $follow_up_db->name = auth()->user()->name;
+                $follow_up_db->type = 'HISTORY';
+                $follow_up_db->reservation_id = $item->reservation_id;
+                $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la hora de recogida de: ".$one_pickup_item_time." a ".$one_pickup_request_time;
+                $follow_up_db->save();
+            }
+        }
+
+        //LOG DE FECHA Y HORA DE REGRESO
+        if( $item->is_round_trip == 1 && $request->op_two_pickup != $item->op_two_pickup ){
+            $two_pickup_request_date = date("Y-m-d", strtotime($request->op_two_pickup));
+            $two_pickup_request_time = date("H:i", strtotime($request->op_two_pickup));
+            $two_pickup_item_date = date("Y-m-d", strtotime($item->op_two_pickup));
+            $two_pickup_item_time = date("H:i", strtotime($item->op_two_pickup));
+
+            if( $two_pickup_request_date != $two_pickup_item_date ){
+                //CREAMOS UN LOG
+                $follow_up_db = new ReservationFollowUp;
+                $follow_up_db->name = auth()->user()->name;
+                $follow_up_db->type = 'HISTORY';
+                $follow_up_db->reservation_id = $item->reservation_id;
+                $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la fecha de regreso de: ".$two_pickup_item_date." a ".$two_pickup_request_date;
+                $follow_up_db->save();
+            }
+
+            if( $two_pickup_request_time != $two_pickup_item_time ){
+                //CREAMOS UN LOG
+                $follow_up_db = new ReservationFollowUp;
+                $follow_up_db->name = auth()->user()->name;
+                $follow_up_db->type = 'HISTORY';
+                $follow_up_db->reservation_id = $item->reservation_id;
+                $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la hora de regreso de: ".$two_pickup_item_time." a ".$two_pickup_request_time;
+                $follow_up_db->save();
+            }            
         }
     }
 
@@ -442,7 +622,7 @@ class ReservationsRepository
         endif;
     }    
 
-    public function arrivalMessage($lang = "en", $item = [], $point = []){         
+    public function arrivalMessage($lang = "en", $item = [], $point = []){
         $arrival_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
         if($lang == "en"):
             return <<<EOF
@@ -541,7 +721,7 @@ class ReservationsRepository
 
     }
 
-    public function departureMessage($lang = "en", $item = [], $destination_id, $type = "departure"){      
+    public function departureMessage($lang = "en", $item = [], $destination_id, $type = "departure"){
         $departure_date = NULL;
         $destination = NULL;     
         

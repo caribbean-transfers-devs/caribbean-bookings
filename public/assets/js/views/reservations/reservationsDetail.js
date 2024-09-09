@@ -1,5 +1,7 @@
 
 let types_cancellations = {};
+const __serviceDateForm = document.getElementById('serviceDateForm');
+const __serviceDateRoundForm = document.getElementById('serviceDateRoundForm');
 
 $(function() {
     $('#serviceSalesModal').on('hidden.bs.modal', function () {
@@ -20,10 +22,12 @@ $(function() {
 function typesCancellations(){
     const __types_cancellations = document.getElementById('types_cancellations');
     if( __types_cancellations != null ){
-        let options = JSON.parse(__types_cancellations.value);
-        options.forEach(option => {
-            types_cancellations[option.id] = option.name_es;
-        });
+        let options = JSON.parse(__types_cancellations.value);        
+        if( options != null && options.length > 0 ){
+            options.forEach(option => {
+                types_cancellations[option.id] = option.name_es;
+            });
+        }
     }
 }
 typesCancellations();
@@ -457,7 +461,6 @@ function itemInfo(item){
     $("#destination_serv").val(item.destination_service_id);
     $("#serviceFromForm").val(item.from_name);
     $("#serviceToForm").val(item.to_name);
-    $("#serviceDateForm").val(item.op_one_pickup);
     $("#serviceFlightForm").val(item.flight_number);
 
     $("#from_lat_edit").val(item.from_lat);
@@ -465,20 +468,32 @@ function itemInfo(item){
     $("#to_lat_edit").val(item.to_lat);
     $("#to_lng_edit").val(item.to_lng);
 
-
+    __serviceDateForm.value = item.op_one_pickup,
+    __serviceDateForm.min = item.op_one_pickup;
     if(item.op_one_status != 'PENDING'){
         $("#serviceDateForm").prop('readonly', true);
     }
+
     if(item.op_two_status != 'PENDING'){
         $("#serviceDateRoundForm").prop('readonly', true);
     }
     if(item.is_round_trip == 1){
-        $("#serviceDateRoundForm").val(item.op_two_pickup);
+        __serviceDateRoundForm.value = item.op_two_pickup,
+        __serviceDateRoundForm.min = item.op_one_pickup;
         $("#info_return").removeClass('d-none');
     }else{
-        $("#serviceDateRoundForm").val('');
+        __serviceDateRoundForm.value = "",
+        __serviceDateRoundForm.min = "";
         $("#info_return").addClass('d-none');
     }
+}
+
+//FUNCIONALIDAD DE CALENDARIO FORM
+if( __serviceDateForm != null ){
+    __serviceDateForm.addEventListener('input', function(event) {
+        event.preventDefault();        
+        __serviceDateRoundForm.min = this.value;
+    });
 }
 
 function getPayment(id){

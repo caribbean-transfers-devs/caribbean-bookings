@@ -1,4 +1,8 @@
 @php
+    use App\Traits\RoleTrait;
+    use Carbon\Carbon;
+@endphp
+@php
     $resume = [
         'status' => [
             'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
@@ -74,10 +78,10 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th>Sitio</th>
-                            <th>Fecha</th>
-                            <th>Hora</th>
                             <th>Código</th>
+                            <th>Referencia</th>
+                            <th>Fecha/Hora</th>
+                            <th>Sitio</th>
                             <th>Origen de venta</th>
                             <th>Estatus</th>
                             <th>Cliente</th>
@@ -143,19 +147,36 @@
                                     endif;                                                
                                     $total_pending = $item->total_sales - $item->total_payments;
                                 @endphp
-                                <tr style="background-color: {{ $item->is_today != 0 ? '#fcf5e9' : '' }};" data-reservation="{{ $item->id }}">
+                                <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
                                     <td class="text-end">
-                                        @if($item->is_today >= 1)
+                                        @if($item->is_today != 0)
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                                         @endif
                                     </td>
-                                    <td>{{ $item->site_name }}</td>
-                                    <td>{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
-                                    <td>{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td>
-                                        <a href="reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a>
-                                    </td> 
-                                    <td>{{ !empty($item->original_code) ? $item->original_code : 'NO APLICA' }}</td>
+                                        @php
+                                            $codes_string = "";
+                                            $codes = explode(",",$item->reservation_codes);
+                                            foreach ($codes as $key => $code) {
+                                                $codes_string .= '<p class="mb-1">'.$code.'</p>';
+                                            }
+                                        @endphp
+                                        @if (RoleTrait::hasPermission(38))
+                                            <a href="/reservations/detail/{{ $item->reservation_id }}"><?=$codes_string?></a>
+                                        @else
+                                            <?=$codes_string?>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <?=( !empty($item->reference) ? '<p class="mb-1">'.$item->reference.'</p>' : '' )?>
+                                        <span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} mb-2 me-4">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {{ date("Y-m-d", strtotime($item->created_at)) }}
+                                        {{ "[".date("H:i", strtotime($item->created_at))."]" }}
+                                    </td>
+                                    <td>{{ $item->site_name }}</td>
+                                    <td>{{ !empty($item->original_code) ? $item->original_code : 'NO DEFINIDO' }}</td>
                                     <td class="text-center">
                                         @if ($item->is_cancelled == 0)
                                             @if($item->open_credit == 1)
@@ -177,9 +198,6 @@
                                     </td> 
                                     <td>
                                         <span>{{ $item->full_name }}</span>
-                                        @if(!empty($item->reference))
-                                            [{{ $item->reference }}]
-                                        @endif
                                     </td>
                                     <td>{{ $item->service_type_name }}</td>
                                     <td class="text-center">{{ $item->passengers }}</td>
@@ -196,7 +214,7 @@
                 </table>
             </div>
         </div>
-        <div class="col-12 col-sm-3">
+        <div class="col-xl-3 col-lg-12 col-12 ">
             <div class="widget widget-chart-three mb-3">
                 <div class="widget-heading">
                     <div class="">
@@ -308,7 +326,7 @@
                 </div>
             </div>
 
-            <div class="widget widget-chart-three mb-3">
+            <div class="widget widget-chart-three">
                 <div class="widget-heading">
                     <div class="">
                         <h5>Resumen afiliados</h5>
