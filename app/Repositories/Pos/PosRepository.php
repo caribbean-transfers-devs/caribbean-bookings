@@ -85,73 +85,88 @@ class PosRepository
         // dd($query);
         
         $bookings = DB::select("SELECT 
-            rez.id, rez.created_at, 
-            CONCAT(rez.client_first_name,' ',rez.client_last_name) as client_full_name, 
-            rez.client_email, 
-            rez.currency, 
-            rez.is_cancelled, 
-            rez.comments, 
-            rez.site_id,
-            rez.is_complete, 
-            rez.pay_at_arrival,
-            COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
-            CASE
-                WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
-                ELSE 'CONFIRMED'
-            END AS status,
-            site.name as site_name,
-            GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
-            GROUP_CONCAT(DISTINCT it.zone_two_name ORDER BY it.zone_two_name ASC SEPARATOR ',') AS destination_name,
-            GROUP_CONCAT(DISTINCT it.zone_two_id ORDER BY it.zone_two_id ASC SEPARATOR ',') AS zone_two_id,
-            GROUP_CONCAT(DISTINCT it.service_type_id ORDER BY it.service_type_id ASC SEPARATOR ',') AS service_type_id,
-            GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
-            SUM(it.passengers) as passengers,
-            GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-            COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_one_pickup_today), 0) as is_today,                                     
-            rez.terminal,
-            SUM(it.is_round_trip) as is_round_trip,
-            vr.name AS vendor,
-            rez.reference
-            FROM reservations as rez
-            INNER JOIN sites as site ON site.id = rez.site_id
-            LEFT JOIN (
-                SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
-                FROM sales
-                WHERE deleted_at IS NULL
-                GROUP BY reservation_id
-            ) as s ON s.reservation_id = rez.id
-            LEFT JOIN (
-                SELECT reservation_id,
-                ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
-                                            WHEN operation = 'division' THEN total / exchange_rate
-                                    ELSE total END), 2) AS total_payments,
-                GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
-                FROM payments
-                GROUP BY reservation_id
-            ) as p ON p.reservation_id = rez.id            
-            LEFT JOIN (
-                SELECT  it.reservation_id, it.is_round_trip,
-                        SUM(it.passengers) as passengers,
-                        GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS code,
-                        GROUP_CONCAT(DISTINCT zone_two.name ORDER BY zone_two.name ASC SEPARATOR ',') AS zone_two_name, 
-                        GROUP_CONCAT(DISTINCT zone_two.id ORDER BY zone_two.id ASC SEPARATOR ',') AS zone_two_id, 
-                        GROUP_CONCAT(DISTINCT dest.id ORDER BY dest.id ASC SEPARATOR ',') AS service_type_id, 
-                        GROUP_CONCAT(DISTINCT dest.name ORDER BY dest.name ASC SEPARATOR ',') AS service_type_name,
-                        MAX(CASE WHEN DATE(it.op_one_pickup) = CURDATE() THEN 1 ELSE 0 END) AS op_one_pickup_today,
-                        MAX(CASE WHEN DATE(it.op_two_pickup) = CURDATE() THEN 1 ELSE 0 END) AS op_two_pickup_today
-                FROM reservations_items as it
-                INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
-                INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
-                INNER JOIN destination_services as dest ON dest.id = it.destination_service_id
-                GROUP BY it.reservation_id, it.is_round_trip
-            ) as it ON it.reservation_id = rez.id
-            LEFT JOIN (
-                SELECT vr.id, vr.name
-                FROM vendors as vr
-            ) as vr ON rez.vendor_id = vr.id
-            WHERE 1=1 AND (rez.vendor_id IS NULL OR rez.vendor_id IS NOT NULL) {$query}
-            GROUP BY rez.id, site.name, vr.vendor",
-        $queryData);
+                                    rez.id as reservation_id,
+                                    CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name,
+                                    rez.client_email,
+                                    rez.currency,
+                                    rez.is_cancelled,
+                                    rez.site_id,
+                                    rez.pay_at_arrival,
+                                    rez.reference,
+                                    rez.affiliate_id,
+                                    rez.terminal,
+                                    rez.comments,
+                                    rez.open_credit,
+                                    rez.is_complete,
+                                    rez.created_at,
+                                    site.name as site_name,
+                                    origin.code as origin_code,
+
+                                    COALESCE(SUM(s.total_sales), 0) as total_sales, 
+                                    COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                    CASE
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+                                        ELSE 'CONFIRMED'
+                                    END AS status,
+                                    
+                                    GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
+                                    GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
+                                    GROUP_CONCAT(DISTINCT it.zone_one_id ORDER BY it.zone_one_id ASC SEPARATOR ',') AS zone_one_id,
+                                    GROUP_CONCAT(DISTINCT it.zone_two_name ORDER BY it.zone_two_name ASC SEPARATOR ',') AS destination_name_to,
+                                    GROUP_CONCAT(DISTINCT it.zone_two_id ORDER BY it.zone_two_id ASC SEPARATOR ',') AS zone_two_id,
+                                    GROUP_CONCAT(DISTINCT it.service_type_id ORDER BY it.service_type_id ASC SEPARATOR ',') AS service_type_id,
+                                    GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
+                                    SUM(it.passengers) as passengers,
+                                    GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                    COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
+                                    SUM(it.is_round_trip) as is_round_trip,
+                                    vr.name AS vendor                                    
+                                FROM reservations as rez
+                                    INNER JOIN sites as site ON site.id = rez.site_id
+                                    LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
+                                    LEFT JOIN (
+                                        SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+                                        FROM sales
+                                        WHERE deleted_at IS NULL
+                                        GROUP BY reservation_id
+                                    ) as s ON s.reservation_id = rez.id
+                                    LEFT JOIN (
+                                        SELECT reservation_id,
+                                        ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                                    WHEN operation = 'division' THEN total / exchange_rate
+                                                            ELSE total END), 2) AS total_payments,
+                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
+                                        FROM payments
+                                        GROUP BY reservation_id
+                                    ) as p ON p.reservation_id = rez.id            
+                                    LEFT JOIN (
+                                        SELECT  
+                                            it.reservation_id, 
+                                            it.is_round_trip,
+                                            SUM(it.passengers) as passengers,
+                                            GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS code,
+                                            GROUP_CONCAT(DISTINCT zone_one.name ORDER BY zone_one.name ASC SEPARATOR ',') AS zone_one_name,
+                                            GROUP_CONCAT(DISTINCT zone_one.id ORDER BY zone_one.id ASC SEPARATOR ',') AS zone_one_id,                                            
+                                            GROUP_CONCAT(DISTINCT zone_two.name ORDER BY zone_two.name ASC SEPARATOR ',') AS zone_two_name, 
+                                            GROUP_CONCAT(DISTINCT zone_two.id ORDER BY zone_two.id ASC SEPARATOR ',') AS zone_two_id, 
+                                            GROUP_CONCAT(DISTINCT dest.id ORDER BY dest.id ASC SEPARATOR ',') AS service_type_id, 
+                                            GROUP_CONCAT(DISTINCT dest.name ORDER BY dest.name ASC SEPARATOR ',') AS service_type_name,
+                                            MAX(CASE WHEN DATE(it.op_one_pickup) = CURDATE() THEN 1 ELSE 0 END) AS op_one_pickup_today,
+                                            MAX(CASE WHEN DATE(it.op_two_pickup) = CURDATE() THEN 1 ELSE 0 END) AS op_two_pickup_today
+                                        FROM reservations_items as it
+                                            INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
+                                            INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
+                                            INNER JOIN destination_services as dest ON dest.id = it.destination_service_id
+                                            INNER JOIN reservations as rez ON rez.id = it.reservation_id
+                                        GROUP BY it.reservation_id, it.is_round_trip
+                                    ) as it ON it.reservation_id = rez.id
+                                    LEFT JOIN (
+                                        SELECT vr.id, vr.name
+                                        FROM vendors as vr
+                                    ) as vr ON rez.vendor_id = vr.id
+                                WHERE 1=1 AND (rez.vendor_id IS NULL OR rez.vendor_id IS NOT NULL) {$query}
+                                GROUP BY rez.id, site.name, vr.vendor",
+                                $queryData);
 
         $services = [];
         $db_services = DB::select("SELECT ds.id, dest.name as destination_name, IFNULL(dest_trans.translation, ds.name) AS service_name
@@ -178,13 +193,17 @@ class PosRepository
             endforeach;            
         endif;
 
+        if(sizeof( $bookings ) > 0):
+            usort($bookings, array($this, 'orderByDateTime'));
+        endif;        
+
         $breadcrumbs = array(
             array(
                 "route" => "",
                 "name" => "Ventas capturadas del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
                 "active" => true
             ),
-        );        
+        );
 
         return view('pos.index', compact('bookings','services','zones','data','breadcrumbs') );
     }
@@ -350,7 +369,7 @@ class PosRepository
         );        
 
         return view('pos.generals', compact('bookings','services','zones','websites','data','breadcrumbs') );
-    }    
+    }
 
     public function detail($request,$id){
         $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site', 'user', 'vendor')->with('payments.clip')->where('id', $id)->first();
