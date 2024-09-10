@@ -71,6 +71,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');
     Route::put('/reservationsDuplicated/{reservation}', [ReservationsController::class, 'duplicated'])->name('reservations.duplicated');
     Route::put('/reservationsOpenCredit/{reservation}', [ReservationsController::class, 'openCredit'])->name('reservations.openCredit');
+    Route::put('/reservationsEnablePlusService/{reservation}', [ReservationsController::class, 'enablePlusService'])->name('reservations.enablePlusService');
+
     Route::put('/reservationsEnable/{reservation}', [ReservationsController::class, 'enable'])->name('reservations.enable');
     Route::delete('/reservations/{reservation}', [ReservationsController::class, 'destroy'])->name('reservations.destroy');
     Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');

@@ -63,6 +63,13 @@ class ReservationsController extends Controller
         }
     }
 
+    public function enablePlusService(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
+    {
+        if(RoleTrait::hasPermission(94)){
+            return $reservationRepository->enablePlusService($request,$reservation);
+        }
+    }
+
     public function enable(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
     {
         if(RoleTrait::hasPermission(67)){

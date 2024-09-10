@@ -10,6 +10,27 @@ div.controls{
     background-color: #dde9fa;
     margin-top: 15px;
     border-radius: 8px;
+    position: relative;
+    >.check-bubble {
+        position: absolute;
+        top: -10px;
+        right: -8px;
+        width: 30px;
+        height: 30px;
+        background-color: #4CAF50; /* Verde para indicar selección */
+        border-radius: 50%; /* Hace que sea un círculo */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para darle un efecto 3D */
+        cursor: pointer; /* Cambia el cursor a mano para indicar que es interactivo */
+        
+        >.check-mark {
+            color: white !important; /* Color del check */
+            font-size: 14px; /* Tamaño del check */
+            font-weight: bold;
+        }
+    }
     > div.items-container{
         padding: 15px;
         background-color: white;

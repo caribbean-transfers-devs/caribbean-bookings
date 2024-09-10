@@ -71,11 +71,11 @@ class ReservationsRepository
             $query .= ' AND site.id = :site';
             $queryData['site'] = $data['site'];
         }
-        if(isset( $request->origin ) && $request->origin != 0){
-            $data['origin'] = $request->origin;
-            $query .= ' AND original.id = :origin';
-            $queryData['origin'] = $data['origin'];
-        }        
+        // if(isset( $request->origin ) && $request->origin != 0){
+        //     $data['origin'] = $request->origin;
+        //     $query .= ' AND original.id = :origin';
+        //     $queryData['origin'] = $data['origin'];
+        // }
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
             $data['payment_method'] = $request->payment_method;
         }
@@ -287,6 +287,21 @@ class ReservationsRepository
             return response()->json(['message' => 'Error marking as open credit'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function enablePlusService($request, $reservation)
+    {
+        try {
+            DB::beginTransaction();
+            $reservation->is_advanced = 1;
+            $reservation->save();
+            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", activo el servicio plus de la reservación: ".$reservation->id, 'HISTORY', 'SERVICIO PLUS');
+            DB::commit();
+            return response()->json(['message' => 'Update successfully completed'], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error activating plus service'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
 
     public function enableReservation($request, $reservation)
     {

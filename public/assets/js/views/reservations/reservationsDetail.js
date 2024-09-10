@@ -22,7 +22,7 @@ $(function() {
 function typesCancellations(){
     const __types_cancellations = document.getElementById('types_cancellations');
     if( __types_cancellations != null ){
-        let options = JSON.parse(__types_cancellations.value);        
+        let options = JSON.parse(__types_cancellations.value);
         if( options != null && options.length > 0 ){
             options.forEach(option => {
                 types_cancellations[option.id] = option.name_es;
@@ -1002,7 +1002,6 @@ function setStatus(event, type, status, item_id, rez_id){
 
 function updateConfirmation(event, id, type, status, rez_id){
     event.preventDefault();
-
     swal.fire({
         title: '¿Está seguro de actualizar el estatus?',
         text: "Esta acción no se puede revertir",
@@ -1012,7 +1011,6 @@ function updateConfirmation(event, id, type, status, rez_id){
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if(result.isConfirmed == true){
-
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1055,69 +1053,71 @@ function updateConfirmation(event, id, type, status, rez_id){
                         'error'
                     );
             });
-
         }
     });  
 }
 
-function updateUnlock(event, id, type, rez_id){
-    event.preventDefault();
-
-    swal.fire({
-        title: '¿Está seguro de desbloquear el cierre de operación de este servicio?',
-        text: "Esta acción no se puede revertir",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if(result.isConfirmed == true){
-
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });                
-            $.ajax({
-                url: `/operation/unlock/service`,
-                type: 'PUT',
-                data: { id, type, rez_id},
-                beforeSend: function() {        
-                    
-                },
-                success: function(resp) {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        icon: 'success',
-                        html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
-                        timer: 2500,
-                        timerProgressBar: true,
-                        didOpen: () => {
-                            Swal.showLoading()
-                            const b = Swal.getHtmlContainer().querySelector('b')
-                            timerInterval = setInterval(() => {
-                                b.textContent = (Swal.getTimerLeft() / 1000)
-                                    .toFixed(0)
-                            }, 100)
-                        },
-                        willClose: () => {
-                            clearInterval(timerInterval)
+const __unlocks = document.querySelectorAll('.unlock');
+if (__unlocks.length > 0) {
+    __unlocks.forEach(__unlocks => {
+        __unlocks.addEventListener('click', function(event){
+            event.preventDefault();
+            const { id, type, rez_id } = this.dataset;
+            swal.fire({
+                title: '¿Está seguro de desbloquear este servicio del cierre de operación?',
+                text: "Esta acción no se puede revertir",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if(result.isConfirmed == true){
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         }
-                    }).then((result) => {
-                        location.reload();
+                    });                
+                    $.ajax({
+                        url: `/operation/unlock/service`,
+                        type: 'PUT',
+                        data: { id, type, rez_id},
+                        beforeSend: function() {        
+                            
+                        },
+                        success: function(resp) {
+                            Swal.fire({
+                                title: '¡Éxito!',
+                                icon: 'success',
+                                html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
+                                timer: 2500,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                    const b = Swal.getHtmlContainer().querySelector('b')
+                                    timerInterval = setInterval(() => {
+                                        b.textContent = (Swal.getTimerLeft() / 1000)
+                                            .toFixed(0)
+                                    }, 100)
+                                },
+                                willClose: () => {
+                                    clearInterval(timerInterval)
+                                }
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        }
+                    }).fail(function(xhr, status, error) {
+                            console.log(xhr);
+                            Swal.fire(
+                                '¡ERROR!',
+                                xhr.responseJSON.message,
+                                'error'
+                            );
                     });
                 }
-            }).fail(function(xhr, status, error) {
-                    console.log(xhr);
-                    Swal.fire(
-                        '¡ERROR!',
-                        xhr.responseJSON.message,
-                        'error'
-                    );
-            });
-
-        }
-    });  
+            });            
+        });
+    });
 }
 
 function enableReservation(id){
@@ -1230,6 +1230,49 @@ function openCredit(id){
                     swal.fire({
                         title: 'Error',
                         text: 'Ha ocurrido un error al marcar como Crédito Abierto',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        }
+    });
+}
+
+function enablePlusService(id){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    swal.fire({
+        title: '¿Está seguro de activar el servicio plus?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        console.log(result, id);
+        if (result.isConfirmed) {
+            var url = "/reservationsEnablePlusService/"+id;
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                dataType: 'json',
+                success: function (data) {
+                    swal.fire({
+                        title: 'Reservación actualizada',
+                        text: 'Se activo el servicio plus en la reservación',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        location.reload();
+                    });
+                },
+                error: function (data) {
+                    swal.fire({
+                        title: 'Error',
+                        text: 'Ha ocurrido un error al activar el servicio plus de la reservación',
                         icon: 'error',
                         confirmButtonText: 'Aceptar'
                     });
