@@ -134,7 +134,7 @@
                 <div class="controls">
                     @csrf
                     @if (RoleTrait::hasPermission(20))
-                    <div class="btn-group btn-group-sm">                        
+                    <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Re-envio de correo
                         </button>
@@ -170,8 +170,12 @@
                     @if (RoleTrait::hasPermission(23))
                         <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
                     @endif
+                    {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
+                    @if (RoleTrait::hasPermission(94) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
+                        <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Activar servicio plus</button>
+                    @endif
                     @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                    <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
+                        <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
                         <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
                     @endif
                     @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
@@ -231,10 +235,15 @@
                             </div>                            
                             @foreach ($reservation->items as $item)
                                 @php
-                                    //dump( $item );
+                                    // dump( $item );
                                 @endphp
                                 <div class="services-container">
                                     <h3>{{ $item->code }}</h3>
+                                    @if ( $reservation->is_advanced == 1 )
+                                        <div class="check-bubble" data-bs-toggle="popover" title="Sericio plus" data-bs-content="incluye cancelación gratuita. bebidas de cortesia. cuponera de descuento. parada de cortesia">
+                                            <span class="check-mark">✔</span>
+                                        </div>
+                                    @endif
                                     <div class="items-container">
                                         <div class="items">
                                             <div class="information_data">
@@ -338,14 +347,18 @@
                                                                                 break;
                                                                         }
                                                                     @endphp
-                                                                    <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_one_status }}</button>
-                                                                    <div class="dropdown-menu" style="">
-                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
-                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event,  'arrival', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
-                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
-                                                                        <hr>
-                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
-                                                                    </div>
+                                                                    @if ( $item->op_one_operation_close == 1 )
+                                                                        <button data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones" type="button" class="btn {{ $btn_op_one_type }}" style="color:white;">{{ $item->op_one_status }}</button>                                                                        
+                                                                    @else
+                                                                        <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_one_status }}</button>
+                                                                        <div class="dropdown-menu" style="">
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event,  'arrival', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
+                                                                            <hr>
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
+                                                                        </div>                                                                        
+                                                                    @endif
                                                                 @else
                                                                     @switch($item->op_one_status)
                                                                         @case('PENDING')
@@ -373,9 +386,7 @@
                                                                 <button class="btn {{ (($item->op_one_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'arrival', {{ (($item->op_one_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})"><i class="align-middle" data-feather="check-circle"></i></button>
                                                             @endif
 
-                                                            @if (RoleTrait::hasPermission(92) && $item->op_one_operation_close == 1 )
-                                                                <button class="btn btn-danger" type="button" onclick="updateUnlock(event, {{ $item->reservations_item_id }}, 'arrival', {{ $item->reservation_id }})"><i class="align-middle" data-feather="unlock"></i></button>
-                                                            @endif
+                                                            <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $item->op_one_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" }}" class="btn btn-{{ $item->op_one_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_one_operation_close == 1 ? "unlock" : "" }}" type="button" data-id="{{ $item->reservations_item_id }}" data-type="arrival" data-rez_id="{{ $item->reservation_id }}"><i class="align-middle" data-feather="{{ $item->op_one_operation_close == 1 ? "lock" : "unlock" }}"></i></button>
                                                         </td>
                                                     </tr>
 
@@ -427,14 +438,18 @@
                                                                                     break;
                                                                             }
                                                                         @endphp
-                                                                        <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_two_status }}</button>
-                                                                        <div class="dropdown-menu" style="">
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event,  'departure', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
-                                                                            <hr>
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
-                                                                        </div>
+                                                                        @if ( $item->op_two_operation_close == 1 )
+                                                                            <button data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones" type="button" class="btn {{ $btn_op_two_type }}" style="color:white;">{{ $item->op_two_status }}</button>    
+                                                                        @else
+                                                                            <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_two_status }}</button>
+                                                                            <div class="dropdown-menu" style="">
+                                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
+                                                                                <a class="dropdown-item" href="#" onclick="setStatus(event,  'departure', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
+                                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
+                                                                                <hr>
+                                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
+                                                                            </div>
+                                                                        @endif
                                                                     @else
                                                                         @switch($item->op_two_status)
                                                                             @case('PENDING')
@@ -462,9 +477,7 @@
                                                                     <button class="btn {{ (($item->op_two_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'departure', {{ (($item->op_two_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})"><i class="align-middle" data-feather="check-circle"></i></button>
                                                                 @endif
 
-                                                                @if (RoleTrait::hasPermission(92) && $item->op_two_operation_close == 1 )
-                                                                    <button class="btn btn-danger" type="button" onclick="updateUnlock(event, {{ $item->reservations_item_id }}, 'departure', {{ $item->reservation_id }})"><i class="align-middle" data-feather="unlock"></i></button>
-                                                                @endif                                                                
+                                                                <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $item->op_two_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" }}" class="btn btn-{{ $item->op_two_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_two_operation_close == 1 ? "unlock" : "" }}" type="button" data-id="{{ $item->reservations_item_id }}" data-type="departure" data-rez_id="{{ $item->reservation_id }}"><i class="align-middle" data-feather="{{ $item->op_two_operation_close == 1 ? "lock" : "unlock" }}"></i></button>
                                                             </td>
                                                         </tr>
                                                     @endif

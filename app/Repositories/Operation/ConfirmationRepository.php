@@ -112,7 +112,6 @@ class ConfirmationRepository
     }
 
     public function statusUpdate($request){
-
         try {
             DB::beginTransaction();
             
@@ -123,8 +122,7 @@ class ConfirmationRepository
             if($request->type == "departure"):
                 $item->op_two_confirmation = (( $request->status == 1 )? 0 : 1 );
             endif;
-            $item->save();
-            
+            $item->save();            
 
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = auth()->user()->name;
@@ -135,7 +133,6 @@ class ConfirmationRepository
 
             DB::commit();
             return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], Response::HTTP_OK);
-
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -143,20 +140,17 @@ class ConfirmationRepository
     }
 
     public function updateUnlock($request){
-
         try {
             DB::beginTransaction();
             
             $item = ReservationsItem::find($request->id);
-            // dd($item, $request->type);
             if($request->type == "arrival"):
                 $item->op_one_operation_close = 0;
             endif;
             if($request->type == "departure"):
                 $item->op_two_operation_close = 0;
             endif;
-            $item->save();
-            
+            $item->save();            
 
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = auth()->user()->name;
@@ -167,7 +161,6 @@ class ConfirmationRepository
 
             DB::commit();
             return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], Response::HTTP_OK);
-
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
