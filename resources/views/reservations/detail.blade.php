@@ -32,7 +32,7 @@
 
         <div class="row">
 
-            <div class="col-12 col-xl-3">
+            <div class="col-xxl-3 col-xl-4 col-12">
                 <div class="card">
                     <div class="card-header">
                         <div class="card-actions float-end">
@@ -50,88 +50,106 @@
                         <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
                     </div>
                     <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm mt-2 mb-4">
+                                <tbody>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <td>{{ $reservation->client_first_name }} {{ $reservation->client_last_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>E-mail</th>
+                                        <td>{{ $reservation->client_email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Teléfono</th>
+                                        <td>{{ $reservation->client_phone }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Moneda</th>
+                                        <td>{{ $reservation->currency }}</td>
+                                    </tr>                                
+                                    <tr>
+                                        <th>Estatus</th>
+                                        <td>
+                                            @if ($data['status'] == "PENDING")
+                                                <span class="badge bg-info">PENDING</span>
+                                            @endif
+                                            @if ($data['status'] == "CONFIRMED")
+                                                <span class="badge bg-success">CONFIRMED</span>
+                                            @endif
+                                            @if ($data['status'] == "CANCELLED")
+                                                <span class="badge bg-danger">CANCELLED</span>
+                                            @endif
+                                            @if ($data['status'] == "DUPLICATED")
+                                                <span class="badge bg-danger">DUPLICADO</span>
+                                            @endif                                                                             
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Unidad</th>
+                                        <td>{{ $reservation->destination->name ?? '' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Creación</th>
+                                        <td>{{ $reservation->created_at }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Referencia</th>
+                                        <td>{{ $reservation->reference }}</td>
+                                    </tr>
+                                    @if( $reservation->open_credit == 1 )
+                                        <tr>
+                                            <th>Crédito Abierto</th>
+                                            <td><span class="badge bg-success">ACEPTADO</span></td>
+                                        </tr>
+                                    @endif
+                                    @if( isset( $reservation->cancellationType->name_es ) )
+                                        <tr>
+                                            <th>Motivo de cancelación</th>
+                                            <td>{{ $reservation->cancellationType->name_es }}</td>
+                                        </tr>
+                                    @endif                                
+                                </tbody>
+                            </table>
+                        </div>
 
-                        <table class="table table-sm mt-2 mb-4">
-                            <tbody>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <td>{{ $reservation->client_first_name }} {{ $reservation->client_last_name }}</td>
-                                </tr>
-                                <tr>
-                                    <th>E-mail</th>
-                                    <td>{{ $reservation->client_email }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Teléfono</th>
-                                    <td>{{ $reservation->client_phone }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Moneda</th>
-                                    <td>{{ $reservation->currency }}</td>
-                                </tr>                                
-                                <tr>
-                                    <th>Estatus</th>
-                                    <td>
-                                        @if ($data['status'] == "PENDING")
-                                            <span class="badge bg-info">PENDING</span>
-                                        @endif
-                                        @if ($data['status'] == "CONFIRMED")
-                                            <span class="badge bg-success">CONFIRMED</span>
-                                        @endif
-                                        @if ($data['status'] == "CANCELLED")
-                                            <span class="badge bg-danger">CANCELLED</span>
-                                        @endif
-                                        @if ($data['status'] == "DUPLICATED")
-                                            <span class="badge bg-danger">DUPLICADO</span>
-                                        @endif                                                                             
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Unidad</th>
-                                    <td>{{ $reservation->destination->name ?? '' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Creación</th>
-                                    <td>{{ $reservation->created_at }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Referencia</th>
-                                    <td>{{ $reservation->reference }}</td>
-                                </tr>
-                                @if( $reservation->open_credit == 1 )
-                                    <tr>
-                                        <th>Crédito Abierto</th>
-                                        <td><span class="badge bg-success">ACEPTADO</span></td>
-                                    </tr>
-                                @endif
-                                @if( isset( $reservation->cancellationType->name_es ) )
-                                    <tr>
-                                        <th>Motivo de cancelación</th>
-                                        <td>{{ $reservation->cancellationType->name_es }}</td>
-                                    </tr>
-                                @endif                                
-                            </tbody>
-                        </table>
+                        @if ( $reservation->callCenterAgent != null )
+                            <div class="callcenter-x">
+                                <div class="d-flex align-items-center mb-3 box zoom-in">
+                                    <div class="flex-none w-10 h-10 overflow-hidden rounded-full image-fit">
+                                        <img alt="Midone Tailwind HTML Admin Template" src="https://midone-vue.vercel.app/assets/profile-8-AMiR1yEM.jpg">
+                                    </div>
+                                    <div class="ms-4 me-auto">
+                                        <div class="font-medium">{{ $reservation->callCenterAgent->name }}</div>
+                                        <div class="text-slate-500 text-xs mt-0.5">Agente de Call Center</div>
+                                    </div>
+                                    {{-- <div class="text-success">+$50</div> --}}
+                                </div>
+                            </div>                            
+                        @endif
+
                         @if (RoleTrait::hasPermission(25))
-                        <strong>Actividad</strong>
-
-                        <ul class="timeline mt-2 mb-0">
-                            @foreach ($reservation->followUps as $followUp)
-                                <li class="timeline-item">
-                                    <strong>[{{ $followUp->type }}]</strong>
-                                    <span class="float-end text-muted text-sm">{{ date("Y/m/d H:i", strtotime($followUp->created_at)) }}</span>
-                                    <p>{{ $followUp->text }}</p>
-                                </li>  
-                            @endforeach
-                           
-                        </ul>
+                            <strong>Actividad</strong>
+                            <ul class="timeline mt-2 mb-0">
+                                @foreach ($reservation->followUps as $followUp)
+                                    <li class="timeline-item">
+                                        <strong>[{{ $followUp->type }}]</strong>
+                                        <span class="float-end text-muted text-sm">{{ date("Y/m/d H:i", strtotime($followUp->created_at)) }}</span>
+                                        <p>{{ $followUp->text }}</p>
+                                    </li>
+                                @endforeach
+                            </ul>
                         @endif
                     </div>
                 </div>
             </div>
 
-            <div class="col-12 col-xl-9">
+            <div class="col-xxl-9 col-xl-8 col-12">
                 <div class="controls">
+                    @php
+                        // dump( $reservation );
+                    @endphp
                     @csrf
                     @if (RoleTrait::hasPermission(20))
                     <div class="btn-group btn-group-sm">
@@ -226,7 +244,7 @@
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="icon-tab-1" role="tabpanel">
-                            <div class="d-flex">                                
+                            <div class="d-flex">
                                 @if (RoleTrait::hasPermission(12)) 
                                 <!--<button class="btn btn-success float-end">
                                     <i class="align-middle" data-feather="plus"></i>
@@ -240,7 +258,7 @@
                                 <div class="services-container">
                                     <h3>{{ $item->code }}</h3>
                                     @if ( $reservation->is_advanced == 1 )
-                                        <div class="check-bubble" data-bs-toggle="popover" title="Sericio plus" data-bs-content="incluye cancelación gratuita. bebidas de cortesia. cuponera de descuento. parada de cortesia">
+                                        <div class="check-bubble" data-bs-toggle="popover" title="Servicio plus" data-bs-content="incluye cancelación gratuita. bebidas de cortesia. cuponera de descuento. parada de cortesia">
                                             <span class="check-mark">✔</span>
                                         </div>
                                     @endif

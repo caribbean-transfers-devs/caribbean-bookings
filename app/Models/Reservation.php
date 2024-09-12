@@ -37,9 +37,14 @@ class Reservation extends Model
         return $this->hasMany(Sale::class, 'reservation_id', 'id');
     }
 
+    // public function callCenterAgent()
+    // {
+    //     return $this->belongsTo(User::class, 'call_center_agent_id', 'id');
+    // }
+
     public function callCenterAgent()
     {
-        return $this->belongsTo(User::class, 'call_center_agent_id', 'id');
+        return $this->hasOneThrough(User::class, Sale::class, 'reservation_id', 'id', 'id', 'call_center_agent_id');
     }
 
     public function followUps()
