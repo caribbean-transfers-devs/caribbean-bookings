@@ -11,6 +11,7 @@ use App\Models\Payment;
 use App\Models\OriginSale;
 use App\Models\ContactPoints;
 use App\Models\Zones;
+use App\Models\Site;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -220,7 +221,7 @@ class ReservationsRepository
         try{
             DB::beginTransaction();
             $payments = Payment::where('reservation_id', $reservation->id)->get();
-
+            $this->logBooking($request, $reservation);
             $reservation->client_first_name = $request->client_first_name;
             $reservation->client_last_name = $request->client_last_name;
             $reservation->client_email = $request->client_email;
@@ -230,9 +231,9 @@ class ReservationsRepository
             $reservation->currency = $request->currency;
             if ( ($request->site_id == 11 || $request->site_id == 21) && $request->vendor_id == NULL && $request->terminal == NULL && count($payments) == 0 ) {
                 $reservation->is_complete = 0;
+                $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", completo la reservación de Taquilla, que se creo desde operaciones", 'HISTORY', auth()->user()->name);
             }
             $reservation->save();
-            $check = $this->create_followUps($reservation->id, 'Se editaron datos de la reserva por '.auth()->user()->name, 'HISTORY', 'EDICIÓN');
             DB::commit();
             return response()->json(['message' => 'Reservation updated successfully', 'success' => true], Response::HTTP_OK);
         } catch (Exception $e) {
@@ -318,28 +319,6 @@ class ReservationsRepository
             DB::rollBack();
             return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    } 
-
-    public function follow_ups($request)
-    {
-        $check = $this->create_followUps($request->reservation_id, $request->text, $request->type, $request->name);
-        if($check){
-            return response()->json(['message' => 'Follow up created successfully','success' => true], Response::HTTP_OK);
-        }else{
-            return response()->json(['message' => 'Error creating follow up','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }   
-
-    public function create_followUps($reservation_id, $text, $type, $name = null)
-    {
-        $follow_up = new ReservationFollowUp();
-        $follow_up->reservation_id = $reservation_id;
-        $follow_up->text = $text;
-        $follow_up->type = $type;
-        $follow_up->name = $name;
-        $follow_up->save();
-
-        return $follow_up->id;
     }
 
     public function get_exchange($request, $reservation)
@@ -354,7 +333,7 @@ class ReservationsRepository
     {
         try {
             DB::beginTransaction();
-            $this->logReservation($request, $item);
+            $this->logBookingService($request, $item);
             $item->destination_service_id = $request->destination_service_id;
             $item->passengers = $request->passengers;
             $item->flight_number = $request->flight_number;
@@ -391,168 +370,6 @@ class ReservationsRepository
         }
     }
 
-    public function logReservation($request, $item){
-        //LOG DE TIPO DE VEHÍVULO
-        if( $request->destination_service_id != $item->destination_service_id ){
-            $destination_old = DestinationService::find($item->destination_service_id);
-            $destination_new = DestinationService::find($request->destination_service_id);
-
-            //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;            
-            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo el tipo de Vehículo de: ".$destination_old->name." a ".$destination_new->name;
-            $follow_up_db->save();
-        }
-
-        //LOG DE NUMERO DE PASAJEROS
-        if( $request->passengers != $item->passengers  ){
-            //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;
-            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo el número de pasajeros de: ".$item->passengers." a ".$request->passengers;
-            $follow_up_db->save();
-        }
-
-        //LOG DE NÚMERO DE VUELO
-        if( $request->flight_number != $item->flight_number  ){
-            //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;            
-            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo el numéro de vuelo de: ".$item->flight_number." a ".$request->flight_number;
-            $follow_up_db->save();
-        }
-
-        //LOG DE ZONA DESDE
-        if( $request->from_zone_id != $item->from_zone ){
-            $zone_old = Zones::find($item->from_zone);            
-            $zone_new = Zones::find($request->from_zone_id);
-
-            //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;
-            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la zona Desde de: ".$zone_old->name." a ".$zone_new->name;
-            $follow_up_db->save();
-        }
-
-        if( $request->from_name != $item->from_name ){
-            //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;
-            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo Desde de: ".$item->from_name." a ".$request->from_name;
-            $follow_up_db->save();
-        }
-
-        if( $request->from_lat != $item->from_lat ){
-            //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;
-            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo las coordenadas Desde lat: ".$item->from_lat." a ".$request->from_lat.", lng: ".$item->from_lng." a ".$request->from_lng;
-            $follow_up_db->save();
-        }
-
-        //LOG DE ZONA HACIA
-        if( $request->to_zone_id != $item->to_zone ){
-            $zone_old = Zones::find($item->to_zone);
-            $zone_new = Zones::find($request->to_zone_id);
-
-            //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;
-            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la zona Hacia de: ".$zone_old->name." a ".$zone_new->name;
-            $follow_up_db->save();
-        }
-
-        if( $request->to_name != $item->to_name ){
-            //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;            
-            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo Hacia de: ".$item->to_name." a ".$request->to_name;
-            $follow_up_db->save();
-        }
-
-        if( $request->to_lat != $item->to_lat ){
-            //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $item->reservation_id;            
-            $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo las coordenadas Hacias lat: ".$item->to_lat." a ".$request->to_lat.", lng: ".$item->to_lng." a ".$request->to_lng;
-            $follow_up_db->save();
-        }
-
-        //LOG DE FECHA Y HORA DE RECOGIDA
-        if( $request->op_one_pickup != $item->op_one_pickup ){
-            $one_pickup_request_date = date("Y-m-d", strtotime($request->op_one_pickup));
-            $one_pickup_request_time = date("H:i", strtotime($request->op_one_pickup));
-            $one_pickup_item_date = date("Y-m-d", strtotime($item->op_one_pickup));
-            $one_pickup_item_time = date("H:i", strtotime($item->op_one_pickup));
-
-            if( $one_pickup_request_date != $one_pickup_item_date ){
-                //CREAMOS UN LOG
-                $follow_up_db = new ReservationFollowUp;
-                $follow_up_db->name = auth()->user()->name;
-                $follow_up_db->type = 'HISTORY';
-                $follow_up_db->reservation_id = $item->reservation_id;
-                $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la fecha de recogida de: ".$one_pickup_item_date." a ".$one_pickup_request_date;
-                $follow_up_db->save();
-            }
-
-            if( $one_pickup_request_time != $one_pickup_item_time ){
-                //CREAMOS UN LOG
-                $follow_up_db = new ReservationFollowUp;
-                $follow_up_db->name = auth()->user()->name;
-                $follow_up_db->type = 'HISTORY';
-                $follow_up_db->reservation_id = $item->reservation_id;
-                $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la hora de recogida de: ".$one_pickup_item_time." a ".$one_pickup_request_time;
-                $follow_up_db->save();
-            }
-        }
-
-        //LOG DE FECHA Y HORA DE REGRESO
-        if( $item->is_round_trip == 1 && $request->op_two_pickup != $item->op_two_pickup ){
-            $two_pickup_request_date = date("Y-m-d", strtotime($request->op_two_pickup));
-            $two_pickup_request_time = date("H:i", strtotime($request->op_two_pickup));
-            $two_pickup_item_date = date("Y-m-d", strtotime($item->op_two_pickup));
-            $two_pickup_item_time = date("H:i", strtotime($item->op_two_pickup));
-
-            if( $two_pickup_request_date != $two_pickup_item_date ){
-                //CREAMOS UN LOG
-                $follow_up_db = new ReservationFollowUp;
-                $follow_up_db->name = auth()->user()->name;
-                $follow_up_db->type = 'HISTORY';
-                $follow_up_db->reservation_id = $item->reservation_id;
-                $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la fecha de regreso de: ".$two_pickup_item_date." a ".$two_pickup_request_date;
-                $follow_up_db->save();
-            }
-
-            if( $two_pickup_request_time != $two_pickup_item_time ){
-                //CREAMOS UN LOG
-                $follow_up_db = new ReservationFollowUp;
-                $follow_up_db->name = auth()->user()->name;
-                $follow_up_db->type = 'HISTORY';
-                $follow_up_db->reservation_id = $item->reservation_id;
-                $follow_up_db->text = "El usuario: ".auth()->user()->name.", actualizo la hora de regreso de: ".$two_pickup_item_time." a ".$two_pickup_request_time;
-                $follow_up_db->save();
-            }            
-        }
-    }
-
     public function getContactPoints($request){
         $contact_points = ContactPoints::where('destination_id', $request['destination_id'] )->get();
         return response()->json($contact_points, Response::HTTP_OK);
@@ -565,7 +382,7 @@ class ReservationsRepository
 
         if($request['terminal_id'] == 0):
             return response()->json(['message' => 'Es necesario seleccionar un punto', 'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
-        endif;            
+        endif;
 
         $item = DB::select("SELECT it.code, it.from_name, it.to_name, it.flight_number, it.passengers, it.op_one_pickup, it.op_two_pickup, rez.client_first_name, rez.client_email, sit.transactional_phone, rez.id as reservation_id
                                 FROM reservations_items as it
@@ -619,7 +436,7 @@ class ReservationsRepository
             $follow_up_db->reservation_id = $item[0]->reservation_id;
             $follow_up_db->save();
 
-            return response()->json(['status' => "success"], 200);
+            return response()->json(['status' => "success", "message" => $message], 200);
         else:
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = 'Sistema';
@@ -717,7 +534,7 @@ class ReservationsRepository
             $follow_up_db->reservation_id = $item[0]->reservation_id;
             $follow_up_db->save();
 
-            return response()->json(['status' => "success"], 200);
+            return response()->json(['status' => "success", "message" => $message], 200);
         else:
             $follow_up_db = new ReservationFollowUp;
             $follow_up_db->name = 'Sistema';
@@ -733,7 +550,6 @@ class ReservationsRepository
                 ]
             ], 404);
         endif;
-
     }
 
     public function departureMessage($lang = "en", $item = [], $destination_id, $type = "departure"){
@@ -903,7 +719,7 @@ class ReservationsRepository
         return strtotime($b->created_at) - strtotime($a->created_at);
     }
 
-    private function makePaymentURL($request, $item, $type = "STRIPE"){        
+    private function makePaymentURL($request, $item, $type = "STRIPE"){
 
         $data = [
             "type" => $type,
@@ -916,5 +732,155 @@ class ReservationsRepository
 
         return 'https://api.caribbean-transfers.com/api/v1/reservation/payment/handler?'.http_build_query($data);        
     }
+
+    // NOS PERMITE GENERAR EL LOG DE CADA UNO DE LOS CAMBIOS DE LA RESERVACIÓN
+    public function logBooking($request, $reservation){
+        if( $request->client_first_name != $reservation->client_first_name ){
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el nombre del cliente de: ".$reservation->client_first_name." a ".$request->client_first_name, 'HISTORY', auth()->user()->name);
+        }
+
+        if( $request->client_last_name != $reservation->client_last_name ){
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo los apellidos del cliente de: ".$reservation->client_last_name." a ".$request->client_last_name, 'HISTORY', auth()->user()->name);
+        }
+
+        if( $request->client_email != $reservation->client_email ){
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el correo del cliente de: ".$reservation->client_email." a ".$request->client_email, 'HISTORY', auth()->user()->name);
+        }
+
+        if( $request->client_phone != $reservation->client_phone ){
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el teléfono del cliente de: ".$reservation->client_phone." a ".$request->client_phone, 'HISTORY', auth()->user()->name);
+        }
+
+        if( $request->site_id != $reservation->site_id ){
+            $site_old = Site::find($reservation->site_id);
+            $site_new = Site::find($request->site_id);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el sitio de: ".$site_old->name." a ".$site_new->name, 'HISTORY', auth()->user()->name);
+        }
+
+        if( $request->reference != $reservation->reference ){
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la referencia de: ".$reservation->reference." a ".$request->reference, 'HISTORY', auth()->user()->name);
+        }
+        
+        if( $request->currency != $reservation->currency ){
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la moneda de: ".$reservation->currency." a ".$request->currency, 'HISTORY', auth()->user()->name);
+        }
+    }
+
+    // NOS PERMITE GENERAR EL LOG DE CADA UNO DE LOS CAMBIOS DE LOS SERVICIOS DE LA RESERVACIÓN
+    public function logBookingService($request, $item){
+        //LOG DE TIPO DE VEHÍVULO
+        if( $request->destination_service_id != $item->destination_service_id ){
+            $destination_old = DestinationService::find($item->destination_service_id);
+            $destination_new = DestinationService::find($request->destination_service_id);
+            //CREAMOS UN LOG
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el tipo de Vehículo de: ".$destination_old->name." a ".$destination_new->name, 'HISTORY', auth()->user()->name);
+        }
+
+        //LOG DE NUMERO DE PASAJEROS
+        if( $request->passengers != $item->passengers  ){
+            //CREAMOS UN LOG
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el número de pasajeros de: ".$item->passengers." a ".$request->passengers, 'HISTORY', auth()->user()->name);
+        }
+
+        //LOG DE NÚMERO DE VUELO
+        if( $request->flight_number != $item->flight_number  ){
+            //CREAMOS UN LOG
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el numéro de vuelo de: ".$item->flight_number." a ".$request->flight_number, 'HISTORY', auth()->user()->name);
+        }
+
+        //LOG DE ZONA DESDE
+        if( $request->from_zone_id != $item->from_zone ){
+            $zone_old = Zones::find($item->from_zone);            
+            $zone_new = Zones::find($request->from_zone_id);
+            //CREAMOS UN LOG
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la zona Desde de: ".$zone_old->name." a ".$zone_new->name, 'HISTORY', auth()->user()->name);
+        }
+
+        if( $request->from_name != $item->from_name ){
+            //CREAMOS UN LOG
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo Desde de: ".$item->from_name." a ".$request->from_name, 'HISTORY', auth()->user()->name);
+        }
+
+        if( $request->from_lat != $item->from_lat ){
+            //CREAMOS UN LOG
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo las coordenadas Desde lat: ".$item->from_lat." a ".$request->from_lat.", lng: ".$item->from_lng." a ".$request->from_lng, 'HISTORY', auth()->user()->name);
+        }
+
+        //LOG DE ZONA HACIA
+        if( $request->to_zone_id != $item->to_zone ){
+            $zone_old = Zones::find($item->to_zone);
+            $zone_new = Zones::find($request->to_zone_id);
+            //CREAMOS UN LOG
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la zona Hacia de: ".$zone_old->name." a ".$zone_new->name, 'HISTORY', auth()->user()->name);
+        }
+
+        if( $request->to_name != $item->to_name ){
+            //CREAMOS UN LOG
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo Hacia de: ".$item->to_name." a ".$request->to_name, 'HISTORY', auth()->user()->name);
+        }
+
+        if( $request->to_lat != $item->to_lat ){
+            //CREAMOS UN LOG
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo las coordenadas Hacias lat: ".$item->to_lat." a ".$request->to_lat.", lng: ".$item->to_lng." a ".$request->to_lng, 'HISTORY', auth()->user()->name);
+        }
+
+        //LOG DE FECHA Y HORA DE RECOGIDA
+        if( $request->op_one_pickup != $item->op_one_pickup ){
+            $one_pickup_request_date = date("Y-m-d", strtotime($request->op_one_pickup));
+            $one_pickup_request_time = date("H:i", strtotime($request->op_one_pickup));
+            $one_pickup_item_date = date("Y-m-d", strtotime($item->op_one_pickup));
+            $one_pickup_item_time = date("H:i", strtotime($item->op_one_pickup));
+
+            if( $one_pickup_request_date != $one_pickup_item_date ){
+                //CREAMOS UN LOG
+                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la fecha de recogida de: ".$one_pickup_item_date." a ".$one_pickup_request_date, 'HISTORY', auth()->user()->name);
+            }
+
+            if( $one_pickup_request_time != $one_pickup_item_time ){
+                //CREAMOS UN LOG
+                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la hora de recogida de: ".$one_pickup_item_time." a ".$one_pickup_request_time, 'HISTORY', auth()->user()->name);
+            }
+        }
+
+        //LOG DE FECHA Y HORA DE REGRESO
+        if( $item->is_round_trip == 1 && $request->op_two_pickup != $item->op_two_pickup ){
+            $two_pickup_request_date = date("Y-m-d", strtotime($request->op_two_pickup));
+            $two_pickup_request_time = date("H:i", strtotime($request->op_two_pickup));
+            $two_pickup_item_date = date("Y-m-d", strtotime($item->op_two_pickup));
+            $two_pickup_item_time = date("H:i", strtotime($item->op_two_pickup));
+
+            if( $two_pickup_request_date != $two_pickup_item_date ){
+                //CREAMOS UN LOG
+                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la fecha de regreso de: ".$two_pickup_item_date." a ".$two_pickup_request_date, 'HISTORY', auth()->user()->name);
+            }
+
+            if( $two_pickup_request_time != $two_pickup_item_time ){
+                //CREAMOS UN LOG
+                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la hora de regreso de: ".$two_pickup_item_time." a ".$two_pickup_request_time, 'HISTORY', auth()->user()->name);
+            }            
+        }
+    }
+
+    public function follow_ups($request)
+    {
+        $check = $this->create_followUps($request->reservation_id, $request->text, $request->type, $request->name);
+        if($check){
+            return response()->json(['message' => 'Follow up created successfully','success' => true], Response::HTTP_OK);
+        }else{
+            return response()->json(['message' => 'Error creating follow up','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
+
+    public function create_followUps($reservation_id, $text, $type, $name = null)
+    {
+        $follow_up = new ReservationFollowUp();
+        $follow_up->reservation_id = $reservation_id;
+        $follow_up->text = $text;
+        $follow_up->type = $type;
+        $follow_up->name = $name;
+        $follow_up->save();
+
+        return $follow_up->id;
+    }    
 
 }

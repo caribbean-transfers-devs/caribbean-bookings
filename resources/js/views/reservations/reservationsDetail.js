@@ -3,6 +3,13 @@ let types_cancellations = {};
 const __serviceDateForm = document.getElementById('serviceDateForm');
 const __serviceDateRoundForm = document.getElementById('serviceDateRoundForm');
 
+const __formConfirmation = document.getElementById('formConfirmation'); // DIV QUE TIENE EL FORMULARIO DE ENVIO DE CONFIRMACION
+const __btnSendArrivalConfirmation = document.getElementById('btnSendArrivalConfirmation'); //BOTON PARA ENVIAR EL EMAIL DE CONFIRMATION
+
+const __titleModal = document.getElementById('titleModal');
+const __closeModalHeader = document.getElementById('closeModalHeader');
+const __closeModalFooter = document.getElementById('closeModalFooter');
+
 $(function() {
     $('#serviceSalesModal').on('hidden.bs.modal', function () {
         $("#frm_new_sale")[0].reset();
@@ -713,6 +720,11 @@ $(function() {
 });
 
 function getContactPoints(item_id, destination_id){
+    __formConfirmation.classList.remove('d-none');
+    __btnSendArrivalConfirmation.classList.remove('d-none');
+    __titleModal.innerHTML = "Confirmación de llegada";
+    __closeModalFooter.innerHTML = "Cerrar";
+    
     $("#arrival_confirmation_item_id").val(item_id);
     $("#terminal_id").empty().html('<option value="0">Cargando...</option>');
     $.ajaxSetup({
@@ -741,12 +753,12 @@ function getContactPoints(item_id, destination_id){
             xhr.responseJSON.message,
             'error'
         )        
-    });    
+    });
 }
 
 function sendArrivalConfirmation(){
     $("#btnSendArrivalConfirmation").prop('disabled', true);
-    let frm_data = $("#formArrivalConfirmation").serializeArray();    
+    let frm_data = $("#formArrivalConfirmation").serializeArray();
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
@@ -757,30 +769,42 @@ function sendArrivalConfirmation(){
         type: 'POST',
         data: frm_data,
         success: function(resp) {
-            
             if (resp.status == 'success') {
-                window.onbeforeunload = null;
-                let timerInterval
                 Swal.fire({
                     title: '¡Éxito!',
                     icon: 'success',
-                    html: 'Confirmación enviada. Será redirigido en <b></b>',
-                    timer: 2500,
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        Swal.showLoading()
-                        const b = Swal.getHtmlContainer().querySelector('b')
-                        timerInterval = setInterval(() => {
-                            b.textContent = (Swal.getTimerLeft() / 1000)
-                                .toFixed(0)
-                        }, 100)
-                    },
-                    willClose: () => {
-                        clearInterval(timerInterval)
-                    }
-                }).then((result) => {
-                    location.reload();
+                    html: 'La confirmación fue enviada.<b></b>',
+                    timer: 2500
                 })
+
+                if( resp.hasOwnProperty('message') ){      
+                    contentMessageConfirmation(resp.message);              
+                }
+
+                $("#btnSendArrivalConfirmation").prop('disabled', false);
+
+                // window.onbeforeunload = null;
+                // let timerInterval
+                // Swal.fire({
+                //     title: '¡Éxito!',
+                //     icon: 'success',
+                //     html: 'Confirmación enviada. Será redirigido en <b></b>',
+                //     timer: 2500,
+                //     timerProgressBar: true,
+                //     didOpen: () => {
+                //         Swal.showLoading()
+                //         const b = Swal.getHtmlContainer().querySelector('b')
+                //         timerInterval = setInterval(() => {
+                //             b.textContent = (Swal.getTimerLeft() / 1000)
+                //                 .toFixed(0)
+                //         }, 100)
+                //     },
+                //     willClose: () => {
+                //         clearInterval(timerInterval)
+                //     }
+                // }).then((result) => {
+                //     location.reload();
+                // })
             }
         }
     }).fail(function(xhr, status, error) {
@@ -795,10 +819,7 @@ function sendArrivalConfirmation(){
 
 function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', type = 'departure'){
     event.preventDefault();
-    //console.log(item_id);
-    //console.log(destination_id);
-    //$("#arrival_confirmation_item_id").val(item_id);
-    //$("#terminal_id").empty().html('<option value="0">Cargando...</option>');
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
@@ -810,29 +831,44 @@ function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', 
         data: { item_id:item_id, destination_id: destination_id, lang:lang, type:type },
         success: function(resp) {
             if (resp.status == 'success') {
-                window.onbeforeunload = null;
-                let timerInterval
                 Swal.fire({
                     title: '¡Éxito!',
                     icon: 'success',
-                    html: 'Confirmación de regreso enviada. Será redirigido en <b></b>',
-                    timer: 2500,
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        Swal.showLoading()
-                        const b = Swal.getHtmlContainer().querySelector('b')
-                        timerInterval = setInterval(() => {
-                            b.textContent = (Swal.getTimerLeft() / 1000)
-                                .toFixed(0)
-                        }, 100)
-                    },
-                    willClose: () => {
-                        clearInterval(timerInterval)
-                    }
-                }).then((result) => {
-                    location.reload();
-                })
-            }    
+                    html: 'La confirmación de regreso fue enviada.<b></b>',
+                    timer: 2500
+                });
+
+                $("#arrivalConfirmationModal").modal('show');
+                __titleModal.innerHTML = ( type == "departure" ? "Confirmación de salida" : ( type == "transfer-pickup" ? "Confirmación de recogida" : "Confirmación de regreso" ) );
+                __closeModalFooter.innerHTML = "Cerrar";
+
+                if( resp.hasOwnProperty('message') ){      
+                    contentMessageConfirmation(resp.message);              
+                }
+
+                // window.onbeforeunload = null;
+                // let timerInterval
+                // Swal.fire({
+                //     title: '¡Éxito!',
+                //     icon: 'success',
+                //     html: 'Confirmación de regreso enviada. Será redirigido en <b></b>',
+                //     timer: 2500,
+                //     timerProgressBar: true,
+                //     didOpen: () => {
+                //         Swal.showLoading()
+                //         const b = Swal.getHtmlContainer().querySelector('b')
+                //         timerInterval = setInterval(() => {
+                //             b.textContent = (Swal.getTimerLeft() / 1000)
+                //                 .toFixed(0)
+                //         }, 100)
+                //     },
+                //     willClose: () => {
+                //         clearInterval(timerInterval)
+                //     }
+                // }).then((result) => {
+                //     location.reload();
+                // })
+            }
         }
     }).fail(function(xhr, status, error) {
         Swal.fire(
@@ -841,6 +877,27 @@ function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', 
             'error'
         )        
     });
+}
+
+__closeModalHeader.addEventListener('click', function(){
+    contentMessageConfirmation("");
+    location.reload();
+});
+
+__closeModalFooter.addEventListener('click', function(){
+    contentMessageConfirmation("");
+    location.reload();
+});
+
+function contentMessageConfirmation(message){
+    const __messageConfirmation = document.getElementById('messageConfirmation');
+    if( message == "" ){
+        __formConfirmation.classList.add('d-none');
+        __btnSendArrivalConfirmation.classList.add('d-none');
+        __titleModal.innerHTML = "";
+        __closeModalFooter.innerHTML = "";        
+    }
+    __messageConfirmation.innerHTML = message;
 }
 
 function loadContent() {

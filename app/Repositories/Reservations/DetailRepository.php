@@ -23,7 +23,34 @@ class DetailRepository
     
     public function detail($request,$id)
     {
-        $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site', 'cancellationType')->find($id);
+        // $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site', 'cancellationType')->find($id);
+
+        // $reservation = Reservation::with(['destination', 'items', 'sales' => function ($query) {
+        //     $query->whereNotNull('call_center_agent_id');
+        // }, 'sales.callCenterAgent', 'payments', 'followUps', 'site', 'cancellationType'])
+        // ->find($id);      
+
+        // $reservation = Reservation::with([
+        //     'destination',
+        //     'items',
+        //     'sales.callCenterAgent', // Relación anidada
+        //     'payments',
+        //     'followUps',
+        //     'site',
+        //     'cancellationType'
+        // ])->find($id);
+
+        $reservation = Reservation::with([
+            'destination',
+            'items',
+            'sales.callCenterAgent',  // Mantienes la relación con ventas por si necesitas la información de ventas
+            'callCenterAgent',  // Relación directa con el agente del call center
+            'payments',
+            'followUps',
+            'site',
+            'cancellationType'
+        ])->find($id);
+                
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
         $sellers = User::whereIn('id', $users_ids)->get();
         
@@ -63,7 +90,6 @@ class DetailRepository
         if($reservation->is_duplicated == 1):
             $data['status'] = "DUPLICATED";
         endif;
-        // return $reservation;
 
         return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data','sites','zones','types_cancellations','media'));
     }

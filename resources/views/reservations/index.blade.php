@@ -169,7 +169,8 @@
                                     </td>
                                     <td>
                                         <?=( !empty($item->reference) ? '<p class="mb-1">'.$item->reference.'</p>' : '' )?>
-                                        <span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} mb-2 me-4">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
+                                        <span class="badge badge-light-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
+                                        
                                     </td>
                                     <td class="text-center">
                                         {{ date("Y-m-d", strtotime($item->created_at)) }}
