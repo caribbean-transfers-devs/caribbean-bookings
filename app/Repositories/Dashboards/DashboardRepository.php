@@ -89,6 +89,18 @@ class DashboardRepository
                 ],
                 "counter" => 0,
             ],
+            'pending' => [
+                "total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "counter" => 0,
+            ],            
             'cancelled' => [
                 "total" => 0,
                 "USD" => [
@@ -165,6 +177,18 @@ class DashboardRepository
                             ],
                             "counter" => 0,
                         ],
+                        'pending' => [
+                            "total" => 0,
+                            "USD" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "MXN" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "counter" => 0,
+                        ],                        
                         'cancelled' => [
                             "total" => 0,
                             "USD" => [
@@ -208,6 +232,18 @@ class DashboardRepository
                             ],
                             "counter" => 0,
                         ],
+                        'pending' => [
+                            "total" => 0,
+                            "USD" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "MXN" => [
+                                "total" => 0,
+                                "counter" => 0,
+                            ],
+                            "counter" => 0,
+                        ],                        
                         'cancelled' => [
                             "total" => 0,
                             "USD" => [

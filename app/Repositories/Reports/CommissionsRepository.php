@@ -28,7 +28,7 @@ class CommissionsRepository
         $paid = DB::select("SELECT 
                                 rez.id as reservation_id, 
                                 CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name, 
-                               rez.currency, 
+                                rez.currency, 
                                 rez.language, 
                                 rez.is_cancelled, 
                                 rez.is_commissionable, 
