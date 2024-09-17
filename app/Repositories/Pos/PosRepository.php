@@ -120,7 +120,7 @@ class PosRepository
                                     GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     SUM(it.is_round_trip) as is_round_trip,
-                                    vr.name AS vendor                                    
+                                    vr.name AS vendor
                                 FROM reservations as rez
                                     INNER JOIN sites as site ON site.id = rez.site_id
                                     LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
@@ -193,9 +193,9 @@ class PosRepository
             endforeach;            
         endif;
 
-        if(sizeof( $bookings ) > 0):
-            usort($bookings, array($this, 'orderByDateTime'));
-        endif;        
+        // if(sizeof( $bookings ) > 0):
+        //     usort($bookings, array($this, 'orderByDateTime'));
+        // endif;
 
         $breadcrumbs = array(
             array(

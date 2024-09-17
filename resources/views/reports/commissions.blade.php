@@ -62,7 +62,7 @@
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>                                                        
-                            {{-- <th>Fecha</th> --}}
+                            <th>Fecha servicio</th>
                             <th>Sitio</th>
                             <th>Código</th>
                             <th>Estatus</th>
@@ -96,7 +96,12 @@
                                     $users[ $value->employee ]['QUANTITY']++;
                                 @endphp
                                 <tr>
-                                    {{-- <td>{{ date("m/d", strtotime($value->created_at)) }}</td> --}}
+                                    <td>
+                                        @if ( $value->final_service_type == "ARRIVAL" )
+                                            {{ date("d/m/Y", strtotime($value->op_one_pickup)) }}</td>    
+                                        @else
+                                            {{ date("d/m/Y", strtotime($value->op_two_pickup)) }}</td>  
+                                        @endif
                                     <td>{{ $value->site_name }}</td>
                                     <td><a href="/reservations/detail/{{ $value->reservation_id }}" target="_blank"> {{ $value->code }}</a></td>
                                     <td>
