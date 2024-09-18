@@ -231,7 +231,7 @@ class ReservationsRepository
             $reservation->currency = $request->currency;
             if ( ($request->site_id == 11 || $request->site_id == 21) && $request->vendor_id == NULL && $request->terminal == NULL && count($payments) == 0 ) {
                 $reservation->is_complete = 0;
-                $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", completo la reservación de Taquilla, que se creo desde operaciones", 'HISTORY', auth()->user()->name);
+                $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", completo la reservación de Taquilla, que se creo desde operaciones", 'HISTORY', 'EDICIÓN RESERVACIÓN');
             }
             $reservation->save();
             DB::commit();
@@ -250,7 +250,7 @@ class ReservationsRepository
             ( isset($request->type) ? $reservation->cancellation_type_id = $request->type : '' );
             $reservation->save();
             $reservation->items()->update(['op_one_status' => 'CANCELLED', 'op_two_status' => 'CANCELLED']);
-            $check = $this->create_followUps($reservation->id, 'SE CANCELO LA RESERVA POR '.auth()->user()->name, 'HISTORY', 'CANCELACIÓN');
+            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", cancelo la reservación: ".$reservation->id, 'HISTORY', 'CANCELACIÓN');
             DB::commit();
             return response()->json(['message' => 'Reservation cancelled successfully'], Response::HTTP_OK);
         } catch (Exception $e) {
@@ -265,7 +265,7 @@ class ReservationsRepository
             DB::beginTransaction();
             $reservation->is_duplicated = 1;
             $reservation->save();
-            $check = $this->create_followUps($reservation->id, 'SE MARCO COMO DUPLICADA RESERVA POR '.auth()->user()->name, 'HISTORY', 'DUPLICADA');
+            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", marco marco como duplicada la reservación: ".$reservation->id, 'HISTORY', 'DUPLICADA');
             DB::commit();
             return response()->json(['message' => 'Reservation duplicated successfully'], Response::HTTP_OK);
         } catch (Exception $e) {
@@ -280,7 +280,7 @@ class ReservationsRepository
             DB::beginTransaction();
             $reservation->open_credit = 1;
             $reservation->save();
-            $check = $this->create_followUps($reservation->id, 'Se marco como Crédito Abierto por '.auth()->user()->name, 'HISTORY', 'CRÉDITO ABIERTO');
+            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", activo el crédito abierto a la reservación: ".$reservation->id, 'HISTORY', 'CRÉDITO ABIERTO');
             DB::commit();
             return response()->json(['message' => 'Update successfully completed'], Response::HTTP_OK);
         } catch (Exception $e) {
@@ -295,7 +295,7 @@ class ReservationsRepository
             DB::beginTransaction();
             $reservation->is_advanced = 1;
             $reservation->save();
-            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", activo el servicio plus de la reservación: ".$reservation->id, 'HISTORY', 'SERVICIO PLUS');
+            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", activo el servicio plus a la reservación: ".$reservation->id, 'HISTORY', 'SERVICIO PLUS');
             DB::commit();
             return response()->json(['message' => 'Update successfully completed'], Response::HTTP_OK);
         } catch (Exception $e) {
@@ -376,7 +376,6 @@ class ReservationsRepository
     }
 
     public function sendArrivalConfirmation($request){
-
         $lang = $request['lang'];
         $point_id = $request['terminal_id'];
 
@@ -429,22 +428,14 @@ class ReservationsRepository
         $email_response = $this->sendMailjet($email_data);
 
         if(isset($email_response['Messages'][0]['Status']) && $email_response['Messages'][0]['Status'] == "success"):
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = 'Sistema';
-            $follow_up_db->text = 'E-mail enviado (confirmación de llegada) por '.auth()->user()->name;
-            $follow_up_db->type = 'INTERN';
-            $follow_up_db->reservation_id = $item[0]->reservation_id;
-            $follow_up_db->save();
+            $check = $this->create_followUps($item[0]->reservation_id, 'El usuario: '.auth()->user()->name.", a enviado E-mail (confirmación de llegada) para la reservación: ".$item[0]->reservation_id, 'INTERN', 'SISTEMA');
+            // E-mail enviado (confirmación de llegada) por '.auth()->user()->name
 
             return response()->json(['status' => "success", "message" => $message], 200);
         else:
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = 'Sistema';
-            $follow_up_db->text = 'No fue posible enviar el e-mail de confirmación de llegada, por favor contactar a Desarrollo';
-            $follow_up_db->type = 'INTERN';
-            $follow_up_db->reservation_id = $item[0]->reservation_id;
-            $follow_up_db->save();
-            
+            $check = $this->create_followUps($item[0]->reservation_id, 'No fue posible enviar el e-mail de confirmación de llegada, por favor contactar a Desarrollo', 'INTERN', 'SISTEMA');
+            // No fue posible enviar el e-mail de confirmación de llegada, por favor contactar a Desarrollo
+
             return response()->json([
                 'error' => [
                     'code' => 'mailing_system',
@@ -527,21 +518,13 @@ class ReservationsRepository
         $email_response = $this->sendMailjet($email_data);
 
         if(isset($email_response['Messages'][0]['Status']) && $email_response['Messages'][0]['Status'] == "success"):
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = 'Sistema';
-            $follow_up_db->text = 'E-mail enviado (confirmación de regreso) por '.auth()->user()->name;
-            $follow_up_db->type = 'INTERN';
-            $follow_up_db->reservation_id = $item[0]->reservation_id;
-            $follow_up_db->save();
+            $check = $this->create_followUps($item[0]->reservation_id, 'El usuario: '.auth()->user()->name.", a enviado E-mail (confirmación de regreso) para la reservación: ".$item[0]->reservation_id, 'INTERN', 'SISTEMA');
+            // 'E-mail enviado (confirmación de regreso) por '.auth()->user()->name
 
             return response()->json(['status' => "success", "message" => $message], 200);
         else:
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = 'Sistema';
-            $follow_up_db->text = 'No fue posible enviar el e-mail de confirmación de regreso, por favor contactar a Desarrollo';
-            $follow_up_db->type = 'INTERN';
-            $follow_up_db->reservation_id = $item[0]->reservation_id;
-            $follow_up_db->save();
+            $check = $this->create_followUps($item[0]->reservation_id, 'No fue posible enviar el e-mail de confirmación de regreso, por favor contactar a Desarrollo', 'INTERN', 'SISTEMA');
+            // No fue posible enviar el e-mail de confirmación de regreso, por favor contactar a Desarrollo
             
             return response()->json([
                 'error' => [
@@ -688,21 +671,13 @@ class ReservationsRepository
         $email_response = $this->sendMailjet($email_data);
 
         if(isset($email_response['Messages'][0]['Status']) && $email_response['Messages'][0]['Status'] == "success"):
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = 'Sistema';
-            $follow_up_db->text = 'E-mail enviado (solicitúd de pago) por '.auth()->user()->name;
-            $follow_up_db->type = 'INTERN';
-            $follow_up_db->reservation_id = $item->reservation_id;
-            $follow_up_db->save();
+            $check = $this->create_followUps($item->reservation_id, 'El usuario: '.auth()->user()->name.", a enviado E-mail (solicitúd de pago) para la reservación: ".$item->reservation_id, 'INTERN', 'SISTEMA');
+            // E-mail enviado (solicitúd de pago) por '.auth()->user()->name
 
             return response()->json(['status' => "success"], 200);
         else:
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = 'Sistema';
-            $follow_up_db->text = 'No fue posible enviar el e-mail de solicitúd de pago, por favor contactar a Desarrollo';
-            $follow_up_db->type = 'INTERN';
-            $follow_up_db->reservation_id = $item->reservation_id;
-            $follow_up_db->save();
+            $check = $this->create_followUps($item->reservation_id, 'No fue posible enviar el e-mail de solicitúd de pago, por favor contactar a Desarrollo', 'INTERN', 'SISTEMA');
+            // No fue posible enviar el e-mail de solicitúd de pago, por favor contactar a Desarrollo
             
             return response()->json([
                 'error' => [
@@ -736,33 +711,33 @@ class ReservationsRepository
     // NOS PERMITE GENERAR EL LOG DE CADA UNO DE LOS CAMBIOS DE LA RESERVACIÓN
     public function logBooking($request, $reservation){
         if( $request->client_first_name != $reservation->client_first_name ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el nombre del cliente de: ".$reservation->client_first_name." a ".$request->client_first_name, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el nombre del cliente de: ".$reservation->client_first_name." a ".$request->client_first_name, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
 
         if( $request->client_last_name != $reservation->client_last_name ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo los apellidos del cliente de: ".$reservation->client_last_name." a ".$request->client_last_name, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo los apellidos del cliente de: ".$reservation->client_last_name." a ".$request->client_last_name, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
 
         if( $request->client_email != $reservation->client_email ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el correo del cliente de: ".$reservation->client_email." a ".$request->client_email, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el correo del cliente de: ".$reservation->client_email." a ".$request->client_email, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
 
         if( $request->client_phone != $reservation->client_phone ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el teléfono del cliente de: ".$reservation->client_phone." a ".$request->client_phone, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el teléfono del cliente de: ".$reservation->client_phone." a ".$request->client_phone, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
 
         if( $request->site_id != $reservation->site_id ){
             $site_old = Site::find($reservation->site_id);
             $site_new = Site::find($request->site_id);
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el sitio de: ".$site_old->name." a ".$site_new->name, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el sitio de: ".$site_old->name." a ".$site_new->name, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
 
         if( $request->reference != $reservation->reference ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la referencia de: ".$reservation->reference." a ".$request->reference, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la referencia de: ".$reservation->reference." a ".$request->reference, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
         
         if( $request->currency != $reservation->currency ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la moneda de: ".$reservation->currency." a ".$request->currency, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la moneda de: ".$reservation->currency." a ".$request->currency, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
     }
 
@@ -773,19 +748,19 @@ class ReservationsRepository
             $destination_old = DestinationService::find($item->destination_service_id);
             $destination_new = DestinationService::find($request->destination_service_id);
             //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el tipo de Vehículo de: ".$destination_old->name." a ".$destination_new->name, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el tipo de Vehículo de: ".$destination_old->name." a ".$destination_new->name, 'HISTORY', 'EDICIÓN SERVICIO');
         }
 
         //LOG DE NUMERO DE PASAJEROS
         if( $request->passengers != $item->passengers  ){
             //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el número de pasajeros de: ".$item->passengers." a ".$request->passengers, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el número de pasajeros de: ".$item->passengers." a ".$request->passengers, 'HISTORY', 'EDICIÓN SERVICIO');
         }
 
         //LOG DE NÚMERO DE VUELO
         if( $request->flight_number != $item->flight_number  ){
             //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el numéro de vuelo de: ".$item->flight_number." a ".$request->flight_number, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el numéro de vuelo de: ".$item->flight_number." a ".$request->flight_number, 'HISTORY', 'EDICIÓN SERVICIO');
         }
 
         //LOG DE ZONA DESDE
@@ -793,17 +768,17 @@ class ReservationsRepository
             $zone_old = Zones::find($item->from_zone);            
             $zone_new = Zones::find($request->from_zone_id);
             //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la zona Desde de: ".$zone_old->name." a ".$zone_new->name, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la zona Desde de: ".$zone_old->name." a ".$zone_new->name, 'HISTORY', 'EDICIÓN SERVICIO');
         }
 
         if( $request->from_name != $item->from_name ){
             //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo Desde de: ".$item->from_name." a ".$request->from_name, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo Desde de: ".$item->from_name." a ".$request->from_name, 'HISTORY', 'EDICIÓN SERVICIO');
         }
 
         if( $request->from_lat != $item->from_lat ){
             //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo las coordenadas Desde lat: ".$item->from_lat." a ".$request->from_lat.", lng: ".$item->from_lng." a ".$request->from_lng, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo las coordenadas Desde lat: ".$item->from_lat." a ".$request->from_lat.", lng: ".$item->from_lng." a ".$request->from_lng, 'HISTORY', 'EDICIÓN SERVICIO');
         }
 
         //LOG DE ZONA HACIA
@@ -811,17 +786,17 @@ class ReservationsRepository
             $zone_old = Zones::find($item->to_zone);
             $zone_new = Zones::find($request->to_zone_id);
             //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la zona Hacia de: ".$zone_old->name." a ".$zone_new->name, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la zona Hacia de: ".$zone_old->name." a ".$zone_new->name, 'HISTORY', 'EDICIÓN SERVICIO');
         }
 
         if( $request->to_name != $item->to_name ){
             //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo Hacia de: ".$item->to_name." a ".$request->to_name, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo Hacia de: ".$item->to_name." a ".$request->to_name, 'HISTORY', 'EDICIÓN SERVICIO');
         }
 
         if( $request->to_lat != $item->to_lat ){
             //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo las coordenadas Hacias lat: ".$item->to_lat." a ".$request->to_lat.", lng: ".$item->to_lng." a ".$request->to_lng, 'HISTORY', auth()->user()->name);
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo las coordenadas Hacias lat: ".$item->to_lat." a ".$request->to_lat.", lng: ".$item->to_lng." a ".$request->to_lng, 'HISTORY', 'EDICIÓN SERVICIO');
         }
 
         //LOG DE FECHA Y HORA DE RECOGIDA
@@ -833,12 +808,12 @@ class ReservationsRepository
 
             if( $one_pickup_request_date != $one_pickup_item_date ){
                 //CREAMOS UN LOG
-                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la fecha de recogida de: ".$one_pickup_item_date." a ".$one_pickup_request_date, 'HISTORY', auth()->user()->name);
+                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la fecha de recogida de: ".$one_pickup_item_date." a ".$one_pickup_request_date, 'HISTORY', 'EDICIÓN SERVICIO');
             }
 
             if( $one_pickup_request_time != $one_pickup_item_time ){
                 //CREAMOS UN LOG
-                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la hora de recogida de: ".$one_pickup_item_time." a ".$one_pickup_request_time, 'HISTORY', auth()->user()->name);
+                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la hora de recogida de: ".$one_pickup_item_time." a ".$one_pickup_request_time, 'HISTORY', 'EDICIÓN SERVICIO');
             }
         }
 
@@ -851,12 +826,12 @@ class ReservationsRepository
 
             if( $two_pickup_request_date != $two_pickup_item_date ){
                 //CREAMOS UN LOG
-                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la fecha de regreso de: ".$two_pickup_item_date." a ".$two_pickup_request_date, 'HISTORY', auth()->user()->name);
+                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la fecha de regreso de: ".$two_pickup_item_date." a ".$two_pickup_request_date, 'HISTORY', 'EDICIÓN SERVICIO');
             }
 
             if( $two_pickup_request_time != $two_pickup_item_time ){
                 //CREAMOS UN LOG
-                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la hora de regreso de: ".$two_pickup_item_time." a ".$two_pickup_request_time, 'HISTORY', auth()->user()->name);
+                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la hora de regreso de: ".$two_pickup_item_time." a ".$two_pickup_request_time, 'HISTORY', 'EDICIÓN SERVICIO');
             }            
         }
     }
@@ -881,6 +856,6 @@ class ReservationsRepository
         $follow_up->save();
 
         return $follow_up->id;
-    }    
+    }
 
 }

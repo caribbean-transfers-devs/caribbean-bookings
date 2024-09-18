@@ -27,7 +27,7 @@ class ReservationDetailsRequest extends FormRequest
             'client_email' => 'required|email|max:255',
             'client_phone' => 'required|string|max:255',
             'site_id' => 'required|integer',
-            'reference' => 'required|string',
+            // 'reference' => 'required|string',
             'currency' => 'in:USD,MXN',
         ];
     }
