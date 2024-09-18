@@ -146,15 +146,15 @@
                                 @if(RoleTrait::hasPermission(36))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.download') }}">Descargar</a></li>                           
                                 @endif
-                                @if(RoleTrait::hasPermission(37))
+                                {{-- @if(RoleTrait::hasPermission(37))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.managment') }}">Gestión</a></li>
-                                @endif
+                                @endif --}}
                                 @if(RoleTrait::hasPermission(39))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.confirmation') }}">Confirmaciones</a></li>
                                 @endif
-                                @if(RoleTrait::hasPermission(46))
+                                {{-- @if(RoleTrait::hasPermission(46))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.ccform') }}">CC Form</a></li>
-                                @endif
+                                @endif --}}
                                 @if(RoleTrait::hasPermission(47))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.spam') }}">SPAM</a></li>
                                 @endif
