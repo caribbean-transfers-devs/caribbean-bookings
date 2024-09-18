@@ -115,7 +115,7 @@
                         </li>
                     @endif
 
-                    @if(RoleTrait::hasPermission(51) || RoleTrait::hasPermission(91) || RoleTrait::hasPermission(52) || RoleTrait::hasPermission(54))
+                    {{-- @if(RoleTrait::hasPermission(51) || RoleTrait::hasPermission(91) || RoleTrait::hasPermission(52) || RoleTrait::hasPermission(54))
                         <li class="sidebar-item">
                             <a href="#pos" data-bs-toggle="collapse" class="sidebar-link collapsed">
                                 <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">Punto de venta</span>
@@ -135,7 +135,7 @@
                                 @endif
                             </ul>
                         </li>
-                    @endif
+                    @endif --}}
 
                     @if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) )
                         <li class="sidebar-item">

@@ -59,9 +59,10 @@
                 'className' => 'btn btn-primary',
             ),
         );
+        // dump($buttons);
     @endphp
     <div class="row layout-top-spacing">
-        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+        <div class="col-xl-9 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
                 @if ($errors->any())
                     <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
@@ -212,6 +213,150 @@
                         @endif
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-12 col-12 ">
+            <div class="widget widget-chart-three mb-3">
+                <div class="widget-heading">
+                    <div class="">
+                        <h5>Resumen por estatus</h5>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="table-responsive">
+                        <table class="table dt-table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Estatus</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($resume['status'] as $key => $value)
+                                @php
+                                    if( $key == "PENDING" || $key == "CONFIRMED" ):
+                                        $resume_total = $resume_total + $value['count'];
+                                        $resume_total_mxn = $resume_total_mxn + $value['USD'];
+                                        $resume_total_usd = $resume_total_usd + $value['MXN'];
+                                    endif;
+                                @endphp
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                            <tfooter>
+                                <tr>
+                                    <td>Total</td>
+                                    <td class="text-center">{{ $resume_total }}</td>                                    
+                                    <td class="text-end">{{ $resume_total_mxn }}</td>
+                                    <td class="text-end">{{ $resume_total_usd }}</td>
+                                </tr>
+                            </tfooter>                             
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget widget-chart-three mb-3">
+                <div class="widget-heading">
+                    <div class="">
+                        <h5>Resumen por sitio</h5>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="table-responsive">
+                        <table class="table dt-table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Estatus</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($sites as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget widget-chart-three mb-3">
+                <div class="widget-heading">
+                    <div class="">
+                        <h5>Resumen por destino</h5>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="table-responsive">
+                        <table class="table dt-table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Destino</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($destinations as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget widget-chart-three">
+                <div class="widget-heading">
+                    <div class="">
+                        <h5>Resumen afiliados</h5>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="table-responsive">
+                        <table class="table dt-table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Estatus</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($affiliates as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
