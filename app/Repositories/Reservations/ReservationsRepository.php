@@ -244,7 +244,7 @@ class ReservationsRepository
 
     public function destroy($request, $reservation)
     {
-        try {            
+        try {
             DB::beginTransaction();
             $reservation->is_cancelled = 1;
             ( isset($request->type) ? $reservation->cancellation_type_id = $request->type : '' );

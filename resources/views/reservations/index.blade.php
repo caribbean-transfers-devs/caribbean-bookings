@@ -61,7 +61,7 @@
         );
     @endphp
     <div class="row layout-top-spacing">
-        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+        <div class="col-xl-9 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
                 @if ($errors->any())
                     <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
@@ -76,7 +76,6 @@
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th></th>
                             <th>Código</th>
                             <th>Referencia</th>
                             <th>Fecha/Hora</th>
@@ -147,11 +146,6 @@
                                     $total_pending = $item->total_sales - $item->total_payments;
                                 @endphp
                                 <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
-                                    <td class="text-end">
-                                        @if($item->is_today != 0)
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                        @endif
-                                    </td>
                                     <td>
                                         @php
                                             $codes_string = "";
@@ -212,6 +206,150 @@
                         @endif
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-12 col-12 ">
+            <div class="widget widget-chart-three mb-3">
+                <div class="widget-heading">
+                    <div class="">
+                        <h5>Resumen por estatus</h5>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="table-responsive">
+                        <table class="table dt-table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Estatus</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($resume['status'] as $key => $value)
+                                @php
+                                    if( $key == "PENDING" || $key == "CONFIRMED" ):
+                                        $resume_total = $resume_total + $value['count'];
+                                        $resume_total_mxn = $resume_total_mxn + $value['USD'];
+                                        $resume_total_usd = $resume_total_usd + $value['MXN'];
+                                    endif;
+                                @endphp
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                            <tfooter>
+                                <tr>
+                                    <td>Total</td>
+                                    <td class="text-center">{{ $resume_total }}</td>                                    
+                                    <td class="text-end">{{ $resume_total_mxn }}</td>
+                                    <td class="text-end">{{ $resume_total_usd }}</td>
+                                </tr>
+                            </tfooter>                             
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget widget-chart-three mb-3">
+                <div class="widget-heading">
+                    <div class="">
+                        <h5>Resumen por sitio</h5>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="table-responsive">
+                        <table class="table dt-table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Estatus</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($sites as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget widget-chart-three mb-3">
+                <div class="widget-heading">
+                    <div class="">
+                        <h5>Resumen por destino</h5>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="table-responsive">
+                        <table class="table dt-table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Destino</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($destinations as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget widget-chart-three">
+                <div class="widget-heading">
+                    <div class="">
+                        <h5>Resumen afiliados</h5>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="table-responsive">
+                        <table class="table dt-table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;">Estatus</th>
+                                    <th style="width:25%">Cantidad</th>
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($affiliates as $key => $value)
+                                <tr>
+                                    <td>{{ strtolower( $key) }}</td>
+                                    <td class="text-center">{{ $value['count'] }}</td>
+                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
+                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -154,13 +154,13 @@
                     'active' => request()->routeIs('operation.download'),
                 ];
             endif;
-            if(RoleTrait::hasPermission(37)):
-                $links_operations[] = [
-                    'name' => 'Gestión',
-                    'route' => route('operation.managment'),
-                    'active' => request()->routeIs('operation.managment','operation.managment.search'),
-                ];
-            endif;
+            // if(RoleTrait::hasPermission(37)):
+            //     $links_operations[] = [
+            //         'name' => 'Gestión',
+            //         'route' => route('operation.managment'),
+            //         'active' => request()->routeIs('operation.managment','operation.managment.search'),
+            //     ];
+            // endif;
             if(RoleTrait::hasPermission(39)):
                 $links_operations[] = [
                     'name' => 'Confirmaciones',
@@ -168,13 +168,13 @@
                     'active' => request()->routeIs('operation.confirmation','operation.confirmation.search'),
                 ];
             endif;
-            if(RoleTrait::hasPermission(46)):
-                $links_operations[] = [
-                    'name' => 'CC Form',
-                    'route' => route('operation.ccform'),
-                    'active' => request()->routeIs('operation.ccform'),
-                ];
-            endif;
+            // if(RoleTrait::hasPermission(46)):
+            //     $links_operations[] = [
+            //         'name' => 'CC Form',
+            //         'route' => route('operation.ccform'),
+            //         'active' => request()->routeIs('operation.ccform'),
+            //     ];
+            // endif;
             if(RoleTrait::hasPermission(47)):
                 $links_operations[] = [
                     'name' => 'SPAM',
