@@ -242,7 +242,7 @@ class OperationRepository
         return view('operation.management', compact('items','date','breadcrumbs'));
     }
 
-    public function statusUpdate($request){        
+    public function statusUpdate($request){
         try {
             DB::beginTransaction();            
             $item = ReservationsItem::find($request->item_id);
@@ -254,17 +254,15 @@ class OperationRepository
             endif;
             $item->save();
             
-
             $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Actualización de estatus de operación (".$request->type.") por ".$request->status;
+            $follow_up_db->name = "ESTATUS DE RESERVACIÓN";
+            $follow_up_db->text = 'El usuario: '.auth()->user()->name.", actualizo es estatus de reservación de: (".$request->type.") a ".$request->status;
             $follow_up_db->type = 'HISTORY';
             $follow_up_db->reservation_id = $request->rez_id;
             $follow_up_db->save();
 
             DB::commit();
             return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], Response::HTTP_OK);
-
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
