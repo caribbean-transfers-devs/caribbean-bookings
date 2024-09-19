@@ -148,99 +148,19 @@ var App = function() {
                 Dom.class.overlay.classList.remove('show');
                 Dom.main.classList.remove('sidebar-noneoverflow');
             });            
-        },    
-        themeToggle: function (layoutName) {
-
-            var togglethemeEl = document.querySelector('.theme-toggle');
-            var getBodyEl = document.body;
-            
-            togglethemeEl.addEventListener('click', function() {
-                
-                var getLocalStorage = localStorage.getItem("theme");
-                var parseObj = JSON.parse(getLocalStorage);
-
-                if (parseObj.settings.layout.darkMode) {
-
-                    var getObjectSettings = parseObj.settings.layout;
-
-                    var newParseObject = {...getObjectSettings, darkMode: false};
-
-                    var newObject = { ...parseObj, settings: { layout: newParseObject }}
-
-                    localStorage.setItem("theme", JSON.stringify(newObject))
-                    
-                    var getUpdatedLocalObject = localStorage.getItem("theme");
-                    var getUpdatedParseObject = JSON.parse(getUpdatedLocalObject);
-
-                    if (!getUpdatedParseObject.settings.layout.darkMode) {
-                        document.body.classList.remove('dark')
-                        ifStarterKit = document.body.getAttribute('page') === 'starter-pack' ? true : false;
-                        if (ifStarterKit) {
-                            document.querySelector('.navbar-logo').setAttribute('src', '/assets/img/logos/brand.svg')
-                        } else {
-                            document.querySelector('.navbar-logo').setAttribute('src', getUpdatedParseObject.settings.layout.logo.lightLogo)
-                        }
-                    }
-                    
-                } else {
-
-                    var getObjectSettings = parseObj.settings.layout;
-
-                    var newParseObject = {...getObjectSettings, darkMode: true};
-
-                    var newObject = { ...parseObj, settings: { layout: newParseObject }}
-
-                    localStorage.setItem("theme", JSON.stringify(newObject))
-                    
-                    var getUpdatedLocalObject = localStorage.getItem("theme");
-                    var getUpdatedParseObject = JSON.parse(getUpdatedLocalObject);
-
-                    if (getUpdatedParseObject.settings.layout.darkMode) {
-                        document.body.classList.add('dark')
-
-                        ifStarterKit = document.body.getAttribute('page') === 'starter-pack' ? true : false;
-
-                        if (ifStarterKit) {
-                            document.querySelector('.navbar-logo').setAttribute('src', '/assets/img/logos/brand.svg')
-                        } else {
-                            document.querySelector('.navbar-logo').setAttribute('src', getUpdatedParseObject.settings.layout.logo.darkLogo)
-                        }
-                        
-                    }
-                    
-                }
-                
-                // localStorage.clear()
-            })
-            
-        }
+        },
     }
 
     var inBuiltfunctionality = {
         mainCatActivateScroll: function() {
-
-            if (document.querySelector('.menu-categories')) {
-            
+            if (document.querySelector('.menu-categories')) {        
                 const ps = new PerfectScrollbar('.menu-categories', {
                     wheelSpeed:.5,
                     swipeEasing:!0,
                     minScrollbarLength:40,
                     maxScrollbarLength:300
                 });
-
             }
-        },
-        notificationScroll: function() {
-
-            if (document.querySelector('.notification-scroll')) {
-                const notificationS = new PerfectScrollbar('.notification-scroll', {
-                    wheelSpeed:.5,
-                    swipeEasing:!0,
-                    minScrollbarLength:40,
-                    maxScrollbarLength:300
-                });
-            }
-            
         },
         preventScrollBody: function() {
             var nonScrollableElement = document.querySelectorAll('#sidebar, .user-profile-dropdown .dropdown-menu, .notification-dropdown .dropdown-menu,  .language-dropdown .dropdown-menu')
@@ -269,7 +189,6 @@ var App = function() {
         },
         bsPopover: function() {
             var bsPopover = document.querySelectorAll('.bs-popover');
-            console.log(bsPopover);
             for (let index = 0; index < bsPopover.length; index++) {
                 var popover = new bootstrap.Popover(bsPopover[index])
             }
@@ -351,11 +270,19 @@ var App = function() {
 
     function sidebarFunctionality() {
         function sidebarCloser() {
-
+            console.log(window.innerWidth);
+            // main: document.querySelector('html, body'),
+            // id: {
+            //     container: document.querySelector("#container"),
+            // },
+            // class: {
+            //     navbar: document.querySelector(".navbar"),
+            //     overlay: document.querySelector('.overlay'),
+            //     mainContainer: document.querySelector('.main-container'),
+            //     mainHeader: document.querySelector('.header.navbar')
+            // }            
             if (window.innerWidth <= 991 ) {
-
                 if (!document.querySelector('body').classList.contains('alt-menu')) {
-
                     Dom.id.container.classList.add("sidebar-closed");
                     Dom.class.overlay.classList.remove('show');
                 } else {
@@ -364,28 +291,26 @@ var App = function() {
                     Dom.id.container.classList.remove('sbar-open');
                     Dom.main.classList.remove('sidebar-noneoverflow');
                 }
-
             } else if (window.innerWidth > 991 ) {
-
-                if (!document.querySelector('body').classList.contains('alt-menu')) {
-
-                    Dom.id.container.classList.remove("sidebar-closed");
-                    Dom.class.navbar.classList.remove("expand-header");
-                    Dom.class.overlay.classList.remove('show');
-                    Dom.id.container.classList.remove('sbar-open');
-                    Dom.main.classList.remove('sidebar-noneoverflow');
-                } else {
+                // if (!document.querySelector('body').classList.contains('alt-menu')) {
+                //     Dom.id.container.classList.remove("sidebar-closed");
+                //     Dom.class.navbar.classList.remove("expand-header");
+                //     Dom.class.overlay.classList.remove('show');
+                //     Dom.id.container.classList.remove('sbar-open');
+                //     Dom.main.classList.remove('sidebar-noneoverflow');
+                // } else {
                     Dom.main.classList.add('sidebar-noneoverflow');
                     Dom.id.container.classList.add("sidebar-closed");
                     Dom.class.navbar.classList.add("expand-header");
-                    Dom.class.overlay.classList.add('show');
+                    // Dom.class.overlay.classList.add('show');
                     Dom.id.container.classList.add('sbar-open');
                     document.querySelector('.sidebar-wrapper [aria-expanded="true"]').parentNode.querySelector('.collapse').classList.remove('show');
-                }
+                // }
             }
         }
 
         function sidebarMobCheck() {
+            console.log(window.innerWidth);
             if (window.innerWidth <= 991 ) {
                 if ( document.querySelector('.main-container').classList.contains('sbar-open') ) {
                     return;
@@ -407,7 +332,6 @@ var App = function() {
     return {
         init: function(Layout) {
             toggleFunction.overlay();
-            toggleFunction.themeToggle(Layout);
             
             /*
                 Desktop Resoltion fn
@@ -427,7 +351,6 @@ var App = function() {
                 In Built Functionality fn
             */
             inBuiltfunctionality.mainCatActivateScroll();
-            inBuiltfunctionality.notificationScroll();
             inBuiltfunctionality.preventScrollBody();
             inBuiltfunctionality.bsTooltip();
             inBuiltfunctionality.bsPopover();

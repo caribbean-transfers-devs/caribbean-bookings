@@ -154,13 +154,6 @@
                     'active' => request()->routeIs('operation.download'),
                 ];
             endif;
-            // if(RoleTrait::hasPermission(37)):
-            //     $links_operations[] = [
-            //         'name' => 'Gestión',
-            //         'route' => route('operation.managment'),
-            //         'active' => request()->routeIs('operation.managment','operation.managment.search'),
-            //     ];
-            // endif;
             if(RoleTrait::hasPermission(39)):
                 $links_operations[] = [
                     'name' => 'Confirmaciones',

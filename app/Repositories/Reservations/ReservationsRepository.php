@@ -8,22 +8,24 @@ use App\Models\ReservationFollowUp;
 use App\Models\ReservationsItem;
 use App\Models\ReservationsService;
 use App\Models\Payment;
-use App\Models\OriginSale;
 use App\Models\ContactPoints;
 use App\Models\Zones;
 use App\Models\Site;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+
+//TRAIT
 use App\Traits\MailjetTrait;
+use App\Traits\GeneralTrait;
+use App\Traits\QueryTrait;
 
 class ReservationsRepository
 {
-    use MailjetTrait;
+    use MailjetTrait, QueryTrait, GeneralTrait;
     
     public function index($request)
     {
-        // dump($request->input());
         $data = [
             "init" => date("Y-m-d") . " 00:00:00",
             "end" => date("Y-m-d") . " 23:59:59",
@@ -37,13 +39,15 @@ class ReservationsRepository
         ];
         
         //Query DB
+        
         $query = ' AND rez.site_id NOT IN(21) AND rez.created_at BETWEEN :init AND :end AND rez.is_duplicated = 0 ';
+        $query2 = '';
+
         $queryData = [
             'init' => date("Y-m-d") . " 00:00:00",
             'end' => date("Y-m-d") . " 23:59:59",
         ];
-
-        $query2 = '';
+        
         if(isset( $request->is_today ) && !empty( $request->is_today)){
             $data['is_today'] = $request->is_today;            
             $query2 = ' HAVING is_today != 0 ';
@@ -69,8 +73,8 @@ class ReservationsRepository
         }
         if(isset( $request->site ) && $request->site != 0){
             $data['site'] = $request->site;
-            $query .= ' AND site.id = :site';
-            $queryData['site'] = $data['site'];
+            $query .= ' AND site.id IN :site';
+            $queryData['site'] = $this->parseArrayQuery($data['site']);
         }
         // if(isset( $request->origin ) && $request->origin != 0){
         //     $data['origin'] = $request->origin;
@@ -92,129 +96,29 @@ class ReservationsRepository
                     )";            
         }
         
-        $bookings = DB::select("SELECT 
-                                    rez.id as reservation_id, 
-                                    CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name, 
-                                    rez.client_email, 
-                                    rez.currency, 
-                                    rez.is_cancelled,
-                                    rez.site_id,
-                                    rez.pay_at_arrival,
-                                    rez.reference,
-                                    rez.affiliate_id,
-                                    rez.terminal,
-                                    rez.comments,
-                                    rez.open_credit,
-                                    rez.is_complete,
-                                    rez.created_at,
-                                    site.name as site_name,
-                                    origin.code as origin_code,
-
-                                    COALESCE(SUM(s.total_sales), 0) as total_sales,
-                                    COALESCE(SUM(p.total_payments), 0) as total_payments,
-                                    CASE
-                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
-                                        ELSE 'CONFIRMED'
-                                    END AS status,
-
-                                    GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
-                                    GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
-                                    GROUP_CONCAT(DISTINCT it.zone_one_id ORDER BY it.zone_one_id ASC SEPARATOR ',') AS zone_one_id,
-                                    GROUP_CONCAT(DISTINCT it.zone_two_name ORDER BY it.zone_two_name ASC SEPARATOR ',') AS destination_name_to,
-                                    GROUP_CONCAT(DISTINCT it.zone_two_id ORDER BY it.zone_two_id ASC SEPARATOR ',') AS zone_two_id,
-                                    GROUP_CONCAT(DISTINCT it.service_type_id ORDER BY it.service_type_id ASC SEPARATOR ',') AS service_type_id,
-                                    GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
-                                    SUM(it.passengers) as passengers,
-                                    GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-                                    COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
-                                    SUM(it.is_round_trip) as is_round_trip
-                                FROM reservations as rez
-                                    INNER JOIN sites as site ON site.id = rez.site_id
-                                    LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
-                                    LEFT JOIN (
-                                        SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
-                                        FROM sales
-                                        WHERE deleted_at IS NULL
-                                        GROUP BY reservation_id
-                                    ) as s ON s.reservation_id = rez.id
-                                    LEFT JOIN (
-                                        SELECT reservation_id,
-                                        ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
-                                                                    WHEN operation = 'division' THEN total / exchange_rate
-                                                            ELSE total END), 2) AS total_payments,
-                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
-                                        FROM payments
-                                        GROUP BY reservation_id
-                                    ) as p ON p.reservation_id = rez.id
-                                    LEFT JOIN (
-                                        SELECT  
-                                            it.reservation_id, 
-                                            it.is_round_trip,
-                                            SUM(it.passengers) as passengers,
-                                            GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS code,
-                                            GROUP_CONCAT(DISTINCT zone_one.name ORDER BY zone_one.name ASC SEPARATOR ',') AS zone_one_name,
-                                            GROUP_CONCAT(DISTINCT zone_one.id ORDER BY zone_one.id ASC SEPARATOR ',') AS zone_one_id,
-                                            GROUP_CONCAT(DISTINCT zone_two.name ORDER BY zone_two.name ASC SEPARATOR ',') AS zone_two_name, 
-                                            GROUP_CONCAT(DISTINCT zone_two.id ORDER BY zone_two.id ASC SEPARATOR ',') AS zone_two_id, 
-                                            GROUP_CONCAT(DISTINCT dest.id ORDER BY dest.id ASC SEPARATOR ',') AS service_type_id, 
-                                            GROUP_CONCAT(DISTINCT dest.name ORDER BY dest.name ASC SEPARATOR ',') AS service_type_name,
-                                            MAX(CASE WHEN DATE(it.op_one_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_one_pickup_today,
-                                            MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_two_pickup_today
-                                        FROM reservations_items as it
-                                            INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
-                                            INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
-                                            INNER JOIN destination_services as dest ON dest.id = it.destination_service_id
-                                            INNER JOIN reservations as rez ON rez.id = it.reservation_id
-                                        GROUP BY it.reservation_id, it.is_round_trip
-                                    ) as it ON it.reservation_id = rez.id
-                                WHERE 1=1 {$query}
-                                GROUP BY rez.id, site.name {$query2}",
-                                $queryData);
-
-        $services = [];
-        $db_services = DB::select("SELECT ds.id, dest.name as destination_name, IFNULL(dest_trans.translation, ds.name) AS service_name
-                                FROM destination_services as ds
-                                    INNER JOIN destinations as dest ON dest.id = ds.destination_id
-                                    LEFT JOIN destination_services_translate as dest_trans ON dest_trans.destination_services_id = ds.id AND dest_trans.lang = 'es'
-                                    ORDER BY ds.order ASC");        
-        if(sizeof($db_services) >=1 ):
-            foreach( $db_services as $key => $value ):
-                if( !isset(  $services[ $value->destination_name ] ) ) $services[ $value->destination_name ] = [];
-                $services[ $value->destination_name ][] = $value;
-            endforeach;            
-        endif;
-
-        $zones = [];
-        $db_zones = DB::select("SELECT dest.name as destination_name, z.id, z.name as zone_name
-                                FROM zones as z
-                                    INNER JOIN destinations as dest ON dest.id = z.destination_id
-                                ORDER BY z.name ASC");
-        if(sizeof($db_zones) >=1 ):
-            foreach( $db_zones as $key => $value ):
-                if( !isset(  $zones[ $value->destination_name ] ) ) $zones[ $value->destination_name ] = [];
-                $zones[ $value->destination_name ][] = $value;
-            endforeach;            
-        endif;
-
-        $websites = DB::select("SELECT id, name as site_name
-                                FROM sites
-                                ORDER BY site_name ASC");
-
-        $origin_sales = OriginSale::All();
+        dd($query, $queryData);
         
-        if(sizeof( $bookings ) > 0):
-            usort($bookings, array($this, 'orderByDateTime'));
-        endif;
-
-        $breadcrumbs = array(
-            array(
-                "route" => "",
-                "name" => "Reservaciones del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
-                "active" => true
-            ),
-        );
+        $bookings = $this->queryBookings($query, $query2, $queryData);
         
-        return view('reservations.index', compact('bookings','services','zones','websites','origin_sales','data','breadcrumbs') );
+        // if(sizeof( $bookings ) > 0):
+        //     usort($bookings, array($this, 'orderByDateTime'));
+        // endif;
+        
+        return view('reservations.index', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Reservaciones del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
+                    "active" => true
+                ]
+            ],
+            'bookings' => $bookings,
+            'websites' => $this->Sites(),
+            'services' => $this->Services(),
+            'zones' => $this->Zones(),
+            'origin_sales' => $this->Origins(),
+            'data' => $data,
+        ]);
     }
 
     public function update($request,$reservation){
