@@ -36,6 +36,7 @@
 
 @section('content')
     @php
+        dump($request->input());
         $buttons = array(
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
@@ -43,14 +44,29 @@
                 'attr' => array(
                     'data-title' =>  "Filtro de reservaciones",
                     'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#filterModal'
+                    'data-bs-target' => '#filterModal',
                 )
             ),
             array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
+                'titleAttr' => 'Administrar columnas',
+                'className' => 'btn btn-primary __btn_columns',
+                'attr' => array(
+                    'data-title' =>  "Filtro de reservaciones",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#columnsModal',
+                    'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
+                    'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
+                )                
+            ),            
+            array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar Excel',
                 'extend' => 'excelHtml5',
-                'titleAttr' => 'Exportar como Excel',
+                'titleAttr' => 'Exportar Excel',
                 'className' => 'btn btn-primary',
+                'exportOptions' => [
+                    'columns' => ':visible'  // Solo exporta las columnas visibles   
+                ]
             ),
         );
     @endphp
@@ -67,13 +83,14 @@
                         </ul>
                     </div>
                 @endif
-                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="bookings" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">REFERENCIA</th>
-                            <th class="text-center">FECHA Y HORA</th>
+                            <th class="text-center">FECHA DE RESERVA</th>
+                            <th class="text-center">HORA DE RESERVA</th>
                             <th class="text-center">SITIO</th>
                             <th class="text-center">ORIGEN DE VENTA</th>
                             <th class="text-center">ESTATUS RESERVACIÓN</th>
@@ -86,15 +103,16 @@
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">BALANCE</th>
                             <th class="text-center">MÉTODO DE PAGO</th>
-                            <th class="text-center">ORIGEN / DESDE</th>
-                            <th class="text-center">DESTINO / HACIA</th>
+                            <th class="text-center">ORIGEN</th>
+                            <th class="text-center">DESDE</th>
+                            <th class="text-center">DESTINO</th>
+                            <th class="text-center">HACIA</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
                                 @php
-                                    // dd($item);
                                     if($item->is_cancelled == 0):
                                         if($item->pay_at_arrival == 1):
                                             $item->status = "CONFIRMED";
@@ -161,15 +179,11 @@
                                             <?=$codes_string?>
                                         @endif
                                     </td>
-                                    <td>
-                                        <?=( !empty($item->reference) ? '<p class="mb-1">'.$item->reference.'</p>' : '' )?>                                        
-                                    </td>
-                                    <td class="text-center">
-                                        {{ date("Y-m-d", strtotime($item->created_at)) }}
-                                        {{ "[".date("H:i", strtotime($item->created_at))."]" }}
-                                    </td>
+                                    <td><?=( !empty($item->reference) ? '<p class="mb-1">'.$item->reference.'</p>' : '' )?></td>
+                                    <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
+                                    <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td>{{ $item->site_name }}</td>
-                                    <td>{{ !empty($item->original_code) ? $item->original_code : 'NO DEFINIDO' }}</td>
+                                    <td>{{ !empty($item->origin_code) ? $item->origin_code : 'NO DEFINIDO' }}</td>
                                     <td class="text-center">
                                         @if ($item->is_cancelled == 0)
                                             @if($item->open_credit == 1)
@@ -198,14 +212,10 @@
                                     <td class="text-center">{{ $item->currency }}</td>
                                     <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td>
                                     <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td>
-                                    <td class="text-center">
-                                        {{ $item->destination_name_from }}
-                                        [{{ $item->from_name }}]
-                                    </td>
-                                    <td class="text-center">
-                                        {{ $item->destination_name_to }}
-                                        [{{ $item->to_name }}]
-                                    </td>
+                                    <td class="text-center">{{ $item->destination_name_from }}</td>
+                                    <td class="text-center">{{ $item->from_name }}</td>
+                                    <td class="text-center">{{ $item->destination_name_to }}</td>
+                                    <td class="text-center">{{ $item->to_name }}</td>
                                 </tr>
                             @endforeach
                         @endif
@@ -360,4 +370,5 @@
     </div>
 
     <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" :originsales="$origin_sales" :istoday="1" />
+    <x-modals.reports.columns />
 @endsection

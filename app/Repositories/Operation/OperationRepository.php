@@ -140,4 +140,31 @@ class OperationRepository
 
         return $xHTML;
     }
+
+    public function statusUpdate($request){
+        try {
+            DB::beginTransaction();            
+            $item = ReservationsItem::find($request->item_id);
+            if($request->type == "arrival"):
+                $item->op_one_status = $request->status;
+            endif;
+            if($request->type == "departure"):
+                $item->op_two_status = $request->status;
+            endif;
+            $item->save();
+            
+            $follow_up_db = new ReservationFollowUp;
+            $follow_up_db->name = "ESTATUS DE RESERVACIÓN";
+            $follow_up_db->text = 'El usuario: '.auth()->user()->name.", actualizo es estatus de reservación de: (".$request->type.") a ".$request->status;
+            $follow_up_db->type = 'HISTORY';
+            $follow_up_db->reservation_id = $request->rez_id;
+            $follow_up_db->save();
+    
+            DB::commit();
+            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
 }

@@ -15,6 +15,10 @@ class OperationController extends Controller
     public function index(Request $request, OperationRepository $operationRepository){
         return $operationRepository->index($request);
     }
+
+    public function statusUpdate(Request $request, OperationRepository $operationRepository){
+        return $operationRepository->statusUpdate($request);        
+    }    
     
     public function confirmation(Request $request, ConfirmationRepository $operationRepository){
         if(!$this->hasPermission(39)){

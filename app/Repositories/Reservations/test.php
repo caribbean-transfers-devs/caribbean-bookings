@@ -30,6 +30,7 @@ class ReservationsRepository
             "init" => date("Y-m-d") . " 00:00:00",
             "end" => date("Y-m-d") . " 23:59:59",
             "filter_text" => NULL,
+            "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
             "site" => ( isset($request->site) ? $request->site : 0 ),
             "product_type" => ( isset($request->product_type) ? $request->product_type : 0 ),
             "zone_one_id" => ( isset($request->zone_one_id) ? $request->zone_one_id : 0 ),
@@ -49,22 +50,23 @@ class ReservationsRepository
             'end' => date("Y-m-d") . " 23:59:59",
         ];
         
-        if(isset( $request->is_today ) && !empty( $request->is_today)){
-            $data['is_today'] = $request->is_today;            
-            $query2 = ' HAVING is_today != 0 ';
-        }
         if(isset( $request->date ) && !empty( $request->date )){
             $tmp_date = explode(" - ", $request->date);
             $data['init'] = $tmp_date[0];
-            $data['end'] = $tmp_date[1];
-            
+            $data['end'] = $tmp_date[1]; 
             $queryData['init'] = $data['init'].' 00:00:00';
             $queryData['end'] = $data['end'].' 23:59:59';
         }
 
-        if(isset( $request->site ) && $request->site != 0){   
-            $params = $this->parseArrayQuery($request->site);         
-            $query .= " AND site.id IN ($params) ";
+        // if(isset( $request->is_round_trip )){
+        //     $query .= ' AND is_round_trip IN (:is_round_trip)';
+        //     $queryData['is_round_trip'] = $this->parseArrayQuery($request->is_round_trip);
+        // }        
+
+        if(isset( $request->site ) && $request->site != 0){
+            $data['site'] = $request->site;
+            $query .= ' AND site.id IN :site';
+            $queryData['site'] = $this->parseArrayQuery($data['site']);
         }
 
         if(isset( $request->product_type ) && !empty( $request->product_type )){
@@ -95,6 +97,11 @@ class ReservationsRepository
             }
             $params = rtrim($params, ' OR ');
             $query .= " AND (".$params.") ";
+        } 
+
+        if(isset( $request->is_today ) && !empty( $request->is_today)){
+            $data['is_today'] = $request->is_today;            
+            $query2 = ' HAVING is_today != 0 ';
         }        
 
         // if(isset( $request->origin ) && $request->origin != 0){
@@ -118,7 +125,7 @@ class ReservationsRepository
                     )";
         }
                 
-        // dd($query, $data, $queryData);
+        // dd($query, $query2, $data, $queryData);
         
         $bookings = $this->queryBookings($query, $query2, $queryData);    
         

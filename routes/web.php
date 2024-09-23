@@ -90,6 +90,8 @@ Route::group(['middleware' => ['auth']], function () {
     //OPERACIONES
     Route::get('/download', [OperationController::class, 'index'])->name('operation.download');
     
+    Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
+
     Route::get('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation');
     Route::post('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation.search');
     Route::put('/operation/confirmation/update-status', [OperationController::class, 'confirmationUpdate'])->name('operation.confirmation.update');

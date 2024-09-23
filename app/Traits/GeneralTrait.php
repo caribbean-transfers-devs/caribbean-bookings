@@ -20,8 +20,8 @@ trait GeneralTrait
     }    
 
     public function Services(){
-        $services =  [];
-        $query = DB::select("SELECT 
+        // $services =  [];
+        $services = DB::select("SELECT 
                                     ds.id,
                                     dest.name AS destination_name, 
                                     IFNULL(dest_trans.translation, ds.name) AS service_name
@@ -30,12 +30,12 @@ trait GeneralTrait
                                     LEFT JOIN destination_services_translate as dest_trans ON dest_trans.destination_services_id = ds.id AND dest_trans.lang = 'es'
                                 ORDER BY ds.order ASC");
 
-        if(sizeof($query) >=1 ):
-            foreach( $query as $key => $value ):
-                if( !isset(  $services[ $value->destination_name ] ) ) $services[ $value->destination_name ] = [];
-                $services[ $value->destination_name ][] = $value;
-            endforeach;            
-        endif;
+        // if(sizeof($query) >=1 ):
+        //     foreach( $query as $key => $value ):
+        //         if( !isset(  $services[ $value->destination_name ] ) ) $services[ $value->destination_name ] = [];
+        //         $services[ $value->destination_name ][] = $value;
+        //     endforeach;            
+        // endif;
 
         return $services;
     }
@@ -63,11 +63,37 @@ trait GeneralTrait
 
     public function parseArrayQuery($data){
         if( is_array($data) ){
-            $string = '(' . implode(',', $data) . ')';
+            $string = implode(',', $data);
             return $string;
         }else{
             return $data;
         }
     }
+
+    // public function parseArrayQuery($data){
+    //     if( is_array($data) ){
+    //         // Filtrar para obtener solo valores numéricos
+    //         $numericValues = array_filter($data, function($item) {
+    //             return is_numeric($item);
+    //         });
+    //         // Unir los valores numéricos en una cadena separada por comas
+    //         $string = implode(',', $numericValues);
+    //         return $string;
+    //     } else {
+    //         return is_numeric($data) ? $data : null;
+    //     }
+    // }
+
+    // public function parseArrayQuery($data){
+    //     if( is_array($data) ){
+    //         // Usamos array_map para agregar comillas dobles a cada elemento
+    //         $string = implode(',', array_map(function($item) {
+    //             return '"' . $item . '"';
+    //         }, $data));
+    //         return $string;
+    //     } else {
+    //         return $data;
+    //     }
+    // }    
 
 }

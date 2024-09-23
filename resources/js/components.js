@@ -168,7 +168,7 @@ let components = {
      * @param {*} response
      */
     proccessResponse: function (response){
-        console.log(response);
+        // console.log(response);
         var _response = new Object();
         _response = response;
         _response.reload = (response.hasOwnProperty('reload') ? response.reload : true );
@@ -177,7 +177,7 @@ let components = {
         if( response.hasOwnProperty('return') && response.return && response.hasOwnProperty('link_return') && response.link_return != "" ){
             _response.link_return = response.link_return;
         }
-        console.log(response);
+        // console.log(response);
         components.sweetAlert(_response);
     },
 
@@ -315,7 +315,86 @@ let components = {
             // document.body.removeChild(load_screen);
             __load_screen.classList.add('d-none');
         }
-    }    
+    },
+
+    actionButtonColumns: function(){
+        const __btn_columns = document.querySelectorAll('.__btn_columns');        
+        __btn_columns.forEach(__btn_column => {
+            __btn_column.addEventListener('click', function(event){
+                event.preventDefault();
+                const { table, container } = this.dataset;                
+                components.renderCheckboxColumns(table, container);
+            });
+        });        
+    },
+
+    renderCheckboxColumns: function(table, container){
+        const __table = document.getElementById(table);
+        const __container = document.getElementById(container);
+
+        if( __table != null ){
+            // __container.innerHTML = "";
+            const __ths = __table.querySelectorAll('th');
+            __ths.forEach((__th, __key) => {
+                const capitalizedText = __th.innerText.toLowerCase().replace(/\b\w/g, function (c) {
+                    return c.toUpperCase();
+                });
+    
+                const __div = document.createElement('div');
+                const __input = document.createElement('input');
+                const __label = document.createElement('label');
+    
+                __div.classList.add('form-check', 'd-flex', 'align-items-center', 'gap-1', 'mb-0', 'w-100');
+                    __div.appendChild(__input);
+                    __input.classList.add('form-check-input', 'toggle-vis');
+                    __input.setAttribute('type', 'checkbox');
+                    __input.setAttribute('value', '');
+                    __input.setAttribute('id', 'flexCheckDefault' + __key);
+                    __input.setAttribute('data-column', __key);
+                    __input.setAttribute('checked', true);
+                    __div.appendChild(__label);
+                    __label.classList.add('form-check-label', 'w-100', 'mb-0');
+                    __label.setAttribute('for', 'flexCheckDefault' + __key);
+                    __label.innerText = capitalizedText;
+    
+                __container.appendChild(__div);
+            });
+            components.callActionCheckboxColumns(__table);
+        }
+    },
+
+    callActionCheckboxColumns: function(__table){
+        let table = $(__table).DataTable();
+        if( document.querySelectorAll('input.toggle-vis').length > 0 ){
+            document.querySelectorAll('input.toggle-vis').forEach(function(checkbox) {          
+                checkbox.addEventListener('change', function(event) {
+                    // Evitar la acción por defecto
+                    event.preventDefault();     
+                    // Obtener el índice de la columna desde el atributo data-column
+                    var columnIndex = this.getAttribute('data-column');
+                    var column = table.column(columnIndex);
+                    // Alternar la visibilidad de la columna en base al estado del checkbox
+                    if (this.checked) {
+                        column.visible(true);  // Mostrar la columna si el checkbox está marcado
+                    } else {
+                        column.visible(false); // Ocultar la columna si el checkbox no está marcado
+                    }
+                });
+            });
+        }
+    },
+
+    setValueSelectpicker: function(){
+        const __selectpickers = document.querySelectorAll('.selectpicker');
+        if( __selectpickers.length > 0 ){
+            __selectpickers.forEach(__selectpicker => {
+                const { value } = __selectpicker.dataset;        
+                if( value !== undefined ){
+                    $("#" + __selectpicker.getAttribute('id')).selectpicker('val', JSON.parse(value));
+                }
+            });
+        }
+    }
 }
 
 /**
@@ -329,15 +408,12 @@ window.addEventListener("beforeunload", function(event) {
 
 // Mostrar el indicador de carga cuando se navega hacia atrás o hacia adelante
 window.addEventListener('popstate', function (event) {
-    console.log("popstate");
     // components.removeLoadScreen();
     // components.loadScreen();
     // components.removeLoadScreen();
 });
 
 window.addEventListener("DOMContentLoaded", function() {
-
-    console.log("The page has fully loaded.");
     //OCULTAMOS LOADING CUANDO DOM ESTA CARGADO COMPLETAMENTE
     components.removeLoadScreen();
 
@@ -349,7 +425,7 @@ window.addEventListener("DOMContentLoaded", function() {
             components.removeLoadScreen();
         },
         error : function(xhr, status, error) {
-            console.log(xhr, status, error);
+            // console.log(xhr, status, error);
             components.sweetAlert({"status": "error", "message": xhr.responseJSON.message});
         },
     });

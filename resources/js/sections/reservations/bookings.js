@@ -29,6 +29,9 @@ let bookings = {
         // _settings.lengthMenu = [];
         // _settings.pageLength = 10;
         _settings.paging = false;
+        // _settings.language = {
+        //     "url": "https://cdn.datatables.net/plug-ins/1.10.16/i18n/es_es.json"
+        // }
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
             "sZeroRecords": "No se encontraron resultados",             
@@ -65,14 +68,6 @@ if( document.querySelector('.table-rendering') != null ){
 }
 components.formReset();
 
-if ( document.getElementById('site') != null ) {
-    new TomSelect(document.getElementById('site'));   
-}
-
-if ( document.getElementById('origin') != null ) {
-    new TomSelect(document.getElementById('origin'));   
-}
-
 //DECLARACION DE VARIABLES
 const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
 const __title_modal = document.getElementById('filterModalLabel');
@@ -83,3 +78,7 @@ if( __create != null ){
         __title_modal.innerHTML = this.dataset.title;
     });
 }
+
+// components.actionButtonColumns();
+components.renderCheckboxColumns('bookings', 'columns');
+components.setValueSelectpicker();

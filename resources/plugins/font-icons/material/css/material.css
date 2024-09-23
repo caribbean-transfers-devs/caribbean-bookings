@@ -1,7 +1,11 @@
 @font-face {
     font-family: remixicon;
     src: url(../../webfonts/remixicon.eot?t=1681573354175);
-    src: url(../../webfonts/remixicon.eot?t=1681573354175#iefix) format("embedded-opentype"),url(../../webfonts/remixicon.woff2?t=1681573354175) format("woff2"),url(../../webfonts/remixicon.woff?t=1681573354175) format("woff"),url(../../webfonts/remixicon.ttf?t=1681573354175) format("truetype"),url(../../webfonts/remixicon.svg?t=1681573354175#remixicon) format("svg");
+    src: url(../../webfonts/remixicon.eot?t=1681573354175#iefix) format("embedded-opentype"),
+         url(../../webfonts/remixicon.woff2?t=1681573354175) format("woff2"),
+         url(../../webfonts/remixicon.woff?t=1681573354175) format("woff"),
+         url(../../webfonts/remixicon.ttf?t=1681573354175) format("truetype"),
+         url(../../webfonts/remixicon.svg?t=1681573354175#remixicon) format("svg");
     font-display: swap
 }
 

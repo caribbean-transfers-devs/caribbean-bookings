@@ -12,12 +12,12 @@
 	<link rel="shortcut icon" href="/assets/img/icons/favicon-32x32.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
-    <link href="/assets/css/core/core.min.css" rel="preload" as="style" >
-    <link href="/assets/css/core/core.min.css" rel="stylesheet" >
-    <link href="/assets/css/panel/panel.min.css" rel="preload" as="style" >
-    <link href="/assets/css/panel/panel.min.css" rel="stylesheet" >
-    <link href="/assets/css/panel/panel2.min.css" rel="preload" as="style" >
-    <link href="/assets/css/panel/panel2.min.css" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/core/core.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/core/core.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/panel/panel2.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/panel/panel2.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/panel/panel.min.css') }}"rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/panel/panel.min.css') }}"rel="stylesheet" >
 
     @stack('Css')
 </head> 

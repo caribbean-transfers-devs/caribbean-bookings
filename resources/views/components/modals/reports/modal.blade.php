@@ -21,43 +21,54 @@
                             <label class="form-label" for="filter_text">/#/Nombre/Correo/Teléfono/Referencia</label>
                             <input type="text" name="filter_text" id="filter_text" class="form-control mb-3" value="{{ trim($data['filter_text']) }}">
                         </div>
+
                         @if ( !empty($websites) )
                             <div class="col-12 col-sm-4">
                                 <label class="form-label" for="site">Sitio</label>
-                                <select class="form-select mb-3" placeholder="Selecciona un sitio" name="site[]" id="site" multiple>                            
+                                <select class="form-control selectpicker mb-3" title="Selecciona un sitio" data-live-search="true" data-selected-text-format="count > 1" name="site[]" id="site" data-value="{{ json_encode($data['site']) }}" multiple>                            
                                     @foreach ($websites as $key => $value)
-                                        <option value="{{ $value->id }}" {{ (($data['site'] == $value->id)?'selected':'') }}>{{ $value->site_name }}</option> 
+                                        <option value="{{ $value->id }}">{{ $value->site_name }}</option> 
                                     @endforeach
                                 </select>
                             </div>
-                        @endif                        
+                        @endif
 
-                        <div class="col-12 col-sm-6">
-                            <label class="form-label" for="product_type">Tipo de producto</label>
-                            <select class="form-control mb-3" name="product_type" id="product_type">
-                                <option value='0'>Seleccionar</option>
-                                @foreach ($services as $key => $value)
-                                    <optgroup label="{{ $key }}">
-                                        @foreach ($value as $service)                                    
-                                            <option value="{{ $service->id }}" {{ (($data['product_type'] == $service->id)?'selected':'') }}>{{ $service->service_name }}</option>                                                          
-                                        @endforeach
-                                    </optgroup>
+                        <div class="col-12 col-sm-4">                            
+                            <label class="form-label" for="product_type">Tipo de vehículo</label>
+                            <select class="form-control selectpicker mb-3" title="Selecciona un vehículo" data-live-search="true" data-selected-text-format="count > 3" name="product_type[]" id="product_type" data-value="{{ json_encode($data['product_type']) }}" multiple>
+                                @foreach ($services as $service)
+                                    <option value="{{ $service->id }}">{{ $service->service_name }}</option>                                                          
                                 @endforeach
-                            </select>
+                            </select>                            
                         </div>
-                        <div class="col-12 col-sm-6">
-                            <label class="form-label" for="zone">Zona</label>
-                                <select class="form-control mb-3" name="zone" id="zone">
-                                    <option value='0'>Seleccionar</option>
+
+                        <div class="col-12 col-sm-4">
+                            <label class="form-label" for="zone">Zona de origen</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una zona" data-live-search="true" data-selected-text-format="count > 3" name="zone_one_id[]" id="zone_one_id" data-value="{{ json_encode($data['zone_one_id']) }}" multiple>
                                     @foreach ($zones as $key => $value)
                                     <optgroup label="{{ $key }}">
-                                        @foreach ($value as $zone)                                    
-                                            <option value="{{ $zone->id }}" {{ (($data['zone'] == $zone->id)?'selected':'') }}>{{ $zone->zone_name }}</option>                                                          
+                                        @foreach ($value as $zone)
+                                            <option value="{{ $zone->id }}">{{ $zone->zone_name }}</option>                                                          
                                         @endforeach
                                     </optgroup>
                                 @endforeach
                             </select>
                         </div>
+
+                        <div class="col-12 col-sm-4">
+                            <label class="form-label" for="zone">Zona de destino</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una zona" data-live-search="true" data-selected-text-format="count > 3" name="zone_two_id[]" id="zone_two_id" data-value="{{ json_encode($data['zone_two_id']) }}" multiple>
+                                    @foreach ($zones as $key => $value)
+                                    <optgroup label="{{ $key }}">
+                                        @foreach ($value as $zone)
+                                            <option value="{{ $zone->id }}">{{ $zone->zone_name }}</option>                                                          
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            </select>
+                        </div>                        
+
+
                         @if ( !empty($originsales) )
                             <div class="col-12 col-sm-6">
                                 <label class="form-label" for="origin">Origen de venta</label>

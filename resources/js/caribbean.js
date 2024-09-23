@@ -269,18 +269,7 @@ var App = function() {
     }
 
     function sidebarFunctionality() {
-        function sidebarCloser() {
-            console.log(window.innerWidth);
-            // main: document.querySelector('html, body'),
-            // id: {
-            //     container: document.querySelector("#container"),
-            // },
-            // class: {
-            //     navbar: document.querySelector(".navbar"),
-            //     overlay: document.querySelector('.overlay'),
-            //     mainContainer: document.querySelector('.main-container'),
-            //     mainHeader: document.querySelector('.header.navbar')
-            // }            
+        function sidebarCloser() {          
             if (window.innerWidth <= 991 ) {
                 if (!document.querySelector('body').classList.contains('alt-menu')) {
                     Dom.id.container.classList.add("sidebar-closed");
@@ -304,13 +293,12 @@ var App = function() {
                     Dom.class.navbar.classList.add("expand-header");
                     // Dom.class.overlay.classList.add('show');
                     Dom.id.container.classList.add('sbar-open');
-                    document.querySelector('.sidebar-wrapper [aria-expanded="true"]').parentNode.querySelector('.collapse').classList.remove('show');
+                    // document.querySelector('.sidebar-wrapper [aria-expanded="true"]').parentNode.querySelector('.collapse').classList.remove('show');
                 // }
             }
         }
 
         function sidebarMobCheck() {
-            console.log(window.innerWidth);
             if (window.innerWidth <= 991 ) {
                 if ( document.querySelector('.main-container').classList.contains('sbar-open') ) {
                     return;
