@@ -15,8 +15,8 @@ class CancellationsRepository
             $date = $request->date;
         endif;
 
-        $search['init_date'] = $date." 00:00:00";
-        $search['end_date'] = $date." 23:59:59";
+        $search['init'] = ( isset( $request->date ) && !empty( $request->date ) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00";
+        $search['end'] = ( isset( $request->date ) && !empty( $request->date ) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59";
 
         $items = DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, '' as messages,
                                                 COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
@@ -96,10 +96,10 @@ class CancellationsRepository
                                     WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
                                     AND rez.is_duplicated = 0
                                     GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id, tc.id",[
-                                        "init_date_one" => $search['init_date'],
-                                        "init_date_two" => $search['end_date'],
-                                        "init_date_three" => $search['init_date'],
-                                        "init_date_four" => $search['end_date'],
+                                        "init_date_one" => $search['init'],
+                                        "init_date_two" => $search['end'],
+                                        "init_date_three" => $search['init'],
+                                        "init_date_four" => $search['end'],
                                     ]);
 
         $breadcrumbs = array(
@@ -110,6 +110,6 @@ class CancellationsRepository
             ),
         );
 
-        return view('reports.cancellations', compact('items','date','breadcrumbs'));
+        return view('reports.cancellations', compact('items','search','breadcrumbs'));
     }
 }

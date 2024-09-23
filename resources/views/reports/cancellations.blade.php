@@ -27,6 +27,7 @@
                     'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
                 ],
                 zIndex: 10,
+                plugins: ['RangePlugin'],
             });   
         }
     </script>    
@@ -189,5 +190,5 @@
         </div>
     </div>
 
-    <x-modals.reservations.reports :data="$date" />
+    <x-modals.reservations.reports :data="$search" />
 @endsection
