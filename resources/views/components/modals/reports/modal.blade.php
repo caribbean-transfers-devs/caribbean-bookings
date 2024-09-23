@@ -1,4 +1,4 @@
-@props(['data','services','zones','websites','originsales','istoday'])
+@props(['data','services','zones','websites','origins','istoday'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -22,6 +22,14 @@
                             <input type="text" name="filter_text" id="filter_text" class="form-control mb-3" value="{{ trim($data['filter_text']) }}">
                         </div>
 
+                        <div class="col-12 col-sm-4">
+                            <label class="form-label" for="is_round_trip">Tipo de servicio</label>
+                            <select class="form-control selectpicker mb-3" title="Selecciona una opción" data-live-search="true" name="is_round_trip[]" id="is_round_trip" data-value="{{ json_encode($data['is_round_trip']) }}" multiple>                                                            
+                                <option value="0">One Way</option>
+                                <option value="1">Round Trip</option>
+                            </select>
+                        </div>                        
+
                         @if ( !empty($websites) )
                             <div class="col-12 col-sm-4">
                                 <label class="form-label" for="site">Sitio</label>
@@ -33,7 +41,18 @@
                             </div>
                         @endif
 
-                        <div class="col-12 col-sm-4">                            
+                        @if ( !empty($origins) )
+                            <div class="col-12 col-sm-4">
+                                <label class="form-label" for="origin">Origen de venta</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona un origen" data-live-search="true" data-selected-text-format="count > 2" name="origin[]" id="origin" data-value="{{ json_encode($data['origin']) }}" multiple>                            
+                                    @foreach ($origins as $key => $origin)
+                                        <option value="{{ $origin->id }}">{{ $origin->code }}</option> 
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif                        
+
+                        <div class="col-12 col-sm-4">
                             <label class="form-label" for="product_type">Tipo de vehículo</label>
                             <select class="form-control selectpicker mb-3" title="Selecciona un vehículo" data-live-search="true" data-selected-text-format="count > 3" name="product_type[]" id="product_type" data-value="{{ json_encode($data['product_type']) }}" multiple>
                                 @foreach ($services as $service)
@@ -68,22 +87,10 @@
                             </select>
                         </div>                        
 
-
-                        @if ( !empty($originsales) )
-                            <div class="col-12 col-sm-6">
-                                <label class="form-label" for="origin">Origen de venta</label>
-                                <select class="form-select mb-3" placeholder="Selecciona un origen" name="origin" >
-                                    <option value="0">Selecciona un origen</option>
-                                    @foreach ($originsales as $key => $originsale)
-                                        <option value="{{ $originsale->id }}" {{ (($data['origin'] == $originsale->id)?'selected':'') }}>{{ $originsale->code }}</option> 
-                                    @endforeach
-                                </select>
-                            </div>
-                        @endif                        
                         @if ( isset($istoday) )
-                            <div class="col-12 col-sm-6">
+                            <div class="col-12 col-sm-4">
                                 <label class="form-label" for="site">Operadas para hoy</label>
-                                <select class="form-select mb-3" name="is_today" id="is_today">
+                                <select class="form-control mb-3" name="is_today" id="is_today">
                                     <option {{ $data['is_today'] == '1' ? 'selected' : '' }} value="1">Sí</option>
                                     <option {{ $data['is_today'] == '0' ? 'selected' : '' }} value="0">No</option>
                                 </select>

@@ -34,6 +34,7 @@
 
 @section('content')
     @php
+        // dump($request->input());
         $buttons = array(
             array(  
                 'text' => 'Filtrar',

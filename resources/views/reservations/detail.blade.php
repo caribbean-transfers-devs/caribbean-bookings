@@ -98,6 +98,12 @@
                                         <th>Referencia</th>
                                         <td>{{ $reservation->reference }}</td>
                                     </tr>
+                                    @if( isset( $reservation->originSale->code ) )
+                                        <tr>
+                                            <th>Origen de venta</th>
+                                            <td>{{ $reservation->originSale->code }}</td>
+                                        </tr>                                    
+                                    @endif                                    
                                     @if( $reservation->open_credit == 1 )
                                         <tr>
                                             <th>Crédito Abierto</th>
@@ -635,7 +641,7 @@
     <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
 </x-modals.new_follow_reservation>
 
-<x-modals.edit_reservation_details :reservation=$reservation :sites=$sites />
+<x-modals.edit_reservation_details :reservation=$reservation :sites=$sites :origins=$origins />
 <x-modals.reservations.confirmation :reservation=$reservation />
 
 @endsection

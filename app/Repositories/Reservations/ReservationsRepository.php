@@ -8,6 +8,7 @@ use App\Models\ReservationFollowUp;
 use App\Models\ReservationsItem;
 use App\Models\ReservationsService;
 use App\Models\Payment;
+use App\Models\OriginSale;
 use App\Models\ContactPoints;
 use App\Models\Zones;
 use App\Models\Site;
@@ -30,11 +31,12 @@ class ReservationsRepository
             "init" => date("Y-m-d") . " 00:00:00",
             "end" => date("Y-m-d") . " 23:59:59",
             "filter_text" => NULL,
+            "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
             "site" => ( isset($request->site) ? $request->site : 0 ),
+            "origin" => ( isset($request->origin) ? $request->origin : 0 ),
             "product_type" => ( isset($request->product_type) ? $request->product_type : 0 ),
             "zone_one_id" => ( isset($request->zone_one_id) ? $request->zone_one_id : 0 ),
-            "zone_two_id" => ( isset($request->zone_two_id) ? $request->zone_two_id : 0 ),
-            "origin" => 0,
+            "zone_two_id" => ( isset($request->zone_two_id) ? $request->zone_two_id : 0 ),            
             "payment_method" => NULL,
             "is_today" => 0,
         ];
@@ -53,6 +55,7 @@ class ReservationsRepository
             $data['is_today'] = $request->is_today;            
             $query2 = ' HAVING is_today != 0 ';
         }
+
         if(isset( $request->date ) && !empty( $request->date )){
             $tmp_date = explode(" - ", $request->date);
             $data['init'] = $tmp_date[0];
@@ -62,9 +65,24 @@ class ReservationsRepository
             $queryData['end'] = $data['end'].' 23:59:59';
         }
 
-        if(isset( $request->site ) && $request->site != 0){   
-            $params = $this->parseArrayQuery($request->site);         
+        if(isset( $request->is_round_trip )){
+            $params = "";
+            foreach( $request->is_round_trip as $key => $is_round_trip ){
+                $queryData['is_round_trip' . $key] = $is_round_trip;
+                $params .= "FIND_IN_SET(:is_round_trip".$key.", is_round_trip) > 0 OR ";
+            }
+            $params = rtrim($params, ' OR ');
+            $query .= " AND (".$params.") ";            
+        }
+
+        if(isset( $request->site ) && !empty( $request->site )){
+            $params = $this->parseArrayQuery($request->site);
             $query .= " AND site.id IN ($params) ";
+        }
+        
+        if(isset( $request->origin ) && !empty( $request->origin )){
+            $params = $this->parseArrayQuery($request->origin);
+            $query .= " AND origin.id IN ($params) ";
         }
 
         if(isset( $request->product_type ) && !empty( $request->product_type )){
@@ -95,17 +113,12 @@ class ReservationsRepository
             }
             $params = rtrim($params, ' OR ');
             $query .= " AND (".$params.") ";
-        }        
-
-        // if(isset( $request->origin ) && $request->origin != 0){
-        //     $data['origin'] = $request->origin;
-        //     $query .= ' AND original.id = :origin';
-        //     $queryData['origin'] = $data['origin'];
-        // }
+        }
 
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
             $data['payment_method'] = $request->payment_method;
         }
+
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
             $data['filter_text'] = $request->filter_text;
             $queryData = [];
@@ -119,7 +132,6 @@ class ReservationsRepository
         }
                 
         // dd($query, $data, $queryData);
-        
         $bookings = $this->queryBookings($query, $query2, $queryData);    
         
         return view('reservations.index', [
@@ -134,7 +146,7 @@ class ReservationsRepository
             'websites' => $this->Sites(),
             'services' => $this->Services(),
             'zones' => $this->Zones(),
-            'origin_sales' => $this->Origins(),
+            'origins' => $this->Origins(),
             'data' => $data,
             'request' => $request,
         ]);
@@ -151,6 +163,9 @@ class ReservationsRepository
             $reservation->client_phone = $request->client_phone;
             $reservation->site_id = $request->site_id;
             $reservation->reference = $request->reference;
+            if( isset($request->origin_sale_id) && $request->origin_sale_id != 0 ){
+                $reservation->origin_sale_id = $request->origin_sale_id;
+            }            
             $reservation->currency = $request->currency;
             if ( ($request->site_id == 11 || $request->site_id == 21) && $request->vendor_id == NULL && $request->terminal == NULL && count($payments) == 0 ) {
                 $reservation->is_complete = 0;
@@ -458,7 +473,7 @@ class ReservationsRepository
         endif;
     }
 
-    public function departureMessage($lang = "en", $item = [], $destination_id, $type = "departure"){
+    public function departureMessage($lang = "en", $item = [], $destination_id = 0, $type = "departure"){
         $departure_date = NULL;
         $destination = NULL;     
         
@@ -658,6 +673,12 @@ class ReservationsRepository
         if( $request->reference != $reservation->reference ){
             $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la referencia de: ".$reservation->reference." a ".$request->reference, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
+
+        if( isset($request->origin_sale_id) && $request->origin_sale_id != 0 && $request->origin_sale_id != $reservation->origin_sale_id ){
+            $origin_old = OriginSale::find($reservation->origin_sale_id);
+            $origin_new = OriginSale::find($request->origin_sale_id);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el origen de venta de: ".( isset($origin_old->code) ? $origin_old->code : "NULL" )." a ".$origin_new->code, 'HISTORY', 'EDICIÓN RESERVACIÓN');
+        }        
         
         if( $request->currency != $reservation->currency ){
             $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la moneda de: ".$reservation->currency." a ".$request->currency, 'HISTORY', 'EDICIÓN RESERVACIÓN');
