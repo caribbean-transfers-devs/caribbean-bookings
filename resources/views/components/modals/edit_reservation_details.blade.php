@@ -39,6 +39,15 @@
                             <input type="text" class="form-control mb-2" id="serviceClientReference" name="reference" value="{{ $reservation->reference }}">
                         </div>
                         <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="originSale">Origen de venta</label>
+                            <select class="form-select mb-2" id="originSale" name="origin_sale_id">
+                                <option value="0">Selecciona una opción</option>
+                                @foreach($origins as $key => $origin)
+                                    <option value="{{ $origin->id }}" {{ $reservation->origin_sale_id == $origin->id ? 'selected' : '' }}>{{ $origin->code }}</option>
+                                @endforeach
+                            </select>
+                        </div>                        
+                        <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
                             <select class="form-select mb-2" id="servicePaymentsCurrencyModal" name="currency" readonly>
                                 <option value="USD" {{ $reservation->currency == 'USD' ? 'selected' : '' }}>USD</option>

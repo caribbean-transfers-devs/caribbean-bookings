@@ -11,6 +11,7 @@ use App\Models\Site;
 use App\Models\Zones;
 
 use App\Traits\ApiTrait;
+use App\Traits\GeneralTrait;
 
 use Exception;
 use Illuminate\Http\Response;
@@ -19,7 +20,7 @@ use App\Models\ReservationsMedia;
 
 class DetailRepository
 {
-    use ApiTrait;
+    use ApiTrait, GeneralTrait;
     
     public function detail($request,$id)
     {
@@ -48,7 +49,8 @@ class DetailRepository
             'payments',
             'followUps',
             'site',
-            'cancellationType'
+            'cancellationType',
+            'originSale'
         ])->find($id);
                 
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
@@ -91,7 +93,18 @@ class DetailRepository
             $data['status'] = "DUPLICATED";
         endif;
 
-        return view('reservations.detail', compact('reservation','sellers','sales_types','services_types','data','sites','zones','types_cancellations','media'));
+        return view('reservations.detail', [
+            'reservation' => $reservation,
+            'sellers' => $sellers,
+            'sales_types' => $sales_types,
+            'services_types' => $services_types,
+            'data' => $data,
+            'sites' => $sites,
+            'zones' => $zones,
+            'types_cancellations' => $types_cancellations,
+            'media' => $media,
+            'origins' => $this->Origins()
+        ]);
     }
 
     public function getMedia($request){

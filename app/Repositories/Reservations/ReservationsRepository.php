@@ -16,10 +16,11 @@ use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Traits\MailjetTrait;
+use App\Traits\GeneralTrait;
 
 class ReservationsRepository
 {
-    use MailjetTrait;
+    use MailjetTrait, GeneralTrait;
     
     public function index($request)
     {
@@ -72,11 +73,11 @@ class ReservationsRepository
             $query .= ' AND site.id = :site';
             $queryData['site'] = $data['site'];
         }
-        // if(isset( $request->origin ) && $request->origin != 0){
-        //     $data['origin'] = $request->origin;
-        //     $query .= ' AND original.id = :origin';
-        //     $queryData['origin'] = $data['origin'];
-        // }
+        if(isset( $request->origin ) && $request->origin != 0){
+            $data['origin'] = $request->origin;
+            $query .= ' AND origin.id = :origin';
+            $queryData['origin'] = $data['origin'];
+        }
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
             $data['payment_method'] = $request->payment_method;
         }
@@ -199,8 +200,6 @@ class ReservationsRepository
         $websites = DB::select("SELECT id, name as site_name
                                 FROM sites
                                 ORDER BY site_name ASC");
-
-        $origin_sales = OriginSale::All();
         
         if(sizeof( $bookings ) > 0):
             usort($bookings, array($this, 'orderByDateTime'));
@@ -214,7 +213,15 @@ class ReservationsRepository
             ),
         );
         
-        return view('reservations.index', compact('bookings','services','zones','websites','origin_sales','data','breadcrumbs') );
+        return view('reservations.index', [
+            'bookings' => $bookings,
+            'services' => $services,
+            'zones' => $zones,
+            'websites' => $websites,
+            'origin_sales' => $this->Origins(),
+            'data' => $data,
+            'breadcrumbs' => $breadcrumbs
+        ] );
     }
 
     public function update($request,$reservation){
@@ -229,6 +236,10 @@ class ReservationsRepository
             $reservation->site_id = $request->site_id;
             $reservation->reference = $request->reference;
             $reservation->currency = $request->currency;
+            if( isset($request->origin_sale_id) && $request->origin_sale_id != 0 ){
+                $reservation->origin_sale_id = $request->origin_sale_id;
+            }
+
             if ( ($request->site_id == 11 || $request->site_id == 21) && $request->vendor_id == NULL && $request->terminal == NULL && count($payments) == 0 ) {
                 $reservation->is_complete = 0;
                 $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", completo la reservación de Taquilla, que se creo desde operaciones", 'HISTORY', 'EDICIÓN RESERVACIÓN');
@@ -734,6 +745,12 @@ class ReservationsRepository
             $site_old = Site::find($reservation->site_id);
             $site_new = Site::find($request->site_id);
             $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el sitio de: ".$site_old->name." a ".$site_new->name, 'HISTORY', 'EDICIÓN RESERVACIÓN');
+        }
+
+        if( isset($request->origin_sale_id) && $request->origin_sale_id != 0 && $request->origin_sale_id != $reservation->origin_sale_id ){
+            $origin_old = OriginSale::find($reservation->origin_sale_id);
+            $origin_new = OriginSale::find($request->origin_sale_id);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el origen de venta de: ".( isset($origin_old->code) ? $origin_old->code : "NULL" )." a ".$origin_new->code, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
 
         if( $request->reference != $reservation->reference ){
