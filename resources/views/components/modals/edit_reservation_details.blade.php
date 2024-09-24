@@ -36,7 +36,7 @@
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceClientReference">Referencia</label>
-                            <input type="text" class="form-control mb-2" id="serviceClientReference" name="reference" value="{{ $reservation->reference }}">
+                            <input type="text" class="form-control mb-2" id="serviceClientReference" name="reference" readonly value="{{ $reservation->reference }}">
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="originSale">Origen de venta</label>
