@@ -149,8 +149,8 @@ class ReservationsRepository
             'status' => $this->Status(),
             'services' => $this->Services(),
             'zones' => $this->Zones(),
-            'currency' => $this->Currencies(),
-            'payment_method' => $this->Methods(),
+            'currencies' => $this->Currencies(),
+            'methods' => $this->Methods(),
             'data' => $data,
             'request' => $request,
         ]);
