@@ -26,12 +26,7 @@ let bookings = {
         _settings.responsive = true;
         _settings.buttons =  _buttons;
         _settings.order = [];
-        // _settings.lengthMenu = [];
-        // _settings.pageLength = 10;
         _settings.paging = false;
-        // _settings.language = {
-        //     "url": "https://cdn.datatables.net/plug-ins/1.10.16/i18n/es_es.json"
-        // }
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
             "sZeroRecords": "No se encontraron resultados",             
@@ -60,7 +55,7 @@ if ( document.getElementById('lookup_date') != null ) {
         ],
         zIndex: 10,
         plugins: ['RangePlugin'],
-    });   
+    });
 }
 
 if( document.querySelector('.table-rendering') != null ){

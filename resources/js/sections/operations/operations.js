@@ -295,7 +295,7 @@ let setup = {
 };
 
 //CONFIGURACION DE DROPZONE
-Dropzone.options.uploadForm = {    
+Dropzone.options.uploadForm = {
     maxFilesize: 5, // Tamaño máximo del archivo en MB
     acceptedFiles: 'image/*,.pdf', // Solo permitir imágenes y archivos PDF
     dictDefaultMessage: 'Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...',
@@ -305,9 +305,8 @@ Dropzone.options.uploadForm = {
     headers: {
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     },
-    init: function() {        
+    init: function() {
         this.on("success", function(file, response) {
-            console.log(response);
             if (response.hasOwnProperty('success') && response.success) {
                 Swal.fire({
                     icon: 'success',

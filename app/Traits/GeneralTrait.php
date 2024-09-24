@@ -8,16 +8,32 @@ use Illuminate\Support\Facades\DB;
 
 //MODELS
 use App\Models\OriginSale;
+use App\Models\Enterprise;
+use App\Models\Vehicle;
+use App\Models\Driver;
+use App\Models\CancellationTypes;
 
 trait GeneralTrait
 {
+    public function enterprises(){
+        return Enterprise::all();
+    }
+
+    public function vehicles(){
+        return Vehicle::all();
+    }
+
+    public function drivers(){
+        return Driver::all();
+    }    
+
     public function Sites(){
         return DB::select("SELECT 
-                                    id, 
-                                    name as site_name
-                                FROM sites
-                                    ORDER BY site_name ASC");        
-    }    
+                                id, 
+                                name as site_name
+                            FROM sites
+                                ORDER BY site_name ASC");
+    }
 
     public function Services(){
         // $services =  [];
@@ -61,6 +77,34 @@ trait GeneralTrait
         return OriginSale::All();
     }
 
+    public function CancellationTypes(){
+        return CancellationTypes::all();
+    }
+
+    public function Status(){
+        return array(
+            "CONFIRMED" => "Confirmado",
+            "PENDING" => "Pendiente",
+            "CANCELLED" => "Cancelado",
+        );
+    }
+    
+    public function currencies(){
+        return array(
+            "USD" => "USD",
+            "MXN" => "MXN",
+        );
+    }
+
+    public function Methods(){
+        return array(
+            "CASH" => "CASH",
+            "CARD" => "CARD",
+            "PAYPAL" => "PAYPAL",
+            "MIFEL" => "MIFEL",
+        );
+    }
+
     public function parseArrayQuery($data){
         if( is_array($data) ){
             $string = implode(',', $data);
@@ -69,31 +113,4 @@ trait GeneralTrait
             return $data;
         }
     }
-
-    // public function parseArrayQuery($data){
-    //     if( is_array($data) ){
-    //         // Filtrar para obtener solo valores numéricos
-    //         $numericValues = array_filter($data, function($item) {
-    //             return is_numeric($item);
-    //         });
-    //         // Unir los valores numéricos en una cadena separada por comas
-    //         $string = implode(',', $numericValues);
-    //         return $string;
-    //     } else {
-    //         return is_numeric($data) ? $data : null;
-    //     }
-    // }
-
-    // public function parseArrayQuery($data){
-    //     if( is_array($data) ){
-    //         // Usamos array_map para agregar comillas dobles a cada elemento
-    //         $string = implode(',', array_map(function($item) {
-    //             return '"' . $item . '"';
-    //         }, $data));
-    //         return $string;
-    //     } else {
-    //         return $data;
-    //     }
-    // }    
-
 }

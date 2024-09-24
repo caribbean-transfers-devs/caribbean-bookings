@@ -99,24 +99,31 @@
                             <th class="text-center">CORREO DEL CLIENTE</th>
                             <th class="text-center">VEHÍCULO</th>
                             <th class="text-center">PAX</th>
-                            <th class="text-center">TOTAL</th>
-                            <th class="text-center">MONEDA</th>
-                            <th class="text-center">BALANCE</th>
-                            <th class="text-center">MÉTODO DE PAGO</th>
                             <th class="text-center">ORIGEN</th>
                             <th class="text-center">DESDE</th>
                             <th class="text-center">DESTINO</th>
                             <th class="text-center">HACIA</th>
+                            <th class="text-center">TOTAL RESERVACIÓN</th>
+                            <th class="text-center">BALANCE</th>
+                            <th class="text-center">COSTO POR SERVICIO</th>
+                            <th class="text-center">MONEDA</th>
+                            <th class="text-center">MÉTODO DE PAGO</th>                            
                         </tr>
                     </thead>
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
+                                {{-- @if ( $item->reservation_id == 36711 || $item->reservation_id == 36696 )
+                                    @dump($item)
+                                @endif --}}
+                                {{-- @if ( $item->status == "UNKNOWN" )
+                                    @dd($item)
+                                @endif --}}
                                 @php
                                     if($item->is_cancelled == 0):
-                                        if($item->pay_at_arrival == 1):
-                                            $item->status = "CONFIRMED";
-                                        endif;
+                                        // if($item->pay_at_arrival == 1):
+                                        //     $item->status = "CONFIRMED";
+                                        // endif;
                                         $resume['status'][$item->status][$item->currency] += $item->total_sales;
                                         $resume['status'][$item->status]['count']++;
 
@@ -162,10 +169,10 @@
                                     $total_pending = $item->total_sales - $item->total_payments;
                                 @endphp
                                 <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
-                                    <td>
+                                    <td class="text-center">
                                         <span class="badge badge-light-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         @php
                                             $codes_string = "";
                                             $codes = explode(",",$item->reservation_codes);
@@ -179,11 +186,11 @@
                                             <?=$codes_string?>
                                         @endif
                                     </td>
-                                    <td><?=( !empty($item->reference) ? '<p class="mb-1">'.$item->reference.'</p>' : '' )?></td>
+                                    <td class="text-center"><?=( !empty($item->reference) ? '<p class="mb-1">'.$item->reference.'</p>' : '' )?></td>
                                     <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
-                                    <td>{{ $item->site_name }}</td>
-                                    <td>{{ !empty($item->origin_code) ? $item->origin_code : 'NO DEFINIDO' }}</td>
+                                    <td class="text-center">{{ $item->site_name }}</td>
+                                    <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'NO DEFINIDO' }}</td>
                                     <td class="text-center">
                                         @if ($item->is_cancelled == 0)
                                             @if($item->open_credit == 1)
@@ -203,19 +210,21 @@
                                             <span class="badge badge-light-danger">Cancelado</span>
                                         @endif
                                     </td> 
-                                    <td><span>{{ $item->full_name }}</span></td>
-                                    <td><span>{{ $item->client_phone }}</span></td>
-                                    <td><span>{{ $item->client_email }}</span></td>
-                                    <td>{{ $item->service_type_name }}</td>
+                                    <td class="text-center"><span>{{ $item->full_name }}</span></td>
+                                    <td class="text-center"><span>{{ $item->client_phone }}</span></td>
+                                    <td class="text-center"><span>{{ $item->client_email }}</span></td>
+                                    <td class="text-center">{{ $item->service_type_name }}</td>
                                     <td class="text-center">{{ $item->passengers }}</td>
-                                    <td class="text-end">{{ $item->total_sales }}</td>
-                                    <td class="text-center">{{ $item->currency }}</td>
-                                    <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td>
-                                    <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td>
                                     <td class="text-center">{{ $item->destination_name_from }}</td>
                                     <td class="text-center">{{ $item->from_name }}</td>
                                     <td class="text-center">{{ $item->destination_name_to }}</td>
                                     <td class="text-center">{{ $item->to_name }}</td>
+                                    <td class="text-center">{{ number_format(ROUND($item->total_sales),2) }}</td>
+                                    <td class="text-center" {{ (($total_pending < 0)? "style=color:red;font-weight:bold;":"") }}>{{ number_format(ROUND($total_pending),2) }}</td>
+                                    <td class="text-center">{{ number_format(ROUND($item->is_round_trip != 0 ? ( $item->total_sales / 2 ) : $item->total_sales),2) }}</td>
+                                    <td class="text-center">{{ $item->currency }}</td>
+                                    {{-- <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td> --}}
+                                    <td class="text-center">{{ $item->payment_type_name }}</td>
                                 </tr>
                             @endforeach
                         @endif
@@ -369,6 +378,6 @@
         </div> --}}
     </div>
 
-    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" />
+    <x-modals.reports.modal :data="$data" :services="$services" :status="$status" :methods="$methods" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" />
     <x-modals.reports.columns />
 @endsection

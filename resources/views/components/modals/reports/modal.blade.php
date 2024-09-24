@@ -1,4 +1,4 @@
-@props(['data','services','zones','websites','origins','istoday'])
+@props(['data','services','status','zones','websites','origins','istoday'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -50,7 +50,18 @@
                                     @endforeach
                                 </select>
                             </div>
-                        @endif                        
+                        @endif
+
+                        @if ( !empty($status) )
+                            <div class="col-12 col-sm-4">
+                                <label class="form-label" for="status_booking">Estatus de reservación</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona un estatus" data-live-search="true" data-selected-text-format="count > 2" name="status_booking[]" id="status_booking" data-value="{{ json_encode($data['status_booking']) }}" multiple>
+                                    @foreach ($status as $key => $statu)
+                                        <option value="{{ $key }}">{{ $statu }}</option> 
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
 
                         <div class="col-12 col-sm-4">
                             <label class="form-label" for="product_type">Tipo de vehículo</label>
@@ -85,7 +96,18 @@
                                     </optgroup>
                                 @endforeach
                             </select>
-                        </div>                        
+                        </div>
+
+                        @if ( !empty($currencies) )
+                            <div class="col-12 col-sm-4">
+                                <label class="form-label" for="status_booking">Moneda de reservación</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una moneda" data-live-search="true" data-selected-text-format="count > 2" name="currency[]" id="currency" data-value="{{ json_encode($data['currency']) }}" multiple>
+                                    @foreach ($currencies as $key => $currency)
+                                        <option value="{{ $key }}">{{ $currency }}</option> 
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif                        
 
                         @if ( isset($istoday) )
                             <div class="col-12 col-sm-4">

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 trait QueryTrait
 {
 
+    // pay_at_arrival: INDICA PAGO A LA LLEGADA PORQUE ELIGIO LA OPCION DE PAGO EN EFECTIVO
     public function queryBookings($query, $query2, $data){
         $bookings = DB::select("SELECT 
                                     rez.id as reservation_id, 
@@ -30,9 +31,15 @@ trait QueryTrait
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     CASE
+                                        WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
-                                        ELSE 'CONFIRMED'
-                                    END AS status,
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
+                                        ELSE 'UNKNOWN'
+                                    END AS status,                                    
+                                    -- CASE
+                                    --     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+                                    --     ELSE 'CONFIRMED'
+                                    -- END AS status,
                                     GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
                                     GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
                                     GROUP_CONCAT(DISTINCT it.zone_one_id ORDER BY it.zone_one_id ASC SEPARATOR ',') AS zone_one_id,
@@ -45,7 +52,15 @@ trait QueryTrait
                                     GROUP_CONCAT(DISTINCT it.service_type_id ORDER BY it.service_type_id ASC SEPARATOR ',') AS service_type_id,
                                     GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
                                     SUM(it.passengers) as passengers,
-                                    GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+
+                                    GROUP_CONCAT(
+                                        DISTINCT 
+                                        CASE 
+                                            WHEN p.payment_type_name IS NULL OR rez.pay_at_arrival = 1 THEN 'CASH' 
+                                            ELSE p.payment_type_name 
+                                        END 
+                                        ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                    -- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     SUM(it.is_round_trip) as is_round_trip
                                 FROM reservations as rez

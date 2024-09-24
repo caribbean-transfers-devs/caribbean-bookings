@@ -34,15 +34,16 @@ class ReservationsRepository
             "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
             "site" => ( isset($request->site) ? $request->site : 0 ),
             "origin" => ( isset($request->origin) ? $request->origin : 0 ),
+            "status_booking" => ( isset($request->status_booking) ? $request->status_booking : 0 ),
             "product_type" => ( isset($request->product_type) ? $request->product_type : 0 ),
             "zone_one_id" => ( isset($request->zone_one_id) ? $request->zone_one_id : 0 ),
-            "zone_two_id" => ( isset($request->zone_two_id) ? $request->zone_two_id : 0 ),            
+            "zone_two_id" => ( isset($request->zone_two_id) ? $request->zone_two_id : 0 ),
+            "currencies" => 0,
             "payment_method" => NULL,
             "is_today" => 0,
         ];
         
-        //Query DB
-        
+        //Query DB        
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.is_duplicated = 0 ';
         $query2 = '';
 
@@ -144,9 +145,12 @@ class ReservationsRepository
             ],
             'bookings' => $bookings,
             'websites' => $this->Sites(),
+            'origins' => $this->Origins(),
+            'status' => $this->Status(),
             'services' => $this->Services(),
             'zones' => $this->Zones(),
-            'origins' => $this->Origins(),
+            'currency' => $this->Currencies(),
+            'payment_method' => $this->Methods(),
             'data' => $data,
             'request' => $request,
         ]);
@@ -180,8 +184,7 @@ class ReservationsRepository
         }
     }
 
-    public function destroy($request, $reservation)
-    {
+    public function destroy($request, $reservation){
         try {
             DB::beginTransaction();
             $reservation->is_cancelled = 1;
@@ -197,8 +200,7 @@ class ReservationsRepository
         }
     }
 
-    public function duplicated($request, $reservation)
-    {
+    public function duplicated($request, $reservation){
         try {            
             DB::beginTransaction();
             $reservation->is_duplicated = 1;
@@ -212,8 +214,7 @@ class ReservationsRepository
         }
     }
 
-    public function openCredit($request, $reservation)
-    {
+    public function openCredit($request, $reservation){
         try {            
             DB::beginTransaction();
             $reservation->open_credit = 1;
@@ -227,8 +228,7 @@ class ReservationsRepository
         }
     }
 
-    public function enablePlusService($request, $reservation)
-    {
+    public function enablePlusService($request, $reservation){
         try {
             DB::beginTransaction();
             $reservation->is_advanced = 1;
@@ -242,8 +242,7 @@ class ReservationsRepository
         }
     }    
 
-    public function enableReservation($request, $reservation)
-    {
+    public function enableReservation($request, $reservation){
         try {            
             DB::beginTransaction();
             $reservation->is_cancelled = 0;
