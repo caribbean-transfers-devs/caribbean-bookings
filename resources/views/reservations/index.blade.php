@@ -170,7 +170,7 @@
                                         {{ "[".date("H:i", strtotime($item->created_at))."]" }}
                                     </td>
                                     <td>{{ $item->site_name }}</td>
-                                    <td>{{ !empty($item->origin_code) ? $item->origin_code : 'NO DEFINIDO' }}</td>
+                                    <td>{{ !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' }}</td>
                                     <td class="text-center">
                                         @if ($item->is_cancelled == 0)
                                             @if($item->open_credit == 1)

@@ -46,7 +46,7 @@
                                     <option value="{{ $origin->id }}" {{ $reservation->origin_sale_id == $origin->id ? 'selected' : '' }}>{{ $origin->code }}</option>
                                 @endforeach
                             </select>
-                        </div>                        
+                        </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
                             <select class="form-select mb-2" id="servicePaymentsCurrencyModal" name="currency" readonly>
@@ -54,6 +54,10 @@
                                 <option value="MXN" {{ $reservation->currency == 'MXN' ? 'selected' : '' }}>MXN</option>
                             </select>
                         </div>
+                        <div class="col-sm-12">
+                            <label class="form-label" for="bookingComment">Solicitudes especiales</label>
+                            <textarea class="form-control" name="special_request" id="formSpecialRequest"></textarea>
+                        </div>                        
                     </div>
                     <input type="hidden" id="reservation_id" value="{{ $reservation->id }}">
                 </form>

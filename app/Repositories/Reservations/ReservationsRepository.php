@@ -244,6 +244,12 @@ class ReservationsRepository
                 $reservation->is_complete = 0;
                 $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", completo la reservación de Taquilla, que se creo desde operaciones", 'HISTORY', 'EDICIÓN RESERVACIÓN');
             }
+
+            if( isset($request->special_request) && !empty($request->special_request) ){
+                $this->create_followUps($reservation->id, $request->special_request, 'CLIENT', auth()->user()->name);
+            }
+
+
             $reservation->save();
             DB::commit();
             return response()->json(['message' => 'Reservation updated successfully', 'success' => true], Response::HTTP_OK);
