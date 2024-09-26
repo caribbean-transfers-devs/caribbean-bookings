@@ -113,7 +113,7 @@
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
-                                {{-- @if ( $item->reservation_id == 36711 || $item->reservation_id == 36696 )
+                                {{-- @if ( $item->reservation_id == 36772 || $item->reservation_id == 36770 )
                                     @dump($item)
                                 @endif --}}
                                 {{-- @if ( $item->status == "UNKNOWN" )

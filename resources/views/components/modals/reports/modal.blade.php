@@ -1,4 +1,4 @@
-@props(['data','services','status','zones','websites','origins','istoday'])
+@props(['data','services','status','currencies','methods','zones','websites','origins','istoday'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -13,16 +13,16 @@
                 <div class="modal-body">
                     @csrf
                     <div class="row">
-                        <div class="col-12 col-sm-4">
+                        <div class="col-lg-4 col-12">
                             <label class="form-label" for="lookup_date">Fecha de creación</label>
-                            <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $data['init'] }} - {{ $data['end'] }}">
+                            <input type="text" name="date" id="lookup_date" class="form-control mb-3" value="{{ $data['init'] }} - {{ $data['end'] }}">
                         </div>
-                        <div class="col-12 col-sm-4">
+                        <div class="col-lg-4 col-12">
                             <label class="form-label" for="filter_text">/#/Nombre/Correo/Teléfono/Referencia</label>
                             <input type="text" name="filter_text" id="filter_text" class="form-control mb-3" value="{{ trim($data['filter_text']) }}">
                         </div>
 
-                        <div class="col-12 col-sm-4">
+                        <div class="col-lg-4 col-12">
                             <label class="form-label" for="is_round_trip">Tipo de servicio</label>
                             <select class="form-control selectpicker mb-3" title="Selecciona una opción" data-live-search="true" name="is_round_trip[]" id="is_round_trip" data-value="{{ json_encode($data['is_round_trip']) }}" multiple>                                                            
                                 <option value="0">One Way</option>
@@ -31,7 +31,7 @@
                         </div>                        
 
                         @if ( !empty($websites) )
-                            <div class="col-12 col-sm-4">
+                            <div class="col-lg-4 col-12">
                                 <label class="form-label" for="site">Sitio</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un sitio" data-live-search="true" data-selected-text-format="count > 1" name="site[]" id="site" data-value="{{ json_encode($data['site']) }}" multiple>                            
                                     @foreach ($websites as $key => $value)
@@ -42,7 +42,7 @@
                         @endif
 
                         @if ( !empty($origins) )
-                            <div class="col-12 col-sm-4">
+                            <div class="col-lg-4 col-12">
                                 <label class="form-label" for="origin">Origen de venta</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un origen" data-live-search="true" data-selected-text-format="count > 2" name="origin[]" id="origin" data-value="{{ json_encode($data['origin']) }}" multiple>                            
                                     @foreach ($origins as $key => $origin)
@@ -53,7 +53,7 @@
                         @endif
 
                         @if ( !empty($status) )
-                            <div class="col-12 col-sm-4">
+                            <div class="col-lg-4 col-12">
                                 <label class="form-label" for="status_booking">Estatus de reservación</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un estatus" data-live-search="true" data-selected-text-format="count > 2" name="status_booking[]" id="status_booking" data-value="{{ json_encode($data['status_booking']) }}" multiple>
                                     @foreach ($status as $key => $statu)
@@ -63,7 +63,7 @@
                             </div>
                         @endif
 
-                        <div class="col-12 col-sm-4">
+                        <div class="col-lg-4 col-12">
                             <label class="form-label" for="product_type">Tipo de vehículo</label>
                             <select class="form-control selectpicker mb-3" title="Selecciona un vehículo" data-live-search="true" data-selected-text-format="count > 3" name="product_type[]" id="product_type" data-value="{{ json_encode($data['product_type']) }}" multiple>
                                 @foreach ($services as $service)
@@ -72,7 +72,7 @@
                             </select>                            
                         </div>
 
-                        <div class="col-12 col-sm-4">
+                        <div class="col-lg-4 col-12">
                             <label class="form-label" for="zone">Zona de origen</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona una zona" data-live-search="true" data-selected-text-format="count > 3" name="zone_one_id[]" id="zone_one_id" data-value="{{ json_encode($data['zone_one_id']) }}" multiple>
                                     @foreach ($zones as $key => $value)
@@ -85,7 +85,7 @@
                             </select>
                         </div>
 
-                        <div class="col-12 col-sm-4">
+                        <div class="col-lg-4 col-12">
                             <label class="form-label" for="zone">Zona de destino</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona una zona" data-live-search="true" data-selected-text-format="count > 3" name="zone_two_id[]" id="zone_two_id" data-value="{{ json_encode($data['zone_two_id']) }}" multiple>
                                     @foreach ($zones as $key => $value)
@@ -99,18 +99,29 @@
                         </div>
 
                         @if ( !empty($currencies) )
-                            <div class="col-12 col-sm-4">
-                                <label class="form-label" for="status_booking">Moneda de reservación</label>
+                            <div class="col-lg-4 col-12">
+                                <label class="form-label" for="currency">Moneda de reservación</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona una moneda" data-live-search="true" data-selected-text-format="count > 2" name="currency[]" id="currency" data-value="{{ json_encode($data['currency']) }}" multiple>
                                     @foreach ($currencies as $key => $currency)
                                         <option value="{{ $key }}">{{ $currency }}</option> 
                                     @endforeach
                                 </select>
                             </div>
+                        @endif
+
+                        @if ( !empty($methods) )
+                            <div class="col-lg-4 col-12">
+                                <label class="form-label" for="payment_method">Metodo de pago</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona un metodo de pago" data-live-search="true" data-selected-text-format="count > 2" name="payment_method[]" id="payment_method" data-value="{{ json_encode($data['payment_method']) }}" multiple>
+                                    @foreach ($methods as $key => $method)
+                                        <option value="{{ $key }}">{{ $method }}</option> 
+                                    @endforeach
+                                </select>
+                            </div>
                         @endif                        
 
                         @if ( isset($istoday) )
-                            <div class="col-12 col-sm-4">
+                            <div class="col-lg-4 col-12">
                                 <label class="form-label" for="site">Operadas para hoy</label>
                                 <select class="form-control mb-3" name="is_today" id="is_today">
                                     <option {{ $data['is_today'] == '1' ? 'selected' : '' }} value="1">Sí</option>

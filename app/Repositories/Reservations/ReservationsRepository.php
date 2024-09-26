@@ -28,8 +28,8 @@ class ReservationsRepository
     public function index($request)
     {
         $data = [
-            "init" => date("Y-m-d") . " 00:00:00",
-            "end" => date("Y-m-d") . " 23:59:59",
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
             "filter_text" => NULL,
             "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
             "site" => ( isset($request->site) ? $request->site : 0 ),
@@ -38,34 +38,21 @@ class ReservationsRepository
             "product_type" => ( isset($request->product_type) ? $request->product_type : 0 ),
             "zone_one_id" => ( isset($request->zone_one_id) ? $request->zone_one_id : 0 ),
             "zone_two_id" => ( isset($request->zone_two_id) ? $request->zone_two_id : 0 ),
-            "currencies" => 0,
-            "payment_method" => NULL,
-            "is_today" => 0,
+            "currency" => ( isset($request->currency) ? $request->currency : 0 ),
+            "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
+            "is_today" => ( isset($request->is_today) ? $request->is_today : 0 ),
         ];
         
         //Query DB        
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.is_duplicated = 0 ';
-        $query2 = '';
+        $havingConditions = []; $query2 = '';
 
         $queryData = [
-            'init' => date("Y-m-d") . " 00:00:00",
-            'end' => date("Y-m-d") . " 23:59:59",
+            'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
+            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
         ];
-        
-        if(isset( $request->is_today ) && !empty( $request->is_today)){
-            $data['is_today'] = $request->is_today;            
-            $query2 = ' HAVING is_today != 0 ';
-        }
 
-        if(isset( $request->date ) && !empty( $request->date )){
-            $tmp_date = explode(" - ", $request->date);
-            $data['init'] = $tmp_date[0];
-            $data['end'] = $tmp_date[1];
-            
-            $queryData['init'] = $data['init'].' 00:00:00';
-            $queryData['end'] = $data['end'].' 23:59:59';
-        }
-
+        //TIPO DE SERVICIO
         if(isset( $request->is_round_trip )){
             $params = "";
             foreach( $request->is_round_trip as $key => $is_round_trip ){
@@ -76,16 +63,25 @@ class ReservationsRepository
             $query .= " AND (".$params.") ";            
         }
 
+        //SITIO
         if(isset( $request->site ) && !empty( $request->site )){
             $params = $this->parseArrayQuery($request->site);
             $query .= " AND site.id IN ($params) ";
         }
         
+        //ORIGEN DE VENTA
         if(isset( $request->origin ) && !empty( $request->origin )){
             $params = $this->parseArrayQuery($request->origin);
             $query .= " AND origin.id IN ($params) ";
         }
 
+        //ESTATUS DE RESERVACIÓN
+        if(isset( $request->status_booking ) && !empty( $request->status_booking )){
+            $params = $this->parseArrayQuery($request->status_booking,"single");
+            $havingConditions[] = " status IN (".$params.") ";
+        }
+
+        //TIPO DE VEHÍCULO
         if(isset( $request->product_type ) && !empty( $request->product_type )){
             $params = "";
             foreach( $request->product_type as $key => $product_type ){
@@ -96,6 +92,7 @@ class ReservationsRepository
             $query .= " AND (".$params.") ";
         }
 
+        //ZONA DE ORIGEN
         if(isset( $request->zone_one_id ) && !empty( $request->zone_one_id )){
             $params = "";
             foreach( $request->zone_one_id as $key => $zone_one_id ){
@@ -106,6 +103,7 @@ class ReservationsRepository
             $query .= " AND (".$params.") ";
         }
 
+        //ZONA DE DESTINO
         if(isset( $request->zone_two_id ) && !empty( $request->zone_two_id )){
             $params = "";
             foreach( $request->zone_two_id as $key => $zone_two_id ){
@@ -116,9 +114,27 @@ class ReservationsRepository
             $query .= " AND (".$params.") ";
         }
 
-        if(isset( $request->payment_method ) && !empty( $request->payment_method )){
-            $data['payment_method'] = $request->payment_method;
+        //MONEDA DE LA RESERVA
+        if(isset( $request->currency ) && !empty( $request->currency )){
+            $params = $this->parseArrayQuery($request->currency,"single");
+            $query .= " AND rez.currency IN ($params) ";
         }
+
+        //METODO DE PAGO
+        if(isset( $request->payment_method ) && !empty( $request->payment_method )){
+            $params = "";
+            foreach( $request->payment_method as $key => $payment_method ){
+                $queryData['payment_method' . $key] = $payment_method;
+                $params .= "FIND_IN_SET(:payment_method".$key.", payment_type_name) > 0 OR ";
+            }
+            $params = rtrim($params, ' OR ');
+            $havingConditions[] = " (".$params.") "; 
+        }
+
+        //RESERVAS OPERADAS EL MISMO DIA DE SU CREACION
+        if(isset( $request->is_today ) && !empty( $request->is_today)){           
+            $havingConditions[] = ' is_today != 0 ';
+        }        
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
             $data['filter_text'] = $request->filter_text;
@@ -131,8 +147,12 @@ class ReservationsRepository
                         ( it.code like '%".$data['filter_text']."%' )
                     )";
         }
+
+        if(  (isset( $request->status_booking ) && !empty( $request->status_booking )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_today ) && !empty( $request->is_today)) ){
+            $query2 = " HAVING " . implode(' AND ', $havingConditions);
+        }
                 
-        // dd($query, $data, $queryData);
+        // dd($query, $query2, $data, $queryData, $havingConditions);
         $bookings = $this->queryBookings($query, $query2, $queryData);    
         
         return view('reservations.index', [

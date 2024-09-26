@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Session;
 trait ApiTrait
 {
 
-    public static function empty(){        
+    public static function empty(){
         $tpv = [
             "type" => "one-way",
             "start" => [
@@ -75,7 +75,7 @@ trait ApiTrait
         endif;
     }
 
-    public static function sendAutocomplete($keyword = ''){        
+    public static function sendAutocomplete($keyword = ''){
         self::checkToken();
         $tpv = Session::get('tpv');
         
@@ -101,8 +101,8 @@ trait ApiTrait
     }
 
     public static function sendRequest($end_point, $method = 'GET', $data = null, $token = null) {
-        $url = 'https://api.caribbean-transfers.com'.$end_point;
-        // $url = 'http://127.0.0.1:8002'.$end_point;
+        // $url = 'https://api.caribbean-transfers.com'.$end_point;
+        $url = 'http://127.0.0.1:8002'.$end_point;
         $ch = curl_init($url);
 
         if ($method == 'POST') {

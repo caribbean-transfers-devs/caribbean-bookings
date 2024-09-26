@@ -105,12 +105,30 @@ trait GeneralTrait
         );
     }
 
-    public function parseArrayQuery($data){
-        if( is_array($data) ){
-            $string = implode(',', $data);
+    // public function parseArrayQuery($data){
+    //     if( is_array($data) ){
+    //         $string = implode(',', $data);
+    //         return $string;
+    //     }else{
+    //         return $data;
+    //     }
+    // }
+
+    public function parseArrayQuery($data, $marks = NULL){
+        if (is_array($data)) {
+            // Envuelve cada valor del array en comillas simples
+            $string = implode(',', array_map(function($value) use ($marks) {
+                if( $marks != NULL && $marks == "single" ){
+                    return "'" . $value . "'";
+                }else if( $marks != NULL && $marks == "single" ){
+                    return '"' . $value . '"';
+                }else{
+                    return $value;   
+                }
+            }, $data));
             return $string;
-        }else{
-            return $data;
+        } else {
+            return "'" . $data . "'";
         }
-    }
+    }    
 }

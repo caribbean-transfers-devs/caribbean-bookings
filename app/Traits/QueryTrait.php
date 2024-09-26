@@ -36,10 +36,7 @@ trait QueryTrait
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                         ELSE 'UNKNOWN'
                                     END AS status,                                    
-                                    -- CASE
-                                    --     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
-                                    --     ELSE 'CONFIRMED'
-                                    -- END AS status,
+
                                     GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
                                     GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
                                     GROUP_CONCAT(DISTINCT it.zone_one_id ORDER BY it.zone_one_id ASC SEPARATOR ',') AS zone_one_id,
@@ -58,9 +55,8 @@ trait QueryTrait
                                         CASE 
                                             WHEN p.payment_type_name IS NULL OR rez.pay_at_arrival = 1 THEN 'CASH' 
                                             ELSE p.payment_type_name 
-                                        END 
-                                        ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-                                    -- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                        END
+                                        ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,                                    
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     SUM(it.is_round_trip) as is_round_trip
                                 FROM reservations as rez
@@ -77,9 +73,10 @@ trait QueryTrait
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id,
-                                            ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
-                                                        WHEN operation = 'division' THEN total / exchange_rate
-                                                    ELSE total END), 2) AS total_payments,
+                                            ROUND(SUM(CASE 
+                                                WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                WHEN operation = 'division' THEN total / exchange_rate
+                                                ELSE total END), 2) AS total_payments,
                                             GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
                                         FROM payments
                                         GROUP BY reservation_id
