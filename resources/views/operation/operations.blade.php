@@ -108,10 +108,16 @@
                                 </div>
                             </div>
 
-                            <div class="col-12 col-sm-4 mb-3 mb-lg-0">
+                            <div class="mb-3 mb-lg-0 col-sm-4 col-12">
                                 <label class="form-label" for="lookup_date">Fecha de creación</label>
                                 <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
                             </div>
+                            <div class="mb-3 mb-lg-0 col-sm-4 col-12">
+                                <label class="form-label" for="lookup_date">Fecha de creación</label>
+                                <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
+                            </div>
+
+
                             <div class="col-12 col-sm-2 align-self-end">
                                 <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
                             </div>
