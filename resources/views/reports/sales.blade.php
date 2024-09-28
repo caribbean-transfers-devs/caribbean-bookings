@@ -312,5 +312,5 @@
     @php
         // dump($data);
     @endphp
-    <x-modals.reports.modal :data="$data" :services="$services" :zones="$zones" :websites="$websites" />    
+    <x-modals.reports.modal :data="$data" :vehicles="$vehicles" :zones="$zones" :websites="$websites" />    
 @endsection

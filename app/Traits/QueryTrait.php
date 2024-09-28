@@ -11,7 +11,7 @@ trait QueryTrait
     // pay_at_arrival: INDICA PAGO A LA LLEGADA PORQUE ELIGIO LA OPCION DE PAGO EN EFECTIVO
     public function queryBookings($query, $query2, $data){
         $bookings = DB::select("SELECT 
-                                    rez.id as reservation_id, 
+                                    rez.id AS reservation_id, 
                                     CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name,
                                     rez.client_email,
                                     rez.client_phone,
@@ -26,16 +26,23 @@ trait QueryTrait
                                     rez.open_credit,
                                     rez.is_complete,
                                     rez.created_at,
-                                    site.name as site_name,
-                                    origin.code as origin_code,
+                                    site.name AS site_name,
+                                    origin.code AS origin_code,
+                                    tc.name_es AS cancellation_reason,                                    
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                    COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                     CASE
                                         WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
+                                        WHEN rez.open_credit = 1 THEN 'OPEN CREDIT'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                         ELSE 'UNKNOWN'
                                     END AS status,                                    
+                                    -- CASE
+                                    --     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+                                    --     ELSE 'CONFIRMED'
+                                    -- END AS status,                                    
 
                                     GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
                                     GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
@@ -53,15 +60,19 @@ trait QueryTrait
                                     GROUP_CONCAT(
                                         DISTINCT 
                                         CASE 
-                                            WHEN p.payment_type_name IS NULL OR rez.pay_at_arrival = 1 THEN 'CASH' 
-                                            ELSE p.payment_type_name 
+                                            -- WHEN p.payment_type_name IS NULL OR rez.pay_at_arrival = 1 THEN 'CASH' 
+                                            -- ELSE p.payment_type_name
+                                            WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
+                                            ELSE 'CASH'
                                         END
-                                        ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,                                    
+                                        ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                    -- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,-- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     SUM(it.is_round_trip) as is_round_trip
                                 FROM reservations as rez
                                     INNER JOIN sites as site ON site.id = rez.site_id
                                     LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
+                                    LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id, 

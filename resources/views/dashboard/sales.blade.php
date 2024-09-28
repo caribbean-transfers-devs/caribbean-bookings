@@ -418,9 +418,9 @@
                                                 </div>
                                             </div>
                                             @if ( isset($bookings_day['bookings']) && count($bookings_day['bookings']) > 15 )
-                                                <div class="tm-action-btn">
+                                                {{-- <div class="tm-action-btn">
                                                     <button class="btn" data-bs-toggle="modal" data-bs-target="#bookingsDayModal"><span>Ver todo</span> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
-                                                </div>
+                                                </div> --}}
                                             @endif
                                         </div>
                                     </div>
@@ -531,9 +531,9 @@
                                                 </div>
                                             </div>
                                             @if ( isset($bookings_month['bookings']) && count($bookings_month['bookings']) > 15 )
-                                                <div class="tm-action-btn">
+                                                {{-- <div class="tm-action-btn">
                                                     <button class="btn" data-bs-toggle="modal" data-bs-target="#bookingsMonthModal"><span>Ver todo</span> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
-                                                </div>
+                                                </div> --}}
                                             @endif
                                         </div>
                                     </div>
@@ -595,8 +595,4 @@
                 </div>
             </div>
         </div>
-    
-
-    <x-modals.reservations.bookings_day :bookings="$bookings_day" />
-    <x-modals.reservations.bookings_month :bookings="$bookings_month" />
 @endsection

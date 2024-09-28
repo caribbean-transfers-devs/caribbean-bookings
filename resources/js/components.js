@@ -329,12 +329,13 @@ let components = {
     },
 
     renderCheckboxColumns: function(table, container){
-        const __table = document.getElementById(table);
+        const __table = document.getElementById(table);        
         const __container = document.getElementById(container);
 
         if( __table != null ){
-            // __container.innerHTML = "";
             const __ths = __table.querySelectorAll('th');
+            const savedState = JSON.parse(localStorage.getItem(table)) || {};           
+
             __ths.forEach((__th, __key) => {
                 const capitalizedText = __th.innerText.toLowerCase().replace(/\b\w/g, function (c) {
                     return c.toUpperCase();
@@ -350,8 +351,9 @@ let components = {
                     __input.setAttribute('type', 'checkbox');
                     __input.setAttribute('value', '');
                     __input.setAttribute('id', 'flexCheckDefault' + __key);
-                    __input.setAttribute('data-column', __key);
-                    __input.setAttribute('checked', true);
+                    __input.setAttribute('data-column', __key);                    
+                    __input.checked = savedState[__key] !== undefined ? savedState[__key] : true;
+                    __input.setAttribute('checked', __input.checked);
                     __div.appendChild(__label);
                     __label.classList.add('form-check-label', 'w-100', 'mb-0');
                     __label.setAttribute('for', 'flexCheckDefault' + __key);
@@ -359,27 +361,60 @@ let components = {
     
                 __container.appendChild(__div);
             });
-            components.callActionCheckboxColumns(__table);
+
+            components.validateColumnVisibility(__table, table);
+            components.callActionCheckboxColumns(__table, table);            
+        }        
+    },
+
+    /**
+     * 
+     * @param {*} __table //DOM Table
+     * @param {*} __storageName  //El nombre del localStorage
+     */
+    callActionCheckboxColumns: function(__table, __storageName){
+        const __DataTable = $(__table).DataTable(); //DOM DataTable
+        const __localStorageKey = __storageName; //El nombre del localStorage
+
+        if( document.querySelectorAll('input.toggle-vis').length > 0 ){
+            document.querySelectorAll('input.toggle-vis').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function(event) {
+                    // Evitar la acción por defecto
+                    event.preventDefault();
+                    const columnVisibility = JSON.parse(localStorage.getItem(__localStorageKey)) || {};
+                    let __key = this.getAttribute('data-column');
+                    let __column = __DataTable.column(__key);
+
+                    // Alternar la visibilidad de la columna en base al estado del checkbox
+                    if (this.checked) {
+                        columnVisibility[__key] = true;
+                        __column.visible(true);  // Mostrar la columna si el checkbox está marcado
+                    } else {
+                        columnVisibility[__key] = false;
+                        __column.visible(false); // Ocultar la columna si el checkbox no está marcado
+                    }
+                    
+                    localStorage.setItem(__localStorageKey, JSON.stringify(columnVisibility));                    
+                });
+            });
         }
     },
 
-    callActionCheckboxColumns: function(__table){
-        let table = $(__table).DataTable();
-        if( document.querySelectorAll('input.toggle-vis').length > 0 ){
-            document.querySelectorAll('input.toggle-vis').forEach(function(checkbox) {          
-                checkbox.addEventListener('change', function(event) {
-                    // Evitar la acción por defecto
-                    event.preventDefault();     
-                    // Obtener el índice de la columna desde el atributo data-column
-                    var columnIndex = this.getAttribute('data-column');
-                    var column = table.column(columnIndex);
-                    // Alternar la visibilidad de la columna en base al estado del checkbox
-                    if (this.checked) {
-                        column.visible(true);  // Mostrar la columna si el checkbox está marcado
-                    } else {
-                        column.visible(false); // Ocultar la columna si el checkbox no está marcado
-                    }
-                });
+    validateColumnVisibility: function(__table, __storageName){
+        const __DataTable = $(__table).DataTable(); //DOM DataTable
+        const localStorageKey = __storageName; //El nombre del localStorage        
+        const savedState = JSON.parse(localStorage.getItem(localStorageKey)) || {};
+    
+        if (__table != null) {
+            const __ths = __table.querySelectorAll('th');
+            __ths.forEach((__th, __key) => {
+                const __column = __DataTable.column(__key);                
+                let  __checked = savedState[__key] !== undefined ? savedState[__key] : true;
+                if (__checked) {
+                    __column.visible(true);
+                } else {
+                    __column.visible(false);
+                }
             });
         }
     },

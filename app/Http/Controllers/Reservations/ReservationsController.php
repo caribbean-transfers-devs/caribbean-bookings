@@ -17,17 +17,15 @@ use App\Traits\RoleTrait;
 
 class ReservationsController extends Controller
 {
-    public function detail(Request $request, DetailRepository $detailRepository, $id)
-    {
+    public function detail(Request $request, DetailRepository $detailRepository, $id){
         if(RoleTrait::hasPermission(10) || RoleTrait::hasPermission(61)){
             return $detailRepository->detail($request,$id);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
-    }
+    }    
 
-    public function index(Request $request, ReservationsRepository $reservationRepository)
-    {
+    public function index(Request $request, ReservationsRepository $reservationRepository){
         if(RoleTrait::hasPermission(10)){
             return $reservationRepository->index($request);
         }else{
@@ -35,62 +33,58 @@ class ReservationsController extends Controller
         }
     }
 
-    public function update(ReservationDetailsRequest $request, ReservationsRepository $reservationRepository, Reservation $reservation)
-    {
+    //NOS TRAE LOS PAGOS DE LA RESERVACIÓN
+    public function reservationPayments(ReservationsRepository $reservationRepository, Reservation $reservation){
+        return $reservationRepository->reservationPayments($reservation);
+    }
+
+    public function update(ReservationDetailsRequest $request, ReservationsRepository $reservationRepository, Reservation $reservation){
         if(RoleTrait::hasPermission(11)){
             return $reservationRepository->update($request,$reservation);
         }
     }
 
-    public function destroy(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
-    {
+    public function destroy(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
         if(RoleTrait::hasPermission(24)){
             return $reservationRepository->destroy($request,$reservation);
         }
     }
 
-    public function duplicated(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
-    {
+    public function duplicated(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
         if(RoleTrait::hasPermission(24)){
             return $reservationRepository->duplicated($request,$reservation);
         }
     }
 
-    public function openCredit(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
-    {
+    public function openCredit(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
         if(RoleTrait::hasPermission(72)){
             return $reservationRepository->openCredit($request,$reservation);
         }
     }
 
-    public function enablePlusService(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
-    {
+    public function enablePlusService(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
         if(RoleTrait::hasPermission(94)){
             return $reservationRepository->enablePlusService($request,$reservation);
         }
     }
 
-    public function enable(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
-    {
+    public function enable(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
         if(RoleTrait::hasPermission(67)){
             return $reservationRepository->enableReservation($request,$reservation);
         }
     }
 
-    public function followups(ReservationFollowUpsRequest $request, ReservationsRepository $reservationRepository)
-    {
+    public function followups(ReservationFollowUpsRequest $request, ReservationsRepository $reservationRepository){
         if(RoleTrait::hasPermission(23)){
             return $reservationRepository->follow_ups($request);
         }
     }
 
-    public function get_exchange(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
-    {
+    public function get_exchange(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
         return $reservationRepository->get_exchange($request,$reservation);
     }
 
-    public function editreservitem(ReservationItemRequest $request, ReservationsRepository $reservationRepository, ReservationsItem $item)
-    {
+    public function editreservitem(ReservationItemRequest $request, ReservationsRepository $reservationRepository, ReservationsItem $item){
         if(RoleTrait::hasPermission(13)){
             return $reservationRepository->editreservitem($request,$item);
         }

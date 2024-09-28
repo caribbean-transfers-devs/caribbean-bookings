@@ -262,7 +262,8 @@ class OperationsController extends Controller
                                 ) as p ON p.reservation_id = rez.id
                             WHERE it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
                                    AND rez.is_cancelled = 0
-                                   AND rez.is_duplicated = 0                                   
+                                   AND rez.is_duplicated = 0
+                                   AND rez.open_credit = 0
                             GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
 
                             UNION
@@ -327,6 +328,7 @@ class OperationsController extends Controller
                                    WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
                                    AND rez.is_cancelled = 0
                                    AND rez.is_duplicated = 0
+                                   AND rez.open_credit = 0
                                    AND it.is_round_trip = 1
                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                                    ORDER BY filtered_date ASC",[

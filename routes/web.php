@@ -67,8 +67,10 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/reservations', [ReservationsController::class, 'index'])->name('reservations.index');
-    Route::post('/reservations', [ReservationsController::class, 'index'])->name('reservations.search');
+    Route::post('/reservations', [ReservationsController::class, 'index'])->name('reservations.search');    
     Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');
+    Route::get('/reservation/payments/{reservation}', [ReservationsController::class, 'reservationPayments'])->name('reservation.payments');
+
     Route::put('/reservationsDuplicated/{reservation}', [ReservationsController::class, 'duplicated'])->name('reservations.duplicated');
     Route::put('/reservationsOpenCredit/{reservation}', [ReservationsController::class, 'openCredit'])->name('reservations.openCredit');
     Route::put('/reservationsEnablePlusService/{reservation}', [ReservationsController::class, 'enablePlusService'])->name('reservations.enablePlusService');

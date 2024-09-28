@@ -8,8 +8,12 @@ use Illuminate\Support\Facades\DB;
 use App\Models\ReservationsItem;
 use App\Models\ReservationFollowUp;
 
+//TRAIT
+use App\Traits\GeneralTrait;
+
 class SalesRepository
 {
+    use GeneralTrait;
     
     public function index($request)
     {          
@@ -17,47 +21,43 @@ class SalesRepository
             "init" => date("Y-m-d") . " 00:00:00",
             "end" => date("Y-m-d") . " 23:59:59",
             "filter_text" => NULL,
-            "product_type" => 0,
-            "zone" => 0,
             "site" => 0,
-            "is_duplicated" => 0,
+            "product_type" => 0,
+            "zone_one_id" => 0,
             "payment_method" => NULL
         ];
         
         //Query DB
-        $query = ' AND rez.created_at BETWEEN :init AND :end';
+        $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_duplicated = 0 ';
+
         $queryData = [
             'init' => date("Y-m-d") . " 00:00:00",
             'end' => date("Y-m-d") . " 23:59:59",
         ];
 
-        $query .= ' AND rez.is_duplicated = :is_duplicated ';
-        $queryData['is_duplicated'] = $data['is_duplicated'];
-
         if(isset( $request->date ) && !empty( $request->date )){            
             $tmp_date = explode(" - ", $request->date);
             $data['init'] = $tmp_date[0];
-            $data['end'] = $tmp_date[1];
-            
+            $data['end'] = $tmp_date[1];            
             $queryData['init'] = $data['init'].' 00:00:00';
             $queryData['end'] = $data['end'].' 23:59:59';
-        }        
+        }
+
         if(isset( $request->product_type ) && !empty( $request->product_type )){
             $data['product_type'] = $request->product_type;
 
             $queryData['product_type'] = $data['product_type'];
             $query .= " AND FIND_IN_SET(:product_type, service_type_id) > 0";
         }
+
         if(isset( $request->zone ) && !empty( $request->zone )){
             $data['zone'] = $request->zone;
             $queryData['zone'] = $data['zone'];
             $query .= " AND FIND_IN_SET(:zone, zone_two_id) > 0";
         }
+
         if(isset( $request->site ) && sizeof($request->site) > 0 ){                
-            //dd(implode(",", $request->site));
-            //$data['site'] = $request->site;
             $query .= ' AND site.id IN( '.implode(",", $request->site).' )';
-            //$queryData['site'] = implode(",", $request->site);
         }
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
             $data['payment_method'] = $request->payment_method;
@@ -129,79 +129,22 @@ class SalesRepository
                                 WHERE 1=1 {$query}
                                 GROUP BY rez.id, site.name",
                                     $queryData);
-        // echo "<pre>";
-        // print_r($bookings);
-        // die();
 
-        $services = [];
-        $db_services = DB::select("SELECT ds.id, dest.name as destination_name, IFNULL(dest_trans.translation, ds.name) AS service_name
-                                FROM destination_services as ds
-                                    INNER JOIN destinations as dest ON dest.id = ds.destination_id
-                                    LEFT JOIN destination_services_translate as dest_trans ON dest_trans.destination_services_id = ds.id AND dest_trans.lang = 'es'
-                                    ORDER BY ds.order ASC");        
-        if(sizeof($db_services) >=1 ):
-            foreach( $db_services as $key => $value ):
-                if( !isset(  $services[ $value->destination_name ] ) ) $services[ $value->destination_name ] = [];
-                $services[ $value->destination_name ][] = $value;
-            endforeach;            
-        endif;
 
-        $zones = [];
-        $db_zones = DB::select("SELECT dest.name as destination_name, z.id, z.name as zone_name
-                                FROM zones as z
-                                    INNER JOIN destinations as dest ON dest.id = z.destination_id
-                                ORDER BY z.name ASC");
-        if(sizeof($db_zones) >=1 ):
-            foreach( $db_zones as $key => $value ):
-                if( !isset(  $zones[ $value->destination_name ] ) ) $zones[ $value->destination_name ] = [];
-                $zones[ $value->destination_name ][] = $value;
-            endforeach;            
-        endif;
-
-        $websites = DB::select("SELECT id, name as site_name
-                                FROM sites
-                                ORDER BY site_name ASC");
-        // echo "<pre>";
-        // print_r($sites);
-        // die();
-
-        $breadcrumbs = array(
-            array(
-                "route" => "",
-                "name" => "Reporte de reservacione del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
-                "active" => true
-            ),
-        );
-
-        return view('reports.sales', compact('bookings','services','zones','websites','data', 'breadcrumbs') );
-
-        /*if(!$request->lookup_date){
-            $from = date('Y-m-d');
-            $to = date('Y-m-d');
-
-            $services = ReservationsService::select('reservation_item_id')->whereDate('pickup', '>=', $from)
-                ->whereDate('pickup', '<=', $to)
-                ->pluck('reservation_item_id');
-            $items = ReservationsItem::select('reservation_id')->whereIn('id', $services)->pluck('reservation_id');
-            $reservations = Reservation::whereIn('id',$items)->with('destination', 'items')->get();
-            return view('reservations.index', compact('reservations','from','to'));
-        }else{
-            if(strlen($request->lookup_date) <= 10){
-                $from = $request->lookup_date;
-                $to = $request->lookup_date;
-            }else{
-                $dates = explode(' a ', $request->lookup_date);
-                $from = $dates[0];
-                $to = $dates[1];
-            }          
-
-            $services = ReservationsService::select('reservation_item_id')->whereDate('pickup', '>=', $from)
-                ->whereDate('pickup', '<=', $to)
-                ->pluck('reservation_item_id');
-            $items = ReservationsItem::select('reservation_id')->whereIn('id', $services)->pluck('reservation_id');
-            $reservations = Reservation::whereIn('id',$items)->with('destination', 'items')->get();
-            return view('reservations.index', compact('reservations','from','to'));
-        } */     
+        return view('reports.sales', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Reporte de reservacione del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
+                    "active" => true                    
+                ]
+            ],
+            'bookings' => $bookings,
+            'websites' => $this->Sites(),
+            'vehicles' => $this->Vehicles(),
+            'zones' => $this->Zones(),
+            'data' => $data,
+        ]);
     }
 
 }

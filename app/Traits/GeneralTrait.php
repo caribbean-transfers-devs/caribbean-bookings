@@ -15,17 +15,25 @@ use App\Models\CancellationTypes;
 
 trait GeneralTrait
 {
-    public function enterprises(){
+    public function Enterprises(){
         return Enterprise::all();
     }
 
-    public function vehicles(){
+    //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADO COMO LOS VEHICULOS QUE TENEMOS
+    public function Units(){
         return Vehicle::all();
     }
 
-    public function drivers(){
+    public function Drivers(){
         return Driver::all();
-    }    
+    }
+
+    public function Services(){
+        return array(
+            "0" => "One Way",
+            "1" => "Round Trip",
+        );
+    }
 
     public function Sites(){
         return DB::select("SELECT 
@@ -35,7 +43,7 @@ trait GeneralTrait
                                 ORDER BY site_name ASC");
     }
 
-    public function Services(){
+    public function Vehicles(){
         // $services =  [];
         $services = DB::select("SELECT 
                                     ds.id,
@@ -74,17 +82,30 @@ trait GeneralTrait
     }
 
     public function Origins(){
-        return OriginSale::All();
+        $origins[] = (object) array(
+            "id" => 0,
+            "code" => "PAGINA WEB"
+        );        
+        $data = OriginSale::All();
+        if( !empty($data) ){
+            foreach ($data as $key => $value) {
+                $origins[] = $value;
+            }
+        }
+        
+        // dd($origins);        
+        return $origins;
     }
 
     public function CancellationTypes(){
-        return CancellationTypes::all();
+        return CancellationTypes::where('status',1)->get();
     }
 
     public function Status(){
         return array(
             "CONFIRMED" => "Confirmado",
             "PENDING" => "Pendiente",
+            "OPEN CREDIT" => "Credito abierto",
             "CANCELLED" => "Cancelado",
         );
     }
@@ -105,17 +126,12 @@ trait GeneralTrait
         );
     }
 
-    // public function parseArrayQuery($data){
-    //     if( is_array($data) ){
-    //         $string = implode(',', $data);
-    //         return $string;
-    //     }else{
-    //         return $data;
-    //     }
-    // }
-
     public function parseArrayQuery($data, $marks = NULL){
         if (is_array($data)) {
+            $filteredData = array_filter($data, function($value) {
+                return $value !== NULL && $value !== 0;
+            });
+            
             // Envuelve cada valor del array en comillas simples
             $string = implode(',', array_map(function($value) use ($marks) {
                 if( $marks != NULL && $marks == "single" ){
@@ -125,10 +141,44 @@ trait GeneralTrait
                 }else{
                     return $value;   
                 }
-            }, $data));
+            }, $filteredData));
             return $string;
         } else {
             return "'" . $data . "'";
+        }
+    }
+
+    public static function classStatusBooking($status = "CONFIRMED"){
+        switch ($status) {
+            case 'PENDING':
+                return 'warning';
+                break;
+            case 'CANCELLED':
+                return 'danger';
+                break;
+            case 'OPEN CREDIT':
+                return 'info';
+                break;
+            default:
+                return 'success';
+                break;
+        }
+    }
+
+    public static function statusBooking($status = "CONFIRMED"){
+        switch ($status) {
+            case 'PENDING':
+                return 'Pendiente';
+                break;
+            case 'CANCELLED':
+                return 'Cancelado';
+                break;
+            case 'OPEN CREDIT':
+                return 'Credito abierto';
+                break;
+            default:
+                return 'Confirmado';
+                break;
         }
     }    
 }

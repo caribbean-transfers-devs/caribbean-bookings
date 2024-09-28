@@ -46,7 +46,7 @@ class CancellationsRepository
                                 INNER JOIN sites as sit ON sit.id = rez.site_id
                                 INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                 INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
-                                LEFT JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id                                
+                                LEFT JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
                                 LEFT JOIN (
                                     SELECT 
                                         reservation_id,  

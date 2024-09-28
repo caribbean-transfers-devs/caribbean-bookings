@@ -20,10 +20,11 @@ use Illuminate\Support\Facades\DB;
 use App\Traits\MailjetTrait;
 use App\Traits\GeneralTrait;
 use App\Traits\QueryTrait;
+use App\Traits\Reports\PaymentsTrait;
 
 class ReservationsRepository
 {
-    use MailjetTrait, QueryTrait, GeneralTrait;
+    use MailjetTrait, QueryTrait, GeneralTrait, PaymentsTrait;
     
     public function index($request)
     {
@@ -33,13 +34,14 @@ class ReservationsRepository
             "filter_text" => NULL,
             "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
             "site" => ( isset($request->site) ? $request->site : 0 ),
-            "origin" => ( isset($request->origin) ? $request->origin : 0 ),
+            "origin" => ( isset($request->origin) ? $request->origin : NULL ),
             "status_booking" => ( isset($request->status_booking) ? $request->status_booking : 0 ),
             "product_type" => ( isset($request->product_type) ? $request->product_type : 0 ),
             "zone_one_id" => ( isset($request->zone_one_id) ? $request->zone_one_id : 0 ),
             "zone_two_id" => ( isset($request->zone_two_id) ? $request->zone_two_id : 0 ),
             "currency" => ( isset($request->currency) ? $request->currency : 0 ),
             "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
+            "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),
             "is_today" => ( isset($request->is_today) ? $request->is_today : 0 ),
         ];
         
@@ -71,8 +73,12 @@ class ReservationsRepository
         
         //ORIGEN DE VENTA
         if(isset( $request->origin ) && !empty( $request->origin )){
+            $queryweb = "";
+            if( in_array("0", $request->origin) ){
+                $queryweb = " OR origin.id IS NULL ";
+            }
             $params = $this->parseArrayQuery($request->origin);
-            $query .= " AND origin.id IN ($params) ";
+            $query .= " AND ( origin.id IN ($params) $queryweb ) ";
         }
 
         //ESTATUS DE RESERVACIÓN
@@ -131,8 +137,14 @@ class ReservationsRepository
             $havingConditions[] = " (".$params.") "; 
         }
 
+        //MOTIVOS DE CANCELACIÓN
+        if(isset( $request->cancellation_status ) && !empty( $request->cancellation_status )){
+            $params = $this->parseArrayQuery($request->cancellation_status);
+            $query .= " AND tc.id IN ($params) ";
+        }
+
         //RESERVAS OPERADAS EL MISMO DIA DE SU CREACION
-        if(isset( $request->is_today ) && !empty( $request->is_today)){           
+        if(isset( $request->is_today ) && !empty( $request->is_today)){
             $havingConditions[] = ' is_today != 0 ';
         }        
 
@@ -153,7 +165,7 @@ class ReservationsRepository
         }
                 
         // dd($query, $query2, $data, $queryData, $havingConditions);
-        $bookings = $this->queryBookings($query, $query2, $queryData);    
+        $bookings = $this->queryBookings($query, $query2, $queryData);
         
         return view('reservations.index', [
             'breadcrumbs' => [
@@ -164,16 +176,22 @@ class ReservationsRepository
                 ]
             ],
             'bookings' => $bookings,
+            'services' => $this->Services(),
             'websites' => $this->Sites(),
             'origins' => $this->Origins(),
             'status' => $this->Status(),
-            'services' => $this->Services(),
+            'vehicles' => $this->Vehicles(),
             'zones' => $this->Zones(),
             'currencies' => $this->Currencies(),
             'methods' => $this->Methods(),
+            'cancellations' => $this->CancellationTypes(),
             'data' => $data,
             'request' => $request,
         ]);
+    }
+
+    public function reservationPayments($reservation){
+        return $this->getPayments($reservation->id);
     }
 
     public function update($request,$reservation){

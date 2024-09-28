@@ -66,6 +66,7 @@ components.formReset();
 //DECLARACION DE VARIABLES
 const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
 const __title_modal = document.getElementById('filterModalLabel');
+const __payment_infos = document.querySelectorAll('.__payment_info');
 
 //ACCION PARA CREAR
 if( __create != null ){
@@ -74,6 +75,39 @@ if( __create != null ){
     });
 }
 
-// components.actionButtonColumns();
+if( __payment_infos.length > 0 ){
+    __payment_infos.forEach(__payment_info => {
+        __payment_info.addEventListener('click', function(event){
+            event.preventDefault();
+            const { reservation } = this.dataset;
+            $("#reservationPaymentsModal").modal('show');
+            $.ajax({
+                url: '/reservation/payments/' + reservation,
+                type: 'GET',
+                async: true,
+                beforeSend: function() {
+                },
+                success: function(resp) {
+                    console.log(resp);
+                    const __container = document.getElementById('containerReservationPayments');
+                    var __tr = "";
+                    if( resp.length > 0 ){
+                        resp.forEach(element => {
+                            __tr =  '<tr">' +
+                                        '<td>'+ element.total +'</td>' +
+                                        '<td>'+ element.currency +'</td>' +
+                                        '<td>'+ element.exchange_rate +'</td>' +
+                                        '<td>'+ element.payment_method +'</td>' +
+                                        '<td>'+ element.reference +'</td>' +
+                                    '</tr>';                            
+                        });
+                    }
+                    __container.innerHTML = __tr;                    
+                }
+            });        
+        });        
+    });
+}
+
 components.renderCheckboxColumns('bookings', 'columns');
 components.setValueSelectpicker();

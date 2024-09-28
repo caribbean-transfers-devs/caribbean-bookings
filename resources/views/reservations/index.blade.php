@@ -1,5 +1,7 @@
 @php
     use App\Traits\RoleTrait;
+    use App\Traits\Reports\PaymentsTrait;
+    use App\Traits\GeneralTrait;
     use Carbon\Carbon;
 @endphp
 @php
@@ -23,6 +25,12 @@
 @push('Css')
     <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
+    <style>
+        .__payment_info{
+            cursor: pointer;
+            font-size: 20px;
+        }
+    </style>
 @endpush
 
 @push('Js')
@@ -89,8 +97,8 @@
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">REFERENCIA</th>
-                            <th class="text-center">FECHA DE RESERVA</th>
-                            <th class="text-center">HORA DE RESERVA</th>
+                            <th class="text-center">FECHA DE RESERVACIÓN</th>
+                            <th class="text-center">HORA DE RESERVACIÓN</th>
                             <th class="text-center">SITIO</th>
                             <th class="text-center">ORIGEN DE VENTA</th>
                             <th class="text-center">ESTATUS RESERVACIÓN</th>
@@ -107,7 +115,8 @@
                             <th class="text-center">BALANCE</th>
                             <th class="text-center">COSTO POR SERVICIO</th>
                             <th class="text-center">MONEDA</th>
-                            <th class="text-center">MÉTODO DE PAGO</th>                            
+                            <th class="text-center">MÉTODO DE PAGO</th> 
+                            <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -121,57 +130,49 @@
                                 @endif --}}
                                 @php
                                     if($item->is_cancelled == 0):
-                                        // if($item->pay_at_arrival == 1):
-                                        //     $item->status = "CONFIRMED";
+                                        // $resume['status'][$item->status][$item->currency] += $item->total_sales;
+                                        // $resume['status'][$item->status]['count']++;
+                                        // //Si está confirmado, sumamos los totales por sitio...
+                                        // if($item->status == "CONFIRMED"):
+                                        //     if(!isset( $sites[$item->site_name] )):
+                                        //         $sites[$item->site_name] = [
+                                        //             'USD' => 0,
+                                        //             'MXN' => 0,
+                                        //             'count' => 0
+                                        //         ];
+                                        //     endif;                                                        
+                                        //     $sites[$item->site_name][$item->currency] += $item->total_sales;
+                                        //     $sites[$item->site_name]['count']++;
+
+                                        //     if($item->affiliate_id != 0 ):
+                                        //         if(!isset( $affiliates[$item->site_name] )):
+                                        //             $affiliates[$item->site_name] = [
+                                        //                 'USD' => 0,
+                                        //                 'MXN' => 0,
+                                        //                 'count' => 0
+                                        //             ];
+                                        //         endif;
+                                        //         $affiliates[$item->site_name][$item->currency] += $item->total_sales;
+                                        //         $affiliates[$item->site_name]['count']++;
+                                        //     endif;
+
+                                        //     if(!isset( $destinations[$item->destination_name_to] )):
+                                        //         $destinations[$item->destination_name_to] = [
+                                        //             'USD' => 0,
+                                        //             'MXN' => 0,
+                                        //             'count' => 0
+                                        //         ];
+                                        //     endif;
+                                        //     $destinations[$item->destination_name_to][$item->currency] += $item->total_sales;
+                                        //     $destinations[$item->destination_name_to]['count']++;
                                         // endif;
-                                        $resume['status'][$item->status][$item->currency] += $item->total_sales;
-                                        $resume['status'][$item->status]['count']++;
-
-                                        //Si está confirmado, sumamos los totales por sitio...
-                                        if($item->status == "CONFIRMED"):
-                                            if(!isset( $sites[$item->site_name] )):
-                                                $sites[$item->site_name] = [
-                                                    'USD' => 0,
-                                                    'MXN' => 0,
-                                                    'count' => 0
-                                                ];
-                                            endif;                                                        
-                                            $sites[$item->site_name][$item->currency] += $item->total_sales;
-                                            $sites[$item->site_name]['count']++;
-
-                                            if($item->affiliate_id != 0 ):
-                                                if(!isset( $affiliates[$item->site_name] )):
-                                                    $affiliates[$item->site_name] = [
-                                                        'USD' => 0,
-                                                        'MXN' => 0,
-                                                        'count' => 0
-                                                    ];
-                                                endif;
-                                                $affiliates[$item->site_name][$item->currency] += $item->total_sales;
-                                                $affiliates[$item->site_name]['count']++;
-                                            endif;
-
-                                            if(!isset( $destinations[$item->destination_name_to] )):
-                                                $destinations[$item->destination_name_to] = [
-                                                    'USD' => 0,
-                                                    'MXN' => 0,
-                                                    'count' => 0
-                                                ];
-                                            endif;
-                                            $destinations[$item->destination_name_to][$item->currency] += $item->total_sales;
-                                            $destinations[$item->destination_name_to]['count']++;
-                                        endif;
-
                                     else:
-                                        $resume['status']['CANCELLED'][$item->currency] += $item->total_sales;
-                                        $resume['status']['CANCELLED']['count']++;
-                                    endif;                                                
-                                    $total_pending = $item->total_sales - $item->total_payments;
+                                        // $resume['status']['CANCELLED'][$item->currency] += $item->total_sales;
+                                        // $resume['status']['CANCELLED']['count']++;
+                                    endif;
                                 @endphp
                                 <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
-                                    <td class="text-center">
-                                        <span class="badge badge-light-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
-                                    </td>
+                                    <td class="text-center"><span class="badge badge-light-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
                                         @php
                                             $codes_string = "";
@@ -190,41 +191,23 @@
                                     <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ $item->site_name }}</td>
-                                    <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'NO DEFINIDO' }}</td>
-                                    <td class="text-center">
-                                        @if ($item->is_cancelled == 0)
-                                            @if($item->open_credit == 1)
-                                                <span class="badge badge-light-warning">Crédito Abierto</span>
-                                            @else
-                                                @switch($item->status)
-                                                    @case('CONFIRMED')
-                                                        <span class="badge badge-light-success">Confirmado</span>
-                                                        @break
-                                                    @case('PENDING')
-                                                        <span class="badge badge-light-info">Pendiente</span>
-                                                        @break
-                                                    @default
-                                                @endswitch
-                                            @endif                                            
-                                        @else
-                                            <span class="badge badge-light-danger">Cancelado</span>
-                                        @endif
-                                    </td> 
-                                    <td class="text-center"><span>{{ $item->full_name }}</span></td>
-                                    <td class="text-center"><span>{{ $item->client_phone }}</span></td>
-                                    <td class="text-center"><span>{{ $item->client_email }}</span></td>
+                                    <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' }}</td>
+                                    <td class="text-center"><span class="badge badge-light-{{ GeneralTrait::classStatusBooking($item->status) }}">{{ GeneralTrait::statusBooking($item->status) }}</span></td> 
+                                    <td class="text-center">{{ $item->full_name }}</td>
+                                    <td class="text-center">{{ $item->client_phone }}</td>
+                                    <td class="text-center">{{ $item->client_email }}</td>
                                     <td class="text-center">{{ $item->service_type_name }}</td>
                                     <td class="text-center">{{ $item->passengers }}</td>
                                     <td class="text-center">{{ $item->destination_name_from }}</td>
                                     <td class="text-center">{{ $item->from_name }}</td>
                                     <td class="text-center">{{ $item->destination_name_to }}</td>
                                     <td class="text-center">{{ $item->to_name }}</td>
-                                    <td class="text-center">{{ number_format(ROUND($item->total_sales),2) }}</td>
-                                    <td class="text-center" {{ (($total_pending < 0)? "style=color:red;font-weight:bold;":"") }}>{{ number_format(ROUND($total_pending),2) }}</td>
-                                    <td class="text-center">{{ number_format(ROUND($item->is_round_trip != 0 ? ( $item->total_sales / 2 ) : $item->total_sales),2) }}</td>
+                                    <td class="text-center">{{ number_format(($item->total_sales),2) }}</td>
+                                    <td class="text-center" {{ (($item->total_balance < 0)? "style=color:red;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>
+                                    <td class="text-center">{{ number_format(($item->is_round_trip != 0 ? ( $item->total_sales / 2 ) : $item->total_sales),2) }}</td>
                                     <td class="text-center">{{ $item->currency }}</td>
-                                    {{-- <td class="text-center">{{ ((empty($item->payment_type_name))? 'CASH' : $item->payment_type_name ) }}</td> --}}
-                                    <td class="text-center">{{ $item->payment_type_name }}</td>
+                                    <td class="text-center">{{ $item->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $item->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                    <td class="text-center">{{ $item->cancellation_reason }}</td>
                                 </tr>
                             @endforeach
                         @endif
@@ -378,6 +361,7 @@
         </div> --}}
     </div>
 
-    <x-modals.reports.modal :data="$data" :services="$services" :status="$status" :methods="$methods" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" />
+    <x-modals.reports.modal :data="$data" :services="$services" :vehicles="$vehicles" :status="$status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" />
     <x-modals.reports.columns />
+    <x-modals.reservations.payments />
 @endsection
