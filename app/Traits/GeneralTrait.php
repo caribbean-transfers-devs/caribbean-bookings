@@ -11,6 +11,8 @@ use App\Models\OriginSale;
 use App\Models\Enterprise;
 use App\Models\Vehicle;
 use App\Models\Driver;
+use App\Models\Zones;
+use App\Models\DestinationService;
 use App\Models\CancellationTypes;
 
 trait GeneralTrait
@@ -25,7 +27,7 @@ trait GeneralTrait
     }
 
     public function Drivers(){
-        return Driver::all();
+        return Driver::orderBy('names','ASC')->get();
     }
 
     public function Services(){
@@ -36,49 +38,15 @@ trait GeneralTrait
     }
 
     public function Sites(){
-        return DB::select("SELECT 
-                                id, 
-                                name as site_name
-                            FROM sites
-                                ORDER BY site_name ASC");
+        return DB::select("SELECT id, name as site_name FROM sites ORDER BY site_name ASC");
     }
 
     public function Vehicles(){
-        // $services =  [];
-        $services = DB::select("SELECT 
-                                    ds.id,
-                                    dest.name AS destination_name, 
-                                    IFNULL(dest_trans.translation, ds.name) AS service_name
-                                FROM destination_services AS ds
-                                    INNER JOIN destinations AS dest ON dest.id = ds.destination_id
-                                    LEFT JOIN destination_services_translate as dest_trans ON dest_trans.destination_services_id = ds.id AND dest_trans.lang = 'es'
-                                ORDER BY ds.order ASC");
-
-        // if(sizeof($query) >=1 ):
-        //     foreach( $query as $key => $value ):
-        //         if( !isset(  $services[ $value->destination_name ] ) ) $services[ $value->destination_name ] = [];
-        //         $services[ $value->destination_name ][] = $value;
-        //     endforeach;            
-        // endif;
-
-        return $services;
+        return DestinationService::all();
     }
 
     public function Zones(){
-        $zones = [];
-        $db_zones = DB::select("SELECT 
-                                    dest.name AS destination_name, 
-                                    z.id, z.name AS zone_name
-                                FROM zones as z
-                                    INNER JOIN destinations as dest ON dest.id = z.destination_id
-                                ORDER BY z.name ASC");
-        if(sizeof($db_zones) >=1 ):
-            foreach( $db_zones as $key => $value ):
-                if( !isset(  $zones[ $value->destination_name ] ) ) $zones[ $value->destination_name ] = [];
-                $zones[ $value->destination_name ][] = $value;
-            endforeach;            
-        endif;
-        return $zones;
+        return Zones::all();;
     }
 
     public function Origins(){

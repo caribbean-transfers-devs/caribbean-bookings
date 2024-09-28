@@ -72,7 +72,7 @@
                                 <label class="form-label" for="product_type">Tipo de vehículo</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un vehículo" data-live-search="true" data-selected-text-format="count > 3" name="product_type[]" id="product_type" data-value="{{ json_encode($data['product_type']) }}" multiple>
                                     @foreach ($vehicles as $vehicle)
-                                        <option value="{{ $vehicle->id }}">{{ $vehicle->service_name }}</option>                                                          
+                                        <option value="{{ $vehicle->id }}">{{ $vehicle->name }}</option>                                                          
                                     @endforeach
                                 </select>
                             </div>
@@ -82,27 +82,19 @@
                             <div class="col-lg-4 col-12">
                                 <label class="form-label" for="zone">Zona de origen</label>
                                     <select class="form-control selectpicker mb-3" title="Selecciona una zona" data-live-search="true" data-selected-text-format="count > 3" name="zone_one_id[]" id="zone_one_id" data-value="{{ json_encode(( isset($data['zone_one_id']) ? $data['zone_one_id'] : array() )) }}" multiple>
-                                        @foreach ($zones as $key => $value)
-                                        <optgroup label="{{ $key }}">
-                                            @foreach ($value as $zone)
-                                                <option value="{{ $zone->id }}">{{ $zone->zone_name }}</option>                                                          
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
+                                        @foreach ($zones as $zone)
+                                            <option value="{{ $zone->id }}">{{ $zone->name }}</option>                                                          
+                                        @endforeach
+                                    </select>
                             </div>
 
                             <div class="col-lg-4 col-12">
                                 <label class="form-label" for="zone">Zona de destino</label>
                                     <select class="form-control selectpicker mb-3" title="Selecciona una zona" data-live-search="true" data-selected-text-format="count > 3" name="zone_two_id[]" id="zone_two_id" data-value="{{ json_encode(( isset($data['zone_two_id']) ? $data['zone_two_id'] : array() )) }}" multiple>
-                                        @foreach ($zones as $key => $value)
-                                        <optgroup label="{{ $key }}">
-                                            @foreach ($value as $zone)
-                                                <option value="{{ $zone->id }}">{{ $zone->zone_name }}</option>                                                          
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
+                                        @foreach ($zones as $zone)
+                                            <option value="{{ $zone->id }}">{{ $zone->name }}</option>                                                          
+                                        @endforeach
+                                    </select>
                             </div>
                         @endif
 
