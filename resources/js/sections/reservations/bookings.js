@@ -81,19 +81,19 @@ if( __payment_infos.length > 0 ){
             event.preventDefault();
             const { reservation } = this.dataset;
             $("#reservationPaymentsModal").modal('show');
+            const __container = document.getElementById('containerReservationPayments');
             $.ajax({
                 url: '/reservation/payments/' + reservation,
                 type: 'GET',
                 async: true,
                 beforeSend: function() {
+                    __container.innerHTML = '<tr align="center"><td colspan="5"><div class="spinner-grow align-self-center"></tr></td>';
                 },
                 success: function(resp) {
-                    console.log(resp);
-                    const __container = document.getElementById('containerReservationPayments');
                     var __tr = "";
                     if( resp.length > 0 ){
                         resp.forEach(element => {
-                            __tr =  '<tr">' +
+                            __tr +=  '<tr>' +
                                         '<td>'+ element.total +'</td>' +
                                         '<td>'+ element.currency +'</td>' +
                                         '<td>'+ element.exchange_rate +'</td>' +
@@ -101,6 +101,10 @@ if( __payment_infos.length > 0 ){
                                         '<td>'+ element.reference +'</td>' +
                                     '</tr>';                            
                         });
+                    }else{
+                        __tr =  '<tr align="center">' +
+                                    '<td colspan="5">no hay pagos</td>' +
+                                '</tr>';                         
                     }
                     __container.innerHTML = __tr;                    
                 }

@@ -1,4 +1,4 @@
-@props(['data','services','vehicles','status','currencies','methods','cancellations','zones','websites','origins','istoday'])
+@props(['data','services','vehicles','status','currencies','methods','cancellations','zones','websites','origins','istoday','isbalance'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -138,6 +138,16 @@
                                 </select>
                             </div>
                         @endif
+
+                        @if ( isset($isbalance) )
+                            <div class="col-lg-4 col-12">
+                                <label class="form-label" for="is_balance">Reserva con balance</label>
+                                <select class="form-control mb-3" name="is_balance" id="is_today">
+                                    <option {{ $data['is_balance'] == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                    <option {{ $data['is_balance'] == '0' ? 'selected' : '' }} value="0">No</option>
+                                </select>
+                            </div>
+                        @endif                        
 
                         @if ( isset($istoday) )
                             <div class="col-lg-4 col-12">

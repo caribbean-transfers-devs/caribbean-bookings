@@ -203,7 +203,8 @@
                                     <td class="text-center">{{ $item->destination_name_to }}</td>
                                     <td class="text-center">{{ $item->to_name }}</td>
                                     <td class="text-center">{{ number_format(($item->total_sales),2) }}</td>
-                                    <td class="text-center" {{ (($item->total_balance < 0)? "style=color:red;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>
+                                    <td class="text-center" {{ (($item->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>
+                                    {{-- <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td> --}}
                                     <td class="text-center">{{ number_format(($item->is_round_trip != 0 ? ( $item->total_sales / 2 ) : $item->total_sales),2) }}</td>
                                     <td class="text-center">{{ $item->currency }}</td>
                                     <td class="text-center">{{ $item->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $item->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
@@ -361,7 +362,7 @@
         </div> --}}
     </div>
 
-    <x-modals.reports.modal :data="$data" :services="$services" :vehicles="$vehicles" :status="$status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" />
+    <x-modals.reports.modal :data="$data" :services="$services" :vehicles="$vehicles" :status="$status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" :isbalance="1" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />
 @endsection

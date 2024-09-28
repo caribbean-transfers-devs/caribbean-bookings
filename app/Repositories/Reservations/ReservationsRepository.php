@@ -43,6 +43,7 @@ class ReservationsRepository
             "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
             "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),
             "is_today" => ( isset($request->is_today) ? $request->is_today : 0 ),
+            "is_balance" => ( isset($request->is_balance) ? $request->is_balance : 0 ),
         ];
         
         //Query DB        
@@ -143,10 +144,15 @@ class ReservationsRepository
             $query .= " AND tc.id IN ($params) ";
         }
 
+        //RESERVAS CON UN BALANCE
+        if(isset( $request->is_balance ) && !empty( $request->is_balance)){
+            $havingConditions[] = ' total_balance > 0 ';
+        }        
+
         //RESERVAS OPERADAS EL MISMO DIA DE SU CREACION
         if(isset( $request->is_today ) && !empty( $request->is_today)){
             $havingConditions[] = ' is_today != 0 ';
-        }        
+        }
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
             $data['filter_text'] = $request->filter_text;
@@ -160,7 +166,7 @@ class ReservationsRepository
                     )";
         }
 
-        if(  (isset( $request->status_booking ) && !empty( $request->status_booking )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_today ) && !empty( $request->is_today)) ){
+        if(  (isset( $request->status_booking ) && !empty( $request->status_booking )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance ) && !empty( $request->is_balance)) || (isset( $request->is_today ) && !empty( $request->is_today)) ){
             $query2 = " HAVING " . implode(' AND ', $havingConditions);
         }
                 
