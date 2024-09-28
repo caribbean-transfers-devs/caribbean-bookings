@@ -20,6 +20,7 @@ use App\Models\DestinationService;
 
 use App\Traits\RoleTrait;
 use App\Traits\CodeTrait;
+use App\Traits\GeneralTrait;
 
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -33,7 +34,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class OperationsController extends Controller
 {
 
-    use CodeTrait, RoleTrait;
+    use CodeTrait, RoleTrait, GeneralTrait;
     // if(!$this->hasPermission(39)){
     //     abort(403, 'NO TIENE AUTORIZACIÓN.');
     // }
@@ -47,21 +48,25 @@ class OperationsController extends Controller
 
         $items = $this->queryBookings($search);
 
-        $breadcrumbs = array(
-            array(
-                "route" => "",
-                "name" => "Gestión de envío de operaciones",
-                "active" => true
-            ),
-        );
-
         $vehicles = Vehicle::All();
-        $drivers = Driver::orderBy('names','ASC')->get();
-        $zones = Zones::all();
-        $services =  DestinationService::all();
-        $websites = DB::select("SELECT id, name as site_name FROM sites ORDER BY site_name ASC");
 
-        return view('operation.operations', compact('items', 'date', 'nexDate', 'breadcrumbs', 'vehicles', 'drivers', 'zones', 'services', 'websites'));
+        return view('operation.operations', [
+            'items' => $items, 
+            'date' => $date, 
+            'nexDate' => $nexDate, 
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Gestión de envío de operaciones",
+                    "active" => true
+                ]
+            ],
+            'vehicles' => $this->Units(), 
+            'drivers' => $this->Drivers(), 
+            'zones' => $this->Zones(), 
+            'services' => $this->Vehicles(), 
+            'websites' => $this->Sites()
+        ]);
     }
 
     public function preassignments(Request $request){
