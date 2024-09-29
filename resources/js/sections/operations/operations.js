@@ -198,15 +198,14 @@ let setup = {
         // _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
         //                 <''tr>
         //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count mb-sm-0 mb-3'i><'dt--pagination'p>>`;
-
-        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B><'dt--pages-count align-self-center ms-3'i>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
+        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                         <''tr>
                         <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
-
         _settings.deferRender = true;
         _settings.responsive = true;
         _settings.buttons =  _buttons;
         _settings.order = [[ 2, "asc" ]];
+        // _settings.order = [];
         _settings.paging = false;
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
@@ -348,7 +347,7 @@ const __open_modal_comments = document.querySelectorAll('.__open_modal_comment')
 const __title_modal = document.getElementById('filterModalLabel');
 const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
 const __btn_preassignment = document.getElementById('btn_preassignment') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
-const __btn_addservice = document.getElementById('btn_addservice') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
+// const __btn_addservice = document.getElementById('btn_addservice') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
 const __btn_close_operation = document.getElementById('btn_close_operation') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
 
 const __btn_update_status_operations = document.querySelectorAll('.btn_update_status_operation');
@@ -594,12 +593,12 @@ if( document.querySelector('.table-rendering') != null ){
 components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
 
 //ABRE EL MODAL PARA PODER AGREGAR UN NUEVO SERVICIO
-if ( __btn_addservice != null ) {
-  __btn_addservice.addEventListener('click', function(event) {
-      event.preventDefault();
-      $("#operationModal").modal('show');
-  });
-}
+// if ( __btn_addservice != null ) {
+//   __btn_addservice.addEventListener('click', function(event) {
+//       event.preventDefault();
+//       $("#operationModal").modal('show');
+//   });
+// }
 
 if( __btn_preassignment != null ){
   __btn_preassignment.addEventListener('click', function() {

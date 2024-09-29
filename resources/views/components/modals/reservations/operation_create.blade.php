@@ -117,8 +117,8 @@
                                 <div class="col-12 col-lg-4">
                                     <label class="form-label" for="destination_service_id">Vehículo</label>
                                     <select class="form-control mb-2" id="destination_service_id" name="destination_service_id">
-                                        @foreach($services as $destination_service)
-                                            <option value="{{ $destination_service->id }}" {{ $destination_service->id == 4 ? 'selected' : '' }}>{{ $destination_service->name }}</option>
+                                        @foreach($vehicles as $vehicle)
+                                            <option value="{{ $vehicle->id }}" {{ $vehicle->id == 4 ? 'selected' : '' }}>{{ $vehicle->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

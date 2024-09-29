@@ -7,7 +7,7 @@
 
 @import "../../plugins/flatpickr/flatpickr.scss";
 @import "../../plugins/notification/snackbar/snackbar";
-@import "../../plugins/bootstrap-select/bootstrap-select";
+@import "../../plugins/bootstrap-select/select";
 
 @import '../template/light/components/accordions';
 @import '../template/dark/components/accordions';
@@ -59,7 +59,7 @@
 }
 
 .btn_status_action{
-    padding: 0.5rem !important;
+    padding: 0.4rem !important;
 }
 
 //MODIFICACIONES DE DATATABLES
@@ -81,22 +81,22 @@ table.dataTable .form-control {
     }
 }
 
-:not(.input-group) > .bootstrap-select.form-control:not([class*="col-"]) {
-    height: calc(1.3em + 1.3rem + 2px);
-}
+// :not(.input-group) > .bootstrap-select.form-control:not([class*="col-"]) {
+//     height: calc(1.3em + 1.3rem + 2px);
+// }
 
-.bootstrap-select{
-    .dropdown-toggle{
-        height: calc(1.3em + 1.3rem + 2px);
-        padding: 7px 16px;
-        line-height: 1.5;
-        white-space: unset;
+// .bootstrap-select{
+//     .dropdown-toggle{
+//         height: calc(1.3em + 1.3rem + 2px);
+//         padding: 7px 16px;
+//         line-height: 1.5;
+//         white-space: unset;
         
-        .filter-option{
-            // height: auto;
-        }
-    }
-    .dropdown-menu{
-        border: 0 !important;
-    }
-}
+//         .filter-option{
+//             // height: auto;
+//         }
+//     }
+//     .dropdown-menu{
+//         border: 0 !important;
+//     }
+// }

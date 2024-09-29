@@ -61,13 +61,11 @@ class OperationsController extends Controller
                     "active" => true
                 ]
             ],
-            'vehicles' => $this->Units(),
-            'services' => $this->Vehicles(), 
+            'vehicles' => $this->Vehicles(),
+            'zones' => $this->Zones(),
+            'websites' => $this->Sites(),
             'units' => $this->Units(), //LAS UNIDADES DADAS DE ALTA
-            
-            'drivers' => $this->Drivers(), 
-            'zones' => $this->Zones(),             
-            'websites' => $this->Sites()
+            'drivers' => $this->Drivers(),
         ]);
     }
 

@@ -311,8 +311,8 @@
             liveSearchNormalize: false,
             liveSearchStyle: "contains",
             actionsBox: false,
-            iconBase: "fas",
-            tickIcon: "fa-check",
+            iconBase: "",
+            tickIcon: "bs-ok-default",
             showTick: false,
             template: {
                 caret: '<span class="caret"></span>',
