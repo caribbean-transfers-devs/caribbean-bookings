@@ -73,13 +73,42 @@
     background-color: rgba(234, 241, 255, 0.74); /* Asegúrate de que el fondo sea blanco o del color de la tabla */
 }
 
-table.dataTable .form-control {
-    font-size: 0.625rem;
-  
-    &::-webkit-input-placeholder, &::-ms-input-placeholder, &::-moz-placeholder {
-      font-size: 0.625rem;
-    }
+//CUSTOMER BOOTSTRAP SELECT 
+.table{ 
+    > tbody {
+        > tr {
+            > td {
+                .bootstrap-select{
+                    &.btn-group{
+                        > .dropdown-toggle{
+                            align-items: center;
+                            display: inline-flex;
+                            justify-content: space-between;
+                            position: relative;
+                            text-align: right;
+                            white-space: nowrap;
+                            width: 100%;
+                            font-size: .625rem;
+                        }
+                        &:not(.input-group-btn){
+
+                        }
+                    }
+                }
+            }
+        }
+    }    
 }
+
+// table.dataTable .form-control {
+//     font-size: 0.625rem;
+  
+//     &::-webkit-input-placeholder, 
+//     &::-ms-input-placeholder, 
+//     &::-moz-placeholder {
+//       font-size: 0.625rem;
+//     }
+// }
 
 // :not(.input-group) > .bootstrap-select.form-control:not([class*="col-"]) {
 //     height: calc(1.3em + 1.3rem + 2px);

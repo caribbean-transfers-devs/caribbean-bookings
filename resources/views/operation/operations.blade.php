@@ -36,7 +36,17 @@
 @section('content')
     @php
         $total_close = 0;
-        $buttons = array();
+        $buttons = array(
+            array(
+                'text' => 'Filtros',
+                'className' => 'btn btn-primary',
+                'attr' => array(
+                    'data-title' =>  "Filtros de operacion",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#filtersOperationModal'
+                )
+            )
+        );
         if (RoleTrait::hasPermission(80)){
             array_push($buttons,
                 array(
@@ -91,7 +101,7 @@
             array_push($buttons,
                 array(
                     'text' => 'Cerrar operación',
-                    'className' => 'btn btn-primary',
+                    'className' => 'btn btn-danger',
                     'attr' => array(
                         'id' =>  "btn_close_operation",
                     )
@@ -119,46 +129,7 @@
         </div>
     @endif
 
-    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-        <div id="filters" class="accordion">
-            <div class="card">
-                <div class="card-header" id="headingOne1">
-                    <section class="mb-0 mt-0">
-                        <div role="menu" class="" data-bs-toggle="collapse" data-bs-target="#defaultAccordionOne" aria-expanded="true" aria-controls="defaultAccordionOne">
-                            Filtros <div class="icons"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
-                        </div>
-                    </section>
-                </div>
-                <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
-                    <div class="card-body">
-                        <form action="" class="row" method="POST" id="formSearch">
-                            @csrf
-                            <input type="hidden" id="lookup_date_next" value="{{ $nexDate }}" required>
-
-                            <div class="mb-3 mb-lg-0 col-sm-4 col-12">
-                                <label class="form-label" for="lookup_date">Fecha de creación</label>
-                                <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
-                            </div>
-                            <div class="mb-3 mb-lg-0 col-sm-4 col-12">
-                                <label class="form-label" for="unit">Unidad</label>
-                                <select class="form-control selectpicker mb-3" title="Selecciona una unidad" data-live-search="true" data-selected-text-format="count > 3" name="unit[]" id="unit" data-value="{{ json_encode(( isset($data['unit']) ? $data['unit'] : array() )) }}" multiple>
-                                    @foreach ($units as $unit)
-                                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>                                                          
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-sm-2 align-self-end">
-                                <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 layout-spacing">
         <div class="widget-content widget-content-area br-8">
             @if ($errors->any())
                 <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
@@ -423,9 +394,10 @@
         </div>
     </div>
 
+    <x-modals.operation.filters :nexDate="$nexDate" :date="$date" :websites="$websites" :units="$units" :drivers="$drivers" />
     <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :vehicles="$vehicles" />
     <x-modals.reservations.comments />
     <x-modals.reservations.operation_messages_history />
     <x-modals.reservations.operation_data_customer />
-    <x-modals.reservations.operation_data_whatsapp />    
+    <x-modals.reservations.operation_data_whatsapp />
 @endsection

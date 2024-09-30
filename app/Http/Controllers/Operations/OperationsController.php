@@ -40,20 +40,32 @@ class OperationsController extends Controller
     // }
 
     public function index(Request $request){
-        $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
-        $nexDate = date('Y-m-d', strtotime($request->date . ' +1 day'));
 
-        $search['init'] = $date." 00:00:00";
-        $search['end'] = $date." 23:59:59";
+        $search['init'] = ( isset( $request->date ) ? $request->date : date("Y-m-d") )." 00:00:00";
+        $search['end'] = ( isset( $request->date ) ? $request->date : date("Y-m-d") )." 23:59:59";
+
+        $queryOne = "";
+        $queryTwo = "";
+
+        if( isset($request->site) && !empty($request->site) ){
+
+        }
+
+        if( isset($request->site) && !empty($request->site) ){
+            
+        }
+
+        if( isset($request->site) && !empty($request->site) ){
+            
+        }
+
 
         $items = $this->queryBookings($search);
 
-        $vehicles = Vehicle::All();
-
         return view('operation.operations', [
             'items' => $items, 
-            'date' => $date, 
-            'nexDate' => $nexDate, 
+            'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ), 
+            'nexDate' => date('Y-m-d', strtotime($request->date . ' +1 day')), 
             'breadcrumbs' => [
                 [
                     "route" => "",
@@ -66,6 +78,7 @@ class OperationsController extends Controller
             'websites' => $this->Sites(),
             'units' => $this->Units(), //LAS UNIDADES DADAS DE ALTA
             'drivers' => $this->Drivers(),
+            'data' => $request->input(),
         ]);
     }
 
@@ -219,6 +232,7 @@ class OperationsController extends Controller
                                 zone_one.name as zone_one_name, 
                                 zone_one.is_primary as zone_one_is_primary, 
                                 zone_one.cut_off as zone_one_cut_off,
+
                                 zone_two.id as zone_two_id, 
                                 zone_two.name as zone_two_name, 
                                 zone_two.is_primary as zone_two_is_primary, 
@@ -290,56 +304,65 @@ class OperationsController extends Controller
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
                                 ELSE 'CONFIRMADO'
                                 END AS status,
-                                    zone_one.id as zone_one_id, zone_one.name as zone_one_name, zone_one.is_primary as zone_one_is_primary, zone_one.cut_off as zone_one_cut_off,
-                                    zone_two.id as zone_two_id, zone_two.name as zone_two_name, zone_two.is_primary as zone_two_is_primary, zone_two.cut_off as zone_two_cut_off,
-                                    CASE
-                                        WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
-                                        WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
-                                        ELSE 'ARRIVAL'
-                                    END AS final_service_type,
-                                    GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-                                    vehicle_one.name as vehicle_one_name,
-                                    vehicle_two.name as vehicle_two_name,
-                                    CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
-                                    CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name
-                                   FROM reservations_items as it
-                                   INNER JOIN reservations as rez ON rez.id = it.reservation_id                                   
-                                   INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
-                                   INNER JOIN sites as sit ON sit.id = rez.site_id
-                                   INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
-                                   INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
-                                   LEFT OUTER JOIN vehicles as vehicle_one ON vehicle_one.id = it.vehicle_id_one
-                                   LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
-                                   LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
-                                   LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
-                                   LEFT OUTER JOIN  reservations_media as upload ON upload.reservation_id = rez.id
-                                   LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND rfu.type IN ('CLIENT', 'OPERATION')
-                                   LEFT JOIN (
-                                           SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales                                            
-                                           FROM sales
-                                           WHERE deleted_at IS NULL
-                                           GROUP BY reservation_id
-                                   ) as s ON s.reservation_id = rez.id
-                                   LEFT JOIN (
-                                           SELECT reservation_id,
-                                           ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
-                                                                                                   WHEN operation = 'division' THEN total / exchange_rate
-                                                                                   ELSE total END), 2) AS total_payments,
-                                           GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
-                                           FROM payments
-                                           GROUP BY reservation_id
-                                   ) as p ON p.reservation_id = rez.id
-                                   WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
+                                zone_one.id as zone_one_id, 
+                                zone_one.name as zone_one_name, 
+                                zone_one.is_primary as zone_one_is_primary, 
+                                zone_one.cut_off as zone_one_cut_off,
+                                
+                                zone_two.id as zone_two_id, 
+                                zone_two.name as zone_two_name, 
+                                zone_two.is_primary as zone_two_is_primary, 
+                                zone_two.cut_off as zone_two_cut_off,
+                                CASE
+                                    WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                    ELSE 'ARRIVAL'
+                                END AS final_service_type,
+                                GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                vehicle_one.name as vehicle_one_name,
+                                vehicle_two.name as vehicle_two_name,
+                                CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
+                                CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name
+                            FROM reservations_items as it
+                                INNER JOIN reservations as rez ON rez.id = it.reservation_id                                   
+                                INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
+                                INNER JOIN sites as sit ON sit.id = rez.site_id
+                                INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
+                                INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
+
+                                LEFT OUTER JOIN vehicles as vehicle_one ON vehicle_one.id = it.vehicle_id_one
+                                LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
+                                LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
+                                LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+                                LEFT OUTER JOIN  reservations_media as upload ON upload.reservation_id = rez.id
+                                LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND rfu.type IN ('CLIENT', 'OPERATION')
+
+                                LEFT JOIN (
+                                        SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales                                            
+                                        FROM sales
+                                        WHERE deleted_at IS NULL
+                                        GROUP BY reservation_id
+                                ) as s ON s.reservation_id = rez.id
+                                LEFT JOIN (
+                                        SELECT reservation_id,
+                                        ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                                                                WHEN operation = 'division' THEN total / exchange_rate
+                                                                                ELSE total END), 2) AS total_payments,
+                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
+                                        FROM payments
+                                        GROUP BY reservation_id
+                                ) as p ON p.reservation_id = rez.id
+                            WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
                                    AND rez.is_cancelled = 0
                                    AND rez.is_duplicated = 0
                                    AND it.is_round_trip = 1
-                                   GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
-                                   ORDER BY filtered_date ASC",[
-                                       "init_date_one" => $search['init'],
-                                       "init_date_two" => $search['end'],
-                                       "init_date_three" => $search['init'],
-                                       "init_date_four" => $search['end'],
-                                   ]);
+                            GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
+                            ORDER BY filtered_date ASC",[
+                                "init_date_one" => $search['init'],
+                                "init_date_two" => $search['end'],
+                                "init_date_three" => $search['init'],
+                                "init_date_four" => $search['end'],
+                            ]);
     }
 
     public function preassignment(Request $request){
