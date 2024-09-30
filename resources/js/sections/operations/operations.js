@@ -292,8 +292,16 @@ let setup = {
     }
 };
 
+if( document.querySelector('.table-rendering') != null ){
+    setup.actionTable($('.table-rendering'));
+}
+setup.bsPopover();
+setup.bsTooltip();
+components.setValueSelectpicker();
+components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
+
 //CONFIGURACION DE DROPZONE
-Dropzone.options.uploadForm = {    
+Dropzone.options.uploadForm = {
     maxFilesize: 5, // Tamaño máximo del archivo en MB
     acceptedFiles: 'image/*,.pdf', // Solo permitir imágenes y archivos PDF
     dictDefaultMessage: 'Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...',
@@ -356,10 +364,17 @@ const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhos
 console.log(socket);
 socket.on('connection');
 
-setup.bsPopover();
-setup.bsTooltip();
-components.setValueSelectpicker();
-
+if ( document.getElementById('lookup_date') != null ) {
+    const picker = new easepick.create({
+        element: "#lookup_date",
+        css: [
+            'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+            'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+            'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
+        ],
+        zIndex: 10,
+    });   
+}
 function history(){
     setup.bsTooltip();
     const __open_modal_historys = document.querySelectorAll('.__open_modal_history');
@@ -568,24 +583,6 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
     // let text = "https://api.whatsapp.com/send?phone=5219982127069&text=" + decodeURIComponent(message);
     // window.location.href = text;
 });
-
-if ( document.getElementById('lookup_date') != null ) {
-  const picker = new easepick.create({
-      element: "#lookup_date",
-      css: [
-          'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-          'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-          'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-      ],
-      zIndex: 10,
-  });   
-}
-
-if( document.querySelector('.table-rendering') != null ){
-  setup.actionTable($('.table-rendering'));
-}
-
-components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
 
 //ABRE EL MODAL PARA PODER AGREGAR UN NUEVO SERVICIO
 // if ( __btn_addservice != null ) {
