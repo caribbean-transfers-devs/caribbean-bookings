@@ -44,11 +44,13 @@ class OperationsController extends Controller
         $search['init'] = ( isset( $request->date ) ? $request->date : date("Y-m-d") )." 00:00:00";
         $search['end'] = ( isset( $request->date ) ? $request->date : date("Y-m-d") )." 23:59:59";
 
-        $queryOne = "";
-        $queryTwo = "";
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
 
         if( isset($request->site) && !empty($request->site) ){
-
+            $params = $this->parseArrayQuery($request->site);
+            $queryOne .= " AND site.id IN ($params) ";
+            $queryTwo .= " AND site.id IN ($params) ";
         }
 
         if( isset($request->site) && !empty($request->site) ){
@@ -60,7 +62,7 @@ class OperationsController extends Controller
         }
 
 
-        $items = $this->queryBookings($search);
+        $items = $this->queryBookings($search, $queryOne, $queryTwo);
 
         return view('operation.operations', [
             'items' => $items, 
@@ -209,7 +211,7 @@ class OperationsController extends Controller
         }
     }
 
-    public function queryBookings($search){
+    public function queryBookings($search, $queryOne, $queryTwo){
         return  DB::select("SELECT 
                                 rez.id as reservation_id,
                                 CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
@@ -218,7 +220,7 @@ class OperationsController extends Controller
                                 serv.name as service_name, 
                                 it.op_one_pickup as filtered_date, 
                                 'arrival' as operation_type,
-                                sit.name as site_name,
+                                site.name as site_name,
                                 'TYPE_ONE' as op_type,
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                 CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
@@ -250,7 +252,7 @@ class OperationsController extends Controller
                             FROM reservations_items as it
                                 INNER JOIN reservations as rez ON rez.id = it.reservation_id
                                 INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
-                                INNER JOIN sites as sit ON sit.id = rez.site_id
+                                INNER JOIN sites as site ON site.id = rez.site_id
                                 INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                 INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
 
@@ -279,10 +281,8 @@ class OperationsController extends Controller
                                     FROM payments
                                         GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
-                            WHERE it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
-                                   AND rez.is_cancelled = 0
-                                   AND rez.is_duplicated = 0                                   
-                            GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
+                            WHERE 1=1 {$queryOne}                                   
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id
 
                             UNION
 
@@ -294,7 +294,7 @@ class OperationsController extends Controller
                                 serv.name as service_name, 
                                 it.op_two_pickup as filtered_date,
                                 'departure' as operation_type, 
-                                sit.name as site_name, 
+                                site.name as site_name, 
                                 'TYPE_TWO' as op_type,
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                 CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
@@ -326,7 +326,7 @@ class OperationsController extends Controller
                             FROM reservations_items as it
                                 INNER JOIN reservations as rez ON rez.id = it.reservation_id                                   
                                 INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
-                                INNER JOIN sites as sit ON sit.id = rez.site_id
+                                INNER JOIN sites as site ON site.id = rez.site_id
                                 INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                 INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
 
@@ -344,19 +344,17 @@ class OperationsController extends Controller
                                         GROUP BY reservation_id
                                 ) as s ON s.reservation_id = rez.id
                                 LEFT JOIN (
-                                        SELECT reservation_id,
+                                    SELECT 
+                                        reservation_id,
                                         ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
-                                                                                                WHEN operation = 'division' THEN total / exchange_rate
-                                                                                ELSE total END), 2) AS total_payments,
+                                                WHEN operation = 'division' THEN total / exchange_rate
+                                                ELSE total END), 2) AS total_payments,
                                         GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
-                                        FROM payments
+                                    FROM payments
                                         GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
-                            WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
-                                   AND rez.is_cancelled = 0
-                                   AND rez.is_duplicated = 0
-                                   AND it.is_round_trip = 1
-                            GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
+                            WHERE 1=1 {$queryTwo}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id
                             ORDER BY filtered_date ASC",[
                                 "init_date_one" => $search['init'],
                                 "init_date_two" => $search['end'],
