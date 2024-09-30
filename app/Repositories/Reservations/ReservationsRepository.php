@@ -351,6 +351,11 @@ class ReservationsRepository
         try {
             DB::beginTransaction();
             $this->logBookingService($request, $item);
+
+            if( isset($request->serviceTypeForm) && $request->serviceTypeForm == 1 ){
+                $item->is_round_trip = $request->serviceTypeForm;
+            }
+
             $item->destination_service_id = $request->destination_service_id;
             $item->passengers = $request->passengers;
             $item->flight_number = $request->flight_number;
@@ -770,6 +775,11 @@ class ReservationsRepository
 
     // NOS PERMITE GENERAR EL LOG DE CADA UNO DE LOS CAMBIOS DE LOS SERVICIOS DE LA RESERVACIÓN
     public function logBookingService($request, $item){
+        //CAMBIANDO EL TIPO DE SERVICIO
+        if( ( isset($request->serviceTypeForm) && $request->serviceTypeForm == 1 ) && ( $request->serviceTypeForm != $item->is_round_trip ) ){
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el servicio: ".$item->id."(".$item->code.") de: One Way a Round Trip", 'HISTORY', 'EDICIÓN SERVICIO');
+        }        
+
         //LOG DE TIPO DE VEHÍVULO
         if( $request->destination_service_id != $item->destination_service_id ){
             $destination_old = DestinationService::find($item->destination_service_id);

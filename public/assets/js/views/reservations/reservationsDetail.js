@@ -10,6 +10,8 @@ const __titleModal = document.getElementById('titleModal');
 const __closeModalHeader = document.getElementById('closeModalHeader');
 const __closeModalFooter = document.getElementById('closeModalFooter');
 
+const __serviceType = document.getElementById('serviceTypeForm');
+
 $(function() {
     $('#serviceSalesModal').on('hidden.bs.modal', function () {
         $("#frm_new_sale")[0].reset();
@@ -458,8 +460,12 @@ function serviceInfo(origin,destination,time,km){
     $("#destination_kms").html(km);
 }
 
+
+
 function itemInfo(item){
     console.log(item);
+    const __service_type = document.querySelector('.serviceTypeForm');    
+
     $("#from_zone_id").val(item.from_zone);
     $("#to_zone_id").val(item.to_zone);
 
@@ -484,15 +490,29 @@ function itemInfo(item){
     if(item.op_two_status != 'PENDING'){
         $("#serviceDateRoundForm").prop('readonly', true);
     }
+
     if(item.is_round_trip == 1){
         __serviceDateRoundForm.value = item.op_two_pickup,
         __serviceDateRoundForm.min = item.op_one_pickup;
         $("#info_return").removeClass('d-none');
+        __service_type.classList.add('d-none');
+        __serviceType.removeAttribute('name');
     }else{
         __serviceDateRoundForm.value = "",
         __serviceDateRoundForm.min = "";
         $("#info_return").addClass('d-none');
+        __service_type.classList.remove('d-none');
+        __serviceType.setAttribute('name','serviceTypeForm');
     }
+}
+
+if( __serviceType != null ){
+    __serviceType.addEventListener('change', function(event){
+        event.preventDefault();        
+        if (__serviceType.value == 1) {
+            $("#info_return").removeClass('d-none');
+        }
+    })
 }
 
 //FUNCIONALIDAD DE CALENDARIO FORM
@@ -910,7 +930,7 @@ function loadContent() {
 
 loadContent();
 
-Dropzone.options.uploadForm = {    
+Dropzone.options.uploadForm = {
     maxFilesize: 5, // Tamaño máximo del archivo en MB
     acceptedFiles: 'image/*,.pdf', // Solo permitir imágenes y archivos PDF
     dictDefaultMessage: 'Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...',

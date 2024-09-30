@@ -21,15 +21,21 @@ class ReservationItemRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+
+        $rules = [
             'destination_service_id' => 'required|integer',
             'passengers' => 'required|integer',
             'from_name' => 'required|string|max:255',
             'to_name' => 'required|string|max:255',
             'op_one_pickup' => 'required|date',
-            'op_two_pickup' => 'nullable|date',
             'flight_number' => 'nullable|string|max:255',
         ];
+        if( $this->input('serviceTypeForm') && $this->input('serviceTypeForm') == 1 ){
+            $rules['op_two_pickup'] = 'required|date';
+        }else{
+            $rules['op_two_pickup'] = 'nullable|date';
+        }
+        return $rules;
     }
 
     /**
