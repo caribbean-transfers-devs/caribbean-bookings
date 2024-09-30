@@ -38,7 +38,7 @@
                             <label class="form-label" for="driver">Conductor</label>
                             <select class="form-control selectpicker mb-3" title="Selecciona un conductor" data-live-search="true" data-selected-text-format="count > 3" name="driver[]" id="driver" data-value="{{ json_encode(( isset($data['driver']) ? $data['driver'] : array() )) }}" multiple>
                                 @foreach ($drivers as $driver)
-                                    <option value="{{ $driver->id }}">{{ $driver->name }}</option>                                                          
+                                    <option value="{{ $driver->id }}">{{ $driver->names }} {{ $driver->surnames }}</option>                                                          
                                 @endforeach
                             </select>
                         </div>

@@ -1108,6 +1108,8 @@ if( document.getElementById('btn_dowload_operation') != null ){
     document.getElementById('btn_dowload_operation').addEventListener('click', function() {
         let date = document.getElementById('lookup_date').value;
         let url = '/operation/board/exportExcel?date=' + date ;
+        // console.log(url);
+        
         components.loadScreen();
 
         fetch(url, {

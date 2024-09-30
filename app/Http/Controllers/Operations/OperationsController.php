@@ -1201,11 +1201,13 @@ class OperationsController extends Controller
     }
 
     public function exportExcelBoard(Request $request){
-        $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
-        $search['init'] = $date." 00:00:00";
-        $search['end'] = $date." 23:59:59";
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
 
-        $items = $this->queryBookings($search);
+        $search['init'] = ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 00:00:00";
+        $search['end'] = ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 23:59:59";
+
+        $items = $this->queryBookings($search, $queryOne, $queryTwo);
 
         // Crear una nueva hoja de cálculo
         $spreadsheet = new Spreadsheet();
@@ -1301,11 +1303,13 @@ class OperationsController extends Controller
     }
 
     public function exportExcelBoardCommision(Request $request){
-        $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
-        $search['init'] = $date." 00:00:00";
-        $search['end'] = $date." 23:59:59";
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
 
-        $items = $this->queryBookings($search);
+        $search['init'] = ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 00:00:00";
+        $search['end'] = ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 23:59:59";
+
+        $items = $this->queryBookings($search, $queryOne, $queryTwo);
 
         // Crear una nueva hoja de cálculo
         $spreadsheet = new Spreadsheet();
