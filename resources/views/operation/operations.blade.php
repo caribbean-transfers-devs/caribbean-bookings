@@ -394,7 +394,7 @@
         </div>
     </div>
 
-    <x-modals.operation.filters :nexDate="$nexDate" :date="$date" :websites="$websites" :units="$units" :drivers="$drivers" />
+    <x-modals.operation.filters :data="$data" :nexDate="$nexDate" :date="$date" :websites="$websites" :units="$units" :drivers="$drivers" />
     <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :vehicles="$vehicles" />
     <x-modals.reservations.comments />
     <x-modals.reservations.operation_messages_history />

@@ -1,4 +1,4 @@
-@props(['nexDate','date','websites','units','drivers'])
+@props(['data','nexDate','date','websites','units','drivers'])
 <!-- Modal -->
 <div class="modal fade" id="filtersOperationModal" tabindex="-1" role="dialog" aria-labelledby="filtersOperationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">

@@ -223,21 +223,18 @@ let setup = {
 
         table.DataTable( _settings );
     },
-
     bsTooltip: function() {
         var bsTooltip = document.querySelectorAll('.bs-tooltip')
         for (let index = 0; index < bsTooltip.length; index++) {
             var tooltip = new bootstrap.Tooltip(bsTooltip[index])
         }
     },
-
     bsPopover: function() {
         var bsPopover = document.querySelectorAll('.bs-popover');
         for (let index = 0; index < bsPopover.length; index++) {
             var popover = new bootstrap.Popover(bsPopover[index])
         }
     },
-
     setStatus: function(_status){
         let alert_type = 'btn-secondary';
         switch (_status) {
@@ -264,7 +261,6 @@ let setup = {
         }
         return alert_type;
     },
-
     setPreassignment: function(_operation){
         let alert_type = 'btn-success';
         switch (_operation) {
@@ -283,13 +279,11 @@ let setup = {
         }
         return alert_type;                
     },
-
     isTime: function(hora) {
         // Expresión regular para validar formato HH:MM
         const regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
         return regex.test(hora);
     },
-
     obtenerHoraActual: function() {
         const ahora = new Date();
         const horas = String(ahora.getHours()).padStart(2, '0');
@@ -364,6 +358,7 @@ socket.on('connection');
 
 setup.bsPopover();
 setup.bsTooltip();
+components.setValueSelectpicker();
 
 function history(){
     setup.bsTooltip();

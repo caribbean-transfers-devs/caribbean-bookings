@@ -315,7 +315,121 @@ let components = {
             // document.body.removeChild(load_screen);
             __load_screen.classList.add('d-none');
         }
-    }    
+    },
+
+    actionButtonColumns: function(){
+        const __btn_columns = document.querySelectorAll('.__btn_columns');        
+        __btn_columns.forEach(__btn_column => {
+            __btn_column.addEventListener('click', function(event){
+                event.preventDefault();
+                const { table, container } = this.dataset;                
+                components.renderCheckboxColumns(table, container);
+            });
+        });        
+    },
+
+    renderCheckboxColumns: function(table, container){
+        const __table = document.getElementById(table);        
+        const __container = document.getElementById(container);
+
+        if( __table != null ){
+            const __ths = __table.querySelectorAll('th');
+            const savedState = JSON.parse(localStorage.getItem(table)) || {};           
+
+            __ths.forEach((__th, __key) => {
+                const capitalizedText = __th.innerText.toLowerCase().replace(/\b\w/g, function (c) {
+                    return c.toUpperCase();
+                });
+    
+                const __div = document.createElement('div');
+                const __input = document.createElement('input');
+                const __label = document.createElement('label');
+    
+                __div.classList.add('form-check', 'd-flex', 'align-items-center', 'gap-1', 'mb-0', 'w-100');
+                    __div.appendChild(__input);
+                    __input.classList.add('form-check-input', 'toggle-vis');
+                    __input.setAttribute('type', 'checkbox');
+                    __input.setAttribute('value', '');
+                    __input.setAttribute('id', 'flexCheckDefault' + __key);
+                    __input.setAttribute('data-column', __key);                    
+                    __input.checked = savedState[__key] !== undefined ? savedState[__key] : true;
+                    __input.setAttribute('checked', __input.checked);
+                    __div.appendChild(__label);
+                    __label.classList.add('form-check-label', 'w-100', 'mb-0');
+                    __label.setAttribute('for', 'flexCheckDefault' + __key);
+                    __label.innerText = capitalizedText;
+    
+                __container.appendChild(__div);
+            });
+
+            components.validateColumnVisibility(__table, table);
+            components.callActionCheckboxColumns(__table, table);            
+        }        
+    },
+
+    /**
+     * 
+     * @param {*} __table //DOM Table
+     * @param {*} __storageName  //El nombre del localStorage
+     */
+    callActionCheckboxColumns: function(__table, __storageName){
+        const __DataTable = $(__table).DataTable(); //DOM DataTable
+        const __localStorageKey = __storageName; //El nombre del localStorage
+
+        if( document.querySelectorAll('input.toggle-vis').length > 0 ){
+            document.querySelectorAll('input.toggle-vis').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function(event) {
+                    // Evitar la acción por defecto
+                    event.preventDefault();
+                    const columnVisibility = JSON.parse(localStorage.getItem(__localStorageKey)) || {};
+                    let __key = this.getAttribute('data-column');
+                    let __column = __DataTable.column(__key);
+
+                    // Alternar la visibilidad de la columna en base al estado del checkbox
+                    if (this.checked) {
+                        columnVisibility[__key] = true;
+                        __column.visible(true);  // Mostrar la columna si el checkbox está marcado
+                    } else {
+                        columnVisibility[__key] = false;
+                        __column.visible(false); // Ocultar la columna si el checkbox no está marcado
+                    }
+                    
+                    localStorage.setItem(__localStorageKey, JSON.stringify(columnVisibility));                    
+                });
+            });
+        }
+    },
+
+    validateColumnVisibility: function(__table, __storageName){
+        const __DataTable = $(__table).DataTable(); //DOM DataTable
+        const localStorageKey = __storageName; //El nombre del localStorage        
+        const savedState = JSON.parse(localStorage.getItem(localStorageKey)) || {};
+    
+        if (__table != null) {
+            const __ths = __table.querySelectorAll('th');
+            __ths.forEach((__th, __key) => {
+                const __column = __DataTable.column(__key);                
+                let  __checked = savedState[__key] !== undefined ? savedState[__key] : true;
+                if (__checked) {
+                    __column.visible(true);
+                } else {
+                    __column.visible(false);
+                }
+            });
+        }
+    },
+
+    setValueSelectpicker: function(){
+        const __selectpickers = document.querySelectorAll('.selectpicker');
+        if( __selectpickers.length > 0 ){
+            __selectpickers.forEach(__selectpicker => {
+                const { value } = __selectpicker.dataset;        
+                if( value !== undefined ){
+                    $("#" + __selectpicker.getAttribute('id')).selectpicker('val', JSON.parse(value));
+                }
+            });
+        }
+    }
 }
 
 /**
@@ -336,8 +450,6 @@ window.addEventListener('popstate', function (event) {
 });
 
 window.addEventListener("DOMContentLoaded", function() {
-
-    console.log("The page has fully loaded.");
     //OCULTAMOS LOADING CUANDO DOM ESTA CARGADO COMPLETAMENTE
     components.removeLoadScreen();
 

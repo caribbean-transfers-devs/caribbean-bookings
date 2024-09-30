@@ -53,12 +53,16 @@ class OperationsController extends Controller
             $queryTwo .= " AND site.id IN ($params) ";
         }
 
-        if( isset($request->site) && !empty($request->site) ){
-            
+        if( isset($request->unit) && !empty($request->unit) ){
+            $params = $this->parseArrayQuery($request->unit);
+            $queryOne .= " AND it.vehicle_id_one IN ($params) ";
+            $queryTwo .= " AND it.vehicle_id_two IN ($params) ";            
         }
 
-        if( isset($request->site) && !empty($request->site) ){
-            
+        if( isset($request->driver) && !empty($request->driver) ){
+            $params = $this->parseArrayQuery($request->driver);
+            $queryOne .= " AND it.driver_id_one IN ($params) ";
+            $queryTwo .= " AND it.driver_id_two IN ($params) ";            
         }
 
 
