@@ -135,8 +135,9 @@
                             <div class="col-lg-4 col-12">
                                 <label class="form-label" for="is_balance">Reserva con balance</label>
                                 <select class="form-control mb-3" name="is_balance" id="is_today">
+                                    <option {{ $data['is_balance'] == '0' ? 'selected' : '' }} value="0">Selecciona una opción</option>
                                     <option {{ $data['is_balance'] == '1' ? 'selected' : '' }} value="1">Sí</option>
-                                    <option {{ $data['is_balance'] == '0' ? 'selected' : '' }} value="0">No</option>
+                                    <option {{ $data['is_balance'] == '2' ? 'selected' : '' }} value="2">No</option>
                                 </select>
                             </div>
                         @endif                        

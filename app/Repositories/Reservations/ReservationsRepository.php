@@ -146,7 +146,7 @@ class ReservationsRepository
 
         //RESERVAS CON UN BALANCE
         if(isset( $request->is_balance ) && !empty( $request->is_balance)){
-            $havingConditions[] = ' total_balance > 0 ';
+            $havingConditions[] = ( $request->is_balance == 1 ? ' total_balance > 0 ' : ' total_balance <= 0 ' );
         }        
 
         //RESERVAS OPERADAS EL MISMO DIA DE SU CREACION
