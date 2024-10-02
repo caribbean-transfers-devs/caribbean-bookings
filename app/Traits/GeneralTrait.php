@@ -73,8 +73,9 @@ trait GeneralTrait
         return array(
             "CONFIRMED" => "Confirmado",
             "PENDING" => "Pendiente",
-            "OPEN CREDIT" => "Credito abierto",
+            "OPENCREDIT" => "Credito abierto",
             "CANCELLED" => "Cancelado",
+            // "DUPLICATED" => "Duplicado",
         );
     }
     
@@ -119,12 +120,14 @@ trait GeneralTrait
     public static function classStatusBooking($status = "CONFIRMED"){
         switch ($status) {
             case 'PENDING':
+            case 'NOSHOW':
                 return 'warning';
                 break;
             case 'CANCELLED':
+            case 'DUPLICATED':
                 return 'danger';
                 break;
-            case 'OPEN CREDIT':
+            case 'OPENCREDIT':
                 return 'info';
                 break;
             default:
@@ -141,12 +144,30 @@ trait GeneralTrait
             case 'CANCELLED':
                 return 'Cancelado';
                 break;
-            case 'OPEN CREDIT':
+            case 'DUPLICATED':
+                return 'Duplicado';
+                break;
+            case 'NOSHOW':
+                return 'No se presentó';
+                break;                                
+            case 'OPENCREDIT':
                 return 'Credito abierto';
                 break;
+            case 'COMPLETED':
+                return 'Completado';
+                break;                
             default:
                 return 'Confirmado';
                 break;
         }
-    }    
+    }
+
+    public static function parseServiceStatus( $data ){
+        $span = "";
+        $items = explode(',',$data);
+        foreach ($items as $key => $item) {
+            $span .= '<span class="badge badge-light-'.self::classStatusBooking($item).' mb-2">'.self::statusBooking($item).'</span>';
+        }
+        return $span;
+    }
 }

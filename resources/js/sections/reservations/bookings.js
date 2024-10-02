@@ -82,31 +82,48 @@ if( __payment_infos.length > 0 ){
             const { reservation } = this.dataset;
             $("#reservationPaymentsModal").modal('show');
             const __container = document.getElementById('containerReservationPayments');
+            const __footer = document.getElementById('footerReservationPayments');
             $.ajax({
                 url: '/reservation/payments/' + reservation,
                 type: 'GET',
                 async: true,
                 beforeSend: function() {
                     __container.innerHTML = '<tr align="center"><td colspan="5"><div class="spinner-grow align-self-center"></tr></td>';
+                    __footer.innerHTML = '';
                 },
                 success: function(resp) {
-                    var __tr = "";
+                    let __tr = "";
+                    let __tr_footer = "";
+                    let __total = 0;
                     if( resp.length > 0 ){
                         resp.forEach(element => {
                             __tr +=  '<tr>' +
-                                        '<td>'+ element.total +'</td>' +
-                                        '<td>'+ element.currency +'</td>' +
-                                        '<td>'+ element.exchange_rate +'</td>' +
-                                        '<td>'+ element.payment_method +'</td>' +
-                                        '<td>'+ element.reference +'</td>' +
-                                    '</tr>';                            
-                        });
+                                        '<td class="text-center">'+ element.total +'</td>' +
+                                        '<td class="text-center">'+ ( element.exchange_rate > 1 ? ( element.total / element.exchange_rate ) : element.total ) +'</td>' +
+                                        '<td class="text-center">'+ element.currency +'</td>' +
+                                        '<td class="text-center">'+ element.exchange_rate +'</td>' +
+                                        '<td class="text-center">'+ element.payment_method +'</td>' +
+                                        '<td class="text-center">'+ element.reference +'</td>' +
+                                    '</tr>';
+                            __total += parseFloat(( element.exchange_rate > 1 ? ( element.total / element.exchange_rate ) : element.total ));
+                        });                        
                     }else{
                         __tr =  '<tr align="center">' +
                                     '<td colspan="5">no hay pagos</td>' +
                                 '</tr>';                         
                     }
-                    __container.innerHTML = __tr;                    
+
+                    __tr_footer = '<tr>' +
+                                    '<td class="text-center">0</td>' +
+                                    '<td class="text-center">'+ __total +'</td>' +
+                                    '<td class="text-center"></td>' +
+                                    '<td class="text-center"></td>' +
+                                    '<td class="text-center"></td>' +
+                                    '<td class="text-center"></td>' +
+                                '</tr>';
+
+                    __container.innerHTML = __tr;
+                    __footer.innerHTML = __tr_footer;
                 }
             });        
         });        

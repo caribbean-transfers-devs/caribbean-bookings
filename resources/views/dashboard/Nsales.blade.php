@@ -279,6 +279,8 @@
 
 @section('content')
 
+    @dump($bookingsData);
+
     <div id="overlayDashboard" class="overlayDashboard"></div>
     <div id="popover" class="popover" data-bs-placement="right">
         <div class="popover-arrow"></div>

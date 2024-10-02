@@ -46,7 +46,7 @@ class ReservationsRepository
             "is_balance" => ( isset($request->is_balance) ? $request->is_balance : 0 ),
         ];
         
-        //Query DB        
+        //Query DB
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.is_duplicated = 0 ';
         $havingConditions = []; $query2 = '';
 
@@ -85,7 +85,7 @@ class ReservationsRepository
         //ESTATUS DE RESERVACIÓN
         if(isset( $request->status_booking ) && !empty( $request->status_booking )){
             $params = $this->parseArrayQuery($request->status_booking,"single");
-            $havingConditions[] = " status IN (".$params.") ";
+            $havingConditions[] = " reservation_status IN (".$params.") ";
         }
 
         //TIPO DE VEHÍCULO

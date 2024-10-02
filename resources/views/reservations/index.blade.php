@@ -5,6 +5,68 @@
     use Carbon\Carbon;
 @endphp
 @php
+    $bookingsStatus = [
+        'ACCUMULATED' => [
+            "total" => 0,
+            "USD" => [
+                "total" => 0,
+                "counter" => 0,
+            ],
+            "MXN" => [
+                "total" => 0,
+                "counter" => 0,
+            ],
+            "counter" => 0,
+        ],
+        'CONFIRMED' => [
+            "total" => 0,
+            "USD" => [
+                "total" => 0,
+                "counter" => 0,
+            ],
+            "MXN" => [
+                "total" => 0,
+                "counter" => 0,
+            ],
+            "counter" => 0,
+        ],
+        'PENDING' => [
+            "total" => 0,
+            "USD" => [
+                "total" => 0,
+                "counter" => 0,
+            ],
+            "MXN" => [
+                "total" => 0,
+                "counter" => 0,
+            ],
+            "counter" => 0,
+        ],            
+        'CANCELLED' => [
+            "total" => 0,
+            "USD" => [
+                "total" => 0,
+                "counter" => 0,
+            ],
+            "MXN" => [
+                "total" => 0,
+                "counter" => 0,
+            ],
+            "counter" => 0,
+        ],
+        'OPENCREDIT' => [
+            "total" => 0,
+            "USD" => [
+                "total" => 0,
+                "counter" => 0,
+            ],
+            "MXN" => [
+                "total" => 0,
+                "counter" => 0,
+            ],
+            "counter" => 0,
+        ],
+    ];
     $resume = [
         'status' => [
             'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
@@ -101,7 +163,7 @@
                             <th class="text-center">HORA DE RESERVACIÓN</th>
                             <th class="text-center">SITIO</th>
                             <th class="text-center">ORIGEN DE VENTA</th>
-                            <th class="text-center">ESTATUS RESERVACIÓN</th>
+                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>
                             <th class="text-center">NOMBRE DEL CLIENTE</th>
                             <th class="text-center">TELÉFONO DEL CLIENTE</th>
                             <th class="text-center">CORREO DEL CLIENTE</th>
@@ -111,7 +173,10 @@
                             <th class="text-center">DESDE</th>
                             <th class="text-center">DESTINO</th>
                             <th class="text-center">HACIA</th>
-                            <th class="text-center">TOTAL RESERVACIÓN</th>
+                            <th class="text-center">FECHA DE SERVICIO</th>
+                            <th class="text-center">HORA DE SERVICIO</th>
+                            <th class="text-center">ESTATUS DE SERVICIO</th>
+                            <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">BALANCE</th>
                             <th class="text-center">COSTO POR SERVICIO</th>
                             <th class="text-center">MONEDA</th>
@@ -122,13 +187,18 @@
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
-                                {{-- @if ( $item->reservation_id == 36772 || $item->reservation_id == 36770 )
+                                {{-- @if ( $item->reservation_id == 37165 )
                                     @dump($item)
                                 @endif --}}
                                 {{-- @if ( $item->status == "UNKNOWN" )
                                     @dd($item)
                                 @endif --}}
                                 @php
+                                    $bookingsStatus['ACCUMULATED']['total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $bookingsStatus['ACCUMULATED'][$item->currency]['total'] += $item->total_sales;
+                                    $bookingsStatus['ACCUMULATED'][$item->currency]['counter']++;
+                                    $bookingsStatus['ACCUMULATED']['counter']++;
+
                                     if($item->is_cancelled == 0):
                                         // $resume['status'][$item->status][$item->currency] += $item->total_sales;
                                         // $resume['status'][$item->status]['count']++;
@@ -192,7 +262,7 @@
                                     <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ $item->site_name }}</td>
                                     <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' }}</td>
-                                    <td class="text-center"><span class="badge badge-light-{{ GeneralTrait::classStatusBooking($item->status) }}">{{ GeneralTrait::statusBooking($item->status) }}</span></td> 
+                                    <td class="text-center"><span class="badge badge-light-{{ GeneralTrait::classStatusBooking($item->reservation_status) }}">{{ GeneralTrait::statusBooking($item->reservation_status) }}</span></td>
                                     <td class="text-center">{{ $item->full_name }}</td>
                                     <td class="text-center">{{ $item->client_phone }}</td>
                                     <td class="text-center">{{ $item->client_email }}</td>
@@ -202,6 +272,24 @@
                                     <td class="text-center">{{ $item->from_name }}</td>
                                     <td class="text-center">{{ $item->destination_name_to }}</td>
                                     <td class="text-center">{{ $item->to_name }}</td>
+                                    <td class="text-center">
+                                        [{{ date("Y-m-d", strtotime($item->pickup_from)) }}] <br>
+                                        @if ( $item->is_round_trip != 0 )
+                                            [{{ date("Y-m-d", strtotime($item->pickup_to)) }}]
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        [{{ date("H:i", strtotime($item->pickup_from)) }}] <br>
+                                        @if ( $item->is_round_trip != 0 )
+                                            [{{ date("H:i", strtotime($item->pickup_to)) }}]
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <?=GeneralTrait::parseServiceStatus($item->one_service_status)?><br>
+                                        @if ( $item->is_round_trip != 0 )
+                                            <?=GeneralTrait::parseServiceStatus($item->two_service_status)?>
+                                        @endif
+                                    </td>                                    
                                     <td class="text-center">{{ number_format(($item->total_sales),2) }}</td>
                                     <td class="text-center" {{ (($item->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>
                                     {{-- <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td> --}}
@@ -216,150 +304,10 @@
                 </table>
             </div>
         </div>
-        {{-- <div class="col-xl-3 col-lg-12 col-12 ">
-            <div class="widget widget-chart-three mb-3">
-                <div class="widget-heading">
-                    <div class="">
-                        <h5>Resumen por estatus</h5>
-                    </div>
-                </div>
-                <div class="widget-content">
-                    <div class="table-responsive">
-                        <table class="table dt-table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="width:35%;">Estatus</th>
-                                    <th style="width:25%">Cantidad</th>
-                                    <th class="text-center">USD</th>
-                                    <th class="text-center">MXN</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($resume['status'] as $key => $value)
-                                @php
-                                    if( $key == "PENDING" || $key == "CONFIRMED" ):
-                                        $resume_total = $resume_total + $value['count'];
-                                        $resume_total_mxn = $resume_total_mxn + $value['USD'];
-                                        $resume_total_usd = $resume_total_usd + $value['MXN'];
-                                    endif;
-                                @endphp
-                                <tr>
-                                    <td>{{ strtolower( $key) }}</td>
-                                    <td class="text-center">{{ $value['count'] }}</td>
-                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
-                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                            <tfooter>
-                                <tr>
-                                    <td>Total</td>
-                                    <td class="text-center">{{ $resume_total }}</td>                                    
-                                    <td class="text-end">{{ $resume_total_mxn }}</td>
-                                    <td class="text-end">{{ $resume_total_usd }}</td>
-                                </tr>
-                            </tfooter>                             
-                        </table>
-                    </div>
-                </div>
-            </div>
+    </div>
 
-            <div class="widget widget-chart-three mb-3">
-                <div class="widget-heading">
-                    <div class="">
-                        <h5>Resumen por sitio</h5>
-                    </div>
-                </div>
-                <div class="widget-content">
-                    <div class="table-responsive">
-                        <table class="table dt-table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="width:35%;">Estatus</th>
-                                    <th style="width:25%">Cantidad</th>
-                                    <th class="text-center">USD</th>
-                                    <th class="text-center">MXN</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($sites as $key => $value)
-                                <tr>
-                                    <td>{{ strtolower( $key) }}</td>
-                                    <td class="text-center">{{ $value['count'] }}</td>
-                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
-                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="widget widget-chart-three mb-3">
-                <div class="widget-heading">
-                    <div class="">
-                        <h5>Resumen por destino</h5>
-                    </div>
-                </div>
-                <div class="widget-content">
-                    <div class="table-responsive">
-                        <table class="table dt-table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="width:35%;">Destino</th>
-                                    <th style="width:25%">Cantidad</th>
-                                    <th class="text-center">USD</th>
-                                    <th class="text-center">MXN</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($destinations as $key => $value)
-                                <tr>
-                                    <td>{{ strtolower( $key) }}</td>
-                                    <td class="text-center">{{ $value['count'] }}</td>
-                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
-                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="widget widget-chart-three">
-                <div class="widget-heading">
-                    <div class="">
-                        <h5>Resumen afiliados</h5>
-                    </div>
-                </div>
-                <div class="widget-content">
-                    <div class="table-responsive">
-                        <table class="table dt-table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="width:35%;">Estatus</th>
-                                    <th style="width:25%">Cantidad</th>
-                                    <th class="text-center">USD</th>
-                                    <th class="text-center">MXN</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($affiliates as $key => $value)
-                                <tr>
-                                    <td>{{ strtolower( $key) }}</td>
-                                    <td class="text-center">{{ $value['count'] }}</td>
-                                    <td class="text-end">{{ number_format($value['USD'],2) }}</td>
-                                    <td class="text-end">{{ number_format($value['MXN'],2) }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
+    <div>
+        {{-- @dump($bookingsStatus); --}}
     </div>
 
     <x-modals.reports.modal :data="$data" :services="$services" :vehicles="$vehicles" :status="$status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" :isbalance="1" />

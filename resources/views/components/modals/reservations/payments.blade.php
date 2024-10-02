@@ -12,16 +12,20 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Total</th>
-                            <th>Moneda</th>
-                            <th>Tipo de cambio</th>
-                            <th>Método de pago</th>
-                            <th>Referencia</th>
+                            <th class="text-center">Total original</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-center">Moneda</th>
+                            <th class="text-center">Tipo de cambio</th>
+                            <th class="text-center">Método de pago</th>
+                            <th class="text-center">Referencia</th>
                         </tr>
                     </thead>
                     <tbody id="containerReservationPayments">
 
                     </tbody>
+                    <tfoot id="footerReservationPayments">
+
+                    </tfoot>
                 </table>
             </div>
             <div class="modal-footer">
