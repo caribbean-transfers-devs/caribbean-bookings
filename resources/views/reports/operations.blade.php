@@ -25,8 +25,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="{{ mix('assets/js/sections/reservations/bookings.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/reports/operations.min.js') }}"></script>
 @endpush
 
 @section('content')
+
 @endsection
