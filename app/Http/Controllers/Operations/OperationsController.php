@@ -65,11 +65,10 @@ class OperationsController extends Controller
             $queryTwo .= " AND it.driver_id_two IN ($params) ";            
         }
 
-
         $items = $this->queryBookings($search, $queryOne, $queryTwo);
 
         return view('operation.operations', [
-            'items' => $items, 
+            'items' => $items,
             'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ), 
             'nexDate' => date('Y-m-d', strtotime($request->date . ' +1 day')), 
             'breadcrumbs' => [

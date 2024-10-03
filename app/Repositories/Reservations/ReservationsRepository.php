@@ -35,7 +35,7 @@ class ReservationsRepository
             "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
             "site" => ( isset($request->site) ? $request->site : 0 ),
             "origin" => ( isset($request->origin) ? $request->origin : NULL ),
-            "status_booking" => ( isset($request->status_booking) ? $request->status_booking : 0 ),
+            "reservation_status" => ( isset($request->reservation_status) ? $request->reservation_status : 0 ),
             "product_type" => ( isset($request->product_type) ? $request->product_type : 0 ),
             "zone_one_id" => ( isset($request->zone_one_id) ? $request->zone_one_id : 0 ),
             "zone_two_id" => ( isset($request->zone_two_id) ? $request->zone_two_id : 0 ),
@@ -49,7 +49,6 @@ class ReservationsRepository
         //Query DB
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.is_duplicated = 0 ';
         $havingConditions = []; $query2 = '';
-
         $queryData = [
             'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
             'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
@@ -83,8 +82,8 @@ class ReservationsRepository
         }
 
         //ESTATUS DE RESERVACIÓN
-        if(isset( $request->status_booking ) && !empty( $request->status_booking )){
-            $params = $this->parseArrayQuery($request->status_booking,"single");
+        if(isset( $request->reservation_status ) && !empty( $request->reservation_status )){
+            $params = $this->parseArrayQuery($request->reservation_status,"single");
             $havingConditions[] = " reservation_status IN (".$params.") ";
         }
 
@@ -166,7 +165,7 @@ class ReservationsRepository
                     )";
         }
 
-        if(  (isset( $request->status_booking ) && !empty( $request->status_booking )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance ) && !empty( $request->is_balance)) || (isset( $request->is_today ) && !empty( $request->is_today)) ){
+        if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance ) && !empty( $request->is_balance)) || (isset( $request->is_today ) && !empty( $request->is_today)) ){
             $query2 = " HAVING " . implode(' AND ', $havingConditions);
         }
                 
@@ -185,14 +184,13 @@ class ReservationsRepository
             'services' => $this->Services(),
             'websites' => $this->Sites(),
             'origins' => $this->Origins(),
-            'status' => $this->Status(),
+            'reservation_status' => $this->reservationStatus(),
             'vehicles' => $this->Vehicles(),
             'zones' => $this->Zones(),
             'currencies' => $this->Currencies(),
             'methods' => $this->Methods(),
             'cancellations' => $this->CancellationTypes(),
             'data' => $data,
-            'request' => $request,
         ]);
     }
 

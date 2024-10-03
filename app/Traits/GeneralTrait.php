@@ -69,7 +69,7 @@ trait GeneralTrait
         return CancellationTypes::where('status',1)->get();
     }
 
-    public function Status(){
+    public function reservationStatus(){
         return array(
             "CONFIRMED" => "Confirmado",
             "PENDING" => "Pendiente",

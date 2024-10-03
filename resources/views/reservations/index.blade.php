@@ -106,13 +106,12 @@
 
 @section('content')
     @php
-        // dump($request->input());
         $buttons = array(
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
                 'className' => 'btn btn-primary __btn_create',
                 'attr' => array(
-                    'data-title' =>  "Filtro de reservaciones",
+                    'data-title' =>  "Filtros de reservaciones",
                     'data-bs-toggle' => 'modal',
                     'data-bs-target' => '#filterModal',
                 )
@@ -310,7 +309,7 @@
         {{-- @dump($bookingsStatus); --}}
     </div>
 
-    <x-modals.reports.modal :data="$data" :services="$services" :vehicles="$vehicles" :status="$status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" :isbalance="1" />
+    <x-modals.filters.bookings :data="$data" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" :isbalance="1" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />
 @endsection

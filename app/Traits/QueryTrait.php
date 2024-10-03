@@ -9,7 +9,7 @@ trait QueryTrait
 {
 
     // pay_at_arrival: INDICA PAGO A LA LLEGADA PORQUE ELIGIO LA OPCION DE PAGO EN EFECTIVO
-    public function queryBookings($query, $query2, $data){
+    public function queryBookings($query, $query2, $queryData){
         $bookings = DB::select("SELECT 
                                     rez.id AS reservation_id, 
                                     CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name,
@@ -30,6 +30,7 @@ trait QueryTrait
                                     site.name AS site_name,
                                     origin.code AS origin_code,
                                     tc.name_es AS cancellation_reason,
+
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
@@ -40,7 +41,7 @@ trait QueryTrait
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                         ELSE 'UNKNOWN'
-                                    END AS reservation_status,                                    
+                                    END AS reservation_status,
                                     -- CASE
                                     --     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     --     ELSE 'CONFIRMED'
@@ -135,13 +136,269 @@ trait QueryTrait
                                     ) as it ON it.reservation_id = rez.id
                                     WHERE 1=1 {$query}
                                 GROUP BY rez.id, site.name {$query2}",
-                                    $data);
+                                    $queryData);
 
         if(sizeof( $bookings ) > 0):
             usort($bookings, array($this, 'orderByDateTime'));
         endif;
 
         return $bookings;
+    }
+
+    public function queryOperations($queryOne, $queryTwo, $queryData){
+        return  DB::select("SELECT 
+                                rez.id as reservation_id,
+                                CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
+                                rez.client_email,
+                                rez.client_phone,
+                                rez.currency,
+                                rez.is_cancelled,
+                                rez.site_id,
+                                rez.pay_at_arrival,
+                                rez.reference,
+                                rez.affiliate_id,
+                                rez.terminal,
+                                rez.comments,
+                                rez.is_duplicated,
+                                rez.open_credit,
+                                rez.is_complete,
+                                rez.created_at,
+                                site.name as site_name,
+                                origin.code AS origin_code,
+                                tc.name_es AS cancellation_reason,                                
+
+                                CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
+                                CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+
+                                COALESCE(SUM(s.total_sales), 0) as total_sales, 
+                                COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+                                CASE
+                                    WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
+                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                    WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
+                                    ELSE 'UNKNOWN'
+                                END AS reservation_status,
+
+                                it.*,
+                                it.op_one_pickup as filtered_date, 
+                                'arrival' as operation_type,
+                                'TYPE_ONE' as op_type,
+                                it.code,
+                                it.passengers,
+
+                                zone_one.id as zone_one_id,
+                                zone_one.name as destination_name_from,
+                                -- zone_one.name as zone_one_name,
+                                zone_one.is_primary as zone_one_is_primary, 
+                                zone_one.cut_off as zone_one_cut_off,
+                                it.op_one_status as one_service_status,
+                                it.op_one_status_operation as one_service_operation_status,
+                                it.op_one_time_operation,
+                                it.op_one_preassignment,
+                                it.op_one_operating_cost,
+                                it.op_one_pickup as pickup_from,
+
+                                zone_two.id as zone_two_id, 
+                                zone_two.name as destination_name_to,
+                                -- zone_two.name as zone_two_name, 
+                                zone_two.is_primary as zone_two_is_primary, 
+                                zone_two.cut_off as zone_two_cut_off,
+                                it.op_two_status as two_service_status,
+                                it.op_two_status_operation as two_service_operation_status,
+                                it.op_two_time_operation,
+                                it.op_two_preassignment,
+                                it.op_two_operating_cost,                                
+                                it.op_two_pickup as pickup_to,
+
+                                CASE 
+                                    WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 1 THEN 'DEPARTURE'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                END AS final_service_type,
+
+                                serv.id as service_type_id,
+                                serv.name as service_type_name,
+
+                                GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+
+                                vehicle_one.name as vehicle_one_name,
+                                vehicle_two.name as vehicle_two_name,
+
+                                CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
+                                CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name
+
+                            FROM reservations_items as it
+                                INNER JOIN reservations as rez ON rez.id = it.reservation_id
+                                INNER JOIN sites as site ON site.id = rez.site_id
+                                LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
+                                LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
+                                
+                                INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
+                                INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
+                                INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
+
+                                LEFT OUTER JOIN vehicles as vehicle_one ON vehicle_one.id = it.vehicle_id_one
+                                LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
+                                LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
+                                LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+
+                                LEFT OUTER JOIN reservations_media as upload ON upload.reservation_id = rez.id
+                                LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND rfu.type IN ('CLIENT', 'OPERATION')
+
+                                LEFT JOIN (
+                                    SELECT 
+                                        reservation_id,  
+                                        ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+                                    FROM sales
+                                        WHERE deleted_at IS NULL
+                                    GROUP BY reservation_id
+                                ) as s ON s.reservation_id = rez.id
+                                LEFT JOIN (
+                                    SELECT 
+                                        reservation_id,
+                                        ROUND(SUM(CASE 
+                                            WHEN operation = 'multiplication' THEN total * exchange_rate
+                                            WHEN operation = 'division' THEN total / exchange_rate
+                                            ELSE total END), 2) AS total_payments,
+                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
+                                    FROM payments
+                                    GROUP BY reservation_id
+                                ) as p ON p.reservation_id = rez.id
+                            WHERE 1=1 {$queryOne}                                   
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id
+
+                            UNION
+
+                            SELECT 
+                                rez.id as reservation_id,
+                                CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
+                                rez.client_email,
+                                rez.client_phone,
+                                rez.currency,
+                                rez.is_cancelled,
+                                rez.site_id,
+                                rez.pay_at_arrival,
+                                rez.reference,
+                                rez.affiliate_id,
+                                rez.terminal,
+                                rez.comments,
+                                rez.is_duplicated,
+                                rez.open_credit,
+                                rez.is_complete,
+                                rez.created_at,
+                                site.name as site_name,
+                                origin.code AS origin_code,
+                                tc.name_es AS cancellation_reason,                                 
+
+                                CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
+                                CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+
+                                COALESCE(SUM(s.total_sales), 0) as total_sales, 
+                                COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+                                CASE
+                                    WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
+                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                    WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
+                                    ELSE 'UNKNOWN'
+                                END AS reservation_status,
+
+                                it.*,                                
+                                it.op_two_pickup as filtered_date,
+                                'departure' as operation_type,                                  
+                                'TYPE_TWO' as op_type,
+                                it.code,
+                                it.passengers,
+
+                                zone_one.id as zone_one_id,
+                                zone_one.name as destination_name_from,
+                                -- zone_one.name as zone_one_name,
+                                zone_one.is_primary as zone_one_is_primary, 
+                                zone_one.cut_off as zone_one_cut_off,
+                                it.op_one_status as one_service_status,
+                                it.op_one_status_operation as one_service_operation_status,
+                                it.op_one_time_operation,
+                                it.op_one_preassignment,
+                                it.op_one_operating_cost,
+                                it.op_one_pickup as pickup_from,
+
+                                zone_two.id as zone_two_id, 
+                                zone_two.name as destination_name_to,
+                                -- zone_two.name as zone_two_name, 
+                                zone_two.is_primary as zone_two_is_primary, 
+                                zone_two.cut_off as zone_two_cut_off,
+                                it.op_two_status as two_service_status,
+                                it.op_two_status_operation as two_service_operation_status,
+                                it.op_two_time_operation,
+                                it.op_two_preassignment,
+                                it.op_two_operating_cost,                                
+                                it.op_two_pickup as pickup_to,
+
+                                CASE
+                                    WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                    ELSE 'ARRIVAL'
+                                END AS final_service_type,
+
+                                serv.id as service_type_id,
+                                serv.name as service_type_name,
+
+                                GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+
+                                vehicle_one.name as vehicle_one_name,
+                                vehicle_two.name as vehicle_two_name,
+
+                                CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
+                                CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name
+                            FROM reservations_items as it
+                                INNER JOIN reservations as rez ON rez.id = it.reservation_id
+                                INNER JOIN sites as site ON site.id = rez.site_id
+                                LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
+                                LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
+                                                                                                
+                                INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
+                                INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
+                                INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
+
+                                LEFT OUTER JOIN vehicles as vehicle_one ON vehicle_one.id = it.vehicle_id_one
+                                LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
+                                LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
+                                LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+
+                                LEFT OUTER JOIN  reservations_media as upload ON upload.reservation_id = rez.id
+                                LEFT JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND rfu.type IN ('CLIENT', 'OPERATION')
+
+                                LEFT JOIN (
+                                    SELECT 
+                                        reservation_id,  
+                                        ROUND( COALESCE(SUM(total), 0), 2) as total_sales                                            
+                                    FROM sales
+                                        WHERE deleted_at IS NULL
+                                    GROUP BY reservation_id
+                                ) as s ON s.reservation_id = rez.id
+                                LEFT JOIN (
+                                    SELECT 
+                                        reservation_id,
+                                        ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                WHEN operation = 'division' THEN total / exchange_rate
+                                                ELSE total END), 2) AS total_payments,
+                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
+                                    FROM payments
+                                        GROUP BY reservation_id
+                                ) as p ON p.reservation_id = rez.id
+                            WHERE 1=1 {$queryTwo}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id
+                            ORDER BY filtered_date ASC",[
+                                "init_date_one" => $queryData['init'],
+                                "init_date_two" => $queryData['end'],
+                                "init_date_three" => $queryData['init'],
+                                "init_date_four" => $queryData['end'],
+                            ]);
     }
 
     private function orderByDateTime($a, $b) {
