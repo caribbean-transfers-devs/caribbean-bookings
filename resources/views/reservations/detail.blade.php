@@ -31,8 +31,10 @@
         </div>
 
         <div class="row">
-
-            <div class="col-xxl-3 col-xl-4 col-12">
+            @php
+                // dump($reservation);
+            @endphp
+            <div class="col-xxl-3 col-xl-4 col-12"> 
                 <div class="card">
                     <div class="card-header">
                         <div class="card-actions float-end">
@@ -110,12 +112,18 @@
                                             <td><span class="badge bg-success">ACEPTADO</span></td>
                                         </tr>
                                     @endif
+                                    @if( isset( $reservation->originSale->code ) )
+                                        <tr>
+                                            <th>Origen de venta</th>
+                                            <td>{{ $reservation->originSale->code }}</td>
+                                        </tr>                                    
+                                    @endif
                                     @if( isset( $reservation->cancellationType->name_es ) )
                                         <tr>
                                             <th>Motivo de cancelación</th>
                                             <td>{{ $reservation->cancellationType->name_es }}</td>
                                         </tr>
-                                    @endif                                
+                                    @endif
                                 </tbody>
                             </table>
                         </div>

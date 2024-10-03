@@ -257,6 +257,15 @@ select.bs-select-hidden, select.selectpicker {
     display: inline-block;
     right: 15px;
     margin-top: 5px; }
+  .bootstrap-select.btn-group.show-tick .dropdown-menu a.selected span.dropdown-item-inner span.check-mark::after{
+    content: "";
+    display: block;
+    height: 1em;
+    transform: rotate(45deg);
+    width: 0.5em;
+    border-style: solid;
+    border-width: 0px 0.26em 0.26em 0px;    
+  }
   
   .bootstrap-select.btn-group.show-tick .dropdown-menu a a span.text {
     margin-right: 34px; }

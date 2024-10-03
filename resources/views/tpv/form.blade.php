@@ -37,7 +37,6 @@
                 </div>
             @endforeach
         @endif
-
     </div>
     <div class="right_">
 
@@ -99,6 +98,7 @@
                 <div>
                     <label class="form-label" for="formOriginSale">Origen de venta</label>
                     <select class="form-control" id="formOriginSale" name="origin_sale_id">
+                        <option value="">Selecciona un origen de venta</option>
                         @if (isset( $origin_sales ) && sizeof($origin_sales) >= 1)
                             @foreach ($origin_sales as $origin_sale)
                                 <option value="{{ $origin_sale->id }}">{{ $origin_sale->code }}</option>
@@ -108,7 +108,7 @@
                 </div>
                 <div>
                     <label class="form-label" for="formReference">Referencia</label>
-                    <input class="form-control" type="text" name="data[callcenter][reference]" id="formReference" autocomplete="off">                                    
+                    <input class="form-control" type="text" name="data[callcenter][reference]" id="formReference" readonly autocomplete="off">                                    
                 </div>
                 <div>
                     <label class="form-label" for="formAgent">Agente</label>

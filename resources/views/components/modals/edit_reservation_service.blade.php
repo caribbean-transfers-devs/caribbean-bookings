@@ -8,8 +8,17 @@
             <div class="modal-body">
                 <form id="edit_reservation_service">
                     <div class="row">
+
+                        <div class="col-sm-12 col-md-12 serviceTypeForm d-none">
+                            <label class="form-label" for="serviceTypeForm">Tipo de servicio</label>
+                            <select class="form-control mb-2" id="serviceTypeForm">
+                                <option value="0">Selecciona una opción</option>
+                                <option value="1">Round Trip</option>
+                            </select>
+                        </div>
+
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="serviceTypeForm">Tipo</label>
+                            <label class="form-label" for="destinationTypeForm">Tipo</label>
                             <select class="form-control mb-2" id="destination_serv" name="destination_service_id">
                                 @foreach ($services as $service)
                                     <option value="{{ $service->id }}">{{ $service->name }}</option>

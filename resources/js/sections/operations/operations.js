@@ -195,13 +195,17 @@ let setup = {
             });
         }
 
-        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
+        // _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
+        //                 <''tr>
+        //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count mb-sm-0 mb-3'i><'dt--pagination'p>>`;
+        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                         <''tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>`;
+                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
         _settings.deferRender = true;
         _settings.responsive = true;
         _settings.buttons =  _buttons;
         _settings.order = [[ 2, "asc" ]];
+        // _settings.order = [];
         _settings.paging = false;
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
@@ -219,21 +223,18 @@ let setup = {
 
         table.DataTable( _settings );
     },
-
     bsTooltip: function() {
         var bsTooltip = document.querySelectorAll('.bs-tooltip')
         for (let index = 0; index < bsTooltip.length; index++) {
             var tooltip = new bootstrap.Tooltip(bsTooltip[index])
         }
     },
-
     bsPopover: function() {
         var bsPopover = document.querySelectorAll('.bs-popover');
         for (let index = 0; index < bsPopover.length; index++) {
             var popover = new bootstrap.Popover(bsPopover[index])
         }
     },
-
     setStatus: function(_status){
         let alert_type = 'btn-secondary';
         switch (_status) {
@@ -260,7 +261,6 @@ let setup = {
         }
         return alert_type;
     },
-
     setPreassignment: function(_operation){
         let alert_type = 'btn-success';
         switch (_operation) {
@@ -279,13 +279,11 @@ let setup = {
         }
         return alert_type;                
     },
-
     isTime: function(hora) {
         // Expresión regular para validar formato HH:MM
         const regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
         return regex.test(hora);
     },
-
     obtenerHoraActual: function() {
         const ahora = new Date();
         const horas = String(ahora.getHours()).padStart(2, '0');
@@ -293,6 +291,14 @@ let setup = {
         return `${horas}:${minutos}`;
     }
 };
+
+if( document.querySelector('.table-rendering') != null ){
+    setup.actionTable($('.table-rendering'));
+}
+setup.bsPopover();
+setup.bsTooltip();
+components.setValueSelectpicker();
+components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
 
 //CONFIGURACION DE DROPZONE
 Dropzone.options.uploadForm = {
@@ -342,7 +348,7 @@ const __open_modal_comments = document.querySelectorAll('.__open_modal_comment')
 const __title_modal = document.getElementById('filterModalLabel');
 const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
 const __btn_preassignment = document.getElementById('btn_preassignment') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
-const __btn_addservice = document.getElementById('btn_addservice') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
+// const __btn_addservice = document.getElementById('btn_addservice') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
 const __btn_close_operation = document.getElementById('btn_close_operation') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
 
 const __btn_update_status_operations = document.querySelectorAll('.btn_update_status_operation');
@@ -357,9 +363,17 @@ const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhos
 console.log(socket);
 socket.on('connection');
 
-setup.bsPopover();
-setup.bsTooltip();
-
+if ( document.getElementById('lookup_date') != null ) {
+    const picker = new easepick.create({
+        element: "#lookup_date",
+        css: [
+            'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+            'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+            'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
+        ],
+        zIndex: 10,
+    });   
+}
 function history(){
     setup.bsTooltip();
     const __open_modal_historys = document.querySelectorAll('.__open_modal_history');
@@ -569,31 +583,13 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
     // window.location.href = text;
 });
 
-if ( document.getElementById('lookup_date') != null ) {
-  const picker = new easepick.create({
-      element: "#lookup_date",
-      css: [
-          'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-          'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-          'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-      ],
-      zIndex: 10,
-  });   
-}
-
-if( document.querySelector('.table-rendering') != null ){
-  setup.actionTable($('.table-rendering'));
-}
-
-components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
-
 //ABRE EL MODAL PARA PODER AGREGAR UN NUEVO SERVICIO
-if ( __btn_addservice != null ) {
-  __btn_addservice.addEventListener('click', function(event) {
-      event.preventDefault();
-      $("#operationModal").modal('show');
-  });
-}
+// if ( __btn_addservice != null ) {
+//   __btn_addservice.addEventListener('click', function(event) {
+//       event.preventDefault();
+//       $("#operationModal").modal('show');
+//   });
+// }
 
 if( __btn_preassignment != null ){
   __btn_preassignment.addEventListener('click', function() {
@@ -1108,6 +1104,8 @@ if( document.getElementById('btn_dowload_operation') != null ){
     document.getElementById('btn_dowload_operation').addEventListener('click', function() {
         let date = document.getElementById('lookup_date').value;
         let url = '/operation/board/exportExcel?date=' + date ;
+        // console.log(url);
+        
         components.loadScreen();
 
         fetch(url, {

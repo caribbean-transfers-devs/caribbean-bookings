@@ -22,6 +22,7 @@ class TpvCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'origin_sale_id' => 'required|integer',
             'service_token' => 'required',
             'first_name' => 'required|max:75',
             'last_name' => 'required|max:75',
@@ -29,6 +30,7 @@ class TpvCreateRequest extends FormRequest
             'phone' => 'required',
             'site_id' => 'required|integer',
             'call_center_agent' => 'required|integer',
+
         ];
     }
 
@@ -38,6 +40,7 @@ class TpvCreateRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'origin_sale_id.required' => 'Debe seleccionar un origen de venta',
             'service_token.required' => 'Debe seleccionar un servicio',
             'first_name.required' => 'El nombre es requerido',
             'last_name.required' => 'El apellido es requerido',

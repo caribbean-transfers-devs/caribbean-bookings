@@ -36,7 +36,16 @@
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceClientReference">Referencia</label>
-                            <input type="text" class="form-control mb-2" id="serviceClientReference" name="reference" value="{{ $reservation->reference }}">
+                            <input type="text" class="form-control mb-2" id="serviceClientReference" name="reference" readonly value="{{ $reservation->reference }}">
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="originSale">Origen de venta</label>
+                            <select class="form-select mb-2" id="originSale" name="origin_sale_id">
+                                <option value="0">Selecciona una opción</option>
+                                @foreach($origins as $key => $origin)
+                                    <option value="{{ $origin->id }}" {{ $reservation->origin_sale_id == $origin->id ? 'selected' : '' }}>{{ $origin->code }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="originSale">Origen de venta</label>
@@ -54,6 +63,10 @@
                                 <option value="MXN" {{ $reservation->currency == 'MXN' ? 'selected' : '' }}>MXN</option>
                             </select>
                         </div>
+                        <div class="col-sm-12">
+                            <label class="form-label" for="bookingComment">Solicitudes especiales</label>
+                            <textarea class="form-control" name="special_request" id="formSpecialRequest"></textarea>
+                        </div>                        
                     </div>
                     <input type="hidden" id="reservation_id" value="{{ $reservation->id }}">
                 </form>

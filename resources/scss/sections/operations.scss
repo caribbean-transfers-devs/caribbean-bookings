@@ -7,7 +7,7 @@
 
 @import "../../plugins/flatpickr/flatpickr.scss";
 @import "../../plugins/notification/snackbar/snackbar";
-@import "../../plugins/bootstrap-select/bootstrap-select";
+@import "../../plugins/bootstrap-select/select";
 
 @import '../template/light/components/accordions';
 @import '../template/dark/components/accordions';
@@ -48,11 +48,18 @@
     }
 }
 
+//BOTONES QUE REALIZAN UNA ACCION COMO ABRI MODAL ENTRE OTRAS COSAS
 .btn_operations{
     padding: 0.375rem 0.75rem;
+    
+    svg{
+        width: 15px;
+        height: 15px;
+    }
 }
+
 .btn_status_action{
-    padding: 0.5rem !important;
+    padding: 0.4rem !important;
 }
 
 //MODIFICACIONES DE DATATABLES
@@ -66,30 +73,59 @@
     background-color: rgba(234, 241, 255, 0.74); /* Asegúrate de que el fondo sea blanco o del color de la tabla */
 }
 
-table.dataTable .form-control {
-    font-size: 0.625rem;
-  
-    &::-webkit-input-placeholder, &::-ms-input-placeholder, &::-moz-placeholder {
-      font-size: 0.625rem;
-    }
-}
+//CUSTOMER BOOTSTRAP SELECT 
+.table{ 
+    > tbody {
+        > tr {
+            > td {
+                .bootstrap-select{
+                    &.btn-group{
+                        > .dropdown-toggle{
+                            align-items: center;
+                            display: inline-flex;
+                            justify-content: space-between;
+                            position: relative;
+                            text-align: right;
+                            white-space: nowrap;
+                            width: 100%;
+                            font-size: .625rem;
+                        }
+                        &:not(.input-group-btn){
 
-:not(.input-group) > .bootstrap-select.form-control:not([class*="col-"]) {
-    height: calc(1.3em + 1.3rem + 2px);
-}
-
-.bootstrap-select{
-    .dropdown-toggle{
-        height: calc(1.3em + 1.3rem + 2px);
-        padding: 7px 16px;
-        line-height: 1.5;
-        white-space: unset;
-        
-        .filter-option{
-            // height: auto;
+                        }
+                    }
+                }
+            }
         }
-    }
-    .dropdown-menu{
-        border: 0 !important;
-    }
+    }    
 }
+
+// table.dataTable .form-control {
+//     font-size: 0.625rem;
+  
+//     &::-webkit-input-placeholder, 
+//     &::-ms-input-placeholder, 
+//     &::-moz-placeholder {
+//       font-size: 0.625rem;
+//     }
+// }
+
+// :not(.input-group) > .bootstrap-select.form-control:not([class*="col-"]) {
+//     height: calc(1.3em + 1.3rem + 2px);
+// }
+
+// .bootstrap-select{
+//     .dropdown-toggle{
+//         height: calc(1.3em + 1.3rem + 2px);
+//         padding: 7px 16px;
+//         line-height: 1.5;
+//         white-space: unset;
+        
+//         .filter-option{
+//             // height: auto;
+//         }
+//     }
+//     .dropdown-menu{
+//         border: 0 !important;
+//     }
+// }

@@ -215,10 +215,20 @@ class ReservationsRepository
                 $reservation->origin_sale_id = $request->origin_sale_id;
             }            
             $reservation->currency = $request->currency;
+            if( isset($request->origin_sale_id) && $request->origin_sale_id != 0 ){
+                $reservation->origin_sale_id = $request->origin_sale_id;
+            }
+
             if ( ($request->site_id == 11 || $request->site_id == 21) && $request->vendor_id == NULL && $request->terminal == NULL && count($payments) == 0 ) {
                 $reservation->is_complete = 0;
                 $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", completo la reservación de Taquilla, que se creo desde operaciones", 'HISTORY', 'EDICIÓN RESERVACIÓN');
             }
+
+            if( isset($request->special_request) && !empty($request->special_request) ){
+                $this->create_followUps($reservation->id, $request->special_request, 'CLIENT', auth()->user()->name);
+            }
+
+
             $reservation->save();
             DB::commit();
             return response()->json(['message' => 'Reservation updated successfully', 'success' => true], Response::HTTP_OK);
@@ -315,6 +325,11 @@ class ReservationsRepository
         try {
             DB::beginTransaction();
             $this->logBookingService($request, $item);
+
+            if( isset($request->serviceTypeForm) && $request->serviceTypeForm == 1 ){
+                $item->is_round_trip = $request->serviceTypeForm;
+            }
+
             $item->destination_service_id = $request->destination_service_id;
             $item->passengers = $request->passengers;
             $item->flight_number = $request->flight_number;
@@ -441,6 +456,8 @@ class ReservationsRepository
                     <p>*In case you require additional assistance, please send a message to the number $item->transactional_phone</p>
                     <p>Tips not included</p>
                     <p>All company personnel are identified with badges and uniforms, please do not pay attention to scam attempts as these payments will not be reimbursed</p>
+                    <p>When you are ready, meet our uniformed Caribbean Transfers staff at the Airport. </p>
+                    <img src="https://ik.imagekit.io/zqiqdytbq/transportation-api/mailing/terminals/rep.jpg?updatedAt=1725124715647" width="250">
             EOF;
         else:
             return <<<EOF
@@ -455,6 +472,8 @@ class ReservationsRepository
                 <p>*En caso de requerir ayuda adicional, envíe un mensaje al número $item->transactional_phone</p>
                 <p>Propinas no incluidas</p>
                 <p>Todo el personal de la empresa está identificado con gafete y uniforme por favor no haga caso de intentos de estafa ya que estos pagos no serán reembolsados.</p>
+                <p>Cuando esté listo, localice a nuestro personal uniformado de Caribbean Transfers en el Aeropuerto. </p>
+                <img src="https://ik.imagekit.io/zqiqdytbq/transportation-api/mailing/terminals/rep.jpg?updatedAt=1725124715647" width="250">
             EOF;            
         endif;
     }
@@ -713,6 +732,12 @@ class ReservationsRepository
             $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el sitio de: ".$site_old->name." a ".$site_new->name, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
 
+        if( isset($request->origin_sale_id) && $request->origin_sale_id != 0 && $request->origin_sale_id != $reservation->origin_sale_id ){
+            $origin_old = OriginSale::find($reservation->origin_sale_id);
+            $origin_new = OriginSale::find($request->origin_sale_id);
+            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el origen de venta de: ".( isset($origin_old->code) ? $origin_old->code : "NULL" )." a ".$origin_new->code, 'HISTORY', 'EDICIÓN RESERVACIÓN');
+        }
+
         if( $request->reference != $reservation->reference ){
             $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la referencia de: ".$reservation->reference." a ".$request->reference, 'HISTORY', 'EDICIÓN RESERVACIÓN');
         }
@@ -730,6 +755,11 @@ class ReservationsRepository
 
     // NOS PERMITE GENERAR EL LOG DE CADA UNO DE LOS CAMBIOS DE LOS SERVICIOS DE LA RESERVACIÓN
     public function logBookingService($request, $item){
+        //CAMBIANDO EL TIPO DE SERVICIO
+        if( ( isset($request->serviceTypeForm) && $request->serviceTypeForm == 1 ) && ( $request->serviceTypeForm != $item->is_round_trip ) ){
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el servicio: ".$item->id."(".$item->code.") de: One Way a Round Trip", 'HISTORY', 'EDICIÓN SERVICIO');
+        }        
+
         //LOG DE TIPO DE VEHÍVULO
         if( $request->destination_service_id != $item->destination_service_id ){
             $destination_old = DestinationService::find($item->destination_service_id);

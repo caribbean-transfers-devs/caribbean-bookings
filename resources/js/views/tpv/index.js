@@ -1,7 +1,7 @@
 var from_autocomplete = document.getElementById('aff-input-from');
 var to_autocomplete = document.getElementById('aff-input-to');
 
-let setup = {        
+let setup = {
   lang: 'es',
   currency: 'USD',
   deeplink: '/resultados',
@@ -180,7 +180,6 @@ let setup = {
   },
 };
 
-
 document.addEventListener('DOMContentLoaded', function() {
   const fechaInput = document.getElementById('bookingPickupForm');
   const rangeCheckbox = document.getElementById('flexSwitchCheckDefault');
@@ -209,6 +208,16 @@ document.addEventListener('DOMContentLoaded', function() {
   rangeCheckbox.addEventListener('change', updatePickerMode);
 });
 
+function loaderSites(){  
+  const __site = document.getElementById('formSite');
+  if( __site != null ){
+    actionSite(__site);
+    __site.addEventListener('change', function(event){
+      event.preventDefault();
+      actionSite(__site);    
+    });
+  }
+}
 
 function saveQuote(event){
   event.preventDefault();
@@ -218,21 +227,18 @@ function saveQuote(event){
           'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
       }
   });
-
   let frm_data = $("#bookingboxForm").serializeArray();
-
   $.ajax({
       url: '/tpv/quote',
       type: 'POST',
       data: frm_data,
-      beforeSend: function() {        
+      beforeSend: function() {
         $("#loadContent").html('<div class="loading"><span class="loader"></span></div>');
       },
       success: function(resp) {
-
         $("html, body").animate({ scrollTop: $("#loadContent").offset().top }, 300);
-
         $("#loadContent").html(resp);
+        loaderSites();
         $("#btn_quote").prop('disabled', false);
       },
   }).fail(function(xhr, status, error) {
@@ -281,8 +287,6 @@ function setTotal(total){
   $("#formTotal").attr("readonly", false);
 }
 
-
-
 function affDelayAutocomplete(callback, ms) {
   var timer = 0;
   return function () {
@@ -295,21 +299,18 @@ function affDelayAutocomplete(callback, ms) {
   };
 }
 
-
-
 from_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
   setup.autocomplete( e.target.value, 'aff-input-from-elements');
 }, 500));
 from_autocomplete.addEventListener('focus', (e) => {
   setup.autocomplete( e.target.value, 'aff-input-from-elements');
 });
-to_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {        
+to_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
   setup.autocomplete( e.target.value, 'aff-input-to-elements');
 }, 500));
 to_autocomplete.addEventListener('focus', (e) => {
   setup.autocomplete( e.target.value, 'aff-input-to-elements');
 });
-
 
 $(document).on("change", "#formSite", function() {
   var selectedValue = $(this).val();
@@ -320,3 +321,12 @@ $(document).on("change", "#formSite", function() {
   }
   $("#formTotal").attr("readonly", false);
 });
+
+function actionSite(__site){
+  const __reference = document.getElementById('formReference');
+  if( __site.value == "9" || __site.value == "14" || __site.value == "16" ){
+    __reference.removeAttribute('readonly');
+  }else{
+    __reference.setAttribute('readonly', true);
+  }
+}

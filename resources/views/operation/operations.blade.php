@@ -36,8 +36,79 @@
 @section('content')
     @php
         $total_close = 0;
-        $buttons = array();
-        // dump($buttons);
+        $buttons = array(
+            array(
+                'text' => 'Filtros',
+                'className' => 'btn btn-primary',
+                'attr' => array(
+                    'data-title' =>  "Filtros de operacion",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#filtersOperationModal'
+                )
+            )
+        );
+        if (RoleTrait::hasPermission(80)){
+            array_push($buttons,
+                array(
+                    'text' => 'Agregar nuevo servicio',
+                    'className' => 'btn btn-primary',
+                    'attr' => array(
+                        'data-title' =>  "Filtro de reservaciones",
+                        'data-bs-toggle' => 'modal',
+                        'data-bs-target' => '#operationModal'
+                    )
+                )
+            );
+        }
+
+        if (RoleTrait::hasPermission(82)){
+            array_push($buttons,
+                array(
+                    'text' => 'Pre-asignación',
+                    'className' => 'btn btn-primary',
+                    'attr' => array(
+                        'id' =>  "btn_preassignment",
+                    )
+                )
+            );
+        }
+
+        if (RoleTrait::hasPermission(83)){
+            array_push($buttons,
+                array(
+                    'text' => 'Descargar operación',
+                    'className' => 'btn btn-primary',
+                    'attr' => array(
+                        'id' =>  "btn_dowload_operation",
+                    )
+                )
+            );
+        }
+
+        if (RoleTrait::hasPermission(84)){
+            array_push($buttons,
+                array(
+                    'text' => 'Descargar comisiones de operación',
+                    'className' => 'btn btn-primary',
+                    'attr' => array(
+                        'id' =>  "btn_dowload_operation_comission",
+                    )
+                )
+            );
+        }
+
+        if (RoleTrait::hasPermission(85)){
+            array_push($buttons,
+                array(
+                    'text' => 'Cerrar operación',
+                    'className' => 'btn btn-danger',
+                    'attr' => array(
+                        'id' =>  "btn_close_operation",
+                    )
+                )
+            );
+        }
+
         if( sizeof($items) >= 1 ):
             foreach ($items as $operation) {
                 $close_operation = ( ( ( $operation->final_service_type == 'ARRIVAL' || $operation->final_service_type == 'TRANSFER' || $operation->final_service_type == 'DEPARTURE' ) && $operation->op_type == "TYPE_ONE" && ( $operation->is_round_trip == 0 || $operation->is_round_trip == 1 ) ) ? $operation->op_one_operation_close : $operation->op_two_operation_close );
@@ -58,71 +129,7 @@
         </div>
     @endif
 
-    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-        <div id="filters" class="accordion">
-            <div class="card">
-                <div class="card-header" id="headingOne1">
-                    <section class="mb-0 mt-0">
-                        <div role="menu" class="" data-bs-toggle="collapse" data-bs-target="#defaultAccordionOne" aria-expanded="true" aria-controls="defaultAccordionOne">
-                            Filtros <div class="icons"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
-                        </div>
-                    </section>
-                </div>
-                <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
-                    <div class="card-body">
-                        <form action="" class="row" method="POST" id="formSearch">
-                            @csrf
-                            <input type="hidden" id="lookup_date_next" value="{{ $nexDate }}" required>
-
-                            <div class="col-12 col-sm-12 mb-3">
-                                <div class="row">
-                                    @if (RoleTrait::hasPermission(80))
-                                        <div class="col-12 col-sm-2 align-self-end">
-                                            <button type="button" class="btn btn-primary btn-lg w-100" id="btn_addservice">Agregar nuevo servicio</button>
-                                        </div>
-                                    @endif
-
-                                    @if (RoleTrait::hasPermission(82))
-                                        <div class="col-12 col-sm-2 align-self-end">
-                                            <button type="button" class="btn btn-primary btn-lg w-100" id="btn_preassignment">Pre-asignación</button>
-                                        </div>
-                                    @endif
-
-                                    @if (RoleTrait::hasPermission(83))
-                                        <div class="col-12 col-sm-2 align-self-end">
-                                            <button type="button" class="btn btn-primary btn-lg w-100" id="btn_dowload_operation">Descargar operación</button>
-                                        </div>
-                                    @endif
-
-                                    @if (RoleTrait::hasPermission(84))
-                                        <div class="col-12 col-sm-2 align-self-end">
-                                            <button type="button" class="btn btn-primary btn-lg w-100" id="btn_dowload_operation_comission">Descargar comisiones de operación</button>
-                                        </div>
-                                    @endif
-
-                                    @if (RoleTrait::hasPermission(85))
-                                        <div class="col-12 col-sm-2 align-self-end">
-                                            <button type="button" class="btn btn-danger btn-lg w-100" id="btn_close_operation">Cerrar operación</button>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="col-12 col-sm-4 mb-3 mb-lg-0">
-                                <label class="form-label" for="lookup_date">Fecha de creación</label>
-                                <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
-                            </div>
-                            <div class="col-12 col-sm-2 align-self-end">
-                                <button type="submit" class="btn btn-primary btn-lg btn-filter w-100">Filtrar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 layout-spacing">
         <div class="widget-content widget-content-area br-8">
             @if ($errors->any())
                 <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
@@ -134,7 +141,7 @@
                     </ul>
                 </div>
             @endif
-            <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>' data-action="dataOperations">
+            <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                 <thead>
                     <tr>
                         <th>#</th>
@@ -162,8 +169,9 @@
                 </thead>
                 <tbody>
                     @if(sizeof($items)>=1)
-                        @foreach($items as $key => $value)
+                        @foreach($items as $key => $value)                        
                             @php
+                                // dump($value);
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
                                 //SABER SI SON ARRIVAL, DEPARTURE O TRANSFER, MEDIANTE UN COLOR DE FONDO
                                 $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "f2eafa" : "dbe0f9" ) ).";";
@@ -188,7 +196,7 @@
                                 $status_booking =   ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_status : $value->op_two_status );
 
                                 $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
-                                $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
+                                $operation_from = (($value->operation_type == 'arrival')? $value->from_name.( (!empty($value->flight_number)) ? ' ('.$value->flight_number.')' : '' )  : $value->to_name );
                                 $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
 
                                 $vehicle_d = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->vehicle_id_one : $value->vehicle_id_two );
@@ -227,11 +235,6 @@
                                         $label2 = 'secondary';
                                         break;
                                 }
-                            @endphp
-                            @php
-                                // if ($value->final_service_type == "ARRIVAL") {
-                                //     dump($value);
-                                // }
                             @endphp
                             <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
                                 <td>
@@ -293,8 +296,8 @@
                                         <select class="form-control vehicles selectpicker" data-live-search="true" id="vehicle_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
                                             <option value="0">Selecciona un vehículo</option>
                                             @if ( isset($vehicles) && count($vehicles) >= 1 )
-                                                @foreach ($vehicles as $vehicle)
-                                                    <option {{ ( $vehicle_d != NULL && $vehicle_d == $vehicle->id ) ? 'selected' : '' }} value="{{ $vehicle->id }}">{{ $vehicle->name }} - {{ $vehicle->destination_service->name }} - {{ $vehicle->enterprise->names }}</option>
+                                                @foreach ($units as $unit)
+                                                    <option {{ ( $vehicle_d != NULL && $vehicle_d == $unit->id ) ? 'selected' : '' }} value="{{ $unit->id }}">{{ $unit->name }} - {{ $unit->destination_service->name }} - {{ $unit->enterprise->names }}</option>
                                                 @endforeach
                                             @endif
                                         </select>                                        
@@ -391,9 +394,10 @@
         </div>
     </div>
 
-    <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :services="$services" />
+    <x-modals.operation.filters :data="$data" :nexDate="$nexDate" :date="$date" :websites="$websites" :units="$units" :drivers="$drivers" />
+    <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :vehicles="$vehicles" />
     <x-modals.reservations.comments />
     <x-modals.reservations.operation_messages_history />
     <x-modals.reservations.operation_data_customer />
-    <x-modals.reservations.operation_data_whatsapp />    
+    <x-modals.reservations.operation_data_whatsapp />
 @endsection
