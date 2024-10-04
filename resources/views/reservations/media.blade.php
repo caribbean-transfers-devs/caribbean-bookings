@@ -20,7 +20,7 @@
                     <a href="{{ $value->url }}" class="btn btn-primary btn-sm" data-id="{{ $value->id }}" data-name="{{ $value->path }}" target="_blank">Ver</a>
                 @endif
                 @if (RoleTrait::hasPermission(66))
-                    <button class="btn btn-danger btn-sm deleteMedia" data-id="{{ $value->id }}">Eliminar</button>
+                    <button class="btn btn-danger btn-sm deleteMedia" data-id="{{ $value->id }}" data-name="{{ $value->path }}">Eliminar</button>
                 @endif
             </div>
         </div>

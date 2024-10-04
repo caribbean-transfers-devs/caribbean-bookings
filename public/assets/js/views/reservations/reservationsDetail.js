@@ -1002,8 +1002,7 @@ Dropzone.options.uploadForm = {
 $( document ).delegate( ".deleteMedia", "click", function(e) {
     e.preventDefault();
     let id = $(this).data("id");
-
-
+    let name = $(this).data("name");
     swal.fire({
         title: '¿Está seguro de eliminar el documento?',
         text: "Esta acción no se puede revertir",        
@@ -1021,7 +1020,7 @@ $( document ).delegate( ".deleteMedia", "click", function(e) {
             $.ajax({
                 url: '/reservations/upload/'+id,
                 type: 'DELETE',
-                data: { id:id },
+                data: { id:id, name:name },
                 success: function(resp) {
                     swal.fire({
                         title: 'Documento eliminado',

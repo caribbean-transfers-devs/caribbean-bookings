@@ -62,7 +62,7 @@ trait DigitalOceanTrait
             $media->save();
 
             $repo = new ReservationsRepository();
-            $repo->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", ha agregado el archivo multimedia: ".$file->getClientOriginalName(), 'HISTORY', 'MEDIA');
+            $repo->create_followUps($request->input('folder'), "El usuario: ".auth()->user()->name.", ha agregado el archivo multimedia: ".$file->getClientOriginalName(), 'HISTORY', 'MEDIA');
             
             if( isset($request->type_action) && $request->type_action == "upload" ){
                 return response()->json([
