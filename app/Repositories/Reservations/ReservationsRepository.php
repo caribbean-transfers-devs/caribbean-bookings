@@ -291,6 +291,21 @@ class ReservationsRepository
         }
     }
 
+    public function removeCommission($request, $reservation)
+    {
+        try {            
+            DB::beginTransaction();
+            $reservation->is_commissionable = 0;
+            $reservation->save();
+            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", actualizo la comisión de: (comisionable) a (no comisionable)", 'HISTORY', 'EDICIÓN RESERVACIÓN');
+            DB::commit();
+            return response()->json(['message' => 'Reservation successfully'], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function openCredit($request, $reservation)
     {
         try {            

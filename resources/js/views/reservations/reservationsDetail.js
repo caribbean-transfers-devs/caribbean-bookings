@@ -232,6 +232,55 @@ function duplicatedReservation(id){
     });
 }
 
+//ACCION PARA REMOVER UNA COMISION
+const __remove_commission = document.querySelector('.__remove_commission');
+if( __remove_commission != null ){
+    __remove_commission.addEventListener('click', function(event){
+        event.preventDefault();
+        const { reservation } = this.dataset;
+        console.log(reservation);
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+            }
+        });
+        swal.fire({
+            title: '¿Está seguro que desea remover la comisión de esta reservación?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var url = "/reservation/removeCommission/"+reservation;
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    dataType: 'json',
+                    success: function (data) {
+                        swal.fire({
+                            title: 'Comisión removida',
+                            text: 'Se ha removido la comisión para esta reservación',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    },
+                    error: function (data) {
+                        swal.fire({
+                            title: 'Error',
+                            text: 'Ha ocurrido un error al remover comisión',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                });
+            }
+        });        
+    })
+}
+
 function saveFollowUp(){
     $("#btn_new_followup").prop('disabled', true);
     $.ajaxSetup({
