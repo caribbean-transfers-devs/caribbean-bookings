@@ -43,7 +43,7 @@ trait DigitalOceanTrait
 
         $client = $this->getS3Client();
         $file = $request->file('file');
-        $filePath = $request->input('folder') . '/' . strtotime(date("Y-m-d H:i:s")). "-" .$file->getClientOriginalName();        
+        $filePath = $request->input('folder') . '/' . strtotime(date("Y-m-d H:i:s")). "-" .$file->getClientOriginalName();
         $mimeType = mime_content_type($file->getPathname());
 
         try {
@@ -62,7 +62,7 @@ trait DigitalOceanTrait
             $media->save();
 
             $repo = new ReservationsRepository();
-            $repo->create_followUps($request->input('folder'), 'Se ha agregado un archivo multimedia por '.auth()->user()->name, 'HISTORY', 'MEDIA');
+            $repo->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", ha agregado el archivo multimedia: ".$file->getClientOriginalName(), 'HISTORY', 'MEDIA');
             
             if( isset($request->type_action) && $request->type_action == "upload" ){
                 return response()->json([
@@ -85,7 +85,8 @@ trait DigitalOceanTrait
     public function deleteMedia($request){
 
         $validator = Validator::make($request->all(), [
-            'id' => 'required|int',            
+            'id' => 'required|int',
+            'name' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -108,9 +109,9 @@ trait DigitalOceanTrait
                 ]);
                 
                 $repo = new ReservationsRepository();
-                $repo->create_followUps($media->reservation_id, 'Se ha eliminado un archivo multimedia por '.auth()->user()->name, 'HISTORY', 'MEDIA');
+                $repo->create_followUps($media->reservation_id, "El usuario: ".auth()->user()->name.", ha eliminado el archivo multimedia: ".$request->name, 'HISTORY', 'MEDIA');
                 
-                $media->delete();                
+                $media->delete();
 
                 return response()->json(['message' => 'Image deleted successfully']);
             } catch (Aws\Exception\AwsException $e) {
