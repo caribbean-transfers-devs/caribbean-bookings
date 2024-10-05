@@ -101,8 +101,8 @@ if( __payment_infos.length > 0 ){
                     if( resp.length > 0 ){
                         resp.forEach(element => {
                             __tr +=  '<tr>' +
-                                        '<td class="text-center">'+ element.total +'</td>' +
-                                        '<td class="text-center">'+ ( element.exchange_rate > 1 ? ( element.total / element.exchange_rate ) : element.total ) +'</td>' +
+                                        '<td class="text-center">'+ parseFloat(element.total) +'</td>' +
+                                        '<td class="text-center">'+ parseFloat(( element.exchange_rate > 1 ? ( element.total / element.exchange_rate ) : element.total )) +'</td>' +
                                         '<td class="text-center">'+ element.currency +'</td>' +
                                         '<td class="text-center">'+ element.exchange_rate +'</td>' +
                                         '<td class="text-center">'+ element.payment_method +'</td>' +
