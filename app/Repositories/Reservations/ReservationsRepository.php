@@ -193,7 +193,6 @@ class ReservationsRepository
             'methods' => $this->Methods(),
             'cancellations' => $this->CancellationTypes(),
             'data' => $data,
-            'request' => $request->input(),
         ]);
     }
 

@@ -151,7 +151,7 @@ trait QueryTrait
         return $bookings;
     }
 
-    public function queryOperations($queryOne, $queryTwo, $queryData){
+    public function queryOperations($queryOne, $queryTwo, $queryHaving, $queryData){
         return  DB::select("SELECT 
                                 rez.id as reservation_id,
                                 CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
@@ -204,7 +204,7 @@ trait QueryTrait
                                 zone_one.id as zone_one_id,
                                 zone_one.name as destination_name_from,
                                 it.from_name as from_name,
-                                zone_one.is_primary as zone_one_is_primary, 
+                                zone_one.is_primary as zone_one_is_primary,
                                 zone_one.cut_off as zone_one_cut_off,
                                 it.op_one_status as one_service_status,
                                 it.op_one_status_operation as one_service_operation_status,
@@ -213,7 +213,7 @@ trait QueryTrait
                                 it.op_one_operating_cost,
                                 it.op_one_pickup as pickup_from,
 
-                                zone_two.id as zone_two_id, 
+                                zone_two.id as zone_two_id,
                                 zone_two.name as destination_name_to,
                                 it.to_name as to_name,
                                 zone_two.is_primary as zone_two_is_primary, 

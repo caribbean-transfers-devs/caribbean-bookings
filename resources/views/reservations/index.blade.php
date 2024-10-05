@@ -187,6 +187,7 @@
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
+                                {{-- @dd($item); --}}
                                 {{-- @dump($item) --}}
 
                                 {{-- @if ( $item->reservation_id == 37165 )
@@ -308,7 +309,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :services="$services" :vehicles="$vehicles" :paymentstatus="$payment_status" :reservationstatus="$reservation_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" :isbalance="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" :isbalance="1" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />
 @endsection

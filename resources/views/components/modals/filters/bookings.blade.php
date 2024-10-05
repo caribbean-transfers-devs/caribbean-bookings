@@ -1,4 +1,4 @@
-@props(['data','services','vehicles','reservationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','istoday','isbalance'])
+@props(['data','isSearch','services','vehicles','reservationstatus','units','drivers','paymentstatus','currencies','methods','cancellations','zones','websites','origins','istoday','isbalance'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -17,10 +17,13 @@
                             <label class="form-label" for="lookup_date">Fecha de creación</label>
                             <input type="text" name="date" id="lookup_date" class="form-control mb-3" value="{{ $data['init'] }} - {{ $data['end'] }}">
                         </div>
-                        <div class="col-lg-4 col-12">
-                            <label class="form-label" for="filter_text">/#/Nombre/Correo/Teléfono/Referencia</label>
-                            <input type="text" name="filter_text" id="filter_text" class="form-control mb-3" value="{{ trim($data['filter_text']) }}">
-                        </div>
+
+                        @if ( isset($isSearch) )
+                            <div class="col-lg-4 col-12">
+                                <label class="form-label" for="filter_text">/#/Nombre/Correo/Teléfono/Referencia</label>
+                                <input type="text" name="filter_text" id="filter_text" class="form-control mb-3" value="{{ trim($data['filter_text']) }}">
+                            </div>
+                        @endif
 
                         @if ( isset($services) && !empty($services) )
                             <div class="col-lg-4 col-12">
@@ -95,6 +98,28 @@
                                             <option value="{{ $zone->id }}">{{ $zone->name }}</option>                                                          
                                         @endforeach
                                     </select>
+                            </div>
+                        @endif
+
+                        @if ( isset($units) && !empty($units) )
+                            <div class="col-lg-4 col-12">
+                                <label class="form-label" for="unit">Unidad</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una unidad" data-live-search="true" data-selected-text-format="count > 3" name="unit[]" id="unit" data-value="{{ json_encode($data['unit']) }}" multiple>
+                                    @foreach ($units as $unit)
+                                        <option value="{{ $unit->id }}">{{ $unit->name }}</option> 
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+                        
+                        @if ( isset($drivers) && !empty($drivers) )
+                            <div class="col-lg-4 col-12">
+                                <label class="form-label" for="driver">Conductor</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona un conductor" data-live-search="true" data-selected-text-format="count > 3" name="driver[]" id="driver" data-value="{{ json_encode($data['driver']) }}" multiple>
+                                    @foreach ($drivers as $driver)
+                                        <option value="{{ $driver->id }}">{{ $driver->names }} {{ $driver->surnames }}</option> 
+                                    @endforeach
+                                </select>
                             </div>
                         @endif
 
