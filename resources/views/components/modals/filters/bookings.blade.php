@@ -1,4 +1,4 @@
-@props(['data','services','vehicles','reservationstatus','currencies','methods','cancellations','zones','websites','origins','istoday','isbalance'])
+@props(['data','services','vehicles','reservationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','istoday','isbalance'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -98,6 +98,17 @@
                             </div>
                         @endif
 
+                        @if ( isset($paymentstatus) && !empty($paymentstatus) )
+                            <div class="col-lg-4 col-12">
+                                <label class="form-label" for="payment_status">Estatus de pago</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona un estatus" data-live-search="true" data-selected-text-format="count > 2" name="payment_status[]" id="payment_status" data-value="{{ json_encode($data['payment_status']) }}" multiple>
+                                    @foreach ($paymentstatus as $key => $status)
+                                        <option value="{{ $key }}">{{ $status }}</option> 
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
                         @if ( !empty($currencies) )
                             <div class="col-lg-4 col-12">
                                 <label class="form-label" for="currency">Moneda de reservación</label>
@@ -134,18 +145,19 @@
                         @if ( isset($isbalance) )
                             <div class="col-lg-4 col-12">
                                 <label class="form-label" for="is_balance">Reserva con balance</label>
-                                <select class="form-control mb-3" name="is_balance" id="is_today">
-                                    <option {{ $data['is_balance'] == '0' ? 'selected' : '' }} value="0">Selecciona una opción</option>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una opción" name="is_balance" id="is_today">
+                                    <option value="">Selecciona una opción</option>
                                     <option {{ $data['is_balance'] == '1' ? 'selected' : '' }} value="1">Sí</option>
-                                    <option {{ $data['is_balance'] == '2' ? 'selected' : '' }} value="2">No</option>
+                                    <option {{ $data['is_balance'] == '0' ? 'selected' : '' }} value="2">No</option>
                                 </select>
                             </div>
                         @endif                        
 
                         @if ( isset($istoday) )
                             <div class="col-lg-4 col-12">
-                                <label class="form-label" for="site">Operadas para hoy</label>
-                                <select class="form-control mb-3" name="is_today" id="is_today">
+                                <label class="form-label" for="is_today">Operadas para hoy</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una opción" name="is_today" id="is_today">
+                                    <option value="">Selecciona una opción</option>
                                     <option {{ $data['is_today'] == '1' ? 'selected' : '' }} value="1">Sí</option>
                                     <option {{ $data['is_today'] == '0' ? 'selected' : '' }} value="0">No</option>
                                 </select>

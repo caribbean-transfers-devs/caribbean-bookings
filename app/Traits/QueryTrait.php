@@ -31,9 +31,15 @@ trait QueryTrait
                                     origin.code AS origin_code,
                                     tc.name_es AS cancellation_reason,
 
+                                    CASE
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAID'
+                                        ELSE 'PENDING'
+                                    END AS payment_status,
+
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
-                                    COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                    COALESCE(SUM(p.total_payments), 0) as total_payments,                                    
                                     COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+
                                     CASE
                                         WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
                                         WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
@@ -165,14 +171,20 @@ trait QueryTrait
                                 rez.created_at,
                                 site.name as site_name,
                                 origin.code AS origin_code,
-                                tc.name_es AS cancellation_reason,                                
+                                tc.name_es AS cancellation_reason,
 
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                 CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
 
+                                CASE
+                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAID'
+                                    ELSE 'PENDING'
+                                END AS payment_status,
+
                                 COALESCE(SUM(s.total_sales), 0) as total_sales, 
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+
                                 CASE
                                     WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
                                     WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
@@ -191,7 +203,7 @@ trait QueryTrait
 
                                 zone_one.id as zone_one_id,
                                 zone_one.name as destination_name_from,
-                                -- zone_one.name as zone_one_name,
+                                it.from_name as from_name,
                                 zone_one.is_primary as zone_one_is_primary, 
                                 zone_one.cut_off as zone_one_cut_off,
                                 it.op_one_status as one_service_status,
@@ -203,7 +215,7 @@ trait QueryTrait
 
                                 zone_two.id as zone_two_id, 
                                 zone_two.name as destination_name_to,
-                                -- zone_two.name as zone_two_name, 
+                                it.to_name as to_name,
                                 zone_two.is_primary as zone_two_is_primary, 
                                 zone_two.cut_off as zone_two_cut_off,
                                 it.op_two_status as two_service_status,
@@ -222,7 +234,16 @@ trait QueryTrait
                                 serv.id as service_type_id,
                                 serv.name as service_type_name,
 
-                                GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                GROUP_CONCAT(
+                                    DISTINCT 
+                                    CASE 
+                                        -- WHEN p.payment_type_name IS NULL OR rez.pay_at_arrival = 1 THEN 'CASH' 
+                                        -- ELSE p.payment_type_name
+                                        WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
+                                        ELSE 'CASH'
+                                    END
+                                    ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                -- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
 
                                 vehicle_one.name as vehicle_one_name,
                                 vehicle_two.name as vehicle_two_name,
@@ -296,9 +317,15 @@ trait QueryTrait
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                 CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
 
+                                CASE
+                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAID'
+                                    ELSE 'PENDING'
+                                END AS payment_status,
+
                                 COALESCE(SUM(s.total_sales), 0) as total_sales, 
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+
                                 CASE
                                     WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
                                     WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
@@ -317,7 +344,7 @@ trait QueryTrait
 
                                 zone_one.id as zone_one_id,
                                 zone_one.name as destination_name_from,
-                                -- zone_one.name as zone_one_name,
+                                it.from_name as from_name,
                                 zone_one.is_primary as zone_one_is_primary, 
                                 zone_one.cut_off as zone_one_cut_off,
                                 it.op_one_status as one_service_status,
@@ -328,8 +355,8 @@ trait QueryTrait
                                 it.op_one_pickup as pickup_from,
 
                                 zone_two.id as zone_two_id, 
-                                zone_two.name as destination_name_to,
-                                -- zone_two.name as zone_two_name, 
+                                zone_two.name as destination_name_to,                                
+                                it.to_name as to_name,
                                 zone_two.is_primary as zone_two_is_primary, 
                                 zone_two.cut_off as zone_two_cut_off,
                                 it.op_two_status as two_service_status,
@@ -348,7 +375,16 @@ trait QueryTrait
                                 serv.id as service_type_id,
                                 serv.name as service_type_name,
 
-                                GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                GROUP_CONCAT(
+                                    DISTINCT 
+                                    CASE 
+                                        -- WHEN p.payment_type_name IS NULL OR rez.pay_at_arrival = 1 THEN 'CASH' 
+                                        -- ELSE p.payment_type_name
+                                        WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
+                                        ELSE 'CASH'
+                                    END
+                                    ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                -- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
 
                                 vehicle_one.name as vehicle_one_name,
                                 vehicle_two.name as vehicle_two_name,

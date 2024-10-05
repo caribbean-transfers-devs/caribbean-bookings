@@ -329,7 +329,8 @@ let components = {
     },
 
     renderCheckboxColumns: function(table, container){
-        const __table = document.getElementById(table);        
+        const __table = document.getElementById(table);
+        console.log(__table);        
         const __container = document.getElementById(container);
 
         if( __table != null ){

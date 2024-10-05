@@ -1,7 +1,7 @@
 @php
     use App\Traits\RoleTrait;
     use App\Traits\Reports\PaymentsTrait;
-    use App\Traits\GeneralTrait;
+    use App\Traits\BookingTrait;
     use Carbon\Carbon;
 @endphp
 @php
@@ -105,7 +105,7 @@
 @endpush
 
 @section('content')
-    @php
+    @php        
         $buttons = array(
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
@@ -174,7 +174,8 @@
                             <th class="text-center">HACIA</th>
                             <th class="text-center">FECHA DE SERVICIO</th>
                             <th class="text-center">HORA DE SERVICIO</th>
-                            <th class="text-center">ESTATUS DE SERVICIO</th>
+                            <th class="text-center">ESTATUS DE SERVICIO(S)</th>
+                            <th class="text-center">ESTATUS DE PAGO</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">BALANCE</th>
                             <th class="text-center">COSTO POR SERVICIO</th>
@@ -186,6 +187,8 @@
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
+                                {{-- @dump($item) --}}
+
                                 {{-- @if ( $item->reservation_id == 37165 )
                                     @dump($item)
                                 @endif --}}
@@ -241,7 +244,7 @@
                                     endif;
                                 @endphp
                                 <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
-                                    <td class="text-center"><span class="badge badge-light-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
+                                    <td class="text-center"><span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
                                         @php
                                             $codes_string = "";
@@ -261,7 +264,7 @@
                                     <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ $item->site_name }}</td>
                                     <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' }}</td>
-                                    <td class="text-center"><span class="badge badge-light-{{ GeneralTrait::classStatusBooking($item->reservation_status) }}">{{ GeneralTrait::statusBooking($item->reservation_status) }}</span></td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }}">{{ BookingTrait::statusBooking($item->reservation_status) }}</button></td>
                                     <td class="text-center">{{ $item->full_name }}</td>
                                     <td class="text-center">{{ $item->client_phone }}</td>
                                     <td class="text-center">{{ $item->client_email }}</td>
@@ -272,7 +275,7 @@
                                     <td class="text-center">{{ $item->destination_name_to }}</td>
                                     <td class="text-center">{{ $item->to_name }}</td>
                                     <td class="text-center">
-                                        [{{ date("Y-m-d", strtotime($item->pickup_from)) }}] <br>
+                                        [{{ date("Y-m-d", strtotime($item->pickup_from)) }}]
                                         @if ( $item->is_round_trip != 0 )
                                             [{{ date("Y-m-d", strtotime($item->pickup_to)) }}]
                                         @endif
@@ -284,14 +287,14 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <?=GeneralTrait::parseServiceStatus($item->one_service_status)?><br>
+                                        <?=BookingTrait::renderServiceStatus($item->one_service_status)?><br>
                                         @if ( $item->is_round_trip != 0 )
-                                            <?=GeneralTrait::parseServiceStatus($item->two_service_status)?>
+                                            <?=BookingTrait::renderServiceStatus($item->two_service_status)?>
                                         @endif
-                                    </td>                                    
-                                    <td class="text-center">{{ number_format(($item->total_sales),2) }}</td>
+                                    </td>
+                                    <td class="text-center" <?=BookingTrait::classStatusPayment($item)?>>{{ BookingTrait::statusPayment($item->payment_status) }}</td>
+                                    <td class="text-center" <?=BookingTrait::classStatusPayment($item)?>>{{ number_format(($item->total_sales),2) }}</td>
                                     <td class="text-center" {{ (($item->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>
-                                    {{-- <td class="text-end" {{ (($total_pending < 0)? "style=color:green;font-weight:bold;":"") }}>{{ number_format(($total_pending),2) }}</td> --}}
                                     <td class="text-center">{{ number_format(($item->is_round_trip != 0 ? ( $item->total_sales / 2 ) : $item->total_sales),2) }}</td>
                                     <td class="text-center">{{ $item->currency }}</td>
                                     <td class="text-center">{{ $item->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $item->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
@@ -305,11 +308,7 @@
         </div>
     </div>
 
-    <div>
-        {{-- @dump($bookingsStatus); --}}
-    </div>
-
-    <x-modals.filters.bookings :data="$data" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" :isbalance="1" />
+    <x-modals.filters.bookings :data="$data" :services="$services" :vehicles="$vehicles" :paymentstatus="$payment_status" :reservationstatus="$reservation_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" :isbalance="1" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />
 @endsection

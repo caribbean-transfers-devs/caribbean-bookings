@@ -11,7 +11,7 @@ use App\Models\Site;
 use App\Models\Zones;
 
 use App\Traits\ApiTrait;
-use App\Traits\GeneralTrait;
+use App\Traits\BookingTrait;
 
 use Exception;
 use Illuminate\Http\Response;
@@ -20,7 +20,7 @@ use App\Models\ReservationsMedia;
 
 class DetailRepository
 {
-    use ApiTrait, GeneralTrait;
+    use ApiTrait, BookingTrait;
     
     public function detail($request,$id)
     {

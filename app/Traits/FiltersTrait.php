@@ -15,7 +15,7 @@ use App\Models\Zones;
 use App\Models\DestinationService;
 use App\Models\CancellationTypes;
 
-trait GeneralTrait
+trait FiltersTrait
 {
     public function Enterprises(){
         return Enterprise::all();
@@ -78,8 +78,15 @@ trait GeneralTrait
             // "DUPLICATED" => "Duplicado",
         );
     }
+
+    public function paymentStatus(){
+        return array(
+            "PAID" => "Pagado",
+            "PENDING" => "Pendiente",
+        );
+    }    
     
-    public function currencies(){
+    public function Currencies(){
         return array(
             "USD" => "USD",
             "MXN" => "MXN",
@@ -115,59 +122,5 @@ trait GeneralTrait
         } else {
             return "'" . $data . "'";
         }
-    }
-
-    public static function classStatusBooking($status = "CONFIRMED"){
-        switch ($status) {
-            case 'PENDING':
-            case 'NOSHOW':
-                return 'warning';
-                break;
-            case 'CANCELLED':
-            case 'DUPLICATED':
-                return 'danger';
-                break;
-            case 'OPENCREDIT':
-                return 'info';
-                break;
-            default:
-                return 'success';
-                break;
-        }
-    }
-
-    public static function statusBooking($status = "CONFIRMED"){
-        switch ($status) {
-            case 'PENDING':
-                return 'Pendiente';
-                break;
-            case 'CANCELLED':
-                return 'Cancelado';
-                break;
-            case 'DUPLICATED':
-                return 'Duplicado';
-                break;
-            case 'NOSHOW':
-                return 'No se presentó';
-                break;                                
-            case 'OPENCREDIT':
-                return 'Credito abierto';
-                break;
-            case 'COMPLETED':
-                return 'Completado';
-                break;                
-            default:
-                return 'Confirmado';
-                break;
-        }
-    }
-
-    public static function parseServiceStatus( $data ){
-        $span = "";
-        $items = explode(',',$data);
-        foreach ($items as $key => $item) {
-            $span .= '<span class="badge badge-light-'.self::classStatusBooking($item).' mb-2">'.self::statusBooking($item).'</span>';
-        }
-        return $span;
     }
 }

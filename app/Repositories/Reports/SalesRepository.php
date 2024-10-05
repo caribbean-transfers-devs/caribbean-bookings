@@ -9,11 +9,11 @@ use App\Models\ReservationsItem;
 use App\Models\ReservationFollowUp;
 
 //TRAIT
-use App\Traits\GeneralTrait;
+use App\Traits\FiltersTrait;
 
 class SalesRepository
 {
-    use GeneralTrait;
+    use FiltersTrait;
     
     public function index($request)
     {          

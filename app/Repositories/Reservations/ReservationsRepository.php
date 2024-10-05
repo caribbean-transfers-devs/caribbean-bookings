@@ -18,13 +18,13 @@ use Illuminate\Support\Facades\DB;
 
 //TRAIT
 use App\Traits\MailjetTrait;
-use App\Traits\GeneralTrait;
+use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
 use App\Traits\Reports\PaymentsTrait;
 
 class ReservationsRepository
 {
-    use MailjetTrait, QueryTrait, GeneralTrait, PaymentsTrait;
+    use MailjetTrait, FiltersTrait, QueryTrait, PaymentsTrait;
     
     public function index($request)
     {
@@ -40,10 +40,11 @@ class ReservationsRepository
             "zone_one_id" => ( isset($request->zone_one_id) ? $request->zone_one_id : 0 ),
             "zone_two_id" => ( isset($request->zone_two_id) ? $request->zone_two_id : 0 ),
             "currency" => ( isset($request->currency) ? $request->currency : 0 ),
+            "payment_status" => ( isset( $request->payment_status ) && !empty( $request->payment_status ) ? $request->payment_status : 0 ),
             "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
-            "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),
-            "is_today" => ( isset($request->is_today) ? $request->is_today : 0 ),
-            "is_balance" => ( isset($request->is_balance) ? $request->is_balance : 0 ),
+            "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),            
+            "is_balance" => ( isset($request->is_balance) ? $request->is_balance : NULL ),
+            "is_today" => ( isset($request->is_today) ? $request->is_today : NULL ),
         ];
         
         //Query DB
@@ -144,13 +145,13 @@ class ReservationsRepository
         }
 
         //RESERVAS CON UN BALANCE
-        if(isset( $request->is_balance ) && !empty( $request->is_balance)){
+        if(isset( $request->is_balance )){
             $havingConditions[] = ( $request->is_balance == 1 ? ' total_balance > 0 ' : ' total_balance <= 0 ' );
         }        
 
         //RESERVAS OPERADAS EL MISMO DIA DE SU CREACION
-        if(isset( $request->is_today ) && !empty( $request->is_today)){
-            $havingConditions[] = ' is_today != 0 ';
+        if(isset( $request->is_today )){
+            $havingConditions[] = ( $request->is_today == 1 ? ' is_today != 0 ' : ' is_today = 0 ' );
         }
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
@@ -165,7 +166,7 @@ class ReservationsRepository
                     )";
         }
 
-        if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance ) && !empty( $request->is_balance)) || (isset( $request->is_today ) && !empty( $request->is_today)) ){
+        if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance )) || (isset( $request->is_today )) ){
             $query2 = " HAVING " . implode(' AND ', $havingConditions);
         }
                 
@@ -187,10 +188,12 @@ class ReservationsRepository
             'reservation_status' => $this->reservationStatus(),
             'vehicles' => $this->Vehicles(),
             'zones' => $this->Zones(),
+            'payment_status' => $this->paymentStatus(),
             'currencies' => $this->Currencies(),
             'methods' => $this->Methods(),
             'cancellations' => $this->CancellationTypes(),
             'data' => $data,
+            'request' => $request->input(),
         ]);
     }
 

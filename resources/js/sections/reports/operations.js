@@ -109,11 +109,11 @@ if( __payment_infos.length > 0 ){
                                         '<td class="text-center">'+ element.reference +'</td>' +
                                     '</tr>';
                             __total += parseFloat(( element.exchange_rate > 1 ? ( element.total / element.exchange_rate ) : element.total ));
-                        });                        
+                        });
                     }else{
                         __tr =  '<tr align="center">' +
                                     '<td colspan="5">no hay pagos</td>' +
-                                '</tr>';                         
+                                '</tr>';
                     }
 
                     __tr_footer = '<tr>' +
@@ -133,5 +133,5 @@ if( __payment_infos.length > 0 ){
     });
 }
 
-components.renderCheckboxColumns('bookings', 'columns');
+components.renderCheckboxColumns('dataOperations', 'columns');
 components.setValueSelectpicker();

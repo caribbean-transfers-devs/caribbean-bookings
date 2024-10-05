@@ -18,10 +18,12 @@ use App\Models\Zones;
 use App\Models\Destination;
 use App\Models\DestinationService;
 
+//TRAIT
 use App\Traits\RoleTrait;
 use App\Traits\CodeTrait;
-use App\Traits\GeneralTrait;
+use App\Traits\FiltersTrait;
 
+//EXCEPTION
 use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +36,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class OperationsController extends Controller
 {
 
-    use CodeTrait, RoleTrait, GeneralTrait;
+    use CodeTrait, RoleTrait, FiltersTrait;
     // if(!$this->hasPermission(39)){
     //     abort(403, 'NO TIENE AUTORIZACIÓN.');
     // }
@@ -1360,7 +1362,6 @@ class OperationsController extends Controller
             $driver_d =  ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? Driver::find($item->driver_id_one) : Driver::find($item->driver_id_two) );
             $porcentaje = ( $item->site_id == 21 ? 0.04 : 0.05 );
             $commission = ( $item->site_id == 21 ? ( $payment * $porcentaje ) : ( $cost_operation * $porcentaje ) );
-
 
             $sheet->setCellValue('A'.strval($count), ( $preassignment != "" ? $preassignment : "ADD" ));
             $sheet->setCellValue('B'.strval($count), date("H:i", strtotime($operation_pickup)));

@@ -300,7 +300,7 @@
                                                     <option {{ ( $vehicle_d != NULL && $vehicle_d == $unit->id ) ? 'selected' : '' }} value="{{ $unit->id }}">{{ $unit->name }} - {{ $unit->destination_service->name }} - {{ $unit->enterprise->names }}</option>
                                                 @endforeach
                                             @endif
-                                        </select>                                        
+                                        </select>
                                     @endif
                                 </td>
                                 <td data-order="{{ ( $driver_d != NULL ) ? $driver_d : 0 }}" data-name="{{ $driver_name }}">

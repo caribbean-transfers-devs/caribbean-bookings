@@ -109,21 +109,21 @@ if( __payment_infos.length > 0 ){
                                         '<td class="text-center">'+ element.reference +'</td>' +
                                     '</tr>';
                             __total += parseFloat(( element.exchange_rate > 1 ? ( element.total / element.exchange_rate ) : element.total ));
-                        });                        
+                        });
+
+                        __tr_footer = '<tr>' +
+                                        '<td class="text-center">0</td>' +
+                                        '<td class="text-center">'+ __total +'</td>' +
+                                        '<td class="text-center"></td>' +
+                                        '<td class="text-center"></td>' +
+                                        '<td class="text-center"></td>' +
+                                        '<td class="text-center"></td>' +
+                                      '</tr>';
                     }else{
                         __tr =  '<tr align="center">' +
                                     '<td colspan="5">no hay pagos</td>' +
                                 '</tr>';                         
                     }
-
-                    __tr_footer = '<tr>' +
-                                    '<td class="text-center">0</td>' +
-                                    '<td class="text-center">'+ __total +'</td>' +
-                                    '<td class="text-center"></td>' +
-                                    '<td class="text-center"></td>' +
-                                    '<td class="text-center"></td>' +
-                                    '<td class="text-center"></td>' +
-                                '</tr>';
 
                     __container.innerHTML = __tr;
                     __footer.innerHTML = __tr_footer;
