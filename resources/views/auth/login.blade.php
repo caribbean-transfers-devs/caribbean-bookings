@@ -47,7 +47,7 @@
 										@csrf
 										<div class="mb-3">
 											<label class="form-label">Email</label>
-											<input class="form-control form-control-lg" type="email" name="email" placeholder="Su email" value="{{ old('email') }}">
+											<input class="form-control form-control-lg" type="email" name="email" placeholder="Su email" value="{{ old('email') }}" autocomplete="username">
 										</div>
 										<div class="mb-3">
 											<label class="form-label">Contraseña</label>
