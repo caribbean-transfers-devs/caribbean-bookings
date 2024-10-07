@@ -51,7 +51,7 @@
 										</div>
 										<div class="mb-3">
 											<label class="form-label">Contraseña</label>
-											<input class="form-control form-control-lg" type="password" name="password" placeholder="Su contraseña">
+											<input class="form-control form-control-lg" type="password" name="password" placeholder="Su contraseña" autocomplete="current-password">
 										</div>
 										<div>
 											<label class="form-check">
