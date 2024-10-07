@@ -86,12 +86,20 @@
                             justify-content: space-between;
                             position: relative;
                             text-align: right;
-                            white-space: nowrap;
+                            white-space: unset;
                             width: 100%;
                             font-size: .625rem;
+                            height: calc(1.3em + 1.3rem + 2px);
+                            padding: 8px 14px;
+                            letter-spacing: 0;
+
+                            .filter-option{
+                                overflow: hidden;
+                                height: 100%;
+                            }
                         }
                         &:not(.input-group-btn){
-
+                            height: calc(1.3em + 1.3rem + 2px);
                         }
                     }
                 }

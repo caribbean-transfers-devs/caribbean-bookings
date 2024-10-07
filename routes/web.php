@@ -76,6 +76,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reservation/payments/{reservation}', [ReservationsController::class, 'reservationPayments'])->name('reservation.payments');
 
     Route::put('/reservationsDuplicated/{reservation}', [ReservationsController::class, 'duplicated'])->name('reservations.duplicated');
+
+    Route::put('/reservation/removeCommission/{reservation}', [ReservationsController::class, 'removeCommission'])->name('reservation.removeCommission');
+
     Route::put('/reservationsOpenCredit/{reservation}', [ReservationsController::class, 'openCredit'])->name('reservations.openCredit');
     Route::put('/reservationsEnablePlusService/{reservation}', [ReservationsController::class, 'enablePlusService'])->name('reservations.enablePlusService');
 

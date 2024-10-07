@@ -124,6 +124,10 @@
                                             <td>{{ $reservation->cancellationType->name_es }}</td>
                                         </tr>
                                     @endif
+                                    <tr>
+                                        <th>Estatus de comisión</th>
+                                        <td><span class="badge btn-{{ $reservation->is_commissionable == 1 ? "success ".( RoleTrait::hasPermission(95) ? '__remove_commission' : '' ) : "danger" }}" data-reservation="{{ $reservation->id }}" style="cursor: pointer;">{{ $reservation->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span></td>
+                                    </tr>                                    
                                 </tbody>
                             </table>
                         </div>

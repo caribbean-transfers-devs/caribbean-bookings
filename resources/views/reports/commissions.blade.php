@@ -74,12 +74,14 @@
                             <th>Vendedor</th>
                             <th>Método de pago</th>
                             <th>Destino</th>
+                            <th>Comsionable</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if(sizeof($items) >= 1)
                             @foreach($items as $key => $value)
                                 @php
+                                    // dump($value);
                                     $status = $value->status;
                                     if(!isset( $users[ $value->employee ] )):
                                         $users[ $value->employee ] = ['USD' => 0, 'MXN' => 0, 'QUANTITY' => 0];
@@ -144,6 +146,9 @@
                                         @if( $value->zone_one_is_primary == 0 && $value->zone_two_is_primary == 0)
                                             {{ $value->zone_one_name }} 
                                         @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-light-{{ $value->is_commissionable == 1 ? "success" : "danger" }}">{{ $value->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span>
                                     </td>
                                 </tr>
                             @endforeach

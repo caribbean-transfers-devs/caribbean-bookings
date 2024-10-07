@@ -74,12 +74,13 @@
                             <th>Hacia</th>
                             <th>Pago</th>
                             <th>Total</th>
-                            <th>Moneda</th>                                        
+                            <th>Moneda</th>
+                            <th>Comsionable</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if(sizeof($items)>=1)
-                            @foreach($items as $key => $value)                                
+                            @foreach($items as $key => $value)
                                 @php
                                     $confirmation_type = $value->op_one_confirmation;
                                     if($value->operation_type == "departure"):
@@ -135,6 +136,9 @@
                                     <td class="text-center">{{ $value->status }}</td>
                                     <td class="text-end">{{ number_format($payment,2) }}</td>
                                     <td class="text-center">{{ $value->currency }}</td>
+                                    <td>
+                                        <span class="badge badge-light-{{ $value->is_commissionable == 1 ? "success" : "danger" }}">{{ $value->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span>
+                                    </td>
                                 </tr>
                             @endforeach
                         @endif
