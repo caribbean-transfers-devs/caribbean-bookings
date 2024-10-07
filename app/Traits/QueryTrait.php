@@ -194,12 +194,14 @@ trait QueryTrait
                                     ELSE 'UNKNOWN'
                                 END AS reservation_status,
 
-                                it.*,
-                                it.op_one_pickup as filtered_date, 
+                                -- it.*,
                                 'arrival' as operation_type,
                                 'TYPE_ONE' as op_type,
+                                it.id,
                                 it.code,
+                                it.is_round_trip,
                                 it.passengers,
+                                it.op_one_pickup as filtered_date,
 
                                 zone_one.id as zone_one_id,
                                 zone_one.name as destination_name_from,
@@ -211,7 +213,7 @@ trait QueryTrait
                                 it.op_one_time_operation,
                                 it.op_one_preassignment,
                                 it.op_one_operating_cost,
-                                it.op_one_pickup as pickup_from,
+                                it.op_one_pickup as pickup_from,                                
 
                                 zone_two.id as zone_two_id,
                                 zone_two.name as destination_name_to,
@@ -289,7 +291,7 @@ trait QueryTrait
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryOne}                                   
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id {$queryHaving}
 
                             UNION
 
@@ -312,7 +314,7 @@ trait QueryTrait
                                 rez.created_at,
                                 site.name as site_name,
                                 origin.code AS origin_code,
-                                tc.name_es AS cancellation_reason,                                 
+                                tc.name_es AS cancellation_reason,
 
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                 CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
@@ -335,12 +337,14 @@ trait QueryTrait
                                     ELSE 'UNKNOWN'
                                 END AS reservation_status,
 
-                                it.*,                                
-                                it.op_two_pickup as filtered_date,
+                                -- it.*,
                                 'departure' as operation_type,                                  
                                 'TYPE_TWO' as op_type,
+                                it.id,
                                 it.code,
+                                it.is_round_trip,
                                 it.passengers,
+                                it.op_two_pickup as filtered_date,
 
                                 zone_one.id as zone_one_id,
                                 zone_one.name as destination_name_from,
@@ -364,7 +368,7 @@ trait QueryTrait
                                 it.op_two_time_operation,
                                 it.op_two_preassignment,
                                 it.op_two_operating_cost,                                
-                                it.op_two_pickup as pickup_to,
+                                it.op_two_pickup as pickup_to,                                
 
                                 CASE
                                     WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
@@ -428,8 +432,8 @@ trait QueryTrait
                                         GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryTwo}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id
-                            ORDER BY filtered_date ASC",[
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id  {$queryHaving}
+                            ORDER BY filtered_date ASC ",[
                                 "init_date_one" => $queryData['init'],
                                 "init_date_two" => $queryData['end'],
                                 "init_date_three" => $queryData['init'],

@@ -1,4 +1,4 @@
-@props(['data','isSearch','services','vehicles','reservationstatus','units','drivers','paymentstatus','currencies','methods','cancellations','zones','websites','origins','istoday','isbalance'])
+@props(['data','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','istoday','isbalance'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -13,20 +13,20 @@
                 <div class="modal-body">
                     @csrf
                     <div class="row">
-                        <div class="col-lg-4 col-12">
+                        <div class="col-lg-4 col-md-6 col-12">
                             <label class="form-label" for="lookup_date">Fecha de creación</label>
                             <input type="text" name="date" id="lookup_date" class="form-control mb-3" value="{{ $data['init'] }} - {{ $data['end'] }}">
                         </div>
 
                         @if ( isset($isSearch) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="filter_text">/#/Nombre/Correo/Teléfono/Referencia</label>
                                 <input type="text" name="filter_text" id="filter_text" class="form-control mb-3" value="{{ trim($data['filter_text']) }}">
                             </div>
                         @endif
 
                         @if ( isset($services) && !empty($services) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="is_round_trip">Tipo de servicio</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un opción" data-live-search="true" data-selected-text-format="count > 2" name="is_round_trip[]" id="is_round_trip" data-value="{{ json_encode($data['is_round_trip']) }}" multiple>
                                     @foreach ($services as $key => $service)
@@ -37,7 +37,7 @@
                         @endif
 
                         @if ( isset($websites) && !empty($websites) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="site">Sitio web</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un sitio" data-live-search="true" data-selected-text-format="count > 1" name="site[]" id="site" data-value="{{ json_encode($data['site']) }}" multiple>                            
                                     @foreach ($websites as $key => $value)
@@ -48,7 +48,7 @@
                         @endif
 
                         @if ( isset($origins) && !empty($origins) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="origin">Origen de venta</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un origen" data-live-search="true" data-selected-text-format="count > 2" name="origin[]" id="origin" data-value="{{ json_encode($data['origin']) }}" multiple>                            
                                     @foreach ($origins as $key => $origin)
@@ -59,7 +59,7 @@
                         @endif
 
                         @if ( isset($reservationstatus) && !empty($reservationstatus) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="reservation_status">Estatus de reservación</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un estatus" data-live-search="true" data-selected-text-format="count > 2" name="reservation_status[]" id="reservation_status" data-value="{{ json_encode($data['reservation_status']) }}" multiple>
                                     @foreach ($reservationstatus as $key => $status)
@@ -69,9 +69,20 @@
                             </div>
                         @endif
 
+                        @if ( isset($servicesoperation) && !empty($servicesoperation) )
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <label class="form-label" for="service_operation">Tipo de servicio en operación</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona un tipo de servicio" data-live-search="true" data-selected-text-format="count > 2" name="service_operation[]" id="service_operation" data-value="{{ json_encode($data['service_operation']) }}" multiple>
+                                    @foreach ($servicesoperation as $key => $status)
+                                        <option value="{{ $key }}">{{ $status }}</option> 
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
                         {{-- EL VEHÍCULO O UNIDAD QUE SELECCIONO EL CLIENTE AL GENERAR SU RESERVA --}}
                         @if ( isset($vehicles) && !empty($vehicles) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="product_type">Tipo de vehículo</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un vehículo" data-live-search="true" data-selected-text-format="count > 3" name="product_type[]" id="product_type" data-value="{{ json_encode($data['product_type']) }}" multiple>
                                     @foreach ($vehicles as $vehicle)
@@ -82,27 +93,38 @@
                         @endif
 
                         @if ( isset($zones) && !empty($zones) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="zone">Zona de origen</label>
-                                    <select class="form-control selectpicker mb-3" title="Selecciona una zona" data-live-search="true" data-selected-text-format="count > 3" name="zone_one_id[]" id="zone_one_id" data-value="{{ json_encode(( isset($data['zone_one_id']) ? $data['zone_one_id'] : array() )) }}" multiple>
-                                        @foreach ($zones as $zone)
-                                            <option value="{{ $zone->id }}">{{ $zone->name }}</option>                                                          
-                                        @endforeach
-                                    </select>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una zona" data-live-search="true" data-selected-text-format="count > 3" name="zone_one_id[]" id="zone_one_id" data-value="{{ json_encode(( isset($data['zone_one_id']) ? $data['zone_one_id'] : array() )) }}" multiple>
+                                    @foreach ($zones as $zone)
+                                        <option value="{{ $zone->id }}">{{ $zone->name }}</option>                                                          
+                                    @endforeach
+                                </select>
                             </div>
 
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="zone">Zona de destino</label>
-                                    <select class="form-control selectpicker mb-3" title="Selecciona una zona" data-live-search="true" data-selected-text-format="count > 3" name="zone_two_id[]" id="zone_two_id" data-value="{{ json_encode(( isset($data['zone_two_id']) ? $data['zone_two_id'] : array() )) }}" multiple>
-                                        @foreach ($zones as $zone)
-                                            <option value="{{ $zone->id }}">{{ $zone->name }}</option>                                                          
-                                        @endforeach
-                                    </select>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una zona" data-live-search="true" data-selected-text-format="count > 3" name="zone_two_id[]" id="zone_two_id" data-value="{{ json_encode(( isset($data['zone_two_id']) ? $data['zone_two_id'] : array() )) }}" multiple>
+                                    @foreach ($zones as $zone)
+                                        <option value="{{ $zone->id }}">{{ $zone->name }}</option>                                                          
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
+                        @if ( isset($serviceoperationstatus) && !empty($serviceoperationstatus) )
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <label class="form-label" for="service_operation_status">Estatus de servicio</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona un estatus" data-live-search="true" data-selected-text-format="count > 2" name="service_operation_status[]" id="service_operation_status" data-value="{{ json_encode($data['service_operation_status']) }}" multiple>
+                                    @foreach ($serviceoperationstatus as $key => $status)
+                                        <option value="{{ $key }}">{{ $status }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         @endif
 
                         @if ( isset($units) && !empty($units) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="unit">Unidad</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona una unidad" data-live-search="true" data-selected-text-format="count > 3" name="unit[]" id="unit" data-value="{{ json_encode($data['unit']) }}" multiple>
                                     @foreach ($units as $unit)
@@ -113,7 +135,7 @@
                         @endif
                         
                         @if ( isset($drivers) && !empty($drivers) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="driver">Conductor</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un conductor" data-live-search="true" data-selected-text-format="count > 3" name="driver[]" id="driver" data-value="{{ json_encode($data['driver']) }}" multiple>
                                     @foreach ($drivers as $driver)
@@ -123,8 +145,19 @@
                             </div>
                         @endif
 
+                        @if ( isset($operationstatus) && !empty($operationstatus) )
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <label class="form-label" for="operation_status">Estatus de operación</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona un estatus" data-live-search="true" data-selected-text-format="count > 2" name="operation_status[]" id="operation_status" data-value="{{ json_encode($data['operation_status']) }}" multiple>
+                                    @foreach ($operationstatus as $key => $status)
+                                        <option value="{{ $key }}">{{ $status }}</option> 
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif                        
+
                         @if ( isset($paymentstatus) && !empty($paymentstatus) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="payment_status">Estatus de pago</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un estatus" data-live-search="true" data-selected-text-format="count > 2" name="payment_status[]" id="payment_status" data-value="{{ json_encode($data['payment_status']) }}" multiple>
                                     @foreach ($paymentstatus as $key => $status)
@@ -135,7 +168,7 @@
                         @endif
 
                         @if ( !empty($currencies) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="currency">Moneda de reservación</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona una moneda" data-live-search="true" data-selected-text-format="count > 2" name="currency[]" id="currency" data-value="{{ json_encode($data['currency']) }}" multiple>
                                     @foreach ($currencies as $key => $currency)
@@ -146,7 +179,7 @@
                         @endif
 
                         @if ( !empty($methods) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="payment_method">Metodo de pago de reservación</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un metodo de pago" data-live-search="true" data-selected-text-format="count > 2" name="payment_method[]" id="payment_method" data-value="{{ json_encode($data['payment_method']) }}" multiple>
                                     @foreach ($methods as $key => $method)
@@ -157,7 +190,7 @@
                         @endif
 
                         @if ( !empty($cancellations) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="cancellation_status">Motivos de cancelación</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona un motivo de cancelación" data-live-search="true" data-selected-text-format="count > 2" name="cancellation_status[]" id="cancellation_status" data-value="{{ json_encode($data['cancellation_status']) }}" multiple>
                                     @foreach ($cancellations as $key => $cancellation)
@@ -168,7 +201,7 @@
                         @endif
 
                         @if ( isset($isbalance) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="is_balance">Reserva con balance</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona una opción" name="is_balance" id="is_today">
                                     <option value="">Selecciona una opción</option>
@@ -179,7 +212,7 @@
                         @endif                        
 
                         @if ( isset($istoday) )
-                            <div class="col-lg-4 col-12">
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="is_today">Operadas para hoy</label>
                                 <select class="form-control selectpicker mb-3" title="Selecciona una opción" name="is_today" id="is_today">
                                     <option value="">Selecciona una opción</option>

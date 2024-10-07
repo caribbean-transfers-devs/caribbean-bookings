@@ -21,15 +21,7 @@ trait FiltersTrait
         return Enterprise::all();
     }
 
-    //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADO COMO LOS VEHICULOS QUE TENEMOS
-    public function Units(){
-        return Vehicle::all();
-    }
-
-    public function Drivers(){
-        return Driver::orderBy('names','ASC')->get();
-    }
-
+    //TIPO DE SERVICIO
     public function Services(){
         return array(
             "0" => "One Way",
@@ -37,16 +29,9 @@ trait FiltersTrait
         );
     }
 
+    //SITIOS O AGENCIAS
     public function Sites(){
         return DB::select("SELECT id, name as site_name FROM sites ORDER BY site_name ASC");
-    }
-
-    public function Vehicles(){
-        return DestinationService::all();
-    }
-
-    public function Zones(){
-        return Zones::all();;
     }
 
     public function Origins(){
@@ -65,10 +50,7 @@ trait FiltersTrait
         return $origins;
     }
 
-    public function CancellationTypes(){
-        return CancellationTypes::where('status',1)->get();
-    }
-
+    //ESTATUS DE RESERVACIÓN
     public function reservationStatus(){
         return array(
             "CONFIRMED" => "Confirmado",
@@ -79,20 +61,72 @@ trait FiltersTrait
         );
     }
 
+    //TIPO DE SERVICIO EN OPERACIÓN
+    public function servicesOperation(){
+        return array(
+            "ARRIVAL" => "Llegada",
+            "DEPARTURE" => "Salida",
+            "TRANSFER" => "Transalado",
+        );
+    }
+
+    //TIPO DE VEHÍCULO
+    public function Vehicles(){
+        return DestinationService::all();
+    }
+
+    //ZONAS DE ORIGEN Y DESTINO
+    public function Zones(){
+        return Zones::all();;
+    }
+
+    //ESTATUS DE SERVICIO
+    public function statusOperationService(){
+        return array(
+            "PENDING" => "Pendiente",
+            "COMPLETED" => "Completado",
+            "NOSHOW" => "No se presentó",
+            "CANCELLED" => "Cancelado",
+        );
+    }
+
+    //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADO COMO LOS VEHICULOS QUE TENEMOS
+    public function Units(){
+        return Vehicle::all();
+    }
+
+    //CONDUCTOR
+    public function Drivers(){
+        return Driver::orderBy('names','ASC')->get();
+    }
+
+    //ESTATUS DE OPERACIÓN
+    public function statusOperation(){
+        return array(
+            "PENDING" => "Pendiente",
+            "E" => "E",
+            "C" => "C",
+            "OK" => "OK",
+        );
+    }    
+    
+    //ESTATUS DE PAGO DE RESERVACIÓN
     public function paymentStatus(){
         return array(
             "PAID" => "Pagado",
             "PENDING" => "Pendiente",
         );
-    }    
-    
+    }
+
+    //MONEDA DE RESERVACIÓN
     public function Currencies(){
         return array(
             "USD" => "USD",
             "MXN" => "MXN",
         );
     }
-
+    
+    //METODO DE PAGO DE RESERVACIÓN
     public function Methods(){
         return array(
             "CASH" => "CASH",
@@ -100,6 +134,11 @@ trait FiltersTrait
             "PAYPAL" => "PAYPAL",
             "MIFEL" => "MIFEL",
         );
+    }
+
+    //MOTIVOS DE CANCELACIÓN
+    public function CancellationTypes(){
+        return CancellationTypes::where('status',1)->get();
     }
 
     public function parseArrayQuery($data, $marks = NULL){

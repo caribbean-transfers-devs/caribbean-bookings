@@ -121,6 +121,12 @@ class ReservationsRepository
             $query .= " AND (".$params.") ";
         }
 
+        //ESTATUS DE PAGO
+        if(isset( $request->payment_status ) && !empty( $request->payment_status )){
+            $params = $this->parseArrayQuery($request->payment_status,"single");
+            $havingConditions[] = " payment_status IN (".$params.") ";
+        }        
+
         //MONEDA DE LA RESERVA
         if(isset( $request->currency ) && !empty( $request->currency )){
             $params = $this->parseArrayQuery($request->currency,"single");
@@ -166,7 +172,7 @@ class ReservationsRepository
                     )";
         }
 
-        if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance )) || (isset( $request->is_today )) ){
+        if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance )) || (isset( $request->is_today )) ){
             $query2 = " HAVING " . implode(' AND ', $havingConditions);
         }
                 
