@@ -63,7 +63,7 @@ class LoginRequest extends FormRequest
         $captchaResp = json_decode($captchaResp, true);
         //dd($this->ip());
 
-        if($captchaResp["success"] == true && $captchaResp["score"] > 0.5){
+        //if($captchaResp["success"] == true && $captchaResp["score"] > 0.5){
             $restricted_user = DB::table("users")->where("email", $this->email )->value("restricted");
             $remember = ($this->boolean('remember-me')) ? true : false;
             
@@ -95,7 +95,7 @@ class LoginRequest extends FormRequest
             }        
 
             RateLimiter::clear($this->throttleKey());
-        }
+        //}
     }
 
     /**
