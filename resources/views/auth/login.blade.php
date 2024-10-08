@@ -47,11 +47,11 @@
 										@csrf
 										<div class="mb-3">
 											<label class="form-label">Email</label>
-											<input class="form-control form-control-lg" type="email" name="email" placeholder="Su email" value="{{ old('email') }}">
+											<input class="form-control form-control-lg" type="email" name="email" placeholder="Su email" value="{{ old('email') }}" autocomplete="username">
 										</div>
 										<div class="mb-3">
 											<label class="form-label">Contraseña</label>
-											<input class="form-control form-control-lg" type="password" name="password" placeholder="Su contraseña">
+											<input class="form-control form-control-lg" type="password" name="password" placeholder="Su contraseña" autocomplete="current-password">
 										</div>
 										<div>
 											<label class="form-check">
