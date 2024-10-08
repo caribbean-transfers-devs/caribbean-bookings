@@ -1,85 +1,113 @@
 @php
+    use Illuminate\Support\Str;
     use App\Traits\RoleTrait;
     use App\Traits\Reports\PaymentsTrait;
-    use App\Traits\BookingTrait;
+    use App\Traits\BookingTrait;    
     use Carbon\Carbon;
 @endphp
 @php
     $bookingsStatus = [
-        'ACCUMULATED' => [
+        "total" => 0,
+        "USD" => [
             "total" => 0,
-            "USD" => [
-                "total" => 0,
-                "counter" => 0,
-            ],
-            "MXN" => [
-                "total" => 0,
-                "counter" => 0,
-            ],
             "counter" => 0,
         ],
-        'CONFIRMED' => [
+        "MXN" => [
             "total" => 0,
-            "USD" => [
-                "total" => 0,
-                "counter" => 0,
-            ],
-            "MXN" => [
-                "total" => 0,
-                "counter" => 0,
-            ],
             "counter" => 0,
         ],
-        'PENDING' => [
-            "total" => 0,
-            "USD" => [
+        "counter" => 0,
+        "data" => [
+            'CONFIRMED' => [
+                "name" => BookingTrait::statusBooking('CONFIRMED'),
                 "total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
                 "counter" => 0,
             ],
-            "MXN" => [
+            'PENDING' => [
+                "name" => BookingTrait::statusBooking('PENDING'),
                 "total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "counter" => 0,
+            ],            
+            'CANCELLED' => [
+                "name" => BookingTrait::statusBooking('CANCELLED'),
+                "total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
                 "counter" => 0,
             ],
-            "counter" => 0,
-        ],            
-        'CANCELLED' => [
-            "total" => 0,
-            "USD" => [
+            'OPENCREDIT' => [
+                "name" => BookingTrait::statusBooking('OPENCREDIT'),
                 "total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
                 "counter" => 0,
             ],
-            "MXN" => [
-                "total" => 0,
-                "counter" => 0,
-            ],
-            "counter" => 0,
-        ],
-        'OPENCREDIT' => [
-            "total" => 0,
-            "USD" => [
-                "total" => 0,
-                "counter" => 0,
-            ],
-            "MXN" => [
-                "total" => 0,
-                "counter" => 0,
-            ],
-            "counter" => 0,
-        ],
-    ];
-    $resume = [
-        'status' => [
-            'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-            'CONFIRMED' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-            'CANCELLED' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
         ]
     ];
-    $sites = [];
-    $affiliates = [];
-    $destinations = [];
-    $resume_total = 0;
-    $resume_total_mxn = 0;
-    $resume_total_usd = 0;
+
+    $dataVehicles = [
+        "total" => 0,
+        "USD" => [
+            "total" => 0,
+            "counter" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "counter" => 0,
+        ],
+        "counter" => 0,
+        "data" => []
+    ];
+
+    $dataOriginSale = [
+        "total" => 0,
+        "USD" => [
+            "total" => 0,
+            "counter" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "counter" => 0,
+        ],
+        "counter" => 0,
+        "data" => []
+    ];
+
+    $dataCurrency = [
+        "total" => 0,
+        "USD" => 0,
+        "MXN" => 0,
+        "counter" => 0,
+        "data" => []
+    ];
 @endphp
 @extends('layout.app')
 @section('title') Reservaciones @endsection
@@ -92,6 +120,106 @@
             cursor: pointer;
             font-size: 20px;
         }
+
+        /* Estilo para la capa */
+        .layer {
+            /* position: fixed; */
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* width: 100vw; */
+            width: 100%;
+            /* height: 100vh; */
+            height: 100%;
+            background-color: #ffffff;
+            color: white;
+            /* display: flex;
+            align-items: center;
+            justify-content: center; */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            /* transition: left 0.5s ease; */
+            z-index: 1000;
+        }
+
+        .layer.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .header-chart,
+        .body-chart{
+            width: 100%;
+            padding: 15px;
+        }
+
+        table.table-chart {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            color: #333;
+            text-align: left;
+            min-width: 400px;
+        }
+        .table-chart thead tr,
+        .table-chart tfoot tr{
+            background-color: #009879;
+            color: white;
+            font-weight: bold;            
+        }
+
+        .table-chart th,
+        .table-chart td {
+            padding: 12px 15px !important;
+            border: 1px solid #ddd;
+        }
+        .table-chart tbody tr:nth-child(even) {
+            background-color: #f3f3f3;
+        }
+
+        /* Hover en las filas */
+        .table-chart tbody tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        /* Resaltar la fila seleccionada */
+        .table-chart tbody tr.active-row {
+            font-weight: bold;
+            color: #009879;
+        }
+
+        .gran_total {
+            font-size: 1.5em; /* Tamaño general más grande para el total */
+            color: #000; /* Color negro para el texto */
+        }
+
+        .gran_total strong {
+            font-size: 1em; /* El texto "TOTAL" se mantiene en el mismo tamaño */
+            margin-right: 10px; /* Espacio entre "TOTAL:" y el monto */
+        }
+
+        .gran_total span {
+            display: inline-flex;
+            /* align-items: flex-end; */
+            align-items: flex-start;
+        }
+
+        .gran_total span::after {
+            /*content: ' MXN';  Moneda */
+            /*font-size: 0.65em;  Texto más pequeño para la moneda */
+            /*margin-left: 5px;  Espacio entre el monto y la moneda */
+            /*color: #333;  Color más oscuro pero menos prominente */
+
+            content: ' MXN'; /* Moneda */
+            font-size: 0.65em; /* Texto más pequeño para la moneda */
+            margin-left: 5px; /* Espacio entre el monto y la moneda */
+            color: #333; /* Color más oscuro pero menos prominente */
+            vertical-align: top; /* Alinea la moneda a la parte superior */
+            position: relative;
+            top: -0.2em; /* Ajuste fino para elevar ligeramente la moneda */            
+        }        
     </style>
 @endpush
 
@@ -102,10 +230,19 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="{{ mix('assets/js/sections/reservations/bookings.min.js') }}"></script>
+    <script>
+        document.getElementById('showLayer').addEventListener('click', function() {
+            document.getElementById('layer').classList.add('active');
+        });
+
+        document.getElementById('closeLayer').addEventListener('click', function() {
+            document.getElementById('layer').classList.remove('active');
+        });
+    </script>
 @endpush
 
 @section('content')
-    @php        
+    @php
         $buttons = array(
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
@@ -127,7 +264,15 @@
                     'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
                     'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
                 )                
-            ),            
+            ),
+            array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas',
+                'titleAttr' => 'Ver graficas',
+                'className' => 'btn btn-primary',
+                'attr' => array(
+                    'id' => 'showLayer',
+                )
+            ),                        
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar Excel',
                 'extend' => 'excelHtml5',
@@ -139,7 +284,8 @@
             ),
         );
     @endphp
-    <div class="row layout-top-spacing">
+
+    <div class="row layout-top-spacing" id="contentData">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
                 @if ($errors->any())
@@ -187,62 +333,69 @@
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
-                                {{-- @dd($item); --}}
-                                {{-- @dump($item) --}}
-
-                                {{-- @if ( $item->reservation_id == 37165 )
-                                    @dump($item)
-                                @endif --}}
-                                {{-- @if ( $item->status == "UNKNOWN" )
-                                    @dd($item)
-                                @endif --}}
                                 @php
-                                    $bookingsStatus['ACCUMULATED']['total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-                                    $bookingsStatus['ACCUMULATED'][$item->currency]['total'] += $item->total_sales;
-                                    $bookingsStatus['ACCUMULATED'][$item->currency]['counter']++;
-                                    $bookingsStatus['ACCUMULATED']['counter']++;
+                                    $bookingsStatus['total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $bookingsStatus[$item->currency]['total'] += $item->total_sales;
+                                    $bookingsStatus[$item->currency]['counter']++;
+                                    $bookingsStatus['counter']++;
 
-                                    if($item->is_cancelled == 0):
-                                        // $resume['status'][$item->status][$item->currency] += $item->total_sales;
-                                        // $resume['status'][$item->status]['count']++;
-                                        // //Si está confirmado, sumamos los totales por sitio...
-                                        // if($item->status == "CONFIRMED"):
-                                        //     if(!isset( $sites[$item->site_name] )):
-                                        //         $sites[$item->site_name] = [
-                                        //             'USD' => 0,
-                                        //             'MXN' => 0,
-                                        //             'count' => 0
-                                        //         ];
-                                        //     endif;                                                        
-                                        //     $sites[$item->site_name][$item->currency] += $item->total_sales;
-                                        //     $sites[$item->site_name]['count']++;
+                                    $bookingsStatus['data'][$item->reservation_status]['total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $bookingsStatus['data'][$item->reservation_status][$item->currency]['total'] += $item->total_sales;
+                                    $bookingsStatus['data'][$item->reservation_status][$item->currency]['counter']++;
+                                    $bookingsStatus['data'][$item->reservation_status]['counter']++;
 
-                                        //     if($item->affiliate_id != 0 ):
-                                        //         if(!isset( $affiliates[$item->site_name] )):
-                                        //             $affiliates[$item->site_name] = [
-                                        //                 'USD' => 0,
-                                        //                 'MXN' => 0,
-                                        //                 'count' => 0
-                                        //             ];
-                                        //         endif;
-                                        //         $affiliates[$item->site_name][$item->currency] += $item->total_sales;
-                                        //         $affiliates[$item->site_name]['count']++;
-                                        //     endif;
+                                    //VEHICULOS
+                                    if (!isset( $dataVehicles['data'][Str::slug(strtoupper($item->service_type_name))] ) ){
+                                        $dataVehicles['data'][Str::slug(strtoupper($item->service_type_name))] = [
+                                            "name" => $item->service_type_name,
+                                            "total" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    $dataVehicles['data'][Str::slug(strtoupper($item->service_type_name))]['total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataVehicles['data'][Str::slug(strtoupper($item->service_type_name))][$item->currency]['total'] += $item->total_sales;
+                                    $dataVehicles['data'][Str::slug(strtoupper($item->service_type_name))][$item->currency]['counter']++;
+                                    $dataVehicles['data'][Str::slug(strtoupper($item->service_type_name))]['counter']++;
 
-                                        //     if(!isset( $destinations[$item->destination_name_to] )):
-                                        //         $destinations[$item->destination_name_to] = [
-                                        //             'USD' => 0,
-                                        //             'MXN' => 0,
-                                        //             'count' => 0
-                                        //         ];
-                                        //     endif;
-                                        //     $destinations[$item->destination_name_to][$item->currency] += $item->total_sales;
-                                        //     $destinations[$item->destination_name_to]['count']++;
-                                        // endif;
-                                    else:
-                                        // $resume['status']['CANCELLED'][$item->currency] += $item->total_sales;
-                                        // $resume['status']['CANCELLED']['count']++;
-                                    endif;
+                                    //ORIGEN DE VENTA
+                                    if (!isset( $dataOriginSale['data'][Str::slug(strtoupper(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))] ) ){
+                                        $dataOriginSale['data'][Str::slug(strtoupper(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))] = [
+                                            "name" => ( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' ),
+                                            "total" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    $dataOriginSale['data'][Str::slug(strtoupper(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))]['total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataOriginSale['data'][Str::slug(strtoupper(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))][$item->currency]['total'] += $item->total_sales;
+                                    $dataOriginSale['data'][Str::slug(strtoupper(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))][$item->currency]['counter']++;
+                                    $dataOriginSale['data'][Str::slug(strtoupper(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))]['counter']++;
+
+                                    //MONEDAS
+                                    if (!isset( $dataCurrency['data'][$item->currency] ) ){
+                                        $dataCurrency['data'][$item->currency] = [
+                                            "name" => $item->currency,
+                                            "total" => 0,
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    $dataCurrency['data'][$item->currency]['total'] += $item->total_sales;
+                                    $dataCurrency['data'][$item->currency]['counter']++;
                                 @endphp
                                 <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
                                     <td class="text-center"><span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
@@ -308,6 +461,151 @@
             </div>
         </div>
     </div>
+
+    <div class="layer" id="layer">
+        <div class="header-chart d-flex justify-content-between">
+            <div class="gran_total">
+                <span><strong>TOTAL:</strong> $ {{ number_format($bookingsStatus['total'],2) }}</span>
+            </div>
+            <div>
+                <button class="btn btn-primary" id="closeLayer">Cerrar</button>
+            </div>
+        </div>
+        <div class="body-chart">
+            <div class="row">
+                <div class="col-lg-6 col-12">
+                    <table class="table table-chart">
+                        <thead>
+                            <tr>
+                                <th>ESTATUS</th>
+                                <th class="text-center">CANTIDAD</th>
+                                <th class="text-center">PESOS</th>
+                                <th class="text-center">DOLARES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($bookingsStatus['data'] as $keyStatus => $status )
+                                <tr>
+                                    <th>{{ $status['name'] }}</th>
+                                    <td class="text-center">{{ $status['counter'] }}</td>
+                                    <td class="text-center">{{ number_format($status['MXN']['total'],2) }}</td>
+                                    <td class="text-center">{{ number_format($status['USD']['total'],2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>TOTAL</th>
+                                <th class="text-center">{{ $bookingsStatus['counter'] }}</th>
+                                <th class="text-center">{{ number_format($bookingsStatus['MXN']['total'],2) }}</th>
+                                <th class="text-center">{{ number_format($bookingsStatus['USD']['total'],2) }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="col-lg-6 col-12">
+                    <table class="table table-chart">
+                        <thead>
+                            <tr>
+                                <th>ESTATUS</th>
+                                <th class="text-center">CANTIDAD</th>
+                                <th class="text-center">PESOS</th>
+                                <th class="text-center">DOLARES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($bookingsStatus['data'] as $keyStatus => $status )
+                                <tr>
+                                    <th>{{ $status['name'] }}</th>
+                                    <td class="text-center">{{ $status['counter'] }}</td>
+                                    <td class="text-center">{{ number_format($status['MXN']['total'],2) }}</td>
+                                    <td class="text-center">{{ number_format($status['USD']['total'],2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>TOTAL</th>
+                                <th class="text-center">{{ $bookingsStatus['counter'] }}</th>
+                                <th class="text-center">{{ number_format($bookingsStatus['MXN']['total'],2) }}</th>
+                                <th class="text-center">{{ number_format($bookingsStatus['USD']['total'],2) }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="col-lg-4 col-12">
+                    <table class="table table-chart">
+                        <thead>
+                            <tr>
+                                <th>VEHÍCULO</th>
+                                <th class="text-center">CANTIDAD</th>
+                                <th class="text-center">PESOS</th>
+                                <th class="text-center">DOLARES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($dataVehicles['data'] as $keyVehicle => $vehicle )
+                                <tr>
+                                    <th>{{ $vehicle['name'] }}</th>
+                                    <td class="text-center">{{ $vehicle['counter'] }}</td>
+                                    <td class="text-center">{{ number_format($vehicle['MXN']['total'],2) }}</td>
+                                    <td class="text-center">{{ number_format($vehicle['USD']['total'],2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="col-lg-4 col-12">
+                    <table class="table table-chart">
+                        <thead>
+                            <tr>
+                                <th>ORIGEN</th>
+                                <th class="text-center">CANTIDAD</th>
+                                <th class="text-center">PESOS</th>
+                                <th class="text-center">DOLARES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($dataOriginSale['data'] as $keyOrigin => $origin )
+                                <tr>
+                                    <th>{{ $origin['name'] }}</th>
+                                    <td class="text-center">{{ $origin['counter'] }}</td>
+                                    <td class="text-center">{{ number_format($origin['MXN']['total'],2) }}</td>
+                                    <td class="text-center">{{ number_format($origin['USD']['total'],2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="col-lg-4 col-12">
+                    <table class="table table-chart">
+                        <thead>
+                            <tr>
+                                <th>MONEDA</th>
+                                <th class="text-center">CANTIDAD</th>
+                                <th class="text-center">TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($dataCurrency['data'] as $keyCurrency => $currency )
+                                <tr>
+                                    <th>{{ $currency['name'] }}</th>
+                                    <td class="text-center">{{ $currency['counter'] }}</td>
+                                    <td class="text-center">{{ number_format($currency['total'],2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    @dump($bookingsStatus, $dataVehicles, $dataOriginSale, $dataCurrency);
 
     <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" :isbalance="1" />
     <x-modals.reports.columns />

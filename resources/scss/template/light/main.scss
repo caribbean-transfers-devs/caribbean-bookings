@@ -3748,15 +3748,15 @@ fieldset:disabled .btn {
   }
 
   &:not(.dataTable) thead tr th {
-    &:first-child {
-      border-top-left-radius: 10px;
-      border-bottom-left-radius: 10px;
-    }
+    // &:first-child {
+    //   border-top-left-radius: 10px;
+    //   border-bottom-left-radius: 10px;
+    // }
 
-    &:last-child {
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
-    }
+    // &:last-child {
+    //   border-top-right-radius: 10px;
+    //   border-bottom-right-radius: 10px;
+    // }
 
     &.checkbox-area {
       width: 5%;

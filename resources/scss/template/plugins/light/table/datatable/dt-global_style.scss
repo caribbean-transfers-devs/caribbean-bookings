@@ -132,7 +132,8 @@ table.dataTable {
   }
 
   > {
-    thead > tr > th {
+    thead > tr > th,
+    tfoot > tr > th {
       text-transform: initial;
       font-weight: 600;
       border-top: none;
