@@ -81,8 +81,14 @@ trait OperationTrait
         }
     }
 
-    public static function serviceStatus($service){
-        return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ));
+    public static function serviceStatus($service, $action = "translate"){
+        if( $action == "translate" ){
+            return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ));
+        }else if( $action == "translate_name" ){
+            return self::statusBooking($service);
+        }else if( $action == "no_translate" ){
+            return ( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status );
+        }
     }
     public static function renderServiceStatus($service){
         return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ), 'OPERATION').'">'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status )).'</button>';
@@ -124,7 +130,7 @@ trait OperationTrait
         }else if( $service->op_type == "TYPE_TWO" ){
             return $service->op_two_operating_cost;
         }else{
-            return "";
+            return 0;
         }
     }
 

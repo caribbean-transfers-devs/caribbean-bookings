@@ -5,9 +5,80 @@
     use App\Traits\OperationTrait;
     use Carbon\Carbon;
 @endphp
-@php    
-    $dataUnit = [];
-    $dataDriver = [];
+@php
+    $operationStatus = [
+        "total" => 0,
+        "gran_total" => 0,
+        "USD" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "counter" => 0,
+        "data" => [
+            'COMPLETED' => [
+                "name" => OperationTrait::serviceStatus('COMPLETED',"translate_name"),
+                "total" => 0,
+                "gran_total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "counter" => 0,
+            ],
+            'PENDING' => [
+                "name" => OperationTrait::serviceStatus('PENDING',"translate_name"),
+                "total" => 0,
+                "gran_total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "counter" => 0,
+            ],
+            'NOSHOW' => [
+                "name" => OperationTrait::serviceStatus('NOSHOW',"translate_name"),
+                "total" => 0,
+                "gran_total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "counter" => 0,
+            ],                       
+            'CANCELLED' => [
+                "name" => OperationTrait::serviceStatus('CANCELLED',"translate_name"),
+                "total" => 0,
+                "gran_total" => 0,
+                "USD" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "MXN" => [
+                    "total" => 0,
+                    "counter" => 0,
+                ],
+                "counter" => 0,
+            ],
+        ]
+    ];    
 
     $dataSites = [
         "total" => 0,
@@ -41,6 +112,49 @@
         ],
         "counter" => 0,
         "data" => []
+    ];
+
+    $dataCurrency = [
+        "total" => 0,
+        "gran_total" => 0,
+        "counter" => 0,
+        "data" => []
+    ];
+
+    $dataUnit = [
+        "total" => 0,
+        "gran_total" => 0,
+        "USD" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "operating_cost" => 0,
+        "counter" => 0,
+        "data" => []        
+    ];
+
+    $dataDriver = [
+        "total" => 0,
+        "gran_total" => 0,
+        "USD" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "commission" => 0,
+        "counter" => 0,
+        "data" => []        
     ];
 
     $dataServiceTypeOperation = [
@@ -313,6 +427,17 @@
                         @if(sizeof($operations) >= 1)
                             @foreach ($operations as $operation)
                                 @php
+                                    $operationStatus['total'] += $operation->service_cost;
+                                    $operationStatus['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                    $operationStatus[$operation->currency]['total'] += $operation->service_cost;
+                                    $operationStatus[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                    $operationStatus[$operation->currency]['counter']++;
+                                    $operationStatus['counter']++;
+                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")][$operation->currency]['total'] += $operation->service_cost;
+                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")][$operation->currency]['counter']++;
+                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['counter']++;
                                     
                                     //SITIOS                                    
                                     if (!isset( $dataSites['data'][strtoupper(Str::slug($operation->site_name))] ) ){
@@ -375,6 +500,92 @@
                                         $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['counter']++;
                                         $dataOriginSale['counter']++;
                                     }
+
+                                    //MONEDAS
+                                    if (!isset( $dataCurrency['data'][$operation->currency] ) ){
+                                        $dataCurrency['data'][$operation->currency] = [
+                                            "name" => $operation->currency,
+                                            "total" => 0,
+                                            "gran_total" => 0,
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                        $dataCurrency['total'] += $operation->service_cost;
+                                        $dataCurrency['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataCurrency['data'][$operation->currency]['total'] += $operation->service_cost;
+                                        $dataCurrency['data'][$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataCurrency['data'][$operation->currency]['counter']++;
+                                        $dataCurrency['counter']++;
+                                    }
+                                    
+                                    //UNIDADES DE OPERACION
+                                    if (!isset( $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))] ) ){
+                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))] = [
+                                            "name" => OperationTrait::setOperationUnit($operation),
+                                            "total" => 0,
+                                            "gran_total" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "operating_cost" => 0,
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                        $dataUnit['total'] += $operation->service_cost;
+                                        $dataUnit['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataUnit[$operation->currency]['total'] += $operation->service_cost;
+                                        $dataUnit[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataUnit[$operation->currency]['counter']++;
+                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['total'] += $operation->service_cost;
+                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))][$operation->currency]['total'] += $operation->service_cost;
+                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))][$operation->currency]['counter']++;
+                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['counter']++;
+                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['operating_cost'] += OperationTrait::setOperatingCost($operation);
+                                        $dataUnit['operating_cost'] += OperationTrait::setOperatingCost($operation);
+                                        $dataUnit['counter']++;
+                                    }
+
+                                    //CONDUCTORES DE OPERACION
+                                    if (!isset( $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))] ) ){
+                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))] = [
+                                            "name" => OperationTrait::setOperationDriver($operation),
+                                            "total" => 0,
+                                            "gran_total" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "commission" => 0,
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                        $dataDriver['total'] += $operation->service_cost;
+                                        $dataDriver['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataDriver[$operation->currency]['total'] += $operation->service_cost;
+                                        $dataDriver[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataDriver[$operation->currency]['counter']++;
+                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['total'] += $operation->service_cost;
+                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))][$operation->currency]['total'] += $operation->service_cost;
+                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))][$operation->currency]['counter']++;
+                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['counter']++;
+                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['commission'] += OperationTrait::commissionOperation($operation);
+                                        $dataDriver['commission'] += OperationTrait::commissionOperation($operation);
+                                        $dataDriver['counter']++;
+                                    }                                    
 
                                     //TIPO DE SERVICIO EN OPERACION
                                     if (!isset( $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] ) ){
@@ -492,7 +703,7 @@
     <div class="layer" id="layer">
         <div class="header-chart d-flex justify-content-between">
             <div class="gran_total">
-                <span><strong>TOTAL:</strong> $ 0</span>
+                <span><strong>TOTAL:</strong> $ {{ number_format($operationStatus['data']['COMPLETED']['gran_total'],2) }}</span>
             </div>
             <div>
                 <button class="btn btn-primary" id="closeLayer">Cerrar</button>
@@ -500,44 +711,288 @@
         </div>
         <div class="body-chart">
             <div class="row">
-                <div class="col-lg-12 col-12">
-                    <table class="table table-chart">
-                        <thead>
-                            <tr>
-                                <th>SITIO</th>
-                                <th class="text-center">GRAN TOTAL</th>
-                                <th class="text-center">CANTIDAD</th>
-                                <th class="text-center">PESOS</th>
-                                <th class="text-center">DOLARES</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($dataSites['data'] as $keySite => $site )
+                <div class="col-lg-8 col-12">
+                    <div class="col-lg-12 col-12">
+                        <table class="table table-chart">
+                            <thead>
                                 <tr>
-                                    <th>{{ $site['name'] }}</th>
-                                    <td class="text-center">{{ number_format($site['gran_total'],2) }}</td>
-                                    <td class="text-center">{{ $site['counter'] }}</td>
-                                    <td class="text-center">{{ number_format($site['MXN']['total'],2) }}</td>
-                                    <td class="text-center">{{ number_format($site['USD']['total'],2) }}</td>
+                                    <th>ESTATUS</th>
+                                    <th class="text-center">GRAN TOTAL</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">PESOS</th>
+                                    <th class="text-center">DOLARES</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>TOTAL</th>
-                                <th class="text-center">{{ number_format($dataSites['gran_total'],2) }}</th>
-                                <th class="text-center">{{ $dataSites['counter'] }}</th>
-                                <th class="text-center">{{ number_format($dataSites['MXN']['total'],2) }}</th>
-                                <th class="text-center">{{ number_format($dataSites['USD']['total'],2) }}</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>                
+                            </thead>
+                            <tbody>
+                                @foreach ($operationStatus['data'] as $keyStatus => $status )
+                                    <tr>
+                                        <th>{{ $status['name'] }}</th>
+                                        <td class="text-center">{{ number_format($status['gran_total'],2) }}</td>
+                                        <td class="text-center">{{ $status['counter'] }}</td>
+                                        <td class="text-center">{{ number_format($status['MXN']['total'],2) }}</td>
+                                        <td class="text-center">{{ number_format($status['USD']['total'],2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>TOTAL</th>
+                                    <th class="text-center">{{ number_format($operationStatus['gran_total'],2) }}</th>
+                                    <th class="text-center">{{ $operationStatus['counter'] }}</th>
+                                    <th class="text-center">{{ number_format($operationStatus['MXN']['total'],2) }}</th>
+                                    <th class="text-center">{{ number_format($operationStatus['USD']['total'],2) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="col-lg-12 col-12">
+                        <table class="table table-chart">
+                            <thead>
+                                <tr>
+                                    <th>CONDUCTOR</th>
+                                    <th class="text-center">GRAN TOTAL</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">PESOS</th>
+                                    <th class="text-center">DOLARES</th>
+                                    <th class="text-center">COMISIÓN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($dataDriver['data'] as $keyDriver => $driver )
+                                    <tr>
+                                        <th>{{ $driver['name'] }}</th>
+                                        <td class="text-center">{{ number_format($driver['gran_total'],2) }}</td>
+                                        <td class="text-center">{{ $driver['counter'] }}</td>
+                                        <td class="text-center">{{ number_format($driver['MXN']['total'],2) }}</td>
+                                        <td class="text-center">{{ number_format($driver['USD']['total'],2) }}</td>
+                                        <td class="text-center">{{ number_format($driver['commission'],2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>TOTAL</th>
+                                    <th class="text-center">{{ number_format($dataDriver['gran_total'],2) }}</th>
+                                    <th class="text-center">{{ $dataDriver['counter'] }}</th>
+                                    <th class="text-center">{{ number_format($dataDriver['MXN']['total'],2) }}</th>
+                                    <th class="text-center">{{ number_format($dataDriver['USD']['total'],2) }}</th>
+                                    <th class="text-center">{{ number_format($dataDriver['commission'],2) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="col-lg-12 col-12">
+                        <table class="table table-chart">
+                            <thead>
+                                <tr>
+                                    <th>SITIO</th>
+                                    <th class="text-center">GRAN TOTAL</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">PESOS</th>
+                                    <th class="text-center">DOLARES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($dataSites['data'] as $keySite => $site )
+                                    <tr>
+                                        <th>{{ $site['name'] }}</th>
+                                        <td class="text-center">{{ number_format($site['gran_total'],2) }}</td>
+                                        <td class="text-center">{{ $site['counter'] }}</td>
+                                        <td class="text-center">{{ number_format($site['MXN']['total'],2) }}</td>
+                                        <td class="text-center">{{ number_format($site['USD']['total'],2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>TOTAL</th>
+                                    <th class="text-center">{{ number_format($dataSites['gran_total'],2) }}</th>
+                                    <th class="text-center">{{ $dataSites['counter'] }}</th>
+                                    <th class="text-center">{{ number_format($dataSites['MXN']['total'],2) }}</th>
+                                    <th class="text-center">{{ number_format($dataSites['USD']['total'],2) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="col-lg-12 col-12">
+                        <table class="table table-chart">
+                            <thead>
+                                <tr>
+                                    <th>ORIGEN</th>
+                                    <th class="text-center">GRAN TOTAL</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">PESOS</th>
+                                    <th class="text-center">DOLARES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($dataOriginSale['data'] as $keyOrigin => $origin )
+                                    <tr>
+                                        <th>{{ $origin['name'] }}</th>
+                                        <td class="text-center">{{ number_format($origin['gran_total'],2) }}</td>
+                                        <td class="text-center">{{ $origin['counter'] }}</td>
+                                        <td class="text-center">{{ number_format($origin['MXN']['total'],2) }}</td>
+                                        <td class="text-center">{{ number_format($origin['USD']['total'],2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>TOTAL</th>
+                                    <th class="text-center">{{ number_format($dataOriginSale['gran_total'],2) }}</th>
+                                    <th class="text-center">{{ $dataOriginSale['counter'] }}</th>
+                                    <th class="text-center">{{ number_format($dataOriginSale['MXN']['total'],2) }}</th>
+                                    <th class="text-center">{{ number_format($dataOriginSale['USD']['total'],2) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-12">
+                    <div class="col-lg-12 col-12">
+                        <table class="table table-chart">
+                            <thead>
+                                <tr>
+                                    <th>MONEDA</th>
+                                    <th class="text-center">GRAN TOTAL</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">TOTAL</th>                                
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($dataCurrency['data'] as $keyCurrency => $currency )
+                                    <tr>
+                                        <th>{{ $currency['name'] }}</th>
+                                        <td class="text-center">{{ number_format($currency['gran_total'],2) }}</td>
+                                        <td class="text-center">{{ $currency['counter'] }}</td>
+                                        <td class="text-center">{{ number_format($currency['total'],2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>TOTAL</th>
+                                    <th class="text-center">{{ number_format($dataCurrency['gran_total'],2) }}</th>
+                                    <th class="text-center">{{ $dataCurrency['counter'] }}</th>
+                                    <th class="text-center">{{ number_format($dataCurrency['total'],2) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <hr>                                
+                    <div class="col-lg-12 col-12">
+                        <table class="table table-chart">
+                            <thead>
+                                <tr>
+                                    <th>UNIDAD</th>
+                                    <th class="text-center">GRAN TOTAL</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">PESOS</th>
+                                    <th class="text-center">DOLARES</th>
+                                    <th class="text-center">COSTO OPERATIVO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($dataUnit['data'] as $keyUnit => $unit )
+                                    <tr>
+                                        <th>{{ $unit['name'] }}</th>
+                                        <td class="text-center">{{ number_format($unit['gran_total'],2) }}</td>
+                                        <td class="text-center">{{ $unit['counter'] }}</td>
+                                        <td class="text-center">{{ number_format($unit['MXN']['total'],2) }}</td>
+                                        <td class="text-center">{{ number_format($unit['USD']['total'],2) }}</td>
+                                        <td class="text-center">{{ number_format($unit['operating_cost'],2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>TOTAL</th>
+                                    <th class="text-center">{{ number_format($dataUnit['gran_total'],2) }}</th>
+                                    <th class="text-center">{{ $dataUnit['counter'] }}</th>
+                                    <th class="text-center">{{ number_format($dataUnit['MXN']['total'],2) }}</th>
+                                    <th class="text-center">{{ number_format($dataUnit['USD']['total'],2) }}</th>
+                                    <th class="text-center">{{ number_format($dataUnit['operating_cost'],2) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="col-lg-12 col-12">
+                        <table class="table table-chart">
+                            <thead>
+                                <tr>
+                                    <th>TIPO DE SERVICIO</th>
+                                    <th class="text-center">GRAN TOTAL</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">PESOS</th>
+                                    <th class="text-center">DOLARES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($dataServiceTypeOperation['data'] as $keyTypeOperation => $typeoperation )
+                                    <tr>
+                                        <th>{{ $typeoperation['name'] }}</th>
+                                        <td class="text-center">{{ number_format($typeoperation['gran_total'],2) }}</td>
+                                        <td class="text-center">{{ $typeoperation['counter'] }}</td>
+                                        <td class="text-center">{{ number_format($typeoperation['MXN']['total'],2) }}</td>
+                                        <td class="text-center">{{ number_format($typeoperation['USD']['total'],2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>TOTAL</th>
+                                    <th class="text-center">{{ number_format($dataServiceTypeOperation['gran_total'],2) }}</th>
+                                    <th class="text-center">{{ $dataServiceTypeOperation['counter'] }}</th>
+                                    <th class="text-center">{{ number_format($dataServiceTypeOperation['MXN']['total'],2) }}</th>
+                                    <th class="text-center">{{ number_format($dataServiceTypeOperation['USD']['total'],2) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="col-lg-12 col-12">
+                        <table class="table table-chart">
+                            <thead>
+                                <tr>
+                                    <th>VEHÍCULO</th>
+                                    <th class="text-center">GRAN TOTAL</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">PESOS</th>
+                                    <th class="text-center">DOLARES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($dataVehicles['data'] as $keyVehicle => $vehicle )
+                                    <tr>
+                                        <th>{{ $vehicle['name'] }}</th>
+                                        <td class="text-center">{{ number_format($vehicle['gran_total'],2) }}</td>
+                                        <td class="text-center">{{ $vehicle['counter'] }}</td>
+                                        <td class="text-center">{{ number_format($vehicle['MXN']['total'],2) }}</td>
+                                        <td class="text-center">{{ number_format($vehicle['USD']['total'],2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>TOTAL</th>
+                                    <th class="text-center">{{ number_format($dataVehicles['gran_total'],2) }}</th>
+                                    <th class="text-center">{{ $dataVehicles['counter'] }}</th>
+                                    <th class="text-center">{{ number_format($dataVehicles['MXN']['total'],2) }}</th>
+                                    <th class="text-center">{{ number_format($dataVehicles['USD']['total'],2) }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    @dump($dataSites, $dataOriginSale, $dataServiceTypeOperation);
+    {{-- @dump($dataSites, $dataOriginSale, $dataCurrency, $dataUnit, $dataServiceTypeOperation); --}}
     <x-modals.filters.bookings :data="$data" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :servicesoperation="$services_operation" :serviceoperationstatus="$service_operation_status" :units="$units" :drivers="$drivers" :operationstatus="$operation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />

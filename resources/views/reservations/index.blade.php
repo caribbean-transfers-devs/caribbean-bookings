@@ -692,6 +692,7 @@
                             </div>                            
                         </div>
                     </div>
+                    <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
                             <div class="col-lg-5 col-12">
@@ -732,6 +733,7 @@
                             </div>
                         </div>
                     </div>
+                    <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
                             <div class="col-lg-5 col-12">
@@ -772,6 +774,7 @@
                             </div>
                         </div>
                     </div>
+                    <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
                             <div class="col-lg-5 col-12">
@@ -845,6 +848,7 @@
                             </tfoot>
                         </table>
                     </div>
+                    <hr>
                     <div class="col-lg-12 col-12">
                         <table class="table table-chart">
                             <thead>
@@ -878,6 +882,7 @@
                             </tfoot>
                         </table>
                     </div>
+                    <hr>
                     <div class="col-lg-12 col-12">
                         <table class="table table-chart">
                             <thead>
