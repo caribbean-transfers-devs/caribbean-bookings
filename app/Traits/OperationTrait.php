@@ -81,6 +81,9 @@ trait OperationTrait
         }
     }
 
+    public static function serviceStatus($service){
+        return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ));
+    }
     public static function renderServiceStatus($service){
         return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ), 'OPERATION').'">'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status )).'</button>';
     }
@@ -125,8 +128,11 @@ trait OperationTrait
         }
     }
 
+    public static function operationStatus($service){
+        return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ));
+    }
     public static function renderOperationStatus($service){
-        return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ), 'OPERATION').'">'.( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ).'</button>';
+        return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ), 'OPERATION').'">'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status )).'</button>';
     }
 
     public static function commissionOperation($service){
@@ -134,5 +140,4 @@ trait OperationTrait
         $percentage = ( $service->site_id == 21 ? 0.04 : 0.05 );
         return ( $payment * $percentage );
     }
-
 }

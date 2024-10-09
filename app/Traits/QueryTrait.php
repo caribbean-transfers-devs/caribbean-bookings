@@ -194,7 +194,6 @@ trait QueryTrait
                                     ELSE 'UNKNOWN'
                                 END AS reservation_status,
 
-                                -- it.*,
                                 'arrival' as operation_type,
                                 'TYPE_ONE' as op_type,
                                 it.id,
@@ -251,8 +250,13 @@ trait QueryTrait
                                 vehicle_two.name as vehicle_two_name,
 
                                 CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
-                                CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name
+                                CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
 
+                                -- Campo adicional: Costo por servicio
+                                CASE 
+                                    WHEN it.is_round_trip = 1 THEN COALESCE(SUM(s.total_sales), 0) / 2
+                                    ELSE COALESCE(SUM(s.total_sales), 0)
+                                END AS service_cost
                             FROM reservations_items as it
                                 INNER JOIN reservations as rez ON rez.id = it.reservation_id
                                 INNER JOIN sites as site ON site.id = rez.site_id
@@ -337,7 +341,6 @@ trait QueryTrait
                                     ELSE 'UNKNOWN'
                                 END AS reservation_status,
 
-                                -- it.*,
                                 'departure' as operation_type,                                  
                                 'TYPE_TWO' as op_type,
                                 it.id,
@@ -394,7 +397,13 @@ trait QueryTrait
                                 vehicle_two.name as vehicle_two_name,
 
                                 CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
-                                CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name
+                                CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
+
+                                -- Campo adicional: Costo por servicio
+                                CASE 
+                                    WHEN it.is_round_trip = 1 THEN COALESCE(SUM(s.total_sales), 0) / 2
+                                    ELSE COALESCE(SUM(s.total_sales), 0)
+                                END AS service_cost
                             FROM reservations_items as it
                                 INNER JOIN reservations as rez ON rez.id = it.reservation_id
                                 INNER JOIN sites as site ON site.id = rez.site_id

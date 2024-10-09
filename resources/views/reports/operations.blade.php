@@ -5,6 +5,78 @@
     use App\Traits\OperationTrait;
     use Carbon\Carbon;
 @endphp
+@php    
+    $dataUnit = [];
+    $dataDriver = [];
+
+    $dataSites = [
+        "total" => 0,
+        "gran_total" => 0,
+        "USD" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "counter" => 0,
+        "data" => []
+    ];
+
+    $dataOriginSale = [
+        "total" => 0,
+        "gran_total" => 0,
+        "USD" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "counter" => 0,
+        "data" => []
+    ];
+
+    $dataServiceTypeOperation = [
+        "total" => 0,
+        "gran_total" => 0,
+        "USD" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "counter" => 0,
+        "data" => []
+    ];
+
+    $dataVehicles = [
+        "total" => 0,
+        "gran_total" => 0,
+        "USD" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "counter" => 0,
+        "data" => []
+    ];
+@endphp
 
 @extends('layout.app')
 @section('title') Operaciones @endsection
@@ -17,6 +89,108 @@
             cursor: pointer;
             font-size: 20px;
         }
+
+        /* Estilo para la capa */
+        .layer {
+            /* position: fixed; */
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* width: 100vw; */
+            width: 100%;
+            /* height: 100vh; */
+            height: 100%;
+            background-color: #ffffff;
+            color: white;
+            /* display: flex;
+            align-items: center;
+            justify-content: center; */
+
+            opacity: 0;
+            visibility: hidden;
+            
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            /* transition: left 0.5s ease; */
+            z-index: 1000;
+        }
+
+        .layer.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .header-chart,
+        .body-chart{
+            width: 100%;
+            padding: 15px;
+        }
+
+        table.table-chart {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            color: #333;
+            text-align: left;
+            min-width: 400px;
+        }
+        .table-chart thead tr,
+        .table-chart tfoot tr{
+            background-color: #009879;
+            color: white;
+            font-weight: bold;            
+        }
+
+        .table-chart th,
+        .table-chart td {
+            padding: 12px 15px !important;
+            border: 1px solid #ddd;
+        }
+        .table-chart tbody tr:nth-child(even) {
+            background-color: #f3f3f3;
+        }
+
+        /* Hover en las filas */
+        .table-chart tbody tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        /* Resaltar la fila seleccionada */
+        .table-chart tbody tr.active-row {
+            font-weight: bold;
+            color: #009879;
+        }
+
+        .gran_total {
+            font-size: 1.5em; /* Tamaño general más grande para el total */
+            color: #000; /* Color negro para el texto */
+        }
+
+        .gran_total strong {
+            font-size: 1em; /* El texto "TOTAL" se mantiene en el mismo tamaño */
+            margin-right: 10px; /* Espacio entre "TOTAL:" y el monto */
+        }
+
+        .gran_total span {
+            display: inline-flex;
+            /* align-items: flex-end; */
+            align-items: flex-start;
+        }
+
+        .gran_total span::after {
+            /*content: ' MXN';  Moneda */
+            /*font-size: 0.65em;  Texto más pequeño para la moneda */
+            /*margin-left: 5px;  Espacio entre el monto y la moneda */
+            /*color: #333;  Color más oscuro pero menos prominente */
+
+            content: ' MXN'; /* Moneda */
+            font-size: 0.65em; /* Texto más pequeño para la moneda */
+            margin-left: 5px; /* Espacio entre el monto y la moneda */
+            color: #333; /* Color más oscuro pero menos prominente */
+            vertical-align: top; /* Alinea la moneda a la parte superior */
+            position: relative;
+            top: -0.2em; /* Ajuste fino para elevar ligeramente la moneda */            
+        }        
     </style>
 @endpush
 
@@ -27,6 +201,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="{{ mix('assets/js/sections/reports/operations.min.js') }}"></script>
+    <script>
+        document.getElementById('showLayer').addEventListener('click', function() {
+            document.getElementById('layer').classList.add('active');
+        });
+
+        document.getElementById('closeLayer').addEventListener('click', function() {
+            document.getElementById('layer').classList.remove('active');
+        });
+    </script>
 @endpush
 
 @section('content')
@@ -52,7 +235,15 @@
                     'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
                     'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
                 )                
-            ),            
+            ),
+            array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas',
+                'titleAttr' => 'Ver graficas',
+                'className' => 'btn btn-primary',
+                'attr' => array(
+                    'id' => 'showLayer',
+                )
+            ),
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar Excel',
                 'extend' => 'excelHtml5',
@@ -63,7 +254,8 @@
                 ]
             ),
         );
-    @endphp
+    @endphp    
+
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
@@ -120,7 +312,132 @@
                     <tbody>
                         @if(sizeof($operations) >= 1)
                             @foreach ($operations as $operation)
-                                {{-- @dd($operation); --}}
+                                @php
+                                    
+                                    //SITIOS                                    
+                                    if (!isset( $dataSites['data'][strtoupper(Str::slug($operation->site_name))] ) ){
+                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))] = [
+                                            "name" => $operation->site_name,
+                                            "total" => 0,
+                                            "gran_total" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                        $dataSites['total'] += $operation->service_cost;
+                                        $dataSites['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataSites[$operation->currency]['total'] += $operation->service_cost;
+                                        $dataSites[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataSites[$operation->currency]['counter']++;
+                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['total'] += $operation->service_cost;
+                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))][$operation->currency]['total'] += $operation->service_cost;
+                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))][$operation->currency]['counter']++;
+                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['counter']++;
+                                        $dataSites['counter']++;
+                                    }
+
+                                    //ORIGEN DE VENTA
+                                    if (!isset( $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))] ) ){
+                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))] = [
+                                            "name" => ( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' ),
+                                            "total" => 0,
+                                            "gran_total" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                        $dataOriginSale['total'] += $operation->service_cost;
+                                        $dataOriginSale['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataOriginSale[$operation->currency]['total'] += $operation->service_cost;
+                                        $dataOriginSale[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataOriginSale[$operation->currency]['counter']++;
+                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['total'] += $operation->service_cost;
+                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))][$operation->currency]['total'] += $operation->service_cost;
+                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))][$operation->currency]['counter']++;
+                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['counter']++;
+                                        $dataOriginSale['counter']++;
+                                    }
+
+                                    //TIPO DE SERVICIO EN OPERACION
+                                    if (!isset( $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] ) ){
+                                        $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] = [
+                                            "name" => $operation->final_service_type,
+                                            "total" => 0,
+                                            "gran_total" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                        $dataServiceTypeOperation['total'] += $operation->service_cost;
+                                        $dataServiceTypeOperation['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataServiceTypeOperation[$operation->currency]['total'] += $operation->service_cost;
+                                        $dataServiceTypeOperation[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataServiceTypeOperation[$operation->currency]['counter']++;
+                                        $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['total'] += $operation->service_cost;
+                                        $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))][$operation->currency]['total'] += $operation->service_cost;
+                                        $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))][$operation->currency]['counter']++;
+                                        $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['counter']++;
+                                        $dataServiceTypeOperation['counter']++;
+                                    }
+
+                                    //VEHICULOS                                    
+                                    if (!isset( $dataVehicles['data'][strtoupper(Str::slug($operation->service_type_name))] ) ){
+                                        $dataVehicles['data'][strtoupper(Str::slug($operation->service_type_name))] = [
+                                            "name" => $operation->service_type_name,
+                                            "total" => 0,
+                                            "gran_total" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                        $dataVehicles['total'] += $operation->service_cost;
+                                        $dataVehicles['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataVehicles[$operation->currency]['total'] += $operation->service_cost;
+                                        $dataVehicles[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataVehicles[$operation->currency]['counter']++;
+                                        $dataVehicles['data'][strtoupper(Str::slug($operation->service_type_name))]['total'] += $operation->service_cost;
+                                        $dataVehicles['data'][strtoupper(Str::slug($operation->service_type_name))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataVehicles['data'][strtoupper(Str::slug($operation->service_type_name))][$operation->currency]['total'] += $operation->service_cost;
+                                        $dataVehicles['data'][strtoupper(Str::slug($operation->service_type_name))][$operation->currency]['counter']++;
+                                        $dataVehicles['data'][strtoupper(Str::slug($operation->service_type_name))]['counter']++;
+                                        $dataVehicles['counter']++;
+                                    }                                   
+                                @endphp
                                 <tr class="" data-nomenclatura="{{ $operation->final_service_type }}{{ $operation->op_type }}" data-reservation="{{ $operation->reservation_id }}" data-item="{{ $operation->id }}" data-operation="{{ $operation->final_service_type }}" data-service="{{ $operation->operation_type }}" data-type="{{ $operation->op_type }}" data-close_operation="">
                                     <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
@@ -159,7 +476,7 @@
                                     <td class="text-center" <?=BookingTrait::classStatusPayment($operation)?>>{{ BookingTrait::statusPayment($operation->payment_status) }}</td>
                                     <td class="text-center" <?=BookingTrait::classStatusPayment($operation)?>>{{ number_format(($operation->total_sales),2) }}</td>
                                     <td class="text-center" {{ (($operation->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($operation->total_balance,2) }}</td>
-                                    <td class="text-center">{{ number_format(($operation->is_round_trip != 0 ? ( $operation->total_sales / 2 ) : $operation->total_sales),2) }}</td>
+                                    <td class="text-center">{{ number_format($operation->service_cost,2) }}</td>
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
                                     <td class="text-center">{{ $operation->cancellation_reason }}</td>
@@ -172,6 +489,55 @@
         </div>
     </div>
 
+    <div class="layer" id="layer">
+        <div class="header-chart d-flex justify-content-between">
+            <div class="gran_total">
+                <span><strong>TOTAL:</strong> $ 0</span>
+            </div>
+            <div>
+                <button class="btn btn-primary" id="closeLayer">Cerrar</button>
+            </div>
+        </div>
+        <div class="body-chart">
+            <div class="row">
+                <div class="col-lg-12 col-12">
+                    <table class="table table-chart">
+                        <thead>
+                            <tr>
+                                <th>SITIO</th>
+                                <th class="text-center">GRAN TOTAL</th>
+                                <th class="text-center">CANTIDAD</th>
+                                <th class="text-center">PESOS</th>
+                                <th class="text-center">DOLARES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($dataSites['data'] as $keySite => $site )
+                                <tr>
+                                    <th>{{ $site['name'] }}</th>
+                                    <td class="text-center">{{ number_format($site['gran_total'],2) }}</td>
+                                    <td class="text-center">{{ $site['counter'] }}</td>
+                                    <td class="text-center">{{ number_format($site['MXN']['total'],2) }}</td>
+                                    <td class="text-center">{{ number_format($site['USD']['total'],2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>TOTAL</th>
+                                <th class="text-center">{{ number_format($dataSites['gran_total'],2) }}</th>
+                                <th class="text-center">{{ $dataSites['counter'] }}</th>
+                                <th class="text-center">{{ number_format($dataSites['MXN']['total'],2) }}</th>
+                                <th class="text-center">{{ number_format($dataSites['USD']['total'],2) }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    @dump($dataSites, $dataOriginSale, $dataServiceTypeOperation);
     <x-modals.filters.bookings :data="$data" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :servicesoperation="$services_operation" :serviceoperationstatus="$service_operation_status" :units="$units" :drivers="$drivers" :operationstatus="$operation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />

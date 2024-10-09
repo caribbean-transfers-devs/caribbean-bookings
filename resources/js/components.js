@@ -318,24 +318,24 @@ let components = {
     },
 
     actionButtonColumns: function(){
-        const __btn_columns = document.querySelectorAll('.__btn_columns');        
+        const __btn_columns = document.querySelectorAll('.__btn_columns');
         __btn_columns.forEach(__btn_column => {
             __btn_column.addEventListener('click', function(event){
                 event.preventDefault();
-                const { table, container } = this.dataset;                
+                const { table, container } = this.dataset;
                 components.renderCheckboxColumns(table, container);
             });
-        });        
+        });
     },
 
     renderCheckboxColumns: function(table, container){
         const __table = document.getElementById(table);
-        console.log(__table);        
+        // console.log(__table);
         const __container = document.getElementById(container);
 
         if( __table != null ){
             const __ths = __table.querySelectorAll('th');
-            const savedState = JSON.parse(localStorage.getItem(table)) || {};           
+            const savedState = JSON.parse(localStorage.getItem(table)) || {};
 
             __ths.forEach((__th, __key) => {
                 const capitalizedText = __th.innerText.toLowerCase().replace(/\b\w/g, function (c) {

@@ -48,7 +48,16 @@ trait BookingTrait
                 break;
             case 'COMPLETED':
                 return 'COMPLETADO';
+                break;
+            case 'E':
+                return 'E';
+                break;
+            case 'C':
+                return 'C';
                 break;                
+            case 'OK':
+                return 'OK';
+                break;
             default:
                 return 'CONFIRMADO';
                 break;

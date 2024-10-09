@@ -187,6 +187,7 @@
             }
         };
     
+        console.log(dashboard.dataChartSale());        
         dashboard.renderChartSale();
 
         const overlay = document.getElementById("overlayDashboard");
@@ -279,7 +280,7 @@
 
 @section('content')
 
-    @dump($bookingsData);
+    {{-- @dump($bookingsData); --}}
 
     <div id="overlayDashboard" class="overlayDashboard"></div>
     <div id="popover" class="popover" data-bs-placement="right">

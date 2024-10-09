@@ -106,21 +106,26 @@ class CommissionsRepository
 
                                 LEFT JOIN (
 					SELECT 
-                                                s.reservation_id, 
+                                                s.reservation_id,
                                                 GROUP_CONCAT(DISTINCT us.name ORDER BY us.name ASC SEPARATOR ',') AS employee
 					FROM sales AS s
 					        INNER JOIN users as us ON us.id = s.call_center_agent_id
 					WHERE s.deleted_at IS NULL
 						GROUP BY s.reservation_id
 				) as emp ON emp.reservation_id = rez.id
-                        WHERE rez.created_at BETWEEN :init_date_one AND :init_date_two
+                        -- WHERE rez.created_at BETWEEN :init_date_one AND :init_date_two
+                        WHERE (it.op_one_pickup BETWEEN :init_date_one AND :init_date_two OR it.op_two_pickup BETWEEN :init_date_three AND :init_date_four)
                                 AND rez.is_commissionable = 1 
                                 AND rez.is_cancelled = 0 
                                 AND rez.is_duplicated = 0 
                                 AND rez.pay_at_arrival = 0
                         GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id, it_counter.quantity, p.payment_type_name, emp.employee", [
+                                // "init_date_one" => $search['init'],
+                                // "init_date_two" => $search['end'],
                                 "init_date_one" => $search['init'],
                                 "init_date_two" => $search['end'],
+                                "init_date_three" => $search['init'],
+                                "init_date_four" => $search['end'],                                
                         ]);
 
         $cash = DB::select("SELECT 
@@ -165,7 +170,7 @@ class CommissionsRepository
                                         WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 1 THEN 'DEPARTURE'
                                         WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
                                 END AS final_service_type,
-                                it_counter.quantity, 
+                                it_counter.quantity,
                                 IFNULL(p.payment_type_name, 'CASH') as payment_type_name, 
                                 emp.employee
                         FROM reservations_items as it
@@ -202,14 +207,17 @@ class CommissionsRepository
 						WHERE s.deleted_at IS NULL
 						GROUP BY s.reservation_id
 				        ) as emp ON emp.reservation_id = rez.id
-        WHERE (it.op_one_pickup BETWEEN :init_date_one AND :init_date_two OR it.op_two_pickup BETWEEN :init_date_three AND :init_date_four)
-        AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.pay_at_arrival = 1
-        GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id, it_counter.quantity, p.payment_type_name, emp.employee", [
-                                    "init_date_one" => $search['init'],
-                                    "init_date_two" => $search['end'],
-                                    "init_date_three" => $search['init'],
-                                    "init_date_four" => $search['end'],
-                                ]);
+                        WHERE (it.op_one_pickup BETWEEN :init_date_one AND :init_date_two OR it.op_two_pickup BETWEEN :init_date_three AND :init_date_four)
+                                AND rez.is_commissionable = 1
+                                AND rez.is_cancelled = 0
+                                AND rez.is_duplicated = 0
+                                AND rez.pay_at_arrival = 1
+                        GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id, it_counter.quantity, p.payment_type_name, emp.employee", [
+                                "init_date_one" => $search['init'],
+                                "init_date_two" => $search['end'],
+                                "init_date_three" => $search['init'],
+                                "init_date_four" => $search['end'],
+                        ]);
 
         if(sizeof($paid) >= 1):
                 foreach($paid as $key => $value):
