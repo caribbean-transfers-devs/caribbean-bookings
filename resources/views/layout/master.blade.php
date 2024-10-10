@@ -82,7 +82,7 @@
                         </li>
                     @endif
 
-                    @if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71))
+                    @if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71) || RoleTrait::hasPermission(97))
                         <li class="sidebar-item">
                             <a href="#reports" data-bs-toggle="collapse" class="sidebar-link collapsed">
                                 <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Reportes</span>
@@ -103,7 +103,9 @@
                                 @if(RoleTrait::hasPermission(71))
                                     {{-- <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.cancellations') }}">Cancelaciones</a></li> --}}
                                 @endif
-                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.operations') }}">Operaciones</a></li>
+                                @if(RoleTrait::hasPermission(97)):
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.operations') }}">Operaciones</a></li>
+                                @endif
                             </ul>
                         </li>
                     @endif

@@ -33,12 +33,6 @@
                 )
             ),
             array(  
-                'text' => 'CSV',
-                'extend' => 'csvHtml5',
-                'titleAttr' => 'Exportar como CSV',
-                'className' => 'btn btn-primary',
-            ),
-            array(  
                 'text' => 'Excel',
                 'extend' => 'excelHtml5',
                 'titleAttr' => 'Exportar como Excel',
@@ -158,7 +152,7 @@
                 </table>
                 <div class="mt-3 px-2">
                     <h6>Resumen</h6>
-                    @dump($users);
+                    {{-- @dump($users); --}}
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
