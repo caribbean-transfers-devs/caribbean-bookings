@@ -32,17 +32,11 @@
                 )
             ),
             array(  
-                'text' => 'CSV',
-                'extend' => 'csvHtml5',
-                'titleAttr' => 'Exportar como CSV',
-                'className' => 'btn btn-primary',
-            ),
-            array(  
                 'text' => 'Excel',
                 'extend' => 'excelHtml5',
                 'titleAttr' => 'Exportar como Excel',
                 'className' => 'btn btn-primary',
-            ),            
+            ),
         );
         // dump($buttons);
     @endphp
@@ -166,7 +160,9 @@
                                     <th>USD</th>
                                     <th>MXN</th>
                                     <th>Total</th>
-                                    <th>Comisión</th>
+                                    @if ( RoleTrait::hasPermission(96) )
+                                        <th>Comisión</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -203,7 +199,9 @@
                                             <td>{{ number_format($value['USD'],2) }}</td>
                                             <td>{{ number_format($value['MXN'],2) }}</td>
                                             <td>{{ number_format($total,2) }}</td>
-                                            <td>{{ number_format($commission,2) }}</td>                                       
+                                            @if ( RoleTrait::hasPermission(96) )
+                                                <td>{{ number_format($commission,2) }}</td>                                                
+                                            @endif
                                         </tr>
                                     @endforeach
                                 @endif
