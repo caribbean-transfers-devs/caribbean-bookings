@@ -1,4 +1,5 @@
 @php
+    use App\Traits\RoleTrait;
     $users = [];
     $exchange_rate = 16.50;
 @endphp
@@ -73,7 +74,7 @@
                             <th>Moneda</th>
                             <th>Vendedor</th>
                             <th>Método de pago</th>
-                            <th>Destino</th>
+                            <th>Destino</th>                            
                             <th>Comsionable</th>
                         </tr>
                     </thead>
@@ -157,6 +158,7 @@
                 </table>
                 <div class="mt-3 px-2">
                     <h6>Resumen</h6>
+                    @dump($users);
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
@@ -166,7 +168,9 @@
                                     <th>USD</th>
                                     <th>MXN</th>
                                     <th>Total</th>
-                                    <th>Comisión</th>
+                                    @if ( RoleTrait::hasPermission(96) )
+                                        <th>Comisión</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -203,7 +207,9 @@
                                             <td>{{ number_format($value['USD'],2) }}</td>
                                             <td>{{ number_format($value['MXN'],2) }}</td>
                                             <td>{{ number_format($total,2) }}</td>
-                                            <td>{{ number_format($commission,2) }}</td>                                       
+                                            @if ( RoleTrait::hasPermission(96) )
+                                                <td>{{ number_format($commission,2) }}</td>                                                
+                                            @endif
                                         </tr>
                                     @endforeach
                                 @endif

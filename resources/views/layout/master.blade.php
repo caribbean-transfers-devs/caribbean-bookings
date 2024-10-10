@@ -89,20 +89,21 @@
                             </a>
                             <ul id="reports" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                                 @if(RoleTrait::hasPermission(43))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.payment') }}">Pagos</a></li>
+                                    {{-- <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.payment') }}">Pagos</a></li> --}}
                                 @endif
                                 @if(RoleTrait::hasPermission(44))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.sales') }}">Ventas</a></li>
+                                    {{-- <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.sales') }}">Ventas</a></li> --}}
                                 @endif
                                 @if(RoleTrait::hasPermission(45))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.commissions') }}">Comisiones</a></li>
                                 @endif
                                 @if(RoleTrait::hasPermission(50))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.cash') }}">Efectivo</a></li>
+                                    {{-- <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.cash') }}">Efectivo</a></li> --}}
                                 @endif
                                 @if(RoleTrait::hasPermission(71))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.cancellations') }}">Cancelaciones</a></li>
+                                    {{-- <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.cancellations') }}">Cancelaciones</a></li> --}}
                                 @endif
+                                <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.operations') }}">Operaciones</a></li>
                             </ul>
                         </li>
                     @endif

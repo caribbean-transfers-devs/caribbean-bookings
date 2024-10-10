@@ -46,20 +46,20 @@
 
         //REPORTES
         if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71)):
-            if(RoleTrait::hasPermission(43)):
-                $links_reports[] = [
-                    'name' => 'Pagos',
-                    'route' => route('reports.payment'),
-                    'active' => request()->routeIs('reports.payment','reports.payment.action'),
-                ];
-            endif;
-            if(RoleTrait::hasPermission(44)):
-                $links_reports[] = [
-                    'name' => 'Ventas',
-                    'route' => route('reports.sales'),
-                    'active' => request()->routeIs('reports.sales','reports.sales.action'),
-                ];
-            endif;
+            // if(RoleTrait::hasPermission(43)):
+            //     $links_reports[] = [
+            //         'name' => 'Pagos',
+            //         'route' => route('reports.payment'),
+            //         'active' => request()->routeIs('reports.payment','reports.payment.action'),
+            //     ];
+            // endif;
+            // if(RoleTrait::hasPermission(44)):
+            //     $links_reports[] = [
+            //         'name' => 'Ventas',
+            //         'route' => route('reports.sales'),
+            //         'active' => request()->routeIs('reports.sales','reports.sales.action'),
+            //     ];
+            // endif;
             if(RoleTrait::hasPermission(45)):
                 $links_reports[] = [
                     'name' => 'Comisiones',
@@ -67,20 +67,20 @@
                     'active' => request()->routeIs('reports.commissions','reports.commissions.action'),
                 ];
             endif;
-            if(RoleTrait::hasPermission(50)):
-                $links_reports[] = [
-                    'name' => 'Efectivo',
-                    'route' => route('reports.cash'),
-                    'active' => request()->routeIs('reports.cash','reports.cash.action'),
-                ];
-            endif;
-            if(RoleTrait::hasPermission(71)):
-                $links_reports[] = [
-                    'name' => 'Cancelaciones',
-                    'route' => route('reports.cancellations'),
-                    'active' => request()->routeIs('reports.cancellations','reports.cancellations.post'),
-                ];
-            endif;
+            // if(RoleTrait::hasPermission(50)):
+            //     $links_reports[] = [
+            //         'name' => 'Efectivo',
+            //         'route' => route('reports.cash'),
+            //         'active' => request()->routeIs('reports.cash','reports.cash.action'),
+            //     ];
+            // endif;
+            // if(RoleTrait::hasPermission(71)):
+            //     $links_reports[] = [
+            //         'name' => 'Cancelaciones',
+            //         'route' => route('reports.cancellations'),
+            //         'active' => request()->routeIs('reports.cancellations','reports.cancellations.post'),
+            //     ];
+            // endif;
             $links_reports[] = [
                 'name' => 'Operaciones',
                 'route' => route('reports.operations'),
