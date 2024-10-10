@@ -1,4 +1,5 @@
 @php
+    use App\Traits\RoleTrait;
     $users = [];
     $exchange_rate = 16.50;
 @endphp
