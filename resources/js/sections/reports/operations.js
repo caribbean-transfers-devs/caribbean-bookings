@@ -8,7 +8,7 @@ let operations = {
         const _settings = {},
             _buttons = table.data('button');
 
-        if( _buttons != undefined && _buttons.length > 0 ){        
+        if( _buttons != undefined && _buttons.length > 0 ){
             _buttons.forEach(_btn => {
                 if( _btn.hasOwnProperty('url') ){
                     _btn.action = function(e, dt, node, config){
@@ -46,6 +46,35 @@ let operations = {
 
         table.DataTable( _settings );
     },
+    actionTableChart: function(table){
+        const _settings = {};
+
+        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'>>>
+                        <'table-responsive'tr>
+                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+        // _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
+        //                 <'table-responsive'tr>
+        //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+        _settings.deferRender = true;
+        _settings.responsive = true;
+        _settings.order = [];
+        _settings.paging = false; // Si no quieres paginación, puedes dejar esto en false
+        _settings.oLanguage = {
+            "sProcessing": "Procesando...",
+            "sZeroRecords": "No se encontraron resultados",             
+            "sInfo": "", // Oculta el número de registros mostrados
+            "sInfoFiltered": "", // Oculta el texto filtrado
+            "sSearch": '', // No muestra el campo de búsqueda
+            "sSearchPlaceholder": "",
+            "sLengthMenu": "", // Oculta el menú de cantidad de resultados por página
+            "oPaginate": { 
+                "sPrevious": '', // No muestra el botón de anterior
+                "sNext": '' // No muestra el botón de siguiente
+            },
+        };
+
+        table.DataTable( _settings );
+    },
 }
 
 if ( document.getElementById('lookup_date') != null ) {
@@ -62,7 +91,8 @@ if ( document.getElementById('lookup_date') != null ) {
 }
 
 if( document.querySelector('.table-rendering') != null ){
-    operations.actionTable($('.table-rendering'));    
+    operations.actionTable($('.table-rendering'));
+    operations.actionTableChart($('.table-chart'));
 }
 components.formReset();
 

@@ -186,7 +186,7 @@ trait QueryTrait
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
 
                                 CASE
-                                    WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
+                                    WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
                                     WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                     WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
@@ -238,16 +238,15 @@ trait QueryTrait
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE 
-                                        -- WHEN p.payment_type_name IS NULL OR rez.pay_at_arrival = 1 THEN 'CASH' 
-                                        -- ELSE p.payment_type_name
                                         WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
                                         ELSE 'CASH'
                                     END
                                     ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-                                -- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
 
                                 vehicle_one.name as vehicle_one_name,
+                                d_one.name as vehicle_name_one,
                                 vehicle_two.name as vehicle_two_name,
+                                d_two.name as vehicle_name_two,
 
                                 CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
                                 CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
@@ -268,7 +267,10 @@ trait QueryTrait
                                 INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
 
                                 LEFT OUTER JOIN vehicles as vehicle_one ON vehicle_one.id = it.vehicle_id_one
+                                LEFT OUTER JOIN destination_services as d_one ON d_one.id = vehicle_one.destination_service_id
                                 LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
+                                LEFT OUTER JOIN destination_services as d_two ON d_two.id = vehicle_two.destination_service_id
+
                                 LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                 LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
 
@@ -384,17 +386,16 @@ trait QueryTrait
 
                                 GROUP_CONCAT(
                                     DISTINCT 
-                                    CASE 
-                                        -- WHEN p.payment_type_name IS NULL OR rez.pay_at_arrival = 1 THEN 'CASH' 
-                                        -- ELSE p.payment_type_name
+                                    CASE
                                         WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
                                         ELSE 'CASH'
                                     END
                                     ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-                                -- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
 
                                 vehicle_one.name as vehicle_one_name,
+                                d_one.name as vehicle_name_one,
                                 vehicle_two.name as vehicle_two_name,
+                                d_two.name as vehicle_name_two,
 
                                 CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
                                 CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
@@ -415,7 +416,10 @@ trait QueryTrait
                                 INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
 
                                 LEFT OUTER JOIN vehicles as vehicle_one ON vehicle_one.id = it.vehicle_id_one
+                                LEFT OUTER JOIN destination_services as d_one ON d_one.id = vehicle_one.destination_service_id
                                 LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
+                                LEFT OUTER JOIN destination_services as d_two ON d_two.id = vehicle_two.destination_service_id
+
                                 LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                 LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
 
@@ -441,7 +445,7 @@ trait QueryTrait
                                         GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryTwo}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id  {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id {$queryHaving}
                             ORDER BY filtered_date ASC ",[
                                 "init_date_one" => $queryData['init'],
                                 "init_date_two" => $queryData['end'],

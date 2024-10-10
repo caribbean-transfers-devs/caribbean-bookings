@@ -11,6 +11,7 @@ trait OperationTrait
 
     use BookingTrait;
 
+    //NOS AYUDA A COLOCAR LA CLASE, QUE TENDRA LA PREASIGNACION DEL SERVICIO
     public static function classServiceNumber($status = "ARRIVAL"){
         switch ($status) {
             case 'DEPARTURE':
@@ -25,6 +26,7 @@ trait OperationTrait
         }        
     }
 
+    //NOS AYUDA A SABER SI EL SERVICIO YA ESTA PREASIGNADO
     public static function validatePreassignment($service){
         $status = false;
         if( $service->op_type == "TYPE_ONE" && $service->op_one_preassignment != "" ){
@@ -94,14 +96,20 @@ trait OperationTrait
         return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ), 'OPERATION').'">'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status )).'</button>';
     }
 
+    //MOSTRAMOS EL NOMBRE DE LA UNIDAD, SELECCIONADA EN LA OPERCION
     public static function setOperationUnit($service){
         if( $service->op_type == "TYPE_ONE" && $service->vehicle_one_name != null ){
-            return $service->vehicle_one_name;
+            return $service->vehicle_one_name." - ".$service->vehicle_name_one;
         }else if( $service->op_type == "TYPE_TWO" && $service->vehicle_two_name != null ){
-            return $service->vehicle_two_name;
+            return $service->vehicle_two_name." - ".$service->vehicle_name_two;
         }else{
-            return "Vehículo no seleccionado";
+            return "Unidad no seleccionada";
         }
+    }
+
+    //MOSTRAMOS EL NOMBRE DEL VEHÍCULO, BASADO EN LA UNIDAD SELECCIONADA EN LA OPERACIÓN
+    public static function setOperationVehicle($service){
+        return ( $service->op_type == "TYPE_ONE" ? $service->vehicle_name_one : $service->vehicle_name_two );
     }
 
     public static function setOperationDriver($service){

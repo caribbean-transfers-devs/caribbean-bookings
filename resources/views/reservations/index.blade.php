@@ -20,64 +20,7 @@
             "counter" => 0,
         ],
         "counter" => 0,
-        "data" => [
-            'CONFIRMED' => [
-                "name" => BookingTrait::statusBooking('CONFIRMED'),
-                "total" => 0,
-                "gran_total" => 0,
-                "USD" => [
-                    "total" => 0,
-                    "counter" => 0,
-                ],
-                "MXN" => [
-                    "total" => 0,
-                    "counter" => 0,
-                ],
-                "counter" => 0,
-            ],
-            'PENDING' => [
-                "name" => BookingTrait::statusBooking('PENDING'),
-                "total" => 0,
-                "gran_total" => 0,
-                "USD" => [
-                    "total" => 0,
-                    "counter" => 0,
-                ],
-                "MXN" => [
-                    "total" => 0,
-                    "counter" => 0,
-                ],
-                "counter" => 0,
-            ],            
-            'CANCELLED' => [
-                "name" => BookingTrait::statusBooking('CANCELLED'),
-                "total" => 0,
-                "gran_total" => 0,
-                "USD" => [
-                    "total" => 0,
-                    "counter" => 0,
-                ],
-                "MXN" => [
-                    "total" => 0,
-                    "counter" => 0,
-                ],
-                "counter" => 0,
-            ],
-            'OPENCREDIT' => [
-                "name" => BookingTrait::statusBooking('OPENCREDIT'),
-                "total" => 0,
-                "gran_total" => 0,
-                "USD" => [
-                    "total" => 0,
-                    "counter" => 0,
-                ],
-                "MXN" => [
-                    "total" => 0,
-                    "counter" => 0,
-                ],
-                "counter" => 0,
-            ],
-        ]
+        "data" => []
     ];
 
     $dataMethodPayments = [
@@ -186,25 +129,16 @@
 
         /* Estilo para la capa */
         .layer {
-            /* position: fixed; */
             position: absolute;
             top: 0;
             left: 0;
-            /* width: 100vw; */
             width: 100%;
-            /* height: 100vh; */
             height: 100%;
             background-color: #ffffff;
             color: white;
-            /* display: flex;
-            align-items: center;
-            justify-content: center; */
-
             opacity: 0;
-            visibility: hidden;
-            
+            visibility: hidden;            
             transition: opacity 0.5s ease, visibility 0.5s ease;
-            /* transition: left 0.5s ease; */
             z-index: 1000;
         }
 
@@ -255,23 +189,23 @@
             color: #009879;
         }
 
-        .gran_total {
+        .gran_total .btn{
             font-size: 1.5em; /* Tamaño general más grande para el total */
             color: #000; /* Color negro para el texto */
         }
 
-        .gran_total strong {
+        .gran_total .btn strong {
             font-size: 1em; /* El texto "TOTAL" se mantiene en el mismo tamaño */
             margin-right: 10px; /* Espacio entre "TOTAL:" y el monto */
         }
 
-        .gran_total span {
+        .gran_total .btn span {
             display: inline-flex;
             /* align-items: flex-end; */
             align-items: flex-start;
         }
 
-        .gran_total span::after {
+        .gran_total .btn span::after {
             /*content: ' MXN';  Moneda */
             /*font-size: 0.65em;  Texto más pequeño para la moneda */
             /*margin-left: 5px;  Espacio entre el monto y la moneda */
@@ -280,7 +214,6 @@
             content: ' MXN'; /* Moneda */
             font-size: 0.65em; /* Texto más pequeño para la moneda */
             margin-left: 5px; /* Espacio entre el monto y la moneda */
-            color: #333; /* Color más oscuro pero menos prominente */
             vertical-align: top; /* Alinea la moneda a la parte superior */
             position: relative;
             top: -0.2em; /* Ajuste fino para elevar ligeramente la moneda */            
@@ -295,7 +228,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="{{ mix('assets/js/sections/reservations/bookings.min.js') }}"></script>
     <script>
         document.getElementById('showLayer').addEventListener('click', function() {
@@ -401,6 +334,23 @@
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
                                 @php
+                                    //ESTATUS
+                                    if (!isset( $bookingsStatus['data'][$item->reservation_status] ) ){
+                                        $bookingsStatus['data'][$item->reservation_status] = [
+                                            "name" => BookingTrait::statusBooking($item->reservation_status),
+                                            "total" => 0,
+                                            "gran_total" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
                                     $bookingsStatus['total'] += $item->total_sales;
                                     $bookingsStatus['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
                                     $bookingsStatus[$item->currency]['total'] += $item->total_sales;
@@ -435,13 +385,12 @@
                                     $dataMethodPayments[$item->currency]['total'] += $item->total_sales;
                                     $dataMethodPayments[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
                                     $dataMethodPayments[$item->currency]['counter']++;
-
                                     $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))]['total'] += $item->total_sales;
                                     $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
                                     $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))][$item->currency]['total'] += $item->total_sales;
                                     $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))][$item->currency]['counter']++;
                                     $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))]['counter']++;
-                                    $dataMethodPayments['counter']++;                                    
+                                    $dataMethodPayments['counter']++;
 
                                     //SITIOS                                    
                                     if (!isset( $dataSites['data'][strtoupper(Str::slug($item->site_name))] ) ){
@@ -643,7 +592,11 @@
     <div class="layer" id="layer">
         <div class="header-chart d-flex justify-content-between">
             <div class="gran_total">
-                <span><strong>TOTAL:</strong> $ {{ number_format($bookingsStatus['gran_total'],2) }}</span>
+                @foreach ($bookingsStatus['data'] as $key => $status)
+                    <div class="btn btn-{{ BookingTrait::classStatusBooking($key) }}">
+                        <span><strong>TOTAL {{ $status['name'] }}:</strong> $ {{ number_format($status['gran_total'],2) }}</span>
+                    </div>
+                @endforeach
             </div>
             <div>
                 <button class="btn btn-primary" id="closeLayer">Cerrar</button>
@@ -689,7 +642,7 @@
                                         </tr>
                                     </tfoot>
                                 </table>
-                            </div>                            
+                            </div>
                         </div>
                     </div>
                     <hr>
@@ -819,103 +772,124 @@
 
                 <div class="col-lg-4 col-12">
                     <div class="col-lg-12 col-12">
-                        <table class="table table-chart">
-                            <thead>
-                                <tr>
-                                    <th>MONEDA</th>
-                                    <th class="text-center">GRAN TOTAL</th>
-                                    <th class="text-center">CANTIDAD</th>
-                                    <th class="text-center">TOTAL</th>                                
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($dataCurrency['data'] as $keyCurrency => $currency )
-                                    <tr>
-                                        <th>{{ $currency['name'] }}</th>
-                                        <td class="text-center">{{ number_format($currency['gran_total'],2) }}</td>
-                                        <td class="text-center">{{ $currency['counter'] }}</td>
-                                        <td class="text-center">{{ number_format($currency['total'],2) }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th>TOTAL</th>
-                                    <th class="text-center">{{ number_format($dataCurrency['gran_total'],2) }}</th>
-                                    <th class="text-center">{{ $dataCurrency['counter'] }}</th>
-                                    <th class="text-center">{{ number_format($dataCurrency['total'],2) }}</th>
-                                </tr>
-                            </tfoot>
-                        </table>
+                        <div class="row g-0">
+                            <div class="col-lg-12 col-12">
+                                <canvas class="" id="chartSaleCurrencies"></canvas>
+                            </div>
+                            <div class="col-lg-12 col-12">
+                                <table class="table table-chart">
+                                    <thead>
+                                        <tr>
+                                            <th>MONEDA</th>
+                                            <th class="text-center">GRAN TOTAL</th>
+                                            <th class="text-center">CANTIDAD</th>
+                                            <th class="text-center">TOTAL</th>                                
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($dataCurrency['data'] as $keyCurrency => $currency )
+                                            <tr>
+                                                <th>{{ $currency['name'] }}</th>
+                                                <td class="text-center">{{ number_format($currency['gran_total'],2) }}</td>
+                                                <td class="text-center">{{ $currency['counter'] }}</td>
+                                                <td class="text-center">{{ number_format($currency['total'],2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>TOTAL</th>
+                                            <th class="text-center">{{ number_format($dataCurrency['gran_total'],2) }}</th>
+                                            <th class="text-center">{{ $dataCurrency['counter'] }}</th>
+                                            <th class="text-center">{{ number_format($dataCurrency['total'],2) }}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                     <hr>
                     <div class="col-lg-12 col-12">
-                        <table class="table table-chart">
-                            <thead>
-                                <tr>
-                                    <th>VEHÍCULO</th>
-                                    <th class="text-center">GRAN TOTAL</th>
-                                    <th class="text-center">CANTIDAD</th>
-                                    <th class="text-center">PESOS</th>
-                                    <th class="text-center">DOLARES</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($dataVehicles['data'] as $keyVehicle => $vehicle )
-                                    <tr>
-                                        <th>{{ $vehicle['name'] }}</th>
-                                        <td class="text-center">{{ number_format($vehicle['gran_total'],2) }}</td>
-                                        <td class="text-center">{{ $vehicle['counter'] }}</td>
-                                        <td class="text-center">{{ number_format($vehicle['MXN']['total'],2) }}</td>
-                                        <td class="text-center">{{ number_format($vehicle['USD']['total'],2) }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th>TOTAL</th>
-                                    <th class="text-center">{{ number_format($dataVehicles['gran_total'],2) }}</th>
-                                    <th class="text-center">{{ $dataVehicles['counter'] }}</th>
-                                    <th class="text-center">{{ number_format($dataVehicles['MXN']['total'],2) }}</th>
-                                    <th class="text-center">{{ number_format($dataVehicles['USD']['total'],2) }}</th>
-                                </tr>
-                            </tfoot>
-                        </table>
+                        <div class="row g-0">
+                            <div class="col-lg-12 col-12">
+                                <canvas class="" id="chartSaleOrigins"></canvas>
+                            </div>
+                            <div class="col-lg-12 col-12">
+                                <table class="table table-chart">
+                                    <thead>
+                                        <tr>
+                                            <th>ORIGEN</th>
+                                            <th class="text-center">GRAN TOTAL</th>
+                                            <th class="text-center">CANTIDAD</th>
+                                            <th class="text-center">PESOS</th>
+                                            <th class="text-center">DOLARES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($dataOriginSale['data'] as $keyOrigin => $origin )
+                                            <tr>
+                                                <th>{{ $origin['name'] }}</th>
+                                                <td class="text-center">{{ number_format($origin['gran_total'],2) }}</td>
+                                                <td class="text-center">{{ $origin['counter'] }}</td>
+                                                <td class="text-center">{{ number_format($origin['MXN']['total'],2) }}</td>
+                                                <td class="text-center">{{ number_format($origin['USD']['total'],2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>TOTAL</th>
+                                            <th class="text-center">{{ number_format($dataOriginSale['gran_total'],2) }}</th>
+                                            <th class="text-center">{{ $dataOriginSale['counter'] }}</th>
+                                            <th class="text-center">{{ number_format($dataOriginSale['MXN']['total'],2) }}</th>
+                                            <th class="text-center">{{ number_format($dataOriginSale['USD']['total'],2) }}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                     <hr>
                     <div class="col-lg-12 col-12">
-                        <table class="table table-chart">
-                            <thead>
-                                <tr>
-                                    <th>ORIGEN</th>
-                                    <th class="text-center">GRAN TOTAL</th>
-                                    <th class="text-center">CANTIDAD</th>
-                                    <th class="text-center">PESOS</th>
-                                    <th class="text-center">DOLARES</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($dataOriginSale['data'] as $keyOrigin => $origin )
-                                    <tr>
-                                        <th>{{ $origin['name'] }}</th>
-                                        <td class="text-center">{{ number_format($origin['gran_total'],2) }}</td>
-                                        <td class="text-center">{{ $origin['counter'] }}</td>
-                                        <td class="text-center">{{ number_format($origin['MXN']['total'],2) }}</td>
-                                        <td class="text-center">{{ number_format($origin['USD']['total'],2) }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th>TOTAL</th>
-                                    <th class="text-center">{{ number_format($dataOriginSale['gran_total'],2) }}</th>
-                                    <th class="text-center">{{ $dataOriginSale['counter'] }}</th>
-                                    <th class="text-center">{{ number_format($dataOriginSale['MXN']['total'],2) }}</th>
-                                    <th class="text-center">{{ number_format($dataOriginSale['USD']['total'],2) }}</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                        <div class="row g-0">
+                            <div class="col-lg-12 col-12">
+                                <canvas class="" id="chartSaleVehicles"></canvas>
+                            </div>
+                            <div class="col-lg-12 col-12">
+                                <table class="table table-chart">
+                                    <thead>
+                                        <tr>
+                                            <th>VEHÍCULO</th>
+                                            <th class="text-center">GRAN TOTAL</th>
+                                            <th class="text-center">CANTIDAD</th>
+                                            <th class="text-center">PESOS</th>
+                                            <th class="text-center">DOLARES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($dataVehicles['data'] as $keyVehicle => $vehicle )
+                                            <tr>
+                                                <th>{{ $vehicle['name'] }}</th>
+                                                <td class="text-center">{{ number_format($vehicle['gran_total'],2) }}</td>
+                                                <td class="text-center">{{ $vehicle['counter'] }}</td>
+                                                <td class="text-center">{{ number_format($vehicle['MXN']['total'],2) }}</td>
+                                                <td class="text-center">{{ number_format($vehicle['USD']['total'],2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>TOTAL</th>
+                                            <th class="text-center">{{ number_format($dataVehicles['gran_total'],2) }}</th>
+                                            <th class="text-center">{{ $dataVehicles['counter'] }}</th>
+                                            <th class="text-center">{{ number_format($dataVehicles['MXN']['total'],2) }}</th>
+                                            <th class="text-center">{{ number_format($dataVehicles['USD']['total'],2) }}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>                    
                 </div>
             </div>
         </div>
@@ -988,7 +962,7 @@
                                             return tooltipItems[0].label;
                                         },
                                         label: function(tooltipItem) {
-                                            console.log(tooltipItem);                                            
+                                            // console.log(tooltipItem);
                                             const index = tooltipItem.dataIndex;
                                             const site = sales.dataChartSaleStatus()[index];
                                             // Mostrar el monto en pesos y dólares junto con el porcentaje
@@ -1004,7 +978,7 @@
                                 },
                                 datalabels: {
                                     display: true,
-                                    formatter: (value, context) => {
+                                    formatter: (value, context) => {                                                                                
                                         const total = context.chart._metasets[0].total;
                                         const percentage = ((value / total) * 100).toFixed(2) + '%';
                                         return percentage; // Mostrar porcentaje en el gráfico
@@ -1272,6 +1246,184 @@
                     });
                 }
             },
+            dataChartSaleCurrencies: function(){
+                let object = [];
+                const systems = Object.entries(this.dataCurrency);
+                systems.forEach( ([key, data]) => {
+                    // console.log(key);
+                    // console.log(data);
+                    object.push(data);
+                });
+                return object;
+            },
+            renderChartSaleCurrencies: function(){
+                // Calcular el total de 'counter'
+                const totalCount = sales.dataChartSaleCurrencies().reduce((sum, system) => sum + system.counter, 0);
+                // Calcular el porcentaje de cada 'counter'
+                const percentages = sales.dataChartSaleCurrencies().map(site => ((site.counter / totalCount) * 100).toFixed(2) + '%');
+                
+                if( document.getElementById('chartSaleCurrencies') != null ){
+                    new Chart(document.getElementById('chartSaleCurrencies'), {
+                        type: 'bar',
+                        data: {
+                            labels: sales.dataChartSaleCurrencies().map(row => row.name),
+                            datasets: [
+                                {
+                                    label: 'MONEDAS', // Etiqueta para el conjunto de datos
+                                    data: sales.dataChartSaleCurrencies().map(row => row.counter),
+                                    // backgroundColor: sales.dataChartSaleCurrencies().map(row => row.background) || '#007bff', // Puedes usar colores personalizados o un color por defecto
+                                    borderWidth: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true, // Hacer el gráfico responsivo
+                            maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
+                            scales: {
+                                y: {
+                                    beginAtZero: true, // Asegurar que el eje Y comience desde 0
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value.toLocaleString(); // Formato de números en el eje Y
+                                        }
+                                    }
+                                }
+                            },                            
+                            plugins: {                              
+                                // tooltip: {
+                                //     callbacks: {
+                                //         title: function(tooltipItems) {
+                                //             // Mostrar el nombre del sitio
+                                //             return tooltipItems[0].label;
+                                //         },
+                                //         label: function(tooltipItem) {
+                                //             console.log(tooltipItem);                                            
+                                //             const index = tooltipItem.dataIndex;
+                                //             const site = sales.dataChartSaleCurrencies()[index];
+                                //             // Mostrar el monto en pesos y dólares junto con el porcentaje
+                                //             return [
+                                //                 `TOTAL DE VENTA: $ ${site.gran_total.toLocaleString()}`,
+                                //                 `TOTAL DE VENTA EN USD: $ ${site['accumulated']['USD'].total.toLocaleString()}`,
+                                //                 `TOTAL DE VENTA EN MXN: $ ${site['accumulated']['MXN'].total.toLocaleString()}`,
+                                //             ];
+                                //         }
+                                //     }
+                                // },
+                                // datalabels: {
+                                //     display: true,
+                                //     formatter: (value, context) => {  
+                                //         console.log(value, context);                                                                          
+                                //         const total = context.chart._metasets[0].total;
+                                //         const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                //         return percentage; // Mostrar porcentaje en el gráfico
+                                //     },
+                                //     color: '#000',
+                                //     font: {
+                                //         weight: 'bold'
+                                //     },
+                                //     anchor: 'end',
+                                //     align: 'start'
+                                // }
+                            }
+                        },
+                        plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
+                    });
+                }
+            },
+            dataChartSaleVehicles: function(){
+                let object = [];
+                const systems = Object.entries(this.dataVehicles);
+                systems.forEach( ([key, data]) => {
+                    object.push(data);
+                });
+                return object;
+            },
+            renderChartSaleVehicles: function(){
+                // Calcular el total de 'counter'
+                const totalCount = sales.dataChartSaleVehicles().reduce((sum, system) => sum + system.counter, 0);
+                // Calcular el porcentaje de cada 'counter'
+                const percentages = sales.dataChartSaleVehicles().map(site => ((site.counter / totalCount) * 100).toFixed(2) + '%');
+                
+                if( document.getElementById('chartSaleVehicles') != null ){
+                    new Chart(document.getElementById('chartSaleVehicles'), {
+                        type: 'bar',
+                        data: {
+                            labels: sales.dataChartSaleVehicles().map(row => row.name),
+                            datasets: [
+                                {
+                                    label: 'VEHÍCULOS', // Etiqueta para el conjunto de datos
+                                    data: sales.dataChartSaleVehicles().map(row => row.counter),
+                                    borderWidth: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true, // Hacer el gráfico responsivo
+                            maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
+                            scales: {
+                                y: {
+                                    beginAtZero: true, // Asegurar que el eje Y comience desde 0
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value.toLocaleString(); // Formato de números en el eje Y
+                                        }
+                                    }
+                                }
+                            },                            
+                            plugins: {
+                            }
+                        },
+                        plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
+                    });
+                }
+            },
+            dataChartSaleOrigins: function(){
+                let object = [];
+                const systems = Object.entries(this.dataOriginSale);
+                systems.forEach( ([key, data]) => {
+                    object.push(data);
+                });
+                return object;
+            },
+            renderChartSaleOrigins: function(){
+                // Calcular el total de 'counter'
+                const totalCount = sales.dataChartSaleOrigins().reduce((sum, system) => sum + system.counter, 0);
+                // Calcular el porcentaje de cada 'counter'
+                const percentages = sales.dataChartSaleOrigins().map(site => ((site.counter / totalCount) * 100).toFixed(2) + '%');
+                
+                if( document.getElementById('chartSaleOrigins') != null ){
+                    new Chart(document.getElementById('chartSaleOrigins'), {
+                        type: 'bar',
+                        data: {
+                            labels: sales.dataChartSaleOrigins().map(row => row.name),
+                            datasets: [
+                                {
+                                    label: 'ORIGENES DE VENTA', // Etiqueta para el conjunto de datos
+                                    data: sales.dataChartSaleOrigins().map(row => row.counter),
+                                    borderWidth: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true, // Hacer el gráfico responsivo
+                            maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
+                            scales: {
+                                y: {
+                                    beginAtZero: true, // Asegurar que el eje Y comience desde 0
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value.toLocaleString(); // Formato de números en el eje Y
+                                        }
+                                    }
+                                }
+                            },                            
+                            plugins: {
+                            }
+                        },
+                        plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
+                    });
+                }
+            },
         };
 
         // console.log(sales.dataChartSaleStatus());
@@ -1279,5 +1431,8 @@
         sales.renderChartSaleMethodPayments();
         sales.renderChartSaleSites();
         sales.renderChartSaleDestinations();
+        sales.renderChartSaleCurrencies();
+        sales.renderChartSaleVehicles();
+        sales.renderChartSaleOrigins();
     </script>
 @endpush
