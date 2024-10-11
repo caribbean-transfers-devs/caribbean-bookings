@@ -37,7 +37,7 @@
                 'extend' => 'excelHtml5',
                 'titleAttr' => 'Exportar como Excel',
                 'className' => 'btn btn-primary',
-            ),            
+            ),
         );
         // dump($buttons);
     @endphp
