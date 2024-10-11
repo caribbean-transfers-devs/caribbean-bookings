@@ -948,7 +948,7 @@
                                     display: true,  // Mostrar las etiquetas
                                     position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                     labels: {
-                                        padding: 20, // Ajustar el espacio entre la leyenda y el gráfico
+                                        padding: 0, // Ajustar el espacio entre la leyenda y el gráfico
                                         boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
                                         font: {
                                             size: 12, // Tamaño de la fuente de los labels

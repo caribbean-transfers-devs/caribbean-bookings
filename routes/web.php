@@ -135,8 +135,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/tpv/quote', [TpvController::class, 'quote'])->name('tpv.quote');
     Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
     Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
-    Route::get('/punto-de-venta', [PosController::class, 'index'])->name('pos.index');
-    Route::post('/punto-de-venta', [PosController::class, 'index'])->name('pos.index.action');
+    // Route::get('/punto-de-venta', [PosController::class, 'index'])->name('pos.index');
+    // Route::post('/punto-de-venta', [PosController::class, 'index'])->name('pos.index.action');
 
     Route::resource('/enterprises', EnterpriseController::class);
     Route::resource('/vehicles', VehicleController::class);
