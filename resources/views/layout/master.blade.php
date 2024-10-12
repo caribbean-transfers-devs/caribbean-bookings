@@ -61,26 +61,20 @@
                     </li>
 
                     @if(RoleTrait::hasPermission(42) || RoleTrait::hasPermission(62) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(63))
-                        <li class="sidebar-item">
-                            <a href="#dashboard" data-bs-toggle="collapse" class="sidebar-link collapsed">
-                                <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboards</span>
+                        <li class="sidebar-item @if(request()->is('dashboard')) active @endif">
+                            <a class="sidebar-link" href="/">
+                                <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">Dashboard</span>
                             </a>
-                            <ul id="dashboard" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                                <!--<li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.admin') }}">Admin</a></li>-->
-                                @if(RoleTrait::hasPermission(42))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['general']) }}">Ventas Generales</a></li>
-                                @endif
-
-                                @if(RoleTrait::hasPermission(62))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['online']) }}">Ventas en Linea</a></li>
-                                @endif
-                                
-                                @if(RoleTrait::hasPermission(63))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('dashboard.sales',['airport']) }}">Ventas de Aereopuerto</a></li>
-                                @endif                                
-                            </ul>
                         </li>
                     @endif
+                    
+                    @if(RoleTrait::hasPermission(10))
+                        <li class="sidebar-item @if(request()->is('reservations')) active @endif">
+                            <a class="sidebar-link" href="{{ route('reservations.index') }}">
+                                <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Reservaciones</span>
+                            </a>
+                        </li>
+                    @endif                    
 
                     @if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71) || RoleTrait::hasPermission(97))
                         <li class="sidebar-item">
@@ -103,18 +97,10 @@
                                 @if(RoleTrait::hasPermission(71))
                                     {{-- <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.cancellations') }}">Cancelaciones</a></li> --}}
                                 @endif
-                                @if(RoleTrait::hasPermission(97)):
+                                @if(RoleTrait::hasPermission(97))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('reports.operations') }}">Operaciones</a></li>
                                 @endif
                             </ul>
-                        </li>
-                    @endif
-
-                    @if(RoleTrait::hasPermission(26))
-                        <li class="sidebar-item @if(request()->is('/tpv/handler')) active @endif">
-                            <a class="sidebar-link" href="/tpv/handler">
-                                <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">TPV</span>
-                            </a>
                         </li>
                     @endif
 
@@ -168,13 +154,13 @@
                         </li>
                     @endif
 
-                    @if(RoleTrait::hasPermission(10))
-                        <li class="sidebar-item @if(request()->is('reservations')) active @endif">
-                            <a class="sidebar-link" href="{{ route('reservations.index') }}">
-                                <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Reservaciones</span>
+                    @if(RoleTrait::hasPermission(26))
+                        <li class="sidebar-item @if(request()->is('/tpv/handler')) active @endif">
+                            <a class="sidebar-link" href="/tpv/handler">
+                                <i class="align-middle" data-feather="shopping-cart"></i> <span class="align-middle">TPV</span>
                             </a>
                         </li>
-                    @endif
+                    @endif                    
                     
                     @if(RoleTrait::hasPermission(28) || RoleTrait::hasPermission(32))
                         <li class="sidebar-item">

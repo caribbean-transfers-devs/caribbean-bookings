@@ -12,37 +12,27 @@
 
         //DASHBOARD
         if(RoleTrait::hasPermission(42) || RoleTrait::hasPermission(62) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(63)):
-            if(RoleTrait::hasPermission(42)):
-                $links_dashboard[] = [
-                    'name' => 'Ventas Generales',
-                    'route' => route('dashboard.sales',['general']),
-                    'active' => request()->is('dashboard/sales/general'),
-                ];
-            endif;
-            if(RoleTrait::hasPermission(62)):
-                $links_dashboard[] = [
-                    'name' => 'Ventas en Linea',
-                    'route' => route('dashboard.sales',['online']),
-                    'active' => request()->is('dashboard/sales/online'),
-                ];
-            endif;
-            if(RoleTrait::hasPermission(63)):
-                $links_dashboard[] = [
-                    'name' => 'Ventas de Aereopuerto',
-                    'route' => route('dashboard.sales',['airport']),
-                    'active' => request()->is('dashboard/sales/airport'),
-                ];
-            endif;
             array_push($links,[
-                'type' => 'multiple',
+                'type' => 'single',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
-                'code' => 'dashboard',
-                'name' => 'Dashboards',
-                'route' => null,
-                'active' => request()->routeIs('dashboard.*'),
-                'urls' => $links_dashboard
+                'code' => 'dashbaoard',
+                'name' => 'Dashboard',
+                'route' => route('dashboard'),
+                'active' => request()->routeIs('dashboard')
             ]);
         endif;
+
+        //RESERVACIONES
+        if(RoleTrait::hasPermission(10)):
+            array_push($links,[
+                'type' => 'single',
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>',
+                'code' => 'bookings',
+                'name' => 'Reservaciones',
+                'route' => route('reservations.index'),
+                'active' => request()->routeIs('reservations.index','reservations.search')
+            ]);        
+        endif;        
 
         //REPORTES
         if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71) || RoleTrait::hasPermission(97)):
@@ -96,18 +86,6 @@
                 'route' => null,
                 'active' => request()->routeIs('reports.payment','reports.payment.action','reports.sales','reports.sales.action','reports.commissions','reports.commissions.action','reports.cash','reports.cash.action','reports.operations','reports.operations.search'),
                 'urls' => $links_reports
-            ]);
-        endif;
-
-        //TPV
-        if(RoleTrait::hasPermission(26)):
-            array_push($links,[
-                'type' => 'single',
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>',
-                'code' => 'tpv',
-                'name' => 'TPV',
-                'route' => route('tpv.handler'),
-                'active' => request()->routeIs('tpv.handler')
             ]);
         endif;
 
@@ -200,17 +178,17 @@
             ]);
         endif;
 
-        //RESERVACIONES
-        if(RoleTrait::hasPermission(10)):
+        //TPV
+        if(RoleTrait::hasPermission(26)):
             array_push($links,[
                 'type' => 'single',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>',
-                'code' => 'bookings',
-                'name' => 'Reservaciones',
-                'route' => route('reservations.index'),
-                'active' => request()->routeIs('reservations.index','reservations.search')
-            ]);        
-        endif;
+                'code' => 'tpv',
+                'name' => 'TPV',
+                'route' => route('tpv.handler'),
+                'active' => request()->routeIs('tpv.handler')
+            ]);
+        endif;        
 
         //CONFIGURACIONES
         if(RoleTrait::hasPermission(28) || RoleTrait::hasPermission(32)):

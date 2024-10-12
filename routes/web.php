@@ -47,12 +47,6 @@ Route::middleware(['guest'])->group(function () {
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-    Route::get('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('dashboard.sales');
-    Route::post('/dashboard/sales/{type}', [DashboardController::class, 'sales'])->name('reservations.sales.search');
-    Route::get('/dashboard/salesOld/{type}', [DashboardController::class, 'sales2'])->name('dashboard.sales.old');
-    Route::post('/dashboard/salesOld/{type}', [DashboardController::class, 'sales2'])->name('reservations.sales.old.search');
-
     //REPORTES
     Route::get('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment');
     Route::post('/reports/payments', [ReportPayment::class, 'managment'])->name('reports.payment.action');
