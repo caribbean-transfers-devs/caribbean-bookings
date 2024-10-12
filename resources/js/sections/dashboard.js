@@ -18,7 +18,7 @@ window.addEventListener("load", function(){
         getParseObject = JSON.parse(getcorkThemeObject)
         ParsedObject = getParseObject;
 
-        const bookings_day = new PerfectScrollbar(document.querySelector('.bookings_day'));
+        // const bookings_day = new PerfectScrollbar(document.querySelector('.bookings_day'));
         dashboard.actionTable($('.table-rendering'));
 
         var Theme = 'dark';
@@ -38,102 +38,102 @@ window.addEventListener("load", function(){
                 Bookings By Status Day | Options
             =================================
         */
-        var optionsStatusDay = {
-            chart: {
-                type: 'donut',
-                width: 370,
-                height: 430
-            },
-            colors: dashboard.seriesStatusDay().colors,
-            dataLabels: {
-                enabled: true
-            },
-            legend: {
-                position: 'bottom',
-                horizontalAlign: 'center',
-                fontSize: '14px',
-                markers: {
-                    width: 10,
-                    height: 10,
-                    offsetX: -5,
-                    offsetY: 0
-                },
-                itemMargin: {
-                    horizontal: 10,
-                    vertical: 30
-                }
-            },
-            plotOptions: {
-                pie: {
-                    donut: {
-                    size: '75%',
-                    background: 'transparent',
-                    labels: {
-                        show: true,
-                        name: {
-                            show: true,
-                            fontSize: '29px',
-                            fontFamily: 'Nunito, sans-serif',
-                            color: undefined,
-                            offsetY: -10
-                        },
-                        value: {
-                            show: true,
-                            fontSize: '26px',
-                            fontFamily: 'Nunito, sans-serif',
-                            color: '#0e1726',
-                            offsetY: 16,
-                            formatter: function (val) {
-                                return val
-                            }
-                        },
-                        total: {
-                            show: true,
-                            showAlways: true,
-                            label: 'Total',
-                            color: '#888ea8',
-                            fontSize: '30px',
-                            formatter: function (w) {
-                                return w.globals.seriesTotals.reduce( function(a, b) {
-                                return a + b
-                                }, 0)
-                            }
-                        }
-                    }
-                    }
-                }
-            },
-            stroke: {
-                show: true,
-                width: 15,
-                colors: '#ffffff'
-            },
-            series: dashboard.seriesStatusDay().series,
-            labels: dashboard.seriesStatusDay().labels,
-            responsive: [
-                {
-                    breakpoint: 1440, options: {
-                        chart: {
-                            width: 325
-                        },
-                    }
-                },
-                {
-                    breakpoint: 1199, options: {
-                        chart: {
-                            width: 380
-                        },
-                    }
-                },
-                {
-                    breakpoint: 575, options: {
-                        chart: {
-                            width: 320
-                        },
-                    }
-                },
-            ],
-        }
+        // var optionsStatusDay = {
+        //     chart: {
+        //         type: 'donut',
+        //         width: 370,
+        //         height: 430
+        //     },
+        //     colors: dashboard.seriesStatusDay().colors,
+        //     dataLabels: {
+        //         enabled: true
+        //     },
+        //     legend: {
+        //         position: 'bottom',
+        //         horizontalAlign: 'center',
+        //         fontSize: '14px',
+        //         markers: {
+        //             width: 10,
+        //             height: 10,
+        //             offsetX: -5,
+        //             offsetY: 0
+        //         },
+        //         itemMargin: {
+        //             horizontal: 10,
+        //             vertical: 30
+        //         }
+        //     },
+        //     plotOptions: {
+        //         pie: {
+        //             donut: {
+        //             size: '75%',
+        //             background: 'transparent',
+        //             labels: {
+        //                 show: true,
+        //                 name: {
+        //                     show: true,
+        //                     fontSize: '29px',
+        //                     fontFamily: 'Nunito, sans-serif',
+        //                     color: undefined,
+        //                     offsetY: -10
+        //                 },
+        //                 value: {
+        //                     show: true,
+        //                     fontSize: '26px',
+        //                     fontFamily: 'Nunito, sans-serif',
+        //                     color: '#0e1726',
+        //                     offsetY: 16,
+        //                     formatter: function (val) {
+        //                         return val
+        //                     }
+        //                 },
+        //                 total: {
+        //                     show: true,
+        //                     showAlways: true,
+        //                     label: 'Total',
+        //                     color: '#888ea8',
+        //                     fontSize: '30px',
+        //                     formatter: function (w) {
+        //                         return w.globals.seriesTotals.reduce( function(a, b) {
+        //                         return a + b
+        //                         }, 0)
+        //                     }
+        //                 }
+        //             }
+        //             }
+        //         }
+        //     },
+        //     stroke: {
+        //         show: true,
+        //         width: 15,
+        //         colors: '#ffffff'
+        //     },
+        //     series: dashboard.seriesStatusDay().series,
+        //     labels: dashboard.seriesStatusDay().labels,
+        //     responsive: [
+        //         {
+        //             breakpoint: 1440, options: {
+        //                 chart: {
+        //                     width: 325
+        //                 },
+        //             }
+        //         },
+        //         {
+        //             breakpoint: 1199, options: {
+        //                 chart: {
+        //                     width: 380
+        //                 },
+        //             }
+        //         },
+        //         {
+        //             breakpoint: 575, options: {
+        //                 chart: {
+        //                     width: 320
+        //                 },
+        //             }
+        //         },
+        //     ],
+        // }
 
         /*
             =================================
@@ -706,145 +706,145 @@ window.addEventListener("load", function(){
                 Bookings Analytics Sites Day | Options
             =================================
         */
-        var optionsBookingsSitesDay = {
-            chart: {
-                fontFamily: 'Nunito, sans-serif',
-                height: 370,
-                type: 'bar',
-                zoom: {
-                    enabled: false
-                },
-                toolbar: {
-                    show: false
-                }                
-            },
-            colors: ['#D01317'],
-            dataLabels: {
-                enabled: true
-            },            
-            series: dashboard.seriesSitesDay().series,
-            xaxis: {
-                type: 'category',
-                labels: {
-                    offsetX: 0,
-                    offsetY: 5,
-                    rotate: -45,
-                    style: {
-                        fontSize: '12px',
-                        fontFamily: 'Nunito, sans-serif',
-                        cssClass: 'apexcharts-xaxis-title',
-                    },
-                },                
-                categories: dashboard.seriesSitesDay().labels
-            },
-            yaxis: {
-                labels: {
-                    offsetX: -15,
-                    offsetY: 0,
-                    style: {
-                        fontSize: '12px',
-                        fontFamily: 'Nunito, sans-serif',
-                        cssClass: 'apexcharts-yaxis-title',
-                    },
-                },                
-            },            
-            tooltip: {
-                theme: Theme,
-                custom: function({ series, seriesIndex, dataPointIndex, w }) {
-                    const details = dashboard.seriesSitesDay().series[seriesIndex].data[dataPointIndex].details;
-                    return `<div class="custom-tooltip">
-                                <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total de ventas:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
-                                </div>
-                                <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
-                                </div>                                
-                                <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
-                                </div>
-                            </div>`;
-                }
-            },            
-            responsive: [{
-                breakpoint: 575,
-            }],
-        }        
+        // var optionsBookingsSitesDay = {
+        //     chart: {
+        //         fontFamily: 'Nunito, sans-serif',
+        //         height: 370,
+        //         type: 'bar',
+        //         zoom: {
+        //             enabled: false
+        //         },
+        //         toolbar: {
+        //             show: false
+        //         }                
+        //     },
+        //     colors: ['#D01317'],
+        //     dataLabels: {
+        //         enabled: true
+        //     },            
+        //     series: dashboard.seriesSitesDay().series,
+        //     xaxis: {
+        //         type: 'category',
+        //         labels: {
+        //             offsetX: 0,
+        //             offsetY: 5,
+        //             rotate: -45,
+        //             style: {
+        //                 fontSize: '12px',
+        //                 fontFamily: 'Nunito, sans-serif',
+        //                 cssClass: 'apexcharts-xaxis-title',
+        //             },
+        //         },                
+        //         categories: dashboard.seriesSitesDay().labels
+        //     },
+        //     yaxis: {
+        //         labels: {
+        //             offsetX: -15,
+        //             offsetY: 0,
+        //             style: {
+        //                 fontSize: '12px',
+        //                 fontFamily: 'Nunito, sans-serif',
+        //                 cssClass: 'apexcharts-yaxis-title',
+        //             },
+        //         },                
+        //     },            
+        //     tooltip: {
+        //         theme: Theme,
+        //         custom: function({ series, seriesIndex, dataPointIndex, w }) {
+        //             const details = dashboard.seriesSitesDay().series[seriesIndex].data[dataPointIndex].details;
+        //             return `<div class="custom-tooltip">
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total de ventas:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
+        //                         </div>
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+        //                         </div>                                
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
+        //                         </div>
+        //                     </div>`;
+        //         }
+        //     },            
+        //     responsive: [{
+        //         breakpoint: 575,
+        //     }],
+        // }
 
         /*
             =================================
                 Bookings Analytics Destinations Day | Options
             =================================
         */        
-        var optionsBookingsDestinationsDay = {
-            chart: {
-                fontFamily: 'Nunito, sans-serif',
-                height: 370,
-                type: 'bar',
-                zoom: {
-                    enabled: false
-                },
-                toolbar: {
-                    show: false
-                }
-            },
-            // colors: dashboard.seriesDestinationMonth().colors,
-            colors: ['#16161D'],
-            dataLabels: {
-                enabled: true,
-            },
-            series: dashboard.seriesDestinationDay().series,
-            xaxis: {
-                type: 'category',
-                labels: {
-                    offsetX: 0,
-                    offsetY: 5,
-                    rotate: -45,
-                    style: {
-                        fontSize: '12px',
-                        fontFamily: 'Nunito, sans-serif',
-                        cssClass: 'apexcharts-xaxis-title',
-                    },
-                },
-                categories: dashboard.seriesDestinationDay().labels,
-            },
-            yaxis: {
-                labels: {
-                    offsetX: -15,
-                    offsetY: 0,
-                    style: {
-                        fontSize: '12px',
-                        fontFamily: 'Nunito, sans-serif',
-                        cssClass: 'apexcharts-yaxis-title',
-                    },
-                },                
-            },
-            tooltip: {
-                theme: Theme,
-                custom: function({ series, seriesIndex, dataPointIndex, w }) {
-                    const details = dashboard.seriesDestinationDay().series[seriesIndex].data[dataPointIndex].details;
-                    return `<div class="custom-tooltip">
-                                <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total de ventas:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
-                                </div>
-                                <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
-                                </div>
-                                <div class="apexcharts-tooltip-y-group">
-                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
-                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
-                                </div>
-                            </div>`;
-                }                
-            },
-            responsive: [{
-                breakpoint: 575,
-            }]
-        }
+        // var optionsBookingsDestinationsDay = {
+        //     chart: {
+        //         fontFamily: 'Nunito, sans-serif',
+        //         height: 370,
+        //         type: 'bar',
+        //         zoom: {
+        //             enabled: false
+        //         },
+        //         toolbar: {
+        //             show: false
+        //         }
+        //     },
+        //     // colors: dashboard.seriesDestinationMonth().colors,
+        //     colors: ['#16161D'],
+        //     dataLabels: {
+        //         enabled: true,
+        //     },
+        //     series: dashboard.seriesDestinationDay().series,
+        //     xaxis: {
+        //         type: 'category',
+        //         labels: {
+        //             offsetX: 0,
+        //             offsetY: 5,
+        //             rotate: -45,
+        //             style: {
+        //                 fontSize: '12px',
+        //                 fontFamily: 'Nunito, sans-serif',
+        //                 cssClass: 'apexcharts-xaxis-title',
+        //             },
+        //         },
+        //         categories: dashboard.seriesDestinationDay().labels,
+        //     },
+        //     yaxis: {
+        //         labels: {
+        //             offsetX: -15,
+        //             offsetY: 0,
+        //             style: {
+        //                 fontSize: '12px',
+        //                 fontFamily: 'Nunito, sans-serif',
+        //                 cssClass: 'apexcharts-yaxis-title',
+        //             },
+        //         },                
+        //     },
+        //     tooltip: {
+        //         theme: Theme,
+        //         custom: function({ series, seriesIndex, dataPointIndex, w }) {
+        //             const details = dashboard.seriesDestinationDay().series[seriesIndex].data[dataPointIndex].details;
+        //             return `<div class="custom-tooltip">
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total de ventas:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
+        //                         </div>
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+        //                         </div>
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
+        //                         </div>
+        //                     </div>`;
+        //         }                
+        //     },
+        //     responsive: [{
+        //         breakpoint: 575,
+        //     }]
+        // }
 
         /*
             =================================
@@ -930,22 +930,22 @@ window.addEventListener("load", function(){
                 Bookings By Status Day | Render
             =================================
         */
-        var bookingsStatusDay = new ApexCharts(
-            document.querySelector("#bookingsStatusDay"),
-            optionsStatusDay
-        );
-        bookingsStatusDay.render();
+        // var bookingsStatusDay = new ApexCharts(
+        //     document.querySelector("#bookingsStatusDay"),
+        //     optionsStatusDay
+        // );
+        // bookingsStatusDay.render();
 
         /*
             =================================
                 Bookings By Status Month | Render
             =================================
         */
-        var bookingsStatusMonth = new ApexCharts(
-            document.querySelector("#bookingsStatusMonth"),
-            optionsStatusMonth
-        );
-        bookingsStatusMonth.render();
+        // var bookingsStatusMonth = new ApexCharts(
+        //     document.querySelector("#bookingsStatusMonth"),
+        //     optionsStatusMonth
+        // );
+        // bookingsStatusMonth.render();
 
         /*
             ================================
@@ -974,11 +974,11 @@ window.addEventListener("load", function(){
                 Bookings Analytics Sites Day | Render
             ================================
         */
-        var bookingsAnalyticsSitesDay = new ApexCharts(
-            document.querySelector("#bookingsAnalyticsSitesDay"),
-            optionsBookingsSitesDay
-        );
-        bookingsAnalyticsSitesDay.render();
+        // var bookingsAnalyticsSitesDay = new ApexCharts(
+        //     document.querySelector("#bookingsAnalyticsSitesDay"),
+        //     optionsBookingsSitesDay
+        // );
+        // bookingsAnalyticsSitesDay.render();
 
         /*
             ================================
@@ -996,11 +996,11 @@ window.addEventListener("load", function(){
                 Bookings Analytics Destinations Day | Render
             ================================
         */
-        var bookingsAnalyticsDestinationsDay = new ApexCharts(
-            document.querySelector("#bookingsAnalyticsDestinationsDay"),
-            optionsBookingsDestinationsDay
-        );
-        bookingsAnalyticsDestinationsDay.render();
+        // var bookingsAnalyticsDestinationsDay = new ApexCharts(
+        //     document.querySelector("#bookingsAnalyticsDestinationsDay"),
+        //     optionsBookingsDestinationsDay
+        // );
+        // bookingsAnalyticsDestinationsDay.render();
 
         /*
             ================================
@@ -1032,22 +1032,22 @@ window.addEventListener("load", function(){
                     ==================================
                     */
 
-                    bookingsStatusDay.updateOptions({
-                        stroke: {
-                            colors: ( ParsedObject.settings.layout.darkMode ? '#0e1726' : '#ffffff' )
-                        },
-                        plotOptions: {
-                            pie: {
-                                donut: {
-                                    labels: {
-                                        value: {
-                                            color: ( ParsedObject.settings.layout.darkMode ? '#bfc9d4' : '#0e1726' )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
+                    // bookingsStatusDay.updateOptions({
+                    //     stroke: {
+                    //         colors: ( ParsedObject.settings.layout.darkMode ? '#0e1726' : '#ffffff' )
+                    //     },
+                    //     plotOptions: {
+                    //         pie: {
+                    //             donut: {
+                    //                 labels: {
+                    //                     value: {
+                    //                         color: ( ParsedObject.settings.layout.darkMode ? '#bfc9d4' : '#0e1726' )
+                    //                     }
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
+                    // });
 
                     /*
                     ==================================

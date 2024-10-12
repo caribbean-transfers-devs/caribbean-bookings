@@ -11,7 +11,11 @@ class DashboardController extends Controller
     use RoleTrait;
 
     public function index(DashboardRepository $dashboard){
-        return $dashboard->index();        
+        $roles = session()->get('roles');
+        // if( ( !RoleTrait::hasPermission(42)) || ( !RoleTrait::hasPermission(62)) || ( !RoleTrait::hasPermission(63)) ){
+        //     abort(403, 'NO TIENE AUTORIZACIÓN.');
+        // }
+        return $dashboard->index($dashboard);   
     }
 
     public function admin(DashboardRepository $dashboard){
@@ -21,22 +25,4 @@ class DashboardController extends Controller
 
         return $dashboard->admin();        
     }
-
-    public function sales(Request $request, $type, DashboardRepository $dashboard){
-        $roles = session()->get('roles');
-        // dd($roles);
-        if(  ( $type == "general" && !RoleTrait::hasPermission(42)) || ( $type == "online" && !RoleTrait::hasPermission(62)) || ( $type == "airport" && !RoleTrait::hasPermission(63))  ){
-            abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }            
-        return $dashboard->sales($request, $type);
-    }
-
-    public function sales2(Request $request, $type, DashboardRepository $dashboard){
-        $roles = session()->get('roles');
-        // dd($roles);
-        if(  ( $type == "general" && !RoleTrait::hasPermission(42)) || ( $type == "online" && !RoleTrait::hasPermission(62)) || ( $type == "airport" && !RoleTrait::hasPermission(63))  ){
-            abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }
-        return $dashboard->sales2($request, $type);
-    }    
 }

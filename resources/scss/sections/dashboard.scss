@@ -26,86 +26,82 @@
 @import '../template/light/widgets/_widgets/widget-chart-two';
 @import '../template/dark/widgets/_widgets/widget-chart-two';
 
-.secondary-nav{
-    top: 0;
-}
+// .button_alignment{
+//     align-self: end;
 
-.button_alignment{
-    align-self: end;
+//     button{
+//         width: 100%;
+//     }
+// }
 
-    button{
-        width: 100%;
-    }
-}
+// body{
+//     .section{
+//         border: 0;
+//         box-shadow: none;
+//     }
 
-body{
-    .section{
-        border: 0;
-        box-shadow: none;
-    }
+//     .general-info{
+//         background: transparent;
+//         border-radius: 0;
 
-    .general-info{
-        background: transparent;
-        border-radius: 0;
-
-        .info, .save-info {
-            padding: 0;
-        }
-    }
+//         .info, .save-info {
+//             padding: 0;
+//         }
+//     }
     
-    .widget {
-        &.widget-six {        
-            .widget-heading {
-                h6 {
-                    margin-bottom: 0;
-                }
+//     .widget {
+//         &.widget-six {        
+//             .widget-heading {
+//                 h6 {
+//                     margin-bottom: 0;
+//                 }
 
-                margin-bottom: 20px;
-            }
-        }
-    }
+//                 margin-bottom: 20px;
+//             }
+//         }
+//     }
 
-    .widget-activity-four {
-        .timeline-line .item-timeline {
-            &:hover .t-text span.badge {
-                padding: 2px 30px;
-            }            
-        }
-    }
+//     .widget-activity-four {
+//         .timeline-line .item-timeline {
+//             &:hover .t-text span.badge {
+//                 padding: 2px 30px;
+//             }            
+//         }
+//     }
 
-    .modal-content {
-        .modal-body{
-            padding: 0;
-        }
-    }
+//     .modal-content {
+//         .modal-body{
+//             padding: 0;
+//         }
+//     }
 
-    &.dark{
+//     &.dark{
 
-        .section{
-            border: 0;
-            box-shadow: none;
-        }
+//         .section{
+//             border: 0;
+//             box-shadow: none;
+//         }
     
-        .general-info{
-            background: transparent;
-            border-radius: 0;
+//         .general-info{
+//             background: transparent;
+//             border-radius: 0;
     
-            .info, .save-info {
-                padding: 0;
-            }
-        }
+//             .info, .save-info {
+//                 padding: 0;
+//             }
+//         }
 
-        .widget {
-            &.widget-six {        
-                .widget-heading {
-                    h6 {
-                        margin-bottom: 0;
-                    }
+//         .widget {
+//             &.widget-six {        
+//                 .widget-heading {
+//                     h6 {
+//                         margin-bottom: 0;
+//                     }
     
-                    margin-bottom: 20px;
-                }
-            }
-        }
+//                     margin-bottom: 20px;
+//                 }
+//             }
+//         }
 
-    }
-} 
+//     }
+// } 
