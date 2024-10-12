@@ -157,7 +157,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 10px;
-            color: #333;
+            color: #000000;
             text-align: left;
             min-width: 400px;
         }
@@ -206,11 +206,6 @@
         }
 
         .gran_total .btn span::after {
-            /*content: ' MXN';  Moneda */
-            /*font-size: 0.65em;  Texto más pequeño para la moneda */
-            /*margin-left: 5px;  Espacio entre el monto y la moneda */
-            /*color: #333;  Color más oscuro pero menos prominente */
-
             content: ' MXN'; /* Moneda */
             font-size: 0.65em; /* Texto más pequeño para la moneda */
             margin-left: 5px; /* Espacio entre el monto y la moneda */
@@ -232,11 +227,13 @@
     <script src="{{ mix('assets/js/sections/reservations/bookings.min.js') }}"></script>
     <script>
         document.getElementById('showLayer').addEventListener('click', function() {
+            // document.getElementById('layer').classList.remove('d-none');
             document.getElementById('layer').classList.add('active');
         });
 
         document.getElementById('closeLayer').addEventListener('click', function() {
             document.getElementById('layer').classList.remove('active');
+            // document.getElementById('layer').classList.add('d-none');
         });
     </script>
 @endpush
@@ -395,7 +392,7 @@
                                     //SITIOS                                    
                                     if (!isset( $dataSites['data'][strtoupper(Str::slug($item->site_name))] ) ){
                                         $dataSites['data'][strtoupper(Str::slug($item->site_name))] = [
-                                            "name" => $item->site_name,
+                                            "name" => strtoupper($item->site_name),
                                             "total" => 0,
                                             "gran_total" => 0,
                                             "USD" => [
@@ -424,7 +421,7 @@
                                     //DESTINOS                                    
                                     if (!isset( $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))] ) ){
                                         $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))] = [
-                                            "name" => $item->destination_name_to,
+                                            "name" => strtoupper($item->destination_name_to),
                                             "total" => 0,
                                             "gran_total" => 0,
                                             "USD" => [
@@ -469,7 +466,7 @@
                                     //VEHICULOS                                    
                                     if (!isset( $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))] ) ){
                                         $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))] = [
-                                            "name" => $item->service_type_name,
+                                            "name" => strtoupper($item->service_type_name),
                                             "total" => 0,
                                             "gran_total" => 0,
                                             "USD" => [
@@ -607,6 +604,7 @@
                 <div class="col-lg-8 col-12">
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">ESTADISTICAS POR ESTATUS</h5>
                             <div class="col-lg-5 col-12">
                                 <canvas class="chartSale" id="chartSaleStatus"></canvas>
                             </div>
@@ -648,6 +646,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por metodo de pago</h5>
                             <div class="col-lg-5 col-12">
                                 <canvas class="chartSale" id="chartSaleMethodPayments"></canvas>
                             </div>
@@ -689,6 +688,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por sitio</h5>
                             <div class="col-lg-5 col-12">
                                 <canvas class="" id="chartSaleSites"></canvas>
                             </div>
@@ -730,6 +730,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por destino</h5>
                             <div class="col-lg-5 col-12">
                                 <canvas class="" id="chartSaleDestinations"></canvas>
                             </div>
@@ -773,6 +774,7 @@
                 <div class="col-lg-4 col-12">
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por meneda</h5>
                             <div class="col-lg-12 col-12">
                                 <canvas class="" id="chartSaleCurrencies"></canvas>
                             </div>
@@ -811,6 +813,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por origen de venta</h5>
                             <div class="col-lg-12 col-12">
                                 <canvas class="" id="chartSaleOrigins"></canvas>
                             </div>
@@ -852,6 +855,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por vehículo</h5>
                             <div class="col-lg-12 col-12">
                                 <canvas class="" id="chartSaleVehicles"></canvas>
                             </div>
@@ -948,13 +952,15 @@
                                     display: true,  // Mostrar las etiquetas
                                     position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                     labels: {
-                                        padding: 0, // Ajustar el espacio entre la leyenda y el gráfico
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                         boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
                                         font: {
                                             size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
                                         },
+                                        color: '#000' // Asegura que el color de los labels sea negro
                                     }
-                                },                                
+                                },
                                 tooltip: {
                                     callbacks: {
                                         title: function(tooltipItems) {
@@ -1032,13 +1038,15 @@
                                     display: true,  // Mostrar las etiquetas
                                     position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                     labels: {
-                                        padding: 20, // Ajustar el espacio entre la leyenda y el gráfico
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                         boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
                                         font: {
                                             size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
                                         },
+                                        color: '#000' // Asegura que el color de los labels sea negro
                                     }
-                                },                                
+                                },
                                 tooltip: {
                                     callbacks: {
                                         title: function(tooltipItems) {
@@ -1115,13 +1123,15 @@
                                     display: true,  // Mostrar las etiquetas
                                     position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                     labels: {
-                                        padding: 20, // Ajustar el espacio entre la leyenda y el gráfico
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                         boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
                                         font: {
                                             size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
                                         },
+                                        color: '#000' // Asegura que el color de los labels sea negro
                                     }
-                                },                                
+                                },
                                 tooltip: {
                                     callbacks: {
                                         title: function(tooltipItems) {
@@ -1198,13 +1208,15 @@
                                     display: true,  // Mostrar las etiquetas
                                     position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                     labels: {
-                                        padding: 20, // Ajustar el espacio entre la leyenda y el gráfico
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                         boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
                                         font: {
                                             size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
                                         },
+                                        color: '#000' // Asegura que el color de los labels sea negro
                                     }
-                                },                                
+                                },
                                 tooltip: {
                                     callbacks: {
                                         title: function(tooltipItems) {

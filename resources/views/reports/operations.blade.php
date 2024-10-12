@@ -243,11 +243,6 @@
         }
 
         .gran_total .btn span::after {
-            /*content: ' MXN';  Moneda */
-            /*font-size: 0.65em;  Texto más pequeño para la moneda */
-            /*margin-left: 5px;  Espacio entre el monto y la moneda */
-            /*color: #333;  Color más oscuro pero menos prominente */
-
             content: ' MXN'; /* Moneda */
             font-size: 0.65em; /* Texto más pequeño para la moneda */
             margin-left: 5px; /* Espacio entre el monto y la moneda */
@@ -726,6 +721,7 @@
                 <div class="col-lg-8 col-12">
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por estatus</h5>
                             <div class="col-lg-5 col-12">
                                 <canvas class="chartSale" id="chartOperationStatus"></canvas>
                             </div>
@@ -767,6 +763,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por metodo de pago</h5>
                             <div class="col-lg-5 col-12">
                                 <canvas class="chartSale" id="chartOperationMethodPayments"></canvas>
                             </div>
@@ -808,6 +805,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por conductor</h5>
                             <div class="col-lg-5 col-12">
                                 <canvas class="chartSale" id="chartOperationDrivers"></canvas>
                             </div>
@@ -858,6 +856,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por unidad</h5>
                             <div class="col-lg-5 col-12">
                                 <canvas class="chartSale" id="chartOperationUnits"></canvas>
                             </div>
@@ -902,6 +901,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por sitio</h5>
                             <div class="col-lg-5 col-12">
                                 <canvas class="chartSale" id="chartOperationSites"></canvas>
                             </div>
@@ -944,6 +944,7 @@
                 <div class="col-lg-4 col-12">
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por moneda</h5>
                             <div class="col-lg-12 col-12">
                                 <canvas class="" id="chartSaleCurrencies"></canvas>
                             </div>
@@ -982,6 +983,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por origen de venta</h5>
                             <div class="col-lg-12 col-12">
                                 <canvas class="" id="chartSaleOrigins"></canvas>
                             </div>
@@ -1023,6 +1025,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por vehículo</h5>
                             <div class="col-lg-12 col-12">
                                 <canvas class="" id="chartSaleVehicles"></canvas>
                             </div>
@@ -1064,6 +1067,7 @@
                     <hr>
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por tipo de servicio</h5>
                             <div class="col-lg-12 col-12">
                                 <canvas class="" id="chartServiceTypeOperation"></canvas>
                             </div>
@@ -1162,13 +1166,15 @@
                                     display: true,  // Mostrar las etiquetas
                                     position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                     labels: {
-                                        padding: 20, // Ajustar el espacio entre la leyenda y el gráfico
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                         boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
                                         font: {
                                             size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
                                         },
+                                        color: '#000' // Asegura que el color de los labels sea negro
                                     }
-                                },                                
+                                },
                                 tooltip: {
                                     callbacks: {
                                         title: function(tooltipItems) {
@@ -1245,13 +1251,15 @@
                                     display: true,  // Mostrar las etiquetas
                                     position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                     labels: {
-                                        padding: 20, // Ajustar el espacio entre la leyenda y el gráfico
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                         boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
                                         font: {
                                             size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
                                         },
+                                        color: '#000' // Asegura que el color de los labels sea negro
                                     }
-                                },                                
+                                },
                                 tooltip: {
                                     callbacks: {
                                         title: function(tooltipItems) {
@@ -1329,13 +1337,15 @@
                                     display: true,  // Mostrar las etiquetas
                                     position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                     labels: {
-                                        padding: 20, // Ajustar el espacio entre la leyenda y el gráfico
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                         boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
                                         font: {
                                             size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
                                         },
+                                        color: '#000' // Asegura que el color de los labels sea negro
                                     }
-                                },                                
+                                },
                                 tooltip: {
                                     callbacks: {
                                         title: function(tooltipItems) {
@@ -1413,13 +1423,15 @@
                                     display: true,  // Mostrar las etiquetas
                                     position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                     labels: {
-                                        padding: 20, // Ajustar el espacio entre la leyenda y el gráfico
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                         boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
                                         font: {
                                             size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
                                         },
+                                        color: '#000' // Asegura que el color de los labels sea negro
                                     }
-                                },                                
+                                },
                                 tooltip: {
                                     callbacks: {
                                         title: function(tooltipItems) {
@@ -1496,13 +1508,15 @@
                                     display: true,  // Mostrar las etiquetas
                                     position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                     labels: {
-                                        padding: 20, // Ajustar el espacio entre la leyenda y el gráfico
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                         boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
                                         font: {
                                             size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
                                         },
+                                        color: '#000' // Asegura que el color de los labels sea negro
                                     }
-                                },                                
+                                },
                                 tooltip: {
                                     callbacks: {
                                         title: function(tooltipItems) {
@@ -1587,41 +1601,7 @@
                                     }
                                 }
                             },                            
-                            plugins: {                              
-                                // tooltip: {
-                                //     callbacks: {
-                                //         title: function(tooltipItems) {
-                                //             // Mostrar el nombre del sitio
-                                //             return tooltipItems[0].label;
-                                //         },
-                                //         label: function(tooltipItem) {
-                                //             console.log(tooltipItem);                                            
-                                //             const index = tooltipItem.dataIndex;
-                                //             const site = sales.dataChartSaleCurrencies()[index];
-                                //             // Mostrar el monto en pesos y dólares junto con el porcentaje
-                                //             return [
-                                //                 `TOTAL DE VENTA: $ ${site.gran_total.toLocaleString()}`,
-                                //                 `TOTAL DE VENTA EN USD: $ ${site['accumulated']['USD'].total.toLocaleString()}`,
-                                //                 `TOTAL DE VENTA EN MXN: $ ${site['accumulated']['MXN'].total.toLocaleString()}`,
-                                //             ];
-                                //         }
-                                //     }
-                                // },
-                                // datalabels: {
-                                //     display: true,
-                                //     formatter: (value, context) => {  
-                                //         console.log(value, context);                                                                          
-                                //         const total = context.chart._metasets[0].total;
-                                //         const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                //         return percentage; // Mostrar porcentaje en el gráfico
-                                //     },
-                                //     color: '#000',
-                                //     font: {
-                                //         weight: 'bold'
-                                //     },
-                                //     anchor: 'end',
-                                //     align: 'start'
-                                // }
+                            plugins: {
                             }
                         },
                         plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels

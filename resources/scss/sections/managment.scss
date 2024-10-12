@@ -12,3 +12,19 @@
 @import '../template/light/widgets/_widgets/reset-analytics';
 @import '../template/light/widgets/_widgets/widget-chart-three';
 @import '../template/dark/widgets/_widgets/widget-chart-three';
+
+table.dataTable thead {
+    border-bottom: 1px solid #000;  /* Borde inferior para separar del body */
+}
+
+// table.dataTable thead th {
+//     // padding: 10px;  /* Ajuste de padding */
+//     font-weight: bold;  /* Negrita en los headers */
+//     border-bottom: 1px solid #000;  /* Borde en los th */
+// }
+
+// .table-responsive {
+//     overflow: hidden;
+//     overflow-y: scroll;  /* Hacer la tabla scrollable verticalmente */
+//     max-height: 400px;  /* Altura máxima de la tabla para activar el scroll */
+// }

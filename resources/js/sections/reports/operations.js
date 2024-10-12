@@ -30,6 +30,9 @@ let operations = {
         _settings.buttons =  _buttons;
         _settings.order = [];
         _settings.paging = false;
+        // _settings.scrollY = '2000px';  // Habilitar scroll vertical
+        // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
+        // _settings.fixedHeader = true;  // Fijar el header  // Habilitar el header fijo
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
             "sZeroRecords": "No se encontraron resultados",             
@@ -59,9 +62,12 @@ let operations = {
         _settings.responsive = true;
         _settings.order = [];
         _settings.paging = false; // Si no quieres paginación, puedes dejar esto en false
+        // _settings.scrollY = '500px';  // Habilitar scroll vertical
+        // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
+        // _settings.fixedHeader = true;  // Fijar el header  // Habilitar el header fijo        
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
-            "sZeroRecords": "No se encontraron resultados",             
+            "sZeroRecords": "No se encontraron resultados",
             "sInfo": "", // Oculta el número de registros mostrados
             "sInfoFiltered": "", // Oculta el texto filtrado
             "sSearch": '', // No muestra el campo de búsqueda

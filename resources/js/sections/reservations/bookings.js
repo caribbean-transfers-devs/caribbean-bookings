@@ -30,6 +30,9 @@ let bookings = {
         _settings.buttons =  _buttons;
         _settings.order = [];
         _settings.paging = false;
+        // _settings.scrollY = '2000px';  // Habilitar scroll vertical
+        // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
+        // _settings.fixedHeader = true;  // Fijar el header  // Habilitar el header fijo
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
             "sZeroRecords": "No se encontraron resultados",             
