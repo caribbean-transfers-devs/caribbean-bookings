@@ -21,7 +21,7 @@
 
     @stack('Css')
 </head> 
-<body class="layout-boxed">
+<body class="">
 
     @include('layout.partials.loader')
 
@@ -39,7 +39,7 @@
         <div id="content" class="main-content">
             <div class="layout-px-spacing">
 
-                <div class="middle-content container-xxl p-0">
+                <div class="middle-content p-0">
 
                     @include('layout.partials.breadcrumbs')
                     

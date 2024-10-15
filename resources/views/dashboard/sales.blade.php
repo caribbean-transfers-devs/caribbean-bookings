@@ -328,7 +328,7 @@
                         <h5 class="">Historial de reservas y ganancias del més</h5>
                     </div>
                     <div class="widget-content">
-                        <div id="bookingsAnalyticsMonth"></div>
+                        <div id="bookingsAnalyticsMonth" style="width:100%;"></div>
                     </div>
                 </div>
             </div>                            
@@ -338,7 +338,7 @@
                         <h5 class="">Historial de reservas por divisas del més</h5>
                     </div>        
                     <div class="widget-content">
-                        <div id="bookingsAnalyticsCurrencyMonth"></div>
+                        <div id="bookingsAnalyticsCurrencyMonth" style="width:100%;"></div>
                     </div>
                 </div>
             </div>

@@ -12,6 +12,7 @@ use App\Models\OriginSale;
 use App\Models\ContactPoints;
 use App\Models\Zones;
 use App\Models\Site;
+use App\Models\Sale;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,6 @@ use Illuminate\Support\Facades\DB;
 use App\Traits\MailjetTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
-// use App\Traits\BookingTrait;
 use App\Traits\Reports\PaymentsTrait;
 
 class ReservationsRepository
@@ -44,6 +44,8 @@ class ReservationsRepository
             "currency" => ( isset($request->currency) ? $request->currency : 0 ),
             "payment_status" => ( isset( $request->payment_status ) && !empty( $request->payment_status ) ? $request->payment_status : 0 ),
             "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
+            "is_commissionable" => ( isset($request->is_commissionable) ? $request->is_commissionable : NULL ),
+            "is_pay_at_arrival" => ( isset($request->is_pay_at_arrival) ? $request->is_pay_at_arrival : NULL ),
             "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),            
             "is_balance" => ( isset($request->is_balance) ? $request->is_balance : NULL ),
             "is_today" => ( isset($request->is_today) ? $request->is_today : NULL ),
@@ -146,6 +148,12 @@ class ReservationsRepository
             $havingConditions[] = " (".$params.") "; 
         }
 
+        //COMISIONABLES
+        if(isset( $request->is_commissionable )){
+            $params = $request->is_commissionable;
+            $query .= " AND rez.is_commissionable = $params ";
+        }        
+
         //MOTIVOS DE CANCELACIÓN
         if(isset( $request->cancellation_status ) && !empty( $request->cancellation_status )){
             $params = $this->parseArrayQuery($request->cancellation_status);
@@ -177,353 +185,8 @@ class ReservationsRepository
         if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance )) || (isset( $request->is_today )) ){
             $query2 = " HAVING " . implode(' AND ', $havingConditions);
         }
-                
-        // dd($query, $query2, $data, $queryData, $havingConditions);
-        // $bookingsStatus = [
-        //     "total" => 0,
-        //     "gran_total" => 0,
-        //     "USD" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "MXN" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "counter" => 0,
-        //     "data" => [
-        //         'CONFIRMED' => [
-        //             "name" => BookingTrait::statusBooking('CONFIRMED'),
-        //             "total" => 0,
-        //             "gran_total" => 0,
-        //             "USD" => [
-        //                 "total" => 0,
-        //                 "counter" => 0,
-        //             ],
-        //             "MXN" => [
-        //                 "total" => 0,
-        //                 "counter" => 0,
-        //             ],
-        //             "counter" => 0,
-        //         ],
-        //         'PENDING' => [
-        //             "name" => BookingTrait::statusBooking('PENDING'),
-        //             "total" => 0,
-        //             "gran_total" => 0,
-        //             "USD" => [
-        //                 "total" => 0,
-        //                 "counter" => 0,
-        //             ],
-        //             "MXN" => [
-        //                 "total" => 0,
-        //                 "counter" => 0,
-        //             ],
-        //             "counter" => 0,
-        //         ],            
-        //         'CANCELLED' => [
-        //             "name" => BookingTrait::statusBooking('CANCELLED'),
-        //             "total" => 0,
-        //             "gran_total" => 0,
-        //             "USD" => [
-        //                 "total" => 0,
-        //                 "counter" => 0,
-        //             ],
-        //             "MXN" => [
-        //                 "total" => 0,
-        //                 "counter" => 0,
-        //             ],
-        //             "counter" => 0,
-        //         ],
-        //         'OPENCREDIT' => [
-        //             "name" => BookingTrait::statusBooking('OPENCREDIT'),
-        //             "total" => 0,
-        //             "gran_total" => 0,
-        //             "USD" => [
-        //                 "total" => 0,
-        //                 "counter" => 0,
-        //             ],
-        //             "MXN" => [
-        //                 "total" => 0,
-        //                 "counter" => 0,
-        //             ],
-        //             "counter" => 0,
-        //         ],
-        //     ]
-        // ];
-    
-        // $dataMethodPayments = [
-        //     "total" => 0,
-        //     "gran_total" => 0,
-        //     "USD" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "MXN" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "counter" => 0,
-        //     "data" => []
-        // ];    
-    
-        // $dataSites = [
-        //     "total" => 0,
-        //     "gran_total" => 0,
-        //     "USD" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "MXN" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "counter" => 0,
-        //     "data" => []
-        // ];
-    
-        // $dataDestinations = [
-        //     "total" => 0,
-        //     "gran_total" => 0,
-        //     "USD" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "MXN" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "counter" => 0,
-        //     "data" => []
-        // ];
-    
-        // $dataCurrency = [
-        //     "total" => 0,
-        //     "gran_total" => 0,
-        //     "counter" => 0,
-        //     "data" => []
-        // ];
-    
-        // $dataVehicles = [
-        //     "total" => 0,
-        //     "gran_total" => 0,
-        //     "USD" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "MXN" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "counter" => 0,
-        //     "data" => []
-        // ];
-    
-        // $dataOriginSale = [
-        //     "total" => 0,
-        //     "gran_total" => 0,
-        //     "USD" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "MXN" => [
-        //         "total" => 0,
-        //         "gran_total" => 0,
-        //         "counter" => 0,
-        //     ],
-        //     "counter" => 0,
-        //     "data" => []
-        // ];
 
         $bookings = $this->queryBookings($query, $query2, $queryData);
-
-        // if(sizeof($bookings) >= 1){
-        //     foreach ($bookings as $item) {
-        //         $bookingsStatus['total'] += $item->total_sales;
-        //         $bookingsStatus['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $bookingsStatus[$item->currency]['total'] += $item->total_sales;
-        //         $bookingsStatus[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $bookingsStatus[$item->currency]['counter']++;
-        //         $bookingsStatus['counter']++;
-        //         $bookingsStatus['data'][$item->reservation_status]['total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $bookingsStatus['data'][$item->reservation_status]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $bookingsStatus['data'][$item->reservation_status][$item->currency]['total'] += $item->total_sales;
-        //         $bookingsStatus['data'][$item->reservation_status][$item->currency]['counter']++;
-        //         $bookingsStatus['data'][$item->reservation_status]['counter']++;
-
-        //         //METODOS DE PAGO
-        //         if (!isset( $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))] ) ){
-        //             $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))] = [
-        //                 "name" => $item->payment_type_name,
-        //                 "total" => 0,
-        //                 "gran_total" => 0,
-        //                 "USD" => [
-        //                     "total" => 0,
-        //                     "counter" => 0,
-        //                 ],
-        //                 "MXN" => [
-        //                     "total" => 0,
-        //                     "counter" => 0,
-        //                 ],
-        //                 "counter" => 0,                                            
-        //             ];
-        //         }
-        //         $dataMethodPayments['total'] += $item->total_sales;
-        //         $dataMethodPayments['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataMethodPayments[$item->currency]['total'] += $item->total_sales;
-        //         $dataMethodPayments[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataMethodPayments[$item->currency]['counter']++;
-
-        //         $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))]['total'] += $item->total_sales;
-        //         $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))][$item->currency]['total'] += $item->total_sales;
-        //         $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))][$item->currency]['counter']++;
-        //         $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))]['counter']++;
-        //         $dataMethodPayments['counter']++;                                    
-
-        //         //SITIOS                                    
-        //         if (!isset( $dataSites['data'][strtoupper(Str::slug($item->site_name))] ) ){
-        //             $dataSites['data'][strtoupper(Str::slug($item->site_name))] = [
-        //                 "name" => $item->site_name,
-        //                 "total" => 0,
-        //                 "gran_total" => 0,
-        //                 "USD" => [
-        //                     "total" => 0,
-        //                     "counter" => 0,
-        //                 ],
-        //                 "MXN" => [
-        //                     "total" => 0,
-        //                     "counter" => 0,
-        //                 ],
-        //                 "counter" => 0,                                            
-        //             ];
-        //         }
-        //         $dataSites['total'] += $item->total_sales;
-        //         $dataSites['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataSites[$item->currency]['total'] += $item->total_sales;
-        //         $dataSites[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataSites[$item->currency]['counter']++;
-        //         $dataSites['data'][strtoupper(Str::slug($item->site_name))]['total'] += $item->total_sales;
-        //         $dataSites['data'][strtoupper(Str::slug($item->site_name))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataSites['data'][strtoupper(Str::slug($item->site_name))][$item->currency]['total'] += $item->total_sales;
-        //         $dataSites['data'][strtoupper(Str::slug($item->site_name))][$item->currency]['counter']++;
-        //         $dataSites['data'][strtoupper(Str::slug($item->site_name))]['counter']++;
-        //         $dataSites['counter']++;
-
-        //         //DESTINOS                                    
-        //         if (!isset( $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))] ) ){
-        //             $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))] = [
-        //                 "name" => $item->destination_name_to,
-        //                 "total" => 0,
-        //                 "gran_total" => 0,
-        //                 "USD" => [
-        //                     "total" => 0,
-        //                     "counter" => 0,
-        //                 ],
-        //                 "MXN" => [
-        //                     "total" => 0,
-        //                     "counter" => 0,
-        //                 ],
-        //                 "counter" => 0,                                            
-        //             ];
-        //         }
-        //         $dataDestinations['total'] += $item->total_sales;
-        //         $dataDestinations['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataDestinations[$item->currency]['total'] += $item->total_sales;
-        //         $dataDestinations[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataDestinations[$item->currency]['counter']++;
-        //         $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))]['total'] += $item->total_sales;
-        //         $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))][$item->currency]['total'] += $item->total_sales;
-        //         $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))][$item->currency]['counter']++;
-        //         $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))]['counter']++;
-        //         $dataDestinations['counter']++;
-
-        //         //MONEDAS
-        //         if (!isset( $dataCurrency['data'][$item->currency] ) ){
-        //             $dataCurrency['data'][$item->currency] = [
-        //                 "name" => $item->currency,
-        //                 "total" => 0,
-        //                 "gran_total" => 0,
-        //                 "counter" => 0,                                            
-        //             ];
-        //         }
-        //         $dataCurrency['total'] += $item->total_sales;
-        //         $dataCurrency['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataCurrency['data'][$item->currency]['total'] += $item->total_sales;
-        //         $dataCurrency['data'][$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataCurrency['data'][$item->currency]['counter']++;
-        //         $dataCurrency['counter']++;
-
-        //         //VEHICULOS                                    
-        //         if (!isset( $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))] ) ){
-        //             $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))] = [
-        //                 "name" => $item->service_type_name,
-        //                 "total" => 0,
-        //                 "gran_total" => 0,
-        //                 "USD" => [
-        //                     "total" => 0,
-        //                     "counter" => 0,
-        //                 ],
-        //                 "MXN" => [
-        //                     "total" => 0,
-        //                     "counter" => 0,
-        //                 ],
-        //                 "counter" => 0,                                            
-        //             ];
-        //         }
-        //         $dataVehicles['total'] += $item->total_sales;
-        //         $dataVehicles['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataVehicles[$item->currency]['total'] += $item->total_sales;
-        //         $dataVehicles[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataVehicles[$item->currency]['counter']++;
-        //         $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))]['total'] += $item->total_sales;
-        //         $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))][$item->currency]['total'] += $item->total_sales;
-        //         $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))][$item->currency]['counter']++;
-        //         $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))]['counter']++;
-        //         $dataVehicles['counter']++;
-
-        //         //ORIGEN DE VENTA
-        //         if (!isset( $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))] ) ){
-        //             $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))] = [
-        //                 "name" => ( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' ),
-        //                 "total" => 0,
-        //                 "gran_total" => 0,
-        //                 "USD" => [
-        //                     "total" => 0,
-        //                     "counter" => 0,
-        //                 ],
-        //                 "MXN" => [
-        //                     "total" => 0,
-        //                     "counter" => 0,
-        //                 ],
-        //                 "counter" => 0,                                            
-        //             ];
-        //         }
-        //         $dataOriginSale['total'] += $item->total_sales;
-        //         $dataOriginSale['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataOriginSale[$item->currency]['total'] += $item->total_sales;
-        //         $dataOriginSale[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataOriginSale[$item->currency]['counter']++;
-        //         $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))]['total'] += $item->total_sales;
-        //         $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-        //         $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))][$item->currency]['total'] += $item->total_sales;
-        //         $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))][$item->currency]['counter']++;
-        //         $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))]['counter']++;
-        //         $dataOriginSale['counter']++;
-        //     }
-        // }
         
         return view('reservations.index', [
             'breadcrumbs' => [
@@ -1247,5 +910,4 @@ class ReservationsRepository
 
         return $follow_up->id;
     }
-
 }

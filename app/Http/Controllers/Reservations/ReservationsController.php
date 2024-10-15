@@ -118,7 +118,7 @@ class ReservationsController extends Controller
         if(RoleTrait::hasPermission(64)){
             return $uploadRepository->add($request);
         }
-    }  
+    } 
 
     public function deleteMedia(Request $request, UploadRepository $uploadRepository){
         if(RoleTrait::hasPermission(66)){

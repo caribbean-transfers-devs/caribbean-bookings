@@ -121,11 +121,8 @@
                                     </td>
                                     <td>{{ $value->service_name }}</td>
                                     <td>
-                                        @if ($value->is_round_trip == 1)
-                                            ROUND TRIP    
-                                        @else
-                                            {{ $value->final_service_type }}
-                                        @endif                                                    
+                                        {{ $value->final_service_type }}
+                                        <p>{{ $value->is_round_trip == 1 ? 'ROUND TRIP' : 'ONE WAY' }}</p>
                                     </td>
                                     <td>{{ number_format($value->total_sales,2,".","") }}</td>
                                     <td>{{ $value->currency }}</td>

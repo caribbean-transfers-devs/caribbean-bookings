@@ -17,6 +17,7 @@ trait QueryTrait
                                     rez.client_phone,
                                     rez.currency,
                                     rez.is_cancelled,
+                                    rez.is_commissionable,                                    
                                     rez.site_id,
                                     rez.pay_at_arrival,
                                     rez.reference,
@@ -30,28 +31,6 @@ trait QueryTrait
                                     site.name AS site_name,
                                     origin.code AS origin_code,
                                     tc.name_es AS cancellation_reason,
-
-                                    CASE
-                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAID'
-                                        ELSE 'PENDING'
-                                    END AS payment_status,
-
-                                    COALESCE(SUM(s.total_sales), 0) as total_sales,
-                                    COALESCE(SUM(p.total_payments), 0) as total_payments,                                    
-                                    COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
-
-                                    CASE
-                                        WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
-                                        WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
-                                        WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
-                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
-                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
-                                        ELSE 'UNKNOWN'
-                                    END AS reservation_status,
-                                    -- CASE
-                                    --     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
-                                    --     ELSE 'CONFIRMED'
-                                    -- END AS status,
 
                                     GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
                                     GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
@@ -75,6 +54,28 @@ trait QueryTrait
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     SUM(it.is_round_trip) as is_round_trip,
 
+                                    COALESCE(SUM(s.total_sales), 0) as total_sales,
+                                    COALESCE(SUM(p.total_payments), 0) as total_payments,                                    
+                                    COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+
+                                    CASE
+                                        WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
+                                        WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                        WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
+                                        ELSE 'UNKNOWN'
+                                    END AS reservation_status,
+                                    -- CASE
+                                    --     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+                                    --     ELSE 'CONFIRMED'
+                                    -- END AS status,
+
+                                    CASE
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
+                                        ELSE 'PENDING'
+                                    END AS payment_status,
+
                                     GROUP_CONCAT(
                                         DISTINCT 
                                         CASE 
@@ -83,8 +84,10 @@ trait QueryTrait
                                             WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
                                             ELSE 'CASH'
                                         END
-                                        ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name
-                                    -- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,-- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name
+                                    ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                    GROUP_CONCAT(DISTINCT p.payment_details ORDER BY p.payment_details ASC SEPARATOR ', ') AS payment_details
+                                    -- GROUP_CONCAT(DISTINCT p.payment_type_name ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+
                                 FROM reservations as rez
                                     INNER JOIN sites as site ON site.id = rez.site_id
                                     LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
@@ -104,7 +107,16 @@ trait QueryTrait
                                                 WHEN operation = 'multiplication' THEN total * exchange_rate
                                                 WHEN operation = 'division' THEN total / exchange_rate
                                                 ELSE total END), 2) AS total_payments,
-                                            GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
+                                            GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
+                                            GROUP_CONCAT(
+                                                DISTINCT CONCAT(
+                                                    payment_method, ' | ', 
+                                                    ROUND(CASE 
+                                                        WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                        WHEN operation = 'division' THEN total / exchange_rate
+                                                        ELSE total END, 2), ' | ', 
+                                                    reference
+                                            ) ORDER BY payment_method ASC SEPARATOR ', ') AS payment_details                                            
                                         FROM payments
                                         GROUP BY reservation_id
                                     ) as p ON p.reservation_id = rez.id

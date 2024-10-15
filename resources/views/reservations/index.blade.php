@@ -4,8 +4,6 @@
     use App\Traits\RoleTrait;
     use App\Traits\BookingTrait;
     use App\Traits\Reports\PaymentsTrait;
-@endphp
-@php
     $bookingsStatus = [
         "total" => 0,
         "gran_total" => 0,
@@ -211,8 +209,16 @@
             margin-left: 5px; /* Espacio entre el monto y la moneda */
             vertical-align: top; /* Alinea la moneda a la parte superior */
             position: relative;
-            top: -0.2em; /* Ajuste fino para elevar ligeramente la moneda */            
-        }        
+            top: -0.2em; /* Ajuste fino para elevar ligeramente la moneda */
+        }
+
+        .fixed-header {
+            position: sticky;
+            top: 100px;
+            z-index: 1000;
+            width: 100%;
+            background-color: rgba(234, 241, 255, 0.74); /* Asegúrate de que el fondo sea blanco o del color de la tabla */
+        }       
     </style>
 @endpush
 
@@ -324,6 +330,9 @@
                             <th class="text-center">COSTO POR SERVICIO</th>
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">MÉTODO DE PAGO</th> 
+                            <th class="text-center">INFORMACIÓN DE MÉTODO DE PAGO</th>
+                            <th class="text-center">PAGO AL LLEGAR</th>
+                            <th class="text-center">ESTATUS DE COMISIÓN</th> 
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
                     </thead>
@@ -553,15 +562,19 @@
                                     <td class="text-center">{{ $item->destination_name_to }}</td>
                                     <td class="text-center">{{ $item->to_name }}</td>
                                     <td class="text-center">
-                                        [{{ date("Y-m-d", strtotime($item->pickup_from)) }}]
+                                        @php
+                                            $pickup_from = explode(',',$item->pickup_from);
+                                            $pickup_to = explode(',',$item->pickup_to);
+                                        @endphp
+                                        [{{ date("Y-m-d", strtotime($pickup_from[0])) }}]
                                         @if ( $item->is_round_trip != 0 )
-                                            [{{ date("Y-m-d", strtotime($item->pickup_to)) }}]
+                                            [{{ date("Y-m-d", strtotime($pickup_to[0])) }}]
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        [{{ date("H:i", strtotime($item->pickup_from)) }}] <br>
+                                        [{{ date("H:i", strtotime($pickup_from[0])) }}] <br>
                                         @if ( $item->is_round_trip != 0 )
-                                            [{{ date("H:i", strtotime($item->pickup_to)) }}]
+                                            [{{ date("H:i", strtotime($pickup_to[0])) }}]
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -576,6 +589,19 @@
                                     <td class="text-center">{{ number_format(($item->is_round_trip != 0 ? ( $item->total_sales / 2 ) : $item->total_sales),2) }}</td>
                                     <td class="text-center">{{ $item->currency }}</td>
                                     <td class="text-center">{{ $item->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $item->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                    <td class="text-center">
+                                        @if ( !empty($item->payment_details) )
+                                            [{{ $item->payment_details }}]
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if ( $item->pay_at_arrival == 1 )
+                                            <button class="btn btn-warning">PAGO AL LLEGAR</button>
+                                        @endif                                        
+                                    </td>                                    
+                                    <td class="text-center">
+                                        <button class="btn btn-{{ $item->is_commissionable == 1 ? 'success' : 'danger' }}">{{ $item->is_commissionable == 1 ? "COMISIONABLE" : "NO COMISIONABLE" }}</button>
+                                    </td>
                                     <td class="text-center">{{ $item->cancellation_reason }}</td>
                                 </tr>
                             @endforeach
@@ -900,7 +926,7 @@
     </div>
 
     {{-- @dump($bookingsStatus, $dataMethodPayments, $dataSites, $dataDestinations, $dataVehicles, $dataOriginSale, $dataCurrency); --}}
-    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :istoday="1" :isbalance="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :istoday="1" :isbalance="1" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />
 @endsection
@@ -912,7 +938,6 @@
             dataMethodPayments: @json(( isset($dataMethodPayments['data']) ? $dataMethodPayments['data'] : [] )),
             dataSites: @json(( isset($dataSites['data']) ? $dataSites['data'] : [] )),
             dataDestinations: @json(( isset($dataDestinations['data']) ? $dataDestinations['data'] : [] )),
-
             dataCurrency: @json(( isset($dataCurrency['data']) ? $dataCurrency['data'] : [] )),
             dataVehicles: @json(( isset($dataVehicles['data']) ? $dataVehicles['data'] : [] )),
             dataOriginSale: @json(( isset($dataOriginSale['data']) ? $dataOriginSale['data'] : [] )),

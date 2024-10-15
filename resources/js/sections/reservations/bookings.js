@@ -99,6 +99,19 @@ if( document.querySelector('.table-rendering') != null ){
 }
 components.formReset();
 
+window.addEventListener('scroll', function() {
+    var table = document.getElementById('bookings');
+    var thead = table.querySelector('thead');
+    var offset = table.getBoundingClientRect().top;
+    console.log(offset);
+    
+    if (window.scrollY > offset) {
+      thead.classList.add('fixed-header');
+    } else {
+      thead.classList.remove('fixed-header');
+    }
+});
+
 //DECLARACION DE VARIABLES
 const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
 const __title_modal = document.getElementById('filterModalLabel');

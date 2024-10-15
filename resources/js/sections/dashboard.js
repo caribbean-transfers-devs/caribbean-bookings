@@ -14,10 +14,6 @@ if ( document.getElementById('lookup_date') != null ) {
 window.addEventListener("load", function(){
     try {
 
-        getcorkThemeObject = localStorage.getItem("theme");
-        getParseObject = JSON.parse(getcorkThemeObject)
-        ParsedObject = getParseObject;
-
         // const bookings_day = new PerfectScrollbar(document.querySelector('.bookings_day'));
         dashboard.actionTable($('.table-rendering'));
 
@@ -245,7 +241,7 @@ window.addEventListener("load", function(){
         var optionsBookingsMonth = {
             chart: {
                 fontFamily: 'Nunito, sans-serif',
-                height: 365,
+                height: 380,
                 type: 'area',
                 zoom: {
                     enabled: false
@@ -1012,86 +1008,6 @@ window.addEventListener("load", function(){
             optionsBookingsDestinationsMonth
         );
         bookingsAnalyticsDestinationsMonth.render();
-
-        /**
-         * =================================================================================================
-         * |     @Re_Render | Re render all the necessary JS when clicked to switch/toggle theme           |
-         * =================================================================================================
-        */
-
-        if( document.querySelector('.theme-toggle') != null ){
-            document.querySelector('.theme-toggle').addEventListener('click', function() {
-
-                getcorkThemeObject = localStorage.getItem("theme");
-                getParseObject = JSON.parse(getcorkThemeObject)
-                ParsedObject = getParseObject;
-
-                    /*
-                    ==================================
-                        Bookings By Status Day | Options
-                    ==================================
-                    */
-
-                    // bookingsStatusDay.updateOptions({
-                    //     stroke: {
-                    //         colors: ( ParsedObject.settings.layout.darkMode ? '#0e1726' : '#ffffff' )
-                    //     },
-                    //     plotOptions: {
-                    //         pie: {
-                    //             donut: {
-                    //                 labels: {
-                    //                     value: {
-                    //                         color: ( ParsedObject.settings.layout.darkMode ? '#bfc9d4' : '#0e1726' )
-                    //                     }
-                    //                 }
-                    //             }
-                    //         }
-                    //     }
-                    // });
-
-                    /*
-                    ==================================
-                        Bookings By Status Month | Options
-                    ==================================
-                    */
-
-                    bookingsStatusMonth.updateOptions({
-                        stroke: {
-                            colors: ( ParsedObject.settings.layout.darkMode ? '#0e1726' : '#ffffff' )
-                        },
-                        plotOptions: {
-                            pie: {
-                                donut: {
-                                    labels: {
-                                        value: {
-                                            color: ( ParsedObject.settings.layout.darkMode ? '#bfc9d4' : '#0e1726' )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    /*
-                        =================================
-                            Bookings Analytics Month | Options
-                        =================================
-                    */
-                    bookingsAnalyticsMonth.updateOptions({
-                        subtitle: {
-                            style: {
-                                color: ( ParsedObject.settings.layout.darkMode ? '#e0e6ed' : '#0e1726' )
-                            }
-                        },
-                        title: {
-                            style: {
-                                color: ( ParsedObject.settings.layout.darkMode ? '#e0e6ed' : '#0e1726' )
-                            },
-                        },                    
-                    });
-
-            });
-        }
     } catch(e) {
         console.log(e);
     }

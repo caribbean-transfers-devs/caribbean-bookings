@@ -1,4 +1,4 @@
-@props(['data','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','istoday','isbalance'])
+@props(['data','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','istoday','isbalance'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -189,6 +189,28 @@
                             </div>
                         @endif
 
+                        @if ( isset($iscommissionable) )
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <label class="form-label" for="is_commissionable">Reservas comisionables</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una opción" name="is_commissionable" id="is_commissionable">
+                                    <option value="">Selecciona una opción</option>
+                                    <option {{ $data['is_commissionable'] == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                    <option {{ $data['is_commissionable'] == '0' ? 'selected' : '' }} value="0">No</option>
+                                </select>
+                            </div>
+                        @endif
+
+                        @if ( isset($ispayarrival) )
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <label class="form-label" for="is_pay_at_arrival">Reservas pago al llegar</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una opción" name="is_pay_at_arrival" id="is_pay_at_arrival">
+                                    <option value="">Selecciona una opción</option>
+                                    <option {{ $data['is_pay_at_arrival'] == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                    <option {{ $data['is_pay_at_arrival'] == '0' ? 'selected' : '' }} value="0">No</option>
+                                </select>
+                            </div>
+                        @endif                        
+
                         @if ( !empty($cancellations) )
                             <div class="col-lg-4 col-md-6 col-12">
                                 <label class="form-label" for="cancellation_status">Motivos de cancelación</label>
@@ -209,7 +231,7 @@
                                     <option {{ $data['is_balance'] == '0' ? 'selected' : '' }} value="2">No</option>
                                 </select>
                             </div>
-                        @endif                        
+                        @endif
 
                         @if ( isset($istoday) )
                             <div class="col-lg-4 col-md-6 col-12">

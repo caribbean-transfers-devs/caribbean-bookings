@@ -1,10 +1,10 @@
     <!--  BEGIN NAVBAR  -->
-    <div class="header-container container-xxl d-flex align-items-center">
+    <div class="header-container d-flex align-items-center">
         <header class="header navbar navbar-center navbar-expand-sm expand-header w-100">
             <ul class="navbar-item theme-brand flex-row  text-center">
                 <li class="nav-item theme-logo">
                     <a href="/">
-                        <img src="/assets/img/logos/brand_white.svg" class="navbar-logo" alt="logo">
+                        <img src="{{ asset("/assets/img/logos/brand.svg") }}" class="navbar-logo" alt="logo">
                     </a>
                 </li>
             </ul>
