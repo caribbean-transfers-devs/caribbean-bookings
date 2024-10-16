@@ -56,7 +56,7 @@
                 @endif
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
-                        <tr>                                                        
+                        <tr>
                             <th>Fecha servicio</th>
                             <th>Sitio</th>
                             <th>Código</th>
@@ -70,6 +70,7 @@
                             <th>Método de pago</th>
                             <th>Destino</th>                            
                             <th>Comsionable</th>
+                            <th>Cantidad</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -142,6 +143,7 @@
                                     <td>
                                         <span class="badge badge-light-{{ $value->is_commissionable == 1 ? "success" : "danger" }}">{{ $value->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span>
                                     </td>
+                                    <td>{{ $value->quantity }}</td>
                                 </tr>
                             @endforeach
                         @endif

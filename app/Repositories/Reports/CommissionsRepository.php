@@ -118,7 +118,7 @@ class CommissionsRepository
                                 AND rez.is_commissionable = 1 
                                 AND rez.is_cancelled = 0 
                                 AND rez.is_duplicated = 0 
-                                AND rez.pay_at_arrival = 0
+                                -- AND rez.pay_at_arrival = 0
                         GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id, it_counter.quantity, p.payment_type_name, us.name", [
                                 "init_date_one" => $search['init'],
                                 "init_date_two" => $search['end'],
@@ -272,17 +272,18 @@ class CommissionsRepository
                         endif;
                 endforeach;
         endif;
-
-        $breadcrumbs = array(
-            array(
-                "route" => "",
-                "name" => "Reporte de comisiones del ". date("Y-m-d", strtotime($search['init'])) ." al ". date("Y-m-d", strtotime($search['end'])),
-                "active" => true
-            ),
-        );
         
-        // dd($items);
-        return view('reports.commissions', compact('search', 'items', 'breadcrumbs'));
+        return view('reports.commissions', [
+                'breadcrumbs' => [
+                        [
+                                "route" => "",
+                                "name" => "Reporte de comisiones del ". date("Y-m-d", strtotime($search['init'])) ." al ". date("Y-m-d", strtotime($search['end'])),
+                                "active" => true
+                        ]
+                ],
+                'search' => $search, 
+                'items' => $items,
+        ]);
     }
 
     public function queryBookings(){

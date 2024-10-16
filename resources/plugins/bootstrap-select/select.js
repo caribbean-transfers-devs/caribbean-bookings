@@ -287,8 +287,8 @@
             maxOptionsText: function(n, o) {
                 return [(n == 1) ? "Limit reached ({n} item max)" : "Limit reached ({n} items max)", (o == 1) ? "Group limit reached ({n} item max)" : "Group limit reached ({n} items max)", ]
             },
-            selectAllText: "Select All",
-            deselectAllText: "Deselect All",
+            selectAllText: "Seleccionar todo",
+            deselectAllText: "Deseleccionar todo",
             doneButton: false,
             doneButtonText: "Close",
             multipleSeparator: ", ",
@@ -411,7 +411,7 @@
                     u = this.autofocus ? " autofocus" : "";
                 var t = this.options.header ? '<div class="popover-title"><button type="button" class="close" aria-hidden="true">&times;</button>' + this.options.header + "</div>" : "";
                 var r = this.options.liveSearch ? '<div class="bs-searchbox"><input type="text" class="form-control" autocomplete="off"' + (null === this.options.liveSearchPlaceholder ? "" : ' placeholder="' + l(this.options.liveSearchPlaceholder) + '"') + ' role="textbox" aria-label="Search"></div>' : "";
-                var q = this.multiple && this.options.actionsBox ? '<div class="bs-actionsbox"><div class="btn-group btn-group-sm btn-block"><button type="button" class="actions-btn bs-select-all btn btn-default btn-light">' + this.options.selectAllText + '</button><button type="button" class="actions-btn bs-deselect-all btn btn-default btn-light">' + this.options.deselectAllText + "</button></div></div>" : "";
+                var q = this.multiple && this.options.actionsBox ? '<div class="bs-actionsbox"><div class="btn-group btn-group-sm btn-block w-100"><button type="button" class="actions-btn bs-select-all btn btn-default btn-light">' + this.options.selectAllText + '</button><button type="button" class="actions-btn bs-deselect-all btn btn-default btn-light">' + this.options.deselectAllText + "</button></div></div>" : "";
                 var n = this.multiple && this.options.doneButton ? '<div class="bs-donebutton"><div class="btn-group btn-block"><button type="button" class="btn btn-sm btn-default btn-light">' + this.options.doneButtonText + "</button></div></div>" : "";
                 var p = '<div class="btn-group bootstrap-select' + s + o + '"><button type="button" class="' + this.options.styleBase + ' dropdown-toggle" data-bs-toggle="dropdown"' + u + ' role="button"><span class="filter-option float-left"></span>&nbsp;<span class="bs-caret">' + this.options.template.caret + '</span></button><div class="dropdown-menu select-dropdown open" role="combobox">' + t + r + q + '<div class="dropdown-menu inner" role="listbox" aria-expanded="false"></div>' + n + "</div></div>";
                 return g(p)

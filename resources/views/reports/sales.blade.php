@@ -168,8 +168,7 @@
                                         @php
                                                 $payments = PaymentsTrait::getPayments($item->id);
                                                 if(sizeof( $payments ) >= 1):
-                                                    foreach($payments as $keyP => $valueP):
-                                                        //dd();
+                                                    foreach($payments as $keyP => $valueP):                                                        
                                                         $total_ = 0;
 
                                                         if($valueP->operation == "division"):

@@ -3,7 +3,6 @@
     use Carbon\Carbon;
     use App\Traits\RoleTrait;
     use App\Traits\BookingTrait;
-    use App\Traits\Reports\PaymentsTrait;
     $bookingsStatus = [
         "total" => 0,
         "gran_total" => 0,
@@ -596,9 +595,9 @@
                                     </td>
                                     <td class="text-center">
                                         @if ( $item->pay_at_arrival == 1 )
-                                            <button class="btn btn-warning">PAGO AL LLEGAR</button>
-                                        @endif                                        
-                                    </td>                                    
+                                            <button class="btn btn-success">SI</button>
+                                        @endif
+                                    </td>
                                     <td class="text-center">
                                         <button class="btn btn-{{ $item->is_commissionable == 1 ? 'success' : 'danger' }}">{{ $item->is_commissionable == 1 ? "COMISIONABLE" : "NO COMISIONABLE" }}</button>
                                     </td>
