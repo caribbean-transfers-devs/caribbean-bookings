@@ -103,13 +103,18 @@ window.addEventListener('scroll', function() {
     var table = document.getElementById('bookings');
     var thead = table.querySelector('thead');
     var offset = table.getBoundingClientRect().top;
-    console.log(offset);
     
     if (window.scrollY > offset) {
       thead.classList.add('fixed-header');
     } else {
       thead.classList.remove('fixed-header');
     }
+});
+
+document.querySelector('.table-responsive').addEventListener('scroll', function() {
+    var table = document.getElementById('bookings');
+    var thead = table.querySelector('thead');
+    thead.style.transform = `translateX(-${this.scrollLeft}px)`;
 });
 
 //DECLARACION DE VARIABLES

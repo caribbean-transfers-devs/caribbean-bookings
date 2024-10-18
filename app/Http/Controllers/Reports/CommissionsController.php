@@ -16,5 +16,12 @@ class CommissionsController extends Controller
         }
         return $commissionsRepository->index($request);        
     }
+
+    public function index2(Request $request, CommissionsRepository $commissionsRepository){
+        if(!$this->hasPermission(45)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+        return $commissionsRepository->index2($request);        
+    }    
     
 }

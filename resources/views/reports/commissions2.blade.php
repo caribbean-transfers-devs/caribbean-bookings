@@ -1,5 +1,8 @@
 @php
     use App\Traits\RoleTrait;
+    use App\Traits\BookingTrait;
+    use App\Traits\OperationTrait;
+    use Illuminate\Support\Str;
     $users = [];
     $exchange_rate = 16.50;
 @endphp
@@ -39,7 +42,6 @@
                 'className' => 'btn btn-primary',
             ),
         );
-        // dump($buttons);
     @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
@@ -57,90 +59,76 @@
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th>Fecha servicio</th>
-                            <th>Sitio</th>
-                            <th>Código</th>
-                            <th>Estatus</th>
-                            <th>Cliente</th>
-                            <th>Vehículo</th>
-                            <th>Tipo de servicio</th>
-                            <th>Total</th>
-                            <th>Moneda</th>
-                            <th>Vendedor</th>
-                            <th>Método de pago</th>
-                            <th>Destino</th>
-                            <th>Comsionable</th>
+                            <th class="text-center">ID</th>
+                            <th class="text-center">TIPO DE SERVICIO</th>
+                            <th class="text-center">CÓDIGO</th>
+                            <th class="text-center">FECHA DE RESERVACIÓN</th>
+                            <th class="text-center">HORA DE RESERVACIÓN</th>
+                            <th class="text-center">SITIO</th>
+                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>
+                            <th class="text-center">TIPO DE SERVICIO EN OPERACIÓN</th>
+                            <th class="text-center">NOMBRE DEL CLIENTE</th>
+                            <th class="text-center">VEHÍCULO</th>
+                            <th class="text-center">FECHA DE SERVICIO</th>
+                            <th class="text-center">HORA DE SERVICIO</th>
+                            <th class="text-center">ESTATUS DE SERVICIO</th>
+                            <th class="text-center">ESTATUS DE OPERACIÓN</th>
+                            <th class="text-center">VENDEDOR</th>
+                            <th class="text-center">TOTAL DE RESERVACIÓN</th>
+                            <th class="text-center">MONEDA</th>
+                            <th class="text-center">MÉTODO DE PAGO</th> 
+                            <th class="text-center">ESTATUS DE COMISIÓN</th> 
                         </tr>
                     </thead>
                     <tbody>
-                        @if(sizeof($items) >= 1)
-                            @foreach($items as $key => $value)
+                        @if(sizeof($operations) >= 1)
+                            @foreach($operations as $key => $operation)
                                 @php
                                     // dump($value);
-                                    $status = $value->status;
-                                    if(!isset( $users[ $value->employee ] )):
-                                        $users[ $value->employee ] = ['USD' => 0, 'MXN' => 0, 'QUANTITY' => 0];
-                                    endif;
+                                    $status = $operation->reservation_status;
 
-                                    if($value->currency == "USD"):
-                                        $users[ $value->employee ]['USD'] += $value->total_sales;
+                                    if(!isset($users[Str::slug($operation->employee)])):
+                                        $users[Str::slug($operation->employee)] = [
+                                            'name' => $operation->employee,                                            
+                                            'USD' => 0,
+                                            'MXN' => 0,
+                                            'QUANTITY' => 0,
+                                            'bookings' => [],
+                                        ];
                                     endif;
-
-                                    if($value->currency == "MXN"):
-                                        $users[ $value->employee ]['MXN'] += $value->total_sales;
-                                    endif;
-
-                                    $users[ $value->employee ]['QUANTITY']++;
+                                    if( !in_array($operation->reservation_id, $users[Str::slug($operation->employee)]['bookings']) ){
+                                        array_push($users[Str::slug($operation->employee)]['bookings'], $operation->reservation_id);
+                                    }
+                                    $users[Str::slug($operation->employee)][$operation->currency] += $operation->total_sales;
+                                    $users[Str::slug($operation->employee)]['QUANTITY']++;
                                 @endphp
-                                <tr>
-                                    <td>
-                                        @if ( $value->final_service_type == "ARRIVAL" )
-                                            {{ date("d/m/Y", strtotime($value->op_one_pickup)) }}</td>    
+                                <tr class="" data-nomenclatura="{{ $operation->final_service_type }}{{ $operation->op_type }}" data-reservation="{{ $operation->reservation_id }}" data-item="{{ $operation->id }}" data-operation="{{ $operation->final_service_type }}" data-service="{{ $operation->operation_type }}" data-type="{{ $operation->op_type }}" data-close_operation="">
+                                    <td class="text-center">{{ $operation->reservation_id }}</td>
+                                    <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
+                                    <td class="text-center">
+                                        @if (RoleTrait::hasPermission(38))
+                                            <a href="/reservations/detail/{{ $operation->reservation_id }}"><p class="mb-1">{{ $operation->code }}</p></a>
                                         @else
-                                            {{ date("d/m/Y", strtotime($value->op_two_pickup)) }}</td>  
-                                        @endif
-                                    <td>{{ $value->site_name }}</td>
-                                    <td><a href="/reservations/detail/{{ $value->reservation_id }}" target="_blank"> {{ $value->code }}</a></td>
-                                    <td>
-                                        {{-- {{ $status }} --}}
-                                        @if ($value->is_cancelled == 0)
-                                            @if($value->open_credit == 1)
-                                                <span class="badge badge-light-warning">Crédito Abierto</span>
-                                            @else
-                                                <span class="badge badge-light-{{ $value->status == "CONFIRMADO" || $value->status == "COMPLETADO" ? 'success' : 'info' }}">{{ $value->status }}</span>
-                                            @endif                                            
-                                        @else
-                                            <span class="badge badge-light-danger">Cancelado</span>
-                                        @endif                                        
-                                    </td>
-                                    <td>
-                                        <span>{{ $value->full_name }}</span>
-                                        @if(!empty($value->reference))
-                                            [{{ $value->reference }}]
-                                        @endif                                        
-                                    </td>
-                                    <td>{{ $value->service_name }}</td>
-                                    <td>
-                                        {{ $value->final_service_type }}
-                                        <p>{{ $value->is_round_trip == 1 ? 'ROUND TRIP' : 'ONE WAY' }}</p>
-                                    </td>
-                                    <td>{{ number_format($value->total_sales,2,".","") }}</td>
-                                    <td>{{ $value->currency }}</td>
-                                    <td>{{ $value->employee }}</td>
-                                    <td>{{ $value->payment_type_name }}</td>
-                                    <td>
-                                        @if( $value->zone_one_is_primary == 1 && $value->zone_two_is_primary == 0)
-                                        {{ $value->zone_two_name }} 
-                                        @endif
-                                        @if( $value->zone_one_is_primary == 0 && $value->zone_two_is_primary == 1)
-                                        {{ $value->zone_one_name }} 
-                                        @endif
-                                        @if( $value->zone_one_is_primary == 0 && $value->zone_two_is_primary == 0)
-                                            {{ $value->zone_one_name }} 
+                                            <p class="mb-1">{{ $operation->code }}</p>
                                         @endif
                                     </td>
-                                    <td>
-                                        <span class="badge badge-light-{{ $value->is_commissionable == 1 ? "success" : "danger" }}">{{ $value->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span>
+                                    <td class="text-center">{{ date("Y-m-d", strtotime($operation->created_at)) }}</td>
+                                    <td class="text-center">{{ date("H:i", strtotime($operation->created_at)) }}</td>
+                                    <td class="text-center">{{ $operation->site_name }}</td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($operation->reservation_status) }}">{{ BookingTrait::statusBooking($operation->reservation_status) }}</button></td>
+                                    <td class="text-center">{{ $operation->final_service_type }}</td>
+                                    <td class="text-center">{{ $operation->full_name }}</td>
+                                    <td class="text-center">{{ $operation->service_type_name }}</td>
+                                    <td class="text-center">{{ OperationTrait::setDateTime($operation, "date") }}</td>
+                                    <td class="text-center">{{ OperationTrait::setDateTime($operation, "time") }}</td>
+                                    <td class="text-center"><?=OperationTrait::renderServiceStatus($operation)?></td>
+                                    <td class="text-center"><?=OperationTrait::renderOperationStatus($operation)?></td>
+                                    <td class="text-center">{{ $operation->employee }}</td>                                    
+                                    <td class="text-center">{{ number_format(($operation->total_sales),2) }}</td>
+                                    <td class="text-center">{{ $operation->currency }}</td>
+                                    <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                    <td class="text-center">
+                                        <span class="badge badge-{{ $operation->is_commissionable == 1 ? "success" : "danger" }}">{{ $operation->is_commissionable == 1 ? "SI" : "NO" }}</span>
                                     </td>
                                 </tr>
                             @endforeach
@@ -192,7 +180,7 @@
                                             
                                         @endphp
                                         <tr>
-                                            <td>{{ $key }}</td>
+                                            <td>{{ $value['name'] }}</td>
                                             <td>{{ $value['QUANTITY'] }}</td>
                                             <td>{{ number_format($value['USD'],2) }}</td>
                                             <td>{{ number_format($value['MXN'],2) }}</td>
@@ -212,7 +200,8 @@
     </div>
 
     @php
-        // dump($search);
+        dump($users);
     @endphp
     <x-modals.reservations.reports :data="$search" />
+    <x-modals.reservations.payments />
 @endsection

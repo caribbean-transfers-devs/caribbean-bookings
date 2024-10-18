@@ -1,8 +1,8 @@
-@php
-    use Illuminate\Support\Str;
-    use Carbon\Carbon;
+@php        
     use App\Traits\RoleTrait;
     use App\Traits\BookingTrait;
+    use Illuminate\Support\Str;
+    use Carbon\Carbon;
     $bookingsStatus = [
         "total" => 0,
         "gran_total" => 0,
@@ -212,12 +212,12 @@
         }
 
         .fixed-header {
-            position: sticky;
-            top: 100px;
+            position: fixed;
+            top: 108px;
             z-index: 1000;
             width: 100%;
             background-color: rgba(234, 241, 255, 0.74); /* Asegúrate de que el fondo sea blanco o del color de la tabla */
-        }       
+        }
     </style>
 @endpush
 
@@ -599,14 +599,14 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <button class="btn btn-{{ $item->is_commissionable == 1 ? 'success' : 'danger' }}">{{ $item->is_commissionable == 1 ? "COMISIONABLE" : "NO COMISIONABLE" }}</button>
+                                        <button class="btn btn-{{ $item->is_commissionable == 1 ? 'success' : 'danger' }}">{{ $item->is_commissionable == 1 ? "SI" : "NO" }}</button>
                                     </td>
                                     <td class="text-center">{{ $item->cancellation_reason }}</td>
                                 </tr>
                             @endforeach
                         @endif
                     </tbody>
-                </table>
+                </table>                    
             </div>
         </div>
     </div>
@@ -799,7 +799,7 @@
                 <div class="col-lg-4 col-12">
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
-                            <h5 class="col-12 text-left text-uppercase">estadisticas por meneda</h5>
+                            <h5 class="col-12 text-left text-uppercase">estadisticas por moneda</h5>
                             <div class="col-lg-12 col-12">
                                 <canvas class="" id="chartSaleCurrencies"></canvas>
                             </div>

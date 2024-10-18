@@ -1,8 +1,8 @@
 @php
     use App\Traits\RoleTrait;
-    use App\Traits\Reports\PaymentsTrait;
     use App\Traits\BookingTrait;
     use App\Traits\OperationTrait;
+    use Illuminate\Support\Str;
     use Carbon\Carbon;
 @endphp
 @php
@@ -151,7 +151,6 @@
         "data" => []
     ];
 @endphp
-
 @extends('layout.app')
 @section('title') Operaciones @endsection
 
@@ -544,7 +543,7 @@
 
                                             if( !in_array(OperationTrait::setOperationUnit($operation), $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['units']) ){
                                                 array_push($dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['units'], OperationTrait::setOperationUnit($operation));
-                                            }                                            
+                                            }
 
                                             $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))][$operation->currency]['total'] += $operation->service_cost;
                                             $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))][$operation->currency]['counter']++;
