@@ -1,4 +1,4 @@
-@props(['data','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','istoday','isbalance'])
+@props(['data','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','istoday','isbalance','isduplicated'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -243,6 +243,16 @@
                                 </select>
                             </div>
                         @endif
+
+                        @if ( isset($isduplicated) )
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <label class="form-label" for="is_duplicated">Mostrar reservas duplicadas</label>
+                                <select class="form-control selectpicker mb-3" title="Selecciona una opción" name="is_duplicated" id="is_duplicated">
+                                    <option value="">Selecciona una opción</option>
+                                    <option {{ $data['is_duplicated'] == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                </select>
+                            </div>
+                        @endif                        
                     </div>
                 </div>
                 <div class="modal-footer">

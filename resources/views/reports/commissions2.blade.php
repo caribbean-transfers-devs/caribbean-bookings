@@ -12,6 +12,43 @@
 @push('Css')
     <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
+    <style>
+        table.table-chart {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            color: #000000;
+            text-align: left;
+            min-width: 400px;
+        }
+        .table-chart thead tr,
+        .table-chart tfoot tr{
+            background-color: #009879;
+            color: white;
+            font-weight: bold;            
+        }
+
+        .table-chart th,
+        .table-chart td {
+            padding: 12px 15px !important;
+            border: 1px solid #ddd;
+        }
+        .table-chart tbody tr:nth-child(even) {
+            background-color: #f3f3f3;
+        }
+
+        /* Hover en las filas */
+        .table-chart tbody tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        /* Resaltar la fila seleccionada */
+        .table-chart tbody tr.active-row {
+            font-weight: bold;
+            color: #009879;
+        }        
+    </style>
 @endpush
 
 @push('Js')
@@ -20,26 +57,53 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>    
     <script src="{{ mix('/assets/js/sections/reports/commissions.min.js') }}"></script>
 @endpush
 
 @section('content')
     @php
         $buttons = array(
-            array(  
-                'text' => 'Filtrar',
+            array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
                 'className' => 'btn btn-primary __btn_create',
                 'attr' => array(
-                    'data-title' =>  "Filtro de reservaciones",
+                    'data-title' =>  "Filtros de comisiones",
                     'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#filterModal'
+                    'data-bs-target' => '#filterModal',
                 )
             ),
-            array(  
-                'text' => 'Excel',
-                'extend' => 'excelHtml5',
-                'titleAttr' => 'Exportar como Excel',
+            array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
+                'titleAttr' => 'Administrar columnas',
+                'className' => 'btn btn-primary __btn_columns',
+                'attr' => array(
+                    'data-title' =>  "Filtro de comisiones",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#columnsModal',
+                    'data-table' => 'commissions',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
+                    'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS
+                )                
+            ),
+            array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas',
+                'titleAttr' => 'Ver graficas',
                 'className' => 'btn btn-primary',
+                'attr' => array(
+                    'data-title' =>  "Tabla de comisiones",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#commissionsModal',                    
+                )
+            ),            
+            array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar Excel',
+                'extend' => 'excelHtml5',
+                'titleAttr' => 'Exportar Excel',
+                'className' => 'btn btn-primary',
+                'exportOptions' => [
+                    'columns' => ':visible'  // Solo exporta las columnas visibles   
+                ]
             ),
         );
     @endphp
@@ -56,10 +120,11 @@
                         </ul>
                     </div>
                 @endif
-                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="commissions" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
                             <th class="text-center">ID</th>
+                            <th class="text-cenet">CANTIDAD</th>
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">FECHA DE RESERVACIÓN</th>
@@ -76,8 +141,10 @@
                             <th class="text-center">VENDEDOR</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">MONEDA</th>
-                            <th class="text-center">MÉTODO DE PAGO</th> 
-                            <th class="text-center">ESTATUS DE COMISIÓN</th> 
+                            <th class="text-center">MÉTODO DE PAGO</th>
+                            <th class="text-center">PAGO AL LLEGAR</th>
+                            <th class="text-center">COMISIÓNABLE</th>
+                            <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,25 +152,34 @@
                             @foreach($operations as $key => $operation)
                                 @php
                                     // dump($value);
-                                    $status = $operation->reservation_status;
-
                                     if(!isset($users[Str::slug($operation->employee)])):
                                         $users[Str::slug($operation->employee)] = [
-                                            'name' => $operation->employee,                                            
+                                            'NAME' => ( !empty($operation->employee) ? $operation->employee : "NO DEFINIDO" ),
+                                            'TOTAL' => 0,
                                             'USD' => 0,
                                             'MXN' => 0,
+                                            'TOTAL_CONFIRMED' => 0,
+                                            'TOTAL_PENDING' => 0,
                                             'QUANTITY' => 0,
-                                            'bookings' => [],
+                                            'BOOKINGS' => [],
                                         ];
                                     endif;
-                                    if( !in_array($operation->reservation_id, $users[Str::slug($operation->employee)]['bookings']) ){
-                                        array_push($users[Str::slug($operation->employee)]['bookings'], $operation->reservation_id);
-                                    }
+                                    $users[Str::slug($operation->employee)]['TOTAL'] += ( $operation->currency == "USD" ? ($operation->total_sales * $exchange_rate) : $operation->total_sales );
                                     $users[Str::slug($operation->employee)][$operation->currency] += $operation->total_sales;
-                                    $users[Str::slug($operation->employee)]['QUANTITY']++;
+                                    if( $operation->reservation_status == "CONFIRMED" && OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" && ( OperationTrait::operationStatus($operation) == "OK" || OperationTrait::operationStatus($operation) == "PENDING" ) ){
+                                        $users[Str::slug($operation->employee)]['TOTAL_CONFIRMED'] += ( $operation->currency == "USD" ? ($operation->cost * $exchange_rate) : $operation->cost );
+                                    }
+                                    if( ( $operation->reservation_status == "PENDING" || $operation->reservation_status == "CONFIRMED" ) && OperationTrait::serviceStatus($operation, "no_translate") == "PENDING"  ){
+                                        $users[Str::slug($operation->employee)]['TOTAL_PENDING'] += ( $operation->currency == "USD" ? ($operation->cost * $exchange_rate) : $operation->cost );
+                                    }
+                                    if( !in_array($operation->reservation_id, $users[Str::slug($operation->employee)]['BOOKINGS']) ){
+                                        $users[Str::slug($operation->employee)]['QUANTITY']++;
+                                        array_push($users[Str::slug($operation->employee)]['BOOKINGS'], $operation->reservation_id);                                        
+                                    }                                    
                                 @endphp
                                 <tr class="" data-nomenclatura="{{ $operation->final_service_type }}{{ $operation->op_type }}" data-reservation="{{ $operation->reservation_id }}" data-item="{{ $operation->id }}" data-operation="{{ $operation->final_service_type }}" data-service="{{ $operation->operation_type }}" data-type="{{ $operation->op_type }}" data-close_operation="">
                                     <td class="text-center">{{ $operation->reservation_id }}</td>
+                                    <td class="text-center">{{ $operation->quantity }}</td>
                                     <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
                                         @if (RoleTrait::hasPermission(38))
@@ -128,80 +204,121 @@
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
                                     <td class="text-center">
-                                        <span class="badge badge-{{ $operation->is_commissionable == 1 ? "success" : "danger" }}">{{ $operation->is_commissionable == 1 ? "SI" : "NO" }}</span>
+                                        <button class="btn btn-{{ $operation->pay_at_arrival == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->pay_at_arrival == 1 ? "SI" : "NO" }}</button>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-{{ $operation->is_commissionable == 1 ? "success" : "danger" }}" type="button">{{ $operation->is_commissionable == 1 ? "SI" : "NO" }}</button>
+                                    </td>
+                                    <td class="text-center">
+                                        @if ( ($operation->reservation_status == "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") )
+                                            @if ( !empty($operation->cancellation_reason) )
+                                                {{ $operation->cancellation_reason }}
+                                            @else
+                                                {{ "NO SHOW" }}  
+                                            @endif
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
                         @endif
                     </tbody>
                 </table>
-                <div class="mt-3 px-2">
-                    <h6>Resumen</h6>
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>                                                        
-                                    <th>Nombre</th>
-                                    <th>Cantidad</th>
-                                    <th>USD</th>
-                                    <th>MXN</th>
-                                    <th>Total</th>
-                                    @if ( RoleTrait::hasPermission(96) )
-                                        <th>Comisión</th>
-                                    @endif
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if(sizeof($users) >= 1)
-                                    @foreach($users as $key => $value)
-                                        @php
-                                            $total = ($value['USD'] * $exchange_rate) + $value['MXN'];
-                                            $commission = 0;
-                                            if($total >= 50000 && $total <= 74999):
-                                                //$commission = 2500;
-                                                $commission = 0.05 * $total;
-                                            endif;
-                                            if($total >= 75000 && $total <= 99999):
-                                                //$commission = 3750;
-                                                $commission = 0.05 * $total;
-                                            endif;
-                                            if($total >= 100000 && $total <= 124999):
-                                                //$commission = 6250;
-                                                $commission = 0.05 * $total;
-                                            endif;
-                                            if($total >= 125000 && $total <= 174999):
-                                                //$commission = 8750;
-                                                $commission = 0.05 * $total;
-                                            endif;
-                                            if($total >= 175000):
-                                                //$commission = 100000;
-                                                $commission = 0.05 * $total;
-                                            endif;
-                                            
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $value['name'] }}</td>
-                                            <td>{{ $value['QUANTITY'] }}</td>
-                                            <td>{{ number_format($value['USD'],2) }}</td>
-                                            <td>{{ number_format($value['MXN'],2) }}</td>
-                                            <td>{{ number_format($total,2) }}</td>
-                                            @if ( RoleTrait::hasPermission(96) )
-                                                <td>{{ number_format($commission,2) }}</td>                                                
-                                            @endif
-                                        </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
-    @php
-        dump($users);
-    @endphp
-    <x-modals.reservations.reports :data="$search" />
+    <x-modals.filters.bookings :data="$search" />    
+    <x-modals.reports.columns />
+    <x-modals.reports.commissions :users="$users" />
     <x-modals.reservations.payments />
+    {{-- @dump($users); --}}
 @endsection
+
+@push('Js')
+    <script>
+        let commissions = {
+            dataUsers: @json(( isset($users) ? $users : [] )),
+            dataChartUsers: function(){
+                let object = [];
+                const systems = Object.entries(this.dataUsers);
+                systems.forEach( ([key, data]) => {
+                    // console.log(key);
+                    // console.log(data);
+                    object.push(data);
+                });
+                return object;
+            },
+            renderChartSalesUsers: function(){
+                // Calcular el total de 'counter'
+                const totalCount = commissions.dataChartUsers().reduce((sum, system) => sum + system.QUANTITY, 0);
+                // Calcular el porcentaje de cada 'counter'
+                const percentages = commissions.dataChartUsers().map(site => ((site.QUANTITY / totalCount) * 100).toFixed(2) + '%');
+
+                if( document.getElementById('ChartSalesUsers') != null ){
+                    new Chart(document.getElementById('ChartSalesUsers'), {
+                        type: 'pie',
+                        data: {
+                            labels: commissions.dataChartUsers().map(row => row.NAME),
+                            datasets: [
+                                {
+                                    data: commissions.dataChartUsers().map(row => row.QUANTITY),
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true, // Hacer el gráfico responsivo
+                            maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
+                            plugins: {
+                                legend: {
+                                    display: true,  // Mostrar las etiquetas
+                                    position: 'bottom', // Colocar las etiquetas debajo del gráfico
+                                    labels: {
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
+                                        boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
+                                        font: {
+                                            size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
+                                        },
+                                        color: '#000' // Asegura que el color de los labels sea negro
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function(tooltipItems) {
+                                            return tooltipItems[0].label;
+                                        },
+                                        label: function(tooltipItem) {
+                                            const index = tooltipItem.dataIndex;
+                                            const site = dataUsers.dataChartUsers()[index];
+                                            return [
+                                                `TOTAL DE VENTA: $ ${site.TOTAL.toLocaleString()}`,
+                                            ];
+                                        }
+                                    }
+                                },
+                                datalabels: {
+                                    display: true,
+                                    formatter: (value, context) => {                                                                                
+                                        const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                                        const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                        return percentage; 
+                                    },
+                                    color: '#000',
+                                    font: {
+                                        weight: 'bold'
+                                    },
+                                    anchor: 'end',
+                                    align: 'start'
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
+                    });
+                }
+            },            
+        };
+
+        commissions.renderChartSalesUsers();
+        console.log(commissions.dataChartUsers());        
+    </script>
+@endpush

@@ -286,7 +286,6 @@
             ),
         );
     @endphp
-
     <div class="row layout-top-spacing" id="contentData">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
@@ -303,6 +302,7 @@
                 <table id="bookings" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
+                            <th class="text-center">ID</th>
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">REFERENCIA</th>
@@ -331,7 +331,7 @@
                             <th class="text-center">MÉTODO DE PAGO</th> 
                             <th class="text-center">INFORMACIÓN DE MÉTODO DE PAGO</th>
                             <th class="text-center">PAGO AL LLEGAR</th>
-                            <th class="text-center">ESTATUS DE COMISIÓN</th> 
+                            <th class="text-center">COMISIÓNABLE</th> 
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
                     </thead>
@@ -530,6 +530,7 @@
                                     $dataOriginSale['counter']++;
                                 @endphp
                                 <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
+                                    <td class="text-center">{{ $item->reservation_id }}</td>
                                     <td class="text-center"><span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
                                         @php
@@ -594,14 +595,20 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        @if ( $item->pay_at_arrival == 1 )
-                                            <button class="btn btn-success">SI</button>
-                                        @endif
+                                        <button class="btn btn-{{ $item->pay_at_arrival == 1 ? 'success' : 'danger' }}" type="button">{{ $item->pay_at_arrival == 1 ? "SI" : "NO" }}</button>
                                     </td>
                                     <td class="text-center">
-                                        <button class="btn btn-{{ $item->is_commissionable == 1 ? 'success' : 'danger' }}">{{ $item->is_commissionable == 1 ? "SI" : "NO" }}</button>
+                                        <button class="btn btn-{{ $item->is_commissionable == 1 ? 'success' : 'danger' }}" type="button">{{ $item->is_commissionable == 1 ? "SI" : "NO" }}</button>
                                     </td>
-                                    <td class="text-center">{{ $item->cancellation_reason }}</td>
+                                    <td class="text-center">
+                                        @if ( $item->reservation_status == "CANCELLED" )
+                                            @if ( !empty($item->cancellation_reason) )
+                                                {{ $item->cancellation_reason }}
+                                            @else
+                                                {{ "NO SHOW" }}
+                                            @endif
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         @endif
@@ -795,7 +802,6 @@
                         </div>
                     </div>                    
                 </div>
-
                 <div class="col-lg-4 col-12">
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
@@ -924,8 +930,7 @@
         </div>
     </div>
 
-    {{-- @dump($bookingsStatus, $dataMethodPayments, $dataSites, $dataDestinations, $dataVehicles, $dataOriginSale, $dataCurrency); --}}
-    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :istoday="1" :isbalance="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :istoday="1" :isbalance="1" :isduplicated="1" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />
 @endsection
@@ -1462,13 +1467,12 @@
             },
         };
 
-        // console.log(sales.dataChartSaleStatus());
         sales.renderChartSaleStatus();
         sales.renderChartSaleMethodPayments();
         sales.renderChartSaleSites();
         sales.renderChartSaleDestinations();
         sales.renderChartSaleCurrencies();
         sales.renderChartSaleVehicles();
-        sales.renderChartSaleOrigins();
+        sales.renderChartSaleOrigins();        
     </script>
 @endpush

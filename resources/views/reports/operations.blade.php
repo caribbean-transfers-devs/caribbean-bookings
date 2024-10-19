@@ -315,7 +315,6 @@
             ),
         );
     @endphp    
-
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
@@ -332,6 +331,7 @@
                 <table id="dataOperations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
+                            <th class="text-center">ID</th>
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">REFERENCIA</th>
@@ -365,7 +365,9 @@
                             <th class="text-center">BALANCE</th>
                             <th class="text-center">COSTO POR SERVICIO</th>
                             <th class="text-center">MONEDA</th>
-                            <th class="text-center">MÉTODO DE PAGO</th> 
+                            <th class="text-center">MÉTODO DE PAGO</th>
+                            <th class="text-center">PAGO AL LLEGAR</th>
+                            <th class="text-center">COMISIÓNABLE</th> 
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
                     </thead>
@@ -652,6 +654,7 @@
                                     }
                                 @endphp
                                 <tr class="" data-nomenclatura="{{ $operation->final_service_type }}{{ $operation->op_type }}" data-reservation="{{ $operation->reservation_id }}" data-item="{{ $operation->id }}" data-operation="{{ $operation->final_service_type }}" data-service="{{ $operation->operation_type }}" data-type="{{ $operation->op_type }}" data-close_operation="">
+                                    <td class="text-center">{{ $operation->reservation_id }}</td>
                                     <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
                                         @if (RoleTrait::hasPermission(38))
@@ -692,7 +695,21 @@
                                     <td class="text-center">{{ number_format($operation->service_cost,2) }}</td>
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
-                                    <td class="text-center">{{ $operation->cancellation_reason }}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-{{ $operation->pay_at_arrival == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->pay_at_arrival == 1 ? "SI" : "NO" }}</button>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-{{ $operation->is_commissionable == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->is_commissionable == 1 ? "SI" : "NO" }}</button>
+                                    </td>
+                                    <td class="text-center">
+                                        @if ( ($operation->reservation_status == "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") )
+                                            @if ( !empty($operation->cancellation_reason) )
+                                                {{ $operation->cancellation_reason }}
+                                            @else
+                                                {{ "NO SHOW" }}  
+                                            @endif
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         @endif
@@ -1110,7 +1127,6 @@
         </div>
     </div>
 
-    {{-- @dump($dataSites, $dataOriginSale, $dataDriver, $dataCurrency, $dataUnit, $dataServiceTypeOperation); --}}
     <x-modals.filters.bookings :data="$data" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :servicesoperation="$services_operation" :serviceoperationstatus="$service_operation_status" :units="$units" :drivers="$drivers" :operationstatus="$operation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />
@@ -1749,15 +1765,15 @@
                 }
             },
         };
+        
         sales.renderChartOperationStatus();
         sales.renderChartOperationDrivers();
         sales.renderChartOperationUnits();
         sales.renderChartOperationSites();
         sales.renderChartOperationMethodPayments();
-
         sales.renderChartSaleCurrencies();
         sales.renderChartSaleVehicles();
         sales.renderChartSaleOrigins();
-        sales.renderChartServiceTypeOperation();
+        sales.renderChartServiceTypeOperation();        
     </script>
 @endpush

@@ -311,7 +311,7 @@ class CommissionsRepository
         ];
     
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
-        $items = $this->queryCommissions($queryOne, $queryTwo, $queryHaving, $queryData);        
+        $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);        
 
         // dd($items);
 

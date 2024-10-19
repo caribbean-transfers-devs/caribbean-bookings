@@ -142,8 +142,13 @@ trait OperationTrait
         }
     }
 
-    public static function operationStatus($service){
-        return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ));
+    
+    public static function operationStatus($service, $action = "translate"){
+        if( $action == "translate" ){
+            return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ));
+        }else if( $action == "no_translate" ){
+            return ( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status );
+        }        
     }
     public static function renderOperationStatus($service){
         return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ), 'OPERATION').'">'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status )).'</button>';

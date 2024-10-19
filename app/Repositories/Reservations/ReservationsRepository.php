@@ -49,10 +49,11 @@ class ReservationsRepository
             "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),            
             "is_balance" => ( isset($request->is_balance) ? $request->is_balance : NULL ),
             "is_today" => ( isset($request->is_today) ? $request->is_today : NULL ),
+            "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : NULL ),
         ];
         
-        //Query DB
-        $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.is_duplicated = 0 ';
+        //Query DB (2013-2206)
+        $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end ';
         $havingConditions = []; $query2 = '';
         $queryData = [
             'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
@@ -168,6 +169,14 @@ class ReservationsRepository
         //RESERVAS OPERADAS EL MISMO DIA DE SU CREACION
         if(isset( $request->is_today )){
             $havingConditions[] = ( $request->is_today == 1 ? ' is_today != 0 ' : ' is_today = 0 ' );
+        }
+
+        //TIPO DE SERVICIO
+        if(!isset( $request->is_duplicated )){
+            $query .= " AND rez.is_duplicated = 0 ";
+        }        
+        if(isset( $request->is_duplicated )){
+            $query .= " AND rez.is_duplicated IN (1,0) ";
         }
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){

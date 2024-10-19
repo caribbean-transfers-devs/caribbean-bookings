@@ -57,7 +57,7 @@ trait FiltersTrait
             "PENDING" => "Pendiente",
             "OPENCREDIT" => "Credito abierto",
             "CANCELLED" => "Cancelado",
-            // "DUPLICATED" => "Duplicado",
+            "DUPLICATED" => "Duplicado",
         );
     }
 
