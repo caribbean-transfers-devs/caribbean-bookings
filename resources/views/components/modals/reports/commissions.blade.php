@@ -19,10 +19,10 @@
                             <thead>
                                 <tr>                                                        
                                     <th>NOMBRE</th>
-                                    <th class="text-ceneter">CANTIDAD</th>
-                                    <th class="text-ceneter">TOTAL DE VENTA</th>
+                                    <th class="text-ceneter">CANTIDAD</th>                                    
                                     <th class="text-ceneter">USD</th>
                                     <th class="text-ceneter">MXN</th>
+                                    <th class="text-ceneter">TOTAL DE VENTA</th>
                                     <th class="text-ceneter">TOTAL OPERADA</th>
                                     <th>TOTAL PENDIENTE</th>
                                     @if ( RoleTrait::hasPermission(96) )
@@ -60,10 +60,10 @@
                                         @endphp
                                         <tr>
                                             <td>{{ $value['NAME'] }}</td>
-                                            <td class="text-center">{{ $value['QUANTITY'] }}</td>
-                                            <td class="text-center">{{ number_format($value['TOTAL'],2) }}</td>
+                                            <td class="text-center">{{ $value['QUANTITY'] }}</td>                                            
                                             <td class="text-center">{{ number_format($value['USD'],2) }}</td>
                                             <td class="text-center">{{ number_format($value['MXN'],2) }}</td>
+                                            <td class="text-center">{{ number_format($value['TOTAL'],2) }}</td>
                                             <td class="text-center">{{ number_format($value['TOTAL_CONFIRMED'],2) }}</td>
                                             <td class="text-center">{{ number_format($value['TOTAL_PENDING'],2) }}</td>
                                             @if ( RoleTrait::hasPermission(96) )

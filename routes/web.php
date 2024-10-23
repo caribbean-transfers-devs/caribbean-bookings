@@ -53,10 +53,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reports/sales', [ReportSales::class, 'index'])->name('reports.sales');
     Route::post('/reports/sales', [ReportSales::class, 'index'])->name('reports.sales.action');
 
-    Route::get('/reports/commissions', [ReportCommissions::class, 'index'])->name('reports.commissions');
-    Route::post('/reports/commissions', [ReportCommissions::class, 'index'])->name('reports.commissions.action');
-    Route::get('/reports/commissions2', [ReportCommissions::class, 'index2'])->name('reports.commissions2');
-    Route::post('/reports/commissions2', [ReportCommissions::class, 'index2'])->name('reports.commissions.action2');
+    Route::get('/reports/commissions', [ReportCommissions::class, 'index2'])->name('reports.commissions');
+    Route::post('/reports/commissions', [ReportCommissions::class, 'index2'])->name('reports.commissions.action');
+    Route::get('/reports/commissions2', [ReportCommissions::class, 'index'])->name('reports.commissions2');
+    Route::post('/reports/commissions2', [ReportCommissions::class, 'index'])->name('reports.commissions.action2');
 
     Route::get('/reports/cash', [ReportCash::class, 'index'])->name('reports.cash');
     Route::post('/reports/cash', [ReportCash::class, 'index'])->name('reports.cash.action');
