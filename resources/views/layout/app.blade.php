@@ -38,7 +38,6 @@
         <!--  BEGIN CONTENT AREA  -->
         <div id="content" class="main-content">
             <div class="layout-px-spacing">
-
                 <div class="middle-content p-0">
 
                     @include('layout.partials.breadcrumbs')
@@ -50,11 +49,8 @@
                     {{-- </div> --}}
 
                 </div>
-
             </div>
-
             @include('layout.partials.footer')
-
         </div>
         <!--  END CONTENT AREA  -->
 

@@ -292,5 +292,4 @@ class SpamRepository
             return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 }

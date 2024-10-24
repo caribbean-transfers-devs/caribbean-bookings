@@ -16,9 +16,11 @@ trait BookingTrait
                 return ( $status == "PENDING" && $section == "OPERATION" ? 'secondary' : 'warning' );
                 break;
             case 'CANCELLED':
-            case 'DUPLICATED':
                 return 'danger';
                 break;
+            case 'DUPLICATED':
+                return 'secondary';
+                break;                
             case 'OPENCREDIT':
             case 'E':
                 return 'info';

@@ -29,10 +29,11 @@ var App = function() {
                 }, 50);
             }
         }
-    }
+    }   
 
     var toggleFunction = {
         sidebar: function($recentSubmenu) {
+
             var sidebarCollapseEle = document.querySelectorAll('.sidebarCollapse');
 
             sidebarCollapseEle.forEach(el => {
@@ -69,6 +70,48 @@ var App = function() {
                 });
             });
         },
+        // sidebar: function($recentSubmenu) {
+        //     var sidebarCollapseEle = document.querySelectorAll('.sidebarCollapse');
+    
+        //     sidebarCollapseEle.forEach(el => {
+        //         el.addEventListener('click', function (sidebar) {
+        //             sidebar.preventDefault();
+        //             getSidebar = document.querySelector('.sidebar-wrapper');
+    
+        //             // Forzar siempre el comportamiento como si fuera móvil
+        //             if ($recentSubmenu === true) {
+        //                 if (document.querySelector('.collapse.submenu').classList.contains('show')) {
+        //                     document.querySelector('.submenu.show').classList.add('mini-recent-submenu');
+        //                     getSidebar.querySelector('.collapse.submenu').classList.remove('show');
+        //                     document.querySelector('.collapse.submenu').parentNode.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'false');
+        //                 } else {
+        //                     if (Dom.class.mainContainer.classList.contains('sidebar-closed')) {
+        //                         if (document.querySelector('.collapse.submenu').classList.contains('recent-submenu')) {
+        //                             getSidebar.querySelector('.collapse.submenu.recent-submenu').classList.add('show');
+        //                             document.querySelector('.collapse.submenu.recent-submenu').parentNode.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'true');
+        //                             document.querySelector('.submenu').classList.remove('mini-recent-submenu');
+        //                         } else {
+        //                             document.querySelector('li.active .submenu').classList.add('recent-submenu');
+        //                             getSidebar.querySelector('.collapse.submenu.recent-submenu').classList.add('show');
+        //                             document.querySelector('.collapse.submenu.recent-submenu').parentNode.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'true');
+        //                             document.querySelector('.submenu').classList.remove('mini-recent-submenu');
+        //                         }
+        //                     }
+        //                 }
+        //             }
+    
+        //             // Forzar la clase de cierre en el contenedor principal para comportamiento móvil
+        //             Dom.class.mainContainer.classList.toggle("sidebar-closed");
+        //             Dom.class.mainHeader.classList.toggle('expand-header');
+        //             Dom.class.mainContainer.classList.toggle("sbar-open");
+        //             Dom.class.overlay.classList.toggle('show');
+        //             Dom.main.classList.toggle('sidebar-noneoverflow');
+                    
+        //             // Ajustar para que siempre actúe como móvil
+        //             Dom.id.container.classList.add("sidebar-closed");
+        //         });
+        //     });
+        // },
         onToggleSidebarSubmenu: function() {
             ['mouseenter', 'mouseleave'].forEach(function(e){
                 document.querySelector('.sidebar-wrapper').addEventListener(e, function() {
@@ -152,13 +195,16 @@ var App = function() {
 
     var inBuiltfunctionality = {
         mainCatActivateScroll: function() {
-            if (document.querySelector('.menu-categories')) {        
+
+            if (document.querySelector('.menu-categories')) {
+
                 const ps = new PerfectScrollbar('.menu-categories', {
                     wheelSpeed:.5,
                     swipeEasing:!0,
                     minScrollbarLength:40,
-                    maxScrollbarLength:300
+                    maxScrollbarLength:300                    
                 });
+
             }
         },
         preventScrollBody: function() {
@@ -243,13 +289,15 @@ var App = function() {
                     toggleFunction.offToggleSidebarSubmenu();
                 }
             });
-        }        
+        }
+
     }
 
     var _desktopResolution = {
         onRefresh: function() {
             var windowWidth = window.innerWidth;
             if ( windowWidth > MediaSize.md ) {
+                console.log("onToggleSidebarSubmenu onRefresh");
                 categoryScroll.scrollCat();
                 toggleFunction.sidebar();
                 toggleFunction.onToggleSidebarSubmenu();
@@ -257,56 +305,71 @@ var App = function() {
         },
         
         onResize: function() {
-            window.addEventListener('resize', function(event) {
-                event.preventDefault();
+            window.addEventListener('resize', function(event) {                
+                event.preventDefault();                
                 var windowWidth = window.innerWidth;
+                console.log(windowWidth, "onToggleSidebarSubmenu onResize");
                 if ( windowWidth > MediaSize.md ) {
                     toggleFunction.onToggleSidebarSubmenu();
                 }
             });
-        }        
+        }
+
     }
 
     function sidebarFunctionality() {
-        function sidebarCloser() {          
-            if (window.innerWidth <= 991 ) {
-                if (!document.querySelector('body').classList.contains('alt-menu')) {
-                    Dom.id.container.classList.add("sidebar-closed");
-                    Dom.class.overlay.classList.remove('show');
-                } else {
-                    Dom.class.navbar.classList.remove("expand-header");
-                    Dom.class.overlay.classList.remove('show');
-                    Dom.id.container.classList.remove('sbar-open');
-                    Dom.main.classList.remove('sidebar-noneoverflow');
-                }
-            } else if (window.innerWidth > 991 ) {
-                // if (!document.querySelector('body').classList.contains('alt-menu')) {
-                //     Dom.id.container.classList.remove("sidebar-closed");
-                //     Dom.class.navbar.classList.remove("expand-header");
-                //     Dom.class.overlay.classList.remove('show');
-                //     Dom.id.container.classList.remove('sbar-open');
-                //     Dom.main.classList.remove('sidebar-noneoverflow');
-                // } else {
-                    Dom.main.classList.add('sidebar-noneoverflow');
-                    Dom.id.container.classList.add("sidebar-closed");
-                    Dom.class.navbar.classList.add("expand-header");
-                    // Dom.class.overlay.classList.add('show');
-                    Dom.id.container.classList.add('sbar-open');
-                    // document.querySelector('.sidebar-wrapper [aria-expanded="true"]').parentNode.querySelector('.collapse').classList.remove('show');
-                // }
-            }
+        function sidebarCloser() {
+
+            Dom.id.container.classList.add("sidebar-closed");
+            Dom.class.navbar.classList.remove("expand-header");
+            Dom.class.overlay.classList.remove('show');
+            Dom.id.container.classList.remove('sbar-open');
+            Dom.main.classList.remove('sidebar-noneoverflow');            
+
+            // if (window.innerWidth <= 991 ) {
+
+            //     if (!document.querySelector('body').classList.contains('alt-menu')) {
+
+            //         Dom.id.container.classList.add("sidebar-closed");
+            //         Dom.class.overlay.classList.remove('show');
+            //     } else {
+            //         Dom.class.navbar.classList.remove("expand-header");
+            //         Dom.class.overlay.classList.remove('show');
+            //         Dom.id.container.classList.remove('sbar-open');
+            //         Dom.main.classList.remove('sidebar-noneoverflow');
+            //     }
+
+            // } else if (window.innerWidth > 991 ) {
+
+            //     if (!document.querySelector('body').classList.contains('alt-menu')) {
+
+            //         Dom.id.container.classList.remove("sidebar-closed");
+            //         Dom.class.navbar.classList.remove("expand-header");
+            //         Dom.class.overlay.classList.remove('show');
+            //         Dom.id.container.classList.remove('sbar-open');
+            //         Dom.main.classList.remove('sidebar-noneoverflow');
+            //     } else {
+            //         Dom.main.classList.add('sidebar-noneoverflow');
+            //         Dom.id.container.classList.add("sidebar-closed");
+            //         Dom.class.navbar.classList.add("expand-header");
+            //         Dom.class.overlay.classList.add('show');
+            //         Dom.id.container.classList.add('sbar-open');
+            //         document.querySelector('.sidebar-wrapper [aria-expanded="true"]').parentNode.querySelector('.collapse').classList.remove('show');
+            //     }
+            // }
         }
 
         function sidebarMobCheck() {
-            if (window.innerWidth <= 991 ) {
-                if ( document.querySelector('.main-container').classList.contains('sbar-open') ) {
-                    return;
-                } else {
-                    sidebarCloser()
-                }
-            } else if (window.innerWidth > 991 ) {
+        //     if (window.innerWidth <= 991 ) {
+
+        //         if ( document.querySelector('.main-container').classList.contains('sbar-open') ) {
+        //             return;
+        //         } else {
+        //             sidebarCloser()
+        //         }
+        //     } else if (window.innerWidth > 991 ) {
                 sidebarCloser();
-            }
+            // }
         }
 
         sidebarCloser();
@@ -314,6 +377,7 @@ var App = function() {
         window.addEventListener('resize', function(event) {
             sidebarMobCheck();
         });
+
     }
 
     return {

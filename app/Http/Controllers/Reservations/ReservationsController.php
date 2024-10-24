@@ -23,14 +23,6 @@ class ReservationsController extends Controller
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
-    }    
-
-    public function index(Request $request, ReservationsRepository $reservationRepository){
-        if(RoleTrait::hasPermission(10)){
-            return $reservationRepository->index($request);
-        }else{
-            abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }
     }
 
     //NOS TRAE LOS PAGOS DE LA RESERVACIÓN

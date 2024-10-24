@@ -8,13 +8,12 @@
         $links_selling_point = [];
         $links_operations = [];
         $links_settings = [];
-        $links_administration = [];
 
         //DASHBOARD
         if(RoleTrait::hasPermission(42) || RoleTrait::hasPermission(62) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(63)):
             array_push($links,[
                 'type' => 'single',
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>',
                 'code' => 'dashbaoard',
                 'name' => 'Dashboard',
                 'route' => route('dashboard'),
@@ -22,20 +21,20 @@
             ]);
         endif;
 
-        //RESERVACIONES
-        if(RoleTrait::hasPermission(10)):
+        //TPV
+        if(RoleTrait::hasPermission(26)):
             array_push($links,[
                 'type' => 'single',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>',
-                'code' => 'bookings',
-                'name' => 'Reservaciones',
-                'route' => route('reservations.index'),
-                'active' => request()->routeIs('reservations.index','reservations.search')
-            ]);        
-        endif;        
+                'code' => 'tpv',
+                'name' => 'TPV',
+                'route' => route('tpv.handler'),
+                'active' => request()->routeIs('tpv.handler')
+            ]);
+        endif;
 
         //REPORTES
-        if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71) || RoleTrait::hasPermission(97)):
+        if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71) || RoleTrait::hasPermission(97) || RoleTrait::hasPermission(98)):
             // if(RoleTrait::hasPermission(43)):
             //     $links_reports[] = [
             //         'name' => 'Pagos',
@@ -68,23 +67,30 @@
             //     $links_reports[] = [
             //         'name' => 'Cancelaciones',
             //         'route' => route('reports.cancellations'),
-            //         'active' => request()->routeIs('reports.cancellations','reports.cancellations.post'),
+            //         'active' => request()->routeIs('reports.cancellations','reports.cancellations.action'),
             //     ];
             // endif;
+            if(RoleTrait::hasPermission(98)):
+                $links_reports[] = [
+                    'name' => 'Reservaciones',
+                    'route' => route('reports.reservations'),
+                    'active' => request()->routeIs('reports.reservations','reports.reservations.action'),
+                ];
+            endif;
             if(RoleTrait::hasPermission(97)):
                 $links_reports[] = [
                     'name' => 'Operaciones',
                     'route' => route('reports.operations'),
-                    'active' => request()->routeIs('reports.operations','reports.operations.search'),
+                    'active' => request()->routeIs('reports.operations','reports.operations.action'),
                 ];
             endif;
             array_push($links,[
                 'type' => 'multiple',
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>',
                 'code' => 'reports',
                 'name' => 'Reportes',
                 'route' => null,
-                'active' => request()->routeIs('reports.payment','reports.payment.action','reports.sales','reports.sales.action','reports.commissions','reports.commissions.action','reports.cash','reports.cash.action','reports.operations','reports.operations.search'),
+                'active' => request()->routeIs('reports.payment','reports.payment.action','reports.sales','reports.sales.action','reports.commissions','reports.commissions.action','reports.cash','reports.cash.action','reports.reservations','reports.reservations.action','reports.operations','reports.operations.action'),
                 'urls' => $links_reports
             ]);
         endif;
@@ -131,28 +137,14 @@
         // endif;
 
         //OPERACION
-        if(RoleTrait::hasPermission(36) || RoleTrait::hasPermission(37) || RoleTrait::hasPermission(39) || RoleTrait::hasPermission(46) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) ):
-            if(RoleTrait::hasPermission(36)):
-                $links_operations[] = [
-                    'name' => 'Descargar',
-                    'route' => route('operation.download'),
-                    'active' => request()->routeIs('operation.download'),
-                ];
-            endif;
+        if(RoleTrait::hasPermission(39) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(10) || RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) ):
             if(RoleTrait::hasPermission(39)):
                 $links_operations[] = [
                     'name' => 'Confirmaciones',
                     'route' => route('operation.confirmation'),
                     'active' => request()->routeIs('operation.confirmation','operation.confirmation.search'),
                 ];
-            endif;
-            // if(RoleTrait::hasPermission(46)):
-            //     $links_operations[] = [
-            //         'name' => 'CC Form',
-            //         'route' => route('operation.ccform'),
-            //         'active' => request()->routeIs('operation.ccform'),
-            //     ];
-            // endif;
+            endif;            
             if(RoleTrait::hasPermission(47)):
                 $links_operations[] = [
                     'name' => 'SPAM',
@@ -160,6 +152,13 @@
                     'active' => request()->routeIs('operation.spam','operation.spam.search'),
                 ];
             endif;
+            if(RoleTrait::hasPermission(10)):
+                $links_operations[] = [
+                    'name' => 'Reservaciones',
+                    'route' => route('operation.reservations.index'),
+                    'active' => request()->routeIs('operation.reservations.index','operation.reservations.search'),
+                ];
+            endif;            
             if(RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79)):
                 $links_operations[] = [
                     'name' => 'Operaciones',
@@ -169,29 +168,52 @@
             endif;            
             array_push($links,[
                 'type' => 'multiple',
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>',
                 'code' => 'operations',
-                'name' => 'Operación',
+                'name' => 'Gestion',
                 'route' => null,
                 'active' => request()->routeIs('operation.*'),
                 'urls' => $links_operations
             ]);
-        endif;
-
-        //TPV
-        if(RoleTrait::hasPermission(26)):
-            array_push($links,[
-                'type' => 'single',
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>',
-                'code' => 'tpv',
-                'name' => 'TPV',
-                'route' => route('tpv.handler'),
-                'active' => request()->routeIs('tpv.handler')
-            ]);
         endif;        
 
         //CONFIGURACIONES
-        if(RoleTrait::hasPermission(28) || RoleTrait::hasPermission(32)):
+        if(RoleTrait::hasPermission(6) || RoleTrait::hasPermission(1) || RoleTrait::hasPermission(73) || RoleTrait::hasPermission(74) || RoleTrait::hasPermission(75) || RoleTrait::hasPermission(28) || RoleTrait::hasPermission(32)):
+            if(RoleTrait::hasPermission(6)):
+                $links_settings[] = [
+                    'name' => 'Roles',
+                    'route' => route('roles.index'),
+                    'active' => request()->routeIs('roles.*'),
+                ];
+            endif;
+            if(RoleTrait::hasPermission(1)):
+                $links_settings[] = [
+                    'name' => 'Usuarios',
+                    'route' => route('users.index'),
+                    'active' => request()->routeIs('users.*'),
+                ];
+            endif;
+            if(RoleTrait::hasPermission(73)):
+                $links_settings[] = [
+                    'name' => 'Empresas',
+                    'route' => route('enterprises.index'),
+                    'active' => request()->routeIs('enterprises.*'),
+                ];
+            endif;
+            if(RoleTrait::hasPermission(74)):
+                $links_settings[] = [
+                    'name' => 'Vehiculos',
+                    'route' => route('vehicles.index'),
+                    'active' => request()->routeIs('vehicles.*'),
+                ];
+            endif;
+            if(RoleTrait::hasPermission(75)):
+                $links_settings[] = [
+                    'name' => 'Conductores',
+                    'route' => route('drivers.index'),
+                    'active' => request()->routeIs('drivers.*'),
+                ];
+            endif;
             if(RoleTrait::hasPermission(28)):
                 $links_settings[] = [
                     'name' => 'Zonas',
@@ -212,56 +234,8 @@
                 'code' => 'settings',
                 'name' => 'Configuraciones',
                 'route' => null,
-                'active' => request()->routeIs('config.zones','config.zones.getZones','config.ratesDestination','config.ratesZones'),
+                'active' => request()->routeIs('users.*','roles.*','enterprises.*','vehicles.*','drivers.*','config.zones','config.zones.getZones','config.ratesDestination','config.ratesZones'),
                 'urls' => $links_settings
-            ]);
-        endif;
-
-        //ADMINISTRACION
-        if(RoleTrait::hasPermission(1) || RoleTrait::hasPermission(6) || RoleTrait::hasPermission(73) || RoleTrait::hasPermission(74) || RoleTrait::hasPermission(75)):
-            if(RoleTrait::hasPermission(1)):
-                $links_administration[] = [
-                    'name' => 'Usuarios',
-                    'route' => route('users.index'),
-                    'active' => request()->routeIs('users.*'),
-                ];
-            endif;
-            if(RoleTrait::hasPermission(6)):
-                $links_administration[] = [
-                    'name' => 'Roles',
-                    'route' => route('roles.index'),
-                    'active' => request()->routeIs('roles.*'),
-                ];
-            endif;
-            if(RoleTrait::hasPermission(73)):
-                $links_administration[] = [
-                    'name' => 'Empresas',
-                    'route' => route('enterprises.index'),
-                    'active' => request()->routeIs('enterprises.*'),
-                ];
-            endif;
-            if(RoleTrait::hasPermission(74)):
-                $links_administration[] = [
-                    'name' => 'Vehiculos',
-                    'route' => route('vehicles.index'),
-                    'active' => request()->routeIs('vehicles.*'),
-                ];
-            endif;
-            if(RoleTrait::hasPermission(75)):
-                $links_administration[] = [
-                    'name' => 'Conductores',
-                    'route' => route('drivers.index'),
-                    'active' => request()->routeIs('drivers.*'),
-                ];
-            endif;
-            array_push($links,[
-                'type' => 'multiple',
-                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
-                'code' => 'administration',
-                'name' => 'Administración',
-                'route' => null,
-                'active' => request()->routeIs('users.*','roles.*','enterprises.*','vehicles.*','drivers.*'),
-                'urls' => $links_administration
             ]);
         endif;
     @endphp
