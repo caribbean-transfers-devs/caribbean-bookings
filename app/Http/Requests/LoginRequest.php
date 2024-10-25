@@ -60,14 +60,15 @@ class LoginRequest extends FormRequest
         $captchaResp = curl_exec($cu);
         curl_close($cu);
  
-        $captchaResp = json_decode($captchaResp, true);
+        $captchaResp = json_decode($captchaResp, true);        
 
         //if($captchaResp["success"] == true && $captchaResp["score"] > 0.5){
             $restricted_user = DB::table("users")->where("email", $this->email )->value("restricted");
-            $remember = ($this->boolean('remember-me')) ? true : false;            
+            $remember = ($this->boolean('remember-me')) ? true : false;
             if($restricted_user){
-                $ip_match = DB::table('whitelist_ips')->where('ip_address',$this->ip())->value('ip_address');
-                if($ip_match == $this->ip()){
+                $clientIP = getClientIP();
+                $ip_match = DB::table('whitelist_ips')->where('ip_address',$clientIP)->value('ip_address');
+                if($ip_match == $clientIP){
                     if (! Auth::attempt([ 'email' => $this->email, 'password' => $this->password , 'status' => 1], $remember)) {
                     
                         RateLimiter::hit($this->throttleKey());
@@ -81,7 +82,7 @@ class LoginRequest extends FormRequest
                     // abort(401);
                     
                     throw ValidationException::withMessages([
-                        "email" => 'No cuenta con acceso a nuestra plataforma desde la ip: '.$this->ip(),
+                        "email" => 'No cuenta con acceso a nuestra plataforma desde la ip: '.$clientIP,
                     ]);
                 }
             }else{
@@ -132,4 +133,17 @@ class LoginRequest extends FormRequest
     {
         return Str::transliterate(Str::lower($this->input("email"))."|".$this->ip());
     }
+
+    function getClientIP() {
+        $ipAddress = '';                   
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {                           
+            $ipAddress = $_SERVER['HTTP_CLIENT_IP'];
+        }else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {                      
+            $ipAddress = $_SERVER['REMOTE_ADDR'];
+        }
+        return $ipAddress;
+    }
+        
 }
