@@ -231,15 +231,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="{{ mix('assets/js/sections/operations/reservations.min.js') }}"></script>
     <script>
-        document.getElementById('showLayer').addEventListener('click', function() {
-            // document.getElementById('layer').classList.remove('d-none');
-            document.getElementById('layer').classList.add('active');
-        });
+        // document.getElementById('showLayer').addEventListener('click', function() {
+        //     // document.getElementById('layer').classList.remove('d-none');
+        //     document.getElementById('layer').classList.add('active');
+        // });
 
-        document.getElementById('closeLayer').addEventListener('click', function() {
-            document.getElementById('layer').classList.remove('active');
-            // document.getElementById('layer').classList.add('d-none');
-        });
+        // document.getElementById('closeLayer').addEventListener('click', function() {
+        //     document.getElementById('layer').classList.remove('active');
+        //     // document.getElementById('layer').classList.add('d-none');
+        // });
     </script>
 @endpush
 

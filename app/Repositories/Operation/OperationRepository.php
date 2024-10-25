@@ -21,8 +21,8 @@ class OperationRepository
     public function reservations($request)
     {
         $data = [
-            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
-            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+            "init" => $request->date . " 00:00:00",
+            "end" => $request->date . " 23:59:59",
             "filter_text" => NULL,
             "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
             "site" => ( isset($request->site) ? $request->site : 0 ),
@@ -46,8 +46,8 @@ class OperationRepository
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end ';
         $havingConditions = []; $query2 = '';
         $queryData = [
-            'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
-            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+            'init' => $request->date . " 00:00:00",
+            'end' => $request->date . " 23:59:59",
         ];
 
         //TIPO DE SERVICIO
