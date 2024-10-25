@@ -77,7 +77,7 @@ class LoginRequest extends FormRequest
                             "email" => 'Las credenciales no son válidas, por favor intente de nuevo.',
                         ]);
                     }
-                }else{           
+                }else{
                     RateLimiter::hit($this->throttleKey());
                     // abort(401);
                     
@@ -136,12 +136,13 @@ class LoginRequest extends FormRequest
 
     public function getIP() 
     {
-        $ipAddress = '';                   
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {                           
+        $ipAddress = '';
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
             $ipAddress = $_SERVER['HTTP_CLIENT_IP'];
-        }else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else {                      
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            // Obtén solo la primera IP en caso de que haya varias separadas por comas
+            $ipAddress = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+        } else {
             $ipAddress = $_SERVER['REMOTE_ADDR'];
         }
         return $ipAddress;
