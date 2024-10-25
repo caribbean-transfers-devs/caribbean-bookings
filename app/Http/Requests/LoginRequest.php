@@ -134,7 +134,8 @@ class LoginRequest extends FormRequest
         return Str::transliterate(Str::lower($this->input("email"))."|".$this->ip());
     }
 
-    function getClientIP() {
+    public function getClientIP() 
+    {
         $ipAddress = '';                   
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {                           
             $ipAddress = $_SERVER['HTTP_CLIENT_IP'];
