@@ -61,17 +61,13 @@ class LoginRequest extends FormRequest
         curl_close($cu);
  
         $captchaResp = json_decode($captchaResp, true);
-        //dd($this->ip());
 
         //if($captchaResp["success"] == true && $captchaResp["score"] > 0.5){
             $restricted_user = DB::table("users")->where("email", $this->email )->value("restricted");
-            $remember = ($this->boolean('remember-me')) ? true : false;
-            
+            $remember = ($this->boolean('remember-me')) ? true : false;            
             if($restricted_user){
                 $ip_match = DB::table('whitelist_ips')->where('ip_address',$this->ip())->value('ip_address');
-                
                 if($ip_match == $this->ip()){
-                    
                     if (! Auth::attempt([ 'email' => $this->email, 'password' => $this->password , 'status' => 1], $remember)) {
                     
                         RateLimiter::hit($this->throttleKey());
@@ -82,12 +78,16 @@ class LoginRequest extends FormRequest
                     }
                 }else{           
                     RateLimiter::hit($this->throttleKey());
-                    abort(401);
+                    // abort(401);
+                    
+                    throw ValidationException::withMessages([
+                        "email" => 'No cuenta con acceso a nuestra plataforma desde la ip: '.$this->ip(),
+                    ]);
                 }
             }else{
                 if (! Auth::attempt([ 'email' => $this->email, 'password' => $this->password , 'status' => 1], $remember)) {
                     RateLimiter::hit($this->throttleKey());
-        
+                    
                     throw ValidationException::withMessages([
                         "email" => 'Las credenciales no son válidas, por favor intente de nuevo.',
                     ]);
