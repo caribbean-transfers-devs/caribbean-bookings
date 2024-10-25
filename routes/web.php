@@ -83,7 +83,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
         Route::put('/operation/unlock/service', [OperationController::class, 'updateUnlock'])->name('operation.unlock.update');
         //RESERVACIONES
-        Route::get('/operation/reservations', [OperationController::class, 'reservations'])->name('operation.reservations.index');
+        Route::get('/operation/reservations', [OperationController::class, 'reservations'])->name('operation.reservations');
         Route::post('/operation/reservations', [OperationController::class, 'reservations'])->name('operation.reservations.search');
         //OPERACIONES
         Route::get('/operation/board', [Operations::class, 'index'])->name('operation.index');

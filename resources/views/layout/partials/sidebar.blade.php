@@ -155,8 +155,8 @@
             if(RoleTrait::hasPermission(10)):
                 $links_operations[] = [
                     'name' => 'Reservaciones',
-                    'route' => route('operation.reservations.index'),
-                    'active' => request()->routeIs('operation.reservations.index','operation.reservations.search'),
+                    'route' => route('operation.reservations'),
+                    'active' => request()->routeIs('operation.reservations','operation.reservations.search'),
                 ];
             endif;            
             if(RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79)):

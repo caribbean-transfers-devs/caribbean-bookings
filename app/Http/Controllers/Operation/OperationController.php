@@ -32,7 +32,7 @@ class OperationController extends Controller
     }    
 
     public function statusUpdate(Request $request){
-        return $this->operationRepository->statusUpdate($request);        
+        return $this->OperationRepository->statusUpdate($request);        
     }
     
     public function confirmation(Request $request){

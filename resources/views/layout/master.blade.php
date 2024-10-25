@@ -142,7 +142,7 @@
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.spam') }}">SPAM</a></li>
                                 @endif
                                 @if(RoleTrait::hasPermission(10))
-                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.spam') }}">Reservaciones</a></li>
+                                    <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.reservations') }}">Reservaciones</a></li>
                                 @endif                                
                                 @if(RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79))
                                     <li class="sidebar-item"><a class="sidebar-link" href="{{ route('operation.index') }}">Operaciones</a></li>
