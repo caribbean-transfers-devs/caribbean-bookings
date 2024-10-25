@@ -66,7 +66,7 @@ class LoginRequest extends FormRequest
             $restricted_user = DB::table("users")->where("email", $this->email )->value("restricted");
             $remember = ($this->boolean('remember-me')) ? true : false;
             if($restricted_user){
-                $clientIP = $this->getClientIP();
+                $clientIP = $this->getIP();
                 $ip_match = DB::table('whitelist_ips')->where('ip_address',$clientIP)->value('ip_address');
                 if($ip_match == $clientIP){
                     if (! Auth::attempt([ 'email' => $this->email, 'password' => $this->password , 'status' => 1], $remember)) {
@@ -134,7 +134,7 @@ class LoginRequest extends FormRequest
         return Str::transliterate(Str::lower($this->input("email"))."|".$this->ip());
     }
 
-    public function getClientIP() 
+    public function getIP() 
     {
         $ipAddress = '';                   
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {                           
