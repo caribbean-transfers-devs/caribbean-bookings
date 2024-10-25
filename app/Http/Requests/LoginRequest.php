@@ -67,7 +67,7 @@ class LoginRequest extends FormRequest
             $remember = ($this->boolean('remember-me')) ? true : false;
             if($restricted_user){
                 $clientIP = $this->getIP();
-                $ip_match = DB::table('whitelist_ips')->where('ip_address',$clientIP)->value('ip_address');
+                $ip_match = DB::table('whitelist_ips')->whereIn('ip_address',$clientIP)->value('ip_address');
                 if($ip_match == $clientIP){
                     if (! Auth::attempt([ 'email' => $this->email, 'password' => $this->password , 'status' => 1], $remember)) {
                     
@@ -136,13 +136,14 @@ class LoginRequest extends FormRequest
 
     public function getIP() 
     {
-        $ipAddress = '';
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ipAddress = '';                   
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {                           
             $ipAddress = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        }else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
             // Obtén solo la primera IP en caso de que haya varias separadas por comas
-            $ipAddress = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
-        } else {
+            // $ipAddress = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+        } else {                      
             $ipAddress = $_SERVER['REMOTE_ADDR'];
         }
         return $ipAddress;
