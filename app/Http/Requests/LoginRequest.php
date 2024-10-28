@@ -71,7 +71,7 @@ class LoginRequest extends FormRequest
                 $clientIPs = is_array($clientIP) ? $clientIP : [$clientIP];
 
                 // $ip_match = DB::table('whitelist_ips')->whereIn('ip_address',$clientIPs)->value('ip_address');
-                $whitelistIPs = DB::table('whitelist_ips')->whereIn('status',1)->whereIn('ip_address', $clientIPs)->pluck('ip_address')->toArray();
+                $whitelistIPs = DB::table('whitelist_ips')->where('status',1)->whereIn('ip_address', $clientIPs)->pluck('ip_address')->toArray();
                 // dd($clientIPs, $whitelistIPs);
 
                 // Validar si hay alguna coincidencia
