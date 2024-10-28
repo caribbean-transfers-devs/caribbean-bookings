@@ -75,10 +75,12 @@ class LoginRequest extends FormRequest
 
                 // Validar si hay alguna coincidencia
                 $isIPMatched = false;
-                foreach ($clientIPs as $ip) {
-                    if (in_array($ip, $whitelistIPs)) {
-                        $isIPMatched = true;
-                        break;
+                if( !empty($whitelistIPs) ){
+                    foreach ($clientIPs as $ip) {
+                        if (in_array($ip, $whitelistIPs)) {
+                            $isIPMatched = true;
+                            break;
+                        }
                     }
                 }
 
