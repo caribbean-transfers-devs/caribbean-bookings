@@ -71,7 +71,7 @@ class LoginRequest extends FormRequest
                 $clientIPs = is_array($clientIP) ? $clientIP : [$clientIP];
 
                 // $ip_match = DB::table('whitelist_ips')->whereIn('ip_address',$clientIPs)->value('ip_address');
-                $whitelistIPs = DB::table('whitelist_ips')->whereIn('ip_address', $clientIPs)->pluck('ip_address')->toArray();
+                $whitelistIPs = DB::table('whitelist_ips')->whereIn('status',1)->whereIn('ip_address', $clientIPs)->pluck('ip_address')->toArray();
                 // dd($clientIPs, $whitelistIPs);
 
                 // Validar si hay alguna coincidencia
@@ -193,7 +193,8 @@ class LoginRequest extends FormRequest
         } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {                           
             $ipAddress = $_SERVER['HTTP_CLIENT_IP'];
         } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ipAddress = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]; // Primera IP
+            $ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            // $ipAddress = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]; // Primera IP
         } else {                      
             $ipAddress = $_SERVER['REMOTE_ADDR'];
         }
