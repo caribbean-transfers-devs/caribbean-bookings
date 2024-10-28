@@ -60,25 +60,40 @@ class LoginRequest extends FormRequest
         $captchaResp = curl_exec($cu);
         curl_close($cu);
  
-        $captchaResp = json_decode($captchaResp, true);        
+        $captchaResp = json_decode($captchaResp, true);
 
         //if($captchaResp["success"] == true && $captchaResp["score"] > 0.5){
             $restricted_user = DB::table("users")->where("email", $this->email )->value("restricted");
             $remember = ($this->boolean('remember-me')) ? true : false;
             if($restricted_user){
                 $clientIP = $this->getIP();
+                // Asegurarse de que $clientIP sea un arreglo
                 $clientIPs = is_array($clientIP) ? $clientIP : [$clientIP];
-                $ip_match = DB::table('whitelist_ips')->whereIn('ip_address',$clientIPs)->value('ip_address');
-                if($ip_match == $clientIP){
+
+                // $ip_match = DB::table('whitelist_ips')->whereIn('ip_address',$clientIPs)->value('ip_address');
+                $whitelistIPs = DB::table('whitelist_ips')->whereIn('ip_address',$clientIPs)->value('ip_address');
+
+                // Validar si hay alguna coincidencia
+                $isIPMatched = false;
+                foreach ($clientIPs as $ip) {
+                    if ($whitelistIPs->contains($ip)) {
+                        $isIPMatched = true;
+                        break;
+                    }
+                }
+
+                // Resultado final
+                if ($isIPMatched) {
+                    // Hay coincidencia
                     if (! Auth::attempt([ 'email' => $this->email, 'password' => $this->password , 'status' => 1], $remember)) {
-                    
                         RateLimiter::hit($this->throttleKey());
                         
                         throw ValidationException::withMessages([
                             "email" => 'Las credenciales no son válidas, por favor intente de nuevo.',
                         ]);
                     }
-                }else{
+                } else {
+                    // No hay coincidencia
                     RateLimiter::hit($this->throttleKey());
                     // abort(401);
                     
@@ -86,6 +101,24 @@ class LoginRequest extends FormRequest
                         "email" => 'No cuenta con acceso a nuestra plataforma desde la ip: '.$clientIP,
                     ]);
                 }
+
+                // if($ip_match == $clientIP){
+                //     if (! Auth::attempt([ 'email' => $this->email, 'password' => $this->password , 'status' => 1], $remember)) {
+                    
+                //         RateLimiter::hit($this->throttleKey());
+                        
+                //         throw ValidationException::withMessages([
+                //             "email" => 'Las credenciales no son válidas, por favor intente de nuevo.',
+                //         ]);
+                //     }
+                // }else{
+                //     RateLimiter::hit($this->throttleKey());
+                //     // abort(401);
+                    
+                //     throw ValidationException::withMessages([
+                //         "email" => 'No cuenta con acceso a nuestra plataforma desde la ip: '.$clientIP,
+                //     ]);
+                // }
             }else{
                 if (! Auth::attempt([ 'email' => $this->email, 'password' => $this->password , 'status' => 1], $remember)) {
                     RateLimiter::hit($this->throttleKey());
@@ -94,7 +127,7 @@ class LoginRequest extends FormRequest
                         "email" => 'Las credenciales no son válidas, por favor intente de nuevo.',
                     ]);
                 }
-            }        
+            }
 
             RateLimiter::clear($this->throttleKey());
         //}
