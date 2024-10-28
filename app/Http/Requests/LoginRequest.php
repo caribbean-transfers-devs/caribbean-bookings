@@ -187,15 +187,15 @@ class LoginRequest extends FormRequest
     // }
     public function getIP() 
     {
-        $ipAddress = '';                   
+        $ipAddress = '';
         if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) { // Cloudflare IP
             $ipAddress = $_SERVER['HTTP_CF_CONNECTING_IP'];
-        } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {                           
+        } else if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
             $ipAddress = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        } else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
             // $ipAddress = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]; // Primera IP
-        } else {                      
+        } else {
             $ipAddress = $_SERVER['REMOTE_ADDR'];
         }
         return $ipAddress;
