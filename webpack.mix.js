@@ -25,7 +25,6 @@ mix.sass('resources/scss/pos/capture.scss', data.assets + "css/pos/capture.min.c
 mix.sass('resources/scss/pos/vendors.scss', data.assets + "css/pos/vendors.min.css");
 mix.sass('resources/scss/zones/index.scss', data.assets + "css/zones/index.min.css");
 
-// mix.copy('resources/js/views/tpv/index.js', data.assets + "js/views/tpv/index.min.js");
 mix.copy('resources/js/views/pos/index.js', data.assets + "js/views/pos/index.min.js");
 mix.copy('resources/js/views/pos/detail.js', data.assets + "js/views/pos/detail.min.js");
 mix.copy('resources/js/views/pos/capture.js', data.assets + "js/views/pos/capture.min.js");
