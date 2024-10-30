@@ -18,20 +18,14 @@ mix.copy('resources/js/datatables.js', data.assets + "js/datatables.js");
 mix.copy('resources/js/sweetalert2.all.min.js', data.assets + "js/sweetalert2.js");
 mix.copy('resources/js/easypick.js', data.assets + "js/easypick.min.js");
 
-mix.copy('resources/js/views/userIndex.js', data.assets + "js/views/userIndex.js");
-mix.copy('resources/js/views/rolesIndex.js', data.assets + "js/views/rolesIndex.js");
 mix.copy('resources/js/views/reservations/reservationsIndex.js', data.assets + "js/views/reservations/reservationsIndex.js");
-mix.copy('resources/js/views/reservations/reservationsDetail.js', data.assets + "js/views/reservations/reservationsDetail.js");
-mix.sass('resources/scss/reservations/detail.scss', data.assets + "css/reservations/detail.min.css");
-mix.sass('resources/scss/reservations/index.scss', data.assets + "css/reservations/index.min.css");
-mix.sass('resources/scss/users/index.scss', data.assets + "css/users/index.min.css");
-mix.sass('resources/scss/tpv/index.scss', data.assets + "css/tpv/index.min.css");
 mix.sass('resources/scss/pos/index.scss', data.assets + "css/pos/index.min.css");
 mix.sass('resources/scss/pos/detail.scss', data.assets + "css/pos/detail.min.css");
 mix.sass('resources/scss/pos/capture.scss', data.assets + "css/pos/capture.min.css");
 mix.sass('resources/scss/pos/vendors.scss', data.assets + "css/pos/vendors.min.css");
 mix.sass('resources/scss/zones/index.scss', data.assets + "css/zones/index.min.css");
-mix.copy('resources/js/views/tpv/index.js', data.assets + "js/views/tpv/index.min.js");
+
+// mix.copy('resources/js/views/tpv/index.js', data.assets + "js/views/tpv/index.min.js");
 mix.copy('resources/js/views/pos/index.js', data.assets + "js/views/pos/index.min.js");
 mix.copy('resources/js/views/pos/detail.js', data.assets + "js/views/pos/detail.min.js");
 mix.copy('resources/js/views/pos/capture.js', data.assets + "js/views/pos/capture.min.js");
@@ -41,10 +35,6 @@ mix.sass('resources/scss/rates/index.scss', data.assets + "css/rates/index.min.c
 mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/admin.min.css");
 
 mix.copy('resources/js/views/rates/index.js', data.assets + "js/views/rates/index.min.js");
-mix.copy('resources/js/views/operation/managment.js', data.assets + "js/views/operation/managment.min.js");
-mix.copy('resources/js/views/operation/confirmation.js', data.assets + "js/views/operation/confirmation.min.js");
-mix.copy('resources/js/views/operation/spam.js', data.assets + "js/views/operation/spam.min.js");
-mix.copy('resources/js/views/reports/cash.js', data.assets + "js/views/reports/cash.min.js");
 
 /************************************************************
  * NUEVOS ESTILOS Y SCRIPT PARA EL PANEL DE CONTROL
@@ -54,6 +44,9 @@ mix.sass('resources/scss/core.scss', data.assets + '/css/core/core.min.css');//c
 mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resources/plugins/font-icons/fontawesome/css/fontawesome.css'], data.assets + '/css/panel/panel.min.css');//panel styles
 // mix.styles(['resources/plugins/font-icons/material/css/material.css','resources/plugins/font-icons/material/css/materialicon.css'], data.assets + '/css/panel/material.min.css');//panel styles
 mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
+
+mix.sass('resources/scss/sections/tpv.scss', data.assets + "css/sections/tpv.min.css"); //TPV
+mix.sass('resources/scss/sections/reservation_details.scss', data.assets + "css/sections/reservation_details.min.css"); //RESERVATION DETAILS
 
 mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css"); //DASHBOARD
 mix.sass('resources/scss/sections/dashboard2.scss', data.assets + "css/sections/dashboard2.min.css"); //DASHBOARD
@@ -83,6 +76,12 @@ mix.combine(['resources/plugins/perfect-scrollbar/perfect-scrollbar.min.js','res
 //DASHBOARD
 mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard.js'], data.assets + "js/sections/dashboard.min.js");
 mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard2.js'], data.assets + "js/sections/dashboard2.min.js");
+
+//TPV
+mix.combine(['resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/tpv/index.js'], data.assets + "js/sections/tpv/index.min.js");
+
+//RESERVATION DETAILS
+mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/reservations/details.js'], data.assets + "js/sections/reservations/details.min.js");
 
 //REPORTS
 mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/managment.js'], data.assets + "js/sections/operations/managment.min.js");

@@ -14,7 +14,7 @@
                     <a href="javascript:void(0);" class="nav-link dropdown-toggle user" id="userProfileDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <div class="avatar-container">
                             <div class="avatar avatar-sm avatar-indicators avatar-online">
-                                <img alt="avatar" src="/assets/img/profile-default.svg" class="rounded-circle">
+                                <img alt="avatar" src="{{ asset('/assets/img/profile-default.svg') }}" class="rounded-circle">
                             </div>
                         </div>
                     </a>
@@ -26,8 +26,8 @@
                                     &#x1F44B;
                                 </div>
                                 <div class="media-body">
-                                    <h5>{{ isset(Session('token_data')['name']) ? Session('token_data')['name'] : ( config('app.locale') == "es" ? "Indefinido" : "Undefined" ) }}</h5>
-                                    <p>{{ isset(Session('token_data')['package']) && Session('token_data')['package'] != NULL ? Session('token_data')['package']['name_'.config('app.locale')] : ( config('app.locale') == "es" ? "Indefinido" : "Undefined" ) }}</p>
+                                    <h5>{{ auth()->user()->name }}</h5>
+                                    <p>{{ auth()->user()->roles[0]->role->role }}</p>
                                 </div>
                             </div>
                         </div>

@@ -198,6 +198,16 @@ class LoginRequest extends FormRequest
         } else {
             $ipAddress = $_SERVER['REMOTE_ADDR'];
         }
+
+        // Convertir IPv6 a IPv4 si es posible
+        if (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            // Verifica si es una dirección IPv4-mapped IPv6
+            if (strpos($ipAddress, '::ffff:') === 0) {
+                // Extrae solo la parte IPv4
+                $ipAddress = substr($ipAddress, 7);
+            }
+        }
+        
         return $ipAddress;
     }    
         

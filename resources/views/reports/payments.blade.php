@@ -58,7 +58,7 @@
         // dump($buttons);
     @endphp
     <div class="row layout-top-spacing">
-        <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
+        <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
                 @if ($errors->any())
                     <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
@@ -166,8 +166,5 @@
         </div>
     </div>
 
-    @php
-        // dump($date);
-    @endphp
     <x-modals.reservations.reports :data="$date" />
 @endsection

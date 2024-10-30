@@ -1,6 +1,6 @@
 
 <div class="modal fade" id="serviceClientModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Datos del cliente</h5>
@@ -37,15 +37,6 @@
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceClientReference">Referencia</label>
                             <input type="text" class="form-control mb-2" id="serviceClientReference" name="reference" readonly value="{{ $reservation->reference }}">
-                        </div>
-                        <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="originSale">Origen de venta</label>
-                            <select class="form-select mb-2" id="originSale" name="origin_sale_id">
-                                <option value="0">Selecciona una opción</option>
-                                @foreach($origins as $key => $origin)
-                                    <option value="{{ $origin->id }}" {{ $reservation->origin_sale_id == $origin->id ? 'selected' : '' }}>{{ $origin->code }}</option>
-                                @endforeach
-                            </select>
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="originSale">Origen de venta</label>

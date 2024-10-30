@@ -1,4 +1,13 @@
 @import '../components/autocomplete';
+@import "../../plugins/flatpickr/flatpickr";
+@import "../../plugins/bootstrap-select/select";
+
+@import '../template/light/components/modal';
+@import '../template/dark/components/modal';
+
+@import '../template/light/widgets/_widgets/reset-analytics';
+@import '../template/light/widgets/_widgets/widget-chart-three';
+@import '../template/dark/widgets/_widgets/widget-chart-three';
 
 .bookingbox{
     padding: 0;

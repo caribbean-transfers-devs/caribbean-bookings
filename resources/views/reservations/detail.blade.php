@@ -2,174 +2,160 @@
     use App\Traits\RoleTrait;    
 @endphp
 
-@extends('layout.master')
+@extends('layout.app')
 @section('title') Detalle @endsection
 
-@push('up-stack')    
-    <link href="{{ mix('/assets/css/reservations/detail.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/reservations/detail.min.css') }}" rel="stylesheet" >    
+@push('Css')    
+    <link href="{{ mix('/assets/css/sections/reservation_details.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/reservation_details.min.css') }}" rel="stylesheet" >    
 @endpush
 
-@push('bootom-stack')
+@push('Js')
     <script>
         const rez_id = {{ $reservation->id }};
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.gmaps.key') }}&libraries=places"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
-
-    <script src="{{ mix('assets/js/views/reservations/reservationsDetail.js') }}"></script>
-    <script src="{{ mix('assets/js/datatables.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/reservations/details.min.js') }}"></script>
 @endpush
 
 @section('content')
-    <div class="container-fluid p-0">
+    <div class="row layout-top-spacing">
+        <div class="col-xxl-3 col-xl-4 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-actions float-end">
+                        @if (RoleTrait::hasPermission(11))
+                        <div class="dropdown show">
+                            <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal align-middle"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="#" type="button" data-bs-toggle="modal" data-bs-target="#serviceClientModal">Editar</a>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                    <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm mt-2 mb-4">
+                            <tbody>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <td>{{ $reservation->client_first_name }} {{ $reservation->client_last_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>E-mail</th>
+                                    <td>{{ $reservation->client_email }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Teléfono</th>
+                                    <td>{{ $reservation->client_phone }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Moneda</th>
+                                    <td>{{ $reservation->currency }}</td>
+                                </tr>                                
+                                <tr>
+                                    <th>Estatus</th>
+                                    <td>
+                                        @if ($data['status'] == "PENDING")
+                                            <span class="badge bg-info">PENDING</span>
+                                        @endif
+                                        @if ($data['status'] == "CONFIRMED")
+                                            <span class="badge bg-success">CONFIRMED</span>
+                                        @endif
+                                        @if ($data['status'] == "CANCELLED")
+                                            <span class="badge bg-danger">CANCELLED</span>
+                                        @endif
+                                        @if ($data['status'] == "DUPLICATED")
+                                            <span class="badge bg-danger">DUPLICADO</span>
+                                        @endif                                                                             
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Unidad</th>
+                                    <td>{{ $reservation->destination->name ?? '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Creación</th>
+                                    <td>{{ $reservation->created_at }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Referencia</th>
+                                    <td>{{ $reservation->reference }}</td>
+                                </tr>
+                                @if( isset( $reservation->originSale->code ) )
+                                    <tr>
+                                        <th>Origen de venta</th>
+                                        <td>{{ $reservation->originSale->code }}</td>
+                                    </tr>                                    
+                                @endif                                    
+                                @if( $reservation->open_credit == 1 )
+                                    <tr>
+                                        <th>Crédito Abierto</th>
+                                        <td><span class="badge bg-success">ACEPTADO</span></td>
+                                    </tr>
+                                @endif
+                                @if( isset( $reservation->originSale->code ) )
+                                    <tr>
+                                        <th>Origen de venta</th>
+                                        <td>{{ $reservation->originSale->code }}</td>
+                                    </tr>                                    
+                                @endif
+                                @if( isset( $reservation->cancellationType->name_es ) )
+                                    <tr>
+                                        <th>Motivo de cancelación</th>
+                                        <td>{{ $reservation->cancellationType->name_es }}</td>
+                                    </tr>
+                                @endif
+                                <tr>
+                                    <th>Estatus de comisión</th>
+                                    <td><span class="badge btn-{{ $reservation->is_commissionable == 1 ? "success ".( RoleTrait::hasPermission(95) ? '__remove_commission' : '' ) : "danger" }}" data-reservation="{{ $reservation->id }}" style="cursor: pointer;">{{ $reservation->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span></td>
+                                </tr>                                    
+                            </tbody>
+                        </table>
+                    </div>
 
-        <div class="mb-3">
-            <h1 class="h3 d-inline align-middle">Detalle de reservación</h1>            
-        </div>
-
-        <div class="row">
-            @php
-                // dump($reservation);
-            @endphp
-            <div class="col-xxl-3 col-xl-4 col-12"> 
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-actions float-end">
-                            @if (RoleTrait::hasPermission(11))
-                            <div class="dropdown show">
-                                <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
-                                    <i class="align-middle" data-feather="more-horizontal"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a class="dropdown-item" href="#" type="button" data-bs-toggle="modal" data-bs-target="#serviceClientModal">Editar</a>
+                    <hr>
+                    @if ( $reservation->callCenterAgent != null )
+                        <div class="callcenter-x">
+                            <div class="d-flex align-items-center mb-3 box zoom-in">
+                                <div class="flex-none w-10 h-10 overflow-hidden rounded-full image-fit">
+                                    <img alt="detalles" width="100%" src="{{ asset('/assets/img/profile-default.svg') }}">
+                                </div>
+                                <div class="ms-4 me-auto">
+                                    <div class="font-medium">{{ $reservation->callCenterAgent->name }}</div>
+                                    <div class="text-slate-500 text-xs mt-0.5">Agente de Call Center</div>
                                 </div>
                             </div>
-                            @endif
                         </div>
-                        <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-sm mt-2 mb-4">
-                                <tbody>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <td>{{ $reservation->client_first_name }} {{ $reservation->client_last_name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>E-mail</th>
-                                        <td>{{ $reservation->client_email }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Teléfono</th>
-                                        <td>{{ $reservation->client_phone }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Moneda</th>
-                                        <td>{{ $reservation->currency }}</td>
-                                    </tr>                                
-                                    <tr>
-                                        <th>Estatus</th>
-                                        <td>
-                                            @if ($data['status'] == "PENDING")
-                                                <span class="badge bg-info">PENDING</span>
-                                            @endif
-                                            @if ($data['status'] == "CONFIRMED")
-                                                <span class="badge bg-success">CONFIRMED</span>
-                                            @endif
-                                            @if ($data['status'] == "CANCELLED")
-                                                <span class="badge bg-danger">CANCELLED</span>
-                                            @endif
-                                            @if ($data['status'] == "DUPLICATED")
-                                                <span class="badge bg-danger">DUPLICADO</span>
-                                            @endif                                                                             
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Unidad</th>
-                                        <td>{{ $reservation->destination->name ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Creación</th>
-                                        <td>{{ $reservation->created_at }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Referencia</th>
-                                        <td>{{ $reservation->reference }}</td>
-                                    </tr>
-                                    @if( isset( $reservation->originSale->code ) )
-                                        <tr>
-                                            <th>Origen de venta</th>
-                                            <td>{{ $reservation->originSale->code }}</td>
-                                        </tr>                                    
-                                    @endif                                    
-                                    @if( $reservation->open_credit == 1 )
-                                        <tr>
-                                            <th>Crédito Abierto</th>
-                                            <td><span class="badge bg-success">ACEPTADO</span></td>
-                                        </tr>
-                                    @endif
-                                    @if( isset( $reservation->originSale->code ) )
-                                        <tr>
-                                            <th>Origen de venta</th>
-                                            <td>{{ $reservation->originSale->code }}</td>
-                                        </tr>                                    
-                                    @endif
-                                    @if( isset( $reservation->cancellationType->name_es ) )
-                                        <tr>
-                                            <th>Motivo de cancelación</th>
-                                            <td>{{ $reservation->cancellationType->name_es }}</td>
-                                        </tr>
-                                    @endif
-                                    <tr>
-                                        <th>Estatus de comisión</th>
-                                        <td><span class="badge btn-{{ $reservation->is_commissionable == 1 ? "success ".( RoleTrait::hasPermission(95) ? '__remove_commission' : '' ) : "danger" }}" data-reservation="{{ $reservation->id }}" style="cursor: pointer;">{{ $reservation->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span></td>
-                                    </tr>                                    
-                                </tbody>
-                            </table>
-                        </div>
+                    @endif
 
-                        @if ( $reservation->callCenterAgent != null )
-                            <div class="callcenter-x">
-                                <div class="d-flex align-items-center mb-3 box zoom-in">
-                                    <div class="flex-none w-10 h-10 overflow-hidden rounded-full image-fit">
-                                        <img alt="Midone Tailwind HTML Admin Template" src="https://midone-vue.vercel.app/assets/profile-8-AMiR1yEM.jpg">
-                                    </div>
-                                    <div class="ms-4 me-auto">
-                                        <div class="font-medium">{{ $reservation->callCenterAgent->name }}</div>
-                                        <div class="text-slate-500 text-xs mt-0.5">Agente de Call Center</div>
-                                    </div>
-                                    {{-- <div class="text-success">+$50</div> --}}
-                                </div>
-                            </div>                            
-                        @endif
-
-                        @if (RoleTrait::hasPermission(25))
-                            <strong>Actividad</strong>
-                            <ul class="timeline mt-2 mb-0">
-                                @foreach ($reservation->followUps as $followUp)
-                                    <li class="timeline-item">
-                                        <strong>[{{ $followUp->type }}]</strong>
-                                        <span class="float-end text-muted text-sm">{{ date("Y/m/d H:i", strtotime($followUp->created_at)) }}</span>
-                                        <p>{{ $followUp->text }}</p>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @endif
-                    </div>
+                    <hr>
+                    @if (RoleTrait::hasPermission(25))
+                        <strong>Actividad</strong>
+                        <ul class="timeline mt-2 mb-0">
+                            @foreach ($reservation->followUps as $followUp)
+                                <li class="timeline-item">
+                                    <strong>[{{ $followUp->type }}]</strong>
+                                    <span class="float-end text-muted text-sm">{{ date("Y/m/d H:i", strtotime($followUp->created_at)) }}</span>
+                                    <p>{{ $followUp->text }}</p>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
                 </div>
             </div>
+        </div>
 
-            <div class="col-xxl-9 col-xl-8 col-12">
-                <div class="controls">
-                    @php
-                        // dump( $reservation );
-                    @endphp
-                    @csrf
-                    @if (RoleTrait::hasPermission(20))
+        <div class="col-xxl-9 col-xl-8 col-12">
+            <div class="controls">
+                @csrf
+                @if (RoleTrait::hasPermission(20))
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Re-envio de correo
@@ -180,8 +166,8 @@
                             <a class="dropdown-item" href="#" onclick="sendMail('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Inglés</a>
                         </div>
                     </div>
-                    @endif
-                    @if (RoleTrait::hasPermission(21))
+                @endif
+                @if (RoleTrait::hasPermission(21))
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Enviar Mensaje
@@ -191,164 +177,262 @@
                             <a class="dropdown-item" href="#">Whatsapp</a>
                         </div>
                     </div>
-                    @endif
-                    @if (RoleTrait::hasPermission(22))
-                        <div class="btn-group btn-group-sm">
-                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Invitación de pago
-                            </button>
-                            <div class="dropdown-menu" style="">
-                                <a class="dropdown-item" href="#" onclick="sendInvitation(event, '{{ $reservation->id }}','en')">Enviar en inglés</a>
-                                <a class="dropdown-item" href="#" onclick="sendInvitation(event, '{{ $reservation->id }}','es')">Enviar en español</a>
-                            </div>
-                        </div>
-                    @endif
-                    @if (RoleTrait::hasPermission(23))
-                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
-                    @endif
-                    {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
-                    @if (RoleTrait::hasPermission(94) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
-                        <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Activar servicio plus</button>
-                    @endif
-                    @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                        <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
-                        <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
-                    @endif
-                    @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                        <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Marcar como duplicado</button>
-                    @endif
-                    @if (RoleTrait::hasPermission(67) && ($reservation->is_cancelled == 1 || $reservation->is_duplicated == 1) )
-                        <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> Activar</button>
-                    @endif
-                    @if (RoleTrait::hasPermission(72) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->open_credit == 0 )
-                        <button class="btn btn-warning btn-sm" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Crédito Abierto</button>
-                    @endif
-
+                @endif
+                @if (RoleTrait::hasPermission(22))
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Copiar Link de pago
+                            Invitación de pago
                         </button>
                         <div class="dropdown-menu" style="">
-                            <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'en')">Inglés</a>
-                            <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'es')">Español</a>
+                            <a class="dropdown-item" href="#" onclick="sendInvitation(event, '{{ $reservation->id }}','en')">Enviar en inglés</a>
+                            <a class="dropdown-item" href="#" onclick="sendInvitation(event, '{{ $reservation->id }}','es')">Enviar en español</a>
                         </div>
                     </div>
+                @endif
+                @if (RoleTrait::hasPermission(23))
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
+                @endif
+                {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
+                @if (RoleTrait::hasPermission(94) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
+                    <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Activar servicio plus</button>
+                @endif
+                @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                    <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
+                    <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
+                @endif
+                @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                    <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Marcar como duplicado</button>
+                @endif
+                @if (RoleTrait::hasPermission(67) && ($reservation->is_cancelled == 1 || $reservation->is_duplicated == 1) )
+                    <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> Activar</button>
+                @endif
+                @if (RoleTrait::hasPermission(72) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->open_credit == 0 )
+                    <button class="btn btn-warning btn-sm" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Crédito Abierto</button>
+                @endif
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Copiar Link de pago
+                    </button>
+                    <div class="dropdown-menu" style="">
+                        <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'en')">Inglés</a>
+                        <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'es')">Español</a>
+                    </div>
                 </div>
+            </div>
 
-                <div class="tab">
-                    <ul class="nav nav-tabs" role="tablist">
+            <div class="tab">
+                <ul class="nav nav-pills mb-3" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#icon-tab-1" data-bs-toggle="tab" role="tab">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin align-middle"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Detalles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#icon-tab-2" data-bs-toggle="tab" role="tab">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-bag align-middle"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                            Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#icon-tab-3" data-bs-toggle="tab" role="tab">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card align-middle"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                            Pagos
+                        </a>
+                    </li>
+                    @if (RoleTrait::hasPermission(65))
                         <li class="nav-item">
-                            <a class="nav-link active" href="#icon-tab-1" data-bs-toggle="tab" role="tab">
-                                <i class="align-middle" data-feather="map-pin"></i>
+                            <a class="nav-link" href="#icon-tab-4" data-bs-toggle="tab" role="tab">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera align-middle"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                Imagenes
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#icon-tab-2" data-bs-toggle="tab" role="tab">
-                                <i class="align-middle" data-feather="shopping-bag"></i>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#icon-tab-3" data-bs-toggle="tab" role="tab">
-                                <i class="align-middle" data-feather="credit-card"></i>
-                            </a>
-                        </li>
-                        @if (RoleTrait::hasPermission(65))
-                            <li class="nav-item">
-                                <a class="nav-link" href="#icon-tab-4" data-bs-toggle="tab" role="tab">
-                                    <i class="align-middle" data-feather="camera"></i>
-                                </a>
-                            </li>
-                        @endif
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="icon-tab-1" role="tabpanel">
-                            <div class="d-flex">
-                                @if (RoleTrait::hasPermission(12)) 
-                                <!--<button class="btn btn-success float-end">
-                                    <i class="align-middle" data-feather="plus"></i>
-                                </button>-->
+                    @endif
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="icon-tab-1" role="tabpanel">
+                        <div class="d-flex">
+                            @if (RoleTrait::hasPermission(12)) 
+                            <!--<button class="btn btn-success float-end">
+                                <i class="align-middle" data-feather="plus"></i>
+                            </button>-->
+                            @endif
+                        </div>                            
+                        @foreach ($reservation->items as $item)
+                            @php
+                                // dump( $item );
+                            @endphp
+                            <div class="services-container">
+                                <h3>{{ $item->code }}</h3>
+                                @if ( $reservation->is_advanced == 1 )
+                                    <div class="check-bubble" data-bs-toggle="popover" title="Servicio plus" data-bs-content="incluye cancelación gratuita. bebidas de cortesia. cuponera de descuento. parada de cortesia">
+                                        <span class="check-mark">✔</span>
+                                    </div>
                                 @endif
-                            </div>                            
-                            @foreach ($reservation->items as $item)
-                                @php
-                                    // dump( $item );
-                                @endphp
-                                <div class="services-container">
-                                    <h3>{{ $item->code }}</h3>
-                                    @if ( $reservation->is_advanced == 1 )
-                                        <div class="check-bubble" data-bs-toggle="popover" title="Servicio plus" data-bs-content="incluye cancelación gratuita. bebidas de cortesia. cuponera de descuento. parada de cortesia">
-                                            <span class="check-mark">✔</span>
+                                <div class="items-container">
+                                    <div class="items">
+                                        <div class="information_data">
+                                            <p><strong>Tipo:</strong> {{ (( $item->is_round_trip == 1 )? 'Round Trip':'One Way') }}</p>
+                                            <p><strong>Vehículo:</strong> {{ $item->destination_service->name }}</p>
+                                            <p><strong>Pasajeros:</strong> {{ $item->passengers }}</p>
+                                            <p><strong># de Vuelo:</strong> {{ $item->flught_number ?? 'N/A' }}</p>
                                         </div>
-                                    @endif
-                                    <div class="items-container">
-                                        <div class="items">
-                                            <div class="information_data">
-                                                <p><strong>Tipo:</strong> {{ (( $item->is_round_trip == 1 )? 'Round Trip':'One Way') }}</p>
-                                                <p><strong>Vehículo:</strong> {{ $item->destination_service->name }}</p>
-                                                <p><strong>Pasajeros:</strong> {{ $item->passengers }}</p>
-                                                <p><strong># de Vuelo:</strong> {{ $item->flught_number ?? 'N/A' }}</p>
-                                            </div>
-                                            <div class="actions mb-3">
-                                                @if (RoleTrait::hasPermission(13))
-                                                    <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" onclick="itemInfo({{ $item }})">Editar</button>
-                                                @endif
-                                                <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
-                                                    Confirmacion de llegada
+                                        <div class="actions mb-3">
+                                            @if (RoleTrait::hasPermission(13))
+                                                <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" onclick="itemInfo({{ $item }})">Editar</button>
+                                            @endif
+                                            <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
+                                                Confirmacion de llegada
+                                            </button>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    Confirmacion de salida
                                                 </button>
-                                                <div class="btn-group btn-group-sm">
-                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        Confirmacion de salida
-                                                    </button>
-                                                    <div class="dropdown-menu" style="">
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'departure')">Enviar en inglés</a>
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'departure')">Enviar en español</a>
-                                                    </div>
+                                                <div class="dropdown-menu" style="">
+                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'departure')">Enviar en inglés</a>
+                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'departure')">Enviar en español</a>
                                                 </div>
-                                                <div class="btn-group btn-group-sm">
-                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        Transfer recogida
-                                                    </button>
-                                                    <div class="dropdown-menu" style="">
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-pickup')">Enviar en inglés</a>
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-pickup')">Enviar en español</a>
-                                                    </div>
+                                            </div>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    Transfer recogida
+                                                </button>
+                                                <div class="dropdown-menu" style="">
+                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-pickup')">Enviar en inglés</a>
+                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-pickup')">Enviar en español</a>
                                                 </div>
-                                                <div class="btn-group btn-group-sm">
-                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        Transfer regreso
-                                                    </button>
-                                                    <div class="dropdown-menu" style="">
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-return')">Enviar en inglés</a>
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-return')">Enviar en español</a>
-                                                    </div>
+                                            </div>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    Transfer regreso
+                                                </button>
+                                                <div class="dropdown-menu" style="">
+                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-return')">Enviar en inglés</a>
+                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-return')">Enviar en español</a>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="item-data">
-                                            <table class="table table-striped table-sm">
-                                                <thead>
+                                    </div>
+                                    <div class="item-data">
+                                        <table class="table table-striped table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <td>Desde</td>
+                                                    <td>Hacia</td>
+                                                    <td>Pickup</td>
+                                                    <td>Operación</td>
+                                                    <td></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <p><strong>Zona</strong>: {{ $item->origin->name }}</p>
+                                                        <p><strong>Lugar</strong>: {{ $item->from_name }}</p>
+                                                    </td>
+                                                    <td>
+                                                        <p><strong>Zona</strong>: {{ $item->destination->name }}</p>
+                                                        <p><strong>Lugar</strong>: {{ $item->to_name }}</p>
+                                                    </td>
+                                                    <td>{{ date("Y/m/d H:i", strtotime( $item->op_one_pickup )) }}</td>
+                                                    <td>
+                                                        @if(false)
+                                                            @switch($item->op_one_status)
+                                                                @case('PENDING')
+                                                                    <span class="badge bg-secondary">PENDING</span>
+                                                                @break
+                                                                @case('CONFIRMED')
+                                                                    <span class="badge bg-success">CONFIRMED</span>
+                                                                @break
+                                                                @case('NOSHOW')
+                                                                    <span class="badge bg-warning">NOSHOW</span>
+                                                                @break
+                                                                @case('CANCELLED')
+                                                                    <span class="badge bg-danger">CANCELLED</span>
+                                                                @break
+                                                                @default
+                                                            @endswitch
+                                                        @endif
+                                                        <div class="btn-group btn-group-sm">
+                                                            @if (RoleTrait::hasPermission(68))
+                                                                @php
+                                                                    $btn_op_one_type = 'btn-secondary';
+                                                                    switch ($item->op_one_status) {
+                                                                        case 'PENDING':
+                                                                            $btn_op_one_type = 'btn-secondary';
+                                                                            break;
+                                                                        case 'COMPLETED':
+                                                                            $btn_op_one_type = 'bg-success';
+                                                                            break;
+                                                                        case 'NOSHOW':
+                                                                            $btn_op_one_type = 'bg-warning';
+                                                                            break;
+                                                                        case 'CANCELLED':
+                                                                            $btn_op_one_type = 'bg-danger';
+                                                                            break;
+                                                                    }
+                                                                @endphp
+                                                                @if ( $item->op_one_operation_close == 1 )
+                                                                    <button data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones" type="button" class="btn {{ $btn_op_one_type }}" style="color:white;">{{ $item->op_one_status }}</button>                                                                        
+                                                                @else
+                                                                    <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_one_status }}</button>
+                                                                    <div class="dropdown-menu" style="">
+                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
+                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event,  'arrival', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
+                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
+                                                                        <hr>
+                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
+                                                                    </div>                                                                        
+                                                                @endif
+                                                            @else
+                                                                @switch($item->op_one_status)
+                                                                    @case('PENDING')
+                                                                        <span class="badge bg-secondary">PENDING</span>
+                                                                    @break
+                                                                    @case('CONFIRMED')
+                                                                        <span class="badge bg-success">CONFIRMED</span>
+                                                                    @break
+                                                                    @case('NOSHOW')
+                                                                        <span class="badge bg-warning">NOSHOW</span>
+                                                                    @break
+                                                                    @case('CANCELLED')
+                                                                        <span class="badge bg-danger">CANCELLED</span>
+                                                                    @break
+                                                                    @default
+                                                                @endswitch
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        @if(false)
+                                                            <button class="btn btn-success" type="button"><i class="align-middle" data-feather="message-square"></i></button>
+                                                        @endif
+                                                        @if (RoleTrait::hasPermission(69))
+                                                            <button class="btn {{ (($item->op_one_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'arrival', {{ (($item->op_one_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle align-middle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                                            </button>
+                                                        @endif
+
+                                                        <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $item->op_one_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" }}" class="btn btn-{{ $item->op_one_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_one_operation_close == 1 ? "unlock" : "" }}" type="button" data-id="{{ $item->reservations_item_id }}" data-type="arrival" data-rez_id="{{ $item->reservation_id }}">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-{{ $item->op_one_operation_close == 1 ? "lock" : "unlock" }} align-middle"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+
+                                                @if($item->is_round_trip == 1)
                                                     <tr>
-                                                        <td>Desde</td>
-                                                        <td>Hacia</td>
-                                                        <td>Pickup</td>
-                                                        <td>Operación</td>
-                                                        <td></td>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
+                                                        <td>
+                                                            <p><strong>Zona</strong>: {{ $item->destination->name }}</p>
+                                                            <p><strong>Lugar</strong>: {{ $item->to_name }}</p>                                                                
+                                                        </td>
                                                         <td>
                                                             <p><strong>Zona</strong>: {{ $item->origin->name }}</p>
                                                             <p><strong>Lugar</strong>: {{ $item->from_name }}</p>
                                                         </td>
-                                                        <td>
-                                                            <p><strong>Zona</strong>: {{ $item->destination->name }}</p>
-                                                            <p><strong>Lugar</strong>: {{ $item->to_name }}</p>
-                                                        </td>
-                                                        <td>{{ date("Y/m/d H:i", strtotime( $item->op_one_pickup )) }}</td>
+                                                        <td>{{ date("Y/m/d H:i", strtotime( $item->op_two_pickup )) }}</td>
                                                         <td>
                                                             @if(false)
-                                                                @switch($item->op_one_status)
+                                                                @switch($item->op_two_status)
                                                                     @case('PENDING')
                                                                         <span class="badge bg-secondary">PENDING</span>
                                                                     @break
@@ -367,36 +451,36 @@
                                                             <div class="btn-group btn-group-sm">
                                                                 @if (RoleTrait::hasPermission(68))
                                                                     @php
-                                                                        $btn_op_one_type = 'btn-secondary';
-                                                                        switch ($item->op_one_status) {
+                                                                        $btn_op_two_type = 'btn-secondary';
+                                                                        switch ($item->op_two_status) {
                                                                             case 'PENDING':
-                                                                                $btn_op_one_type = 'btn-secondary';
+                                                                                $btn_op_two_type = 'btn-secondary';
                                                                                 break;
                                                                             case 'COMPLETED':
-                                                                                $btn_op_one_type = 'bg-success';
+                                                                                $btn_op_two_type = 'bg-success';
                                                                                 break;
                                                                             case 'NOSHOW':
-                                                                                $btn_op_one_type = 'bg-warning';
+                                                                                $btn_op_two_type = 'bg-warning';
                                                                                 break;
                                                                             case 'CANCELLED':
-                                                                                $btn_op_one_type = 'bg-danger';
+                                                                                $btn_op_two_type = 'bg-danger';
                                                                                 break;
                                                                         }
                                                                     @endphp
-                                                                    @if ( $item->op_one_operation_close == 1 )
-                                                                        <button data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones" type="button" class="btn {{ $btn_op_one_type }}" style="color:white;">{{ $item->op_one_status }}</button>                                                                        
+                                                                    @if ( $item->op_two_operation_close == 1 )
+                                                                        <button data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones" type="button" class="btn {{ $btn_op_two_type }}" style="color:white;">{{ $item->op_two_status }}</button>    
                                                                     @else
-                                                                        <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_one_status }}</button>
+                                                                        <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_two_status }}</button>
                                                                         <div class="dropdown-menu" style="">
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event,  'arrival', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event,  'departure', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
                                                                             <hr>
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
-                                                                        </div>                                                                        
+                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
+                                                                        </div>
                                                                     @endif
                                                                 @else
-                                                                    @switch($item->op_one_status)
+                                                                    @switch($item->op_two_status)
                                                                         @case('PENDING')
                                                                             <span class="badge bg-secondary">PENDING</span>
                                                                         @break
@@ -419,241 +503,146 @@
                                                                 <button class="btn btn-success" type="button"><i class="align-middle" data-feather="message-square"></i></button>
                                                             @endif
                                                             @if (RoleTrait::hasPermission(69))
-                                                                <button class="btn {{ (($item->op_one_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'arrival', {{ (($item->op_one_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})"><i class="align-middle" data-feather="check-circle"></i></button>
+                                                                <button class="btn {{ (($item->op_two_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'departure', {{ (($item->op_two_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})"><i class="align-middle" data-feather="check-circle"></i></button>
                                                             @endif
 
-                                                            <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $item->op_one_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" }}" class="btn btn-{{ $item->op_one_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_one_operation_close == 1 ? "unlock" : "" }}" type="button" data-id="{{ $item->reservations_item_id }}" data-type="arrival" data-rez_id="{{ $item->reservation_id }}"><i class="align-middle" data-feather="{{ $item->op_one_operation_close == 1 ? "lock" : "unlock" }}"></i></button>
+                                                            <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $item->op_two_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" }}" class="btn btn-{{ $item->op_two_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_two_operation_close == 1 ? "unlock" : "" }}" type="button" data-id="{{ $item->reservations_item_id }}" data-type="departure" data-rez_id="{{ $item->reservation_id }}"><i class="align-middle" data-feather="{{ $item->op_two_operation_close == 1 ? "lock" : "unlock" }}"></i></button>
                                                         </td>
                                                     </tr>
+                                                @endif
 
-                                                    @if($item->is_round_trip == 1)
-                                                        <tr>
-                                                            <td>
-                                                                <p><strong>Zona</strong>: {{ $item->destination->name }}</p>
-                                                                <p><strong>Lugar</strong>: {{ $item->to_name }}</p>                                                                
-                                                            </td>
-                                                            <td>
-                                                                <p><strong>Zona</strong>: {{ $item->origin->name }}</p>
-                                                                <p><strong>Lugar</strong>: {{ $item->from_name }}</p>
-                                                            </td>
-                                                            <td>{{ date("Y/m/d H:i", strtotime( $item->op_two_pickup )) }}</td>
-                                                            <td>
-                                                                @if(false)
-                                                                    @switch($item->op_two_status)
-                                                                        @case('PENDING')
-                                                                            <span class="badge bg-secondary">PENDING</span>
-                                                                        @break
-                                                                        @case('CONFIRMED')
-                                                                            <span class="badge bg-success">CONFIRMED</span>
-                                                                        @break
-                                                                        @case('NOSHOW')
-                                                                            <span class="badge bg-warning">NOSHOW</span>
-                                                                        @break
-                                                                        @case('CANCELLED')
-                                                                            <span class="badge bg-danger">CANCELLED</span>
-                                                                        @break
-                                                                        @default
-                                                                    @endswitch
-                                                                @endif
-                                                                <div class="btn-group btn-group-sm">
-                                                                    @if (RoleTrait::hasPermission(68))
-                                                                        @php
-                                                                            $btn_op_two_type = 'btn-secondary';
-                                                                            switch ($item->op_two_status) {
-                                                                                case 'PENDING':
-                                                                                    $btn_op_two_type = 'btn-secondary';
-                                                                                    break;
-                                                                                case 'COMPLETED':
-                                                                                    $btn_op_two_type = 'bg-success';
-                                                                                    break;
-                                                                                case 'NOSHOW':
-                                                                                    $btn_op_two_type = 'bg-warning';
-                                                                                    break;
-                                                                                case 'CANCELLED':
-                                                                                    $btn_op_two_type = 'bg-danger';
-                                                                                    break;
-                                                                            }
-                                                                        @endphp
-                                                                        @if ( $item->op_two_operation_close == 1 )
-                                                                            <button data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones" type="button" class="btn {{ $btn_op_two_type }}" style="color:white;">{{ $item->op_two_status }}</button>    
-                                                                        @else
-                                                                            <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_two_status }}</button>
-                                                                            <div class="dropdown-menu" style="">
-                                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setStatus(event,  'departure', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
-                                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
-                                                                                <hr>
-                                                                                <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
-                                                                            </div>
-                                                                        @endif
-                                                                    @else
-                                                                        @switch($item->op_two_status)
-                                                                            @case('PENDING')
-                                                                                <span class="badge bg-secondary">PENDING</span>
-                                                                            @break
-                                                                            @case('CONFIRMED')
-                                                                                <span class="badge bg-success">CONFIRMED</span>
-                                                                            @break
-                                                                            @case('NOSHOW')
-                                                                                <span class="badge bg-warning">NOSHOW</span>
-                                                                            @break
-                                                                            @case('CANCELLED')
-                                                                                <span class="badge bg-danger">CANCELLED</span>
-                                                                            @break
-                                                                            @default
-                                                                        @endswitch
-                                                                    @endif
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                @if(false)
-                                                                    <button class="btn btn-success" type="button"><i class="align-middle" data-feather="message-square"></i></button>
-                                                                @endif
-                                                                @if (RoleTrait::hasPermission(69))
-                                                                    <button class="btn {{ (($item->op_two_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'departure', {{ (($item->op_two_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})"><i class="align-middle" data-feather="check-circle"></i></button>
-                                                                @endif
-
-                                                                <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $item->op_two_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" }}" class="btn btn-{{ $item->op_two_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_two_operation_close == 1 ? "unlock" : "" }}" type="button" data-id="{{ $item->reservations_item_id }}" data-type="departure" data-rez_id="{{ $item->reservation_id }}"><i class="align-middle" data-feather="{{ $item->op_two_operation_close == 1 ? "lock" : "unlock" }}"></i></button>
-                                                            </td>
-                                                        </tr>
-                                                    @endif
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>                                
-                                </div>
-                                
-                                <input type="hidden" id="from_lat" value="{{ $item->from_lat }}">
-                                <input type="hidden" id="from_lng" value="{{ $item->from_lng }}">
-                                <input type="hidden" id="to_lat" value="{{ $item->to_lat }}">
-                                <input type="hidden" id="to_lng" value="{{ $item->to_lng }}">
-                            @endforeach
-                        </div>
-                        <div class="tab-pane" id="icon-tab-2" role="tabpanel">
-                            <div class="d-flex">
-                                <h4 class="flex-grow-1 tab-title">Ventas</h4> 
-                                @if (RoleTrait::hasPermission(14))
-                                <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#serviceSalesModal">
-                                    <i class="align-middle" data-feather="plus"></i>
-                                </button>
-                                @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>                                
                             </div>
-                            <table class="table table-striped table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Tipo</th>
-                                        <th class="text-left">Descripción</th>
-                                        <th class="text-center">Cantidad</th>
-                                        <th class="text-center">Total</th>
-                                        <th class="text-center">Vendedor</th>
-                                        <th class="text-center"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($reservation->sales as $sale)
-                                        <tr>
-                                            <td>{{ $sale->type->name }}</td>
-                                            <td class="text-left">{{ $sale->description }}</td>
-                                            <td class="text-center">{{ $sale->quantity }}</td>
-                                            <td class="text-center">{{ number_format($sale->total,2) }}</td>
-                                            <td class="text-center">{{ $sale->callCenterAgent->name ?? 'System' }}</td>
-                                            <td class="text-center">
-                                                @if (RoleTrait::hasPermission(15))
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#serviceSalesModal" onclick="getSale({{ $sale->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
-                                                @endif
-                                                @if (RoleTrait::hasPermission(16))
-                                                <a href="#" onclick="deleteSale({{ $sale->id }})"><i class="align-middle" data-feather="trash"></i></a>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach                                   
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tab-pane" id="icon-tab-3" role="tabpanel">
-                            <div class="d-flex">
-                                <h4 class="flex-grow-1 tab-title">Pagos</h4> 
-                                @if (RoleTrait::hasPermission(14))
-                                    <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
-                                        <i class="align-middle" data-feather="plus"></i>
-                                    </button>
-                                @endif
-                            </div>
-                            <table class="table table-striped table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Método</th>
-                                        <th>Descripción</th>
-                                        <th class="text-center">Total</th>
-                                        <th class="text-center">Moneda</th>
-                                        <th class="text-center">TC</th>
-                                        <th class="text-start">Ref.</th>
-                                        <th class="text-center"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($reservation->payments as $payment)
-                                        <tr>
-                                            <td>{{ $payment->payment_method }}</td>
-                                            <td>{{ $payment->description }}</td>
-                                            <td class="text-end">{{ number_format($payment->total) }}</td>
-                                            <td class="text-center">{{ $payment->currency }}</td>
-                                            <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
-                                            <td class="text-start">{{ $payment->reference }}</td>
-                                            <td class="text-center">
-                                                @if (RoleTrait::hasPermission(15))
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
-                                                @endif
-                                                @if (RoleTrait::hasPermission(16))
-                                                <a href="#" onclick="deletePayment({{ $payment->id }})"><i class="align-middle" data-feather="trash"></i></a>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach                                   
-                                </tbody>
-                            </table>
-                        </div>
-                        @if (RoleTrait::hasPermission(65))
-                            <div class="tab-pane" id="icon-tab-4" role="tabpanel">                       
-                                @if (RoleTrait::hasPermission(64))
-                                    <form id="upload-form" class="dropzone" action="/reservations/upload">
-                                        @csrf
-                                        <input type="hidden" name="folder" value="{{ $reservation->id }}">
-                                    </form>
-                                @endif
-                                @if (RoleTrait::hasPermission(65))
-                                    <div class="image-listing" id="media-listing"></div>
-                                @endif
-                            </div>
-                        @endif
+                            
+                            <input type="hidden" id="from_lat" value="{{ $item->from_lat }}">
+                            <input type="hidden" id="from_lng" value="{{ $item->from_lng }}">
+                            <input type="hidden" id="to_lat" value="{{ $item->to_lat }}">
+                            <input type="hidden" id="to_lng" value="{{ $item->to_lng }}">
+                        @endforeach
                     </div>
+                    <div class="tab-pane" id="icon-tab-2" role="tabpanel">
+                        <div class="d-flex">
+                            <h5 class="flex-grow-1 tab-title">Ventas</h5>
+                            @if (RoleTrait::hasPermission(14))
+                                <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#serviceSalesModal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                </button>
+                            @endif
+                        </div>
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th class="text-left">Descripción</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-center">Total</th>
+                                    <th class="text-center">Vendedor</th>
+                                    <th class="text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($reservation->sales as $sale)
+                                    <tr>
+                                        <td>{{ $sale->type->name }}</td>
+                                        <td class="text-left">{{ $sale->description }}</td>
+                                        <td class="text-center">{{ $sale->quantity }}</td>
+                                        <td class="text-center">{{ number_format($sale->total,2) }}</td>
+                                        <td class="text-center">{{ $sale->callCenterAgent->name ?? 'System' }}</td>
+                                        <td class="text-center">
+                                            @if (RoleTrait::hasPermission(15))
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#serviceSalesModal" onclick="getSale({{ $sale->id }})">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 align-middle"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                                </a>
+                                            @endif
+                                            @if (RoleTrait::hasPermission(16))
+                                                <a href="#" onclick="deleteSale({{ $sale->id }})">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash align-middle"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                </a>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach                                   
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="icon-tab-3" role="tabpanel">
+                        <div class="d-flex">
+                            <h5 class="flex-grow-1 tab-title">Pagos</h5> 
+                            @if (RoleTrait::hasPermission(14))
+                                <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                </button>
+                            @endif
+                        </div>
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Método</th>
+                                    <th>Descripción</th>
+                                    <th class="text-center">Total</th>
+                                    <th class="text-center">Moneda</th>
+                                    <th class="text-center">TC</th>
+                                    <th class="text-start">Ref.</th>
+                                    <th class="text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($reservation->payments as $payment)
+                                    <tr>
+                                        <td>{{ $payment->payment_method }}</td>
+                                        <td>{{ $payment->description }}</td>
+                                        <td class="text-end">{{ number_format($payment->total) }}</td>
+                                        <td class="text-center">{{ $payment->currency }}</td>
+                                        <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
+                                        <td class="text-start">{{ $payment->reference }}</td>
+                                        <td class="text-center">
+                                            @if (RoleTrait::hasPermission(15))
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})"><i class="align-middle" data-feather="edit-2"></i></a>
+                                            @endif
+                                            @if (RoleTrait::hasPermission(16))
+                                            <a href="#" onclick="deletePayment({{ $payment->id }})"><i class="align-middle" data-feather="trash"></i></a>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach                                   
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (RoleTrait::hasPermission(65))
+                        <div class="tab-pane" id="icon-tab-4" role="tabpanel">
+                            @if (RoleTrait::hasPermission(64))
+                                <form id="upload-form" class="dropzone" action="/reservations/upload">
+                                    @csrf
+                                    <input type="hidden" name="folder" value="{{ $reservation->id }}">
+                                </form>
+                            @endif
+                            @if (RoleTrait::hasPermission(65))
+                                <div class="image-listing" id="media-listing"></div>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
-            
-        </div>        
-        
+        </div>
     </div>
 
-<!-- Modals -->
-<x-modals.service_map />
+    <!-- Modals -->
+    <x-modals.service_map />
+    <x-modals.edit_reservation_service :services=$services_types :zones=$zones />
+    <x-modals.new_sale_reservation :sellers=$sellers :types=$sales_types>
+        <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
+    </x-modals.new_sale_reservation>
+    <x-modals.new_payment_reservation>
+        <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
+        <x-slot name="currency">{{ $reservation->currency }}</x-slot>
+    </x-modals.new_payment_reservation>
+    <x-modals.new_follow_reservation>
+        <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
+    </x-modals.new_follow_reservation>
 
-<x-modals.edit_reservation_service :services=$services_types :zones=$zones />
-
-<x-modals.new_sale_reservation :sellers=$sellers :types=$sales_types>
-    <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
-</x-modals.new_sale_reservation>
-
-<x-modals.new_payment_reservation>
-    <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
-    <x-slot name="currency">{{ $reservation->currency }}</x-slot>
-</x-modals.new_payment_reservation>
-
-<x-modals.new_follow_reservation>
-    <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
-</x-modals.new_follow_reservation>
-
-<x-modals.edit_reservation_details :reservation=$reservation :sites=$sites :origins=$origins />
-<x-modals.reservations.confirmation :reservation=$reservation />
-
+    <x-modals.edit_reservation_details :reservation=$reservation :sites=$sites :origins=$origins />
+    <x-modals.reservations.confirmation :reservation=$reservation />
 @endsection

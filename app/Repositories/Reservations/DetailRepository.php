@@ -25,7 +25,6 @@ class DetailRepository
     public function detail($request,$id)
     {
         // $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site', 'cancellationType')->find($id);
-
         // $reservation = Reservation::with(['destination', 'items', 'sales' => function ($query) {
         //     $query->whereNotNull('call_center_agent_id');
         // }, 'sales.callCenterAgent', 'payments', 'followUps', 'site', 'cancellationType'])
@@ -94,6 +93,13 @@ class DetailRepository
         endif;
 
         return view('reservations.detail', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Detalle de reservación: ".$id,
+                    "active" => true
+                ]
+            ],
             'reservation' => $reservation,
             'sellers' => $sellers,
             'sales_types' => $sales_types,

@@ -56,12 +56,19 @@ class TpvRepository
             return redirect('/');
         endif;
 
-        $config = [
-            "code" => $request->code,
-            "items" => $tpv[ $request->code ]
-        ];
-
-        return view('tpv.index', compact('config'));
+        return view('tpv.index', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "TPV",
+                    "active" => true
+                ]
+            ],
+            'config' => [
+                "code" => $request->code,
+                "items" => $tpv[ $request->code ]
+            ],            
+        ]);
     }
 
     public function quote($request){
