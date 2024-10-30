@@ -1,6 +1,8 @@
-@import "../template/light/users/account-setting.scss";
-@import "../template/dark/users/account-setting.scss";
+@import "../../plugins/choices/choices";
 
-@import "../template/light/elements/alert.scss";
-@import "../template/dark/elements/alert.scss";
+@import "../template/light/users/account-setting";
+@import "../template/dark/users/account-setting";
+
+@import "../template/light/elements/alert";
+@import "../template/dark/elements/alert";
 

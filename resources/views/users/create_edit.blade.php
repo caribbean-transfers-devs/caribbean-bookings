@@ -6,8 +6,9 @@
     <link href="{{ mix('/assets/css/sections/enterprise_forms.min.css') }}" rel="stylesheet" > 
 @endpush
 
-@push('JS')
-    <script>
+@push('Js')    
+    <script src="{{ mix('assets/js/sections/user_edit.min.js') }}"></script>
+    <script>        
         const choices = new Choices(document.getElementById('roles'),{
             removeItemButton: true,
             loadingText: 'Cargando...',
