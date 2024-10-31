@@ -28,14 +28,14 @@
                             <label class="form-label" for="new_sale_total">Total</label>
                             <input type="number" class="form-control mb-2" id="new_sale_total" name="total">
                         </div>
-                        <div class="col-sm-12 col-md-12">
+                        {{-- <div class="col-sm-12 col-md-12">
                             <label class="form-label" for="new_sale_agent_id">Agente</label>
                             <select class="form-select mb-2" id="new_sale_agent_id" name="call_center_agent_id"> 
                                 @foreach($sellers as $agent)
                                     <option value="{{ $agent->id }}">{{ $agent->name }}</option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
                     </div>
                     <input type="hidden" name="reservation_id" value="{{ $reservation_id }}">
                 </form>
