@@ -1,5 +1,6 @@
 @php
-    use App\Traits\RoleTrait;    
+    use App\Traits\RoleTrait;
+    use Carbon\Carbon;
 @endphp
 
 @extends('layout.app')
@@ -39,9 +40,9 @@
                     </div>
                     <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-sm mt-2 mb-4">
+                        <table class="table table-hover table-striped table-bordered table-details-booking mb-0">
                             <tbody>
                                 <tr>
                                     <th>Nombre</th>
@@ -119,10 +120,10 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <hr>
+                    
                     @if ( $reservation->callCenterAgent != null )
-                        <div class="callcenter-x">
+                        <hr style="width:95%; margin-left: auto; margin-right: auto;">
+                        <div class="callcenter-x px-2">
                             <div class="d-flex align-items-center mb-3 box zoom-in">
                                 <div class="flex-none w-10 h-10 overflow-hidden rounded-full image-fit">
                                     <img alt="detalles" width="100%" src="{{ asset('/assets/img/profile-default.svg') }}">
@@ -135,18 +136,46 @@
                         </div>
                     @endif
 
-                    <hr>
+                    <hr style="width:95%; margin-left: auto; margin-right: auto;">
                     @if (RoleTrait::hasPermission(25))
-                        <strong>Actividad</strong>
-                        <ul class="timeline mt-2 mb-0">
+                        {{-- <div class="timeline-alter">
                             @foreach ($reservation->followUps as $followUp)
-                                <li class="timeline-item">
-                                    <strong>[{{ $followUp->type }}]</strong>
-                                    <span class="float-end text-muted text-sm">{{ date("Y/m/d H:i", strtotime($followUp->created_at)) }}</span>
+                            <div class="item-timeline">
+                                <div class="t-time">
+                                    <p class="">{{ date("H:i", strtotime($followUp->created_at)) }}</p>
+                                </div>
+                                <div class="t-usr-txt">
+                                    <p><span>{{ strtoupper(substr($followUp->type, 0, 1)) }}</span></p>
+                                </div>
+                                <div class="t-meta-time">
+                                    @php
+                                        $fecha = Carbon::parse($followUp->created_at);
+                                    @endphp
+                                    <p class="">{{ $fecha->diffForHumans() }}</p>
+                                    <p class="">{{ date("Y/m/d", strtotime($followUp->created_at)) }}</p>
+                                </div>
+                                <div class="t-text">
                                     <p>{{ $followUp->text }}</p>
-                                </li>
+                                </div>
+                            </div>
                             @endforeach
-                        </ul>
+                        </div> --}}
+                        <div class="followUps px-2 pb-2">
+                            <h6>Actividad</h6>
+                            <ul class="timeline m-0">
+                                @foreach ($reservation->followUps as $followUp)
+                                    <li class="timeline-item">
+                                        <strong class="text-black">[{{ $followUp->type }}]</strong>
+                                        <span class=" text-muted text-sm">{{ date("Y/m/d H:i", strtotime($followUp->created_at)) }}</span>
+                                        @php
+                                            $fecha = Carbon::parse($followUp->created_at);
+                                        @endphp
+                                        <span class="text-muted text-sm">{{ $fecha->diffForHumans() }}</span>
+                                        <p>{{ $followUp->text }}</p>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -314,7 +343,7 @@
                                         </div>
                                     </div>
                                     <div class="item-data">
-                                        <table class="table table-striped table-sm">
+                                        <table class="table table-hover table-striped table-bordered">
                                             <thead>
                                                 <tr>
                                                     <td>Desde</td>
@@ -503,14 +532,17 @@
                                                                 <button class="btn btn-success" type="button"><i class="align-middle" data-feather="message-square"></i></button>
                                                             @endif
                                                             @if (RoleTrait::hasPermission(69))
-                                                                <button class="btn {{ (($item->op_two_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'departure', {{ (($item->op_two_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})"><i class="align-middle" data-feather="check-circle"></i></button>
+                                                                <button class="btn {{ (($item->op_two_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'departure', {{ (($item->op_two_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle align-middle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                                                </button>
                                                             @endif
 
-                                                            <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $item->op_two_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" }}" class="btn btn-{{ $item->op_two_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_two_operation_close == 1 ? "unlock" : "" }}" type="button" data-id="{{ $item->reservations_item_id }}" data-type="departure" data-rez_id="{{ $item->reservation_id }}"><i class="align-middle" data-feather="{{ $item->op_two_operation_close == 1 ? "lock" : "unlock" }}"></i></button>
+                                                            <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $item->op_two_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" }}" class="btn btn-{{ $item->op_two_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_two_operation_close == 1 ? "unlock" : "" }}" type="button" data-id="{{ $item->reservations_item_id }}" data-type="departure" data-rez_id="{{ $item->reservation_id }}">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-{{ $item->op_two_operation_close == 1 ? "lock" : "unlock" }} align-middle"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 @endif
-
                                             </tbody>
                                         </table>
                                     </div>
@@ -524,15 +556,15 @@
                         @endforeach
                     </div>
                     <div class="tab-pane" id="icon-tab-2" role="tabpanel">
-                        <div class="d-flex">
-                            <h5 class="flex-grow-1 tab-title">Ventas</h5>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h5 class="mb-0">Ventas</h5>
                             @if (RoleTrait::hasPermission(14))
                                 <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#serviceSalesModal">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                 </button>
                             @endif
                         </div>
-                        <table class="table table-striped table-sm">
+                        <table class="table table-hover table-striped table-bordered">
                             <thead>
                                 <tr>
                                     <th>Tipo</th>
@@ -553,12 +585,12 @@
                                         <td class="text-center">{{ $sale->callCenterAgent->name ?? 'System' }}</td>
                                         <td class="text-center">
                                             @if (RoleTrait::hasPermission(15))
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#serviceSalesModal" onclick="getSale({{ $sale->id }})">
+                                                <a href="#" class="action-btn btn-delete" data-bs-toggle="modal" data-bs-target="#serviceSalesModal" onclick="getSale({{ $sale->id }})">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 align-middle"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
                                                 </a>
                                             @endif
                                             @if (RoleTrait::hasPermission(16))
-                                                <a href="#" onclick="deleteSale({{ $sale->id }})">
+                                                <a href="#" class="action-btn btn-delete" onclick="deleteSale({{ $sale->id }})">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash align-middle"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                                 </a>
                                             @endif
@@ -569,15 +601,15 @@
                         </table>
                     </div>
                     <div class="tab-pane" id="icon-tab-3" role="tabpanel">
-                        <div class="d-flex">
-                            <h5 class="flex-grow-1 tab-title">Pagos</h5> 
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h5 class="mb-0">Pagos</h5> 
                             @if (RoleTrait::hasPermission(14))
                                 <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                 </button>
                             @endif
                         </div>
-                        <table class="table table-striped table-sm">
+                        <table class="table table-hover table-striped table-bordered">
                             <thead>
                                 <tr>
                                     <th>Método</th>

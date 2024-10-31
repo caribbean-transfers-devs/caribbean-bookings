@@ -115,7 +115,10 @@ class TpvRepository
             ], Response::HTTP_BAD_REQUEST);
         endif;
 
-        $sites = Site::all();
+        // $sites = Site::all();
+        $sites = Site::orderByRaw("FIELD(name LIKE '%[CS]%', 1) DESC")
+                ->orderBy('name')
+                ->get();        
         $origin_sales = OriginSale::where('status',1)->get();
 
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');

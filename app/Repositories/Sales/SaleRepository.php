@@ -26,7 +26,7 @@ class SaleRepository
             $sale->description = $request->description;
             $sale->quantity = $request->quantity;
             $sale->total = $request->total;
-            $sale->call_center_agent_id = $request->call_center_agent_id;
+            // $sale->call_center_agent_id = $request->call_center_agent_id;
             $sale->save();
 
             DB::commit();

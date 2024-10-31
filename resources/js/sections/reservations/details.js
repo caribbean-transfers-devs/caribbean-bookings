@@ -12,6 +12,13 @@ const __closeModalFooter = document.getElementById('closeModalFooter');
 
 const __serviceType = document.getElementById('serviceTypeForm');
 
+if( document.querySelectorAll('.timeline-item').length > 0 ){
+    document.querySelectorAll('.timeline-item').forEach(item => {
+        const height = item.offsetHeight;
+        item.style.setProperty('--timeline-height', `${height}px`);
+    });
+}
+
 $(function() {
     $('#serviceSalesModal').on('hidden.bs.modal', function () {
         $("#frm_new_sale")[0].reset();

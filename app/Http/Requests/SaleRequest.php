@@ -27,7 +27,7 @@ class SaleRequest extends FormRequest
             'description' => 'required|string|max:255',
             'quantity' => 'required|numeric',
             'total' => 'required|numeric',
-            'call_center_agent_id' => 'required|exists:users,id'
+            //'call_center_agent_id' => 'required|exists:users,id'
         ];
     }
 
@@ -47,8 +47,8 @@ class SaleRequest extends FormRequest
             'quantity.numeric' => 'La cantidad debe ser un número',
             'total.required' => 'El total es requerido',
             'total.numeric' => 'El total debe ser un número',
-            'call_center_agent_id.required' => 'El agente es requerido',
-            'call_center_agent_id.exists' => 'El agente no existe'
+            // 'call_center_agent_id.required' => 'El agente es requerido',
+            // 'call_center_agent_id.exists' => 'El agente no existe'
         ];
     }
 }

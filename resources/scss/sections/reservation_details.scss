@@ -1,10 +1,16 @@
 @import "../../plugins/flatpickr/flatpickr";
 @import "../../plugins/bootstrap-select/select";
+// @import "../../plugins/table/datatable/datatables";
+// @import "../template/plugins/light/table/datatable/dt-global_style";
+// @import "../template/plugins/dark/table/datatable/dt-global_style";
 
 @import '../template/light/components/modal';
 @import '../template/dark/components/modal';
 @import '../template/light/components/tabs';
 @import '../template/dark/components/tabs';
+
+// @import '../template/light/components/timeline';
+// @import '../template/dark/components/timeline';
 
 .nav-link {
     display: flex;
@@ -29,11 +35,72 @@
     }
 }
 
-.btn svg,
-.table:not(.dataTable) tbody tr td svg{
+.btn svg.feather-check-circle,
+.btn svg.feather-unlock,
+.btn svg.feather-lock,
+.btn svg.feather-plus{
     width: 15px;
     height: 15px;
-    color: #fff;
+    color: #fff !important;
+}
+
+.timeline-item:before, .timeline:before {
+    content: " ";
+    display: inline-block;
+    position: absolute;
+    z-index: 1;
+}
+
+.timeline {
+    list-style-type: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    height: 300px;
+    overflow: hidden;
+    overflow-y: scroll;
+
+    .timeline-item{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 8px;
+
+        /* Elemento marcador */
+        &::before{
+            background: #fff;
+            border-radius: 50%;
+            border: 3px solid #3b7ddd;
+            left: 0;
+            width: 20px;
+            height: 20px;            
+        }
+
+        /* Línea de conexión entre los elementos */
+        &::after {
+            content: "";
+            position: absolute;
+            background: #3b7ddd;
+            width: 2px;
+            left: 9px; /* Centrado con el círculo */
+            top: 20px; /* Ajustado para empezar desde el centro del círculo */
+            height: var(--timeline-height); /* Ajustado para llegar hasta el final del item */
+            z-index: 0;
+        }
+    
+        &:last-child::after {
+            display: none; /* Oculta la línea en el último elemento */
+        }
+    }
+    
+    // &::before{
+    //     background: #000;
+    //     left: 9px;
+    //     width: 2px;
+    //     height: 100%;
+    // }
 }
 
 *>.callcenter-x:nth-child(1) {
