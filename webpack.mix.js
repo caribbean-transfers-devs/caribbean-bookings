@@ -13,100 +13,104 @@ if (mix.inProduction()) {
 
 mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css");
 mix.copy('resources/css/base.min.css', data.assets + "css/base/base.min.css");
+
 mix.copy('resources/js/base.js', data.assets + "js/base.min.js");
 mix.copy('resources/js/datatables.js', data.assets + "js/datatables.js");
 mix.copy('resources/js/sweetalert2.all.min.js', data.assets + "js/sweetalert2.js");
-mix.copy('resources/js/easypick.js', data.assets + "js/easypick.min.js");
 
 mix.copy('resources/js/views/reservations/reservationsIndex.js', data.assets + "js/views/reservations/reservationsIndex.js");
 mix.sass('resources/scss/pos/index.scss', data.assets + "css/pos/index.min.css");
 mix.sass('resources/scss/pos/detail.scss', data.assets + "css/pos/detail.min.css");
 mix.sass('resources/scss/pos/capture.scss', data.assets + "css/pos/capture.min.css");
 mix.sass('resources/scss/pos/vendors.scss', data.assets + "css/pos/vendors.min.css");
-mix.sass('resources/scss/zones/index.scss', data.assets + "css/zones/index.min.css");
 
 mix.copy('resources/js/views/pos/index.js', data.assets + "js/views/pos/index.min.js");
 mix.copy('resources/js/views/pos/detail.js', data.assets + "js/views/pos/detail.min.js");
 mix.copy('resources/js/views/pos/capture.js', data.assets + "js/views/pos/capture.min.js");
 mix.copy('resources/js/views/pos/vendors.js', data.assets + "js/views/pos/vendors.min.js");
-mix.copy('resources/js/views/zones/index.js', data.assets + "js/views/zones/index.min.js");
-mix.sass('resources/scss/rates/index.scss', data.assets + "css/rates/index.min.css");
-mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/admin.min.css");
 
-mix.copy('resources/js/views/rates/index.js', data.assets + "js/views/rates/index.min.js");
+mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/admin.min.css");
 
 /************************************************************
  * NUEVOS ESTILOS Y SCRIPT PARA EL PANEL DE CONTROL
 ************************************************************/
 
-mix.sass('resources/scss/core.scss', data.assets + '/css/core/core.min.css');//core styles
-mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resources/plugins/font-icons/fontawesome/css/fontawesome.css'], data.assets + '/css/panel/panel.min.css');//panel styles
-// mix.styles(['resources/plugins/font-icons/material/css/material.css','resources/plugins/font-icons/material/css/materialicon.css'], data.assets + '/css/panel/material.min.css');//panel styles
-mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
+        /************************************************************
+         * CSS
+        ************************************************************/
 
-mix.sass('resources/scss/sections/tpv.scss', data.assets + "css/sections/tpv.min.css"); //TPV
-mix.sass('resources/scss/sections/reservation_details.scss', data.assets + "css/sections/reservation_details.min.css"); //RESERVATION DETAILS
+        mix.sass('resources/scss/core.scss', data.assets + '/css/core/core.min.css');//core styles
+        mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resources/plugins/font-icons/fontawesome/css/fontawesome.css'], data.assets + '/css/panel/panel.min.css');//panel styles
+        // mix.styles(['resources/plugins/font-icons/material/css/material.css','resources/plugins/font-icons/material/css/materialicon.css'], data.assets + '/css/panel/material.min.css');//panel styles
+        mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
 
-mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css"); //DASHBOARD
-mix.sass('resources/scss/sections/dashboard2.scss', data.assets + "css/sections/dashboard2.min.css"); //DASHBOARD
-mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //REPORTS
+        mix.sass('resources/scss/sections/tpv.scss', data.assets + "css/sections/tpv.min.css"); //TPV
+        mix.sass('resources/scss/sections/reservation_details.scss', data.assets + "css/sections/reservation_details.min.css"); //RESERVATION DETAILS
 
-mix.sass('resources/scss/sections/download.scss', data.assets + "css/sections/download.min.css"); //DOWNLOAD
-mix.sass('resources/scss/sections/management.scss', data.assets + "css/sections/management.min.css"); //MANAGEMENT
-mix.sass('resources/scss/sections/confirmation.scss', data.assets + "css/sections/confirmation.min.css"); //CONFIRMATION
-mix.sass('resources/scss/sections/ccform.scss', data.assets + "css/sections/ccform.min.css"); //CCFORM
-mix.sass('resources/scss/sections/spam.scss', data.assets + "css/sections/spam.min.css"); //SPAM
-mix.sass('resources/scss/sections/operations.scss', data.assets + "css/sections/operations.min.css"); //OPERATIONS
+        mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css"); //DASHBOARD
+        mix.sass('resources/scss/sections/dashboard2.scss', data.assets + "css/sections/dashboard2.min.css"); //DASHBOARD
+        mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //REPORTS
 
-mix.sass('resources/scss/sections/zones.scss', data.assets + "css/sections/zones.min.css"); //ZONES
-mix.sass('resources/scss/sections/rates.scss', data.assets + "css/sections/rates.min.css"); //RATES
-mix.sass('resources/scss/sections/users.scss', data.assets + "css/sections/users.min.css"); //USERS
-mix.sass('resources/scss/sections/enterprise.scss', data.assets + "css/sections/enterprise.min.css");
-mix.sass('resources/scss/sections/enterprise_forms.scss', data.assets + "css/sections/enterprise_forms.min.css");
-mix.sass('resources/scss/sections/vehicle.scss', data.assets + "css/sections/vehicle.min.css");
-mix.sass('resources/scss/sections/vehicle_forms.scss', data.assets + "css/sections/vehicle_forms.min.css");
-mix.sass('resources/scss/sections/driver.scss', data.assets + "css/sections/driver.min.css");
-mix.sass('resources/scss/sections/driver_forms.scss', data.assets + "css/sections/driver_forms.min.css");
+        mix.sass('resources/scss/sections/download.scss', data.assets + "css/sections/download.min.css"); //DOWNLOAD
+        mix.sass('resources/scss/sections/management.scss', data.assets + "css/sections/management.min.css"); //MANAGEMENT
+        mix.sass('resources/scss/sections/confirmation.scss', data.assets + "css/sections/confirmation.min.css"); //CONFIRMATION
+        mix.sass('resources/scss/sections/ccform.scss', data.assets + "css/sections/ccform.min.css"); //CCFORM
+        mix.sass('resources/scss/sections/spam.scss', data.assets + "css/sections/spam.min.css"); //SPAM
+        mix.sass('resources/scss/sections/operations.scss', data.assets + "css/sections/operations.min.css"); //OPERATIONS
 
-mix.combine(['resources/plugins/global/vendors.min.js','resources/js/bootstrap.bundle.min.js','resources/plugins/font-icons/feather/feather.min.js','resources/plugins/sweetalerts2/sweetalerts22.min.js'], data.assets + '/js/core/core.min.js');//core scripts
-mix.combine(['resources/plugins/perfect-scrollbar/perfect-scrollbar.min.js','resources/plugins/mousetrap/mousetrap.min.js','resources/plugins/waves/waves.min.js','resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/waitMe/waitme.js', 'resources/js/caribbean.js','resources/js/components.js'], data.assets + '/js/panel/panel.min.js');//panel scripts
-mix.combine(['resources/plugins/perfect-scrollbar/perfect-scrollbar.min.js','resources/plugins/mousetrap/mousetrap.min.js','resources/plugins/waves/waves.min.js','resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/waitMe/waitme.js','resources/js/components.js'], data.assets + '/js/panel/panel_custom.min.js');//panel scripts
+        mix.sass('resources/scss/sections/zones.scss', data.assets + "css/sections/zones.min.css"); //ZONES
+        mix.sass('resources/scss/sections/rates.scss', data.assets + "css/sections/rates.min.css"); //RATES
+        mix.sass('resources/scss/sections/users.scss', data.assets + "css/sections/users.min.css"); //USERS
+        mix.sass('resources/scss/sections/enterprise.scss', data.assets + "css/sections/enterprise.min.css");
+        mix.sass('resources/scss/sections/enterprise_forms.scss', data.assets + "css/sections/enterprise_forms.min.css");
+        mix.sass('resources/scss/sections/vehicle.scss', data.assets + "css/sections/vehicle.min.css");
+        mix.sass('resources/scss/sections/vehicle_forms.scss', data.assets + "css/sections/vehicle_forms.min.css");
+        mix.sass('resources/scss/sections/driver.scss', data.assets + "css/sections/driver.min.css");
+        mix.sass('resources/scss/sections/driver_forms.scss', data.assets + "css/sections/driver_forms.min.css");
 
-//DASHBOARD
-mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard.js'], data.assets + "js/sections/dashboard.min.js");
-mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard2.js'], data.assets + "js/sections/dashboard2.min.js");
+        /************************************************************
+         * JS
+        ************************************************************/        
 
-//TPV
-mix.combine(['resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/tpv/index.js'], data.assets + "js/sections/tpv/index.min.js");
+        mix.combine(['resources/plugins/global/vendors.min.js','resources/js/bootstrap.bundle.min.js','resources/plugins/font-icons/feather/feather.min.js','resources/plugins/sweetalerts2/sweetalerts22.min.js'], data.assets + '/js/core/core.min.js');//core scripts
+        mix.combine(['resources/plugins/perfect-scrollbar/perfect-scrollbar.min.js','resources/plugins/mousetrap/mousetrap.min.js','resources/plugins/waves/waves.min.js','resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/waitMe/waitme.js', 'resources/js/caribbean.js','resources/js/components.js'], data.assets + '/js/panel/panel.min.js');//panel scripts
+        mix.combine(['resources/plugins/perfect-scrollbar/perfect-scrollbar.min.js','resources/plugins/mousetrap/mousetrap.min.js','resources/plugins/waves/waves.min.js','resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/waitMe/waitme.js','resources/js/components.js'], data.assets + '/js/panel/panel_custom.min.js');//panel scripts
 
-//RESERVATION DETAILS
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/reservations/details.js'], data.assets + "js/sections/reservations/details.min.js");
+        //DASHBOARD
+        mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard.js'], data.assets + "js/sections/dashboard.min.js");
+        mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard2.js'], data.assets + "js/sections/dashboard2.min.js");
 
-//REPORTS
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/managment.js'], data.assets + "js/sections/operations/managment.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/tomSelect/tom-select.base.js', 'resources/js/sections/reservations/sales.js'], data.assets + "js/sections/reservations/sales.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/reports/commissions.js'], data.assets + "js/sections/reports/commissions.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/reports/cash.js'], data.assets + "js/sections/reports/cash.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/reports/reservations.js'], data.assets + "js/sections/reports/reservations.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/reports/operations.js'], data.assets + "js/sections/reports/operations.min.js");
+        //TPV
+        mix.combine(['resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/tpv/index.js'], data.assets + "js/sections/tpv/index.min.js");
 
-//POST
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/tomSelect/tom-select.base.js', 'resources/js/sections/pos/sales.js'], data.assets + "js/sections/pos/sales.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/pos/sellers.js'], data.assets + "js/sections/pos/sellers.min.js");
+        //RESERVATION DETAILS
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/reservations/details.js'], data.assets + "js/sections/reservations/details.min.js");
 
-//OPERATION
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/confirmation.js'], data.assets + "js/sections/operations/confirmation.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/spam.js'], data.assets + "js/sections/operations/spam.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/operations/reservations.js'], data.assets + "js/sections/operations/reservations.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/bootstrap-select/select.js', 'resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/operations/operations.js'], data.assets + "js/sections/operations/operations.min.js");
+        //REPORTS
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/managment.js'], data.assets + "js/sections/operations/managment.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/tomSelect/tom-select.base.js', 'resources/js/sections/reservations/sales.js'], data.assets + "js/sections/reservations/sales.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/reports/commissions.js'], data.assets + "js/sections/reports/commissions.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/reports/cash.js'], data.assets + "js/sections/reports/cash.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/reports/reservations.js'], data.assets + "js/sections/reports/reservations.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/reports/operations.js'], data.assets + "js/sections/reports/operations.min.js");
 
-//SETTINGS
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/zones.js'], data.assets + "js/sections/zones.min.js"); //ZONES
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/rates.js'], data.assets + "js/sections/rates.min.js"); //RATES
+        //POST
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/tomSelect/tom-select.base.js', 'resources/js/sections/pos/sales.js'], data.assets + "js/sections/pos/sales.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/pos/sellers.js'], data.assets + "js/sections/pos/sellers.min.js");
 
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/users.js'], data.assets + "js/sections/users.min.js");
-mix.combine(['resources/plugins/choices/choices.js'], data.assets + "js/sections/user_edit.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/roles.js'], data.assets + "js/sections/roles.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/enterprise.js'], data.assets + "js/sections/enterprise.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/vehicle.js'], data.assets + "js/sections/vehicle.min.js");
-mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/driver.js'], data.assets + "js/sections/driver.min.js");
+        //OPERATION
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/confirmation.js'], data.assets + "js/sections/operations/confirmation.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/operations/spam.js'], data.assets + "js/sections/operations/spam.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/operations/reservations.js'], data.assets + "js/sections/operations/reservations.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/bootstrap-select/select.js', 'resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/operations/operations.js'], data.assets + "js/sections/operations/operations.min.js");
+
+        //SETTINGS
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/zones.js'], data.assets + "js/sections/zones.min.js"); //ZONES
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/rates.js'], data.assets + "js/sections/rates.min.js"); //RATES
+
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/users.js'], data.assets + "js/sections/users.min.js");
+        mix.combine(['resources/plugins/choices/choices.js'], data.assets + "js/sections/user_edit.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/roles.js'], data.assets + "js/sections/roles.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/enterprise.js'], data.assets + "js/sections/enterprise.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/vehicle.js'], data.assets + "js/sections/vehicle.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/driver.js'], data.assets + "js/sections/driver.min.js");

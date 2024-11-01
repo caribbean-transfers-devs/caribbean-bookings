@@ -21,7 +21,7 @@ class OperationController extends Controller
     public function __construct(OperationRepository $OperationRepository)
     {
         $this->OperationRepository = $OperationRepository;
-    }    
+    }
 
     public function reservations(Request $request){
         if(RoleTrait::hasPermission(10)){

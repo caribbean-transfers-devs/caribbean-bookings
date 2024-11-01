@@ -190,12 +190,12 @@
                                 $comment =       ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_comments : $value->op_two_comments );
 
                                 //ESTATUS
-                                $status_operation = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_status_operation : $value->op_two_status_operation );
+                                $status_operation = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->one_service_operation_status : $value->two_service_operation_status );
                                 $time_operation =   ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_time_operation : $value->op_two_time_operation );
                                 $cost_operation =   ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_operating_cost : $value->op_two_operating_cost );
-                                $status_booking =   ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_status : $value->op_two_status );
+                                $status_booking =   ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->one_service_status : $value->two_service_status );
 
-                                $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
+                                $operation_pickup = (($value->operation_type == 'arrival')? $value->pickup_from : $value->pickup_to );
                                 $operation_from = (($value->operation_type == 'arrival')? $value->from_name.( (!empty($value->flight_number)) ? ' ('.$value->flight_number.')' : '' )  : $value->to_name );
                                 $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
 
@@ -274,7 +274,7 @@
                                 </td>
                                 <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>                                    
                                 <td>
-                                    <span>{{ $value->client_first_name }} {{ $value->client_last_name }}</span>
+                                    <span>{{ $value->full_name }}</span>
                                     @if(!empty($value->reference))
                                         [{{ $value->reference }}]
                                     @endif
@@ -372,9 +372,9 @@
                                         {{ $value->code }}
                                     @endif
                                 </td>
-                                <td style="{{ ( $value->service_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_name }}</td>
-                                <td class="text-center" style="{{ ( $value->status == "PENDING" || $value->status == "PENDIENTE" || ( $value->status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ $value->status }}</td>
-                                <td class="text-end" style="{{ ( $value->status == "PENDING" || $value->status == "PENDIENTE" || ( $value->status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($value->total_sales,2) }}</td>
+                                <td style="{{ ( $value->service_type_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_type_name }}</td>
+                                <td class="text-center" style="{{ ( $value->reservation_status == "PENDING" || $value->reservation_status == "PENDIENTE" || ( $value->reservation_status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ $value->reservation_status }}</td>
+                                <td class="text-end" style="{{ ( $value->reservation_status == "PENDING" || $value->reservation_status == "PENDIENTE" || ( $value->reservation_status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($value->total_sales,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">

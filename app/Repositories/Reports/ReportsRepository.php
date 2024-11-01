@@ -1138,7 +1138,7 @@ class ReportsRepository
 
         if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || isset( $request->service_operation ) && !empty( $request->service_operation ) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) ){
             $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
-        }        
+        }
 
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
