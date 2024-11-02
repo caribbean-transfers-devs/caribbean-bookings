@@ -30,7 +30,6 @@ class SaleRepository
             $sale->save();
 
             DB::commit();
-
             return response()->json([
                 'message' => 'Sale created successfully',
                 'success' => true
@@ -53,11 +52,10 @@ class SaleRepository
             $sale->description = $request->description;
             $sale->quantity = $request->quantity;
             $sale->total = $request->total;
-            $sale->call_center_agent_id = $request->call_center_agent_id;
+            // $sale->call_center_agent_id = $request->call_center_agent_id;
             $sale->save();
 
             DB::commit();
-
             return response()->json([
                 'message' => 'Sale updated successfully',
                 'success' => true
@@ -80,6 +78,7 @@ class SaleRepository
             $repo = new ReservationsRepository();
             $repo->create_followUps($reservation->id, 'Venta eliminada por '.auth()->user()->name, 'HISTORY', 'ELIMINACIÓN');
             $sale->delete();
+
             DB::commit();
             return response()->json(['message' => 'Sale deleted successfully'], Response::HTTP_OK);
         } catch (Exception $e) {

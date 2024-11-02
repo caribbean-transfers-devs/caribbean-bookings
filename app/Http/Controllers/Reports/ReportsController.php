@@ -72,5 +72,4 @@ class ReportsController extends Controller
     public function operations(Request $request){
         return $this->ReportsRepository->operations($request);
     }
-
 }

@@ -13,16 +13,16 @@ use App\Models\Vehicle;
 use App\Models\Reservation;
 use App\Models\ReservationsItem;
 use App\Models\Sale;
-use App\Models\ReservationFollowUp;
 use App\Models\Zones;
 use App\Models\Destination;
 use App\Models\DestinationService;
 
 //TRAIT
-use App\Traits\RoleTrait;
 use App\Traits\CodeTrait;
+use App\Traits\RoleTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
+use App\Traits\FollowUpTrait;
 
 //EXCEPTION
 use Exception;
@@ -37,7 +37,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class OperationsController extends Controller
 {
 
-    use CodeTrait, RoleTrait, FiltersTrait, QueryTrait;
+    use CodeTrait, RoleTrait, FiltersTrait, QueryTrait, FollowUpTrait;
 
     public function index(Request $request)
     {
@@ -151,12 +151,7 @@ class OperationsController extends Controller
                     $service->save();
 
                     //CREAMOS UN LOG
-                    $follow_up_db = new ReservationFollowUp;
-                    $follow_up_db->name = auth()->user()->name;
-                    $follow_up_db->text = "Se pre-asigno de (NULL) por ".$preassignment. " al servicio: ".$item->id.", por ".auth()->user()->name;
-                    $follow_up_db->type = 'HISTORY';
-                    $follow_up_db->reservation_id = $item->reservation_id;
-                    $follow_up_db->save();
+                    $this->create_followUps($item->reservation_id, "Se pre-asigno de (NULL) por ".$preassignment. " al servicio: ".$item->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
                 endforeach;
             endif;
 
@@ -310,12 +305,7 @@ class OperationsController extends Controller
             $service->save();
 
             //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Se pre-asigno de (NULL) por ".$preassignment. " al servicio: ".$service->id.", por ".auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $service->reservation_id;
-            $follow_up_db->save();
+            $this->create_followUps($service->reservation_id, "Se pre-asigno de (NULL) por ".$preassignment. " al servicio: ".$service->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
 
             DB::commit();
             return response()->json([
@@ -384,19 +374,9 @@ class OperationsController extends Controller
             $service->save();
 
             //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$service->id.", por ".auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $service->reservation_id;
-            $follow_up_db->save();
+            $this->create_followUps($service->reservation_id, "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$service->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
 
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Actualización de costo operativo por ".$request->value. " al servicio: ".$service->id.", por ".auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $service->reservation_id;
-            $follow_up_db->save();
+            $this->create_followUps($service->reservation_id, "Actualización de costo operativo por ".$request->value. " al servicio: ".$service->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
 
             DB::commit();
             return response()->json([
@@ -459,12 +439,7 @@ class OperationsController extends Controller
             $service->save();            
 
             //CREAMOS UN LOG
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Se asigno al conductor (".( isset($driver_current->names) ? $driver_current->names." ".$driver_current->surnames : "NULL" ).") por ".$driver_new->names." ".$driver_new->surnames. " al servicio: ".$service->id.", por ".auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $service->reservation_id;
-            $follow_up_db->save();
+            $this->create_followUps($service->reservation_id, "Se asigno al conductor (".( isset($driver_current->names) ? $driver_current->names." ".$driver_current->surnames : "NULL" ).") por ".$driver_new->names." ".$driver_new->surnames. " al servicio: ".$service->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
 
             DB::commit();
             return response()->json([
@@ -523,19 +498,9 @@ class OperationsController extends Controller
             endif;
             $service->save();
             
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Actualización de estatus de operación (".$request->operation.") por ".$request->status.", por ".auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $service->reservation_id;
-            $follow_up_db->save();
+            $this->create_followUps($service->reservation_id, "Actualización de estatus de operación (".$request->operation.") por ".$request->status.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
 
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Actualización de hora operación (".$request->operation.") por ".$request->time.", por ".auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $service->reservation_id;
-            $follow_up_db->save();
+            $this->create_followUps($service->reservation_id, "Actualización de hora operación (".$request->operation.") por ".$request->time.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
 
             DB::commit();
             return response()->json([
@@ -587,12 +552,7 @@ class OperationsController extends Controller
             endif;
             $service->save();
             
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Actualización de estatus de reservación (".$request->operation.") por ".$request->status;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $service->reservation_id;
-            $follow_up_db->save();
+            $this->create_followUps($service->reservation_id, "Actualización de estatus de reservación (".$request->operation.") por ".$request->status, 'HISTORY', auth()->user()->name);
 
             DB::commit();
             return response()->json([
@@ -717,12 +677,7 @@ class OperationsController extends Controller
             $reservation->save();
 
             // Creando follow_up
-            $follow_up = new ReservationFollowUp();
-            $follow_up->reservation_id = $reservation->id;
-            $follow_up->name = auth()->user()->name;
-            $follow_up->text = 'SE CAPTURÓ LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES';
-            $follow_up->type = 'HISTORY';
-            $follow_up->save();
+            $this->create_followUps($reservation->id, 'SE CAPTURÓ LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES', 'HISTORY', auth()->user()->name);
 
             $item = new ReservationsItem();
             $item->reservation_id = $reservation->id;
@@ -747,12 +702,7 @@ class OperationsController extends Controller
             $item->updated_at = Carbon::now();
             $item->save();
 
-            $follow_up = new ReservationFollowUp();
-            $follow_up->reservation_id = $reservation->id;
-            $follow_up->name = auth()->user()->name;
-            $follow_up->text = 'SE CREO EL SERVICIO: '.$item->code.' PARA LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES';
-            $follow_up->type = 'HISTORY';
-            $follow_up->save();
+            $this->create_followUps($reservation->id, 'SE CREO EL SERVICIO: '.$item->code.' PARA LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES', 'HISTORY', auth()->user()->name);
 
             // Creando Sale
             $sale = new Sale();
@@ -764,12 +714,7 @@ class OperationsController extends Controller
             $sale->updated_at = Carbon::now();
             $sale->save();
 
-            $follow_up = new ReservationFollowUp();
-            $follow_up->reservation_id = $reservation->id;
-            $follow_up->name = auth()->user()->name;
-            $follow_up->text = 'SE CAPTURO EL MONTO: '.$request->total.' PARA LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES';
-            $follow_up->type = 'HISTORY';
-            $follow_up->save();
+            $this->create_followUps($reservation->id, 'SE CAPTURO EL MONTO: '.$request->total.' PARA LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES', 'HISTORY', auth()->user()->name);
 
             DB::commit();
 
@@ -819,12 +764,7 @@ class OperationsController extends Controller
             endif;
             $service->save();
             
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = auth()->user()->name;
-            $follow_up_db->text = "Se agrego un comentario al servicio: ".$request->code.", por ".auth()->user()->name;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $service->reservation_id;
-            $follow_up_db->save();
+            $this->create_followUps($service->reservation_id, "Se agrego un comentario al servicio: ".$request->code.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
 
             DB::commit();
             return response()->json([
@@ -1123,12 +1063,12 @@ class OperationsController extends Controller
             $flag_preassignment = ( ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ) && $item->op_one_preassignment != "" ? true : ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && ( $item->is_round_trip == 1 ) && $item->op_two_preassignment != "" ? true : false ) );
             $preassignment = ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_preassignment : $item->op_two_preassignment );
 
-            $status_operation = ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_status_operation : $item->op_two_status_operation );
+            $status_operation = ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->one_service_operation_status : $item->two_service_operation_status );
             $time_operation =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_time_operation : $item->op_two_time_operation );
             $cost_operation =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_operating_cost : $item->op_two_operating_cost );
-            $status_booking =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_status : $item->op_two_status );            
+            $status_booking =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->one_service_status : $item->two_service_status );
 
-            $operation_pickup = (($item->operation_type == 'arrival')? $item->op_one_pickup : $item->op_two_pickup );
+            $operation_pickup = (($item->operation_type == 'arrival')? $item->pickup_from : $item->pickup_to );
             $operation_from = (($item->operation_type == 'arrival')? $item->from_name.((!empty($item->flight_number))? ' ('.$item->flight_number.')' :'')  : $item->to_name );
             $operation_to = (($item->operation_type == 'arrival')? $item->to_name : $item->from_name );
             $vehicle_d = ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? Vehicle::find($item->vehicle_id_one) : Vehicle::find($item->vehicle_id_two) );
@@ -1138,7 +1078,7 @@ class OperationsController extends Controller
             $sheet->setCellValue('A'.strval($count), ( $preassignment != "" ? $preassignment : "ADD" ));
             $sheet->setCellValue('B'.strval($count), $item->code);
             $sheet->setCellValue('C'.strval($count), date("H:i", strtotime($operation_pickup)));
-            $sheet->setCellValue('D'.strval($count), $item->client_first_name.' '.$item->client_last_name);
+            $sheet->setCellValue('D'.strval($count), $item->full_name);
             $sheet->setCellValue('E'.strval($count), $item->final_service_type);
             $sheet->setCellValue('F'.strval($count), $item->reference);
             $sheet->setCellValue('G'.strval($count), $item->passengers);
@@ -1151,8 +1091,8 @@ class OperationsController extends Controller
             $sheet->setCellValue('N'.strval($count), ( $time_operation != NULL )  ? date("H:i", strtotime($time_operation)) : $time_operation);
             $sheet->setCellValue('O'.strval($count), $cost_operation);
             $sheet->setCellValue('P'.strval($count), $status_booking);
-            $sheet->setCellValue('Q'.strval($count), $item->service_name);
-            $sheet->setCellValue('R'.strval($count), $item->status);
+            $sheet->setCellValue('Q'.strval($count), $item->service_type_name);
+            $sheet->setCellValue('R'.strval($count), $item->reservation_status);
             $sheet->setCellValue('S'.strval($count), number_format(( $item->is_round_trip == 1 ? ( $payment / 2 ) : $payment ),2));
             $sheet->setCellValue('T'.strval($count), $item->currency);
             $sheet->setCellValue('U'.strval($count), ( !empty($item->payment_type_name) ? $item->payment_type_name : "PENDIENTE DE PAGO" ));
@@ -1182,6 +1122,7 @@ class OperationsController extends Controller
         ];
 
         $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
+        //  
 
         // Crear una nueva hoja de cálculo
         $spreadsheet = new Spreadsheet();
@@ -1208,18 +1149,16 @@ class OperationsController extends Controller
         $count = 2;
 
         foreach( $items as $key => $item ){
-            // $payment = ( $item->total_sales - $item->total_payments );
-            // if($payment < 0) $payment = 0;
             $payment = ( $item->site_id == 21 ? ( $item->currency == "USD" ? ( $item->total_sales * 16 ) : $item->total_sales ) : $item->total_sales );
 
             $preassignment = ( ( $item->final_service_type == 'ARRIVAL' ) || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_preassignment : $item->op_two_preassignment );
 
-            $status_operation = ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_status_operation : $item->op_two_status_operation );
+            $status_operation = ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->one_service_operation_status : $item->two_service_operation_status );
             $time_operation =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_time_operation : $item->op_two_time_operation );
             $cost_operation =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_operating_cost : $item->op_two_operating_cost );
-            $status_booking =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->op_one_status : $item->op_two_status );            
+            $status_booking =   ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? $item->one_service_status : $item->two_service_status );            
 
-            $operation_pickup = (($item->operation_type == 'arrival')? $item->op_one_pickup : $item->op_two_pickup );
+            $operation_pickup = (($item->operation_type == 'arrival')? $item->pickup_from : $item->pickup_to );
             $operation_from = (($item->operation_type == 'arrival')? $item->from_name.((!empty($item->flight_number))? ' ('.$item->flight_number.')' :'')  : $item->to_name );
             $operation_to = (($item->operation_type == 'arrival')? $item->to_name : $item->from_name );
             $vehicle_d = ( ($item->final_service_type == 'ARRIVAL') || ( ( $item->final_service_type == 'TRANSFER' || $item->final_service_type == 'DEPARTURE' ) && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ) ? Vehicle::find($item->vehicle_id_one) : Vehicle::find($item->vehicle_id_two) );
@@ -1229,7 +1168,7 @@ class OperationsController extends Controller
 
             $sheet->setCellValue('A'.strval($count), ( $preassignment != "" ? $preassignment : "ADD" ));
             $sheet->setCellValue('B'.strval($count), date("H:i", strtotime($operation_pickup)));
-            $sheet->setCellValue('C'.strval($count), $item->client_first_name.' '.$item->client_last_name);
+            $sheet->setCellValue('C'.strval($count), $item->full_name);
             $sheet->setCellValue('D'.strval($count), $item->final_service_type);
             $sheet->setCellValue('E'.strval($count), $item->reference);
             $sheet->setCellValue('F'.strval($count), $item->passengers);
