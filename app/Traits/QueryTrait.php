@@ -290,12 +290,16 @@ trait QueryTrait
                                 LEFT OUTER JOIN destination_services as d_two ON d_two.id = vehicle_two.destination_service_id
                                 LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                 LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
-                                LEFT OUTER JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND rfu.type IN ('CLIENT', 'OPERATION')
 
                                 LEFT OUTER JOIN (
                                     SELECT DISTINCT reservation_id
                                     FROM reservations_media
                                 ) as upload ON upload.reservation_id = rez.id
+                                LEFT OUTER JOIN (
+                                    SELECT DISTINCT reservation_id
+                                    FROM reservations_follow_up
+                                    WHERE type IN ('CLIENT', 'OPERATION')
+                                ) as rfu ON rfu.reservation_id = rez.id                                
                                 LEFT JOIN (
                                         SELECT
                                             it.reservation_id,
@@ -323,7 +327,7 @@ trait QueryTrait
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryOne}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, it_counter.quantity {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity {$queryHaving}
 
                             UNION
 
@@ -453,12 +457,16 @@ trait QueryTrait
                                 LEFT OUTER JOIN destination_services as d_two ON d_two.id = vehicle_two.destination_service_id
                                 LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                 LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
-                                LEFT OUTER JOIN reservations_follow_up as rfu ON rfu.reservation_id = rez.id AND rfu.type IN ('CLIENT', 'OPERATION')
 
                                 LEFT OUTER JOIN (
                                     SELECT DISTINCT reservation_id
                                     FROM reservations_media
                                 ) as upload ON upload.reservation_id = rez.id
+                                LEFT OUTER JOIN (
+                                    SELECT DISTINCT reservation_id
+                                    FROM reservations_follow_up
+                                    WHERE type IN ('CLIENT', 'OPERATION')
+                                ) as rfu ON rfu.reservation_id = rez.id
                                 LEFT JOIN (
                                         SELECT
                                             it.reservation_id,
@@ -485,7 +493,7 @@ trait QueryTrait
                                         GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryTwo}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, it_counter.quantity {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity {$queryHaving}
                             ORDER BY filtered_date ASC ",[
                                 "init_date_one" => $queryData['init'],
                                 "init_date_two" => $queryData['end'],

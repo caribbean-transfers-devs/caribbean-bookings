@@ -72,4 +72,8 @@ class ReportsController extends Controller
     public function operations(Request $request){
         return $this->ReportsRepository->operations($request);
     }
+
+    public function conciliation(Request $request){
+        return $this->ReportsRepository->conciliation($request);
+    }
 }

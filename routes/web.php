@@ -69,6 +69,9 @@ Route::group(['middleware' => ['auth']], function () {
         //OPERACIONES
         Route::get('/reports/operations', [ReportsController::class, 'operations'])->name('reports.operations');
         Route::post('/reports/operations', [ReportsController::class, 'operations'])->name('reports.operations.action');
+        //PAGOS
+        Route::get('/reports/conciliation', [ReportsController::class, 'conciliation'])->name('reports.conciliation');
+        Route::post('/reports/conciliation', [ReportsController::class, 'conciliation'])->name('reports.conciliation.action');
 
     //GESTION
         //CONFIRMACIONES
@@ -101,8 +104,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/operation/preassignment', [Operations::class, 'preassignment'])->name('operation.preassignment');
         Route::post('/operation/capture/service', [Operations::class, 'createService'])->name('operation.capture.service');
         Route::get('/operation/board/exportExcel', [Operations::class, 'exportExcelBoard'])->name('operation.board.exportExcel');
-        Route::get('/operation/board/exportExcelCommission', [Operations::class, 'exportExcelBoardCommision'])->name('operation.board.exportExcelComission');        
-
+        Route::get('/operation/board/exportExcelCommission', [Operations::class, 'exportExcelBoardCommision'])->name('operation.board.exportExcelComission');
 
     
     Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');

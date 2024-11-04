@@ -375,6 +375,9 @@
                         @if(sizeof($operations) >= 1)
                             @foreach ($operations as $operation)
                                 @php
+                                    // if ($operation->reservation_id == 38697) {
+                                    //     dump($operation);
+                                    // }
                                     //ESTATUS
                                     if (!isset( $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")] ) ){
                                         $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")] = [
