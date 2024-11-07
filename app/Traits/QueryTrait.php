@@ -502,7 +502,23 @@ trait QueryTrait
                             ]);
     }
 
+    // CREATE INDEX `status_index` ON payments (`status`);
+    // CREATE INDEX `payment_method_index` ON payments (`payment_method`);
+    // CREATE INDEX `is_conciliated_index` ON payments (`is_conciliated`);
+    // public function getPayPalPayments(){
+    //    return DB::select("SELECT *
+    //                         FROM payments AS p
+    //                         WHERE p.payment_method = 'PAYPAL' AND p.status = 0 AND p.is_conciliated = 0 LIMIT 10");
+    // }
+
+    public function getPayPalPayments($offset, $limit) {
+        return DB::select("SELECT *
+                            FROM payments AS p
+                            WHERE p.payment_method = 'PAYPAL' AND p.status = 0 AND p.is_conciliated = 0
+                            LIMIT ?, ?", [$offset, $limit]);
+    }    
+
     private function orderByDateTime($a, $b) {
         return strtotime($b->created_at) - strtotime($a->created_at);
-    }
+    }    
 }

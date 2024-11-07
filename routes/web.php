@@ -22,6 +22,8 @@ use App\Http\Controllers\Enterprise\EnterpriseController;
 use App\Http\Controllers\Vehicle\VehicleController;
 use App\Http\Controllers\Driver\DriverController;
 
+use App\Http\Controllers\Accounting\ConciliationController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -42,6 +44,9 @@ Route::middleware(['guest'])->group(function () {
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    //BOTS 
+    Route::get('/bot/conciliation/paypal', [ConciliationController::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
 
     //REPORTES
         //PAGOS

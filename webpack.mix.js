@@ -43,6 +43,8 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
         mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resources/plugins/font-icons/fontawesome/css/fontawesome.css'], data.assets + '/css/panel/panel.min.css');//panel styles
         // mix.styles(['resources/plugins/font-icons/material/css/material.css','resources/plugins/font-icons/material/css/materialicon.css'], data.assets + '/css/panel/material.min.css');//panel styles
         mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
+        mix.sass('resources/scss/error.scss', data.assets + "css/panel/error.min.css");//error styles
+
 
         mix.sass('resources/scss/sections/tpv.scss', data.assets + "css/sections/tpv.min.css"); //TPV
         mix.sass('resources/scss/sections/reservation_details.scss', data.assets + "css/sections/reservation_details.min.css"); //RESERVATION DETAILS

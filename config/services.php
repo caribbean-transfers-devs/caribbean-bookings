@@ -43,6 +43,11 @@ return [
         'key' => env('MAILJET_KEY'),
         'secret' => env('MAILJET_SECRET'),
     ],
+    'paypal' => [
+        'apiUrl' => env('PAYPAL_API_URL'),
+        'clientID' => env('PAYPAL_CLIENT_ID'),
+        'secretKey' => env('PAYPAL_CLIENT_SECRET'),
+    ],    
     'digital_ocean' => [
         'key' => env('DO_SPACES_KEY'),
         'secret' => env('DO_SPACES_SECRET'),

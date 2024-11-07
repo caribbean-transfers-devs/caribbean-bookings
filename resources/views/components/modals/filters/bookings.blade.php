@@ -12,18 +12,62 @@
             <form class="form" action="" method="POST" id="formSearch">
                 <div class="modal-body">
                     @csrf
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-12">
-                            <label class="form-label" for="lookup_date">Fecha de creación</label>
-                            <input type="text" name="date" id="lookup_date" class="form-control mb-3" value="{{ $data['init'] }} - {{ $data['end'] }}">
-                        </div>
-
-                        @if ( isset($isSearch) )
-                            <div class="col-lg-4 col-md-6 col-12">
-                                <label class="form-label" for="filter_text">/#/Nombre/Correo/Teléfono/Referencia</label>
-                                <input type="text" name="filter_text" id="filter_text" class="form-control mb-3" value="{{ trim($data['filter_text']) }}">
+                    <div class="top">
+                        <div class="item">
+                            <div class="box_input transparent">
+                                <svg width="24" height="24"><use xlink:href="/assets/img/icons/icons.svg#calendar"></use></svg>
+                                <div class="input">
+                                    <label for="lookup_date">Fecha De Creación:</label>
+                                    <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $data['init'] }} - {{ $data['end'] }}">
+                                </div>
+                                <svg width="24" height="24"><use xlink:href="/assets/img/icons/icons.svg#calendar"></use></svg>
                             </div>
-                        @endif
+                        </div>
+                        <div class="item">                            
+                            @if ( isset($isSearch) )
+                                <div class="box_input">
+                                    <svg width="24" height="24"><use xlink:href="/assets/img/icons/icons.svg#calendar"></use></svg>
+                                    <div class="input">
+                                        <label class="form-label" for="filter_text">/#/Nombre/Correo/Teléfono/Referencia</label>
+                                        <input type="text" name="filter_text" id="filter_text" class="form-control mb-3" value="{{ trim($data['filter_text']) }}">
+                                    </div>
+                                </div>
+                            @endif
+                            <div class="box_input">
+
+                            </div>
+                        </div>
+                        <div class="item">
+
+                        </div>                        
+                    </div>
+                    <div class="bottom">
+
+                    </div>
+                    {{-- <div class="filters-row">
+                        <div class="filter-group">
+                            <input type="text" placeholder="Fecha De Creación: 22 - 03 - 2024 / 25 - 03 - 2024" class="date-input">
+                        </div>
+                        <div class="filter-group">
+                            <input type="text" placeholder="Search By: #/Nombre/Correo/Telefono/Referencia" class="search-input">
+                            <select>
+                                <option>Tipo De Servicio</option>
+                            </select>
+                        </div>
+                        <div class="filter-group checkbox-group">
+                            <label><input type="checkbox" checked> Operadas Hoy</label>
+                            <label><input type="checkbox"> Reservas Duplicadas</label>
+                        </div>
+                        <div class="filter-group">
+                            <select>
+                                <option>Moneda De Reservacion: MXN</option>
+                            </select>
+                        </div>
+                    </div> --}}
+                    <div class="row">
+
+
+       
 
                         @if ( isset($services) && !empty($services) )
                             <div class="col-lg-4 col-md-6 col-12">

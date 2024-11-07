@@ -152,7 +152,7 @@
                             @foreach($operations as $key => $operation)
                                 @php
                                     // dump($value);
-                                    if(!isset($users[Str::slug($operation->employee)])):
+                                    if( !isset($users[Str::slug($operation->employee)]) ):
                                         $users[Str::slug($operation->employee)] = [
                                             'NAME' => ( !empty($operation->employee) ? $operation->employee : "NO DEFINIDO" ),
                                             'TOTAL' => 0,
