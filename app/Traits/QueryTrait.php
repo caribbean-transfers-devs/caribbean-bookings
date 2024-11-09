@@ -274,10 +274,10 @@ trait QueryTrait
                                 CASE 
                                     WHEN it_counter.quantity > 0 THEN COALESCE(SUM(s.total_sales), 0) / it_counter.quantity
                                     ELSE 0
-                                END AS cost                                
+                                END AS cost
                             FROM reservations_items as it
-                                INNER JOIN reservations as rez ON rez.id = it.reservation_id                                
-                                INNER JOIN sites as site ON site.id = rez.site_id                                                                                                
+                                INNER JOIN reservations as rez ON rez.id = it.reservation_id
+                                INNER JOIN sites as site ON site.id = rez.site_id
                                 INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                 INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
                                 INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
@@ -444,9 +444,9 @@ trait QueryTrait
                                 END AS cost                                
                             FROM reservations_items as it
                                 INNER JOIN reservations as rez ON rez.id = it.reservation_id
-                                INNER JOIN sites as site ON site.id = rez.site_id                                                                                                
+                                INNER JOIN sites as site ON site.id = rez.site_id
                                 INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
-                                INNER JOIN zones as zone_two ON zone_two.id = it.to_zone                                
+                                INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
                                 INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
                                 LEFT OUTER JOIN users as us ON us.id = rez.call_center_agent_id
                                 LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id

@@ -93,7 +93,7 @@
                 'attr' => array(
                     'data-title' =>  "Tabla de comisiones",
                     'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#commissionsModal',                    
+                    'data-bs-target' => '#commissionsModal',
                 )
             ),            
             array(
@@ -151,7 +151,9 @@
                         @if(sizeof($operations) >= 1)
                             @foreach($operations as $key => $operation)
                                 @php
-                                    // dump($value);
+                                    // if( $operation->reservation_id == 37525 ){
+                                    //     dump($operation);
+                                    // }
                                     if( !isset($users[Str::slug($operation->employee)]) ):
                                         $users[Str::slug($operation->employee)] = [
                                             'NAME' => ( !empty($operation->employee) ? $operation->employee : "NO DEFINIDO" ),
@@ -166,14 +168,15 @@
                                     endif;
                                     $users[Str::slug($operation->employee)]['TOTAL'] += ( $operation->currency == "USD" ? ($operation->total_sales * $exchange_rate) : $operation->total_sales );
                                     $users[Str::slug($operation->employee)][$operation->currency] += $operation->total_sales;
+
                                     if( $operation->reservation_status == "CONFIRMED" && OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" && ( OperationTrait::operationStatus($operation) == "OK" || OperationTrait::operationStatus($operation) == "PENDING" ) ){
                                         $users[Str::slug($operation->employee)]['TOTAL_CONFIRMED'] += ( $operation->currency == "USD" ? ($operation->cost * $exchange_rate) : $operation->cost );
+                                        $users[Str::slug($operation->employee)]['QUANTITY']++;
                                     }
                                     if( ( $operation->reservation_status == "PENDING" || $operation->reservation_status == "CONFIRMED" ) && OperationTrait::serviceStatus($operation, "no_translate") == "PENDING"  ){
                                         $users[Str::slug($operation->employee)]['TOTAL_PENDING'] += ( $operation->currency == "USD" ? ($operation->cost * $exchange_rate) : $operation->cost );
                                     }
-                                    if( !in_array($operation->reservation_id, $users[Str::slug($operation->employee)]['BOOKINGS']) ){
-                                        $users[Str::slug($operation->employee)]['QUANTITY']++;
+                                    if( !in_array($operation->reservation_id, $users[Str::slug($operation->employee)]['BOOKINGS']) ){                                     
                                         array_push($users[Str::slug($operation->employee)]['BOOKINGS'], $operation->reservation_id);                                        
                                     }                                    
                                 @endphp
