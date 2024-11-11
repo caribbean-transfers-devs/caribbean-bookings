@@ -351,9 +351,11 @@ const __btn_close_operation = document.getElementById('btn_close_operation') //*
 const __btn_update_status_operations = document.querySelectorAll('.btn_update_status_operation');
 const __btn_update_status_bookings = document.querySelectorAll('.btn_update_status_booking');
 
-const __copy_whatsapp = document.querySelector('.copy_whatsapp');
+const __copy_whatsapp = document.querySelector('.copy_whatsapp'); //* ===== BUTTON TO COPY THE CONTENT THAT WILL BE SENT BY WHATSAPP ===== */
 const __copy_history = document.querySelector('.copy_history');
 const __copy_data_customer = document.querySelector('.copy_data_customer');
+const __copy_confirmation = document.querySelector('.copy_confirmation'); //* ===== BUTTON TO COPY CONFIRMATION CONTENT ===== */
+const __send_confirmation_whatsapp = document.querySelector('.send_confirmation_whatsapp'); //* ===== BUTTON TO COPY CONFIRMATION CONTENT ===== */
 
 //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
 const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhost:4000': 'https://socket-caribbean-transfers.up.railway.app' );
@@ -578,6 +580,34 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
 
     // let text = "https://api.whatsapp.com/send?phone=5219982127069&text=" + decodeURIComponent(message);
     // window.location.href = text;
+});
+
+//FUNCIONADA PARA EXTRACION DE INFORMACION DE DATOS DE CONFIRMACION PARA ENVIAR POR WHATSAPP
+$('#zero-config').on('click', '.extract_confirmation', function() {
+    const  __language = this.dataset.language;
+    const  __terminal1 = document.getElementById('terminal1');
+    const  __terminal2 = document.getElementById('terminal2');
+    const  __terminal3 = document.getElementById('terminal3');
+
+    console.log(__language);    
+
+    let __message_terminal1 = ( __language == "es" ? "<p>Bienvenidos a Cancun1 Gracias por elegir Caribbean Transfers como su medio de transporte. Para asegurar una experiencia de abordaje rápida y eficiente, le pedimos amablemente que nos envíe una foto tipo selfie de usted y de sus acompañantes. Esto permitirá que nuestro conductor lo reconozca fácilmente al momento de su llegada.</p> \n <p>Cuando tengan listo su equipaje los esperamos en el welcome barafuera de la terminal</p> \n " : "<p>Welcome to Cancun1 Thank you for choosing Caribbean Transfers as your transportation provider. To ensure a fast and efficient boarding experience, we kindly ask you to send us a selfie photo of you and your companions. This will allow our driver to easily recognize you upon arrival.</p> \n <p>When you have your bags ready. we will wait for you at the Margarita ville restaurant, out side of the terminal</p> \n " );
+    let __message_terminal2 = ( __language == "es" ? "<p>Bienvenidos a Cancun2 Gracias por elegir Caribbean Transfers como su medio de transporte. Para asegurar una experiencia de abordaje rápida y eficiente, le pedimos amablemente que nos envíe una foto tipo selfie de usted y de sus acompañantes. Esto permitirá que nuestro conductor lo reconozca fácilmente al momento de su llegada.</p> \n <p>Cuando tengan listo su equipaje los esperamos en el welcome barafuera de la terminal</p> \n " : "<p>Welcome to Cancun2 Thank you for choosing Caribbean Transfers as your transportation provider. To ensure a fast and efficient boarding experience, we kindly ask you to send us a selfie photo of you and your companions. This will allow our driver to easily recognize you upon arrival.</p> \n <p>When you have your bags ready. we will wait for you at the Margarita ville restaurant, out side of the terminal</p> \n " );
+    let __message_terminal3 = ( __language == "es" ? "<p>Bienvenidos a Cancun3 Gracias por elegir Caribbean Transfers como su medio de transporte. Para asegurar una experiencia de abordaje rápida y eficiente, le pedimos amablemente que nos envíe una foto tipo selfie de usted y de sus acompañantes. Esto permitirá que nuestro conductor lo reconozca fácilmente al momento de su llegada.</p> \n <p>Cuando tengan listo su equipaje los esperamos en el welcome barafuera de la terminal</p> \n " : "<p>Welcome to Cancun3 Thank you for choosing Caribbean Transfers as your transportation provider. To ensure a fast and efficient boarding experience, we kindly ask you to send us a selfie photo of you and your companions. This will allow our driver to easily recognize you upon arrival.</p> \n <p>When you have your bags ready. we will wait for you at the Margarita ville restaurant, out side of the terminal</p> \n " );
+
+    // Obtener la fila en la que se encuentra el botón
+    var fila = $(this).closest('tr');
+
+    // Extraer la información de las celdas de la fila
+    let identificator = ( fila.find('td').eq(0).find('button').text() == "ADD" ? "NO DEFINIDO" : fila.find('td').eq(0).find('button').text() );
+
+    __message_terminal1 += "<p>" + identificator + "</p>";
+    __message_terminal2 += "<p>" + identificator + "</p>";
+    __message_terminal3 += "<p>" + identificator + "</p>";
+
+    __terminal1.innerHTML = __message_terminal1;
+    __terminal2.innerHTML = __message_terminal2;
+    __terminal3.innerHTML = __message_terminal3;
 });
 
 //ABRE EL MODAL PARA PODER AGREGAR UN NUEVO SERVICIO
@@ -1064,6 +1094,50 @@ if ( __copy_data_customer != null ) {
             console.error('No se pudo copiar el contenido: ', err);
         });
     });    
+}
+
+if ( __copy_confirmation != null ){
+    __copy_confirmation.addEventListener('click', function(){
+        const __tab_pane = document.querySelector("#confirmationModal .tab-pane.active");
+
+        // Obtiene el div por su ID
+        const __wrapper = document.getElementById(__tab_pane.dataset.code)
+        // Obtiene el contenido del div y elimina los espacios
+        // var contenido = div.textContent.replace(/\s+/g, '');  
+        var contenido = __wrapper.textContent;
+        // Usa la API del portapapeles para copiar el contenido
+        navigator.clipboard.writeText(contenido).then(function() {
+            // Notifica al usuario que el contenido se ha copiado
+            // alert('Contenido copiado: ' + contenido);
+            window.open(url, "_blank");
+        }, function(err) {
+            // Notifica al usuario en caso de error
+            console.error('No se pudo copiar el contenido: ', err);
+        });
+    });
+}
+
+if ( __send_confirmation_whatsapp != null ){
+    __send_confirmation_whatsapp.addEventListener('click', function(){
+        const __tab_pane = document.querySelector("#confirmationModal .tab-pane.active");
+
+        // Obtiene el div por su ID
+        const __wrapper = document.getElementById(__tab_pane.dataset.code)
+        // Obtiene el contenido del div y elimina los espacios
+        // var contenido = div.textContent.replace(/\s+/g, '');  
+        var contenido = __wrapper.textContent;
+        // Usa la API del portapapeles para copiar el contenido
+        navigator.clipboard.writeText(contenido).then(function() {
+            // Notifica al usuario que el contenido se ha copiado
+            // alert('Contenido copiado: ' + contenido);
+            let url = "https://api.whatsapp.com/send?phone=5219982127069&text=" + decodeURIComponent(contenido);
+            // window.location.href = text;
+            window.open(url, "_blank");
+        }, function(err) {
+            // Notifica al usuario en caso de error
+            console.error('No se pudo copiar el contenido: ', err);
+        });
+    });
 }
 
 //FUNCIONALIDAD QUE RECARGA LA PAGINA, CUANDO ESTA DETACTA INACTIVIDAD POR 5 MINUTOS

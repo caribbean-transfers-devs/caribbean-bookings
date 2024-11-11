@@ -384,6 +384,11 @@
                                         <div class="btn btn-primary btn_operations extract_whatsapp bs-tooltip" title="Ver información para enviar por whatsApp" id="extract_whatsapp{{ $key.$value->id }}" data-bs-toggle="modal" data-bs-target="#operationWhatsAppModal">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-navigation"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
                                         </div>
+                                        @if ( $value->final_service_type == "ARRIVAL" )
+                                            <div class="btn btn-primary btn_operations extract_confirmation bs-tooltip" title="Ver información de confirmación" id="extract_confirmation{{ $key.$value->id }}" data-bs-toggle="modal" data-language="{{ $value->language }}" data-bs-target="#confirmationModal">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-navigation"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                                            </div>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -399,5 +404,6 @@
     <x-modals.reservations.comments />
     <x-modals.reservations.operation_messages_history />
     <x-modals.reservations.operation_data_customer />
+    <x-modals.reservations.operation_confirmations />
     <x-modals.reservations.operation_data_whatsapp />
 @endsection
