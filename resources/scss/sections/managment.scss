@@ -13,142 +13,147 @@
 @import '../template/light/widgets/_widgets/widget-chart-three';
 @import '../template/dark/widgets/_widgets/widget-chart-three';
 
-// #filterModal{
-//     .modal-content{
-//         background-color: #fafbfc;
-//         font-family: Arial, sans-serif;
+#filterModal{
+    .modal-content{
+        background-color: #fafbfc;
+        font-family: Arial, sans-serif;
 
-//         .modal-header{
-//             h5{
-//                 color: #425466;                
-//                 font-family: Arial, sans-serif;
-//                 font-size: 18px;
-//                 font-weight: 700;
-//                 line-height: 24.15px;
-//                 letter-spacing: 0;
-//             }
-//         }
+        .modal-header{
+            h5{
+                color: #425466;                
+                font-family: Arial, sans-serif;
+                font-size: 18px;
+                font-weight: 700;
+                line-height: 24.15px;
+                letter-spacing: 0;
+            }
+        }
 
-//         form{
-//             background-color: #ffffff;
-//         }
+        form{
+            background-color: #ffffff;
+        }
 
-//         .modal-body{
-//             padding: 0;
-//             display: flex;
-//             flex-direction: column;
+        .modal-body{
+            padding: 0;
+            display: flex;
+            flex-direction: column;
 
-//             .top{
-//                 padding: 1.313rem 1.313rem 2.125rem;
-//             }
+            .top{
+                padding: 1.313rem 1.313rem 2.125rem;
+                border-bottom: 1px solid #CCD6EB;
+            }
 
-//             .top, .bottom{
-//                 display: flex;
-//                 flex-direction: column;
-//                 gap: 21px;                
+            .bottom{
+                padding: 2.125rem 1.313rem 1.313rem;
+            }
 
-//                 .item{
-//                     display: flex;
+            .top, .bottom{
+                display: flex;
+                flex-direction: column;
+                gap: 21px;
+                
+                .bootstrap-select{
+                    .dropdown-toggle{
+                        padding: 16px;
+                    }
+                }
 
-//                     &:first-child{
-//                         justify-content: end;
-//                     }
-//                 }
+                .item{
+                    display: flex;
 
-//                 .form-control {
-//                     -webkit-appearance: none;
-//                     -moz-appearance: none;
-//                     appearance: none;
-//                     background-clip: padding-box;
-//                     background-color: #fff;
-//                     border: 1px solid #ced4da;
-//                     border-radius: .25rem;
-//                     color: #212529;
-//                     display: block;
-//                     font-size: 1rem;
-//                     font-weight: 400;
-//                     line-height: 1.5;
-//                     padding: .375rem .75rem;
-//                 }
+                    &:first-child{
+                        justify-content: end;
+                    }
 
-//                 .box_input{
-//                     display: grid;
-//                     grid-template-columns: 25px 1fr 25px;
-//                     align-items: center;
-//                     padding: 5px;
+                    &:nth-child(2){
+                        display: grid;
+                        grid-template-columns: 1fr 287px;
+                        grid-gap: 10px;
+                    }
+                }
 
-//                     .input{
-//                         display: flex;
-//                         flex-direction: row;
-//                         gap: 5px;
+                .form-control {
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                    appearance: none;
+                    background-clip: padding-box;
+                    background-color: #fff;
+                }
 
-//                         label, .form-control{                            
-//                             color: #425466;                                                      
-//                             font-size: 14px;
-//                             outline: none;
-//                             margin: 0;
-//                         }
-//                     }
+                .box_input{
+                    display: grid;
+                    grid-template-columns: 25px 1fr 25px;
+                    align-items: center;
+                    padding: 5px;
+                    border-radius: 8px;
 
-//                     &.transparent{
-//                         padding: 0;
-//                         border: 0;
-//                         grid-gap: 5px;
+                    .input{
+                        display: flex;
+                        flex-direction: row;
+                        gap: 5px;
 
-//                         .input{
-//                             display: grid;
-//                             grid-template-columns: 144px 1fr;
-//                             grid-gap: 5px;
-//                             align-items: center;
+                        label, .form-control, .form-control::placeholder{
+                            color: #425466;                                                      
+                            font-size: 14px;
+                            outline: none;
+                            margin: 0;
+                        }
 
-//                             label, .form-control{
-//                                 line-height: 19.55px;
-//                                 border: 0;
-//                                 padding: 0;
-//                             }
+                        .form-control::placeholder{
+                            font-family: Arial, sans-serif;
+                            font-weight: 400;
+                            color: rgba(66, 84, 102, 0.55);
+                        }
+                    }
 
-//                             label{
-//                                 font-weight: 400; 
-//                             }
+                    &.transparent, &.transparent_border{
+                        padding: 0;
+                        border: 0;
+                        grid-gap: 5px;
 
-//                             .form-control{
-//                                 font-weight: 700;
-//                                 text-align: center;
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
+                        .input{
+                            display: grid;
+                            grid-template-columns: 144px 1fr;
+                            grid-gap: 5px;
+                            align-items: center;
 
+                            label, .form-control, .form-control::placeholder{
+                                line-height: 19.55px;
+                                border: 0;
+                                padding: 0;
+                            }
 
-//             .filters-row {
-//                 display: flex;
-//                 flex-wrap: wrap;
-//                 gap: 0.5rem;
-//                 margin-bottom: 1rem;
+                            label{
+                                font-weight: 400; 
+                            }
 
-//                 .filter-group {
-//                     flex: 1;
-//                     display: flex;
-//                     align-items: center;
+                            .form-control{
+                                font-weight: 700;
+                                text-align: center;
+                            }
+                        }
+                    }
 
-//                     .date-input, .search-input, select {
-//                         width: 100%;
-//                         padding: 0.5rem;
-//                         border: 1px solid #ddd;
-//                         border-radius: 4px;
-//                     }
+                    &.transparent_border{
+                        grid-template-columns: 25px 1fr;
+                        grid-gap: 10px;
+                        border: 1px solid #CCD6EB;
+                        padding: 16px;                        
 
-//                     &.checkbox-group {
-//                         display: flex;
-//                         align-items: center;
-//                         gap: 0.5rem;
-//                     }
-//                 }                
-//             }            
-//         }
-//     }
-// }
+                        .input{
+                            grid-template-columns: 84px 1fr;
+                            grid-gap: 10px;
+
+                            .form-control{
+                                text-align: left;
+                            }
+                        }
+                    }                    
+                }
+            }
+        }
+    }
+}
 
 table.dataTable thead {
     border-bottom: 1px solid #000;  /* Borde inferior para separar del body */
