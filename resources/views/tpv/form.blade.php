@@ -90,7 +90,7 @@
                     <select class="form-control" id="formSite" name="site_id">
                         @if (isset( $sites ) && sizeof($sites) >= 1)
                             @foreach ($sites as $item)
-                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                <option value="{{ $item->id }}" data-type="{{ $item->type_site }}">{{ $item->name }}</option>
                             @endforeach
                         @endif
                     </select>

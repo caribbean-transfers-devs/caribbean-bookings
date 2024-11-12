@@ -60,7 +60,7 @@ let setup = {
           console.error('Error:', error);
       });
   },
-  makeItems: function(data, element){    
+  makeItems: function(data, element){
 
     const finalElement = document.getElementById(element);
           finalElement.innerHTML = '';
@@ -151,7 +151,7 @@ let setup = {
             toLng[0].value = data.geo.lng;
     }
   },
-  saveHotel: function(element, data){      
+  saveHotel: function(element, data){
       let item = {
         name: data.name,
         address: data.address,
@@ -324,7 +324,11 @@ $(document).on("change", "#formSite", function() {
 
 function actionSite(__site){
   const __reference = document.getElementById('formReference');
-  if( __site.value == "9" || __site.value == "14" || __site.value == "16" ){
+  const selectedOption = __site.options[__site.selectedIndex];
+  // console.log(__site, selectedOption.getAttribute('data-type'));
+  
+  // if( __site.value == "9" || __site.value == "14" || __site.value == "16" ){
+  if( selectedOption.getAttribute('data-type') == "AGENCY" ){
     __reference.removeAttribute('readonly');
   }else{
     __reference.setAttribute('readonly', true);
