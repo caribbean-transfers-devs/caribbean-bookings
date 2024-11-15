@@ -799,8 +799,8 @@ class ReportsRepository
     public function reservations($request)
     {
         $data = [
-            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
-            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
             "filter_text" => NULL,
             "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
             "site" => ( isset($request->site) ? $request->site : 0 ),
@@ -814,10 +814,12 @@ class ReportsRepository
             "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
             "is_commissionable" => ( isset($request->is_commissionable) ? $request->is_commissionable : NULL ),
             "is_pay_at_arrival" => ( isset($request->is_pay_at_arrival) ? $request->is_pay_at_arrival : NULL ),
-            "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),            
+            "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),
             "is_balance" => ( isset($request->is_balance) ? $request->is_balance : NULL ),
-            "is_today" => ( isset($request->is_today) ? $request->is_today : NULL ),
-            "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : NULL ),
+            // "is_today" => ( isset($request->is_today) ? $request->is_today : NULL ),
+            "is_today" => ( isset($request->is_today) ? $request->is_today : 0 ),
+            // "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : NULL ),
+            "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : 0 ),
         ];
         
         //Query DB (2013-2206)
@@ -935,8 +937,9 @@ class ReportsRepository
         }        
 
         //RESERVAS OPERADAS EL MISMO DIA DE SU CREACION
-        if(isset( $request->is_today )){
-            $havingConditions[] = ( $request->is_today == 1 ? ' is_today != 0 ' : ' is_today = 0 ' );
+        if(isset( $request->is_today ) && !empty( $request->is_today )){
+            // $havingConditions[] = ( $request->is_today == 1 ? ' is_today != 0 ' : ' is_today = 0 ' );
+            $havingConditions[] = ' is_today != 0 ';
         }
 
         //TIPO DE SERVICIO
@@ -985,6 +988,7 @@ class ReportsRepository
             'methods' => $this->Methods(),
             'cancellations' => $this->CancellationTypes(),
             'data' => $data,
+            'request' => $request->input(),
         ]);
     }
 
