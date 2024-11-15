@@ -613,7 +613,7 @@
                             @endforeach
                         @endif
                     </tbody>
-                </table>                    
+                </table>
             </div>
         </div>
     </div>
@@ -930,7 +930,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :istoday="1" :isbalance="1" :isduplicated="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :istoday="1" :isbalance="1" :isduplicated="1" :request="$request" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />
 @endsection
