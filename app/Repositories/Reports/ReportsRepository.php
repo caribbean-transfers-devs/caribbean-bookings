@@ -798,6 +798,8 @@ class ReportsRepository
 
     public function reservations($request)
     {
+        ini_set('memory_limit', '-1'); // Sin límite
+
         $data = [
             "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
             "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
@@ -820,9 +822,9 @@ class ReportsRepository
             "is_today" => ( isset($request->is_today) ? $request->is_today : 0 ),
             // "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : NULL ),
             "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : 0 ),
+            "is_agency" => ( isset($request->is_agency) ? $request->is_agency : 0 ),
         ];
         
-        //Query DB (2013-2206)
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end ';
         $havingConditions = []; $query2 = '';
         $queryData = [
@@ -945,10 +947,15 @@ class ReportsRepository
         //TIPO DE SERVICIO
         if(!isset( $request->is_duplicated )){
             $query .= " AND rez.is_duplicated = 0 ";
-        }        
+        }
         if(isset( $request->is_duplicated )){
             $query .= " AND rez.is_duplicated IN (1,0) ";
         }
+
+        //VER AGENCIAS
+        if(!isset( $request->is_agency )){
+            $query .= " AND site.type_site != 'AGENCY' ";
+        }        
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
             $data['filter_text'] = $request->filter_text;
@@ -994,10 +1001,12 @@ class ReportsRepository
 
     public function operations($request)
     {
+        ini_set('memory_limit', '-1'); // Sin límite
+
         $data = [
-            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
-            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
-            "filter_text" => NULL,
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
+            // "filter_text" => NULL,
             "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
             "site" => ( isset($request->site) ? $request->site : 0 ),
             "origin" => ( isset($request->origin) ? $request->origin : NULL ),
@@ -1172,8 +1181,9 @@ class ReportsRepository
             'payment_status' => $this->paymentStatus(),
             'currencies' => $this->Currencies(),
             'methods' => $this->Methods(),
-            'cancellations' => $this->CancellationTypes(),
+            'cancellations' => $this->CancellationTypes(),            
             'data' => $data,
+            'request' => $request->input(),
         ]);
     }
 

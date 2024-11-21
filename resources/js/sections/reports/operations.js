@@ -60,11 +60,8 @@ let operations = {
         //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
         _settings.deferRender = true;
         _settings.responsive = true;
-        _settings.order = [];
+        _settings.order = ['3'];
         _settings.paging = false; // Si no quieres paginación, puedes dejar esto en false
-        // _settings.scrollY = '500px';  // Habilitar scroll vertical
-        // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
-        // _settings.fixedHeader = true;  // Fijar el header  // Habilitar el header fijo        
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
             "sZeroRecords": "No se encontraron resultados",

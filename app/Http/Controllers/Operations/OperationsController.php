@@ -41,6 +41,7 @@ class OperationsController extends Controller
 
     public function index(Request $request)
     {
+        ini_set('memory_limit', '-1'); // Sin límite        
 
         $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
         $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";

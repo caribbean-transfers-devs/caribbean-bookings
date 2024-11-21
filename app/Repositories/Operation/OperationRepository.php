@@ -20,6 +20,8 @@ class OperationRepository
 
     public function reservations($request)
     {
+        ini_set('memory_limit', '-1'); // Sin límite
+
         $data = [
             "init" => ( isset($request->date) ? $request->date : date('Y-m-d') ) . " 00:00:00",
             "end" => ( isset($request->date) ? $request->date : date('Y-m-d') ) . " 23:59:59",
@@ -42,7 +44,6 @@ class OperationRepository
             "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : NULL ),
         ];
         
-        //Query DB (2013-2206)
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end ';
         $havingConditions = []; $query2 = '';
         $queryData = [

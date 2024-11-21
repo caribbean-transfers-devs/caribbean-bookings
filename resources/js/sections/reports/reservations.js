@@ -10,7 +10,7 @@ let bookings = {
         //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
         _settings.deferRender = true;
         _settings.responsive = true;
-        _settings.order = [];
+        _settings.order = ['3'];
         _settings.paging = false; // Si no quieres paginación, puedes dejar esto en false
         _settings.oLanguage = {
             "sProcessing": "Procesando...",

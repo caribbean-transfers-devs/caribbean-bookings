@@ -1,4 +1,4 @@
-@props(['data','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','istoday','isbalance','isduplicated','request'])
+@props(['data','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','istoday','isbalance','isduplicated','isagency','request'])
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -12,6 +12,10 @@
             <form class="form" action="" method="POST" id="formSearch">
                 <div class="modal-body">
                     @csrf
+                    @php
+                        // dump($data);
+                        // dump($request);
+                    @endphp
                     <div class="top">
                         <div class="item">
                             <div class="box_input transparent">
@@ -43,9 +47,9 @@
                                 @endif
                             </div>
                         @endif
-                        @if ( isset($istoday) || isset($isduplicated) || !empty($currencies) )
+                        @if ( isset($istoday) || isset($isduplicated) || isset($isagency) || !empty($currencies) )
                             <div class="item">
-                                @if ( isset($istoday) || isset($isduplicated) )
+                                @if ( isset($istoday) || isset($isduplicated) || isset($isagency) )
                                     <div class="box_check">
                                         @if ( isset($istoday) )
                                             <div class="form-check">
@@ -57,6 +61,12 @@
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" value="{{ isset($data['is_duplicated']) ? $data['is_duplicated'] : 0 }}" name="is_duplicated" id="is_duplicated" {{ !empty($data['is_duplicated']) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="is_duplicated">Reservas Duplicadas</label>
+                                            </div>
+                                        @endif
+                                        @if ( isset($isagency) )
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="{{ isset($data['is_agency']) ? $data['is_agency'] : 0 }}" name="is_agency" id="is_agency" {{ !empty($data['is_agency']) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="is_agency">Ver Agencias</label>
                                             </div>
                                         @endif
                                     </div>

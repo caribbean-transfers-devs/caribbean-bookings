@@ -144,6 +144,10 @@ return [
         // 'store'  => 'redis',
     ],
 
+    'php' => [
+        'memory_limit' => '1024M',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
