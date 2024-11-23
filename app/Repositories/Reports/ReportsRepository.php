@@ -973,6 +973,7 @@ class ReportsRepository
             $query2 = " HAVING " . implode(' AND ', $havingConditions);
         }
 
+        // dd($query, $query2, $queryData);
         $bookings = $this->queryBookings($query, $query2, $queryData);
         
         return view('reports.reservations', [

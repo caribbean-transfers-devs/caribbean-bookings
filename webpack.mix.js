@@ -9,7 +9,6 @@ const data = {
 if (mix.inProduction()) {
     mix.version();     
 }
-// mix.js('resources/js/app.js', 'public/js');
 
 mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css");
 mix.copy('resources/css/base.min.css', data.assets + "css/base/base.min.css");
@@ -52,13 +51,18 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
         mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css"); //DASHBOARD
         mix.sass('resources/scss/sections/dashboard2.scss', data.assets + "css/sections/dashboard2.min.css"); //DASHBOARD
         mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //REPORTS
-
         mix.sass('resources/scss/sections/download.scss', data.assets + "css/sections/download.min.css"); //DOWNLOAD
-        mix.sass('resources/scss/sections/management.scss', data.assets + "css/sections/management.min.css"); //MANAGEMENT
+        mix.sass('resources/scss/sections/management.scss', data.assets + "css/sections/management.min.css"); //MANAGEMENT        
+
+        //STYLES REPORTS
+        mix.sass('resources/scss/sections/_report_reservations.scss', data.assets + "css/sections/report_reservations.min.css"); //RESERVATIONS
+        mix.sass('resources/scss/sections/_report_operations.scss', data.assets + "css/sections/report_operations.min.css"); //OPERATIONS
+
+        //STYLES MANAGEMENT
         mix.sass('resources/scss/sections/confirmation.scss', data.assets + "css/sections/confirmation.min.css"); //CONFIRMATION
         mix.sass('resources/scss/sections/ccform.scss', data.assets + "css/sections/ccform.min.css"); //CCFORM
         mix.sass('resources/scss/sections/spam.scss', data.assets + "css/sections/spam.min.css"); //SPAM
-        mix.sass('resources/scss/sections/operations.scss', data.assets + "css/sections/operations.min.css"); //OPERATIONS
+        mix.sass('resources/scss/sections/operations.scss', data.assets + "css/sections/operations.min.css"); //MANAGEMENT OPERATIONS
 
         mix.sass('resources/scss/sections/zones.scss', data.assets + "css/sections/zones.min.css"); //ZONES
         mix.sass('resources/scss/sections/rates.scss', data.assets + "css/sections/rates.min.css"); //RATES

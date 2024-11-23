@@ -152,104 +152,11 @@
     ];
 @endphp
 @extends('layout.app')
-@section('title') Operaciones @endsection
+@section('title') Reporte De Operaciones @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
-    <style>
-        .__payment_info{
-            cursor: pointer;
-            font-size: 20px;
-        }
-
-        /* Estilo para la capa */
-        .layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #ffffff;
-            color: white;
-            opacity: 0;
-            visibility: hidden;            
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-            z-index: 1000;
-        }
-
-        .layer.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .header-chart,
-        .body-chart{
-            width: 100%;
-            padding: 15px;
-        }
-
-        table.table-chart {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 10px;
-            color: #333;
-            text-align: left;
-            min-width: 400px;
-        }
-        .table-chart thead tr,
-        .table-chart tfoot tr{
-            background-color: #009879;
-            color: white;
-            font-weight: bold;            
-        }
-
-        .table-chart th,
-        .table-chart td {
-            padding: 12px 15px !important;
-            border: 1px solid #ddd;
-        }
-        .table-chart tbody tr:nth-child(even) {
-            background-color: #f3f3f3;
-        }
-
-        /* Hover en las filas */
-        .table-chart tbody tr:hover {
-            background-color: #f1f1f1;
-            cursor: pointer;
-        }
-
-        /* Resaltar la fila seleccionada */
-        .table-chart tbody tr.active-row {
-            font-weight: bold;
-            color: #009879;
-        }
-
-        .gran_total .btn {
-            font-size: 1.5em; /* Tamaño general más grande para el total */
-            color: #000; /* Color negro para el texto */
-        }
-
-        .gran_total .btn strong {
-            font-size: 1em; /* El texto "TOTAL" se mantiene en el mismo tamaño */
-            margin-right: 10px; /* Espacio entre "TOTAL:" y el monto */
-        }
-
-        .gran_total .btn span {
-            display: inline-flex;
-            /* align-items: flex-end; */
-            align-items: flex-start;
-        }
-
-        .gran_total .btn span::after {
-            content: ' MXN'; /* Moneda */
-            font-size: 0.65em; /* Texto más pequeño para la moneda */
-            margin-left: 5px; /* Espacio entre el monto y la moneda */
-            vertical-align: top; /* Alinea la moneda a la parte superior */
-            position: relative;
-            top: -0.2em; /* Ajuste fino para elevar ligeramente la moneda */            
-        }        
-    </style>
+    <link href="{{ mix('/assets/css/sections/report_operations.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/report_operations.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -261,6 +168,17 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="{{ mix('assets/js/sections/reports/operations.min.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const tableContainer = document.querySelector(".table-container");
+            const tableWrapper = document.querySelector(".table-wrapper");
+            
+            // Sincroniza el desplazamiento horizontal entre la tabla y el container
+            tableContainer.addEventListener("scroll", () => {
+                tableWrapper.scrollLeft = tableContainer.scrollLeft;
+            });
+        });        
+    </script>
     <script>
         document.getElementById('showLayer').addEventListener('click', function() {
             document.getElementById('layer').classList.add('active');
@@ -328,204 +246,66 @@
                         </ul>
                     </div>
                 @endif
-                <table id="dataOperations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
-                    <thead>
-                        <tr>
-                            <th class="text-center">ID</th>
-                            <th class="text-center">TIPO DE SERVICIO</th>
-                            <th class="text-center">CÓDIGO</th>
-                            <th class="text-center">REFERENCIA</th>
-                            <th class="text-center">FECHA DE RESERVACIÓN</th>
-                            <th class="text-center">HORA DE RESERVACIÓN</th>
-                            <th class="text-center">SITIO</th>
-                            <th class="text-center">ORIGEN DE VENTA</th>
-                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>
-                            <th class="text-center"># DE SERVICIO</th>
-                            <th class="text-center">TIPO DE SERVICIO EN OPERACIÓN</th>
-                            <th class="text-center">NOMBRE DEL CLIENTE</th>
-                            <th class="text-center">TELÉFONO DEL CLIENTE</th>
-                            <th class="text-center">CORREO DEL CLIENTE</th>
-                            <th class="text-center">VEHÍCULO</th>
-                            <th class="text-center">PAX</th>
-                            <th class="text-center">ORIGEN</th>
-                            <th class="text-center">DESDE</th>
-                            <th class="text-center">DESTINO</th>
-                            <th class="text-center">HACIA</th>
-                            <th class="text-center">FECHA DE SERVICIO</th>
-                            <th class="text-center">HORA DE SERVICIO</th>
-                            <th class="text-center">ESTATUS DE SERVICIO</th>
-                            <th class="text-center">UNIDAD DE OPERACIÓN</th>
-                            <th class="text-center">CONDUCTOR DE OPERACIÓN</th>
-                            <th class="text-center">HORA DE OPERACIÓN</th>
-                            <th class="text-center">COSTO DE OPERACIÓN</th>
-                            <th class="text-center">ESTATUS DE OPERACIÓN</th>
-                            <th class="text-center">COMISIÓN CONDUCTOR</th>
-                            <th class="text-center">ESTATUS DE PAGO</th>
-                            <th class="text-center">TOTAL DE RESERVACIÓN</th>
-                            <th class="text-center">BALANCE</th>
-                            <th class="text-center">COSTO POR SERVICIO</th>
-                            <th class="text-center">MONEDA</th>
-                            <th class="text-center">MÉTODO DE PAGO</th>
-                            <th class="text-center">PAGO AL LLEGAR</th>
-                            <th class="text-center">COMISIÓNABLE</th> 
-                            <th class="text-center">MOTIVO DE CANCELACIÓN</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(sizeof($operations) >= 1)
-                            @foreach ($operations as $operation)
-                                @php
-                                    // if ($operation->reservation_id == 38697) {
-                                    //     dump($operation);
-                                    // }
-                                    //ESTATUS
-                                    if (!isset( $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")] ) ){
-                                        $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")] = [
-                                            "name" => OperationTrait::serviceStatus(OperationTrait::serviceStatus($operation,"no_translate"),"translate_name"),
-                                            "total" => 0,
-                                            "gran_total" => 0,
-                                            "USD" => [
-                                                "total" => 0,
-                                                "counter" => 0,
-                                            ],
-                                            "MXN" => [
-                                                "total" => 0,
-                                                "counter" => 0,
-                                            ],
-                                            "counter" => 0,                                            
-                                        ];
-                                    }
-                                    $operationStatus['total'] += $operation->service_cost;
-                                    $operationStatus['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                    $operationStatus[$operation->currency]['total'] += $operation->service_cost;
-                                    $operationStatus[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                    $operationStatus[$operation->currency]['counter']++;
-                                    $operationStatus['counter']++;
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")][$operation->currency]['total'] += $operation->service_cost;
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")][$operation->currency]['counter']++;
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['counter']++;
-
-                                    //METODOS DE PAGO
-                                    if (!isset( $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))] ) ){
-                                        $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))] = [
-                                            "name" => $operation->payment_type_name,
-                                            "total" => 0,
-                                            "gran_total" => 0,
-                                            "USD" => [
-                                                "total" => 0,
-                                                "counter" => 0,
-                                            ],
-                                            "MXN" => [
-                                                "total" => 0,
-                                                "counter" => 0,
-                                            ],
-                                            "counter" => 0,                                            
-                                        ];
-                                    }
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
-                                        $dataMethodPayments['total'] += $operation->service_cost;
-                                        $dataMethodPayments['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataMethodPayments[$operation->currency]['total'] += $operation->service_cost;
-                                        $dataMethodPayments[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataMethodPayments[$operation->currency]['counter']++;
-                                        $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))]['total'] += $operation->service_cost;
-                                        $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))][$operation->currency]['total'] += $operation->service_cost;
-                                        $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))][$operation->currency]['counter']++;
-                                        $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))]['counter']++;
-                                        $dataMethodPayments['counter']++;
-                                    }
-                                    
-                                    //SITIOS                                    
-                                    if (!isset( $dataSites['data'][strtoupper(Str::slug($operation->site_name))] ) ){
-                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))] = [
-                                            "name" => $operation->site_name,
-                                            "total" => 0,
-                                            "gran_total" => 0,
-                                            "USD" => [
-                                                "total" => 0,
-                                                "counter" => 0,
-                                            ],
-                                            "MXN" => [
-                                                "total" => 0,
-                                                "counter" => 0,
-                                            ],
-                                            "counter" => 0,                                            
-                                        ];
-                                    }
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
-                                        $dataSites['total'] += $operation->service_cost;
-                                        $dataSites['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataSites[$operation->currency]['total'] += $operation->service_cost;
-                                        $dataSites[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataSites[$operation->currency]['counter']++;
-                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['total'] += $operation->service_cost;
-                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))][$operation->currency]['total'] += $operation->service_cost;
-                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))][$operation->currency]['counter']++;
-                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['counter']++;
-                                        $dataSites['counter']++;
-                                    }
-
-                                    //ORIGEN DE VENTA
-                                    if (!isset( $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))] ) ){
-                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))] = [
-                                            "name" => ( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' ),
-                                            "total" => 0,
-                                            "gran_total" => 0,
-                                            "USD" => [
-                                                "total" => 0,
-                                                "counter" => 0,
-                                            ],
-                                            "MXN" => [
-                                                "total" => 0,
-                                                "counter" => 0,
-                                            ],
-                                            "counter" => 0,                                            
-                                        ];
-                                    }
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
-                                        $dataOriginSale['total'] += $operation->service_cost;
-                                        $dataOriginSale['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataOriginSale[$operation->currency]['total'] += $operation->service_cost;
-                                        $dataOriginSale[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataOriginSale[$operation->currency]['counter']++;
-                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['total'] += $operation->service_cost;
-                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))][$operation->currency]['total'] += $operation->service_cost;
-                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))][$operation->currency]['counter']++;
-                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['counter']++;
-                                        $dataOriginSale['counter']++;
-                                    }
-
-                                    //MONEDAS
-                                    if (!isset( $dataCurrency['data'][$operation->currency] ) ){
-                                        $dataCurrency['data'][$operation->currency] = [
-                                            "name" => $operation->currency,
-                                            "total" => 0,
-                                            "gran_total" => 0,
-                                            "counter" => 0,                                            
-                                        ];
-                                    }
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
-                                        $dataCurrency['total'] += $operation->service_cost;
-                                        $dataCurrency['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataCurrency['data'][$operation->currency]['total'] += $operation->service_cost;
-                                        $dataCurrency['data'][$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                        $dataCurrency['data'][$operation->currency]['counter']++;
-                                        $dataCurrency['counter']++;
-                                    }
-
-                                    //CONDUCTORES DE OPERACION
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
-                                        if (!isset( $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))] ) ){
-                                            $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))] = [
-                                                "name" => OperationTrait::setOperationDriver($operation),
+                <div class="table-container">
+                    <!-- Contenedor del scroll superior -->
+                    <div class="scroll-wrapper" id="scroll-top"></div>
+                    <!-- Tabla principal -->
+                    <table id="dataOperations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                        <thead>
+                            <tr>
+                                <th class="text-center">ID</th>
+                                <th class="text-center">TIPO DE SERVICIO</th>
+                                <th class="text-center">CÓDIGO</th>
+                                <th class="text-center">REFERENCIA</th>
+                                <th class="text-center">FECHA DE RESERVACIÓN</th>
+                                <th class="text-center">HORA DE RESERVACIÓN</th>
+                                <th class="text-center">SITIO</th>
+                                <th class="text-center">ORIGEN DE VENTA</th>
+                                <th class="text-center">ESTATUS DE RESERVACIÓN</th>
+                                <th class="text-center"># DE SERVICIO</th>
+                                <th class="text-center">TIPO DE SERVICIO EN OPERACIÓN</th>
+                                <th class="text-center">NOMBRE DEL CLIENTE</th>
+                                <th class="text-center">TELÉFONO DEL CLIENTE</th>
+                                <th class="text-center">CORREO DEL CLIENTE</th>
+                                <th class="text-center">VEHÍCULO</th>
+                                <th class="text-center">PAX</th>
+                                <th class="text-center">ORIGEN</th>
+                                <th class="text-center">DESDE</th>
+                                <th class="text-center">DESTINO</th>
+                                <th class="text-center">HACIA</th>
+                                <th class="text-center">FECHA DE SERVICIO</th>
+                                <th class="text-center">HORA DE SERVICIO</th>
+                                <th class="text-center">ESTATUS DE SERVICIO</th>
+                                <th class="text-center">UNIDAD DE OPERACIÓN</th>
+                                <th class="text-center">CONDUCTOR DE OPERACIÓN</th>
+                                <th class="text-center">HORA DE OPERACIÓN</th>
+                                <th class="text-center">COSTO DE OPERACIÓN</th>
+                                <th class="text-center">ESTATUS DE OPERACIÓN</th>
+                                <th class="text-center">COMISIÓN CONDUCTOR</th>
+                                <th class="text-center">ESTATUS DE PAGO</th>
+                                <th class="text-center">TOTAL DE RESERVACIÓN</th>
+                                <th class="text-center">BALANCE</th>
+                                <th class="text-center">COSTO POR SERVICIO</th>
+                                <th class="text-center">MONEDA</th>
+                                <th class="text-center">MÉTODO DE PAGO</th>
+                                <th class="text-center">PAGO AL LLEGAR</th>
+                                <th class="text-center">COMISIÓNABLE</th> 
+                                <th class="text-center">MOTIVO DE CANCELACIÓN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(sizeof($operations) >= 1)
+                                @foreach ($operations as $operation)
+                                    @php
+                                        // if ($operation->reservation_id == 38697) {
+                                        //     dump($operation);
+                                        // }
+                                        //ESTATUS
+                                        if (!isset( $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")] ) ){
+                                            $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")] = [
+                                                "name" => OperationTrait::serviceStatus(OperationTrait::serviceStatus($operation,"no_translate"),"translate_name"),
                                                 "total" => 0,
                                                 "gran_total" => 0,
-                                                "units" => [],
                                                 "USD" => [
                                                     "total" => 0,
                                                     "counter" => 0,
@@ -534,190 +314,385 @@
                                                     "total" => 0,
                                                     "counter" => 0,
                                                 ],
-                                                "commission" => 0,
                                                 "counter" => 0,                                            
                                             ];
                                         }
-                                            $dataDriver['total'] += $operation->service_cost;
-                                            $dataDriver['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataDriver[$operation->currency]['total'] += $operation->service_cost;
-                                            $dataDriver[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataDriver[$operation->currency]['counter']++;
-                                            $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['total'] += $operation->service_cost;
-                                            $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $operationStatus['total'] += $operation->service_cost;
+                                        $operationStatus['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $operationStatus[$operation->currency]['total'] += $operation->service_cost;
+                                        $operationStatus[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $operationStatus[$operation->currency]['counter']++;
+                                        $operationStatus['counter']++;
+                                        $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")][$operation->currency]['total'] += $operation->service_cost;
+                                        $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")][$operation->currency]['counter']++;
+                                        $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['counter']++;
 
-                                            if( !in_array(OperationTrait::setOperationUnit($operation), $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['units']) ){
-                                                array_push($dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['units'], OperationTrait::setOperationUnit($operation));
+                                        //METODOS DE PAGO
+                                        if (!isset( $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))] ) ){
+                                            $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))] = [
+                                                "name" => $operation->payment_type_name,
+                                                "total" => 0,
+                                                "gran_total" => 0,
+                                                "USD" => [
+                                                    "total" => 0,
+                                                    "counter" => 0,
+                                                ],
+                                                "MXN" => [
+                                                    "total" => 0,
+                                                    "counter" => 0,
+                                                ],
+                                                "counter" => 0,                                            
+                                            ];
+                                        }
+                                        if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                            $dataMethodPayments['total'] += $operation->service_cost;
+                                            $dataMethodPayments['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataMethodPayments[$operation->currency]['total'] += $operation->service_cost;
+                                            $dataMethodPayments[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataMethodPayments[$operation->currency]['counter']++;
+                                            $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))]['total'] += $operation->service_cost;
+                                            $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))][$operation->currency]['total'] += $operation->service_cost;
+                                            $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))][$operation->currency]['counter']++;
+                                            $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))]['counter']++;
+                                            $dataMethodPayments['counter']++;
+                                        }
+                                        
+                                        //SITIOS                                    
+                                        if (!isset( $dataSites['data'][strtoupper(Str::slug($operation->site_name))] ) ){
+                                            $dataSites['data'][strtoupper(Str::slug($operation->site_name))] = [
+                                                "name" => $operation->site_name,
+                                                "total" => 0,
+                                                "gran_total" => 0,
+                                                "USD" => [
+                                                    "total" => 0,
+                                                    "counter" => 0,
+                                                ],
+                                                "MXN" => [
+                                                    "total" => 0,
+                                                    "counter" => 0,
+                                                ],
+                                                "counter" => 0,                                            
+                                            ];
+                                        }
+                                        if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                            $dataSites['total'] += $operation->service_cost;
+                                            $dataSites['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataSites[$operation->currency]['total'] += $operation->service_cost;
+                                            $dataSites[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataSites[$operation->currency]['counter']++;
+                                            $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['total'] += $operation->service_cost;
+                                            $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataSites['data'][strtoupper(Str::slug($operation->site_name))][$operation->currency]['total'] += $operation->service_cost;
+                                            $dataSites['data'][strtoupper(Str::slug($operation->site_name))][$operation->currency]['counter']++;
+                                            $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['counter']++;
+                                            $dataSites['counter']++;
+                                        }
+
+                                        //ORIGEN DE VENTA
+                                        if (!isset( $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))] ) ){
+                                            $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))] = [
+                                                "name" => ( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' ),
+                                                "total" => 0,
+                                                "gran_total" => 0,
+                                                "USD" => [
+                                                    "total" => 0,
+                                                    "counter" => 0,
+                                                ],
+                                                "MXN" => [
+                                                    "total" => 0,
+                                                    "counter" => 0,
+                                                ],
+                                                "counter" => 0,                                            
+                                            ];
+                                        }
+                                        if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                            $dataOriginSale['total'] += $operation->service_cost;
+                                            $dataOriginSale['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataOriginSale[$operation->currency]['total'] += $operation->service_cost;
+                                            $dataOriginSale[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataOriginSale[$operation->currency]['counter']++;
+                                            $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['total'] += $operation->service_cost;
+                                            $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))][$operation->currency]['total'] += $operation->service_cost;
+                                            $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))][$operation->currency]['counter']++;
+                                            $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['counter']++;
+                                            $dataOriginSale['counter']++;
+                                        }
+
+                                        //MONEDAS
+                                        if (!isset( $dataCurrency['data'][$operation->currency] ) ){
+                                            $dataCurrency['data'][$operation->currency] = [
+                                                "name" => $operation->currency,
+                                                "total" => 0,
+                                                "gran_total" => 0,
+                                                "counter" => 0,                                            
+                                            ];
+                                        }
+                                        if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                            $dataCurrency['total'] += $operation->service_cost;
+                                            $dataCurrency['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataCurrency['data'][$operation->currency]['total'] += $operation->service_cost;
+                                            $dataCurrency['data'][$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataCurrency['data'][$operation->currency]['counter']++;
+                                            $dataCurrency['counter']++;
+                                        }
+
+                                        //CONDUCTORES DE OPERACION
+                                        if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                            if (!isset( $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))] ) ){
+                                                $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))] = [
+                                                    "name" => OperationTrait::setOperationDriver($operation),
+                                                    "total" => 0,
+                                                    "gran_total" => 0,
+                                                    "units" => [],
+                                                    "USD" => [
+                                                        "total" => 0,
+                                                        "counter" => 0,
+                                                    ],
+                                                    "MXN" => [
+                                                        "total" => 0,
+                                                        "counter" => 0,
+                                                    ],
+                                                    "commission" => 0,
+                                                    "counter" => 0,                                            
+                                                ];
                                             }
+                                                $dataDriver['total'] += $operation->service_cost;
+                                                $dataDriver['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataDriver[$operation->currency]['total'] += $operation->service_cost;
+                                                $dataDriver[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataDriver[$operation->currency]['counter']++;
+                                                $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['total'] += $operation->service_cost;
+                                                $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
 
-                                            $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))][$operation->currency]['total'] += $operation->service_cost;
-                                            $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))][$operation->currency]['counter']++;
-                                            $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['counter']++;
-                                            $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['commission'] += OperationTrait::commissionOperation($operation);
-                                            $dataDriver['commission'] += OperationTrait::commissionOperation($operation);
-                                            $dataDriver['counter']++;
-                                    }
-                                    
-                                    //UNIDADES DE OPERACION
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
-                                        if (!isset( $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))] ) ){
-                                            $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))] = [
-                                                "name" => OperationTrait::setOperationUnit($operation),
-                                                "total" => 0,
-                                                "gran_total" => 0,
-                                                "USD" => [
-                                                    "total" => 0,
-                                                    "counter" => 0,
-                                                ],
-                                                "MXN" => [
-                                                    "total" => 0,
-                                                    "counter" => 0,
-                                                ],
-                                                "operating_cost" => 0,
-                                                "counter" => 0,                                            
-                                            ];
+                                                if( !in_array(OperationTrait::setOperationUnit($operation), $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['units']) ){
+                                                    array_push($dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['units'], OperationTrait::setOperationUnit($operation));
+                                                }
+
+                                                $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))][$operation->currency]['total'] += $operation->service_cost;
+                                                $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))][$operation->currency]['counter']++;
+                                                $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['counter']++;
+                                                $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['commission'] += OperationTrait::commissionOperation($operation);
+                                                $dataDriver['commission'] += OperationTrait::commissionOperation($operation);
+                                                $dataDriver['counter']++;
                                         }
                                         
-                                            $dataUnit['total'] += $operation->service_cost;
-                                            $dataUnit['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataUnit[$operation->currency]['total'] += $operation->service_cost;
-                                            $dataUnit[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataUnit[$operation->currency]['counter']++;
-                                            $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['total'] += $operation->service_cost;
-                                            $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))][$operation->currency]['total'] += $operation->service_cost;
-                                            $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))][$operation->currency]['counter']++;
-                                            $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['counter']++;
-                                            $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['operating_cost'] += OperationTrait::setOperatingCost($operation);
-                                            $dataUnit['operating_cost'] += OperationTrait::setOperatingCost($operation);
-                                            $dataUnit['counter']++;
-                                        
-                                    }
-
-                                    //TIPO DE SERVICIO EN OPERACION
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
-                                        if (!isset( $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] ) ){
-                                            $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] = [
-                                                "name" => $operation->final_service_type,
-                                                "total" => 0,
-                                                "gran_total" => 0,
-                                                "USD" => [
+                                        //UNIDADES DE OPERACION
+                                        if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                            if (!isset( $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))] ) ){
+                                                $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))] = [
+                                                    "name" => OperationTrait::setOperationUnit($operation),
                                                     "total" => 0,
-                                                    "counter" => 0,
-                                                ],
-                                                "MXN" => [
-                                                    "total" => 0,
-                                                    "counter" => 0,
-                                                ],
-                                                "counter" => 0,                                            
-                                            ];
-                                        }                                    
-                                            $dataServiceTypeOperation['total'] += $operation->service_cost;
-                                            $dataServiceTypeOperation['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataServiceTypeOperation[$operation->currency]['total'] += $operation->service_cost;
-                                            $dataServiceTypeOperation[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataServiceTypeOperation[$operation->currency]['counter']++;
-                                            $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['total'] += $operation->service_cost;
-                                            $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))][$operation->currency]['total'] += $operation->service_cost;
-                                            $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))][$operation->currency]['counter']++;
-                                            $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['counter']++;
-                                            $dataServiceTypeOperation['counter']++;
-                                    }
-
-                                    //VEHICULOS
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){                               
-                                        if (!isset( $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))] ) ){
-                                            $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))] = [
-                                                "name" => OperationTrait::setOperationVehicle($operation),
-                                                "total" => 0,
-                                                "gran_total" => 0,
-                                                "USD" => [
-                                                    "total" => 0,
-                                                    "counter" => 0,
-                                                ],
-                                                "MXN" => [
-                                                    "total" => 0,
-                                                    "counter" => 0,
-                                                ],
-                                                "counter" => 0,                                            
-                                            ];
+                                                    "gran_total" => 0,
+                                                    "USD" => [
+                                                        "total" => 0,
+                                                        "counter" => 0,
+                                                    ],
+                                                    "MXN" => [
+                                                        "total" => 0,
+                                                        "counter" => 0,
+                                                    ],
+                                                    "operating_cost" => 0,
+                                                    "counter" => 0,                                            
+                                                ];
+                                            }
+                                            
+                                                $dataUnit['total'] += $operation->service_cost;
+                                                $dataUnit['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataUnit[$operation->currency]['total'] += $operation->service_cost;
+                                                $dataUnit[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataUnit[$operation->currency]['counter']++;
+                                                $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['total'] += $operation->service_cost;
+                                                $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))][$operation->currency]['total'] += $operation->service_cost;
+                                                $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))][$operation->currency]['counter']++;
+                                                $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['counter']++;
+                                                $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['operating_cost'] += OperationTrait::setOperatingCost($operation);
+                                                $dataUnit['operating_cost'] += OperationTrait::setOperatingCost($operation);
+                                                $dataUnit['counter']++;
+                                            
                                         }
-                                            $dataVehicles['total'] += $operation->service_cost;
-                                            $dataVehicles['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataVehicles[$operation->currency]['total'] += $operation->service_cost;
-                                            $dataVehicles[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataVehicles[$operation->currency]['counter']++;
-                                            $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['total'] += $operation->service_cost;
-                                            $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                            $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))][$operation->currency]['total'] += $operation->service_cost;
-                                            $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))][$operation->currency]['counter']++;
-                                            $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['counter']++;
-                                            $dataVehicles['counter']++;
-                                    }
-                                @endphp
-                                <tr class="" data-nomenclatura="{{ $operation->final_service_type }}{{ $operation->op_type }}" data-reservation="{{ $operation->reservation_id }}" data-item="{{ $operation->id }}" data-operation="{{ $operation->final_service_type }}" data-service="{{ $operation->operation_type }}" data-type="{{ $operation->op_type }}" data-close_operation="">
-                                    <td class="text-center">{{ $operation->reservation_id }}</td>
-                                    <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
-                                    <td class="text-center">
-                                        @if (RoleTrait::hasPermission(38))
-                                            <a href="/reservations/detail/{{ $operation->reservation_id }}"><p class="mb-1">{{ $operation->code }}</p></a>
-                                        @else
-                                            <p class="mb-1">{{ $operation->code }}</p>
-                                        @endif
-                                    </td>
-                                    <td class="text-center"><?=( !empty($operation->reference) ? '<p class="mb-1">'.$operation->reference.'</p>' : '' )?></td>
-                                    <td class="text-center">{{ date("Y-m-d", strtotime($operation->created_at)) }}</td>
-                                    <td class="text-center">{{ date("H:i", strtotime($operation->created_at)) }}</td>
-                                    <td class="text-center">{{ $operation->site_name }}</td>
-                                    <td class="text-center">{{ !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($operation->reservation_status) }}">{{ BookingTrait::statusBooking($operation->reservation_status) }}</button></td>
-                                    <td class="text-center"><?=OperationTrait::renderServicePreassignment($operation)?></td>
-                                    <td class="text-center">{{ $operation->final_service_type }}</td>
-                                    <td class="text-center">{{ $operation->full_name }}</td>
-                                    <td class="text-center">{{ $operation->client_phone }}</td>
-                                    <td class="text-center">{{ $operation->client_email }}</td>
-                                    <td class="text-center">{{ $operation->service_type_name }}</td>
-                                    <td class="text-center">{{ $operation->passengers }}</td>
-                                    <td class="text-center">{{ OperationTrait::setFrom($operation, "destination") }}</td>
-                                    <td class="text-center" <?=OperationTrait::classCutOffZone($operation)?>>{{ OperationTrait::setFrom($operation, "name") }}</td>
-                                    <td class="text-center">{{ OperationTrait::setTo($operation, "destination") }}</td>
-                                    <td class="text-center" <?=OperationTrait::classCutOffZone($operation)?>>{{ OperationTrait::setTo($operation, "name") }}</td>
-                                    <td class="text-center">{{ OperationTrait::setDateTime($operation, "date") }}</td>
-                                    <td class="text-center">{{ OperationTrait::setDateTime($operation, "time") }}</td>
-                                    <td class="text-center"><?=OperationTrait::renderServiceStatus($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::setOperationUnit($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::setOperationDriver($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::setOperationTime($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::setOperatingCost($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::renderOperationStatus($operation)?></td>
-                                    <td class="text-center">{{ OperationTrait::commissionOperation($operation) }}</td>
-                                    <td class="text-center" <?=BookingTrait::classStatusPayment($operation)?>>{{ BookingTrait::statusPayment($operation->payment_status) }}</td>
-                                    <td class="text-center" <?=BookingTrait::classStatusPayment($operation)?>>{{ number_format(($operation->total_sales),2) }}</td>
-                                    <td class="text-center" {{ (($operation->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($operation->total_balance,2) }}</td>
-                                    <td class="text-center">{{ number_format($operation->service_cost,2) }}</td>
-                                    <td class="text-center">{{ $operation->currency }}</td>
-                                    <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
-                                    <td class="text-center">
-                                        <button class="btn btn-{{ $operation->pay_at_arrival == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->pay_at_arrival == 1 ? "SI" : "NO" }}</button>
-                                    </td>
-                                    <td class="text-center">
-                                        <button class="btn btn-{{ $operation->is_commissionable == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->is_commissionable == 1 ? "SI" : "NO" }}</button>
-                                    </td>
-                                    <td class="text-center">
-                                        @if ( ($operation->reservation_status == "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") )
-                                            @if ( !empty($operation->cancellation_reason) )
-                                                {{ $operation->cancellation_reason }}
+
+                                        //TIPO DE SERVICIO EN OPERACION
+                                        if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                            if (!isset( $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] ) ){
+                                                $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] = [
+                                                    "name" => $operation->final_service_type,
+                                                    "total" => 0,
+                                                    "gran_total" => 0,
+                                                    "USD" => [
+                                                        "total" => 0,
+                                                        "counter" => 0,
+                                                    ],
+                                                    "MXN" => [
+                                                        "total" => 0,
+                                                        "counter" => 0,
+                                                    ],
+                                                    "counter" => 0,                                            
+                                                ];
+                                            }                                    
+                                                $dataServiceTypeOperation['total'] += $operation->service_cost;
+                                                $dataServiceTypeOperation['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataServiceTypeOperation[$operation->currency]['total'] += $operation->service_cost;
+                                                $dataServiceTypeOperation[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataServiceTypeOperation[$operation->currency]['counter']++;
+                                                $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['total'] += $operation->service_cost;
+                                                $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))][$operation->currency]['total'] += $operation->service_cost;
+                                                $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))][$operation->currency]['counter']++;
+                                                $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['counter']++;
+                                                $dataServiceTypeOperation['counter']++;
+                                        }
+
+                                        //VEHICULOS
+                                        if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){                               
+                                            if (!isset( $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))] ) ){
+                                                $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))] = [
+                                                    "name" => OperationTrait::setOperationVehicle($operation),
+                                                    "total" => 0,
+                                                    "gran_total" => 0,
+                                                    "USD" => [
+                                                        "total" => 0,
+                                                        "counter" => 0,
+                                                    ],
+                                                    "MXN" => [
+                                                        "total" => 0,
+                                                        "counter" => 0,
+                                                    ],
+                                                    "counter" => 0,                                            
+                                                ];
+                                            }
+                                                $dataVehicles['total'] += $operation->service_cost;
+                                                $dataVehicles['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataVehicles[$operation->currency]['total'] += $operation->service_cost;
+                                                $dataVehicles[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataVehicles[$operation->currency]['counter']++;
+                                                $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['total'] += $operation->service_cost;
+                                                $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                                $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))][$operation->currency]['total'] += $operation->service_cost;
+                                                $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))][$operation->currency]['counter']++;
+                                                $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['counter']++;
+                                                $dataVehicles['counter']++;
+                                        }
+                                    @endphp
+                                    <tr class="" data-nomenclatura="{{ $operation->final_service_type }}{{ $operation->op_type }}" data-reservation="{{ $operation->reservation_id }}" data-item="{{ $operation->id }}" data-operation="{{ $operation->final_service_type }}" data-service="{{ $operation->operation_type }}" data-type="{{ $operation->op_type }}" data-close_operation="">
+                                        <td class="text-center">{{ $operation->reservation_id }}</td>
+                                        <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
+                                        <td class="text-center">
+                                            @if (RoleTrait::hasPermission(38))
+                                                <a href="/reservations/detail/{{ $operation->reservation_id }}"><p class="mb-1">{{ $operation->code }}</p></a>
                                             @else
-                                                {{ "NO SHOW" }}  
+                                                <p class="mb-1">{{ $operation->code }}</p>
                                             @endif
-                                        @endif
-                                    </td>
+                                        </td>
+                                        <td class="text-center"><?=( !empty($operation->reference) ? '<p class="mb-1">'.$operation->reference.'</p>' : '' )?></td>
+                                        <td class="text-center">{{ date("Y-m-d", strtotime($operation->created_at)) }}</td>
+                                        <td class="text-center">{{ date("H:i", strtotime($operation->created_at)) }}</td>
+                                        <td class="text-center">{{ $operation->site_name }}</td>
+                                        <td class="text-center">{{ !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' }}</td>
+                                        <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($operation->reservation_status) }}">{{ BookingTrait::statusBooking($operation->reservation_status) }}</button></td>
+                                        <td class="text-center"><?=OperationTrait::renderServicePreassignment($operation)?></td>
+                                        <td class="text-center">{{ $operation->final_service_type }}</td>
+                                        <td class="text-center">{{ $operation->full_name }}</td>
+                                        <td class="text-center">{{ $operation->client_phone }}</td>
+                                        <td class="text-center">{{ $operation->client_email }}</td>
+                                        <td class="text-center">{{ $operation->service_type_name }}</td>
+                                        <td class="text-center">{{ $operation->passengers }}</td>
+                                        <td class="text-center">{{ OperationTrait::setFrom($operation, "destination") }}</td>
+                                        <td class="text-center" <?=OperationTrait::classCutOffZone($operation)?>>{{ OperationTrait::setFrom($operation, "name") }}</td>
+                                        <td class="text-center">{{ OperationTrait::setTo($operation, "destination") }}</td>
+                                        <td class="text-center" <?=OperationTrait::classCutOffZone($operation)?>>{{ OperationTrait::setTo($operation, "name") }}</td>
+                                        <td class="text-center">{{ OperationTrait::setDateTime($operation, "date") }}</td>
+                                        <td class="text-center">{{ OperationTrait::setDateTime($operation, "time") }}</td>
+                                        <td class="text-center"><?=OperationTrait::renderServiceStatus($operation)?></td>
+                                        <td class="text-center"><?=OperationTrait::setOperationUnit($operation)?></td>
+                                        <td class="text-center"><?=OperationTrait::setOperationDriver($operation)?></td>
+                                        <td class="text-center"><?=OperationTrait::setOperationTime($operation)?></td>
+                                        <td class="text-center"><?=OperationTrait::setOperatingCost($operation)?></td>
+                                        <td class="text-center"><?=OperationTrait::renderOperationStatus($operation)?></td>
+                                        <td class="text-center">{{ OperationTrait::commissionOperation($operation) }}</td>
+                                        <td class="text-center" <?=BookingTrait::classStatusPayment($operation)?>>{{ BookingTrait::statusPayment($operation->payment_status) }}</td>
+                                        <td class="text-center" <?=BookingTrait::classStatusPayment($operation)?>>{{ number_format(($operation->total_sales),2) }}</td>
+                                        <td class="text-center" {{ (($operation->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($operation->total_balance,2) }}</td>
+                                        <td class="text-center">{{ number_format($operation->service_cost,2) }}</td>
+                                        <td class="text-center">{{ $operation->currency }}</td>
+                                        <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-{{ $operation->pay_at_arrival == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->pay_at_arrival == 1 ? "SI" : "NO" }}</button>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-{{ $operation->is_commissionable == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->is_commissionable == 1 ? "SI" : "NO" }}</button>
+                                        </td>
+                                        <td class="text-center">
+                                            @if ( ($operation->reservation_status == "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") )
+                                                @if ( !empty($operation->cancellation_reason) )
+                                                    {{ $operation->cancellation_reason }}
+                                                @else
+                                                    {{ "NO SHOW" }}  
+                                                @endif
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                    <!-- Contenedor del scroll inferior -->
+                    {{-- <div class="scroll-wrapper" id="scroll-bottom"></div> --}}
+                </div>
+
+
+                {{-- <div class="table-wrapper">
+                    <div class="table-responsive">                    
+                        <table class="table" id="responsive-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Posición</th>
+                                    <th>Oficina</th>
+                                    <th>Edad</th>
+                                    <th>Inicio</th>
+                                    <th>Salario</th>
+                                    <th>Salario</th>
+                                    <th>Salario</th>
+                                    <th>Salario</th>
+                                    <th>Salario</th>
+                                    <th>Salario</th>
+                                    <th>Salario</th>
+                                    <th>Salario</th>
+                                    <th>Salario</th>
+                                    <th>Salario</th>                                
                                 </tr>
-                            @endforeach
-                        @endif
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                                <!-- Datos de la tabla -->
+                                @for ($i = 0; $i < 100; $i++)
+                                <tr>
+                                    <td>victor daniel</td>
+                                    <td>Programador</td>
+                                    <td>Caribbean transfers</td>
+                                    <td>33 años</td>
+                                    <td>16/02/2024</td>
+                                    <td>300</td>
+                                    <td>300</td>
+                                    <td>300</td>
+                                    <td>300</td>
+                                    <td>300</td>
+                                    <td>300</td>
+                                    <td>300</td>
+                                    <td>300</td>
+                                    <td>300</td>
+                                    <td>300</td>                                
+                                </tr>
+                                @endfor                            
+                            </tbody>
+                        </table>
+                    </div>
+                </div> --}}
+                
             </div>
         </div>
     </div>
@@ -731,7 +706,7 @@
                     </div>
                 @endforeach
             </div>
-            <div>
+            <div class="btn_close">
                 <button class="btn btn-primary" id="closeLayer">Cerrar</button>
             </div>
         </div>
@@ -745,7 +720,7 @@
                                 <canvas class="chartSale" id="chartOperationStatus"></canvas>
                             </div>
                             <div class="col-lg-7 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>ESTATUS</th>
@@ -787,7 +762,7 @@
                                 <canvas class="chartSale" id="chartOperationMethodPayments"></canvas>
                             </div>
                             <div class="col-lg-7 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>METODO DE PAGO</th>
@@ -829,7 +804,7 @@
                                 <canvas class="chartSale" id="chartOperationDrivers"></canvas>
                             </div>
                             <div class="col-lg-7 col-12">                        
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-driver">
                                     <thead>
                                         <tr>
                                             <th>CONDUCTOR</th>
@@ -880,7 +855,7 @@
                                 <canvas class="chartSale" id="chartOperationUnits"></canvas>
                             </div>
                             <div class="col-lg-7 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>UNIDAD</th>
@@ -925,7 +900,7 @@
                                 <canvas class="chartSale" id="chartOperationSites"></canvas>
                             </div>
                             <div class="col-lg-7 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>SITIO</th>
@@ -968,7 +943,7 @@
                                 <canvas class="" id="chartSaleCurrencies"></canvas>
                             </div>
                             <div class="col-lg-12 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>MONEDA</th>
@@ -1007,7 +982,7 @@
                                 <canvas class="" id="chartSaleOrigins"></canvas>
                             </div>
                             <div class="col-lg-12 col-12">                        
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>ORIGEN</th>
@@ -1049,7 +1024,7 @@
                                 <canvas class="" id="chartSaleVehicles"></canvas>
                             </div>
                             <div class="col-lg-12 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>VEHÍCULO</th>
@@ -1091,7 +1066,7 @@
                                 <canvas class="" id="chartServiceTypeOperation"></canvas>
                             </div>
                             <div class="col-lg-12 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>TIPO DE SERVICIO</th>

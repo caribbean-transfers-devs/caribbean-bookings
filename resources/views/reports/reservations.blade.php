@@ -116,109 +116,8 @@
 @section('title') Reservaciones @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
-    <style>
-        .__payment_info{
-            cursor: pointer;
-            font-size: 20px;
-        }
-
-        /* Estilo para la capa */
-        .layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #ffffff;
-            color: white;
-            opacity: 0;
-            visibility: hidden;            
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-            z-index: 1000;
-        }
-
-        .layer.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .header-chart,
-        .body-chart{
-            width: 100%;
-            padding: 15px;
-        }
-
-        table.table-chart {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 10px;
-            color: #000000;
-            text-align: left;
-            min-width: 400px;
-        }
-        .table-chart thead tr,
-        .table-chart tfoot tr{
-            background-color: #009879;
-            color: white;
-            font-weight: bold;            
-        }
-
-        .table-chart th,
-        .table-chart td {
-            padding: 12px 15px !important;
-            border: 1px solid #ddd;
-        }
-        .table-chart tbody tr:nth-child(even) {
-            background-color: #f3f3f3;
-        }
-
-        /* Hover en las filas */
-        .table-chart tbody tr:hover {
-            background-color: #f1f1f1;
-            cursor: pointer;
-        }
-
-        /* Resaltar la fila seleccionada */
-        .table-chart tbody tr.active-row {
-            font-weight: bold;
-            color: #009879;
-        }
-
-        .gran_total .btn{
-            font-size: 1.5em; /* Tamaño general más grande para el total */
-            color: #000; /* Color negro para el texto */
-        }
-
-        .gran_total .btn strong {
-            font-size: 1em; /* El texto "TOTAL" se mantiene en el mismo tamaño */
-            margin-right: 10px; /* Espacio entre "TOTAL:" y el monto */
-        }
-
-        .gran_total .btn span {
-            display: inline-flex;
-            /* align-items: flex-end; */
-            align-items: flex-start;
-        }
-
-        .gran_total .btn span::after {
-            content: ' MXN'; /* Moneda */
-            font-size: 0.65em; /* Texto más pequeño para la moneda */
-            margin-left: 5px; /* Espacio entre el monto y la moneda */
-            vertical-align: top; /* Alinea la moneda a la parte superior */
-            position: relative;
-            top: -0.2em; /* Ajuste fino para elevar ligeramente la moneda */
-        }
-
-        .fixed-header {
-            position: fixed;
-            top: 108px;
-            z-index: 1000;
-            width: 100%;
-            background-color: rgba(234, 241, 255, 0.74); /* Asegúrate de que el fondo sea blanco o del color de la tabla */
-        }
-    </style>
+    <link href="{{ mix('/assets/css/sections/report_reservations.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/report_reservations.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -627,7 +526,7 @@
                     </div>
                 @endforeach
             </div>
-            <div>
+            <div class="btn_close">
                 <button class="btn btn-primary" id="closeLayer">Cerrar</button>
             </div>
         </div>
@@ -641,7 +540,7 @@
                                 <canvas class="chartSale" id="chartSaleStatus"></canvas>
                             </div>
                             <div class="col-lg-7 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>ESTATUS</th>
@@ -683,7 +582,7 @@
                                 <canvas class="chartSale" id="chartSaleMethodPayments"></canvas>
                             </div>
                             <div class="col-lg-7 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>METODO DE PAGO</th>
@@ -725,7 +624,7 @@
                                 <canvas class="" id="chartSaleSites"></canvas>
                             </div>
                             <div class="col-lg-7 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>SITIO</th>
@@ -767,7 +666,7 @@
                                 <canvas class="" id="chartSaleDestinations"></canvas>
                             </div>
                             <div class="col-lg-7 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>DESTINO</th>
@@ -810,7 +709,7 @@
                                 <canvas class="" id="chartSaleCurrencies"></canvas>
                             </div>
                             <div class="col-lg-12 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>MONEDA</th>
@@ -849,7 +748,7 @@
                                 <canvas class="" id="chartSaleOrigins"></canvas>
                             </div>
                             <div class="col-lg-12 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>ORIGEN</th>
@@ -891,7 +790,7 @@
                                 <canvas class="" id="chartSaleVehicles"></canvas>
                             </div>
                             <div class="col-lg-12 col-12">
-                                <table class="table table-chart">
+                                <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>VEHÍCULO</th>

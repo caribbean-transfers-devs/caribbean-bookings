@@ -48,7 +48,7 @@
                             </div>
                         @endif
                         @if ( isset($istoday) || isset($isduplicated) || isset($isagency) || !empty($currencies) )
-                            <div class="item">
+                            <div class="item {{ !isset($istoday) && !isset($isduplicated) && !isset($isagency) ? 'one' : '' }}">
                                 @if ( isset($istoday) || isset($isduplicated) || isset($isagency) )
                                     <div class="box_check">
                                         @if ( isset($istoday) )

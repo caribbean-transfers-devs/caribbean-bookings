@@ -1,8 +1,4 @@
 let operations = {
-    /**
-     * ===== Render Table Settings ===== *
-     * @param {*} table //tabla a renderizar
-    */
     actionTable: function(table){
         let buttons = [];
         const _settings = {},
@@ -18,21 +14,24 @@ let operations = {
                 buttons.push(_btn);
             });
         }
+        // console.log(buttons);
 
-        // _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
-        //                 <'table-responsive'tr>
-        //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pages-count  mb-sm-0 mb-3'i><'dt--pagination'p>>`;
-        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3'B>><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
+        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-12 col-lg-8 d-flex flex-column flex-sm-row justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3 ms-lg-3'B>><'col-12 col-sm-12 col-lg-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                         <'table-responsive'tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;        
         _settings.deferRender = true;
         _settings.responsive = true;
         _settings.buttons =  _buttons;
         _settings.order = [];
         _settings.paging = false;
-        // _settings.scrollY = '2000px';  // Habilitar scroll vertical
-        // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
-        // _settings.fixedHeader = true;  // Fijar el header  // Habilitar el header fijo
+        
+        _settings.scrollX = true;
+
+        // _settings.lengthMenu = [10, 20, 50];
+        // _settings.pageLength = 10;
+        _settings.scrollY = '2000px';  // Habilitar scroll vertical
+        _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
+        _settings.fixedHeader = true;  // Fijar el header  // Habilitar el header fijo
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
             "sZeroRecords": "No se encontraron resultados",             
@@ -47,20 +46,22 @@ let operations = {
             },
         };
 
+        // let __table = 
         table.DataTable( _settings );
     },
-    actionTableChart: function(table){
+    actionTableChart: function(table, section = "general"){
         const _settings = {};
 
         _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'>>>
                         <'table-responsive'tr>
                         <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
-        // _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
-        //                 <'table-responsive'tr>
-        //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
         _settings.deferRender = true;
         _settings.responsive = true;
-        _settings.order = ['3'];
+        if (section == "driver") {
+            _settings.order = ['3'];
+        }else{
+            _settings.order = ['2'];
+        }
         _settings.paging = false; // Si no quieres paginación, puedes dejar esto en false
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
@@ -95,7 +96,8 @@ if ( document.getElementById('lookup_date') != null ) {
 
 if( document.querySelector('.table-rendering') != null ){
     operations.actionTable($('.table-rendering'));
-    operations.actionTableChart($('.table-chart'));
+    operations.actionTableChart($('.table-chart-general'), 'general');
+    operations.actionTableChart($('.table-chart-driver'), 'driver');
 }
 components.formReset();
 

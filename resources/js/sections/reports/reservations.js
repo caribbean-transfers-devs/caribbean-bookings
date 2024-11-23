@@ -1,16 +1,13 @@
 let bookings = {
-    actionTableChart: function(table){
+    actionTableChart: function(table, section = "general"){
         const _settings = {};
 
         _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'>>>
                         <'table-responsive'tr>
                         <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
-        // _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
-        //                 <'table-responsive'tr>
-        //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
         _settings.deferRender = true;
         _settings.responsive = true;
-        _settings.order = ['3'];
+        _settings.order = ['2'];
         _settings.paging = false; // Si no quieres paginación, puedes dejar esto en false
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
@@ -45,7 +42,7 @@ if ( document.getElementById('lookup_date') != null ) {
 
 if( document.querySelector('.table-rendering') != null ){
     components.actionTable($('.table-rendering'));
-    bookings.actionTableChart($('.table-chart'));
+    bookings.actionTableChart($('.table-chart-general'), 'general');
 }
 components.formReset();
 

@@ -1,0 +1,55 @@
+@import "../../plugins/table/datatable/datatables";
+@import "../template/plugins/light/table/datatable/dt-global_style";
+@import "../template/plugins/dark/table/datatable/dt-global_style";
+
+@import '../template/light/components/modal';
+@import '../template/dark/components/modal';
+
+@import '../components/filters';
+@import '../components/charts';
+
+
+.table-container {
+    position: relative;
+    overflow: auto; // Maneja el scroll en posiciones X y Y
+    max-width: 100%;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+  
+    .table-wrapper {
+      position: relative;
+  
+      table {
+        width: 100%;
+        border-collapse: collapse;
+  
+        thead {
+          position: sticky;
+          top: 0;
+          background-color: #fff;
+          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  
+          th {
+            text-align: left;
+            padding: 8px;
+            background-color: #f1f1f1;
+            font-weight: bold;
+            border-bottom: 2px solid #ccc;
+          }
+        }
+  
+        tbody {
+          tr {
+            &:hover {
+              background-color: #f5f5f5;
+            }
+  
+            td {
+              padding: 8px;
+              border-bottom: 1px solid #ddd;
+            }
+          }
+        }
+      }
+    }
+  }
