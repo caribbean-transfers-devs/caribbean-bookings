@@ -113,7 +113,7 @@
     ];
 @endphp
 @extends('layout.app')
-@section('title') Reservaciones @endsection
+@section('title') Reporte De Reservaciones @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/report_reservations.min.css') }}" rel="preload" as="style" >

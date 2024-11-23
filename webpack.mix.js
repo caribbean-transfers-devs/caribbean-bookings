@@ -55,6 +55,7 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
         mix.sass('resources/scss/sections/management.scss', data.assets + "css/sections/management.min.css"); //MANAGEMENT        
 
         //STYLES REPORTS
+        mix.sass('resources/scss/sections/_report_commissions.scss', data.assets + "css/sections/report_commissions.min.css"); //COMMISSIONS
         mix.sass('resources/scss/sections/_report_reservations.scss', data.assets + "css/sections/report_reservations.min.css"); //RESERVATIONS
         mix.sass('resources/scss/sections/_report_operations.scss', data.assets + "css/sections/report_operations.min.css"); //OPERATIONS
 

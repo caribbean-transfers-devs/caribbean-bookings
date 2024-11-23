@@ -10,45 +10,8 @@
 @section('title') Comisiones @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
-    <style>
-        table.table-chart {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 10px;
-            color: #000000;
-            text-align: left;
-            min-width: 400px;
-        }
-        .table-chart thead tr,
-        .table-chart tfoot tr{
-            background-color: #009879;
-            color: white;
-            font-weight: bold;            
-        }
-
-        .table-chart th,
-        .table-chart td {
-            padding: 12px 15px !important;
-            border: 1px solid #ddd;
-        }
-        .table-chart tbody tr:nth-child(even) {
-            background-color: #f3f3f3;
-        }
-
-        /* Hover en las filas */
-        .table-chart tbody tr:hover {
-            background-color: #f1f1f1;
-            cursor: pointer;
-        }
-
-        /* Resaltar la fila seleccionada */
-        .table-chart tbody tr.active-row {
-            font-weight: bold;
-            color: #009879;
-        }        
-    </style>
+    <link href="{{ mix('/assets/css/sections/report_commissions.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/report_commissions.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')

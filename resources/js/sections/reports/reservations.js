@@ -18,13 +18,12 @@ let bookings = {
 
         _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-12 col-lg-8 d-flex flex-column flex-sm-row justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3 ms-lg-3'B>><'col-12 col-sm-12 col-lg-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                         <'table-responsive'tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;        
+                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
         _settings.deferRender = true;
         _settings.responsive = true;
         _settings.buttons =  _buttons;
         _settings.order = [];
-        _settings.paging = false;
-        
+        _settings.paging = false;    
         _settings.scrollX = true;
         // _settings.lengthMenu = [10, 20, 50];
         // _settings.pageLength = 10;
@@ -46,7 +45,7 @@ let bookings = {
         };
 
         table.DataTable( _settings );
-    },    
+    },
     actionTableChart: function(table, section = "general"){
         const _settings = {};
 
