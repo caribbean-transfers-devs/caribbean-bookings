@@ -26,7 +26,6 @@ let operations = {
         _settings.paging = false;
         
         _settings.scrollX = true;
-
         // _settings.lengthMenu = [10, 20, 50];
         // _settings.pageLength = 10;
         _settings.scrollY = '2000px';  // Habilitar scroll vertical
@@ -46,7 +45,6 @@ let operations = {
             },
         };
 
-        // let __table = 
         table.DataTable( _settings );
     },
     actionTableChart: function(table, section = "general"){

@@ -15,13 +15,11 @@ select * from `reservations` where `site_id` = 9
 
 TAREAS COMPLETADAS
 Error en el reporte de operaciones de meses anteriores --------- PENDIENTE
-Ordenamos de mayor a menor, mediante el campo cantidad --------- PENDIENTE
 
 
 
 TAREAS PENDIENTES
-los header se mantengan fixed
-completar el registro de tiempos compartidos
+completar el registro de servicios compartidos
 
 alguna opcion mejorada para poder agregar pagos, en donde al seleccionar el metodo de pago, este me de las opciones de bancos
 mejorar los filtros en las graficas de reportes
