@@ -61,10 +61,19 @@
                         justify-content: end;
                     }
 
-                    &:nth-child(2), &:nth-child(3){
+                    &:nth-child(2){
                         display: grid;
                         grid-template-columns: 1fr 287px;
                         grid-gap: 10px;
+                    }
+
+                    &:nth-child(3){
+                        display: grid;                        
+                        grid-gap: 10px;
+
+                        @media (min-width: 992px) {
+                            grid-template-columns: 1fr 287px;
+                        }
                     }
 
                     &:nth-child(2).one, &:nth-child(3).one{

@@ -18,18 +18,21 @@ let commissions2 = {
 
         _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-12 col-lg-8 d-flex flex-column flex-sm-row justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3 ms-lg-3'B>><'col-12 col-sm-12 col-lg-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                         <'table-responsive'tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;        
         _settings.deferRender = true;
         _settings.responsive = true;
         _settings.buttons =  _buttons;
         _settings.order = [];
-        _settings.paging = false;    
+        _settings.paging = false;
+
+        // _settings.fixedHeader = true; // Activar encabezados fijos
+        // _settings.scrollX = true;
+
         _settings.scrollX = true;
-        // _settings.lengthMenu = [10, 20, 50];
-        // _settings.pageLength = 10;
-        _settings.scrollY = '2000px';  // Habilitar scroll vertical
-        _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
+        // _settings.scrollY = '2000px';  // Habilitar scroll vertical
+        // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
         _settings.fixedHeader = true;  // Fijar el header  // Habilitar el header fijo
+
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
             "sZeroRecords": "No se encontraron resultados",             
@@ -44,8 +47,19 @@ let commissions2 = {
             },
         };
 
-        table.DataTable( _settings );
-    },    
+        let __table = table.DataTable( _settings );
+
+        // Ajustar encabezado fijo al scroll dentro del contenedor
+        // new $.fn.dataTable.FixedHeader(__table, {
+        //     header: true, // Habilita encabezado fijo
+        //     footer: false // Opcional: deshabilitar footer fijo si no lo necesitas
+        // });
+
+        // Corrige el ancho al inicializar
+        table.on('init', function () {
+            __table.columns.adjust().draw();
+        });
+    },
     actionTableChart: function(table){
         const _settings = {};
 

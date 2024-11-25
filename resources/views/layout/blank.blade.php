@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-{{-- 
+
     <title>@yield('title') | Bookings</title>
 	<meta name="description" content="Caribbean Transfers | Affiliates">
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -17,15 +17,13 @@
     <link href="/assets/css/panel/panel.min.css" rel="preload" as="style" >
     <link href="/assets/css/panel/panel.min.css" rel="stylesheet" >
     <link href="/assets/css/panel/panel2.min.css" rel="preload" as="style" >
-    <link href="/assets/css/panel/panel2.min.css" rel="stylesheet" > --}}
+    <link href="/assets/css/panel/panel2.min.css" rel="stylesheet" >
 
     @stack('Css')
 </head> 
 <body class="layout-boxed">
 
-    @yield('content')
-
-    {{-- @include('layout.partials.loader')
+    @include('layout.partials.loader')
 
     <!--  BEGIN MAIN CONTAINER  -->
     <div class="main-container" id="container">
@@ -51,7 +49,7 @@
     <!-- END MAIN CONTAINER -->
 
     <script src="{{ mix('/assets/js/core/core.min.js') }}"></script>
-    <script src="{{ mix('/assets/js/panel/panel.min.js') }}"></script> --}}
+    <script src="{{ mix('/assets/js/panel/panel.min.js') }}"></script>
 
     @stack('Js')
 </body>

@@ -157,6 +157,19 @@
 @push('Css')
     <link href="{{ mix('/assets/css/sections/report_operations.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/report_operations.min.css') }}" rel="stylesheet" >
+    <style>
+/* .table-responsive {
+    position: relative;
+}
+
+.dataTables_wrapper .dataTables_scrollBody {
+    overflow-x: auto;
+    border: none;
+}
+.dtfh-floatingparenthead{
+    top: 106px !important;
+} */
+    </style>    
 @endpush
 
 @push('Js')
@@ -168,17 +181,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="{{ mix('assets/js/sections/reports/operations.min.js') }}"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const tableContainer = document.querySelector(".table-container");
-            const tableWrapper = document.querySelector(".table-wrapper");
-            
-            // Sincroniza el desplazamiento horizontal entre la tabla y el container
-            tableContainer.addEventListener("scroll", () => {
-                tableWrapper.scrollLeft = tableContainer.scrollLeft;
-            });
-        });        
-    </script>
     <script>
         document.getElementById('showLayer').addEventListener('click', function() {
             document.getElementById('layer').classList.add('active');
