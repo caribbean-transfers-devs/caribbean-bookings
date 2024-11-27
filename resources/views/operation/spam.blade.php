@@ -73,24 +73,24 @@
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>        
-                            <th></th>
-                            <th>Code</th>
-                            <th># Llamadas aceptadas</th>                            
-                            <th>Sitio</th>
-                            <th>Pickup</th>                           
+                            <th class="text-center"></th>
+                            <th class="text-center">Code</th>
+                            <th class="text-center"># Llamadas aceptadas</th>
+                            <th class="text-center">Sitio</th>
+                            <th class="text-center">Pickup</th>
                             <th class="text-center">Tipo</th>
                             <th class="text-center">Round Trip</th>
                             <th class="text-center">Operación</th>
-                            <th>Código</th>
-                            <th>Cliente</th>
-                            <th>Teléfono</th>
-                            <th>Correo</th>
-                            <th>Vehículo</th>
-                            <th>Pasajeros</th>
-                            <th>Desde</th>
-                            <th>Hacia</th>                                        
-                            <th>Total</th>
-                            <th>Moneda</th>                                        
+                            <th class="text-center">Código</th>
+                            <th class="text-center">Cliente</th>
+                            <th class="text-center">Teléfono</th>
+                            <th class="text-center">Correo</th>
+                            <th class="text-center">Vehículo</th>
+                            <th class="text-center">Pasajeros</th>
+                            <th class="text-center">Desde</th>
+                            <th class="text-center">Hacia</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-center">Moneda</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -232,10 +232,6 @@
         </div>
     </div>
 
-
-    @php
-        // dump($date);
-    @endphp
     <x-modals.reservations.reports :data="$data" />
     @if (RoleTrait::hasPermission(70))
         <x-modals.reservations.exports :data="$data" />

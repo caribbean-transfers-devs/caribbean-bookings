@@ -26,12 +26,10 @@ let commissions2 = {
         _settings.paging = false;
 
         // _settings.fixedHeader = true; // Activar encabezados fijos
-        // _settings.scrollX = true;
-
         _settings.scrollX = true;
+
         // _settings.scrollY = '2000px';  // Habilitar scroll vertical
         // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
-        _settings.fixedHeader = true;  // Fijar el header  // Habilitar el header fijo
 
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
@@ -50,10 +48,10 @@ let commissions2 = {
         let __table = table.DataTable( _settings );
 
         // Ajustar encabezado fijo al scroll dentro del contenedor
-        // new $.fn.dataTable.FixedHeader(__table, {
-        //     header: true, // Habilita encabezado fijo
-        //     footer: false // Opcional: deshabilitar footer fijo si no lo necesitas
-        // });
+        new $.fn.dataTable.FixedHeader(__table, {
+            header: true, // Habilita encabezado fijo
+            footer: false // Opcional: deshabilitar footer fijo si no lo necesitas
+        });
 
         // Corrige el ancho al inicializar
         table.on('init', function () {

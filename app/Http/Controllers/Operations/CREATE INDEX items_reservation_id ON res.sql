@@ -7,6 +7,32 @@ CREATE INDEX payments_reservation_id ON payments(reservation_id);
 CREATE INDEX media_reservation_id ON reservations_media(reservation_id);
 CREATE INDEX follow_up_reservation_id ON reservations_follow_up(reservation_id);
 
+CREATE INDEX reservation_client_first_name ON reservations(client_first_name);
+CREATE INDEX reservation_client_last_name ON reservations(client_last_name);
+CREATE INDEX reservation_client_email ON reservations(client_email);
+CREATE INDEX reservation_client_phone ON reservations(client_phone);
+CREATE INDEX reservation_currency ON reservations(currency);
+CREATE INDEX reservation_language ON reservations(language);
+CREATE INDEX reservation_is_cancelled ON reservations(is_cancelled);
+CREATE INDEX reservation_is_commissionable ON reservations(is_commissionable);
+CREATE INDEX reservation_is_advanced ON reservations(is_advanced);
+CREATE INDEX reservation_pay_at_arrival ON reservations(pay_at_arrival);
+CREATE INDEX reservation_site_id ON reservations(site_id);
+CREATE INDEX reservation_destination_id ON reservations(destination_id);
+CREATE INDEX reservation_created_at ON reservations(created_at);
+CREATE INDEX reservation_reference ON reservations(reference);
+CREATE INDEX reservation_call_center_agent_id ON reservations(call_center_agent_id);
+CREATE INDEX reservation_affiliate_id ON reservations(affiliate_id);
+CREATE INDEX reservation_vendor_id ON reservations(vendor_id);
+CREATE INDEX reservation_payment_reconciled ON reservations(payment_reconciled);
+CREATE INDEX reservation_user_id ON reservations(user_id);
+CREATE INDEX reservation_terminal ON reservations(terminal);
+CREATE INDEX reservation_cancellation_type_id ON reservations(cancellation_type_id);
+CREATE INDEX reservation_is_duplicated ON reservations(is_duplicated);
+CREATE INDEX reservation_open_credit ON reservations(open_credit);
+CREATE INDEX reservation_is_complete ON reservations(is_complete);
+CREATE INDEX reservation_origin_sale_id ON reservations(origin_sale_id);
+
 
 update `reservations` set `site_id` = 14 where `site_id` = 9
 delete from `sites` where `id` = 9

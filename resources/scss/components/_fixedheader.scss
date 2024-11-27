@@ -1,15 +1,18 @@
 .table-responsive {
     position: relative;
-    /* overflow-y: auto !important; 
-    max-height: 800px; */
 }
-
 .dataTables_wrapper .dataTables_scrollBody {
     overflow-x: auto;
     border: none;
 }
+.dataTables_scrollHeadInner{
+    width: 100% !important;
+}
 .dtfh-floatingparenthead{
     top: 106px !important;
+}
+.dtfh-floatingparenthead table{
+    // width: 100% !important;
 }
 table.dataTable thead {
     border-bottom: 1px solid #000;  /* Borde inferior para separar del body */

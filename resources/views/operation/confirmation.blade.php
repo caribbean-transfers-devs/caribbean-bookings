@@ -57,24 +57,24 @@
                         </ul>
                     </div>
                 @endif
-                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="confirmations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th></th>                                                
-                            <th>Sitio</th>
-                            <th>Pickup</th>
-                            <th class="text-center">Tipo</th>
-                            <th class="text-center">Estatus Op.</th>
-                            <th>Código</th>
-                            <th>Cliente</th>
-                            <th>Vehículo</th>
-                            <th>Pasajeros</th>
-                            <th>Desde</th>
-                            <th>Hacia</th>
-                            <th>Pago</th>
-                            <th>Total</th>
-                            <th>Moneda</th>
-                            <th>Comsionable</th>
+                            <th class="text-center"></th>
+                            <th class="text-center">SITIO</th>
+                            <th class="text-center">PICKUP</th>
+                            <th class="text-center">TIPO</th>
+                            <th class="text-center">ESTATUS OPERACIÓN</th>
+                            <th class="text-center">CÓDIGO</th>
+                            <th class="text-center">CLIENTE</th>
+                            <th class="text-center">VEHÍCULO</th>
+                            <th class="text-center">PASAJEROS</th>
+                            <th class="text-center">DESDE</th>
+                            <th class="text-center">HACIA</th>
+                            <th class="text-center">PAGO</th>
+                            <th class="text-center">TOTAL</th>
+                            <th class="text-center">MONEDA</th>
+                            <th class="text-center">COMISIONABLE</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -111,7 +111,7 @@
                                             $label = 'secondary';
                                             break;
                                     }
-                                @endphp
+                                @endphp                            
                                 <tr>
                                     <td>
                                         @if (RoleTrait::hasPermission(40))

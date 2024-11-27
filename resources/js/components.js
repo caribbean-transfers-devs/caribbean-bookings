@@ -28,7 +28,7 @@ let components = {
      * ===== Render Table Settings ===== *
      * @param {*} table //tabla a renderizar
     */
-    actionTable: function(table){
+    actionTable: function(table, action = ""){
         let buttons = [];
         const _settings = {},
             _buttons = table.data('button');
@@ -53,12 +53,14 @@ let components = {
         _settings.buttons =  _buttons;
         _settings.order = [];
         _settings.paging = false;
-        // _settings.scrollX = true;
-        // _settings.lengthMenu = [10, 20, 50];
-        // _settings.pageLength = 10;
-        // _settings.scrollY = '2000px';  // Habilitar scroll vertical
-        // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
-        // _settings.fixedHeader = true;  // Fijar el header  // Habilitar el header fijo     
+
+        if( action == "fixedheader" ){
+            // _settings.fixedHeader = true; // Activar encabezados fijos
+            _settings.scrollX = true;
+            // _settings.scrollY = '2000px';  // Habilitar scroll vertical
+            // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
+        }
+
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
             "sZeroRecords": "No se encontraron resultados",             
@@ -73,7 +75,20 @@ let components = {
             },
         };
 
-        table.DataTable( _settings );
+        let __table = table.DataTable( _settings );
+
+        if( action == "fixedheader" ){
+            // Ajustar encabezado fijo al scroll dentro del contenedor
+            new $.fn.dataTable.FixedHeader(__table, {
+                header: true, // Habilita encabezado fijo
+                footer: false // Opcional: deshabilitar footer fijo si no lo necesitas
+            });
+
+            // Corrige el ancho al inicializar
+            table.on('init', function () {
+                __table.columns.adjust().draw();
+            });            
+        }
     },
 
     formReset: function(){
