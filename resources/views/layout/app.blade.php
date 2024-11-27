@@ -31,7 +31,7 @@
     <div class="main-container" id="container">
 
         <div class="overlay"></div>
-        <div class="search-overlay"></div>
+        {{-- <div class="search-overlay"></div> --}}
 
         @include('layout.partials.sidebar')
 

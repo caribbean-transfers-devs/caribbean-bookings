@@ -961,12 +961,17 @@ body.dark {
   background: transparent;
 }
 
+.main-container:not(.sbar-open) .sidebar-wrapper {
+  width: 0;
+  left: -52px;
+}
+
 .sidebar-closed {
   
   padding: 0;
   .sidebar-wrapper {
-    width: 0;
-    left: -212px;
+    // width: 0;
+    // left: -212px;
 
     &:hover {
       width: 255px;
@@ -1754,10 +1759,10 @@ body.dark {
       }
     }
 
-    .main-container:not(.sbar-open) .sidebar-wrapper {
-      width: 0;
-      left: -52px;
-    }
+    // .main-container:not(.sbar-open) .sidebar-wrapper {
+    //   width: 0;
+    //   left: -52px;
+    // }
 
     body.alt-menu .sidebar-closed > .sidebar-wrapper {
       width: 255px;
