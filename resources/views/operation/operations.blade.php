@@ -154,6 +154,26 @@
                     </ul>
                 </div>
             @endif
+
+            <div class="row layout-top-spacing mb-3">
+                <div class="col-md-12">
+                    <ul class="nav nav-pills" id="animateLine" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="animated-underline-private-tab" data-bs-toggle="tab" href="#animated-underline-private" role="tab" aria-controls="animated-underline-private" aria-selected="false" tabindex="-1"> Operación privada</button>
+                        </li>                
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="animated-underline-shared-tab" data-bs-toggle="tab" href="#animated-underline-shared" role="tab" aria-controls="animated-underline-shared" aria-selected="false" tabindex="-1"> Operación compartida</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tab-content" id="animateLineContent-4">
+                <div class="tab-pane fade show active" id="animated-underline-private" role="tabpanel" aria-labelledby="animated-underline-badge-private">
+                    
+                </div>
+            </div>
+
             <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                 <thead>
                     <tr>

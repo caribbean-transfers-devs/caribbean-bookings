@@ -19,11 +19,18 @@
                         <div class="box-option">
                             <h2 class="fs-6">Información general</h2>
                             <div class="row">
-                                <div class="col-12 col-lg-4">
+                                <div class="col-12 col-lg-3">
+                                    <label class="form-label" for="type_service">Tipo de servicio</label>
+                                    <select name="type_service" class="form-control" id="type_service">
+                                        <option value="PRIVATE">Privado</option>
+                                        <option value="SHARED">Compartido</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-lg-3">
                                     <label class="form-label" for="reference">Referencia</label>
                                     <input class="form-control" type="text" name="reference" id="reference">
-                                </div>
-                                <div class="col-12 col-lg-4">
+                                </div>                                
+                                <div class="col-12 col-lg-3">
                                     <label class="form-label" for="site_id">Agencia</label>
                                     <select class="form-control mb-2" id="site_id" name="site_id">
                                         @foreach($websites as $website)
@@ -31,7 +38,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-12 col-lg-4">
+                                <div class="col-12 col-lg-3">
                                     <label class="form-label" for="client_last_name">Idioma</label>
                                     <select class="form-control mb-2" id="language" name="language">
                                         <option value="es">Español</option>
