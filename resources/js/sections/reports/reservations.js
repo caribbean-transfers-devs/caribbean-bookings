@@ -1,93 +1,3 @@
-let bookings = {
-    actionTable: function(table){
-        let buttons = [];
-        const _settings = {},
-            _buttons = table.data('button');
-
-        if( _buttons != undefined && _buttons.length > 0 ){
-            _buttons.forEach(_btn => {
-                if( _btn.hasOwnProperty('url') ){
-                    _btn.action = function(e, dt, node, config){
-                        window.location.href = _btn.url;
-                    }
-                };
-                buttons.push(_btn);
-            });
-        }
-        // console.log(buttons);
-
-        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-12 col-lg-8 d-flex flex-column flex-sm-row justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3 ms-lg-3'B>><'col-12 col-sm-12 col-lg-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
-                        <'table-responsive'tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;        
-        _settings.deferRender = true;
-        _settings.responsive = true;
-        _settings.buttons =  _buttons;
-        _settings.order = [];
-        _settings.paging = false;
-
-        // _settings.fixedHeader = true; // Activar encabezados fijos
-        // _settings.scrollX = true;
-
-        _settings.scrollX = true;
-        // _settings.scrollY = '2000px';  // Habilitar scroll vertical
-        // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
-        _settings.fixedHeader = true;  // Fijar el header  // Habilitar el header fijo
-
-        _settings.oLanguage = {
-            "sProcessing": "Procesando...",
-            "sZeroRecords": "No se encontraron resultados",             
-            "sInfo": "Mostrando _TOTAL_ registros",
-            "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-            "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
-            "sSearchPlaceholder": components.getTranslation("table.search") + "...",
-            "sLengthMenu": components.getTranslation("table.results") + " :  _MENU_",
-            "oPaginate": { 
-                "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>', 
-                "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' 
-            },
-        };
-
-        let __table = table.DataTable( _settings );
-
-        // Ajustar encabezado fijo al scroll dentro del contenedor
-        // new $.fn.dataTable.FixedHeader(__table, {
-        //     header: true, // Habilita encabezado fijo
-        //     footer: false // Opcional: deshabilitar footer fijo si no lo necesitas
-        // });
-
-        // Corrige el ancho al inicializar
-        table.on('init', function () {
-            __table.columns.adjust().draw();
-        });
-    },
-    actionTableChart: function(table, section = "general"){
-        const _settings = {};
-
-        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-8 d-flex justify-content-sm-start justify-content-center'l><'col-12 col-sm-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'>>>
-                        <'table-responsive'tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
-        _settings.deferRender = true;
-        _settings.responsive = true;
-        _settings.order = ['2'];
-        _settings.paging = false; // Si no quieres paginación, puedes dejar esto en false
-        _settings.oLanguage = {
-            "sProcessing": "Procesando...",
-            "sZeroRecords": "No se encontraron resultados",             
-            "sInfo": "", // Oculta el número de registros mostrados
-            "sInfoFiltered": "", // Oculta el texto filtrado
-            "sSearch": '', // No muestra el campo de búsqueda
-            "sSearchPlaceholder": "",
-            "sLengthMenu": "", // Oculta el menú de cantidad de resultados por página
-            "oPaginate": { 
-                "sPrevious": '', // No muestra el botón de anterior
-                "sNext": '' // No muestra el botón de siguiente
-            },
-        };
-
-        table.DataTable( _settings );
-    },    
-};
-
 if ( document.getElementById('lookup_date') != null ) {
     const picker = new easepick.create({
         element: "#lookup_date",
@@ -102,28 +12,10 @@ if ( document.getElementById('lookup_date') != null ) {
 }
 
 if( document.querySelector('.table-rendering') != null ){
-    bookings.actionTable($('.table-rendering'));
-    bookings.actionTableChart($('.table-chart-general'), 'general');
+    components.actionTable($('.table-rendering'), 'fixedheader');
+    components.actionTableChart($('.table-chart-general'), 'general');
 }
 components.formReset();
-
-// window.addEventListener('scroll', function() {
-//     var table = document.getElementById('bookings');
-//     var thead = table.querySelector('thead');
-//     var offset = table.getBoundingClientRect().top;
-    
-//     if (window.scrollY > offset) {
-//       thead.classList.add('fixed-header');
-//     } else {
-//       thead.classList.remove('fixed-header');
-//     }
-// });
-
-// document.querySelector('.table-responsive').addEventListener('scroll', function() {
-//     var table = document.getElementById('bookings');
-//     var thead = table.querySelector('thead');
-//     thead.style.transform = `translateX(-${this.scrollLeft}px)`;
-// });
 
 //DECLARACION DE VARIABLES
 const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
@@ -192,5 +84,5 @@ if( __payment_infos.length > 0 ){
     });
 }
 
-components.renderCheckboxColumns('bookings', 'columns');
+components.renderCheckboxColumns('dataBookings', 'columns');
 components.setValueSelectpicker();

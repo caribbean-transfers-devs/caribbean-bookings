@@ -15,16 +15,16 @@
             <div class="modal-body">
                 <div class="row">                    
                     <div class="col-12">
-                        <table class="table table-chart">
+                        <table class="table table-chart table-chart-general">
                             <thead>
                                 <tr>                                                        
-                                    <th>NOMBRE</th>
-                                    <th class="text-ceneter">CANTIDAD</th>                                    
-                                    <th class="text-ceneter">USD</th>
-                                    <th class="text-ceneter">MXN</th>
-                                    <th class="text-ceneter">TOTAL DE VENTA</th>
-                                    <th class="text-ceneter">TOTAL OPERADA</th>
-                                    <th>TOTAL PENDIENTE</th>
+                                    <th class="text-center">NOMBRE</th>
+                                    <th class="text-center">CANTIDAD</th>                                    
+                                    <th class="text-center">USD</th>
+                                    <th class="text-center">MXN</th>
+                                    <th class="text-center">TOTAL DE VENTA</th>
+                                    <th class="text-center">TOTAL OPERADA</th>
+                                    <th class="text-center">TOTAL PENDIENTE</th>
                                     @if ( RoleTrait::hasPermission(96) )
                                         <th class="text-center">COMISIÓN</th>
                                     @endif
@@ -59,7 +59,7 @@
                                             $users[$key]['COMMISSION'] = $commission;
                                         @endphp
                                         <tr>
-                                            <td>{{ $value['NAME'] }}</td>
+                                            <td class="text-center">{{ $value['NAME'] }}</td>
                                             <td class="text-center">{{ $value['QUANTITY'] }}</td>                                            
                                             <td class="text-center">{{ number_format($value['USD'],2) }}</td>
                                             <td class="text-center">{{ number_format($value['MXN'],2) }}</td>

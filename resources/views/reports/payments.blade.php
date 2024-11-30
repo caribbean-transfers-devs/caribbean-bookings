@@ -13,11 +13,11 @@
     $destinations = [];
 @endphp
 @extends('layout.app')
-@section('title') Operación @endsection
+@section('title') Reporte De Pagos @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/report_payments.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/report_payments.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -26,30 +26,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="{{ mix('/assets/js/sections/operations/managment.min.js') }}"></script>
-    <script>
-        if ( document.getElementById('lookup_date') != null ) {
-            const picker = new easepick.create({
-                element: "#lookup_date",
-                css: [
-                    'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-                    'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-                    'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-                ],
-                zIndex: 10,
-            });   
-        }        
-    </script>
+    <script src="{{ mix('/assets/js/sections/reports/payments.min.js') }}"></script>
 @endpush
 
 @section('content')
     @php
         $buttons = array(
             array(  
-                'text' => 'Filtrar',
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtrar',
                 'className' => 'btn btn-primary __btn_create',
                 'attr' => array(
-                    'data-title' =>  "Filtro de reservaciones",
+                    'data-title' =>  "Filtros de pagos",
                     'data-bs-toggle' => 'modal',
                     'data-bs-target' => '#filterModal'
                 )
@@ -70,29 +57,29 @@
                         </ul>
                     </div>
                 @endif
-                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataPayments" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th>Pickup</th>
-                            <th>Sitio</th>
-                            <th class="text-center">Tipo</th>
-                            <th class="text-center">Estatus Op.</th>
-                            <th>Código</th>
-                            <th>Cliente</th>
-                            <th>Vehículo</th>
-                            <th>Pasajeros</th>
-                            <th>Desde</th>
-                            <th>Hacia</th>
-                            <th>Pago</th>
-                            <th>Ventas</th>
-                            <th>Moneda</th>
-                            <th>Desglose</th>
+                            <th class="text-center">PICKUP</th>
+                            <th class="text-center">SITIO</th>
+                            <th class="text-center">TIPO</th>
+                            <th class="text-center">ESTATUS OPERACIÓN.</th>
+                            <th class="text-center">CÓDIGO</th>
+                            <th class="text-center">CLIENTE</th>
+                            <th class="text-center">VEHÍCULO</th>
+                            <th class="text-center">PASAJEROS</th>
+                            <th class="text-center">DESDE</th>
+                            <th class="text-center">HACIA</th>
+                            <th class="text-center">PAGO</th>
+                            <th class="text-center">VENTAS</th>
+                            <th class="text-center">MONEDA </th>
+                            <th class="text-center">DESGLOSE</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if(sizeof($items)>=1)
                             @foreach($items as $key => $value)                                
-                                @php                                                                                
+                                @php
                                     $payment = ( $value->total_sales - $value->total_payments );
                                     if($payment < 0) $payment = 0;
 
@@ -120,24 +107,24 @@
                                     }
                                 @endphp
                                 <tr>
-                                    <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
-                                    <td>{{ $value->site_name }}</td>
-                                    <td>{{ $value->final_service_type }}</td>
+                                    <td class="text-center">{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                    <td class="text-center">{{ $value->site_name }}</td>
+                                    <td class="text-center">{{ $value->final_service_type }}</td>
                                     <td class="text-center"><span class="badge badge-light-{{ $label }} mb-2 me-4">{{ $operation_status }}</span></td>
-                                    <td>
+                                    <td class="text-center">
                                         @if (RoleTrait::hasPermission(38))
                                             <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
                                         @else
                                             {{ $value->code }}
                                         @endif
                                     </td>
-                                    <td>{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
-                                    <td>{{ $value->service_name }}</td>
-                                    <td class="text-center">{{ $value->passengers }}</td>
-                                    <td>{{ $operation_from }}</td>
-                                    <td>{{ $operation_to }}</td>
+                                    <td class="text-center">{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
+                                    <td class="text-center">{{ $value->service_name }}</td>
+                                    <td class="text-center" class="text-center">{{ $value->passengers }}</td>
+                                    <td class="text-center">{{ $operation_from }}</td>
+                                    <td class="text-center">{{ $operation_to }}</td>
                                     <td class="text-center">{{ $value->status }}</td>
-                                    <td class="text-end">{{ number_format($value->total_sales,2) }}</td>
+                                    <td class="text-center">{{ number_format($value->total_sales,2) }}</td>
                                     <td class="text-center">{{ $value->currency }}</td>
                                     <td class="text-center">
                                         @php
@@ -166,5 +153,5 @@
         </div>
     </div>
 
-    <x-modals.reservations.reports :data="$date" />
+    <x-modals.filters.bookings :data="$date" />
 @endsection

@@ -23,23 +23,23 @@ class OperationController extends Controller
         $this->OperationRepository = $OperationRepository;
     }
 
+    public function confirmation(Request $request){
+        if(!$this->hasPermission(39)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+        return $this->OperationRepository->confirmation($request);
+    }
+
+    public function statusUpdate(Request $request){
+        return $this->OperationRepository->statusUpdate($request);        
+    }    
+
     public function reservations(Request $request){
         if(RoleTrait::hasPermission(10)){
             return $this->OperationRepository->reservations($request);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
-    }    
-
-    public function statusUpdate(Request $request){
-        return $this->OperationRepository->statusUpdate($request);        
-    }
-    
-    public function confirmation(Request $request){
-        if(!$this->hasPermission(39)){
-            abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }
-        return $this->OperationRepository->confirmation($request);
     }
     
     public function updateStatusConfirmation(Request $request){

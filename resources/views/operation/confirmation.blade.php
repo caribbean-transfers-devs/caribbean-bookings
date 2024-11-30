@@ -36,7 +36,7 @@
                     'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtrar',
                     'className' => 'btn btn-primary __btn_create',
                     'attr' => array(
-                        'data-title' =>  "Filtro de confirmaciones",
+                        'data-title' =>  "Filtros de confirmaciones",
                         'data-bs-toggle' => 'modal',
                         'data-bs-target' => '#filterModal'
                     )
@@ -57,7 +57,7 @@
                         </ul>
                     </div>
                 @endif
-                <table id="confirmations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataConfirmations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
                             <th class="text-center"></th>
@@ -113,29 +113,29 @@
                                     }
                                 @endphp                            
                                 <tr>
-                                    <td>
+                                    <td class="text-center">
                                         @if (RoleTrait::hasPermission(40))
                                             <button class="btn btn-order {{ (($confirmation_type == 0)? 'btn-warning':'btn-success')}}" onClick="updateConfirmation(event,{{$value->id}},'{{$value->operation_type}}',{{$confirmation_type}},{{$value->reservation_id}})">
                                                 {{ (($confirmation_type == 0)? 'N':'Y')}}
                                             </button>
                                         @endif
                                     </td>
-                                    <td>{{ $value->site_name }}</td>
-                                    <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
-                                    <td>{{ $value->final_service_type }}</td>
-                                    <td class="text-center"><span class="badge badge-light-{{ $label }} mb-2 me-4">{{ $operation_status }}</span></td>
-                                    <td>
+                                    <td class="text-center">{{ $value->site_name }}</td>
+                                    <td class="text-center">{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                    <td class="text-center">{{ $value->final_service_type }}</td>
+                                    <td class="text-center"><span class="badge badge-light-{{ $label }}">{{ $operation_status }}</span></td>
+                                    <td class="text-center">
                                         <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>                                                        
                                     </td>
-                                    <td>{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
-                                    <td>{{ $value->service_name }}</td>
-                                    <td class="text-center">{{ $value->passengers }}</td>
-                                    <td>{{ $operation_from }}</td>
-                                    <td>{{ $operation_to }}</td>
+                                    <td class="text-center">{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
+                                    <td class="text-center">{{ $value->service_name }}</td>
+                                    <td class="text-center" class="text-center">{{ $value->passengers }}</td>
+                                    <td class="text-center">{{ $operation_from }}</td>
+                                    <td class="text-center">{{ $operation_to }}</td>
                                     <td class="text-center">{{ $value->status }}</td>
-                                    <td class="text-end">{{ number_format($payment,2) }}</td>
+                                    <td class="text-center">{{ number_format($payment,2) }}</td>
                                     <td class="text-center">{{ $value->currency }}</td>
-                                    <td>
+                                    <td class="text-center">
                                         <span class="badge badge-light-{{ $value->is_commissionable == 1 ? "success" : "danger" }}">{{ $value->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span>
                                     </td>
                                 </tr>
@@ -147,5 +147,5 @@
         </div>
     </div>
 
-    <x-modals.reservations.reports :data="$date" />
+    <x-modals.filters.bookings :data="$date" />
 @endsection

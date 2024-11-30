@@ -16,25 +16,29 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class SpamRepository
 {
     public function index($request){
-        // dd($request->input());
-        //$date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
         $data = [
-            "init" => date("Y-m-d") . " 00:00:00",
-            "end" => date("Y-m-d") . " 23:59:59",
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),            
         ];
 
-        if(isset( $request->date ) && !empty( $request->date )){
-            $tmp_date = explode(" - ", $request->date);
-            $data['init'] = $tmp_date[0]." 00:00:00";
-            $data['end'] = $tmp_date[1]." 23:59:59";
-        }
+        $queryData = [
+            'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
+            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+        ];        
 
-        // $search['init'] = $date[0]." 00:00:00";
-        // $search['end'] = $date[1]." 23:59:59";
+        $items = $this->querySpam($queryData);
 
-        $items = $this->querySpam($data);
-        // dd($items);
-        return view('operation.spam', compact('items','data'));
+        return view('operation.spam', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Gestion de spam del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
+                    "active" => true
+                ]
+            ],
+            'items' => $items,
+            'data' => $data,
+        ]);
 
     }
 

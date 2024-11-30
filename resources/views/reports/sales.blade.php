@@ -11,11 +11,11 @@
     $destinations = [];
 @endphp
 @extends('layout.app')
-@section('title') Reservaciones @endsection
+@section('title') Reporte De Ventas @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/report_sales.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/report_sales.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -24,43 +24,29 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="{{ mix('/assets/js/sections/reservations/sales.min.js') }}"></script>
-    <script>
-        if ( document.getElementById('lookup_date') != null ) {
-            const picker = new easepick.create({
-                element: "#lookup_date",
-                css: [
-                    'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-                    'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-                    'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-                ],
-                zIndex: 10,
-                plugins: ['RangePlugin'],
-            });
-        }        
-    </script>    
+    <script src="{{ mix('/assets/js/sections/reports/sales.min.js') }}"></script>
 @endpush
 
 @section('content')
     @php
         $buttons = array(
             array(  
-                'text' => 'Filtrar',
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtrar',
                 'className' => 'btn btn-primary __btn_create',
                 'attr' => array(
-                    'data-title' =>  "Filtro de reservaciones",
+                    'data-title' =>  "Filtros de ventas",
                     'data-bs-toggle' => 'modal',
                     'data-bs-target' => '#filterModal'
                 )
             ),            
             array(
-                'text' => 'CSV',
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> CSV',
                 'extend' => 'csvHtml5',
                 'titleAttr' => 'Exportar como CSV',
                 'className' => 'btn btn-primary',
             ),
             array(
-                'text' => 'Excel',
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Excel',
                 'extend' => 'excelHtml5',
                 'titleAttr' => 'Exportar como Excel',
                 'className' => 'btn btn-primary',
@@ -81,26 +67,26 @@
                         </ul>
                     </div>
                 @endif
-                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataSales" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>                                        
-                            <th>Sitio</th>
-                            <th>Código</th>
-                            <th>Estatus</th>
-                            <th>Cliente</th>
-                            <th>Servicio</th>
-                            <th>Pasajeros</th>
-                            <th>Total</th>
-                            <th>Moneda</th>
-                            <th>Pendiente</th>
-                            <th>Método</th>
-                            <th>Destino</th>
+                            <th class="text-center">SITIO</th>
+                            <th class="text-center">CÓDIGO</th>
+                            <th class="text-center">ESTATUS</th>
+                            <th class="text-center">CLIENTE</th>
+                            <th class="text-center">SERVICIO</th>
+                            <th class="text-center">PASAJEROS</th>
+                            <th class="text-center">TOTAL</th>
+                            <th class="text-center">MONEDA</th>
+                            <th class="text-center">PENDIENTE</th>
+                            <th class="text-center">MÉTODO</th>
+                            <th class="text-center">DESTINO</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
-                                @php                                                
+                                @php
                                     if($item->is_cancelled == 0):
                                         if($item->pay_at_arrival == 1):
                                             $item->status = "CONFIRMED";
@@ -139,8 +125,8 @@
                                     $total_pending = $item->total_sales - $item->total_payments;
                                 @endphp
                                 <tr>
-                                    <td>{{ $item->site_name }}</td>
-                                    <td>
+                                    <td class="text-center">{{ $item->site_name }}</td>
+                                    <td class="text-center">
                                         <a href="/reservations/detail/{{ $item->id }}"> {{ $item->reservation_codes }}</a>
                                     </td> 
                                     <td class="text-center">
@@ -158,8 +144,8 @@
                                                 <span class="badge badge-light-danger mb-2 me-4">Cancelado</span>
                                         @endif
                                     </td> 
-                                    <td>{{ $item->client_full_name }}</td>                                           
-                                    <td>{{ $item->service_type_name }}</td>
+                                    <td class="text-center">{{ $item->client_full_name }}</td>                                           
+                                    <td class="text-center">{{ $item->service_type_name }}</td>
                                     <td class="text-center">{{ $item->passengers }}</td>
                                     <td class="text-end">{{ $item->total_sales }}</td>
                                     <td class="text-center">{{ $item->currency }}</td>
@@ -307,9 +293,6 @@
             </div>
         </div>
     </div>
-
-    @php
-        // dump($data);
-    @endphp
-    <x-modals.reports.modal :data="$data" :vehicles="$vehicles" :zones="$zones" :websites="$websites" />    
+    
+    <x-modals.filters.bookings :data="$data" :isSearch="1"  :vehicles="$vehicles" :zones="$zones" :websites="$websites" />
 @endsection

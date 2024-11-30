@@ -105,22 +105,24 @@ class ReportsRepository
                                         "init_date_four" => $search['end_date'],
                                     ]);
 
-        $breadcrumbs = array(
-            array(
-                "route" => "",
-                "name" => "Reporte de pagos",
-                "active" => true
-            ),
-        );
-
-        return view('reports.payments', compact('items','date','breadcrumbs'));
+        return view('reports.payments', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Reporte de pagos del " . date("Y-m-d", strtotime($date)),
+                    "active" => true
+                ]
+            ],            
+            'items' => $items,
+            'date' => $date,
+        ]);
     }
 
     public function sales($request)
     {
         $data = [
-            "init" => date("Y-m-d") . " 00:00:00",
-            "end" => date("Y-m-d") . " 23:59:59",
+            "init" => date("Y-m-d"),
+            "end" => date("Y-m-d"),
             "filter_text" => NULL,
             "site" => 0,
             "product_type" => 0,
@@ -136,7 +138,7 @@ class ReportsRepository
             'end' => date("Y-m-d") . " 23:59:59",
         ];
 
-        if(isset( $request->date ) && !empty( $request->date )){            
+        if(isset( $request->date ) && !empty( $request->date )){
             $tmp_date = explode(" - ", $request->date);
             $data['init'] = $tmp_date[0];
             $data['end'] = $tmp_date[1];            
@@ -157,13 +159,15 @@ class ReportsRepository
             $query .= " AND FIND_IN_SET(:zone, zone_two_id) > 0";
         }
 
-        if(isset( $request->site ) && sizeof($request->site) > 0 ){                
+        if(isset( $request->site ) && sizeof($request->site) > 0 ){
             $query .= ' AND site.id IN( '.implode(",", $request->site).' )';
         }
+
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
             $data['payment_method'] = $request->payment_method;
         }
-        if(isset( $request->filter_text ) && !empty( $request->filter_text )){            
+
+        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
             $data['filter_text'] = $request->filter_text;
             $queryData = [];
             $query  = " AND (
@@ -236,12 +240,13 @@ class ReportsRepository
             'breadcrumbs' => [
                 [
                     "route" => "",
-                    "name" => "Reporte de reservacione del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
+                    "name" => "Reporte de ventas del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
                     "active" => true                    
                 ]
             ],
             'bookings' => $bookings,
             'websites' => $this->Sites(),
+            'services' => $this->Services(),
             'vehicles' => $this->Vehicles(),
             'zones' => $this->Zones(),
             'data' => $data,
@@ -249,20 +254,16 @@ class ReportsRepository
     }
 
     public function cash($request)
-    {
-        
-        $search = [];
-        $date_search = date("Y-m-d"). " - ".date("Y-m-d");
-        if(isset($request->date)){
-            $dateRange = explode(" - ", $request->date);
-            $search['init_date'] = $dateRange[0]." 00:00:00";
-            $search['end_date'] = $dateRange[1]." 23:59:59";
-            $date_search = $dateRange[0]. " - ".$dateRange[1];
-        } else {
-            $date = date("Y-m-d");
-            $search['init_date'] = $date." 00:00:00";
-            $search['end_date'] = $date." 23:59:59";
-        }
+    {        
+        $data = [
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
+        ];
+
+        $queryData = [
+            'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
+            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+        ];
 
         $items = DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, sit.is_cxc, sit.is_cxp, '' as messages,
                                                 COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
@@ -338,32 +339,38 @@ class ReportsRepository
                                     WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
                                     AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND sit.is_cxc <> 1
                                     GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id",[
-                                        "init_date_one" => $search['init_date'],
-                                        "init_date_two" => $search['end_date'],
-                                        "init_date_three" => $search['init_date'],
-                                        "init_date_four" => $search['end_date'],
+                                        "init_date_one" => $queryData['init'],
+                                        "init_date_two" => $queryData['end'],
+                                        "init_date_three" => $queryData['init'],
+                                        "init_date_four" => $queryData['end'],
                                     ]);
 
-        $breadcrumbs = array(
-            array(
-                "route" => "",
-                "name" => "Reporte de pagos en efectivo del ". date("Y-m-d", strtotime($search['init_date'])) ." al ". date("Y-m-d", strtotime($search['end_date'])),
-                "active" => true
-            ),
-        );
 
-        return view('reports.cash', compact('items','date_search','breadcrumbs'));
+
+        return view('reports.cash', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Reporte de efectivo del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
+                    "active" => true
+                ]
+            ],
+            'items' => $items,
+            'data' => $data,            
+        ]);
     }
 
     public function cancellations($request)
     {
-        $date = date("Y-m-d");
-        if(isset( $request->date )):
-            $date = $request->date;
-        endif;
+        $data = [
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
+        ];
 
-        $search['init'] = ( isset( $request->date ) && !empty( $request->date ) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00";
-        $search['end'] = ( isset( $request->date ) && !empty( $request->date ) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59";
+        $queryData = [
+            'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
+            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+        ];
 
         $items = DB::select("SELECT 
                                 rez.id as reservation_id, 
@@ -462,21 +469,23 @@ class ReportsRepository
                                     WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
                                     AND rez.is_duplicated = 0
                                     GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id, tc.id",[
-                                        "init_date_one" => $search['init'],
-                                        "init_date_two" => $search['end'],
-                                        "init_date_three" => $search['init'],
-                                        "init_date_four" => $search['end'],
+                                        "init_date_one" => $queryData['init'],
+                                        "init_date_two" => $queryData['end'],
+                                        "init_date_three" => $queryData['init'],
+                                        "init_date_four" => $queryData['end'],
                                     ]);
 
-        $breadcrumbs = array(
-            array(
-                "route" => "",
-                "name" => "Gestión de operación",
-                "active" => true
-            ),
-        );
-
-        return view('reports.cancellations', compact('items','search','breadcrumbs'));
+        return view('reports.cancellations', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Reporte de cancelados del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
+                    "active" => true
+                ]
+            ],
+            'items' => $items,
+            'data' => $data,
+        ]);
     }
 
     public function commissions($request)
@@ -774,8 +783,8 @@ class ReportsRepository
         $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
         $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
         $queryData = [
-                'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
-                'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+            'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
+            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
         ];
     
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
@@ -784,15 +793,15 @@ class ReportsRepository
         // dd($items);
 
         return view('reports.commissions2', [
-                'breadcrumbs' => [
-                        [
-                                "route" => "",
-                                "name" => "Reporte de comisiones del ". date("Y-m-d", strtotime($queryData['init'])) ." al ". date("Y-m-d", strtotime($queryData['end'])),
-                                "active" => true
-                        ]
-                ],
-                'search' => $queryData, 
-                'operations' => $items,
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Reporte de comisiones del ". date("Y-m-d", strtotime($queryData['init'])) ." al ". date("Y-m-d", strtotime($queryData['end'])),
+                    "active" => true
+                ]
+            ],
+            'search' => $queryData, 
+            'operations' => $items,
         ]);        
     }
 
@@ -980,7 +989,7 @@ class ReportsRepository
             'breadcrumbs' => [
                 [
                     "route" => "",
-                    "name" => "Reservaciones del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
+                    "name" => "Reporte de reservaciones del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
                     "active" => true
                 ]
             ],
@@ -1163,7 +1172,7 @@ class ReportsRepository
             'breadcrumbs' => [
                 [
                     "route" => "",
-                    "name" => "Operacion del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
+                    "name" => "Reporte de operaciones del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
                     "active" => true
                 ]
             ],

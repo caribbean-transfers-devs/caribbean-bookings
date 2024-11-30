@@ -28,7 +28,7 @@
                     'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtrar',
                     'className' => 'btn btn-primary __btn_create',
                     'attr' => array(
-                        'data-title' =>  "Filtro de reservaciones",
+                        'data-title' =>  "Filtros de spam",
                         'data-bs-toggle' => 'modal',
                         'data-bs-target' => '#filterModal'
                     )
@@ -46,7 +46,7 @@
         if (RoleTrait::hasPermission(70)){
             array_push($buttons,
                 array(
-                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar teléfonia de boxi plan',
+                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar teléfonia de Box in plan',
                     'className' => 'btn btn-primary __btn_export',
                     'attr' => array(
                         'data-title' =>  "Generar reporte de excel",
@@ -70,7 +70,7 @@
                         </ul>
                     </div>
                 @endif
-                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataSpams" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>        
                             <th class="text-center"></th>
@@ -159,7 +159,7 @@
                                         $resumen[ $value->spam ]++;
                                     @endphp
                                     <tr>
-                                        <td>
+                                        <td class="text-center">
                                             <div class="btn-group" role="group">
                                                 <button id="actions" type="button" class="btn {{ $spam }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="{{$value->id}}">
                                                     {{ $value->spam }}
@@ -175,12 +175,12 @@
                                                 </div>
                                             </div>                                 
                                         </td>
-                                        <td>{{ $value->id }}</td>
-                                        <td>{{ $value->spam_count }}</td>                                        
-                                        <td>{{ $value->site_name }}</td>
-                                        <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
-                                        <td>{{ $value->final_service_type }}</td>
-                                        <td>
+                                        <td class="text-center">{{ $value->id }}</td>
+                                        <td class="text-center">{{ $value->spam_count }}</td>                                        
+                                        <td class="text-center">{{ $value->site_name }}</td>
+                                        <td class="text-center">{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                        <td class="text-center">{{ $value->final_service_type }}</td>
+                                        <td class="text-center">
                                             @if ( $value->is_round_trip == 1 )
                                                 Si
                                             @else
@@ -188,17 +188,17 @@
                                             @endif
                                         </td>
                                         <td class="text-center"><span class="badge badge-light-{{ $label }} mb-2 me-4">{{ $operation_status }}</span></td>
-                                        <td>
+                                        <td class="text-center">
                                             <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>                                                        
                                         </td>
-                                        <td>{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
-                                        <td>{{ trim($value->client_phone) }}</td>
-                                        <td>{{ trim(strtolower($value->client_email)) }}</td>
-                                        <td>{{ $value->service_name }}</td>
-                                        <td class="text-center">{{ $value->passengers }}</td>
-                                        <td>{{ $operation_from }}</td>
-                                        <td>{{ $operation_to }}</td>                                                    
-                                        <td class="text-end">{{ number_format($value->total_sales,2) }}</td>
+                                        <td class="text-center">{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
+                                        <td class="text-center">{{ trim($value->client_phone) }}</td>
+                                        <td class="text-center">{{ trim(strtolower($value->client_email)) }}</td>
+                                        <td class="text-center">{{ $value->service_name }}</td>
+                                        <td class="text-center" class="text-center">{{ $value->passengers }}</td>
+                                        <td class="text-center">{{ $operation_from }}</td>
+                                        <td class="text-center">{{ $operation_to }}</td>                                                    
+                                        <td class="text-center">{{ number_format($value->total_sales,2) }}</td>
                                         <td class="text-center">{{ $value->currency }}</td>
                                     </tr>
                                 @endif
@@ -232,7 +232,7 @@
         </div>
     </div>
 
-    <x-modals.reservations.reports :data="$data" />
+    <x-modals.filters.bookings :data="$data" />
     @if (RoleTrait::hasPermission(70))
         <x-modals.reservations.exports :data="$data" />
     @endif

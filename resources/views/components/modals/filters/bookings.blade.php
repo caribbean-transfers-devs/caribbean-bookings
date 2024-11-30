@@ -1,4 +1,12 @@
 @props(['data','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','istoday','isbalance','isduplicated','isagency','request'])
+@php
+    $date = "";
+    if( is_array($data) ){
+        $date = $data['init']." - ".$data['end'];
+    }else{
+        $date = $data;
+    }
+@endphp
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -22,7 +30,7 @@
                                 <svg width="24" height="24"><use xlink:href="{{ asset('/assets/img/icons/icons.svg#calendar') }}"></use></svg>
                                 <div class="input">
                                     <label for="lookup_date">Fecha De Creación:</label>
-                                    <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $data['init'] }} - {{ $data['end'] }}">
+                                    <input type="text" name="date" id="lookup_date" class="form-control" value="{{ $date }}">
                                 </div>
                                 <svg width="24" height="24"><use xlink:href="{{ asset('/assets/img/icons/icons.svg#caret-down') }}"></use></svg>
                             </div>

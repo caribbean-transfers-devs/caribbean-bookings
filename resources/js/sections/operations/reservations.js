@@ -44,27 +44,8 @@ if ( document.getElementById('lookup_date') != null ) {
 
 if( document.querySelector('.table-rendering') != null ){
     components.actionTable($('.table-rendering'), 'fixedheader');
-    bookings.actionTableChart($('.table-chart'));
 }
 components.formReset();
-
-// window.addEventListener('scroll', function() {
-//     var table = document.getElementById('bookings');
-//     var thead = table.querySelector('thead');
-//     var offset = table.getBoundingClientRect().top;
-    
-//     if (window.scrollY > offset) {
-//       thead.classList.add('fixed-header');
-//     } else {
-//       thead.classList.remove('fixed-header');
-//     }
-// });
-
-// document.querySelector('.table-responsive').addEventListener('scroll', function() {
-//     var table = document.getElementById('bookings');
-//     var thead = table.querySelector('thead');
-//     thead.style.transform = `translateX(-${this.scrollLeft}px)`;
-// });
 
 //DECLARACION DE VARIABLES
 const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
@@ -73,7 +54,7 @@ const __payment_infos = document.querySelectorAll('.__payment_info');
 
 //ACCION PARA CREAR
 if( __create != null ){
-    __create.addEventListener('click', function () {
+    __create.addEventListener('click', function () {    
         __title_modal.innerHTML = this.dataset.title;
     });
 }
@@ -133,5 +114,5 @@ if( __payment_infos.length > 0 ){
     });
 }
 
-components.renderCheckboxColumns('bookings', 'columns');
+components.renderCheckboxColumns('dataBookings', 'columns');
 components.setValueSelectpicker();

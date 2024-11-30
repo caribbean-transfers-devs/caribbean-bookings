@@ -83,7 +83,7 @@
                         </ul>
                     </div>
                 @endif
-                <table id="commissions" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataCommissions" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
                             <th class="text-center">ID</th>
@@ -197,7 +197,6 @@
     <x-modals.reports.columns />
     <x-modals.reports.commissions :users="$users" />
     <x-modals.reservations.payments />
-    {{-- @dump($users); --}}
 @endsection
 
 @push('Js')

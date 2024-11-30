@@ -19,6 +19,7 @@ use App\Http\Controllers\Reports\CashController as ReportCash;
 
 use App\Http\Controllers\Pos\PosController;
 use App\Http\Controllers\Enterprise\EnterpriseController;
+use App\Http\Controllers\Sites\SitesController;
 use App\Http\Controllers\Vehicle\VehicleController;
 use App\Http\Controllers\Driver\DriverController;
 
@@ -148,9 +149,12 @@ Route::group(['middleware' => ['auth']], function () {
     // Route::post('/punto-de-venta', [PosController::class, 'index'])->name('pos.index.action');
 
     Route::resource('/enterprises', EnterpriseController::class);
+    Route::get('/sites/{enterprise}', [SitesController::class, 'index'])->name('enterprise.sites');
+    Route::resource('/sites', SitesController::class);
     Route::resource('/vehicles', VehicleController::class);
     Route::resource('/drivers', DriverController::class);
     Route::resource('/users', UserController::class);
+
     Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');
     Route::put('/ChangeStatus/{user}', [UserController::class, 'change_status'])->name('users.change_status');
     Route::post('/StoreIP', [UserController::class, 'store_ips'])->name('users.store_ips');

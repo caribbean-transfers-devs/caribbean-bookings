@@ -156,20 +156,7 @@
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/report_operations.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/report_operations.min.css') }}" rel="stylesheet" >
-    <style>
-/* .table-responsive {
-    position: relative;
-}
-
-.dataTables_wrapper .dataTables_scrollBody {
-    overflow-x: auto;
-    border: none;
-}
-.dtfh-floatingparenthead{
-    top: 106px !important;
-} */
-    </style>    
+    <link href="{{ mix('/assets/css/sections/report_operations.min.css') }}" rel="stylesheet" >   
 @endpush
 
 @push('Js')
@@ -1697,6 +1684,6 @@
         sales.renderChartSaleCurrencies();
         sales.renderChartSaleVehicles();
         sales.renderChartSaleOrigins();
-        sales.renderChartServiceTypeOperation();        
+        sales.renderChartServiceTypeOperation();
     </script>
 @endpush

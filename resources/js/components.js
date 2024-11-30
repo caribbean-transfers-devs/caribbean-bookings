@@ -33,7 +33,7 @@ let components = {
         const _settings = {},
             _buttons = table.data('button');
 
-        if( _buttons != undefined && _buttons.length > 0 ){        
+        if( _buttons != undefined && _buttons.length > 0 ){
             _buttons.forEach(_btn => {
                 if( _btn.hasOwnProperty('url') ){
                     _btn.action = function(e, dt, node, config){
@@ -49,14 +49,17 @@ let components = {
                         <'table-responsive'tr>
                         <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;                        
         _settings.deferRender = true;
-        _settings.responsive = true;
+        _settings.responsive = false; // La tabla sigue siendo responsive
         _settings.buttons =  _buttons;
         _settings.order = [];
         _settings.paging = false;
 
         if( action == "fixedheader" ){
+            _settings.fixedHeader = true; // Deshabilita FixedHeader si estaba habilitado
+            _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
+
             // _settings.fixedHeader = true; // Activar encabezados fijos
-            _settings.scrollX = true;
+            // _settings.scrollX = true;
             // _settings.scrollY = '2000px';  // Habilitar scroll vertical
             // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
         }
@@ -79,17 +82,58 @@ let components = {
 
         if( action == "fixedheader" ){
             // Ajustar encabezado fijo al scroll dentro del contenedor
-            new $.fn.dataTable.FixedHeader(__table, {
-                header: true, // Habilita encabezado fijo
-                footer: false // Opcional: deshabilitar footer fijo si no lo necesitas
-            });
+            // new $.fn.dataTable.FixedHeader(__table, {
+            //     header: true, // Habilita encabezado fijo
+            //     footer: false // Opcional: deshabilitar footer fijo si no lo necesitas
+            // });
 
-            // Corrige el ancho al inicializar
-            table.on('init', function () {
-                __table.columns.adjust().draw();
-            });            
+            // // Corrige el ancho al inicializar
+            // table.on('init', function () {
+            //     __table.columns.adjust().draw();
+            // });
+
+            // table.on('draw', function () {
+            //     __table.columns.adjust();
+            // });
         }
     },
+
+    actionTableChart: function(table, section = "general"){
+        const _settings = {};
+
+        _settings.dom = `<'table-responsive'tr>
+                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+        _settings.deferRender = true;
+        _settings.responsive = false;
+        if (section == "driver") {
+            _settings.order = [[3, 'desc']];
+            _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
+        }else if(section == "commissions"){
+            _settings.order = [[1, 'desc']];
+        }else{
+            _settings.order = [[2, 'desc']];
+        }
+        _settings.paging = false; // Si no quieres paginación, puedes dejar esto en false
+        _settings.oLanguage = {
+            "sProcessing": "Procesando...",
+            "sZeroRecords": "No se encontraron resultados",
+            "sInfo": "", // Oculta el número de registros mostrados
+            "sInfoFiltered": "", // Oculta el texto filtrado
+            "sSearch": '', // No muestra el campo de búsqueda
+            "sSearchPlaceholder": "",
+            "sLengthMenu": "", // Oculta el menú de cantidad de resultados por página
+            "oPaginate": { 
+                "sPrevious": '', // No muestra el botón de anterior
+                "sNext": '' // No muestra el botón de siguiente
+            },
+        };
+
+        let __table = table.DataTable( _settings );
+
+        table.on('init', function () {
+            __table.columns.adjust().draw();
+        });        
+    },    
 
     formReset: function(){
         const __closes = document.querySelectorAll('.__close');
