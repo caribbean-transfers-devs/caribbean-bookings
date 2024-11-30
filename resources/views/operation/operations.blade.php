@@ -155,7 +155,7 @@
                 </div>
             @endif
 
-            <div class="row layout-top-spacing mb-3">
+            {{-- <div class="row layout-top-spacing mb-3">
                 <div class="col-md-12">
                     <ul class="nav nav-pills" id="animateLine" role="tablist">
                         <li class="nav-item" role="presentation">
@@ -172,7 +172,7 @@
                 <div class="tab-pane fade show active" id="animated-underline-private" role="tabpanel" aria-labelledby="animated-underline-badge-private">
                     
                 </div>
-            </div>
+            </div> --}}
 
             <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                 <thead>
