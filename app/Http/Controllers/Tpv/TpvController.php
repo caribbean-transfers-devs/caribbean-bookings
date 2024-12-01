@@ -16,7 +16,7 @@ class TpvController extends Controller
         return $tpvRepository->handler($request);
     }
 
-    public function index(Request $request, $code, TpvRepository $tpvRepository){     
+    public function index(Request $request, $code, TpvRepository $tpvRepository){
 
         if (!$request->code) {
             return response()->json([
@@ -34,7 +34,7 @@ class TpvController extends Controller
         return $tpvRepository->quote($request);
     }
 
-    public function create(TpvCreateRequest $request, TpvRepository $tpvRepository){       
+    public function create(TpvCreateRequest $request, TpvRepository $tpvRepository){
         return $tpvRepository->create($request);
     }
 

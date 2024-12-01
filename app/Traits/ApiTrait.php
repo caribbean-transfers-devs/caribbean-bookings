@@ -51,13 +51,22 @@ trait ApiTrait
         return $response;
     }
 
-    public static function checkToken(){
+    public static function checkToken($uuid = ''){
+        
         if (!Session::has('tpv')):
             $token = self::init();
-            $tpv['token'] = [
-                "token" => $token['data']['token'],
-                "expires_in" => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " + " . $token['data']['expires_in'] . " seconds"))
+            // $tpv['token'] = [
+            //     "token" => $token['data']['token'],
+            //     "expires_in" => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " + " . $token['data']['expires_in'] . " seconds"))
+            // ];
+            $tpv[$uuid] = [
+                "token" => [
+                    "token" => $token['data']['token'],
+                    "expires_in" => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " + " . $token['data']['expires_in'] . " seconds"))
+                ],
+                "data" => self::empty()
             ];
+
             Session::put('tpv', $tpv);
         else:
             $tpv = Session::get('tpv');
@@ -65,33 +74,34 @@ trait ApiTrait
                 $nowDate = date('Y-m-d H:i:s', strtotime(date("Y-m-d H:i:s") . ' - 1440 minutes'));
                 if($nowDate <= $tpv['token']['expires_in']):
                     $token = self::init();
-                    $tpv['token'] = [
+                    $tpv[$uuid]['token'] = [
                         "token" => $token['data']['token'],
                         "expires_in" => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " + " . $token['data']['expires_in'] . " seconds"))
                     ];
+                    $tpv[$uuid]['data'] = $tpv[$uuid]['data'];
                     Session::put('tpv', $tpv);
                 endif;
             endif;
         endif;
     }
 
-    public static function sendAutocomplete($keyword = ''){
-        self::checkToken();
-        $tpv = Session::get('tpv');
+    public static function sendAutocomplete($keyword = '', $uuid = ''){
+        self::checkToken($uuid);
+        $tpv = Session::get('tpv')[$uuid];
         
         return self::sendRequest('/api/v1/autocomplete', 'POST', array('keyword' => $keyword), $tpv['token']['token']);
     }
 
-    public static function makeQuote($data = []){
-        self::checkToken();
-        $tpv = Session::get('tpv');
+    public static function makeQuote($data = [], $uuid = ''){
+        self::checkToken($uuid);
+        $tpv = Session::get('tpv')[$uuid];
 
         return self::sendRequest('/api/v1/quote', 'POST', $data, $tpv['token']['token']);
     }
 
-    public static function makeReservation($data = []){
-        self::checkToken();
-        $tpv = Session::get('tpv');
+    public static function makeReservation($data = [], $uuid = ''){
+        self::checkToken($uuid);
+        $tpv = Session::get('tpv')[$uuid];
 
         return self::sendRequest('/api/v1/create', 'POST', $data, $tpv['token']['token']);
     }
