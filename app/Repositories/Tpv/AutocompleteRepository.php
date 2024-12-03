@@ -13,7 +13,7 @@ class AutocompleteRepository
     use ApiTrait;
 
     public function autocomplete($request){    
-        if ( (!$request->keyword || empty($request->keyword)) || (!$request->uuid || empty($request->uuid)) ) {
+        if ( (!$request->keyword || empty($request->keyword)) ) {
             return response()->json([
                     'error' => [
                         'code' => 'required_params', 
