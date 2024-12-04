@@ -238,7 +238,7 @@ let components = {
      * @param {*} response
      */
     proccessResponse: function (response){
-        // console.log(response);
+        console.log(response);
         var _response = new Object();
         _response = response;
         _response.reload = (response.hasOwnProperty('reload') ? response.reload : true );
@@ -247,7 +247,7 @@ let components = {
         if( response.hasOwnProperty('return') && response.return && response.hasOwnProperty('link_return') && response.link_return != "" ){
             _response.link_return = response.link_return;
         }
-        // console.log(response);
+        console.log(response);
         components.sweetAlert(_response);
     },
 
@@ -509,7 +509,8 @@ let components = {
  * una advertencia o una confirmación antes de permitir que abandonen la página.
  */
 window.addEventListener("beforeunload", function(event) {
-    // components.loadScreen();
+    console.log(event);
+    components.loadScreen();
 });
 
 // Mostrar el indicador de carga cuando se navega hacia atrás o hacia adelante
@@ -528,11 +529,13 @@ window.addEventListener("DOMContentLoaded", function() {
             'X-CSRF-TOKEN': csrfToken
         },
         complete : function(xhr, status) {
+            console.log('complete', xhr, status);
             components.removeLoadScreen();
         },
         error : function(xhr, status, error) {
-            // console.log(xhr, status, error);
-            components.sweetAlert({"status": "error", "message": xhr.responseJSON.message});
+            console.log('error', xhr, status, error);
+            let __response = xhr.responseJSON;
+            components.sweetAlert({"status": ( __response.hasOwnProperty('status') ? __response.status : 'error' ), "message": __response.message});
         },
     });
     

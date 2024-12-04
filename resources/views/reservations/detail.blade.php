@@ -19,6 +19,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
     <script src="{{ mix('assets/js/sections/reservations/details.min.js') }}"></script>
+    <script>
+        window.onload = () => {
+            const resources = performance.getEntriesByType("resource");
+            const script = resources.find(res => res.name.includes("details.min.js"));
+
+            if (script) {
+                console.log(`El archivo tardó ${script.responseEnd - script.startTime} ms en cargarse.`);
+            } else {
+                console.warn("No se encontró el archivo en la lista de recursos.");
+            }
+        };        
+    </script>
 @endpush
 
 @section('content')
@@ -402,7 +414,7 @@
                                                                     }
                                                                 @endphp
                                                                 @if ( $item->op_one_operation_close == 1 )
-                                                                    <button data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones" type="button" class="btn {{ $btn_op_one_type }}" style="color:white;">{{ $item->op_one_status }}</button>                                                                        
+                                                                    <button data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones" type="button" class="btn {{ $btn_op_one_type }} bs-tooltip" style="color:white;">{{ $item->op_one_status }}</button>                                                                        
                                                                 @else
                                                                     <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_one_status }}</button>
                                                                     <div class="dropdown-menu" style="">
@@ -442,7 +454,7 @@
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle align-middle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                                                                 </button>
                                                             @endif
-                                                            <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $item->op_one_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" }}" class="btn btn-{{ $item->op_one_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_one_operation_close == 1 ? "unlock" : "" }}" type="button" data-id="{{ $item->reservations_item_id }}" data-type="arrival" data-rez_id="{{ $item->reservation_id }}">
+                                                            <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $item->op_one_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" }}" class="btn btn-{{ $item->op_one_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_one_operation_close == 1 ? "unlock" : "" }} bs-tooltip" type="button" data-id="{{ $item->reservations_item_id }}" data-type="arrival" data-rez_id="{{ $item->reservation_id }}">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-{{ $item->op_one_operation_close == 1 ? "lock" : "unlock" }} align-middle"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
                                                             </button>
                                                         </div>
@@ -498,7 +510,7 @@
                                                                         }
                                                                     @endphp
                                                                     @if ( $item->op_two_operation_close == 1 )
-                                                                        <button data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones" type="button" class="btn {{ $btn_op_two_type }}" style="color:white;">{{ $item->op_two_status }}</button>    
+                                                                        <button data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones" type="button" class="btn {{ $btn_op_two_type }} bs-tooltip" style="color:white;">{{ $item->op_two_status }}</button>
                                                                     @else
                                                                         <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ $item->op_two_status }}</button>
                                                                         <div class="dropdown-menu" style="">

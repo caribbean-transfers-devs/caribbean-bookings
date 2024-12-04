@@ -13,8 +13,13 @@ use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
+//TRAIS
+use App\Traits\FollowUpTrait;
+
 class PaymentRepository
 {
+    use FollowUpTrait;
+
     public function store($request)
     {
         try {
@@ -31,20 +36,27 @@ class PaymentRepository
             $payment->currency = $request->currency;
             $payment->reservation_id = $request->reservation_id;
             $payment->reference = $request->reference;
+
+            $payment->created_at = date('Y-m-d H:m:s');
+            $payment->updated_at = date('Y-m-d H:m:s');
+
             $payment->user_id = auth()->user()->id;
             $payment->save();
 
+            $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency, 'HISTORY', 'CREATE_PAYMENT');
+
             DB::commit();
 
+            // Payment created successfully
             return response()->json([
-                'message' => 'Payment created successfully',
-                'success' => true
+                'status' => 'success',
+                'message' => 'El pago se creo correctamente',
             ], Response::HTTP_CREATED);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Hubo un error, contacte a soporte',
-                'success' => false
+                'status' => 'error',
+                'message' => 'Error al crear el pago, contacte a soporte',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -52,6 +64,8 @@ class PaymentRepository
     public function update($request,$payment){
         try {
             DB::beginTransaction();
+
+            $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', actualizo el pago con ID: '.$payment->id.' de ( tipo: '.$payment->payment_method.', por un monto de: '.$payment->total.' '.$payment->currency.' ) a ( tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency.' )', 'HISTORY', 'UPDATE_PAYMENT');
 
             $payment->reservation_id = $request->reservation_id;
             $payment->description = 'Panel';
@@ -63,19 +77,23 @@ class PaymentRepository
             $payment->currency = $request->currency;
             $payment->reservation_id = $request->reservation_id;
             $payment->reference = $request->reference;
-            $payment->save();
+
+            $payment->updated_at = date('Y-m-d H:m:s');
+
+            $payment->save();            
 
             DB::commit();
 
+            // Payment updated successfully
             return response()->json([
-                'message' => 'Payment updated successfully',
-                'success' => true
+                'status' => 'success',
+                'message' => 'El pago se actualizo correctamente',
             ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Hubo un error, contacte a soporte',
-                'success' => false
+                'status' => 'error',
+                'message' => 'Error al actualizar el pago, contacte a soporte',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -86,14 +104,25 @@ class PaymentRepository
             DB::beginTransaction();
             //SEND A FOLLOW UP SAYING IT WAS DELETED
             $reservation = Reservation::find($payment->reservation_id);
-            $repo = new ReservationsRepository();
-            $repo->create_followUps($reservation->id, 'Pago eliminado por '.auth()->user()->name, 'HISTORY', 'ELIMINACIÓN');
+            // $repo = new ReservationsRepository();
+            // $repo->create_followUps($reservation->id, 'Pago eliminado por '.auth()->user()->name, 'HISTORY', 'ELIMINACIÓN');
             $payment->delete();
+
+            $this->create_followUps($payment->reservation_id, 'El usuario: '.auth()->user()->name.', elimino el pago con ID: '.$payment->id.', por un monto de: '.$payment->total.' '.$payment->currency, 'HISTORY', 'DELETE_PAYMENT');
+
             DB::commit();
-            return response()->json(['message' => 'Payment deleted successfully'], Response::HTTP_OK);
+
+            // Payment deleted successfully
+            return response()->json([
+                'status' => 'success',
+                'message' => 'El pago se elimino correctamente'
+            ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Hubo un error, contacte a soporte'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al eliminar el pago, contacte a soporte'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
