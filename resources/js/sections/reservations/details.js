@@ -42,11 +42,13 @@ $(function() {
     });
 });
 
-function typesCancellations(){
+function typesCancellations() {
     const __types_cancellations = document.getElementById('types_cancellations');
     if( __types_cancellations != null ){
         let options = JSON.parse(__types_cancellations.value);
         if( options != null && options.length > 0 ){
+            // Ordenar las opciones alfabéticamente por 'name_es'
+            options.sort((a, b) => a.name_es.localeCompare(b.name_es));        
             options.forEach(option => {
                 types_cancellations[option.id] = option.name_es;
             });
@@ -158,20 +160,18 @@ function sendInvitation(event, item_id, lang = 'en'){
 //FUNCION PARA PODER CANCELAR LA RESERVACIÓN PADRE Y SUS ITEMS, SIEMPRE QUE NO TENGA ALGUN SERVICIO COMPLETED
 function cancelReservation(id){
     swal.fire({
-        title: '¿Está seguro de cancelar la reservación?',
-        text: "Esta acción no se puede revertir",
+        html: '¿Está seguro de cancelar la reservación? <br> Esta acción no se puede revertir',
         inputLabel: "Selecciona el motivo de cancelación",
         input: "select",
         inputOptions: types_cancellations,
-        icon: 'warning',
+        icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
             let __params = {};
-            __params.type = result.value;
-            
+            __params.type = result.value;            
             components.request_exec_ajax( _LOCAL_URL + "/reservations/" + id, 'DELETE', __params );
         }
     });
@@ -883,85 +883,31 @@ $( document ).delegate( ".deleteMedia", "click", function(e) {
 
 });
 
+//PERMITE CAMBIAR EL ESTATUS DE LOS SERVICIOS
 function setStatus(event, type, status, item_id, rez_id){
     event.preventDefault();
-    var clickedRow = event.target.closest('tr');
-    var statusCell = clickedRow.querySelector('td:nth-child(4)');
-    //statusCell.textContent = status;
+    let __settings = {};
+    __settings.html = '¿Está seguro de actualizar el estatus? <br> Esta acción no se puede revertir';
+    if( status == "CANCELLED" ){
+        __settings.inputLabel = "Selecciona el motivo de cancelación";
+        __settings.input = "select";
+        __settings.inputOptions = types_cancellations;
+    }
+    __settings.icon = "question";
+    __settings.showCancelButton = true;
+    __settings.confirmButtonText = "Aceptar";
+    __settings.cancelButtonText = "Cancelar";
 
-    let alert_type = 'btn-secondary';
-    switch (status) {
-        case 'PENDING':
-            alert_type = 'btn-secondary';
-            break;
-        case 'COMPLETED':
-            alert_type = 'btn-success';
-            break; 
-        case 'NOSHOW':
-            alert_type = 'btn-warning';
-            break;
-        case 'CANCELLED':
-            alert_type = 'btn-danger';
-            break;  
-        default:
-            alert_type = 'btn-secondary';
-            break;
-    }    
-
-    swal.fire({
-        title: '¿Está seguro de actualizar el estatus?',
-        text: "Esta acción no se puede revertir",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    swal.fire( __settings ).then((result) => {
         if(result.isConfirmed == true){
+            let __params = {};
+            __params.rez_id = rez_id;
+            __params.item_id = item_id;
+            __params.type = type;
+            __params.status = status;
+            __params.type_cancel = result.value;
 
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });                
-            $.ajax({
-                url: `/operation/managment/update-status`,
-                type: 'PUT',
-                data: { rez_id:rez_id, item_id:item_id, type:type, status:status },
-                beforeSend: function() {        
-                    
-                },
-                success: function(resp) {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        icon: 'success',
-                        html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
-                        timer: 1500,
-                        timerProgressBar: true,
-                        didOpen: () => {
-                            Swal.showLoading()
-                            const b = Swal.getHtmlContainer().querySelector('b')
-                            timerInterval = setInterval(() => {
-                                b.textContent = (Swal.getTimerLeft() / 1000)
-                                    .toFixed(0)
-                            }, 100)
-                        },
-                        willClose: () => {
-                            clearInterval(timerInterval)
-                        }
-                    }).then((result) => {
-                        location.reload();
-                    })
-
-                }
-            }).fail(function(xhr, status, error) {
-                    console.log(xhr);
-                    Swal.fire(
-                        '¡ERROR!',
-                        xhr.responseJSON.message,
-                        'error'
-                    );
-            });
-
+            components.request_exec_ajax( _LOCAL_URL + "/operation/managment/update-status", 'PUT', __params );
         }
     });    
    

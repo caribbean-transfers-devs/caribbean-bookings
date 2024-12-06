@@ -150,28 +150,6 @@
 
                     <hr style="width:95%; margin-left: auto; margin-right: auto;">
                     @if (RoleTrait::hasPermission(25))
-                        {{-- <div class="timeline-alter">
-                            @foreach ($reservation->followUps as $followUp)
-                            <div class="item-timeline">
-                                <div class="t-time">
-                                    <p class="">{{ date("H:i", strtotime($followUp->created_at)) }}</p>
-                                </div>
-                                <div class="t-usr-txt">
-                                    <p><span>{{ strtoupper(substr($followUp->type, 0, 1)) }}</span></p>
-                                </div>
-                                <div class="t-meta-time">
-                                    @php
-                                        $fecha = Carbon::parse($followUp->created_at);
-                                    @endphp
-                                    <p class="">{{ $fecha->diffForHumans() }}</p>
-                                    <p class="">{{ date("Y/m/d", strtotime($followUp->created_at)) }}</p>
-                                </div>
-                                <div class="t-text">
-                                    <p>{{ $followUp->text }}</p>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div> --}}
                         <div class="followUps px-2 pb-2">
                             <h6>Actividad</h6>
                             <ul class="timeline m-0">
@@ -196,6 +174,7 @@
         <div class="col-xxl-9 col-xl-8 col-12">
             <div class="controls">
                 @csrf
+                <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
                 @if (RoleTrait::hasPermission(20))
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -237,8 +216,7 @@
                 @if (RoleTrait::hasPermission(94) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
                     <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Activar servicio plus</button>
                 @endif
-                @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                    <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
+                @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )                    
                     <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
                 @endif
                 @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )

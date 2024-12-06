@@ -24,26 +24,11 @@ class DetailRepository
     
     public function detail($request,$id)
     {
-        // $reservation = Reservation::with('destination','items','sales', 'callCenterAgent','payments','followUps','site', 'cancellationType')->find($id);
-        // $reservation = Reservation::with(['destination', 'items', 'sales' => function ($query) {
-        //     $query->whereNotNull('call_center_agent_id');
-        // }, 'sales.callCenterAgent', 'payments', 'followUps', 'site', 'cancellationType'])
-        // ->find($id);      
-
-        // $reservation = Reservation::with([
-        //     'destination',
-        //     'items',
-        //     'sales.callCenterAgent', // Relación anidada
-        //     'payments',
-        //     'followUps',
-        //     'site',
-        //     'cancellationType'
-        // ])->find($id);
-
         $reservation = Reservation::with([
             'destination',
-            'items',
-            'sales.callCenterAgent',  // Mantienes la relación con ventas por si necesitas la información de ventas
+            'items.cancellationTypeOrigin',
+            'items.cancellationTypeDestino',
+            'sales.callCenterAgent',  // Mantienes la relación con ventas por si necesitas la información de ventas // Relación anidada
             'callCenterAgent',  // Relación directa con el agente del call center
             'payments',
             'followUps',
@@ -51,10 +36,11 @@ class DetailRepository
             'cancellationType',
             'originSale'
         ])->find($id);
+
+        // dd($reservation->toArray());
                 
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
-        $sellers = User::whereIn('id', $users_ids)->get();
-        
+        $sellers = User::whereIn('id', $users_ids)->get();        
         $sales_types = SalesType::all();
         $services_types = DestinationService::where('status',1)->where('destination_id',$reservation->destination_id)->get();
         $zones = Zones::where('destination_id', 1)->get();
