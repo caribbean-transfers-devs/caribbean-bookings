@@ -449,14 +449,10 @@ sold_in_currency_select.addEventListener('change', (e) => {
 form.addEventListener('submit', function (event) {
     event.preventDefault();
 
-    // submitBtn.disabled = true;
-    // submitBtn.innerText = 'Cargando...';
-
     $('#sold_in_currency').prop('disabled', false);
     $('#total').prop('disabled', false);
 
     let _params = components.serialize(this,'object');
-    console.log(_params);
 
     $.ajax({
         type: "POST", // Método HTTP de la solicitud
@@ -481,8 +477,6 @@ form.addEventListener('submit', function (event) {
                 });
                 $('#sold_in_currency').prop('disabled', true);
                 $('#total').prop('disabled', true);
-                // submitBtn.disabled = false;
-                // submitBtn.innerText = 'guardar';
             }
         }
     });
