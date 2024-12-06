@@ -12,6 +12,13 @@ const __closeModalFooter = document.getElementById('closeModalFooter');
 
 const __serviceType = document.getElementById('serviceTypeForm');
 
+//DECLARAMOS VARIABLES, PARA VENTAS Y PAGOS
+const __type = document.getElementById('type_form');
+const __code = document.getElementById('sale_id');
+
+const __type_pay = document.getElementById('type_form_pay');
+const __code_pay = document.getElementById('payment_id');
+
 if( document.querySelectorAll('.timeline-item').length > 0 ){
     document.querySelectorAll('.timeline-item').forEach(item => {
         const height = item.offsetHeight;
@@ -35,11 +42,13 @@ $(function() {
     });
 });
 
-function typesCancellations(){
+function typesCancellations() {
     const __types_cancellations = document.getElementById('types_cancellations');
     if( __types_cancellations != null ){
         let options = JSON.parse(__types_cancellations.value);
         if( options != null && options.length > 0 ){
+            // Ordenar las opciones alfabéticamente por 'name_es'
+            options.sort((a, b) => a.name_es.localeCompare(b.name_es));        
             options.forEach(option => {
                 types_cancellations[option.id] = option.name_es;
             });
@@ -148,50 +157,22 @@ function sendInvitation(event, item_id, lang = 'en'){
     });    
 }
 
+//FUNCION PARA PODER CANCELAR LA RESERVACIÓN PADRE Y SUS ITEMS, SIEMPRE QUE NO TENGA ALGUN SERVICIO COMPLETED
 function cancelReservation(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
     swal.fire({
-        title: '¿Está seguro de cancelar la reservación?',
-        text: "Esta acción no se puede revertir",
+        html: '¿Está seguro de cancelar la reservación? <br> Esta acción no se puede revertir',
         inputLabel: "Selecciona el motivo de cancelación",
         input: "select",
         inputOptions: types_cancellations,
-        icon: 'warning',
+        icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
-        console.log(result, id);
         if (result.isConfirmed) {
-            var url = "/reservations/"+id;
-            $.ajax({
-                url: url,
-                type: 'DELETE',
-                data: { type: result.value },
-                dataType: 'json',
-                success: function (data) {
-                    swal.fire({
-                        title: 'Reservación cancelada',
-                        text: 'Se ha cancelado la reservación correctamente',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        location.reload();
-                    });
-                },
-                error: function (data) {
-                    swal.fire({
-                        title: 'Error',
-                        text: 'Ha ocurrido un error al cancelar la reservación',
-                        icon: 'error',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            });
+            let __params = {};
+            __params.type = result.value;            
+            components.request_exec_ajax( _LOCAL_URL + "/reservations/" + id, 'DELETE', __params );
         }
     });
 }
@@ -340,57 +321,11 @@ function saveFollowUp(){
     });
 }
 
+/* ===== Start Events Sales Settings ===== */
 function saveSale(){
     $("#btn_new_sale").prop('disabled', true);
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
-    let frm_data = $("#frm_new_sale").serializeArray();
-    let type = $("#type_form").val();
-    let type_req = type == 1 ? 'POST' : 'PUT';
-    let url_req = type == 1 ? '/sales' : '/sales/'+$("#sale_id").val();
-    $.ajax({
-        url: url_req,
-        type: type_req,
-        data: frm_data,
-        success: function(resp) {
-            if (resp.success == 1) {
-                window.onbeforeunload = null;
-                let timerInterval
-                Swal.fire({
-                    title: '¡Éxito!',
-                    icon: 'success',
-                    html: 'Venta guardada con éxito. Será redirigido en <b></b>',
-                    timer: 2500,
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        Swal.showLoading()
-                        const b = Swal.getHtmlContainer().querySelector('b')
-                        timerInterval = setInterval(() => {
-                            b.textContent = (Swal.getTimerLeft() / 1000)
-                                .toFixed(0)
-                        }, 100)
-                    },
-                    willClose: () => {
-                        clearInterval(timerInterval)
-                    }
-                }).then((result) => {
-                    location.reload();
-                })
-            } else {
-                console.log(resp);
-            }
-        }
-    }).fail(function(xhr, status, error) {
-        Swal.fire(
-            '¡ERROR!',
-            xhr.responseJSON.message,
-            'error'
-        )
-        $("#btn_new_sale").prop('disabled', false);
-    });
+    let __params = components.serialize(document.getElementById('frm_new_sale'),'object');
+    components.request_exec_ajax( _LOCAL_URL + ( __type.value == 1 ? "/sales" : "/sales/" + __code.value ), ( __type.value == 1 ? 'POST' : 'PUT' ), __params );
 }
 
 function getSale(id){
@@ -416,46 +351,20 @@ function getSale(id){
 }
 
 function deleteSale(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
     swal.fire({
-        title: '¿Está seguro de eliminar la venta?',
-        text: "Esta acción no se puede revertir",
-        icon: 'warning',
+        html: '¿Está seguro de eliminar la venta? <br> Esta acción no se puede revertir',
+        icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.value) {
-            $.ajax({
-                url: '/sales/'+id,
-                type: 'DELETE',
-                dataType: 'json',
-                success: function (data) {
-                    swal.fire({
-                        title: 'Venta eliminada',
-                        text: 'Se ha eliminado la venta correctamente',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        location.reload();
-                    });
-                },
-                error: function (data) {
-                    swal.fire({
-                        title: 'Error',
-                        text: 'Ha ocurrido un error al eliminar la venta',
-                        icon: 'error',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            });
+            let __params = {};
+            components.request_exec_ajax( _LOCAL_URL + "/sales/" + id, 'DELETE', __params );
         }
     });
 }
+/* ===== End Events Sales Settings ===== */
 
 $("#btn_edit_res_details").on('click', function(){
     $("#btn_edit_res_details").prop('disabled', true);
@@ -515,8 +424,6 @@ function serviceInfo(origin,destination,time,km){
     $("#destination_time").html(time);
     $("#destination_kms").html(km);
 }
-
-
 
 function itemInfo(item){
     console.log(item);
@@ -579,6 +486,13 @@ if( __serviceDateForm != null ){
     });
 }
 
+/* ===== Start Events Payments Settings ===== */
+$("#btn_new_payment").on('click', function(){
+    $("#btn_new_payment").prop('disabled', true);
+    let __params = components.serialize(document.getElementById('frm_new_payment'),'object');
+    components.request_exec_ajax( _LOCAL_URL + ( __type_pay.value == 1 ? "/payments" : "/payments/" + __code_pay.value ), ( __type_pay.value == 1 ? 'POST' : 'PUT' ), __params );
+});
+
 function getPayment(id){
     $("#btn_new_payment").prop('disabled', true);
     $("#type_form_pay").val(2);
@@ -602,99 +516,20 @@ function getPayment(id){
 }
 
 function deletePayment(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
     swal.fire({
-        title: '¿Está seguro de eliminar el pago?',
-        text: "Esta acción no se puede revertir",
-        icon: 'warning',
+        html: '¿Está seguro de eliminar el pago? <br> Esta acción no se puede revertir',
+        icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.value) {
-            $.ajax({
-                url: '/payments/'+id,
-                type: 'DELETE',
-                dataType: 'json',
-                success: function (data) {
-                    swal.fire({
-                        title: 'Pago eliminado',
-                        text: 'Se ha eliminado el pago correctamente',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        location.reload();
-                    });
-                },
-                error: function (data) {
-                    swal.fire({
-                        title: 'Error',
-                        text: 'Ha ocurrido un error al eliminar el pago',
-                        icon: 'error',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            });
+            let __params = {};
+            components.request_exec_ajax( _LOCAL_URL + "/payments/" + id, 'DELETE', __params );
         }
     });
 }
-
-$("#btn_new_payment").on('click', function(){
-    $("#btn_new_payment").prop('disabled', true);
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
-    let frm_data = $("#frm_new_payment").serializeArray();
-    let type = $("#type_form_pay").val();
-    let type_req = type == 1 ? 'POST' : 'PUT';
-    let url_req = type == 1 ? '/payments' : '/payments/'+$("#payment_id").val();
-    $.ajax({
-        url: url_req,
-        type: type_req,
-        data: frm_data,
-        success: function(resp) {
-            if (resp.success == 1) {
-                window.onbeforeunload = null;
-                let timerInterval
-                Swal.fire({
-                    title: '¡Éxito!',
-                    icon: 'success',
-                    html: 'Pago guardado con éxito. Será redirigido en <b></b>',
-                    timer: 2500,
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        Swal.showLoading()
-                        const b = Swal.getHtmlContainer().querySelector('b')
-                        timerInterval = setInterval(() => {
-                            b.textContent = (Swal.getTimerLeft() / 1000)
-                                .toFixed(0)
-                        }, 100)
-                    },
-                    willClose: () => {
-                        clearInterval(timerInterval)
-                    }
-                }).then((result) => {
-                    location.reload();
-                })
-            } else {
-                console.log(resp);
-            }
-        }
-    }).fail(function(xhr, status, error) {
-        Swal.fire(
-            '¡ERROR!',
-            xhr.responseJSON.message,
-            'error'
-        )
-        $("#btn_new_payment").prop('disabled', false);
-    });
-});
+/* ===== End Events Payments Settings ===== */
 
 $("#servicePaymentsCurrencyModal").on('change', function(){
     let currency = $(this).val();
@@ -1048,85 +883,31 @@ $( document ).delegate( ".deleteMedia", "click", function(e) {
 
 });
 
+//PERMITE CAMBIAR EL ESTATUS DE LOS SERVICIOS
 function setStatus(event, type, status, item_id, rez_id){
     event.preventDefault();
-    var clickedRow = event.target.closest('tr');
-    var statusCell = clickedRow.querySelector('td:nth-child(4)');
-    //statusCell.textContent = status;
+    let __settings = {};
+    __settings.html = '¿Está seguro de actualizar el estatus? <br> Esta acción no se puede revertir';
+    if( status == "CANCELLED" ){
+        __settings.inputLabel = "Selecciona el motivo de cancelación";
+        __settings.input = "select";
+        __settings.inputOptions = types_cancellations;
+    }
+    __settings.icon = "question";
+    __settings.showCancelButton = true;
+    __settings.confirmButtonText = "Aceptar";
+    __settings.cancelButtonText = "Cancelar";
 
-    let alert_type = 'btn-secondary';
-    switch (status) {
-        case 'PENDING':
-            alert_type = 'btn-secondary';
-            break;
-        case 'COMPLETED':
-            alert_type = 'btn-success';
-            break; 
-        case 'NOSHOW':
-            alert_type = 'btn-warning';
-            break;
-        case 'CANCELLED':
-            alert_type = 'btn-danger';
-            break;  
-        default:
-            alert_type = 'btn-secondary';
-            break;
-    }    
-
-    swal.fire({
-        title: '¿Está seguro de actualizar el estatus?',
-        text: "Esta acción no se puede revertir",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    swal.fire( __settings ).then((result) => {
         if(result.isConfirmed == true){
+            let __params = {};
+            __params.rez_id = rez_id;
+            __params.item_id = item_id;
+            __params.type = type;
+            __params.status = status;
+            __params.type_cancel = result.value;
 
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });                
-            $.ajax({
-                url: `/operation/managment/update-status`,
-                type: 'PUT',
-                data: { rez_id:rez_id, item_id:item_id, type:type, status:status },
-                beforeSend: function() {        
-                    
-                },
-                success: function(resp) {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        icon: 'success',
-                        html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
-                        timer: 1500,
-                        timerProgressBar: true,
-                        didOpen: () => {
-                            Swal.showLoading()
-                            const b = Swal.getHtmlContainer().querySelector('b')
-                            timerInterval = setInterval(() => {
-                                b.textContent = (Swal.getTimerLeft() / 1000)
-                                    .toFixed(0)
-                            }, 100)
-                        },
-                        willClose: () => {
-                            clearInterval(timerInterval)
-                        }
-                    }).then((result) => {
-                        location.reload();
-                    })
-
-                }
-            }).fail(function(xhr, status, error) {
-                    console.log(xhr);
-                    Swal.fire(
-                        '¡ERROR!',
-                        xhr.responseJSON.message,
-                        'error'
-                    );
-            });
-
+            components.request_exec_ajax( _LOCAL_URL + "/operation/managment/update-status", 'PUT', __params );
         }
     });    
    

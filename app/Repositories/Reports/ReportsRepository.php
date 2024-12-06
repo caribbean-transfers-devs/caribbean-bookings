@@ -254,7 +254,7 @@ class ReportsRepository
     }
 
     public function cash($request)
-    {        
+    {
         $data = [
             "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
             "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),

@@ -40,7 +40,6 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
 
         mix.sass('resources/scss/core.scss', data.assets + '/css/core/core.min.css');//core styles
         mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resources/plugins/font-icons/fontawesome/css/fontawesome.css'], data.assets + '/css/panel/panel.min.css');//panel styles
-        // mix.styles(['resources/plugins/font-icons/material/css/material.css','resources/plugins/font-icons/material/css/materialicon.css'], data.assets + '/css/panel/material.min.css');//panel styles
         mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
         mix.sass('resources/scss/error.scss', data.assets + "css/panel/error.min.css");//error styles
 
@@ -49,10 +48,7 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
         mix.sass('resources/scss/sections/reservation_details.scss', data.assets + "css/sections/reservation_details.min.css"); //RESERVATION DETAILS
 
         mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css"); //DASHBOARD
-        mix.sass('resources/scss/sections/dashboard2.scss', data.assets + "css/sections/dashboard2.min.css"); //DASHBOARD
-        mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //REPORTS
-        mix.sass('resources/scss/sections/download.scss', data.assets + "css/sections/download.min.css"); //DOWNLOAD
-        mix.sass('resources/scss/sections/management.scss', data.assets + "css/sections/management.min.css"); //MANAGEMENT        
+        mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //REPORTS 
 
         //STYLES REPORTS
         mix.sass('resources/scss/sections/_report_payments.scss', data.assets + "css/sections/report_payments.min.css"); //PAYMENTS

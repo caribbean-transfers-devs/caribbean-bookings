@@ -114,9 +114,6 @@
                         @if(sizeof($operations) >= 1)
                             @foreach($operations as $key => $operation)
                                 @php
-                                    // if( $operation->reservation_id == 37525 ){
-                                    //     dump($operation);
-                                    // }
                                     if( !isset($users[Str::slug($operation->employee)]) ):
                                         $users[Str::slug($operation->employee)] = [
                                             'NAME' => ( !empty($operation->employee) ? $operation->employee : "NO DEFINIDO" ),

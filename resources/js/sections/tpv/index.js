@@ -1,3 +1,4 @@
+const __uuid = document.getElementById('uuid');
 var from_autocomplete = document.getElementById('aff-input-from');
 var to_autocomplete = document.getElementById('aff-input-to');
 
@@ -47,7 +48,7 @@ let setup = {
       if(size < 3) return false;
       setup.loadingMessage(element);
 
-      fetch(`/tpv/autocomplete/${keyword}`, {
+      fetch(`/tpv/autocomplete/${keyword}/?uuid=${__uuid.value}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -228,6 +229,8 @@ function saveQuote(event){
       }
   });
   let frm_data = $("#bookingboxForm").serializeArray();
+  frm_data.push({ name: 'uuid', value: __uuid.value });
+  
   $.ajax({
       url: '/tpv/quote',
       type: 'POST',
@@ -263,6 +266,7 @@ function makeReservationButton(event){
   });
 
   let frm_data = $("#formReservation").serializeArray();
+  frm_data.push({ name: 'uuid', value: __uuid.value });
 
   $.ajax({
       url: '/tpv/create',

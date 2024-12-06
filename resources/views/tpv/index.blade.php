@@ -28,16 +28,20 @@
 @endpush
 
 @section('content')
+@php
+    // dump(Session('tpv'));
+    // dump($config);
+@endphp
     <div class="row layout-top-spacing">
         <div class="widget-content widget-content-area br-8">
             <form class="bookingbox" id="bookingboxForm" method="post">
                 @csrf
-                <input type="hidden" name="code" value="{{ $config['code'] }}">
+                <input type="hidden" name="code" id="uuid" value="{{ $config['code'] }}">
                 <input type="hidden" name="from_lat">
                 <input type="hidden" name="from_lng">
                 <input type="hidden" name="to_lat">
                 <input type="hidden" name="to_lng">
-                <div class="type">                        
+                <div class="type">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" name="is_round_trip" value="1">
                         <label class="form-check-label" for="flexSwitchCheckDefault">Viaje redondo</label>

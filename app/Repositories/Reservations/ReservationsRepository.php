@@ -17,7 +17,7 @@ use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
-//TRAIT
+//TRAITS
 use App\Traits\MailjetTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
@@ -70,18 +70,38 @@ class ReservationsRepository
     }
 
     public function destroy($request, $reservation){
-        try {
-            DB::beginTransaction();
+        try {            
+            // Verificar si existe algún ítem relacionado con status COMPLETED
+            $hasCompletedItems = $reservation->items()->where(function ($query) {
+                $query->where('op_one_status', 'COMPLETED')
+                ->orWhere('op_two_status', 'COMPLETED');
+            })->exists();
+
+            // Cannot cancel the reservation because it has items with status COMPLETED
+            if ($hasCompletedItems) {                
+                return response()->json(['status' => 'warning', 'message' => 'No se puede cancelar la reserva porque tiene servicios con estado COMPLETADO'], Response::HTTP_BAD_REQUEST);
+            }
+
+            DB::beginTransaction();           
             $reservation->is_cancelled = 1;
             ( isset($request->type) ? $reservation->cancellation_type_id = $request->type : '' );
             $reservation->save();
-            $reservation->items()->update(['op_one_status' => 'CANCELLED', 'op_two_status' => 'CANCELLED']);
-            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", cancelo la reservación: ".$reservation->id, 'HISTORY', 'CANCELACIÓN');
+
+            // Actualizar los estados de los ítems
+            $reservation->items()->update([
+                'op_one_status' => 'CANCELLED',
+                'op_two_status' => 'CANCELLED'
+            ]);
+
+            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", cancelo la reservación: ".$reservation->id, 'HISTORY', 'CANCELLATION_BOOKING');
+            
             DB::commit();
-            return response()->json(['message' => 'Reservation cancelled successfully'], Response::HTTP_OK);
+            // Reservation cancelled successfully
+            return response()->json(['status' => 'success', 'message' => 'Reserva cancelada correctamente'], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            // Error cancelling reservation
+            return response()->json(['status' => 'danger', 'message' => 'Error al cancelar la reserva'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -164,8 +184,7 @@ class ReservationsRepository
         return $exchange;
     }
 
-    public function editreservitem($request, $item)
-    {
+    public function editreservitem($request, $item){
         try {
             DB::beginTransaction();
             $this->logBookingService($request, $item);
@@ -283,7 +302,7 @@ class ReservationsRepository
                 ]
             ], 404);
         endif;
-    }    
+    }
 
     public function arrivalMessage($lang = "en", $item = [], $point = []){
         $arrival_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
@@ -697,8 +716,7 @@ class ReservationsRepository
         }
     }
 
-    public function follow_ups($request)
-    {
+    public function follow_ups($request){
         $check = $this->create_followUps($request->reservation_id, $request->text, $request->type, $request->name);
         if($check){
             return response()->json(['message' => 'Follow up created successfully','success' => true], Response::HTTP_OK);
@@ -707,8 +725,7 @@ class ReservationsRepository
         }
     }    
 
-    public function create_followUps($reservation_id, $text, $type, $name = null)
-    {
+    public function create_followUps($reservation_id, $text, $type, $name = null){
         $follow_up = new ReservationFollowUp();
         $follow_up->reservation_id = $reservation_id;
         $follow_up->text = $text;

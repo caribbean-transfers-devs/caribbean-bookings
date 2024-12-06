@@ -347,24 +347,27 @@ class OperationRepository
             $item = ReservationsItem::find($request->item_id);
             if($request->type == "arrival"):
                 $item->op_one_status = $request->status;
+                $item->op_one_cancellation_type_id = $request->type_cancel;
             endif;
             if($request->type == "departure"):
                 $item->op_two_status = $request->status;
-            endif;
+                $item->op_two_cancellation_type_id = $request->type_cancel;
+            endif;            
             $item->save();
-            
-            $follow_up_db = new ReservationFollowUp;
-            $follow_up_db->name = "ESTATUS DE RESERVACIÓN";
-            $follow_up_db->text = 'El usuario: '.auth()->user()->name.", actualizo es estatus de reservación de: (".$request->type.") a ".$request->status;
-            $follow_up_db->type = 'HISTORY';
-            $follow_up_db->reservation_id = $request->rez_id;
-            $follow_up_db->save();
+
+            $this->create_followUps($request->rez_id, "El usuario: ".auth()->user()->name.", actualizo es estatus de reservación de: (".$request->type.") a ".$request->status, 'HISTORY', "ESTATUS DE RESERVACIÓN");        
     
             DB::commit();
-            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], Response::HTTP_OK);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Estatus actualizado con éxito', 'success' => true
+            ], Response::HTTP_OK);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al actualizar el estatus'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }    
 }

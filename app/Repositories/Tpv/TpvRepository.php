@@ -18,36 +18,79 @@ class TpvRepository
     use ApiTrait;
 
     public function handler($request){
-        Session::forget('tpv');
+        // Session::forget('tpv');
+        // $uuid = Str::uuid()->toString();
+
+        // if (!Session::has('tpv')):
+        //     //Requerimos el Token y seteamos su tiempo de vida...
+        //     $token = $this->init();
+        //     if($token['status'] == false):
+        //         return response()->json([
+        //             'success' => false,
+        //             'message' => '('.$token['code'].') '.$token['message'],
+        //             'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+        //         ]);
+        //     endif;
+            
+        //     $tpv = [
+        //         "token" => [
+        //             "token" => $token['data']['token'],
+        //             "expires_in" => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " + " . $token['data']['expires_in'] . " seconds"))
+        //         ]      
+        //     ];
+        //     $tpv[$uuid] = $this->empty();
+        //     Session::put('tpv', $tpv);
+        //     return redirect('/tpv/edit/'.$uuid);
+        // endif;
+        
+        // $tpv = Session::get('tpv');
+        // $tpv[$uuid] = $this->empty();
+
+        // Session::put('tpv', $tpv);
+        // return redirect('/tpv/edit/'.$uuid);
+
+        // Generamos un nuevo UUID para identificar esta cotización
         $uuid = Str::uuid()->toString();
 
-        if (!Session::has('tpv')):
-            //Requerimos el Token y seteamos su tiempo de vida...
-            $token = $this->init();
-            if($token['status'] == false):
-                return response()->json([
-                    'success' => false,
-                    'message' => '('.$token['code'].') '.$token['message'],
-                    'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-                ]);
-            endif;
-            
-            $tpv = [
-                "token" => [
-                    "token" => $token['data']['token'],
-                    "expires_in" => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " + " . $token['data']['expires_in'] . " seconds"))
-                ]      
-            ];
-            $tpv[$uuid] = $this->empty();
-            Session::put('tpv', $tpv);
-            return redirect('/tpv/edit/'.$uuid);
-        endif;
-        
-        $tpv = Session::get('tpv');
-        $tpv[$uuid] = $this->empty();
+        // Verificamos si la sesión 'tpv' existe, si no, la inicializamos
+        if (!Session::has('tpv')) {
+            Session::put('tpv', []); // Inicializamos como un arreglo vacío
+        }
 
+        $tpv = Session::get('tpv'); // Obtenemos la sesión actual
+
+        // Si ya existe un seguimiento para este UUID, redirigimos directamente
+        if (isset($tpv[$uuid])) {
+            return redirect('/tpv/edit/' . $uuid);
+        }
+
+        // Si no existe, requerimos un token
+        $token = $this->init();
+        if ($token['status'] == false) {
+            return response()->json([
+                'success' => false,
+                'message' => '(' . $token['code'] . ') ' . $token['message'],
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ]);
+        }
+
+        // Creamos la estructura del nuevo seguimiento
+        $tpv[$uuid] = [
+            "token" => [
+                "token" => $token['data']['token'],
+                "expires_in" => date(
+                    "Y-m-d H:i:s",
+                    strtotime(date("Y-m-d H:i:s") . " + " . $token['data']['expires_in'] . " seconds")
+                )
+            ],
+            "data" => $this->empty()
+        ];
+
+        // Guardamos la cotización en la sesión
         Session::put('tpv', $tpv);
-        return redirect('/tpv/edit/'.$uuid);
+
+        // Redirigimos a la edición de la cotización
+        return redirect('/tpv/edit/' . $uuid);        
     }
 
     public function index($request){
@@ -66,7 +109,7 @@ class TpvRepository
             ],
             'config' => [
                 "code" => $request->code,
-                "items" => $tpv[ $request->code ]
+                "items" => $tpv[ $request->code ]['data']
             ],            
         ]);
     }
@@ -102,7 +145,7 @@ class TpvRepository
 
         Session::put('tpv', $tpv);
 
-        $quotation = $this->makeQuote($tpv[ $request->code ]);
+        $quotation = $this->makeQuote($tpv[ $request->code ], $request->code);
 
         if(isset($quotation['error'])):
             return response()->json([
@@ -127,7 +170,7 @@ class TpvRepository
         return view('tpv.form', compact('quotation','sites','origin_sales','agents'));
     }
 
-    public function create($request){
+    public function create($request){    
         $data = [
             'service_token' => $request->service_token,
             'first_name' => $request->first_name,
@@ -151,7 +194,7 @@ class TpvRepository
             $data['pay_at_arrival'] = 1;
         endif;
         
-        $rez = $this->makeReservation($data);
+        $rez = $this->makeReservation($data, $request->uuid);
 
         if(isset($rez['error'])):
             return response()->json([
@@ -164,6 +207,13 @@ class TpvRepository
             ], Response::HTTP_BAD_REQUEST);
         endif;
 
+        $tpv = Session::get('tpv');
+
+        // Verificar si el índice existe en el arreglo
+        if (isset($tpv[$request->uuid])) {
+            unset($tpv[$request->uuid]); // Eliminar el índice del arreglo
+            Session::put('tpv', $tpv); // Actualizar la sesión con el arreglo modificado
+        }
         return response()->json($rez, Response::HTTP_OK);
     }
     

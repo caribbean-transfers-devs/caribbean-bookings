@@ -132,7 +132,7 @@ class OperationsController extends Controller
             if( sizeof($items)>=1 ):
                 foreach($items as $key => $item):
                     $preassignment = "";
-                    $service = ReservationsItem::find($item->id);
+                    $service = ReservationsItem::find($item->id); //ES LA INFORMACION DEL SERVICIO
                     if( $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
                         $preassignment = "L".$arrival_counter;
                         $service->op_one_preassignment = $preassignment;
@@ -245,8 +245,12 @@ class OperationsController extends Controller
         try {
             DB::beginTransaction();
             //DECLARAMOS VARIABLES
-            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
-            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
+            // $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
+            // $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
+
+            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND it.op_one_preassignment IS NOT NULL ";
+            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND it.op_two_preassignment IS NOT NULL AND it.is_round_trip = 1 ";            
+
             $havingConditions = []; $queryHaving = "";
             $queryData = [
                 'init' => $request->date." 00:00:00",
