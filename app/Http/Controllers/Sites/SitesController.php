@@ -11,6 +11,10 @@ use App\Http\Requests\SiteRequest;
 //REPOSITORY
 use App\Repositories\Sites\SitesRepository;
 
+//MODEL
+use App\Models\Enterprise;
+use App\Models\Site;
+
 class SitesController extends Controller
 {
     private $SitesRepository;
@@ -20,33 +24,33 @@ class SitesController extends Controller
         $this->SitesRepository = $SitesRepository;
     }
 
-    public function index(Request $request)
+    public function index(Enterprise $Enterprise)
     {
-        return $this->SitesRepository->index($request);
+        return $this->SitesRepository->index($Enterprise);
+    }    
+
+    public function create(Request $request, Enterprise $Enterprise)
+    {
+        return $this->SitesRepository->create($request, $Enterprise);
     }
 
-    public function create(Request $request)
+    public function store(SiteRequest $request, Enterprise $Enterprise)
     {
-        return $this->SitesRepository->create($request);
+        return $this->SitesRepository->store($request, $Enterprise);
     }
 
-    public function store(SiteRequest $request)
+    public function edit(Request $request, Site $Site)
     {
-        return $this->SitesRepository->store($request);
+        return $this->SitesRepository->edit($request, $Site);
     }
 
-    public function edit(Request $request, $id)
+    public function update(SiteRequest $request, Site $Site)
     {
-        return $this->SitesRepository->edit($request, $id);
+        return $this->SitesRepository->update($request, $Site);
     }
 
-    public function update(SiteRequest $request, $id)
+    public function destroy(Request $request, Site $Site)
     {
-        return $this->SitesRepository->update($request, $id);
-    }
-
-    public function destroy(Request $request, $id)
-    {
-        return $this->SitesRepository->destroy($request, $id);
+        return $this->SitesRepository->destroy($request, $Site);
     }     
 }

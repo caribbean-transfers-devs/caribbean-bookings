@@ -16,8 +16,8 @@
 @section('title') Operación @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/managment.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/report_conciliation.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/report_conciliation.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -26,20 +26,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="{{ mix('/assets/js/sections/operations/managment.min.js') }}"></script>
-    <script>
-        if ( document.getElementById('lookup_date') != null ) {
-            const picker = new easepick.create({
-                element: "#lookup_date",
-                css: [
-                    'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-                    'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-                    'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-                ],
-                zIndex: 10,
-            });   
-        }        
-    </script>
+    <script src="{{ mix('/assets/js/sections/reports/conciliation.min.js') }}"></script>
 @endpush
 
 @section('content')
@@ -70,6 +57,10 @@
                         </ul>
                     </div>
                 @endif
+                <button class="btn btn-primary">Filtrar</button>
+                <button class="btn btn-primary">Conciliacion de PayPal</button>
+                <button class="btn btn-primary"></button>
+                
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>

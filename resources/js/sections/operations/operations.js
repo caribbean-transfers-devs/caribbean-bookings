@@ -1153,15 +1153,26 @@ document.addEventListener('keydown', resetTimer);
 resetTimer(); 
 
 window.addEventListener('scroll', function() {
-  var table = document.getElementById('zero-config');
-  var thead = table.querySelector('thead');
-  var offset = table.getBoundingClientRect().top;
+  let __table_private = document.getElementById('operation-private');
+  let __table_shared = document.getElementById('operation-shared');
 
-  if (window.scrollY > offset) {
-    thead.classList.add('fixed-header');
+  let __thead_private = __table_private.querySelector('thead');
+  let __offset_private = __table_private.getBoundingClientRect().top;
+
+  let __thead_shared = __table_shared.querySelector('thead');
+  let __offset_shared = __table_shared.getBoundingClientRect().top;
+
+  if (window.scrollY > __offset_private) {
+    __thead_private.classList.add('fixed-header');
   } else {
-    thead.classList.remove('fixed-header');
+    __thead_private.classList.remove('fixed-header');
   }
+
+  if (window.scrollY > __offset_shared) {
+    __thead_shared.classList.add('fixed-header');
+  } else {
+    __thead_shared.classList.remove('fixed-header');
+  }  
 });
 
 //BOTONES 

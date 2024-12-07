@@ -22,16 +22,40 @@ class SiteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'names' => 'required|string|max:255',
-            'is_external' => 'required|integer|in:1,0',
+            'name' => 'required|string|max:255',
+            'logo' => 'required|string|url',
+            'payment_domain' => 'required|string|url',
+            'color' => ['required', 'string', 'regex:/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/'],
+            'transactional_email' => 'required|string|max:255',
+            'transactional_email_send' => 'required|integer|in:1,0',
+            'transactional_phone' => 'required|string',
+            'is_commissionable' => 'required|integer|in:1,0',
+            'is_cxc' => 'required|integer|in:1,0',
+            'is_cxp' => 'required|integer|in:1,0',
+            'success_payment_url' => 'required|string',
+            'cancel_payment_url' => 'required|string',
+            'type_site' => 'required|string|in:PLATFORM,CALLCENTER,AGENCY,TICKETOFFICE',
         ];
     }
 
     public function messages()
     {
         return [
-            'names.required' => 'Por favor, ingresa el nombre de la empresa',
-            'names.string' => 'El campo nombre de la empresa, debe ser una cadena de texto',
+            'name.required' => 'Por favor, ingresa el nombre del sitio',
+            'logo.required' => 'Por favor, ingresa la url del logo',
+            'payment_domain.required' => 'Por favor, ingresa el dominio',
+            'color.required' => 'Por favor, ingresa un color',
+
+            'transactional_email.required' => 'por favor, ingresa el correo',
+            'transactional_email_send.required' => 'Por favor, indica si envia correo',
+            'transactional_phone.required' => 'Por favor, ingresa el teléfono',
+            'is_commissionable.required' => 'Por favor, indica si es comisionable',
+            'is_cxc.required' => 'Por favor, indica si maneja cuentas por cobrar',
+            'is_cxp.required' => 'Por favor, indica si maneja cuentas por pagar',
+
+            'success_payment_url.required' => 'Por favor, ingresa la url de pago confirmado',
+            'cancel_payment_url.required' => 'Por favor, ingresa la url de pago cancelado',
+            'type_site.required' => 'Por favor, indica el tipo de sitio',
         ];
     }
 }

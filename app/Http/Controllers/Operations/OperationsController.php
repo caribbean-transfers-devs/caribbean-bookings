@@ -635,14 +635,20 @@ class OperationsController extends Controller
             }
 
             //VALIDAMOS SI LA REFERENCIA YA EXISTE
-            $duplicated_reservation = Reservation::where('reference', $request->reference)->count();
-            if( $duplicated_reservation ) {
-                return response()->json([
-                    'errors' => [
-                        'code' => 'required_params',
-                    ],
-                    'message' => 'Ese folio ya ha sido registrado',
-                ], Response::HTTP_BAD_REQUEST); 
+            if( $request->type_service == "PRIVATE" ){
+                $duplicated_reservation = Reservation::where('reference', $request->reference)->count();
+                if( $duplicated_reservation ) {
+                    return response()->json([
+                        'errors' => [
+                            'code' => 'required_params',
+                        ],
+                        'message' => 'Ese folio ya ha sido registrado',
+                    ], Response::HTTP_BAD_REQUEST); 
+                }
+            }
+
+            if( $request->type_service == "SHARED" ){
+                $duplicated_reservation = Reservation::where('reference', $request->reference)->get();
             }
 
             //FORMATEAMOS LA FECHA DEL SERVICIO PARA PODER VER SI ACTUALIZAREMOS LA TABLA
