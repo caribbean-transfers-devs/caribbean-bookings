@@ -50,5 +50,5 @@ class DriverController extends Controller
     public function destroy(Request $request, $id)
     {
         return $this->DriverRepository->destroy($request, $id);
-    } 
+    }
 }

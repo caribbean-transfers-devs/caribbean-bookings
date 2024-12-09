@@ -5,12 +5,12 @@
 @section('title') Sitios de empresa @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/enterprise.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/enterprise.min.css') }}" rel="stylesheet" > 
+    <link href="{{ mix('/assets/css/sections/settings_enterprises.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/settings_enterprises.min.css') }}" rel="stylesheet" > 
 @endpush
 
 @push('Js')
-    <script src="{{ mix('assets/js/sections/enterprise.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/settings/enterprises.min.js') }}"></script>
 @endpush
 
 @section('content')
@@ -36,6 +36,17 @@
                         </ul>
                     </div>
                 @endif
+                @if (session('success'))
+                    <div class="alert alert-light-success alert-dismissible fade show border-0 mb-4" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if (session('danger'))
+                    <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
+                        {{ session('danger') }}
+                    </div>
+                @endif
+
                 <table id="dataSites" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>

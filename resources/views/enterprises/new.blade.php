@@ -10,7 +10,7 @@
 @endpush
 
 @push('Js')
-    <script src="{{ mix('assets/js/sections/enterprise.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/settings/enterprises.min.js') }}"></script>
 @endpush
 
 @section('content')
@@ -30,7 +30,6 @@
                                     </ul>
                                 </div>
                             @endif
-
                             @if (session('success'))
                                 <div class="alert alert-light-success alert-dismissible fade show border-0 mb-4" role="alert"> 
                                     {{ session('success') }}
@@ -40,7 +39,8 @@
                                 <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
                                     {{ session('danger') }}
                                 </div>
-                            @endif                            
+                            @endif
+
                             <form action="{{ isset($enterprise) ? route('enterprises.update', $enterprise->id) : route('enterprises.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @if ( isset($enterprise) )

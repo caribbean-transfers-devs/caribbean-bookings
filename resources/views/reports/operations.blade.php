@@ -180,7 +180,7 @@
 @endpush
 
 @section('content')
-    @php
+    @php        
         $buttons = array(
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
@@ -303,13 +303,13 @@
                                         ];
                                     }
                                     $operationStatus['total'] += $operation->service_cost;
-                                    $operationStatus['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                    $operationStatus['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                     $operationStatus[$operation->currency]['total'] += $operation->service_cost;
-                                    $operationStatus[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                    $operationStatus[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                     $operationStatus[$operation->currency]['counter']++;
                                     $operationStatus['counter']++;
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
+                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                     $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")][$operation->currency]['total'] += $operation->service_cost;
                                     $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")][$operation->currency]['counter']++;
                                     $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['counter']++;
@@ -333,12 +333,12 @@
                                     }
                                     if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
                                         $dataMethodPayments['total'] += $operation->service_cost;
-                                        $dataMethodPayments['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataMethodPayments['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataMethodPayments[$operation->currency]['total'] += $operation->service_cost;
-                                        $dataMethodPayments[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataMethodPayments[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataMethodPayments[$operation->currency]['counter']++;
                                         $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))]['total'] += $operation->service_cost;
-                                        $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))][$operation->currency]['total'] += $operation->service_cost;
                                         $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))][$operation->currency]['counter']++;
                                         $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))]['counter']++;
@@ -364,12 +364,12 @@
                                     }
                                     if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
                                         $dataSites['total'] += $operation->service_cost;
-                                        $dataSites['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataSites['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataSites[$operation->currency]['total'] += $operation->service_cost;
-                                        $dataSites[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataSites[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataSites[$operation->currency]['counter']++;
                                         $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['total'] += $operation->service_cost;
-                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataSites['data'][strtoupper(Str::slug($operation->site_name))][$operation->currency]['total'] += $operation->service_cost;
                                         $dataSites['data'][strtoupper(Str::slug($operation->site_name))][$operation->currency]['counter']++;
                                         $dataSites['data'][strtoupper(Str::slug($operation->site_name))]['counter']++;
@@ -395,12 +395,12 @@
                                     }
                                     if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
                                         $dataOriginSale['total'] += $operation->service_cost;
-                                        $dataOriginSale['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataOriginSale['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataOriginSale[$operation->currency]['total'] += $operation->service_cost;
-                                        $dataOriginSale[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataOriginSale[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataOriginSale[$operation->currency]['counter']++;
                                         $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['total'] += $operation->service_cost;
-                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))][$operation->currency]['total'] += $operation->service_cost;
                                         $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))][$operation->currency]['counter']++;
                                         $dataOriginSale['data'][strtoupper(Str::slug(( !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' )))]['counter']++;
@@ -418,9 +418,9 @@
                                     }
                                     if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
                                         $dataCurrency['total'] += $operation->service_cost;
-                                        $dataCurrency['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataCurrency['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataCurrency['data'][$operation->currency]['total'] += $operation->service_cost;
-                                        $dataCurrency['data'][$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                        $dataCurrency['data'][$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataCurrency['data'][$operation->currency]['counter']++;
                                         $dataCurrency['counter']++;
                                     }
@@ -446,12 +446,12 @@
                                             ];
                                         }
                                             $dataDriver['total'] += $operation->service_cost;
-                                            $dataDriver['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataDriver['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataDriver[$operation->currency]['total'] += $operation->service_cost;
-                                            $dataDriver[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataDriver[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataDriver[$operation->currency]['counter']++;
                                             $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['total'] += $operation->service_cost;
-                                            $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
 
                                             if( !in_array(OperationTrait::setOperationUnit($operation), $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['units']) ){
                                                 array_push($dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['units'], OperationTrait::setOperationUnit($operation));
@@ -486,12 +486,12 @@
                                         }
                                         
                                             $dataUnit['total'] += $operation->service_cost;
-                                            $dataUnit['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataUnit['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataUnit[$operation->currency]['total'] += $operation->service_cost;
-                                            $dataUnit[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataUnit[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataUnit[$operation->currency]['counter']++;
                                             $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['total'] += $operation->service_cost;
-                                            $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))][$operation->currency]['total'] += $operation->service_cost;
                                             $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))][$operation->currency]['counter']++;
                                             $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['counter']++;
@@ -520,12 +520,12 @@
                                             ];
                                         }                                    
                                             $dataServiceTypeOperation['total'] += $operation->service_cost;
-                                            $dataServiceTypeOperation['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataServiceTypeOperation['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataServiceTypeOperation[$operation->currency]['total'] += $operation->service_cost;
-                                            $dataServiceTypeOperation[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataServiceTypeOperation[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataServiceTypeOperation[$operation->currency]['counter']++;
                                             $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['total'] += $operation->service_cost;
-                                            $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))][$operation->currency]['total'] += $operation->service_cost;
                                             $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))][$operation->currency]['counter']++;
                                             $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))]['counter']++;
@@ -551,12 +551,12 @@
                                             ];
                                         }
                                             $dataVehicles['total'] += $operation->service_cost;
-                                            $dataVehicles['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataVehicles['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataVehicles[$operation->currency]['total'] += $operation->service_cost;
-                                            $dataVehicles[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataVehicles[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataVehicles[$operation->currency]['counter']++;
                                             $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['total'] += $operation->service_cost;
-                                            $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * 18) : $operation->service_cost );
+                                            $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                             $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))][$operation->currency]['total'] += $operation->service_cost;
                                             $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))][$operation->currency]['counter']++;
                                             $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['counter']++;

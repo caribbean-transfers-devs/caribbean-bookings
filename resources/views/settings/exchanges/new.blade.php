@@ -10,7 +10,12 @@
 @endpush
 
 @push('Js')
-    <script src="{{ mix('assets/js/sections/settings/drivers.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="{{ mix('assets/js/sections/settings/exchanges.min.js') }}"></script>
 @endpush
 
 @section('content')
@@ -40,43 +45,33 @@
                                     {{ session('danger') }}
                                 </div>
                             @endif
-                                                        
-                            <form action="{{ isset($driver) ? route('drivers.update', $driver->id) : route('drivers.store') }}" method="POST" enctype="multipart/form-data">
+
+                            <form action="{{ isset($exchange) ? route('config.exchanges.update', $exchange->id) : route('config.exchanges.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                @if ( isset($driver) )
+                                @if ( isset($exchange) )
                                     @method('PUT')
                                 @endif
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="enterprise_id">Selecciona una empresa</label>
-                                            <select id="enterprise_id" name="enterprise_id" class="form-control mb-3">
-                                                @foreach ($enterprises as $enterprise)
-                                                    <option {{ ( isset($driver->enterprise_id) && $driver->enterprise_id == $enterprise->id ? 'selected' : '' ) }} value="{{ $enterprise->id }}">{{ $enterprise->names }}</option>
-                                                @endforeach
-                                            </select>
+                                            <label for="exchange">Monto</label>
+                                            <input type="number" step=".01" id="exchange" name="exchange" class="form-control mb-3" placeholder="Monto" value="{{ ( isset($exchange->exchange) ? $exchange->exchange : '' ) }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="names">Nombres</label>
-                                            <input type="text" id="names" name="names" class="form-control mb-3" placeholder="Nombres" value="{{ ( isset($driver->names) ? $driver->names : '' ) }}">
+                                            <label for="date_init">Fecha inicio</label>
+                                            <input type="text" id="date_init" name="date_init" class="form-control mb-3" placeholder="Fecha inicio" value="{{ ( isset($exchange->date_init) ? $exchange->date_init : '' ) }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="surnames">Apellidos</label>
-                                            <input type="text" id="surnames" name="surnames" class="form-control mb-3" placeholder="Apellidos" value="{{ ( isset($driver->surnames) ? $driver->surnames : '' ) }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="phone">Teléfono</label>
-                                            <input type="text" id="phone" name="phone" class="form-control mb-3" placeholder="Teléfono" value="{{ ( isset($driver->phone) ? $driver->phone : '' ) }}">
+                                            <label for="date_end">Fecha fin</label>
+                                            <input type="text" id="date_end" name="date_end" class="form-control mb-3" placeholder="Fecha fin" value="{{ ( isset($exchange->date_end) ? $exchange->date_end : '' ) }}">
                                         </div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">
-                                        <a class="btn btn-danger" href="{{ route('drivers.index') }}">Cancelar</a>
+                                        <a class="btn btn-danger" href="{{ route('config.exchanges') }}">Cancelar</a>
                                         <button type="submit" class="btn btn-primary">{{ ( isset($driver) ? 'Actualizar' : 'Guardar' ) }}</button>
                                     </div>
                                 </div>

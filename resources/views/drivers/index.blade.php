@@ -2,27 +2,26 @@
     use App\Traits\RoleTrait;
 @endphp
 @extends('layout.app')
-@section('title') Empresas @endsection
+@section('title') Conductores @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/driver.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/driver.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/settings_drivers.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/settings_drivers.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
-    <script src="{{ mix('assets/js/sections/driver.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/settings/drivers.min.js') }}"></script>
 @endpush
 
 @section('content')
     @php
         $buttons = array(
             array(  
-                'text' => 'Agregar un conductor',
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Agregar un conductor',
                 'className' => 'btn btn-primary __btn_create',
                 'url' => route('drivers.create')
             )
         );
-        // dump($buttons);
     @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
@@ -37,26 +36,37 @@
                         </ul>
                     </div>
                 @endif
-                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                @if (session('success'))
+                    <div class="alert alert-light-success alert-dismissible fade show border-0 mb-4" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if (session('danger'))
+                    <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
+                        {{ session('danger') }}
+                    </div>
+                @endif
+
+                <table id="dataDrivers" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th>Empresa</th>
-                            <th>destino</th>
-                            <th>Nombres</th>
-                            <th>Apellido</th>
-                            <th>Teléfono</th>
-                            <th></th>
+                            <th class="text-center">Empresa</th>
+                            <th class="text-center">destino</th>
+                            <th class="text-center">Nombres</th>
+                            <th class="text-center">Apellido</th>
+                            <th class="text-center">Teléfono</th>
+                            <th class="text-center"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($drivers as $driver)
                             <tr>
-                                <td>{{ $driver->enterprise->names }}</td>
-                                <td>{{ $driver->destination->name }}</td>
-                                <td>{{ $driver->names }}</td>
-                                <td>{{ $driver->surnames }}</td>
-                                <td>{{ $driver->phone }}</td>
-                                <td>
+                                <td class="text-center">{{ $driver->enterprise->names }}</td>
+                                <td class="text-center">{{ $driver->destination->name }}</td>
+                                <td class="text-center">{{ $driver->names }}</td>
+                                <td class="text-center">{{ $driver->surnames }}</td>
+                                <td class="text-center">{{ $driver->phone }}</td>
+                                <td class="text-center">
                                     <div class="d-flex gap-3">
                                         <a class="btn btn-primary" href="{{ route('drivers.edit', [$driver->id]) }}">Editar</a>
                                         <form action="{{ route('drivers.destroy', $driver->id) }}" method="POST">

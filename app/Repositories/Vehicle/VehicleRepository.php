@@ -19,7 +19,16 @@ class VehicleRepository
     {
         try {            
             $vehicles = Vehicle::with('enterprise','destination_service','destination')->get();
-            return view('vehicles.index', compact('vehicles'));
+            return view('vehicles.index', [
+                'breadcrumbs' => [
+                    [
+                        "route" => "",
+                        "name" => "Listado de vehículos",
+                        "active" => true
+                    ]
+                ],
+                'vehicles' => $vehicles,
+            ]);
         } catch (Exception $e) {
         }
     }
@@ -28,7 +37,22 @@ class VehicleRepository
         try {
             $enterprises = Enterprise::all();
             $services = DestinationService::all();
-            return view('vehicles.new', compact('enterprises', 'services'));
+            return view('vehicles.new', [
+                'breadcrumbs' => [
+                    [
+                        "route" => route('vehicles.index'),
+                        "name" => "Listado de vehículos",
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Nuevo vehículo",
+                        "active" => true
+                    ]
+                ],                
+                'enterprises' => $enterprises, 
+                'services' => $services,
+            ]);
         } catch (Exception $e) {
         }
     }
@@ -61,7 +85,23 @@ class VehicleRepository
             $enterprises = Enterprise::all();           
             $services = DestinationService::all();            
             $vehicle = Vehicle::find($id);
-            return view('vehicles.new',compact('enterprises', 'services', 'vehicle'));
+            return view('vehicles.new',[
+                'breadcrumbs' => [
+                    [
+                        "route" => route('vehicles.index'),
+                        "name" => "Listado de vehículos",
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Editar el vehículo: ".$vehicle->name,
+                        "active" => true
+                    ]
+                ],                
+                'enterprises' => $enterprises, 
+                'services' => $services, 
+                'vehicle' => $vehicle,
+            ]);
         } catch (Exception $e) {
         }
     }

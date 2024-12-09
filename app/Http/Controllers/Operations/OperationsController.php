@@ -648,7 +648,10 @@ class OperationsController extends Controller
             }
 
             if( $request->type_service == "SHARED" ){
-                $duplicated_reservation = Reservation::where('reference', $request->reference)->get();
+                $duplicated_reservation = Reservation::where('reference', $request->reference)->first();
+                if( $duplicated_reservation != NULL ){
+                    $reservation = $duplicated_reservation;
+                }
             }
 
             //FORMATEAMOS LA FECHA DEL SERVICIO PARA PODER VER SI ACTUALIZAREMOS LA TABLA
@@ -658,7 +661,6 @@ class OperationsController extends Controller
             $departure_date = $dateTime->format('Y-m-d');
             $departure_date_today = ( $departure_date == date('Y-m-d') ? true : false );
 
-    
             $default_destination_id = 1; // Considerando que el id corresponde a: "Cancún"
             $destination = Destination::find( $default_destination_id );
     
@@ -684,32 +686,38 @@ class OperationsController extends Controller
             }
 
             // Creando reservación
-            $reservation = new Reservation;
-            $reservation->client_first_name = $request->client_first_name;
-            $reservation->client_last_name = $request->client_last_name;
-            $reservation->client_email = $request->client_email ? $request->client_email : null;
-            $reservation->client_phone = $request->client_phone ? $request->client_phone : null;
-            $reservation->currency = $request->sold_in_currency;
-            $reservation->language = $request->language;
-            $reservation->rate_group = '0B842B8C';
-            $reservation->is_commissionable = 0;
-            $reservation->pay_at_arrival = 1;
-            $reservation->site_id = $request->site_id;
-            $reservation->destination_id = $destination ? $default_destination_id : null;
-            $reservation->user_id = auth()->user()->id;
-            $reservation->reference = $request->reference;
-            $reservation->created_at = Carbon::now();
-            $reservation->updated_at = Carbon::now();
-            $reservation->comments = $request->comments;
-            $reservation->is_complete = ( $request->site_id == 11 || $request->site_id == 21 ? 0 : 1 );
-            $reservation->save();
+            if( ($request->type_service == "PRIVATE") || ($request->type_service == "SHARED" && $duplicated_reservation == NULL) ){
+                $reservation = new Reservation;
+                $reservation->client_first_name = $request->client_first_name;
+                $reservation->client_last_name = $request->client_last_name;
+                $reservation->client_email = $request->client_email ? $request->client_email : null;
+                $reservation->client_phone = $request->client_phone ? $request->client_phone : null;
+                $reservation->currency = $request->sold_in_currency;
+                $reservation->language = $request->language;
+                $reservation->rate_group = '0B842B8C';
+                $reservation->is_commissionable = 0;
+                $reservation->pay_at_arrival = 1;
+                $reservation->site_id = $request->site_id;
+                $reservation->destination_id = $destination ? $default_destination_id : null;
+                $reservation->user_id = auth()->user()->id;
+                $reservation->reference = $request->reference;
+                $reservation->created_at = Carbon::now();
+                $reservation->updated_at = Carbon::now();
+                $reservation->comments = $request->comments;
+                $reservation->is_complete = ( $request->site_id == 11 || $request->site_id == 21 ? 0 : 1 );
+                $reservation->save();
 
-            // Creando follow_up
-            $this->create_followUps($reservation->id, 'SE CAPTURÓ LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES', 'HISTORY', auth()->user()->name);
+                // Creando follow_up
+                $this->create_followUps($reservation->id, 'SE CAPTURÓ LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES', 'HISTORY', auth()->user()->name);
+            }
 
             $item = new ReservationsItem();
             $item->reservation_id = $reservation->id;
             $item->code = $this->generateCode();
+            if( $request->type_service == "SHARED" ){
+                $item->client_first_name = $request->client_first_name;
+                $item->client_last_name = $request->client_last_name;
+            }
             $item->destination_service_id = $request->destination_service_id;
             $item->from_name = $request->from_name ? $request->from_name : $from_zone->name;
             $item->from_lat = $from_lat;

@@ -219,6 +219,13 @@
                     'active' => request()->routeIs('drivers.*'),
                 ];
             endif;
+            // if(RoleTrait::hasPermission(32)):
+                $links_settings[] = [
+                    'name' => 'Tipos de cambio reportes',
+                    'route' => route('config.exchanges'),
+                    'active' => request()->routeIs('config.exchanges'),
+                ];
+            // endif;
             if(RoleTrait::hasPermission(28)):
                 $links_settings[] = [
                     'name' => 'Zonas',

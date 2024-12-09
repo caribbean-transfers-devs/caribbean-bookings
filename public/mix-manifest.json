@@ -14,6 +14,10 @@
     "/assets/css/sections/users.min.css": "/assets/css/sections/users.min.css?id=91df729810d6d875aabaf81006092208",
     "/assets/css/sections/rates.min.css": "/assets/css/sections/rates.min.css?id=f6ce89a2b9ed71e6d422475c9fb9835e",
     "/assets/css/sections/zones.min.css": "/assets/css/sections/zones.min.css?id=5e283bae5690a32918a66a41df11ae08",
+    "/assets/css/sections/settings_exchanges.min.css": "/assets/css/sections/settings_exchanges.min.css?id=367636504b41b21dfea4a0b57b5cb117",
+    "/assets/css/sections/settings_drivers.min.css": "/assets/css/sections/settings_drivers.min.css?id=367636504b41b21dfea4a0b57b5cb117",
+    "/assets/css/sections/settings_vehicles.min.css": "/assets/css/sections/settings_vehicles.min.css?id=367636504b41b21dfea4a0b57b5cb117",
+    "/assets/css/sections/settings_enterprises.min.css": "/assets/css/sections/settings_enterprises.min.css?id=367636504b41b21dfea4a0b57b5cb117",
     "/assets/css/sections/operations.min.css": "/assets/css/sections/operations.min.css?id=0ff03d771ef2477e179589bc3fcfc83e",
     "/assets/css/sections/management_reservations.min.css": "/assets/css/sections/management_reservations.min.css?id=b2a69e02d9b5a381363845afbd627221",
     "/assets/css/sections/management_spam.min.css": "/assets/css/sections/management_spam.min.css?id=b2a69e02d9b5a381363845afbd627221",
@@ -65,12 +69,13 @@
     "/assets/js/sections/operations/operations.min.js": "/assets/js/sections/operations/operations.min.js?id=de9ff83e91d5c0cafcc3cccf5789fd1e",
     "/assets/js/sections/pos/sales.min.js": "/assets/js/sections/pos/sales.min.js?id=955f423667d0c6a71ed4095ed5f55645",
     "/assets/js/sections/pos/sellers.min.js": "/assets/js/sections/pos/sellers.min.js?id=b93bc76bc803d019d01ddb71bea20fe3",
+    "/assets/js/sections/settings/enterprises.min.js": "/assets/js/sections/settings/enterprises.min.js?id=83851d0ddd129b70f32ed579bd40be68",
+    "/assets/js/sections/settings/vehicles.min.js": "/assets/js/sections/settings/vehicles.min.js?id=83851d0ddd129b70f32ed579bd40be68",
+    "/assets/js/sections/settings/drivers.min.js": "/assets/js/sections/settings/drivers.min.js?id=83851d0ddd129b70f32ed579bd40be68",
+    "/assets/js/sections/settings/exchanges.min.js": "/assets/js/sections/settings/exchanges.min.js?id=2bf259a6616c9a290bc7283b3b6e9786",
     "/assets/js/sections/zones.min.js": "/assets/js/sections/zones.min.js?id=012d7351f22dc4c3ad61337e823befee",
     "/assets/js/sections/rates.min.js": "/assets/js/sections/rates.min.js?id=40682781f989e3302944c8231dca009e",
     "/assets/js/sections/users.min.js": "/assets/js/sections/users.min.js?id=da8d35715ecbb10f95aeb47e34f7b6fd",
     "/assets/js/sections/user_edit.min.js": "/assets/js/sections/user_edit.min.js?id=4d1a1f2feb3ac053df5fb6cdcc76d02e",
-    "/assets/js/sections/roles.min.js": "/assets/js/sections/roles.min.js?id=348fb17a0b18f863d38ad6dffad8adb2",
-    "/assets/js/sections/enterprise.min.js": "/assets/js/sections/enterprise.min.js?id=8a967d2073ab70fc8e4a783e92244978",
-    "/assets/js/sections/vehicle.min.js": "/assets/js/sections/vehicle.min.js?id=8a967d2073ab70fc8e4a783e92244978",
-    "/assets/js/sections/driver.min.js": "/assets/js/sections/driver.min.js?id=8a967d2073ab70fc8e4a783e92244978"
+    "/assets/js/sections/roles.min.js": "/assets/js/sections/roles.min.js?id=348fb17a0b18f863d38ad6dffad8adb2"
 }

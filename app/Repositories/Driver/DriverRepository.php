@@ -18,7 +18,16 @@ class DriverRepository
     {
         try {
             $drivers = Driver::with('enterprise','destination')->get();
-            return view('drivers.index', compact('drivers'));
+            return view('drivers.index', [
+                'breadcrumbs' => [
+                    [
+                        "route" => "",
+                        "name" => "Listado de conductores",
+                        "active" => true
+                    ]
+                ],
+                'drivers' => $drivers,
+            ]);
         } catch (Exception $e) {
         }
     }
@@ -26,7 +35,21 @@ class DriverRepository
     public function create($request){
         try {
             $enterprises = Enterprise::all();
-            return view('drivers.new', compact('enterprises'));
+            return view('drivers.new', [
+                'breadcrumbs' => [
+                    [
+                        "route" => route('drivers.index'),
+                        "name" => "Listado de conductores",
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Nuevo conductor",
+                        "active" => true
+                    ]
+                ],
+                'enterprises' => $enterprises,
+            ]);
         } catch (Exception $e) {
         }
     }
@@ -57,7 +80,22 @@ class DriverRepository
         try {
             $enterprises = Enterprise::all();
             $driver = Driver::find($id);
-            return view('drivers.new',compact('enterprises','driver'));
+            return view('drivers.new',[
+                'breadcrumbs' => [
+                    [
+                        "route" => route('drivers.index'),
+                        "name" => "Listado de conductores",
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Editar el conductor: ".$driver->names.' '.$driver->surnames,
+                        "active" => true
+                    ]
+                ],
+                'enterprises' => $enterprises,
+                'driver' => $driver,
+            ]);
         } catch (Exception $e) {
         }
     }

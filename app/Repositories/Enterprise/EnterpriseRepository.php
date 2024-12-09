@@ -17,14 +17,36 @@ class EnterpriseRepository
     {
         try {
             $enterprises = Enterprise::all();
-            return view('enterprises.index', compact('enterprises'));
+            return view('enterprises.index', [
+                'breadcrumbs' => [
+                    [
+                        "route" => "",
+                        "name" => "Listado de empresas",
+                        "active" => true
+                    ]
+                ],
+                'enterprises' => $enterprises
+            ]);
         } catch (Exception $e) {
         }
     }
 
     public function create($request){
         try {
-            return view('enterprises.new');
+            return view('enterprises.new',[
+                'breadcrumbs' => [
+                    [
+                        "route" => route('enterprises.index'),
+                        "name" => "Listado de empresas",
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Nuevo empresa",
+                        "active" => true
+                    ]
+                ],                
+            ]);
         } catch (Exception $e) {
         }
     }
@@ -63,7 +85,21 @@ class EnterpriseRepository
     public function edit($request, $id){
         try {
             $enterprise = Enterprise::find($id);
-            return view('enterprises.new',compact('enterprise'));
+            return view('enterprises.new',[
+                'breadcrumbs' => [
+                    [
+                        "route" => route('enterprises.index'),
+                        "name" => "Listado de empresas",
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Editar la empresa: ".$enterprise->names,
+                        "active" => true
+                    ]
+                ],
+                'enterprise' => $enterprise,
+            ]);
         } catch (Exception $e) {
         }
     }

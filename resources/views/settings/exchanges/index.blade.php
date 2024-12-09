@@ -2,24 +2,24 @@
     use App\Traits\RoleTrait;
 @endphp
 @extends('layout.app')
-@section('title') Empresas @endsection
+@section('title') Tipos de cambio @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/settings_vehicles.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/settings_vehicles.min.css') }}" rel="stylesheet" > 
+    <link href="{{ mix('/assets/css/sections/settings_exchanges.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/settings_exchanges.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
-    <script src="{{ mix('assets/js/sections/settings/vehicles.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/settings/exchanges.min.js') }}"></script>
 @endpush
 
 @section('content')
     @php
         $buttons = array(
             array(  
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Agregar un vehículo',
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Agregar un tipo de cambio',
                 'className' => 'btn btn-primary __btn_create',
-                'url' => route('vehicles.create')
+                'url' => route('config.exchanges.create')
             )
         );
     @endphp
@@ -47,31 +47,27 @@
                     </div>
                 @endif
 
-                <table id="dataVehicles" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataExchanges" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th class="text-center">Empresa</th>
-                            <th class="text-center">Servicio</th>
-                            <th class="text-center">destino</th>
-                            <th class="text-center">Nombre</th>
-                            <th class="text-center">Código de la unidad</th>
-                            <th class="text-center">Número de placa</th>
+                            <th class="text-center">Monto</th>
+                            <th class="text-center">Periodo</th>
+                            <th class="text-center">Estatus</th>
                             <th class="text-center"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($vehicles as $vehicle)
+                        @foreach ($exchanges as $exchange)
                             <tr>
-                                <td class="text-center">{{ $vehicle->enterprise->names }}</td>
-                                <td class="text-center">{{ $vehicle->destination_service->name }}</td>
-                                <td class="text-center">{{ $vehicle->destination->name }}</td>
-                                <td class="text-center">{{ $vehicle->name }}</td>
-                                <td class="text-center">{{ $vehicle->unit_code }}</td>
-                                <td class="text-center">{{ $vehicle->plate_number }}</td>
+                                <td class="text-center">{{ number_format($exchange->exchange,2) }}</td>
+                                <td class="text-center">{{ $exchange->date_init }} - {{ $exchange->date_end }}</td>
+                                <td class="text-center">
+                                    <span class="badge badge-light-{{ ( $exchange->status == 1 ) ? 'success' : 'danger' }}">{{ ( $exchange->status == 1 ) ? 'Activo' : 'Inactivo' }}</span>
+                                </td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
-                                        <a class="btn btn-primary" href="{{ route('vehicles.edit', [$vehicle->id]) }}">Editar</a>
-                                        <form action="{{ route('vehicles.destroy', $vehicle->id) }}" method="POST">
+                                        <a class="btn btn-primary" href="{{ route('config.exchanges.edit', [$exchange->id]) }}">Editar</a>
+                                        <form action="{{ route('config.exchanges.destroy', $exchange->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">Eliminar</button>
@@ -82,7 +78,7 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>   
+            </div>
         </div>
     </div>
 @endsection

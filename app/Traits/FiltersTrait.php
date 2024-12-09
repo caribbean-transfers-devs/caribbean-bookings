@@ -14,9 +14,24 @@ use App\Models\Driver;
 use App\Models\Zones;
 use App\Models\DestinationService;
 use App\Models\CancellationTypes;
+use App\Models\ExchangeRateReport;
 
 trait FiltersTrait
 {
+    public function Exchange($in, $end){
+        $in = ( isset($in) ? $in : date('Y-m-d') );
+        $end = ( isset($in) ? $in : date('Y-m-d') );
+        $report = ExchangeRateReport::where('status', 1)->where('date_init', '<=', $in)
+                                ->where('date_end', '>=', $end)
+                                ->first();
+
+        if ($report) {
+            return $report->exchange; // Ejemplo: 25.50
+        } else {
+            return 18;
+        }                                
+    }
+
     public function Enterprises(){
         return Enterprise::all();
     }

@@ -143,7 +143,7 @@
 @endpush
 
 @section('content')
-    @php
+    @php        
         $buttons = array(
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
@@ -256,13 +256,13 @@
                                         ];
                                     }
                                     $bookingsStatus['total'] += $item->total_sales;
-                                    $bookingsStatus['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $bookingsStatus['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $bookingsStatus[$item->currency]['total'] += $item->total_sales;
-                                    $bookingsStatus[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $bookingsStatus[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $bookingsStatus[$item->currency]['counter']++;
                                     $bookingsStatus['counter']++;
-                                    $bookingsStatus['data'][$item->reservation_status]['total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
-                                    $bookingsStatus['data'][$item->reservation_status]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $bookingsStatus['data'][$item->reservation_status]['total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
+                                    $bookingsStatus['data'][$item->reservation_status]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $bookingsStatus['data'][$item->reservation_status][$item->currency]['total'] += $item->total_sales;
                                     $bookingsStatus['data'][$item->reservation_status][$item->currency]['counter']++;
                                     $bookingsStatus['data'][$item->reservation_status]['counter']++;
@@ -285,12 +285,12 @@
                                         ];
                                     }
                                     $dataMethodPayments['total'] += $item->total_sales;
-                                    $dataMethodPayments['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataMethodPayments['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataMethodPayments[$item->currency]['total'] += $item->total_sales;
-                                    $dataMethodPayments[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataMethodPayments[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataMethodPayments[$item->currency]['counter']++;
                                     $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))]['total'] += $item->total_sales;
-                                    $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))][$item->currency]['total'] += $item->total_sales;
                                     $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))][$item->currency]['counter']++;
                                     $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))]['counter']++;
@@ -314,12 +314,12 @@
                                         ];
                                     }
                                     $dataSites['total'] += $item->total_sales;
-                                    $dataSites['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataSites['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataSites[$item->currency]['total'] += $item->total_sales;
-                                    $dataSites[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataSites[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataSites[$item->currency]['counter']++;
                                     $dataSites['data'][strtoupper(Str::slug($item->site_name))]['total'] += $item->total_sales;
-                                    $dataSites['data'][strtoupper(Str::slug($item->site_name))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataSites['data'][strtoupper(Str::slug($item->site_name))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataSites['data'][strtoupper(Str::slug($item->site_name))][$item->currency]['total'] += $item->total_sales;
                                     $dataSites['data'][strtoupper(Str::slug($item->site_name))][$item->currency]['counter']++;
                                     $dataSites['data'][strtoupper(Str::slug($item->site_name))]['counter']++;
@@ -343,12 +343,12 @@
                                         ];
                                     }
                                     $dataDestinations['total'] += $item->total_sales;
-                                    $dataDestinations['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataDestinations['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataDestinations[$item->currency]['total'] += $item->total_sales;
-                                    $dataDestinations[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataDestinations[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataDestinations[$item->currency]['counter']++;
                                     $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))]['total'] += $item->total_sales;
-                                    $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))][$item->currency]['total'] += $item->total_sales;
                                     $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))][$item->currency]['counter']++;
                                     $dataDestinations['data'][strtoupper(Str::slug($item->destination_name_to))]['counter']++;
@@ -364,9 +364,9 @@
                                         ];
                                     }
                                     $dataCurrency['total'] += $item->total_sales;
-                                    $dataCurrency['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataCurrency['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataCurrency['data'][$item->currency]['total'] += $item->total_sales;
-                                    $dataCurrency['data'][$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataCurrency['data'][$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataCurrency['data'][$item->currency]['counter']++;
                                     $dataCurrency['counter']++;
 
@@ -388,12 +388,12 @@
                                         ];
                                     }
                                     $dataVehicles['total'] += $item->total_sales;
-                                    $dataVehicles['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataVehicles['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataVehicles[$item->currency]['total'] += $item->total_sales;
-                                    $dataVehicles[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataVehicles[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataVehicles[$item->currency]['counter']++;
                                     $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))]['total'] += $item->total_sales;
-                                    $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))][$item->currency]['total'] += $item->total_sales;
                                     $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))][$item->currency]['counter']++;
                                     $dataVehicles['data'][strtoupper(Str::slug($item->service_type_name))]['counter']++;
@@ -417,12 +417,12 @@
                                         ];
                                     }
                                     $dataOriginSale['total'] += $item->total_sales;
-                                    $dataOriginSale['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataOriginSale['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataOriginSale[$item->currency]['total'] += $item->total_sales;
-                                    $dataOriginSale[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataOriginSale[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataOriginSale[$item->currency]['counter']++;
                                     $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))]['total'] += $item->total_sales;
-                                    $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * 18) : $item->total_sales );
+                                    $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
                                     $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))][$item->currency]['total'] += $item->total_sales;
                                     $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))][$item->currency]['counter']++;
                                     $dataOriginSale['data'][strtoupper(Str::slug(( !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' )))]['counter']++;
@@ -586,7 +586,7 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($bookingsStatus['data'] as $keyStatus => $status )
-                                            @if ( isset($keyStatus['CANCELLED']) && $keyStatus == "CANCELLED" )
+                                            @if ( $keyStatus == "CANCELLED" )
                                                 <tr>
                                                     <th>{{ $status['name'] }}</th>
                                                     <td class="text-center">{{ number_format($status['gran_total'],2) }}</td>
@@ -600,10 +600,10 @@
                                     <tfoot>
                                         <tr>
                                             <th>TOTAL</th>
-                                            <th class="text-center">{{ number_format(0,2) }}</th>
-                                            <th class="text-center">{{ 0 }}</th>
-                                            <th class="text-center">{{ number_format(0,2) }}</th>
-                                            <th class="text-center">{{ number_format(0,2) }}</th>
+                                            <th class="text-center">{{ number_format(( isset($bookingsStatus['data']['CANCELLED']['gran_total']) ? $bookingsStatus['data']['CANCELLED']['gran_total'] : 0 ),2) }}</th>
+                                            <th class="text-center">{{ ( isset($bookingsStatus['data']['CANCELLED']['counter']) ? $bookingsStatus['data']['CANCELLED']['counter'] : 0 ) }}</th>
+                                            <th class="text-center">{{ number_format(( isset($bookingsStatus['data']['CANCELLED']['MXN']['total']) ? $bookingsStatus['data']['CANCELLED']['MXN']['total'] : 0 ),2) }}</th>
+                                            <th class="text-center">{{ number_format(( isset($bookingsStatus['data']['CANCELLED']['USD']['total']) ? $bookingsStatus['data']['CANCELLED']['USD']['total'] : 0 ),2) }}</th>
                                         </tr>
                                     </tfoot>
                                 </table>                                

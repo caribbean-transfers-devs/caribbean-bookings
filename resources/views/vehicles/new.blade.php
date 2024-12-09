@@ -10,7 +10,7 @@
 @endpush
 
 @push('Js')
-    <script src="{{ mix('assets/js/sections/enterprise.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/settings/vehicles.min.js') }}"></script>
 @endpush
 
 @section('content')
@@ -40,6 +40,7 @@
                                     {{ session('danger') }}
                                 </div>
                             @endif
+                            
                             <form action="{{ isset($vehicle) ? route('vehicles.update', $vehicle->id) : route('vehicles.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @if ( isset($vehicle) )

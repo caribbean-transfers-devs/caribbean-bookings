@@ -1,29 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Accounting\ConciliationController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Dashboard\DashboardController;
-use App\Http\Controllers\Payments\PaymentsController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\Users\UserController;
-use App\Http\Controllers\Reservations\ReservationsController;
-use App\Http\Controllers\Sales\SalesController;
-use App\Http\Controllers\Tpv\TpvController;
-use App\Http\Controllers\Configs\ZonesController;
+use App\Http\Controllers\Configs\ExchangeReportsController;
 use App\Http\Controllers\Configs\RatesController;
+use App\Http\Controllers\Configs\ZonesController;
+use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Driver\DriverController;
+use App\Http\Controllers\Enterprise\EnterpriseController;
 use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
-
-use App\Http\Controllers\Reports\ReportsController;
-use App\Http\Controllers\Reports\CashController as ReportCash;
-
+use App\Http\Controllers\Payments\PaymentsController;
 use App\Http\Controllers\Pos\PosController;
-use App\Http\Controllers\Enterprise\EnterpriseController;
-use App\Http\Controllers\Sites\SitesController;
-use App\Http\Controllers\Vehicle\VehicleController;
-use App\Http\Controllers\Driver\DriverController;
+use App\Http\Controllers\Reports\CashController as ReportCash;
+use App\Http\Controllers\Reports\ReportsController;
 
-use App\Http\Controllers\Accounting\ConciliationController;
+use App\Http\Controllers\Reservations\ReservationsController;
+use App\Http\Controllers\RoleController;
+
+use App\Http\Controllers\Sales\SalesController;
+use App\Http\Controllers\Sites\SitesController;
+use App\Http\Controllers\Tpv\TpvController;
+use App\Http\Controllers\Users\UserController;
+use App\Http\Controllers\Vehicle\VehicleController;
+
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -170,6 +171,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/punto-de-venta/vendors/edit', [PosController::class, 'editVendor'])->name('pos.vendors.edit');
     Route::delete('/punto-de-venta/vendors/delete', [PosController::class, 'deleteVendor'])->name('pos.vendors.delete');
     Route::put('/punto-de-venta/edit-created-at', [PosController::class, 'editCreatedAt'])->name('pos.editCreatedAt');
+
+    //TIPO DE CAMBIO PARA REPORTES
+    Route::get('/config/exchange-reports', [ExchangeReportsController::class, 'index'])->name('config.exchanges');
+    Route::get('/config/exchange-reports/create', [ExchangeReportsController::class, 'create'])->name('config.exchanges.create');
+    Route::post('/config/exchange-reports/store', [ExchangeReportsController::class, 'store'])->name('config.exchanges.store');
+    Route::get('/config/exchange-reports/{exchage}/edit', [ExchangeReportsController::class, 'edit'])->name('config.exchanges.edit');
+    Route::put('/config/exchange-reports/{exchage}', [ExchangeReportsController::class, 'update'])->name('config.exchanges.update');
+    Route::delete('/config/exchange-reports/{exchage}', [ExchangeReportsController::class, 'destroy'])->name('config.exchanges.destroy');
 
     Route::get('/config/destinations', [ZonesController::class, 'index'])->name('config.zones');
     Route::get('/config/destinations/{id}', [ZonesController::class, 'getZones'])->name('config.zones.getZones');

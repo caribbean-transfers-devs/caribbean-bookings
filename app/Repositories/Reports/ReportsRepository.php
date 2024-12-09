@@ -1004,6 +1004,7 @@ class ReportsRepository
             'currencies' => $this->Currencies(),
             'methods' => $this->Methods(),
             'cancellations' => $this->CancellationTypes(),
+            'exchange' => $this->Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
             'data' => $data,
             'request' => $request->input(),
         ]);
@@ -1191,7 +1192,8 @@ class ReportsRepository
             'payment_status' => $this->paymentStatus(),
             'currencies' => $this->Currencies(),
             'methods' => $this->Methods(),
-            'cancellations' => $this->CancellationTypes(),            
+            'cancellations' => $this->CancellationTypes(),
+            'exchange' => $this->Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
             'data' => $data,
             'request' => $request->input(),
         ]);
