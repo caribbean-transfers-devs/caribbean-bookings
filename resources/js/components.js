@@ -57,7 +57,6 @@ let components = {
         if( action == "fixedheader" ){
             _settings.fixedHeader = true; // Deshabilita FixedHeader si estaba habilitado
             _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
-
             // _settings.fixedHeader = true; // Activar encabezados fijos
             // _settings.scrollX = true;
             // _settings.scrollY = '2000px';  // Habilitar scroll vertical
@@ -88,9 +87,9 @@ let components = {
             // });
 
             // // Corrige el ancho al inicializar
-            // table.on('init', function () {
-            //     __table.columns.adjust().draw();
-            // });
+            table.on('init', function () {
+                __table.columns.adjust().draw();
+            });
 
             // table.on('draw', function () {
             //     __table.columns.adjust();
