@@ -11,14 +11,17 @@
 
 @import '../template/light/components/accordions';
 @import '../template/dark/components/accordions';
-@import '../template/light/components/tabs.scss';
-@import '../template/dark/components/tabs.scss';
+@import '../template/light/components/tabs';
+@import '../template/dark/components/tabs';
 @import '../template/light/components/modal';
 @import '../template/dark/components/modal';
 @import '../components/autocomplete';
 
-@import "../template/light/users/account-setting.scss";
-@import "../template/dark/users/account-setting.scss";
+@import "../template/light/users/account-setting";
+@import "../template/dark/users/account-setting";
+
+@import '../components/filters';
+@import '../components/charts';
 
 .autocomplete-results {
     z-index: 9;

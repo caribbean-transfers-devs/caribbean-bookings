@@ -1,5 +1,8 @@
 @php
     use App\Traits\RoleTrait;
+    $arrivalTimeGroup = [];
+    $departureTimeGroup = [];
+    $generalTimeGroup = []; // Arreglo para agrupar los datos
 @endphp
 @extends('layout.custom')
 @section('title') Operación @endsection
@@ -19,6 +22,14 @@
             background: #fff;
             color: #343a40;
         }
+
+        /**/
+        .dt-buttons .btn svg{
+            width: 18px;
+            height: 18px;
+        }
+
+        /*ESTILOS PARA IDENTIFICAR LOS COLORES DE AGENCIAS ESPECIFICAS*/
         .agency_29{
             background-color: #FE7A1F !important;
         }
@@ -42,8 +53,19 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
     <script src="{{ mix('assets/js/sections/operations/operations.min.js') }}"></script>
+    <script>
+        document.getElementById('showLayer').addEventListener('click', function() {
+            document.getElementById('layer').classList.add('active');
+        });
+
+        document.getElementById('closeLayer').addEventListener('click', function() {
+            document.getElementById('layer').classList.remove('active');
+        });
+    </script>
 @endpush
 
 @section('content')
@@ -51,22 +73,30 @@
         $total_close = 0;
         $buttons = array(
             array(
-                'text' => 'Filtros',
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
                 'className' => 'btn btn-primary',
                 'attr' => array(
                     'data-title' =>  "Filtros de operacion",
                     'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#filtersOperationModal'
+                    'data-bs-target' => '#filterModal'
                 )
-            )
+            ),
+            array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas',
+                'titleAttr' => 'Ver graficas',
+                'className' => 'btn btn-primary',
+                'attr' => array(
+                    'id' => 'showLayer',
+                )
+            ),            
         );
         if (RoleTrait::hasPermission(80)){
             array_push($buttons,
                 array(
-                    'text' => 'Agregar nuevo servicio',
+                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg> Agregar nuevo servicio',
                     'className' => 'btn btn-primary',
                     'attr' => array(
-                        'data-title' =>  "Filtro de reservaciones",
+                        'data-title' =>  "Agregar nuevo servicio",
                         'data-bs-toggle' => 'modal',
                         'data-bs-target' => '#operationModal'
                     )
@@ -77,7 +107,7 @@
         if (RoleTrait::hasPermission(82)){
             array_push($buttons,
                 array(
-                    'text' => 'Pre-asignación',
+                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Pre-asignación',
                     'className' => 'btn btn-primary',
                     'attr' => array(
                         'id' =>  "btn_preassignment",
@@ -87,33 +117,33 @@
         }
 
         if (RoleTrait::hasPermission(83)){
-            array_push($buttons,
-                array(
-                    'text' => 'Descargar operación',
-                    'className' => 'btn btn-primary',
-                    'attr' => array(
-                        'id' =>  "btn_dowload_operation",
-                    )
-                )
-            );
+            // array_push($buttons,
+            //     array(
+            //         'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Descargar operación',
+            //         'className' => 'btn btn-primary',
+            //         'attr' => array(
+            //             'id' =>  "btn_dowload_operation",
+            //         )
+            //     )
+            // );
         }
 
         if (RoleTrait::hasPermission(84)){
-            array_push($buttons,
-                array(
-                    'text' => 'Descargar comisiones de operación',
-                    'className' => 'btn btn-primary',
-                    'attr' => array(
-                        'id' =>  "btn_dowload_operation_comission",
-                    )
-                )
-            );
+            // array_push($buttons,
+            //     array(
+            //         'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Descargar comisiones de operación',
+            //         'className' => 'btn btn-primary',
+            //         'attr' => array(
+            //             'id' =>  "btn_dowload_operation_comission",
+            //         )
+            //     )
+            // );
         }
 
         if (RoleTrait::hasPermission(85)){
             array_push($buttons,
                 array(
-                    'text' => 'Cerrar operación',
+                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Cerrar operación',
                     'className' => 'btn btn-danger',
                     'attr' => array(
                         'id' =>  "btn_close_operation",
@@ -169,8 +199,7 @@
             </div>
 
             <div class="tab-content" id="animateLineContent-4">
-                <div class="tab-pane fade show active" id="animated-underline-private" role="tabpanel" aria-labelledby="animated-underline-badge-private">
-                    
+                <div class="tab-pane fade show active" id="animated-underline-private" role="tabpanel" aria-labelledby="animated-underline-badge-private">                    
                 </div>
             </div> --}}
 
@@ -271,6 +300,75 @@
                                         $label2 = 'secondary';
                                         break;
                                 }
+
+                                //LOGISTICA PARA GRAFICAS
+                                    // Obtener la hora formateada
+                                    $time = date("H:i", strtotime($operation_pickup)); //EXTRAEMOS LA HORA DE LA FECHA
+                                    $hour = date("H", strtotime($operation_pickup)); //EXTRAEMOS LA HORA                                
+                                    $minutes = date("i", strtotime($operation_pickup)); //EXTRAEMOS LOS SEGUNDOS
+
+                                    // Agrupar por intervalo de 15 minutos
+                                    if ($minutes < 15) {
+                                        $index = $hour . ':00';
+                                    } elseif ($minutes < 30) {
+                                        $index = $hour . ':15';
+                                    } elseif ($minutes < 45) {
+                                        $index = $hour . ':30';
+                                    } else {
+                                        $index = $hour . ':45';
+                                    }
+
+                                    // Agregar al arreglo agrupado
+                                    if( $value->final_service_type == "ARRIVAL" ){
+                                        if ( !isset($arrivalTimeGroup[$hour]) ) {
+                                            $arrivalTimeGroup[$hour] = [
+                                                'name' => $hour,
+                                                // 'data' => [],     // Lista de reservas
+                                                'quantity' => 0,  // Contador
+                                            ];
+                                        }
+                                        // if (!isset($arrivalTimeGroup[$hour]['data'][$index])) {
+                                        //     $arrivalTimeGroup[$hour]['data'][$index] = [];
+                                        // }
+                                        // $arrivalTimeGroup[$hour][] = $time;
+                                        // $arrivalTimeGroup[$hour]['data'][$index][] = $value;
+                                        $arrivalTimeGroup[$hour]['quantity']++;                                        
+                                    }
+                                    if( $value->final_service_type == "DEPARTURE" || $value->final_service_type == "TRANSFER" ){
+                                        if ( !isset($departureTimeGroup[$hour]) ) {
+                                            $departureTimeGroup[$hour] = [
+                                                'name' => $hour,
+                                                // 'data' => [],     // Lista de reservas
+                                                'quantity' => 0,  // Contador
+                                            ];
+                                        }
+                                        // if (!isset($departureTimeGroup[$hour]['data'][$index])) {
+                                        //     $departureTimeGroup[$hour]['data'][$index] = [];
+                                        // }
+                                        // $departureTimeGroup[$hour][] = $time;
+                                        // $departureTimeGroup[$hour]['data'][$index][] = $value;
+                                        $departureTimeGroup[$hour]['quantity']++;
+                                    }
+
+                                    if( $value->final_service_type == "ARRIVAL" || $value->final_service_type == "DEPARTURE" || $value->final_service_type == "TRANSFER" ){
+                                        // Inicializar el índice si no existe
+                                        if (!isset($generalTimeGroup[$hour])) {
+                                            $generalTimeGroup[$hour] = [
+                                                'name' => $hour,
+                                                // 'data' => [],     // Lista de reservas
+                                                'quantity' => 0,  // Contador
+                                            ];
+                                        }
+                                        // if (!isset($generalTimeGroup[$hour][$index])) {
+                                        //     $generalTimeGroup[$hour]['data'][$index] = [];
+                                        // }
+
+                                        // $generalTimeGroup[$hour][]['data'] = $time;
+                                        // Agregar la reserva a la lista de datos y aumentar el contador
+                                        // $generalTimeGroup[$hour]['data'][$index][] = $value;
+                                        $generalTimeGroup[$hour]['quantity']++;
+                                    }
+
                             @endphp
                             <tr class="item-{{ $key.$value->id }} {{ $class_agency }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
                                 <td>
@@ -308,7 +406,7 @@
                                         </div>                                        
                                     </div>
                                 </td>
-                                <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>                                    
+                                <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
                                 <td>
                                     <span>{{ $value->full_name }}</span>
                                     @if(!empty($value->reference))
@@ -435,11 +533,221 @@
         </div>
     </div>
 
-    <x-modals.operation.filters :data="$data" :nexDate="$nexDate" :date="$date" :websites="$websites" :units="$units" :drivers="$drivers" />
+    @php
+        // dump($arrivalTimeGroup);
+        // dump($departureTimeGroup);
+        // dump($generalTimeGroup);
+    @endphp
+    <div class="layer" id="layer">
+        <div class="header-chart d-flex justify-content-between">
+            <div class="btn_close">                
+                <button class="btn btn-primary" id="closeLayer">Cerrar</button>
+            </div>
+        </div>
+        <div class="body-chart">
+            <div class="row">
+                <div class="col-lg-12 col-12">
+                    <h5 class="col-12 text-left text-uppercase">Gráfica general de servicios por hora</h5>
+                    <canvas class="chartSale" id="chartGeneral" height="150"></canvas>
+                </div>
+                <hr>
+                <div class="col-lg-6 col-12">
+                    <h5 class="col-12 text-left text-uppercase">Gráfica de llegadas por hora</h5>
+                    <canvas class="" id="chartArrival" height="200"></canvas>
+                </div>
+                <div class="col-lg-6 col-12">
+                    <h5 class="col-12 text-left text-uppercase">Gráfica de salidas por hora</h5>
+                    <canvas class="" id="chartDeparture" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <x-modals.filters.bookings :data="$data" :websites="$websites" :units="$units" :drivers="$drivers" :reservationstatus="$reservation_status" />
     <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :vehicles="$vehicles" />
     <x-modals.reservations.comments />
     <x-modals.reservations.operation_messages_history />
     <x-modals.reservations.operation_data_customer />
     <x-modals.reservations.operation_confirmations />
-    <x-modals.reservations.operation_data_whatsapp />
+    <x-modals.reservations.operation_data_whatsapp />    
 @endsection
+
+@push('Js')
+    <script>
+        let graphics = {
+            dataGeneral: @json(( isset($generalTimeGroup) ? $generalTimeGroup : [] )),
+            dataArrival: @json(( isset($arrivalTimeGroup) ? $arrivalTimeGroup : [] )),
+            dataDeparture: @json(( isset($departureTimeGroup) ? $departureTimeGroup : [] )),
+            dataChartGeneral: function(){
+                let object = [];                    
+                // Obtiene y ordena las claves en orden ascendente
+                const generalKeys = Object.keys(this.dataGeneral).sort((a, b) => {
+                    if (!isNaN(a) && !isNaN(b)) {
+                        // Si son numéricos, los convierte para ordenar correctamente
+                        return parseFloat(a) - parseFloat(b);
+                    }
+                    // Si no son numéricos, usa orden lexicográfico
+                    return a.localeCompare(b);
+                });
+                generalKeys.forEach( (key) => {
+                    object.push(this.dataGeneral[key]);
+                });
+                // const systems = Object.entries(this.dataArrival);
+                // systems.forEach( ([key, data]) => {
+                //     // console.log(key);
+                //     // console.log(data);
+                //     object.push(data);
+                // });
+                return object;
+            },
+            dataChartArrival: function(){
+                let object = [];                    
+                // Obtiene y ordena las claves en orden ascendente
+                const generalKeys = Object.keys(this.dataArrival).sort((a, b) => {
+                    if (!isNaN(a) && !isNaN(b)) {
+                        // Si son numéricos, los convierte para ordenar correctamente
+                        return parseFloat(a) - parseFloat(b);
+                    }
+                    // Si no son numéricos, usa orden lexicográfico
+                    return a.localeCompare(b);
+                });
+                generalKeys.forEach( (key) => {
+                    object.push(this.dataArrival[key]);
+                });
+                return object;
+            },
+            dataChartDeparture: function(){
+                let object = [];                    
+                // Obtiene y ordena las claves en orden ascendente
+                const generalKeys = Object.keys(this.dataDeparture).sort((a, b) => {
+                    if (!isNaN(a) && !isNaN(b)) {
+                        // Si son numéricos, los convierte para ordenar correctamente
+                        return parseFloat(a) - parseFloat(b);
+                    }
+                    // Si no son numéricos, usa orden lexicográfico
+                    return a.localeCompare(b);
+                });
+                generalKeys.forEach( (key) => {
+                    object.push(this.dataDeparture[key]);
+                });
+                return object;
+            },
+        };
+
+        // console.log(graphics.dataChartGeneral());
+
+        if( document.getElementById('chartGeneral') != null ){
+            // Tu arreglo de datos
+            const dataGeneral = graphics.dataChartGeneral();
+            // Extraer etiquetas (eje X) y datos (eje Y)
+            const labelsG = dataGeneral.map(item => item.name);
+            const quantitiesG = dataGeneral.map(item => item.quantity);
+            // Configuración de la gráfica
+            const ctxG = document.getElementById('chartGeneral');
+            const myChartG = new Chart(ctxG, {
+                type: 'bar', // Tipo de gráfica
+                data: {
+                    labels: labelsG, // Etiquetas del eje X
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: quantitiesG, // Datos del eje Y
+                        // backgroundColor: 'rgba(75, 192, 192, 0.2)', // Color de fondo
+                        // borderColor: 'rgba(75, 192, 192, 1)', // Color del borde
+                        // borderWidth: 1 // Grosor del borde
+                    }]
+                },
+                options: {
+                    responsive: true, // Se adapta al tamaño del contenedor
+                    maintainAspectRatio: true, // Permitir que el gráfico ajuste su altura además de su ancho
+                    plugins: {
+                        legend: {
+                            position: 'top', // Posición de la leyenda
+                            display: false  // Oculta la leyenda
+                        },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true // Iniciar eje Y en 0
+                        }
+                    }
+                }
+            });
+        }
+
+        if( document.getElementById('chartArrival') != null ){
+            // Tu arreglo de datos
+            const dataArrival = graphics.dataChartArrival();
+            // Extraer etiquetas (eje X) y datos (eje Y)
+            const labelsA = dataArrival.map(item => item.name);
+            const quantitiesA = dataArrival.map(item => item.quantity);
+            // Configuración de la gráfica
+            const ctxA = document.getElementById('chartArrival');
+            const myChartA = new Chart(ctxA, {
+                type: 'bar', // Tipo de gráfica
+                data: {
+                    labels: labelsA, // Etiquetas del eje X
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: quantitiesA, // Datos del eje Y
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Color de fondo
+                        borderColor: 'rgba(75, 192, 192, 1)', // Color del borde
+                        borderWidth: 1 // Grosor del borde
+                    }]
+                },
+                options: {
+                    responsive: true, // Se adapta al tamaño del contenedor
+                    maintainAspectRatio: true, // Permitir que el gráfico ajuste su altura además de su ancho
+                    plugins: {
+                        legend: {
+                            position: 'top', // Posición de la leyenda
+                            display: false  // Oculta la leyenda
+                        },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true // Iniciar eje Y en 0
+                        }
+                    }
+                }
+            });
+        }
+        
+        if( document.getElementById('chartDeparture') != null ){
+            // Tu arreglo de datos
+            const dataDeparture = graphics.dataChartDeparture();
+            // Extraer etiquetas (eje X) y datos (eje Y)
+            const labelsD = dataDeparture.map(item => item.name);
+            const quantitiesD = dataDeparture.map(item => item.quantity);
+            // Configuración de la gráfica
+            const ctxD = document.getElementById('chartDeparture');
+            const myChartD = new Chart(ctxD, {
+                type: 'bar', // Tipo de gráfica
+                data: {
+                    labels: labelsD, // Etiquetas del eje X
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: quantitiesD, // Datos del eje Y
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Color de fondo
+                        borderColor: 'rgba(75, 192, 192, 1)', // Color del borde
+                        borderWidth: 1 // Grosor del borde
+                    }]
+                },
+                options: {
+                    responsive: true, // Se adapta al tamaño del contenedor
+                    maintainAspectRatio: true, // Permitir que el gráfico ajuste su altura además de su ancho
+                    plugins: {
+                        legend: {
+                            position: 'top', // Posición de la leyenda
+                            display: false  // Oculta la leyenda
+                        },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true // Iniciar eje Y en 0
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+@endpush

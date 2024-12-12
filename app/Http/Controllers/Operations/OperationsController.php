@@ -39,16 +39,23 @@ class OperationsController extends Controller
 
     use CodeTrait, RoleTrait, FiltersTrait, QueryTrait, FollowUpTrait;
 
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
+
+        $data = [
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? $request->date : date("Y-m-d") ),
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? $request->date : date("Y-m-d") ),
+            "site" => ( isset($request->site) ? $request->site : 0 ),
+            "reservation_status" => ( isset($request->reservation_status) ? $request->reservation_status : 0 ),
+            "unit" => ( isset($request->unit) ? $request->unit : 0 ),
+            "driver" => ( isset($request->driver) ? $request->driver : 0 ),
+        ];
 
         $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
         $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
-
         // $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two  ";
         // $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four  AND it.is_round_trip = 1 ";
-
         $havingConditions = []; $queryHaving = "";
         $queryData = [
             'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") )." 00:00:00",
@@ -60,6 +67,12 @@ class OperationsController extends Controller
             $params = $this->parseArrayQuery($request->site);
             $queryOne .= " AND site.id IN ($params) ";
             $queryTwo .= " AND site.id IN ($params) ";
+        }
+
+        //ESTATUS DE RESERVACIÓN
+        if(isset( $request->reservation_status ) && !empty( $request->reservation_status )){
+            $params = $this->parseArrayQuery($request->reservation_status,"single");
+            $havingConditions[] = " reservation_status IN (".$params.") ";
         }
 
         //UNIDAD ASIGNADA AL SERVICIO
@@ -80,8 +93,8 @@ class OperationsController extends Controller
 
         return view('operation.operations', [
             'items' => $items,
-            'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ), 
-            'nexDate' => date('Y-m-d', strtotime($request->date . ' +1 day')), 
+            'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ),
+            'nexDate' => date('Y-m-d', strtotime($request->date . ' +1 day')),
             'breadcrumbs' => [
                 [
                     "route" => "",
@@ -89,12 +102,14 @@ class OperationsController extends Controller
                     "active" => true
                 ]
             ],
+            'websites' => $this->Sites(),
+            'reservation_status' => $this->reservationStatus(),
             'vehicles' => $this->Vehicles(),
             'zones' => $this->Zones(),
-            'websites' => $this->Sites(),
             'units' => $this->Units(), //LAS UNIDADES DADAS DE ALTA
             'drivers' => $this->Drivers(),
-            'data' => $request->input(),
+            'data' => $data,
+            'request' => $request->input(),
         ]);
     }
 
