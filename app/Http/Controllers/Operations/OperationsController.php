@@ -39,16 +39,23 @@ class OperationsController extends Controller
 
     use CodeTrait, RoleTrait, FiltersTrait, QueryTrait, FollowUpTrait;
 
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
 
-        $queryOneP = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.type_service = 'PRIVATE' ";
-        $queryTwoP = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.type_service = 'PRIVATE' AND it.is_round_trip = 1 ";
+        $data = [
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? $request->date : date("Y-m-d") ),
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? $request->date : date("Y-m-d") ),
+            "site" => ( isset($request->site) ? $request->site : 0 ),
+            "reservation_status" => ( isset($request->reservation_status) ? $request->reservation_status : 0 ),
+            "unit" => ( isset($request->unit) ? $request->unit : 0 ),
+            "driver" => ( isset($request->driver) ? $request->driver : 0 ),
+        ];
 
-        $queryOneS = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.type_service = 'SHARED' ";
-        $queryTwoS = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.type_service = 'SHARED' AND it.is_round_trip = 1 ";        
-
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
+        // $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two  ";
+        // $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four  AND it.is_round_trip = 1 ";
         $havingConditions = []; $queryHaving = "";
         $queryData = [
             'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") )." 00:00:00",
@@ -58,42 +65,36 @@ class OperationsController extends Controller
         //SITIO
         if( isset($request->site) && !empty($request->site) ){
             $params = $this->parseArrayQuery($request->site);
-            $queryOneP .= " AND site.id IN ($params) ";
-            $queryTwoP .= " AND site.id IN ($params) ";
+            $queryOne .= " AND site.id IN ($params) ";
+            $queryTwo .= " AND site.id IN ($params) ";
+        }
 
-            $queryOneS .= " AND site.id IN ($params) ";
-            $queryTwoS .= " AND site.id IN ($params) ";
+        //ESTATUS DE RESERVACIÓN
+        if(isset( $request->reservation_status ) && !empty( $request->reservation_status )){
+            $params = $this->parseArrayQuery($request->reservation_status,"single");
+            $havingConditions[] = " reservation_status IN (".$params.") ";
         }
 
         //UNIDAD ASIGNADA AL SERVICIO
         if( isset($request->unit) && !empty($request->unit) ){
             $params = $this->parseArrayQuery($request->unit);
-            $queryOneP .= " AND it.vehicle_id_one IN ($params) ";
-            $queryTwoP .= " AND it.vehicle_id_two IN ($params) ";
-
-            $queryOneS .= " AND it.vehicle_id_one IN ($params) ";
-            $queryTwoS .= " AND it.vehicle_id_two IN ($params) ";            
+            $queryOne .= " AND it.vehicle_id_one IN ($params) ";
+            $queryTwo .= " AND it.vehicle_id_two IN ($params) ";            
         }
 
         //CONDUCTOR ASIGNADO AL SERVICIO
         if( isset($request->driver) && !empty($request->driver) ){
             $params = $this->parseArrayQuery($request->driver);
-            $queryOneP .= " AND it.driver_id_one IN ($params) ";
-            $queryTwoP .= " AND it.driver_id_two IN ($params) ";
-
-            $queryOneS .= " AND it.driver_id_one IN ($params) ";
-            $queryTwoS .= " AND it.driver_id_two IN ($params) ";            
+            $queryOne .= " AND it.driver_id_one IN ($params) ";
+            $queryTwo .= " AND it.driver_id_two IN ($params) ";            
         }
 
-        // dd($queryOneP, $queryTwoP, $queryHaving, $queryData);
-        $privates = $this->queryOperations($queryOneP, $queryTwoP, $queryHaving, $queryData);
-        $shareds = $this->queryOperations($queryOneS, $queryTwoS, $queryHaving, $queryData);
+        $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
 
         return view('operation.operations', [
-            'privates' => $privates,
-            'shareds' => $shareds,
-            'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ), 
-            'nexDate' => date('Y-m-d', strtotime($request->date . ' +1 day')), 
+            'items' => $items,
+            'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ),
+            'nexDate' => date('Y-m-d', strtotime($request->date . ' +1 day')),
             'breadcrumbs' => [
                 [
                     "route" => "",
@@ -101,12 +102,14 @@ class OperationsController extends Controller
                     "active" => true
                 ]
             ],
+            'websites' => $this->Sites(),
+            'reservation_status' => $this->reservationStatus(),
             'vehicles' => $this->Vehicles(),
             'zones' => $this->Zones(),
-            'websites' => $this->Sites(),
             'units' => $this->Units(), //LAS UNIDADES DADAS DE ALTA
             'drivers' => $this->Drivers(),
-            'data' => $request->input(),
+            'data' => $data,
+            'request' => $request->input(),
         ]);
     }
 
@@ -602,7 +605,6 @@ class OperationsController extends Controller
             DB::beginTransaction();
 
             $validator = Validator::make($request->all(), [
-                'type_service' => 'required|string||in:PRIVATE,SHARED',
                 'reference' => 'required|string|max:255',
                 'site_id' => 'required|integer|exists:sites,id',
                 'language' => 'required|in:en,es',
@@ -635,20 +637,14 @@ class OperationsController extends Controller
             }
 
             //VALIDAMOS SI LA REFERENCIA YA EXISTE
-            if( $request->type_service == "PRIVATE" ){
-                $duplicated_reservation = Reservation::where('reference', $request->reference)->count();
-                if( $duplicated_reservation ) {
-                    return response()->json([
-                        'errors' => [
-                            'code' => 'required_params',
-                        ],
-                        'message' => 'Ese folio ya ha sido registrado',
-                    ], Response::HTTP_BAD_REQUEST); 
-                }
-            }
-
-            if( $request->type_service == "SHARED" ){
-                $duplicated_reservation = Reservation::where('reference', $request->reference)->get();
+            $duplicated_reservation = Reservation::where('reference', $request->reference)->count();
+            if( $duplicated_reservation ) {
+                return response()->json([
+                    'errors' => [
+                        'code' => 'required_params',
+                    ],
+                    'message' => 'Ese folio ya ha sido registrado',
+                ], Response::HTTP_BAD_REQUEST); 
             }
 
             //FORMATEAMOS LA FECHA DEL SERVICIO PARA PODER VER SI ACTUALIZAREMOS LA TABLA
@@ -728,7 +724,6 @@ class OperationsController extends Controller
             $item->op_two_status = 'PENDING';
             $item->created_at = Carbon::now();
             $item->updated_at = Carbon::now();
-            $item->type_service = $request->type_service;
             $item->save();
 
             $this->create_followUps($reservation->id, 'SE CREO EL SERVICIO: '.$item->code.' PARA LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES', 'HISTORY', auth()->user()->name);
@@ -1223,5 +1218,5 @@ class OperationsController extends Controller
         $writer->save($temp_file);
 
         return ResponseFile::download($temp_file, $fileName)->deleteFileAfterSend(true);        
-    }
+    }    
 }
