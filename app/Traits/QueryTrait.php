@@ -483,6 +483,15 @@ trait QueryTrait
                             ]);
     }
 
+    public function queryConciliation($query, $query2, $queryData){
+        $payments = DB::select("SELECT * FROM payments as p
+                                    INNER JOIN reservations as rez ON p.reservation_id = rez.id
+                                    WHERE 1=1 {$query} ",
+                                    $queryData);
+
+        return $payments;
+    }    
+
     // CREATE INDEX `status_index` ON payments (`status`);
     // CREATE INDEX `payment_method_index` ON payments (`payment_method`);
     // CREATE INDEX `is_conciliated_index` ON payments (`is_conciliated`);

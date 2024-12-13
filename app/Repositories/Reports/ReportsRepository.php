@@ -1201,102 +1201,76 @@ class ReportsRepository
 
     public function conciliation($request)
     {
-        $date = date("Y-m-d");
-        if(isset( $request->date )):
-            $date = $request->date;
-        endif;
+        ini_set('memory_limit', '-1'); // Sin límite
 
-        $search['init_date'] = $date." 00:00:00";
-        $search['end_date'] = $date." 23:59:59";
+        $data = [
+            // "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
+            // "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
 
-        $items = DB::select("SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_one_pickup as filtered_date, 'arrival' as operation_type, sit.name as site_name, '' as messages,
-                                                COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
-                                                CASE
-                                                    WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
-                                                    ELSE 'CONFIRMADO'
-                                                END AS status,
-                                                zone_one.id as zone_one_id, zone_one.name as zone_one_name, zone_one.is_primary as zone_one_is_primary,
-                                                zone_two.id as zone_two_id, zone_two.name as zone_two_name, zone_two.is_primary as zone_two_is_primary,
-                                                CASE 
-                                                    WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
-                                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 1 THEN 'DEPARTURE'
-                                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
-                                                END AS final_service_type
-                                    FROM reservations_items as it
-                                    INNER JOIN reservations as rez ON rez.id = it.reservation_id
-                                    INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
-                                    INNER JOIN sites as sit ON sit.id = rez.site_id
-                                    INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
-                                    INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
-                                    LEFT JOIN (
-                                        SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
-                                        FROM sales
-                                        WHERE deleted_at IS NULL
-                                        GROUP BY reservation_id
-                                    ) as s ON s.reservation_id = rez.id
-                                    LEFT JOIN (
-                                        SELECT reservation_id,
-                                        ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
-                                                                                                WHEN operation = 'division' THEN total / exchange_rate
-                                                                                ELSE total END), 2) AS total_payments,
-                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
-                                        FROM payments
-                                        GROUP BY reservation_id
-                                    ) as p ON p.reservation_id = rez.id
-                                    WHERE it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
-                                    AND rez.is_cancelled = 0 AND rez.is_duplicated = 0
-                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
-                                    UNION 
-                                    SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_two_pickup as filtered_date, 'departure' as operation_type, sit.name as site_name, '' as messages,
-                                                COALESCE(SUM(s.total_sales), 0) as total_sales, COALESCE(SUM(p.total_payments), 0) as total_payments,
-                                                CASE
-                                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDIENTE'
-                                                        ELSE 'CONFIRMADO'
-                                                END AS status,
-                                                zone_one.id as zone_one_id, zone_one.name as zone_one_name, zone_one.is_primary as zone_one_is_primary,
-                                                zone_two.id as zone_two_id, zone_two.name as zone_two_name, zone_two.is_primary as zone_two_is_primary,
-                                                CASE                                                     
-                                                    WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
-                                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
-                                                END AS final_service_type
-                                    FROM reservations_items as it
-                                    INNER JOIN reservations as rez ON rez.id = it.reservation_id
-                                    INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
-                                    INNER JOIN sites as sit ON sit.id = rez.site_id
-                                    INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
-                                    INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
-                                    LEFT JOIN (
-                                            SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
-                                            FROM sales
-                                            WHERE deleted_at IS NULL
-                                            GROUP BY reservation_id
-                                    ) as s ON s.reservation_id = rez.id
-                                    LEFT JOIN (
-                                            SELECT reservation_id,
-                                            ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
-                                                                                                    WHEN operation = 'division' THEN total / exchange_rate
-                                                                                    ELSE total END), 2) AS total_payments,
-                                            GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
-                                            FROM payments
-                                            GROUP BY reservation_id
-                                    ) as p ON p.reservation_id = rez.id
-                                    WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
-                                    AND rez.is_cancelled = 0 AND rez.is_duplicated = 0
-                                    GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id",[
-                                        "init_date_one" => $search['init_date'],
-                                        "init_date_two" => $search['end_date'],
-                                        "init_date_three" => $search['init_date'],
-                                        "init_date_four" => $search['end_date'],
-                                    ]);
+            "init" => "2024-11-01",
+            "end" => "2024-11-30",
+            "filter_text" => NULL,
+            "currency" => ( isset($request->currency) ? $request->currency : 0 ),
+            "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
+        ];
 
-        $breadcrumbs = array(
-            array(
-                "route" => "",
-                "name" => "Reporte de pagos y conciliaciones",
-                "active" => true
-            ),
-        );
+        $query = ' AND p.created_at is not null AND p.deleted_at is null AND p.created_at BETWEEN :init AND :end AND rez.site_id NOT IN(21,11) ';
+        $havingConditions = []; $query2 = '';
+        $queryData = [
+            // 'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
+            // 'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
 
-        return view('reports.conciliation', compact('items','date','breadcrumbs'));
+            'init' => "2024-11-01 00:00:00",
+            'end' => "2024-11-30 23:59:59",
+        ];        
+
+        //MONEDA DE LA RESERVA
+        if(isset( $request->currency ) && !empty( $request->currency )){
+            $params = $this->parseArrayQuery($request->currency,"single");
+            $query .= " AND rez.currency IN ($params) ";
+        }
+
+        //METODO DE PAGO
+        if(isset( $request->payment_method ) && !empty( $request->payment_method )){
+            $params = "";
+            foreach( $request->payment_method as $key => $payment_method ){
+                $queryData['payment_method' . $key] = $payment_method;
+                $params .= "FIND_IN_SET(:payment_method".$key.", payment_type_name) > 0 OR ";
+            }
+            $params = rtrim($params, ' OR ');
+            $havingConditions[] = " (".$params.") "; 
+        }
+
+        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
+            $data['filter_text'] = $request->filter_text;
+            $queryData = [];
+            $query  = " AND (
+                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
+                        ( rez.client_phone like '%".$data['filter_text']."%') OR
+                        ( rez.client_email like '%".$data['filter_text']."%') OR
+                        ( rez.reference like '%".$data['filter_text']."%') OR
+                        ( it.code like '%".$data['filter_text']."%' )
+                    )";
+        }
+
+        if( (isset( $request->payment_method ) && !empty( $request->payment_method )) ){
+            $query2 = " HAVING " . implode(' AND ', $havingConditions);
+        }
+
+        dd($query, $query2, $queryData);
+        $bookings = $this->queryConciliation($query, $query2, $queryData);
+        dd($bookings);
+
+        return view('reports.conciliation', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Reporte de conciliación del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
+                    "active" => true
+                ]
+            ],
+            'items' => $items,
+            'date' => $date,
+        ]);
     }
 }
