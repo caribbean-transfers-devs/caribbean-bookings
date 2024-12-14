@@ -1257,7 +1257,7 @@ class ReportsRepository
             $query2 = " HAVING " . implode(' AND ', $havingConditions);
         }
 
-        dd($query, $query2, $queryData);
+        // dd($query, $query2, $queryData);
         $bookings = $this->queryConciliation($query, $query2, $queryData);
         dd($bookings);
 

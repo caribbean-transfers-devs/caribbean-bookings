@@ -42,7 +42,6 @@
                 )
             )
         );
-        // dump($buttons);
     @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
@@ -61,7 +60,7 @@
                 <button class="btn btn-primary">Conciliacion de PayPal</button>
                 <button class="btn btn-primary"></button>
                 
-                <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataConciliation" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
                             <th>Pickup</th>
