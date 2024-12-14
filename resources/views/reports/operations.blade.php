@@ -413,7 +413,7 @@
                                             "name" => $operation->currency,
                                             "total" => 0,
                                             "gran_total" => 0,
-                                            "counter" => 0,                                            
+                                            "counter" => 0,
                                         ];
                                     }
                                     if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
@@ -1676,6 +1676,7 @@
             },
         };
         
+        // console.log(sales.dataChartOperationStatus());
         sales.renderChartOperationStatus();
         sales.renderChartOperationDrivers();
         sales.renderChartOperationUnits();

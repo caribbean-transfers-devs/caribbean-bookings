@@ -808,6 +808,7 @@ class ReportsRepository
     public function sales($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
 
         $data = [
             "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
@@ -835,7 +836,7 @@ class ReportsRepository
         ];
         
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end ';
-        $havingConditions = []; $query2 = '';
+        $havingConditions = []; $queryHaving = '';
         $queryData = [
             'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
             'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
@@ -979,11 +980,11 @@ class ReportsRepository
         }
 
         if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance )) || (isset( $request->is_today )) ){
-            $query2 = " HAVING " . implode(' AND ', $havingConditions);
+            $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
         }
 
-        // dd($query, $query2, $queryData);
-        $bookings = $this->queryBookings($query, $query2, $queryData);
+        // dd($query, $queryHaving, $queryData);
+        $bookings = $this->queryBookings($query, $queryHaving, $queryData);
         
         return view('reports.reservations', [
             'breadcrumbs' => [
@@ -1013,6 +1014,7 @@ class ReportsRepository
     public function operations($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
 
         $data = [
             "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),

@@ -55,7 +55,7 @@ table.dataTable {
     margin-bottom: 0;
     border-collapse: collapse;
     background: transparent;
-  }
+}
 
 .table {
     > tbody tr {
@@ -88,4 +88,92 @@ table.dataTable {
             font-size: 10px;                    
         }
     }
+}
+
+.dt--bottom-section {
+  padding: 10px;
+}
+
+.page-item .page-link:hover {
+  background: #191e3a;
+  color: #bfc9d4;
+}
+
+div.dt-container div.dt-paging {
+  margin: 0;
+  white-space: nowrap;
+  text-align: right;
+  display: inline-block;
+}
+
+.page-link {
+  margin-right: 5px;
+  border-radius: 8px;
+  background: rgba(0, 23, 55, 0.08);
+  border: none;
+  color: #888ea8;
+  height: 33px;
+  width: 33px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+div.dt-container div.dt-paging ul.pagination {
+  margin: 3px 0;
+  flex-wrap: wrap;
+}
+
+.page-item {
+  &.disabled .page-link {
+    background: transparent;
+
+    svg {
+      color: #888ea8;
+    }
+  }
+
+  &:first-child .page-link {
+    border-radius: 8px;
+    padding: 0;
+    height: 33px;
+    width: 33px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+      width: 17px;
+    }
+  }
+
+  &:last-child .page-link {
+    border-radius: 8px;
+    padding: 0;
+    height: 33px;
+    width: 33px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &.next:not(.disabled) .page-link, &.previous:not(.disabled) .page-link {
+    background: #1b2e4b;
+  }
+
+  &.next:not(.disabled) .page-link svg, &.previous:not(.disabled) .page-link svg {
+    color: #fff;
+  }
+
+  &:last-child .page-link svg {
+    width: 17px;
+  }
+
+  &.active .page-link {
+    background-color: $primary;
+  }
 }

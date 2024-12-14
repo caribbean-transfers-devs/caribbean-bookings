@@ -1408,6 +1408,6 @@
         sales.renderChartSaleDestinations();
         sales.renderChartSaleCurrencies();
         sales.renderChartSaleVehicles();
-        sales.renderChartSaleOrigins();        
+        sales.renderChartSaleOrigins();
     </script>
 @endpush

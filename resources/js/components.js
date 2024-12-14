@@ -52,21 +52,24 @@ let components = {
         _settings.responsive = false; // La tabla sigue siendo responsive
         _settings.buttons =  _buttons;
         _settings.order = [];
-        _settings.paging = false;
+        if( action == "fixedheaderPagination" ){
+            _settings.paging = true; // Aseguramos que la paginación esté activada
+            _settings.pageLength = 100; // Muestra 100 elementos por página por defecto
+            _settings.lengthChange = false; // Quita el selector de "mostrar X elementos por página"
+        }else{
+            _settings.paging = false;
+        }
+        // _settings.stateSave = false;
 
-        if( action == "fixedheader" ){
+        if( action == "fixedheader" || action == "fixedheaderPagination" ){
             _settings.fixedHeader = true; // Deshabilita FixedHeader si estaba habilitado
             _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
-            // _settings.fixedHeader = true; // Activar encabezados fijos
-            // _settings.scrollX = true;
-            // _settings.scrollY = '2000px';  // Habilitar scroll vertical
-            // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
         }
 
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
             "sZeroRecords": "No se encontraron resultados",             
-            "sInfo": "Mostrando _TOTAL_ registros",
+            "sInfo": ( action == "fixedheaderPagination" ? "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros" : "Mostrando _TOTAL_ registros" ),
             "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
             "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
             "sSearchPlaceholder": components.getTranslation("table.search") + "...",
@@ -79,7 +82,7 @@ let components = {
 
         let __table = table.DataTable( _settings );
 
-        if( action == "fixedheader" ){
+        if( action == "fixedheader" || action == "fixedheaderPagination" ){
             // Ajustar encabezado fijo al scroll dentro del contenedor
             // new $.fn.dataTable.FixedHeader(__table, {
             //     header: true, // Habilita encabezado fijo
@@ -91,9 +94,21 @@ let components = {
                 __table.columns.adjust().draw();
             });
 
-            // table.on('draw', function () {
-            //     __table.columns.adjust();
-            // });
+            // Corrige el ancho al inicializar
+            table.on('init', function () {
+                __table.columns.adjust().draw();
+                // setTimeout(function () {
+                //     table.DataTable( _settings ).columns.adjust().draw();
+                // }, 100); // Agrega un pequeño retraso para garantizar que el DOM esté completamente cargado                
+            });
+
+            table.on('draw', function () {
+                __table.columns.adjust();
+            });
+
+            $(window).on('resize', function () {
+                __table.columns.adjust().draw();
+            });
         }
     },
 

@@ -12,7 +12,7 @@ if ( document.getElementById('lookup_date') != null ) {
 }
 
 if( document.querySelector('.table-rendering') != null ){
-    components.actionTable($('.table-rendering'), 'fixedheader');
+    components.actionTable($('.table-rendering'), 'fixedheaderPagination');
     components.actionTableChart($('.table-chart-general'), 'general');
 }
 components.formReset();
