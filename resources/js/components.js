@@ -52,10 +52,16 @@ let components = {
         _settings.responsive = false; // La tabla sigue siendo responsive
         _settings.buttons =  _buttons;
         _settings.order = [];
-        _settings.paging = false;
+        if( action == "fixedheaderPagination" ){
+            _settings.paging = true; // Aseguramos que la paginación esté activada
+            _settings.pageLength = 100; // Muestra 100 elementos por página por defecto
+            _settings.lengthChange = false; // Quita el selector de "mostrar X elementos por página"
+        }else{
+            _settings.paging = false;
+        }
         // _settings.stateSave = false;
 
-        if( action == "fixedheader" ){
+        if( action == "fixedheader" || action == "fixedheaderPagination" ){
             _settings.fixedHeader = true; // Deshabilita FixedHeader si estaba habilitado
             _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
         }
@@ -76,7 +82,7 @@ let components = {
 
         let __table = table.DataTable( _settings );
 
-        if( action == "fixedheader" ){
+        if( action == "fixedheader" || action == "fixedheaderPagination" ){
             // Ajustar encabezado fijo al scroll dentro del contenedor
             // new $.fn.dataTable.FixedHeader(__table, {
             //     header: true, // Habilita encabezado fijo
