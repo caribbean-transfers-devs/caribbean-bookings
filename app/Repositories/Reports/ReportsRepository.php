@@ -808,6 +808,7 @@ class ReportsRepository
     public function reservations($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
 
         $data = [
             "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
@@ -1012,6 +1013,7 @@ class ReportsRepository
     public function operations($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
 
         $data = [
             "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),

@@ -1,4 +1,4 @@
-@php        
+@php
     use App\Traits\RoleTrait;
     use App\Traits\BookingTrait;
     use Illuminate\Support\Str;
@@ -1372,6 +1372,6 @@
         sales.renderChartSaleDestinations();
         sales.renderChartSaleCurrencies();
         sales.renderChartSaleVehicles();
-        sales.renderChartSaleOrigins();        
+        sales.renderChartSaleOrigins();
     </script>
 @endpush

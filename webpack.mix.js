@@ -100,6 +100,7 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/cash.js'], data.assets + "js/sections/reports/cash.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/cancellations.js'], data.assets + "js/sections/reports/cancellations.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/commissions.js'], data.assets + "js/sections/reports/commissions.min.js");
+        // 'resources/plugins/table/datatable/dataTables_fixedHeader.min.js', 
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/reservations.js'], data.assets + "js/sections/reports/reservations.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/operations.js'], data.assets + "js/sections/reports/operations.min.js");
 

@@ -2,10 +2,10 @@ let filters = {
     checked: function(checked, type){
         if (checked.checked) {
             checked.value = "1";
-            console.log("Checkbox " + type + ". Nuevo valor:", checked.value);
+            // console.log("Checkbox " + type + ". Nuevo valor:", checked.value);
         } else {
             checked.value = "0";
-            console.log("Checkbox " + type + ". Nuevo valor:", checked.value);
+            // console.log("Checkbox " + type + ". Nuevo valor:", checked.value);
         }
     },
 }

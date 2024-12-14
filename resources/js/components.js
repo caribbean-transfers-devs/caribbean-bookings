@@ -53,15 +53,11 @@ let components = {
         _settings.buttons =  _buttons;
         _settings.order = [];
         _settings.paging = false;
+        // _settings.stateSave = false;
 
         if( action == "fixedheader" ){
             _settings.fixedHeader = true; // Deshabilita FixedHeader si estaba habilitado
             _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
-
-            // _settings.fixedHeader = true; // Activar encabezados fijos
-            // _settings.scrollX = true;
-            // _settings.scrollY = '2000px';  // Habilitar scroll vertical
-            // _settings.scrollCollapse = true;  // Colapsar el scroll cuando no haya suficientes filas
         }
 
         _settings.oLanguage = {
@@ -87,14 +83,26 @@ let components = {
             //     footer: false // Opcional: deshabilitar footer fijo si no lo necesitas
             // });
 
-            // // Corrige el ancho al inicializar
-            // table.on('init', function () {
+            // Forzar ajuste de columnas después de que el plugin se haya activado
+            // setTimeout(function () {
             //     __table.columns.adjust().draw();
-            // });
+            // }, 100);
 
-            // table.on('draw', function () {
-            //     __table.columns.adjust();
-            // });
+            // Corrige el ancho al inicializar
+            table.on('init', function () {
+                __table.columns.adjust().draw();
+                // setTimeout(function () {
+                //     table.DataTable( _settings ).columns.adjust().draw();
+                // }, 100); // Agrega un pequeño retraso para garantizar que el DOM esté completamente cargado                
+            });
+
+            table.on('draw', function () {
+                __table.columns.adjust();
+            });
+
+            $(window).on('resize', function () {
+                __table.columns.adjust().draw();
+            });
         }
     },
 
