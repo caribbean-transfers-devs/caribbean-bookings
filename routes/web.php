@@ -54,8 +54,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/reports/payments', [ReportsController::class, 'payments'])->name('reports.payment');
         Route::post('/reports/payments', [ReportsController::class, 'payments'])->name('reports.payment.action');
         //VENTAS
-        Route::get('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales');
-        Route::post('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales.action');
+        // Route::get('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales');
+        // Route::post('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales.action');
         //EFECTIVO
         Route::get('/reports/cash', [ReportsController::class, 'cash'])->name('reports.cash');
         Route::post('/reports/cash', [ReportsController::class, 'cash'])->name('reports.cash.action');
@@ -70,8 +70,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/reports/commissions2', [ReportsController::class, 'commissions'])->name('reports.commissions2');
         Route::post('/reports/commissions2', [ReportsController::class, 'commissions'])->name('reports.commissions2.action');
         //RESERVACIONES
-        Route::get('/reports/reservations', [ReportsController::class, 'reservations'])->name('reports.reservations');
-        Route::post('/reports/reservations', [ReportsController::class, 'reservations'])->name('reports.reservations.action');
+        Route::get('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales');
+        Route::post('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales.action');
         //OPERACIONES
         Route::get('/reports/operations', [ReportsController::class, 'operations'])->name('reports.operations');
         Route::post('/reports/operations', [ReportsController::class, 'operations'])->name('reports.operations.action');
@@ -145,8 +145,12 @@ Route::group(['middleware' => ['auth']], function () {
     // Route::post('/punto-de-venta', [PosController::class, 'index'])->name('pos.index.action');
 
     Route::resource('/enterprises', EnterpriseController::class);
-    Route::get('/sites/{enterprise}', [SitesController::class, 'index'])->name('enterprise.sites');
+    Route::get('/enterprises/{enterprise}', [SitesController::class, 'index'])->name('enterprise.sites');
+    
     Route::resource('/sites', SitesController::class);
+    Route::get('/sites/create/{enterprise}', [SitesController::class, 'create'])->name('sites.create.enterprise');
+    Route::post('/sites/store/{enterprise}', [SitesController::class, 'store'])->name('sites.store.enterprise');
+
     Route::resource('/vehicles', VehicleController::class);
     Route::resource('/drivers', DriverController::class);
     Route::resource('/users', UserController::class);

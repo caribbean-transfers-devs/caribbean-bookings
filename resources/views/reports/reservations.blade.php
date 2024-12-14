@@ -239,7 +239,7 @@
                             @foreach ($bookings as $item)
                                 @php
                                     //ESTATUS
-                                    if (!isset( $bookingsStatus['data'][$item->reservation_status] ) ){
+                                    if (!isset( $bookingsStatus['data'][$item->reservation_status] )){
                                         $bookingsStatus['data'][$item->reservation_status] = [
                                             "name" => BookingTrait::statusBooking($item->reservation_status),
                                             "total" => 0,
@@ -252,7 +252,7 @@
                                                 "total" => 0,
                                                 "counter" => 0,
                                             ],
-                                            "counter" => 0,                                            
+                                            "counter" => 0,
                                         ];
                                     }
                                     $bookingsStatus['total'] += $item->total_sales;
@@ -540,6 +540,40 @@
                                 <canvas class="chartSale" id="chartSaleStatus"></canvas>
                             </div>
                             <div class="col-lg-7 col-12">
+                                <table class="table table-chart table-chart-general mb-3">
+                                    <thead>
+                                        <tr>
+                                            <th>ESTATUS</th>
+                                            <th class="text-center">GRAN TOTAL</th>
+                                            <th class="text-center">CANTIDAD</th>
+                                            <th class="text-center">PESOS</th>
+                                            <th class="text-center">DOLARES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($bookingsStatus['data'] as $keyStatus => $status )
+                                            @if ( $keyStatus != "CANCELLED" )
+                                                <tr>
+                                                    <th>{{ $status['name'] }}</th>
+                                                    <td class="text-center">{{ number_format($status['gran_total'],2) }}</td>
+                                                    <td class="text-center">{{ $status['counter'] }}</td>
+                                                    <td class="text-center">{{ number_format($status['MXN']['total'],2) }}</td>
+                                                    <td class="text-center">{{ number_format($status['USD']['total'],2) }}</td>
+                                                </tr>
+                                            @endif
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>TOTAL</th>
+                                            <th class="text-center">{{ number_format($bookingsStatus['gran_total'] - ( isset($bookingsStatus['data']['CANCELLED']) ? $bookingsStatus['data']['CANCELLED']['gran_total'] : 0 ) ,2) }}</th>
+                                            <th class="text-center">{{ $bookingsStatus['counter'] - ( isset($bookingsStatus['data']['CANCELLED']) ? $bookingsStatus['data']['CANCELLED']['counter'] : 0 ) }}</th>
+                                            <th class="text-center">{{ number_format($bookingsStatus['MXN']['total'] - ( isset($bookingsStatus['data']['CANCELLED']) ? $bookingsStatus['data']['CANCELLED']['MXN']['total'] : 0 ),2) }}</th>
+                                            <th class="text-center">{{ number_format($bookingsStatus['USD']['total'] - ( isset($bookingsStatus['data']['CANCELLED']) ? $bookingsStatus['data']['CANCELLED']['USD']['total'] : 0 ),2) }}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+
                                 <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
@@ -552,25 +586,27 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($bookingsStatus['data'] as $keyStatus => $status )
-                                            <tr>
-                                                <th>{{ $status['name'] }}</th>
-                                                <td class="text-center">{{ number_format($status['gran_total'],2) }}</td>
-                                                <td class="text-center">{{ $status['counter'] }}</td>
-                                                <td class="text-center">{{ number_format($status['MXN']['total'],2) }}</td>
-                                                <td class="text-center">{{ number_format($status['USD']['total'],2) }}</td>
-                                            </tr>
+                                            @if ( isset($keyStatus['CANCELLED']) && $keyStatus == "CANCELLED" )
+                                                <tr>
+                                                    <th>{{ $status['name'] }}</th>
+                                                    <td class="text-center">{{ number_format($status['gran_total'],2) }}</td>
+                                                    <td class="text-center">{{ $status['counter'] }}</td>
+                                                    <td class="text-center">{{ number_format($status['MXN']['total'],2) }}</td>
+                                                    <td class="text-center">{{ number_format($status['USD']['total'],2) }}</td>
+                                                </tr>
+                                            @endif
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th>TOTAL</th>
-                                            <th class="text-center">{{ number_format($bookingsStatus['gran_total'],2) }}</th>
-                                            <th class="text-center">{{ $bookingsStatus['counter'] }}</th>
-                                            <th class="text-center">{{ number_format($bookingsStatus['MXN']['total'],2) }}</th>
-                                            <th class="text-center">{{ number_format($bookingsStatus['USD']['total'],2) }}</th>
+                                            <th class="text-center">{{ number_format(0,2) }}</th>
+                                            <th class="text-center">{{ 0 }}</th>
+                                            <th class="text-center">{{ number_format(0,2) }}</th>
+                                            <th class="text-center">{{ number_format(0,2) }}</th>
                                         </tr>
                                     </tfoot>
-                                </table>
+                                </table>                                
                             </div>
                         </div>
                     </div>

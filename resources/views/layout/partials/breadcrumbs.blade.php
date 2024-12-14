@@ -15,7 +15,7 @@
                             <ol class="breadcrumb">
                                 @if ( isset($breadcrumbs) )
                                     @foreach ($breadcrumbs as $breadcrumb)
-                                        <li class="breadcrumb-item <?=( $breadcrumb['active'] ? 'active' : '' )?>" <?=( $breadcrumb['active'] ? 'aria-current="page"' : '' )?>><?=( $breadcrumb['active'] ? '<a href="#">'.$breadcrumb['name'].'</a>' : $breadcrumb['name'] )?></li>
+                                        <li class="breadcrumb-item <?=( $breadcrumb['active'] ? 'active' : '' )?>" <?=( $breadcrumb['active'] ? 'aria-current="page"' : '' )?>><?=( !$breadcrumb['active'] ? '<a href="'.$breadcrumb['route'].'">'.$breadcrumb['name'].'</a>' : $breadcrumb['name'] )?></li>
                                     @endforeach
                                 @endif
                             </ol>
