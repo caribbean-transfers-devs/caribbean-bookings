@@ -4,7 +4,7 @@
     use App\Traits\Reports\PaymentsTrait;
 @endphp
 @extends('layout.app')
-@section('title') Reporte de conciliación @endsection
+@section('title') Reporte De Conciliación @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/report_conciliation.min.css') }}" rel="preload" as="style" >
@@ -35,7 +35,7 @@
         );
     @endphp
     <div class="row layout-top-spacing">
-        <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
                 @if ($errors->any())
                     <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
@@ -58,7 +58,7 @@
                             <th class="text-center">TOTAL DEL PAGO</th>
                             <th class="text-center">MONEDA DE PAGO</th>
                             <th class="text-center">FECHA DE PAGO</th>
-                            <th class="text-center">CONCILIADO</th>                            
+                            <th class="text-center">CONCILIADO</th>
                             <th class="text-center">NOMBRE DEL CLIENTE</th>
                             <th class="text-center">TELÉFONO DEL CLIENTE</th>
                             <th class="text-center">CORREO DEL CLIENTE</th>
@@ -71,7 +71,7 @@
                         @if(sizeof($conciliations)>=1)
                             @foreach($conciliations as $key => $conciliation)
                                 @php
-                                    dd($conciliation);
+                                    // dd($conciliation);
                                 @endphp
                                 <tr>
                                     <td class="text-center">{{ $conciliation->reservation_id }}</td>
@@ -87,7 +87,7 @@
                                     <td class="text-center">{{ $conciliation->full_name }}</td>
                                     <td class="text-center">{{ $conciliation->client_phone }}</td>
                                     <td class="text-center">{{ $conciliation->client_email }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-"></button></td>
+                                    <td class="text-center"><td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($conciliation->reservation_status) }}">{{ BookingTrait::statusBooking($conciliation->reservation_status) }}</button></td>
                                     <td class="text-center">{{ $conciliation->currency }}</td>
                                     <td class="text-center">0</td>
                                 </tr>

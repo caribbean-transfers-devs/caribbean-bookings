@@ -196,6 +196,7 @@
                         </ul>
                     </div>
                 @endif
+                
                 <table id="dataBookings" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>

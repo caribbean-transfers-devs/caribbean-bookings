@@ -517,8 +517,8 @@ trait QueryTrait
                                             WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
                                             WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                             WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
-                                            WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total), 0) > 0 THEN 'PENDING'
-                                            WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total), 0) <= 0 THEN 'CONFIRMED'
+                                            WHEN s.total_sales - p.total > 0 THEN 'PENDING'
+                                            WHEN s.total_sales - p.total <= 0 THEN 'CONFIRMED'
                                             ELSE 'UNKNOWN'
                                         END AS reservation_status
                                     FROM payments as p

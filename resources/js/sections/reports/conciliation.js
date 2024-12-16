@@ -8,11 +8,11 @@ if ( document.getElementById('lookup_date') != null ) {
         ],
         zIndex: 10,
         plugins: ['RangePlugin'],
-    });   
+    });
 }
 
 if( document.querySelector('.table-rendering') != null ){
-    components.actionTable($('.table-rendering'), 'fixedheader');
+    components.actionTable($('.table-rendering'), 'fixedheaderPagination');
 }
 components.formReset();
 
