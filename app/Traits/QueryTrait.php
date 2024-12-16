@@ -484,8 +484,43 @@ trait QueryTrait
     }
 
     public function queryConciliation($query, $query2, $queryData){
-        $payments = DB::select("SELECT * FROM payments as p
+        $payments = DB::select("SELECT 
+                                        rez.id as reservation_id,
+                                        CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
+                                        rez.client_email,
+                                        rez.client_phone,
+                                        rez.currency,
+                                        rez.language,
+                                        rez.is_cancelled,
+                                        rez.is_commissionable,
+                                        rez.site_id,
+                                        rez.pay_at_arrival,
+                                        rez.reference,
+                                        rez.affiliate_id,
+                                        rez.terminal,
+                                        rez.comments,
+                                        rez.is_duplicated,
+                                        rez.open_credit,
+                                        rez.is_complete,
+                                        rez.created_at,
+                                        p.id as code_payment,
+                                        p.payment_method,
+                                        p.description,
+                                        p.total,
+                                        p.currency as currency_payment,
+                                        p.reference,
+                                        p.is_conciliated,
+                                        p.created_at as created_payment
+                                    FROM payments as p
                                     INNER JOIN reservations as rez ON p.reservation_id = rez.id
+                                    LEFT JOIN (
+                                        SELECT 
+                                            reservation_id, 
+                                            ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+                                        FROM sales
+                                            WHERE deleted_at IS NULL 
+                                        GROUP BY reservation_id
+                                    ) as s ON s.reservation_id = rez.id                                    
                                     WHERE 1=1 {$query} ",
                                     $queryData);
 

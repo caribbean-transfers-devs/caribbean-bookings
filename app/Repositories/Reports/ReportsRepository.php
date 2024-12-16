@@ -1204,27 +1204,23 @@ class ReportsRepository
     public function conciliation($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
 
         $data = [
-            // "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
-            // "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
-
-            "init" => "2024-11-01",
-            "end" => "2024-11-30",
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
             "filter_text" => NULL,
             "currency" => ( isset($request->currency) ? $request->currency : 0 ),
+            "payment_status" => ( isset( $request->payment_status ) && !empty( $request->payment_status ) ? $request->payment_status : 0 ),
             "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
         ];
 
-        $query = ' AND p.created_at is not null AND p.deleted_at is null AND p.created_at BETWEEN :init AND :end AND rez.site_id NOT IN(21,11) ';
-        $havingConditions = []; $query2 = '';
+        $query = ' AND p.created_at is not null AND p.deleted_at is null AND p.created_at BETWEEN :init AND :end AND rez.site_id NOT IN(21,11) AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ';
+        $havingConditions = []; $queryHaving = '';
         $queryData = [
-            // 'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
-            // 'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
-
-            'init' => "2024-11-01 00:00:00",
-            'end' => "2024-11-30 23:59:59",
-        ];        
+            'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
+            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+        ];
 
         //MONEDA DE LA RESERVA
         if(isset( $request->currency ) && !empty( $request->currency )){
@@ -1256,12 +1252,11 @@ class ReportsRepository
         }
 
         if( (isset( $request->payment_method ) && !empty( $request->payment_method )) ){
-            $query2 = " HAVING " . implode(' AND ', $havingConditions);
+            $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
         }
 
-        // dd($query, $query2, $queryData);
-        $bookings = $this->queryConciliation($query, $query2, $queryData);
-        dd($bookings);
+        // dd($query, $queryHaving, $queryData);
+        $conciliations = $this->queryConciliation($query, $queryHaving, $queryData);
 
         return view('reports.conciliation', [
             'breadcrumbs' => [
@@ -1271,8 +1266,12 @@ class ReportsRepository
                     "active" => true
                 ]
             ],
-            'items' => $items,
-            'date' => $date,
+            'conciliations' => $conciliations,
+            'payment_status' => $this->paymentStatus(),
+            'currencies' => $this->Currencies(),
+            'methods' => $this->Methods(),
+            'data' => $data,
+            'request' => $request->input(),            
         ]);
     }
 }

@@ -1,19 +1,10 @@
 @php
     use App\Traits\RoleTrait;
+    use App\Traits\BookingTrait;
     use App\Traits\Reports\PaymentsTrait;
-    
-    $resume = [
-        'status' => [
-            'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-            'CONFIRMED' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-            'CANCELLED' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-        ]
-    ];
-    $sites = [];
-    $destinations = [];
 @endphp
 @extends('layout.app')
-@section('title') Operación @endsection
+@section('title') Reporte de conciliación @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/report_conciliation.min.css') }}" rel="preload" as="style" >
@@ -33,7 +24,7 @@
     @php
         $buttons = array(
             array(  
-                'text' => 'Filtrar',
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
                 'className' => 'btn btn-primary __btn_create',
                 'attr' => array(
                     'data-title' =>  "Filtro de reservaciones",
@@ -56,97 +47,46 @@
                         </ul>
                     </div>
                 @endif
-                <button class="btn btn-primary">Filtrar</button>
-                <button class="btn btn-primary">Conciliacion de PayPal</button>
-                <button class="btn btn-primary"></button>
                 
                 <table id="dataConciliation" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th>Pickup</th>
-                            <th>Sitio</th>
-                            <th class="text-center">Tipo</th>
-                            <th class="text-center">Estatus Op.</th>
-                            <th>Código</th>
-                            <th>Cliente</th>
-                            <th>Vehículo</th>
-                            <th>Pasajeros</th>
-                            <th>Desde</th>
-                            <th>Hacia</th>
-                            <th>Pago</th>
-                            <th>Ventas</th>
-                            <th>Moneda</th>
-                            <th>Desglose</th>
+                            <th class="text-center">ID</th>
+                            <th class="text-center">METODO DE PAGO</th>
+                            <th class="text-center">DESCRIPCIÓN DEL PAGO</th>
+                            <th class="text-center">REFERENCIA</th>
+                            <th class="text-center">TOTAL DEL PAGO</th>
+                            <th class="text-center">MONEDA DE PAGO</th>
+                            <th class="text-center">FECHA DE PAGO</th>
+                            <th class="text-center">CONCILIADO</th>                            
+                            <th class="text-center">NOMBRE DEL CLIENTE</th>
+                            <th class="text-center">TELÉFONO DEL CLIENTE</th>
+                            <th class="text-center">CORREO DEL CLIENTE</th>
+                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>
+                            <th class="text-center">MONEDA DE RESERVACIÓN</th>
+                            <th class="text-center">TOTAL DE RESERVACIÓN</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if(sizeof($items)>=1)
-                            @foreach($items as $key => $value)
-                                @php                                                                                
-                                    $payment = ( $value->total_sales - $value->total_payments );
-                                    if($payment < 0) $payment = 0;
-
-                                    $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
-                                    $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
-                                    $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
-                                    $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
-
-                                    switch ($operation_status) {
-                                        case 'PENDING':
-                                            $label = 'secondary';
-                                            break;
-                                        case 'COMPLETED':
-                                            $label = 'success';
-                                            break;
-                                        case 'NOSHOW':
-                                            $label = 'warning';
-                                            break;
-                                        case 'CANCELLED':
-                                            $label = 'danger';
-                                            break;
-                                        default:
-                                            $label = 'secondary';
-                                            break;
-                                    }
-                                @endphp
+                        @if(sizeof($conciliations)>=1)
+                            @foreach($conciliations as $key => $conciliation)
                                 <tr>
-                                    <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
-                                    <td>{{ $value->site_name }}</td>
-                                    <td>{{ $value->final_service_type }}</td>
-                                    <td class="text-center"><span class="badge badge-light-{{ $label }} mb-2 me-4">{{ $operation_status }}</span></td>
-                                    <td>
-                                        @if (RoleTrait::hasPermission(38))
-                                            <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
-                                        @else
-                                            {{ $value->code }}
-                                        @endif
-                                    </td>
-                                    <td>{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
-                                    <td>{{ $value->service_name }}</td>
-                                    <td class="text-center">{{ $value->passengers }}</td>
-                                    <td>{{ $operation_from }}</td>
-                                    <td>{{ $operation_to }}</td>
-                                    <td class="text-center">{{ $value->status }}</td>
-                                    <td class="text-end">{{ number_format($value->total_sales,2) }}</td>
-                                    <td class="text-center">{{ $value->currency }}</td>
+                                    <td class="text-center">{{ $conciliation->reservation_id }}</td>
+                                    <td class="text-center">{{ $conciliation->payment_method }}</td>
+                                    <td class="text-center">{{ $conciliation->description }}</td>
+                                    <td class="text-center">{{ $conciliation->reference }}</td>
+                                    <td class="text-center">{{ $conciliation->total }}</td>
+                                    <td class="text-center">{{ $conciliation->currency_payment }}</td>
+                                    <td class="text-center">{{ date("Y-m-d", strtotime($conciliation->created_payment)) }}</td>
                                     <td class="text-center">
-                                        @php
-                                            $payments = PaymentsTrait::getPayments($value->reservation_id);
-                                            if(sizeof( $payments ) >= 1):
-                                                foreach($payments as $keyP => $valueP):
-                                                    //dd();
-                                                    $total_ = 0;
-
-                                                    if($valueP->operation == "division"):
-                                                        $total_ = $valueP->total/$valueP->exchange_rate;
-                                                    else:
-                                                        $total_ = $valueP->total*$valueP->exchange_rate;
-                                                    endif;
-                                                    echo '['.$valueP->payment_method.' | '.$total_.' | '.$valueP->reference.']';
-                                                endforeach;
-                                            endif;                                                            
-                                        @endphp
+                                        <button class="btn btn-{{ $conciliation->is_conciliated == 1 ? 'success' : 'danger' }}">{{ $conciliation->is_conciliated == 1 ? 'SÍ' : 'NO' }}</button>
                                     </td>
+                                    <td class="text-center">{{ $conciliation->full_name }}</td>
+                                    <td class="text-center">{{ $conciliation->client_phone }}</td>
+                                    <td class="text-center">{{ $conciliation->client_email }}</td>
+                                    <td class="text-center"><button type="button" class="btn btn-"></button></td>
+                                    <td class="text-center">{{ $conciliation->currency }}</td>
+                                    <td class="text-center">0</td>
                                 </tr>
                             @endforeach
                         @endif
@@ -156,5 +96,5 @@
         </div>
     </div>
 
-    <x-modals.reservations.reports :data="$date" />
+    <x-modals.filters.bookings :data="$data" :paymentstatus="$payment_status" :methods="$methods" :currencies="$currencies" :request="$request" />
 @endsection
