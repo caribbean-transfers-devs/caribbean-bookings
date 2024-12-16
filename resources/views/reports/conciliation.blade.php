@@ -70,6 +70,9 @@
                     <tbody>
                         @if(sizeof($conciliations)>=1)
                             @foreach($conciliations as $key => $conciliation)
+                                @php
+                                    dd($conciliation);
+                                @endphp
                                 <tr>
                                     <td class="text-center">{{ $conciliation->reservation_id }}</td>
                                     <td class="text-center">{{ $conciliation->payment_method }}</td>

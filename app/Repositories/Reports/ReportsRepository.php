@@ -1215,7 +1215,7 @@ class ReportsRepository
             "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
         ];
 
-        $query = ' AND p.created_at is not null AND p.deleted_at is null AND p.created_at BETWEEN :init AND :end AND rez.site_id NOT IN(21,11) AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ';
+        $query = ' AND p.created_at IS NOT NULL AND p.deleted_at IS NULL AND p.created_at BETWEEN :init AND :end AND rez.site_id NOT IN(21,11) AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ';
         $havingConditions = []; $queryHaving = '';
         $queryData = [
             'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",

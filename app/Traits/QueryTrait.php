@@ -98,7 +98,7 @@ trait QueryTrait
                                                         WHEN operation = 'division' THEN total / exchange_rate
                                                         ELSE total END, 2), ' | ', 
                                                     reference
-                                            ) ORDER BY payment_method ASC SEPARATOR ', ') AS payment_details                                            
+                                            ) ORDER BY payment_method ASC SEPARATOR ', ') AS payment_details
                                         FROM payments
                                         GROUP BY reservation_id
                                     ) as p ON p.reservation_id = rez.id
@@ -503,6 +503,7 @@ trait QueryTrait
                                         rez.open_credit,
                                         rez.is_complete,
                                         rez.created_at,
+
                                         p.id as code_payment,
                                         p.payment_method,
                                         p.description,
@@ -510,17 +511,26 @@ trait QueryTrait
                                         p.currency as currency_payment,
                                         p.reference,
                                         p.is_conciliated,
-                                        p.created_at as created_payment
+                                        p.created_at as created_payment,
+
+                                        CASE
+                                            WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
+                                            WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                            WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                            WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total), 0) > 0 THEN 'PENDING'
+                                            WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total), 0) <= 0 THEN 'CONFIRMED'
+                                            ELSE 'UNKNOWN'
+                                        END AS reservation_status
                                     FROM payments as p
-                                    INNER JOIN reservations as rez ON p.reservation_id = rez.id
-                                    LEFT JOIN (
-                                        SELECT 
-                                            reservation_id, 
-                                            ROUND( COALESCE(SUM(total), 0), 2) as total_sales
-                                        FROM sales
-                                            WHERE deleted_at IS NULL 
-                                        GROUP BY reservation_id
-                                    ) as s ON s.reservation_id = rez.id                                    
+                                        INNER JOIN reservations as rez ON p.reservation_id = rez.id
+                                        LEFT JOIN (
+                                            SELECT 
+                                                reservation_id, 
+                                                ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+                                            FROM sales
+                                                WHERE deleted_at IS NULL 
+                                            GROUP BY reservation_id
+                                        ) as s ON s.reservation_id = rez.id
                                     WHERE 1=1 {$query} ",
                                     $queryData);
 
