@@ -523,8 +523,8 @@ let components = {
  * una advertencia o una confirmación antes de permitir que abandonen la página.
  */
 window.addEventListener("beforeunload", function(event) {
-    console.log(event);
-    components.loadScreen();
+    // console.log(event);
+    // components.loadScreen();
 });
 
 // Mostrar el indicador de carga cuando se navega hacia atrás o hacia adelante
