@@ -130,7 +130,7 @@ trait FiltersTrait
     public function Methods(){
         return array(
             "CASH" => "CASH",
-            "CARD" => "CARD",
+            "STRIPE" => "STRIPE",
             "PAYPAL" => "PAYPAL",
             "MIFEL" => "MIFEL",
         );
