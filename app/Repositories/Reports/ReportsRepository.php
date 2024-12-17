@@ -1230,13 +1230,8 @@ class ReportsRepository
 
         //METODO DE PAGO
         if(isset( $request->payment_method ) && !empty( $request->payment_method )){
-            $params = "";
-            foreach( $request->payment_method as $key => $payment_method ){
-                $queryData['payment_method' . $key] = $payment_method;
-                $params .= "FIND_IN_SET(:payment_method".$key.", payment_type_name) > 0 OR ";
-            }
-            $params = rtrim($params, ' OR ');
-            $havingConditions[] = " (".$params.") "; 
+            $params = $this->parseArrayQuery($request->payment_method,"single");
+            $query .= " AND p.payment_method IN ($params) ";
         }
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){

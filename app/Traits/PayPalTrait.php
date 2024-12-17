@@ -72,20 +72,30 @@ trait PayPalTrait
 
         // Endpoint para obtener detalles de un pago por ID de transacción
         $response = Http::withToken($accessToken)
-            ->get($this->apiUrl . '/v2/payments/captures/' . $transactionId);
+                        ->timeout(120) // Aumentar el timeout a 60 segundos
+                        // ->withOptions([
+                        //     'verify' => false, // Desactivar temporalmente la verificación SSL
+                        //     'debug' => true,   // Habilitar logs de depuración
+                        // ])
+                        ->get($this->apiUrl . '/v2/payments/captures/' . $transactionId);
 
         if ($response->successful()) {
             return response()->json($response->json());
         } else {
-            // if ($response->status() == 401) {
-            //     $accessToken = $this->authenticate();
-            //     $response = Http::withToken($accessToken)
-            //         ->get($this->apiUrl . '/v2/payments/captures/' . $transactionId);
+            if ($response->status() == 401) {
+                $accessToken = $this->authenticate();
+                $response = Http::withToken($accessToken)
+                                ->timeout(120) // Aumentar el timeout a 60 segundos
+                                // ->withOptions([
+                                //     'verify' => false, // Desactivar temporalmente la verificación SSL
+                                //     'debug' => true,   // Habilitar logs de depuración
+                                // ])
+                                ->get($this->apiUrl . '/v2/payments/captures/' . $transactionId);
 
-            //     if ($response->successful()) {
-            //         return response()->json($response->json());
-            //     }
-            // }
+                if ($response->successful()) {
+                    return response()->json($response->json());
+                }
+            }
             return response()->json(['error' => 'Failed to retrieve payment: ' . $response->body()], $response->status());
         }
     }    

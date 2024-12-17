@@ -40,6 +40,9 @@ class PaymentRepository
             $payment->created_at = date('Y-m-d H:m:s');
             $payment->updated_at = date('Y-m-d H:m:s');
 
+            ( isset($request->is_conciliated) ? $payment->is_conciliated = $request->is_conciliated : "" );
+            ( isset($request->conciliation_comment) ? $payment->conciliation_comment = $request->conciliation_comment : "" );            
+
             $payment->user_id = auth()->user()->id;
             $payment->save();
 
@@ -65,7 +68,11 @@ class PaymentRepository
         try {
             DB::beginTransaction();
 
-            $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', actualizo el pago con ID: '.$payment->id.' de ( tipo: '.$payment->payment_method.', por un monto de: '.$payment->total.' '.$payment->currency.' ) a ( tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency.' )', 'HISTORY', 'UPDATE_PAYMENT');
+            if( !isset($request->is_conciliated) ){
+                $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', actualizo el pago con ID: '.$payment->id.' de ( tipo: '.$payment->payment_method.', por un monto de: '.$payment->total.' '.$payment->currency.' ) a ( tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency.' )', 'HISTORY', 'UPDATE_PAYMENT');
+            }else{
+                $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', '.( $request->is_conciliated == 0 ? "desconcilio" : "concilio" ).' el pago con ID: '.$payment->id.' de ( tipo: '.$payment->payment_method.', por un monto de: '.$payment->total.' '.$payment->currency.' ) a ( tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency.' )', 'HISTORY', 'PAYMENT_CONCILIATION');
+            }
 
             $payment->reservation_id = $request->reservation_id;
             $payment->description = 'Panel';
@@ -77,6 +84,9 @@ class PaymentRepository
             $payment->currency = $request->currency;
             $payment->reservation_id = $request->reservation_id;
             $payment->reference = $request->reference;
+
+            ( isset($request->is_conciliated) ? $payment->is_conciliated = $request->is_conciliated : "" );
+            ( isset($request->conciliation_comment) ? $payment->conciliation_comment = $request->conciliation_comment : "" );
 
             $payment->updated_at = date('Y-m-d H:m:s');
 

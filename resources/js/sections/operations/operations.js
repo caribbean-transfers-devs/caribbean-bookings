@@ -652,7 +652,7 @@ if( __btn_preassignment != null ){
                   }
               });
           }
-      });               
+      });
   });
 }
 

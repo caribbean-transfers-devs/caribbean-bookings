@@ -507,6 +507,8 @@ function getPayment(id){
             $("#servicePaymentsTotalModal").val(data.total);
             $("#servicePaymentsCurrencyModal").val(data.currency);
             $("#servicePaymentsExchangeModal").val(data.exchange_rate);
+            $("#servicePaymentsConciliationModal").val(data.is_conciliated);
+            $("#servicePaymentsMessageConciliationModal").val(data.conciliation_comment);
             $("#btn_new_payment").prop('disabled', false);
         },
         error: function (data) {

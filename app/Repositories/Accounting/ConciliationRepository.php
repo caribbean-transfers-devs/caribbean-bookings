@@ -18,64 +18,45 @@ class ConciliationRepository
     use QueryTrait, PayPalTrait;
 
     public function PayPalPayments($request){
-        $blockSize = 100; // Tamaño del bloque (ajusta este valor según tu necesidad)
-        $offset = 0;
-        $data2 = [];
+        ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
 
-        do {
-            // Obtiene un bloque de pagos
-            $payments = $this->getPayPalPayments($offset, $blockSize);
-    
-            if (empty($payments)) {
-                break;
-            }
-                
-            foreach ($payments as $payment) {                
+        $payments = $this->getPayPalPayments();
+        //26J96896MD306042F : NOS INDICA UN ERROR Failed to retrieve payment        
+        // $data = $this->getPayment('1NB52251SH516033U');
+        // $data = $this->getOrder('81074207LV178403W');
+
+        // $info = array(
+        //     "status" => $data->original['status'],
+        //     "amount" => $data->original['amount']['value'],
+        //     "gross_amount" => $data->original['seller_receivable_breakdown']['gross_amount']['value'],
+        //     "paypal_fee" => $data->original['seller_receivable_breakdown']['paypal_fee']['value'],
+        //     "net_amount" => $data->original['seller_receivable_breakdown']['net_amount']['value'],
+        // );
+
+        $data2 = array();
+        if( !empty($payments) ){
+            foreach ($payments as $key => $payment) {
                 $dataPayment = $this->getPayment($payment->reference);
-                if( !empty($dataPayment) ){
-                    array_push($data2, $dataPayment);
-                }                
-    
-                // Procesa y concilia el pago si corresponde
-                // if ($dataPayment->status == "COMPLETED" && $dataPayment->amount->value == $payment->total) {
-                //     $item = Payment::find($payment->id);
-                //     $item->is_conciliated = 1;
-                //     $item->save();
+                // if( !isset($dataPayment->original['status']) ){
+                //     dd($payment, $dataPayment);
                 // }
+                if( !empty($dataPayment) && isset($dataPayment->original['status']) && $dataPayment->original['status'] == "COMPLETED" && $dataPayment->original['amount']['value'] == $payment->total ){
+                    array_push($data2, $dataPayment);
+                    $item = Payment::find($payment->id);
+                    $item->is_conciliated = 1;
+                    $item->total_fee = $dataPayment->original['seller_receivable_breakdown']['paypal_fee']['value'];
+                    $item->total_net = $dataPayment->original['seller_receivable_breakdown']['net_amount']['value'];
+                    $item->save();
+                }
             }
-    
-            // Aumenta el offset para el próximo bloque
-            $offset += $blockSize;
-    
-            // Pausa breve para evitar sobrecargar la API de PayPal y el servidor
-            usleep(500000); // 0.5 segundos
-        } while (count($payments) === $blockSize); // Continúa si el bloque está lleno
-    
+        }
+
         return response()->json([
-            'data' => $data2,
-            'messages' => empty($data2) ? "No hay pagos para conciliar" : "Se conciliaron los pagos correctamente",
-            'success' => true
-        ], Response::HTTP_OK);        
-
-        // $payments = $this->getPayPalPayments();
-        // // $data = $this->getPayment('9RK27226158346400');
-        // $data2 = array();
-        // if( !empty($payments) ){
-        //     foreach ($payments as $key => $payment) {
-        //         $dataPayment = $this->getPayment($payment->reference);
-        //         array_push($data2, $dataPayment);
-        //         // if( $dataPayment->status == "COMPLETED" && $dataPayment->amount->value == $payment->total ){
-        //         //     $item = Payment::find($payment->id);
-        //         //     $item->is_conciliated = 1;
-        //         //     $item->save();
-        //         // }
-        //     }
-        // }
-
-        // return response()->json([
-        //     'data' => $data2,
-        //     'messages' => ( empty($payments) ? "No hay pagos para conciliar" : "Se conciliaron los pagos correctamente" ),
-        //     'success' => true
-        // ], Response::HTTP_OK);
+            // 'data' => $data,
+            // 'info' => $info,
+            'message' => ( empty($payments) ? "No hay pagos para conciliar" : "Se conciliaron los pagos correctamente" ),
+            'status' => ( empty($payments) ? "info" : "success" )
+        ], Response::HTTP_OK);
     }
 }

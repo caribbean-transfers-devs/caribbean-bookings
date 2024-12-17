@@ -508,10 +508,15 @@ trait QueryTrait
                                         p.payment_method,
                                         p.description,
                                         p.total,
+                                        p.total_fee,
+                                        p.total_net,
                                         p.currency as currency_payment,
                                         p.reference,
                                         p.is_conciliated,
+                                        p.conciliation_comment,
                                         p.created_at as created_payment,
+
+                                        s.total_sales as total_sales,
 
                                         CASE
                                             WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
@@ -535,23 +540,11 @@ trait QueryTrait
                                     $queryData);
 
         return $payments;
-    }    
+    }
 
-    // CREATE INDEX `status_index` ON payments (`status`);
-    // CREATE INDEX `payment_method_index` ON payments (`payment_method`);
-    // CREATE INDEX `is_conciliated_index` ON payments (`is_conciliated`);
-    // public function getPayPalPayments(){
-    //    return DB::select("SELECT *
-    //                         FROM payments AS p
-    //                         WHERE p.payment_method = 'PAYPAL' AND p.status = 0 AND p.is_conciliated = 0 LIMIT 10");
-    // }
-
-    public function getPayPalPayments($offset, $limit) {
-        return DB::select("SELECT *
-                            FROM payments AS p
-                            WHERE p.payment_method = 'PAYPAL' AND p.status = 0 AND p.is_conciliated = 0
-                            LIMIT ?, ?", [$offset, $limit]);
-    }    
+    public function getPayPalPayments(){
+       return DB::select("SELECT * FROM payments WHERE payment_method = 'PAYPAL' AND created_at IS NOT NULL AND deleted_at IS NULL AND is_conciliated = 0 LIMIT 300");
+    }
 
     private function orderByDateTime($a, $b) {
         return strtotime($b->created_at) - strtotime($a->created_at);
