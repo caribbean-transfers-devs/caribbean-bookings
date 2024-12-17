@@ -19,7 +19,7 @@ use App\Traits\PayPalTrait;
 
 class PaymentRepository
 {
-    use FollowUpTrait;
+    use PayPalTrait, FollowUpTrait;
 
     public function store($request)
     {
