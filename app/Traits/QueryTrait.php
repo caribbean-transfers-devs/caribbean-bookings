@@ -543,7 +543,7 @@ trait QueryTrait
     }
 
     public function getPayPalPayments(){
-       return DB::select("SELECT * FROM payments WHERE payment_method = 'PAYPAL' AND created_at IS NOT NULL AND deleted_at IS NULL AND is_conciliated = 0 LIMIT 300");
+       return DB::select("SELECT * FROM payments WHERE payment_method = 'PAYPAL' AND created_at IS NOT NULL AND deleted_at IS NULL AND is_conciliated = 0 LIMIT 100");
     }
 
     private function orderByDateTime($a, $b) {

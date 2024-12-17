@@ -15,7 +15,7 @@ class PaymentsController extends Controller
     {
         if(RoleTrait::hasPermission(14)){
             return $paymentRepository->store($request);
-        }        
+        }
     }
 
     public function show(Payment $payment)

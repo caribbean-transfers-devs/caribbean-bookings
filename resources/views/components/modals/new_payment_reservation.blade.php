@@ -13,7 +13,7 @@
                             <select class="form-select mb-2" id="servicePaymentsTypeModal" name="payment_method">
                                 <option value="CASH" selected>Efectivo</option>
                                 <option value="PAYPAL">PayPal</option>
-                                <option value="CARD">Tarjeta</option>
+                                <option value="STRIPE">Stripe</option>
                                 <option value="TRANSFER">Transferencia</option>
                                 <option value="MIFEL">MIFEL</option>
                             </select>
