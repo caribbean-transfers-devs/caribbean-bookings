@@ -100,8 +100,8 @@ class PaymentRepository
                 $data_bank = ( $request->payment_method == "PAYPAL" ? $this->getPayment($request->reference) : array() );
                 $payment->is_conciliated = $request->is_conciliated;
                 $payment->conciliation_comment = $request->conciliation_comment;
-                $payment->total_fee = ( $request->payment_method == "PAYPAL" ? $data_bank->original['seller_receivable_breakdown']['paypal_fee']['value'] : 0 );
-                $payment->total_net = ( $request->payment_method == "PAYPAL" ? $data_bank->original['seller_receivable_breakdown']['net_amount']['value'] : $request->total );
+                $payment->total_fee = ( $request->payment_method == "PAYPAL" ? ( isset($data_bank->original['status']) && $data_bank->original['status'] ? $data_bank->original['seller_receivable_breakdown']['paypal_fee']['value'] : 0 ) : 0 );
+                $payment->total_net = ( $request->payment_method == "PAYPAL" ? ( isset($data_bank->original['status']) && $data_bank->original['status'] ? $data_bank->original['seller_receivable_breakdown']['net_amount']['value'] : 0 ) : $request->total );
             };
 
             $payment->updated_at = date('Y-m-d H:m:s');
