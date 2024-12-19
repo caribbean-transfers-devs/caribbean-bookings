@@ -542,8 +542,18 @@ trait QueryTrait
         return $payments;
     }
 
-    public function getPayPalPayments(){
-       return DB::select("SELECT * FROM payments WHERE payment_method = 'PAYPAL' AND created_at IS NOT NULL AND deleted_at IS NULL AND is_conciliated = 0 LIMIT 100");
+    //TRAEREMOS PAGOS DE PAYPAL QUE TENGA FECHA DE AGREGACIÓN Y NO AYAN SIDO ELIMINADOS
+    public function getPayPalPayments($init = "", $end = ""){
+        $query = ( $init != "" && $end != "" ? ' AND p.created_at BETWEEN "'.$init.'" AND "'.$end.'" ' : "" );
+       return DB::select("SELECT * FROM payments AS p
+                                INNER JOIN reservations AS rez ON p.reservation_id = rez.id
+                                WHERE 
+                                    p.payment_method = 'PAYPAL' AND
+                                    p.created_at IS NOT NULL AND
+                                    p.deleted_at IS NULL AND
+                                    p.is_conciliated = 0 AND
+                                    rez.is_cancelled = 0 AND
+                                    rez.is_duplicated = 0 ".$query." ");
     }
 
     private function orderByDateTime($a, $b) {

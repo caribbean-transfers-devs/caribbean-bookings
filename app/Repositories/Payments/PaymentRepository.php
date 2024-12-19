@@ -65,7 +65,8 @@ class PaymentRepository
         }
     }
 
-    public function update($request,$payment){
+    public function update($request,$payment)
+    {
         try {
             DB::beginTransaction();
 

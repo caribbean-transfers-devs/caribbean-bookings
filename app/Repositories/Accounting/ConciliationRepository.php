@@ -21,8 +21,12 @@ class ConciliationRepository
         ini_set('memory_limit', '-1'); // Sin límite
         set_time_limit(120); // Aumenta el límite a 60 segundos
 
-        $payments = $this->getPayPalPayments();
-        //26J96896MD306042F : NOS INDICA UN ERROR Failed to retrieve payment        
+        $init = ( isset($request->startDate) ? $request->startDate." 00:00:00" : "" );
+        $end = ( isset($request->endDate) ? $request->endDate." 23:59:59" : "" );
+
+        $payments = $this->getPayPalPayments($init, $end);
+
+        //26J96896MD306042F : NOS INDICA UN ERROR Failed to retrieve payment
         // $data = $this->getPayment('1NB52251SH516033U');
         // $data = $this->getOrder('81074207LV178403W');
 
@@ -41,19 +45,21 @@ class ConciliationRepository
                 // if( !isset($dataPayment->original['status']) ){
                 //     dd($payment, $dataPayment);
                 // }
-                if( !empty($dataPayment) && isset($dataPayment->original['status']) && $dataPayment->original['status'] == "COMPLETED" && $dataPayment->original['amount']['value'] == $payment->total ){
-                    array_push($data2, $dataPayment);
+                // && $dataPayment->original['amount']['value'] == $payment->total
+                if( !empty($dataPayment) && isset($dataPayment->original['status']) && $dataPayment->original['status'] == "COMPLETED" ){                    
                     $item = Payment::find($payment->id);
                     $item->is_conciliated = 1;
                     $item->total_fee = $dataPayment->original['seller_receivable_breakdown']['paypal_fee']['value'];
                     $item->total_net = $dataPayment->original['seller_receivable_breakdown']['net_amount']['value'];
                     $item->save();
+                    array_push($data2, $item);
                 }
             }
         }
 
         return response()->json([
             // 'data' => $data,
+            'data2' => $data2,
             // 'info' => $info,
             'message' => ( empty($payments) ? "No hay pagos para conciliar" : "Se conciliaron los pagos correctamente" ),
             'status' => ( empty($payments) ? "info" : "success" )

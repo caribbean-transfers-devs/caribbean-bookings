@@ -635,7 +635,7 @@ if( __btn_preassignment != null ){
               $.ajax({
                   type: "POST",
                   url: _LOCAL_URL + "/operation/preassignments",
-                  data: JSON.stringify({ date: result.value }), // Datos a enviar al servidor                            
+                  data: JSON.stringify({ date: result.value }), // Datos a enviar al servidor
                   dataType: "json",
                   contentType: 'application/json; charset=utf-8',   
                   beforeSend: function(){
@@ -895,18 +895,18 @@ if (__btn_update_status_bookings.length > 0) {
                   
                   if ( ( __vehicle.value == 0 && __driver.value == 0 ) || ( __vehicle.value == 0 ) || ( __driver.value == 0 ) ) {
                       Swal.fire({
-                          text: 'Valida la seleccion de unidad y conductor.',
-                          icon: 'error',
-                          showConfirmButton: false,
-                          timer: 1500,
-                      });                        
+                        text: 'Valida la seleccion de unidad y conductor.',
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 1500,
+                      });
                   }else{
                       $.ajax({
                           url: `/operation/status/booking`,
                           type: 'PUT',
                           data: { id: key, rez_id: booking, item_id: item, operation: operation, service: service, type: type, status: status },
                           beforeSend: function() {
-                              components.loadScreen();
+                            components.loadScreen();
                           },
                           success: function(resp) {
                               Swal.fire({

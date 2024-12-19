@@ -36,16 +36,46 @@ if( __btn_conciliation_paypal != null ){
     __btn_conciliation_paypal.addEventListener('click', function(event){
         event.preventDefault();
         swal.fire({
-            text: '¿Esta seguro de conciliar los pagos de PayPal?',
+            title: '¿Esta seguro de conciliar los pagos de PayPal?',
+            html: `
+                <div class="w-100 d-flex justify-content-between gap-3">
+                    <div class="w-50">
+                        <label for="startDate">Fecha Inicio:</label>
+                        <input id="startDate" type="date" class="form-control">
+                    </div>
+                    <div class="w-50">
+                        <label for="endDate">Fecha Fin:</label>
+                        <input id="endDate" type="date" class="form-control">
+                    </div>
+                </div>
+            `,            
             icon: 'info',
             showCancelButton: true,
             confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar'
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+        
+                if (!startDate || !endDate) {
+                    Swal.showValidationMessage('Por favor seleccione un rango de fechas válido.');
+                    return false;
+                }
+        
+                if (new Date(startDate) > new Date(endDate)) {
+                    Swal.showValidationMessage('La fecha de inicio no puede ser mayor que la fecha de fin.');
+                    return false;
+                }
+        
+                return { startDate, endDate };
+            }
         }).then((result) => {
             if(result.isConfirmed == true){
+                const { startDate, endDate } = result.value;
                 $.ajax({
                     type: "GET",
                     url: _LOCAL_URL + "/bot/conciliation/paypal",
+                    data: { startDate, endDate }, // Envío de fechas
                     dataType: "json",
                     beforeSend: function(){
                         components.loadScreen();
