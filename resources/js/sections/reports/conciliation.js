@@ -164,4 +164,5 @@ $("#btn_new_payment").on('click', function(){
     components.request_exec_ajax( _LOCAL_URL + ( __type_pay.value == 1 ? "/payments" : "/payments/" + __code_pay.value ), ( __type_pay.value == 1 ? 'POST' : 'PUT' ), __params );
 });
 
+components.renderCheckboxColumns('dataConciliation', 'columns');
 components.setValueSelectpicker();

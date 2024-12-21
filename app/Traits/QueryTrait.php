@@ -545,7 +545,12 @@ trait QueryTrait
     //TRAEREMOS PAGOS DE PAYPAL QUE TENGA FECHA DE AGREGACIÓN Y NO AYAN SIDO ELIMINADOS
     public function getPayPalPayments($init = "", $end = ""){
         $query = ( $init != "" && $end != "" ? ' AND p.created_at BETWEEN "'.$init.'" AND "'.$end.'" ' : "" );
-       return DB::select("SELECT * FROM payments AS p
+       return DB::select("SELECT 
+                                p.*,
+                                rez.id AS reservation_id,
+                                rez.is_cancelled,
+                                rez.is_duplicated
+                                FROM payments AS p
                                 INNER JOIN reservations AS rez ON p.reservation_id = rez.id
                                 WHERE 
                                     p.payment_method = 'PAYPAL' AND

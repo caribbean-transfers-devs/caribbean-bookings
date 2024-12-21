@@ -5,6 +5,7 @@ namespace App\Repositories\Accounting;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 //MODELS
 use App\Models\Payment;
@@ -45,9 +46,9 @@ class ConciliationRepository
         //         // if( !isset($dataPayment->original['status']) ){
         //         //     dd($payment, $dataPayment);
         //         // }
-        //         // && $dataPayment->original['amount']['value'] == $payment->total
-        //         // !empty($dataPayment) && 
-        //         if( isset($dataPayment->original['status']) && $dataPayment->original['status'] == "COMPLETED" ){
+        //         // if( isset($data->original['status']) && $data->original['status'] == "COMPLETED" ){
+        //         if( !empty($dataPayment) && isset($dataPayment->original['status']) && $dataPayment->original['status'] == "COMPLETED" && $dataPayment->original['amount']['value'] == $payment->total ){
+        //             // $item = Payment::find(34458);
         //             $item = Payment::find($payment->id);
         //             $item->is_conciliated = 1;
         //             $item->total_fee = $dataPayment->original['seller_receivable_breakdown']['paypal_fee']['value'];
@@ -59,6 +60,8 @@ class ConciliationRepository
         // }
 
         return response()->json([
+            // 'payments' => $payments,
+            // 'count' => count($payments),
             'data' => $data,
             // 'data2' => $data2,
             // 'info' => $info,
