@@ -152,7 +152,7 @@
             endif;            
             if(RoleTrait::hasPermission(47)):
                 $links_operations[] = [
-                    'name' => 'SPAM',
+                    'name' => 'POS venta',
                     'route' => route('operation.spam'),
                     'active' => request()->routeIs('operation.spam','operation.spam.search'),
                 ];

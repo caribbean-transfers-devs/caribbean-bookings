@@ -46,6 +46,7 @@ Route::middleware(['guest'])->group(function () {
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/', [DashboardController::class, 'index'])->name('dashboard.search');
 
     //BOTS 
     Route::get('/bot/conciliation/paypal', [ConciliationController::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
