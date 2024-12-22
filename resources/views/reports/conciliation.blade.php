@@ -3,6 +3,25 @@
     use App\Traits\BookingTrait;
     use Illuminate\Support\Str;
     use Carbon\Carbon;
+    $conciliationPayments = [
+        "total" => 0,
+        "total_taxes" => 0,
+        "total_received" => 0,
+        "USD" => [
+            "total" => 0,
+            "total_taxes" => 0,
+            "total_received" => 0,
+            "quantity" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "total_taxes" => 0,
+            "total_received" => 0,
+            "quantity" => 0,
+        ],
+        "quantity" => 0,
+        "data" => []
+    ];
 @endphp
 @extends('layout.app')
 @section('title') Reporte De Conciliación @endsection
@@ -18,6 +37,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>    
     <script src="{{ mix('/assets/js/sections/reports/conciliation.min.js') }}"></script>
     <script>
         document.getElementById('showLayer').addEventListener('click', function() {
@@ -109,6 +130,7 @@
                             <th class="text-center">MONEDA DE PAGO</th>
                             <th class="text-center">COMENTARIO DE CONCILIACIÓN</th>
                             <th class="text-center">FECHA DE PAGO</th>
+                            <th class="text-center">FECHA EN QUE SE RECIBIO EL PAGO</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">MONEDA DE RESERVACIÓN</th>
                             <th class="text-center">CONCILIADO</th>
@@ -123,7 +145,49 @@
                         @if(sizeof($conciliations)>=1)
                             @foreach($conciliations as $key => $conciliation)
                                 @php
-                                    // dd($conciliation);
+                                    if (!isset( $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))] )){
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))] = [
+                                            "name" => strtoupper(Str::slug($conciliation->payment_method)),
+                                            "total" => 0,
+                                            "total_taxes" => 0,
+                                            "total_received" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "total_taxes" => 0,
+                                                "total_received" => 0,
+                                                "quantity" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "total_taxes" => 0,
+                                                "total_received" => 0,
+                                                "quantity" => 0,
+                                            ],
+                                            "quantity" => 0,
+                                        ];
+                                    }                                    
+                                    if( $conciliation->is_conciliated == 1 ){
+                                        $conciliationPayments['total'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total * $exchange) : $conciliation->total );
+                                        $conciliationPayments['total_taxes'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_fee * $exchange) : $conciliation->total_fee );
+                                        $conciliationPayments['total_received'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_net * $exchange) : $conciliation->total_net );
+
+                                        $conciliationPayments[$conciliation->currency_payment]['total'] += $conciliation->total;
+                                        $conciliationPayments[$conciliation->currency_payment]['total_taxes'] += $conciliation->total_fee;
+                                        $conciliationPayments[$conciliation->currency_payment]['total_received'] += $conciliation->total_net;
+                                        $conciliationPayments[$conciliation->currency_payment]['quantity']++;
+
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['total'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total * $exchange) : $conciliation->total );
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['total_taxes'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_fee * $exchange) : $conciliation->total_fee );
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['total_received'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_net * $exchange) : $conciliation->total_net );
+
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['total'] += $conciliation->total;
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['total_taxes'] += $conciliation->total_fee;
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['total_received'] += $conciliation->total_net;
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['quantity']++;
+
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['quantity']++;
+                                        $conciliationPayments['quantity']++;
+                                    }
                                 @endphp
                                 <tr>
                                     <td class="text-center">{{ $conciliation->reservation_id }}</td>
@@ -141,6 +205,10 @@
                                         {{ date("Y-m-d", strtotime($conciliation->created_payment)) }}
                                         [{{ date("H:m", strtotime($conciliation->created_payment)) }}]
                                     </td>
+                                    <td class="text-center">
+                                        {{ date("Y-m-d", strtotime($conciliation->conciliation_payment)) }}
+                                        [{{ date("H:m", strtotime($conciliation->conciliation_payment)) }}]
+                                    </td>                                    
                                     <td class="text-center">{{ number_format($conciliation->total_sales, 2) }}</td>
                                     <td class="text-center">{{ $conciliation->currency }}</td>
                                     <td class="text-center"><button class="btn btn-{{ $conciliation->is_conciliated == 1 ? 'success' : 'danger' }} __btn_conciliation bs-tooltip" data-reservation="{{ $conciliation->reservation_id }}" data-payment="{{ $conciliation->code_payment }}" data-currency="{{ $conciliation->currency_payment }}" title="{{ $conciliation->is_conciliated == 1 ? 'Click para ver la conciliación' : 'click para conciliar el pago' }}">{{ $conciliation->is_conciliated == 1 ? 'SÍ' : 'NO' }}</button></td>
@@ -167,80 +235,48 @@
         </div>
         <div class="body-chart">
             <div class="row">
-                <div class="col-lg-8 col-12">
+                <div class="col-lg-12 col-12">
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
-                            <h5 class="col-12 text-left text-uppercase">ESTADISTICAS POR ESTATUS</h5>
-                            <div class="col-lg-5 col-12">
-                                <canvas class="chartSale" id="chartSaleStatus"></canvas>
+                            <h5 class="col-12 text-left text-uppercase">Estadisiticas de pagos conciliados</h5>
+                            <div class="col-lg-4 col-12">
+                                <canvas class="" id="chartPaymentsConciliation"></canvas>
                             </div>
-                            <div class="col-lg-7 col-12">
-                                <table class="table table-chart table-chart-general mb-3">
-                                    <thead>
-                                        <tr>
-                                            <th>ESTATUS</th>
-                                            <th class="text-center">GRAN TOTAL</th>
-                                            <th class="text-center">CANTIDAD</th>
-                                            <th class="text-center">PESOS</th>
-                                            <th class="text-center">DOLARES</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-
-                                        </tr>
-                                    </tfoot>
-                                </table>
-
-                                <table class="table table-chart table-chart-general">
-                                    <thead>
-                                        <tr>
-                                            <th>ESTATUS</th>
-                                            <th class="text-center">GRAN TOTAL</th>
-                                            <th class="text-center">CANTIDAD</th>
-                                            <th class="text-center">PESOS</th>
-                                            <th class="text-center">DOLARES</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-
-                                        </tr>
-                                    </tfoot>
-                                </table>                                
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="col-lg-12 col-12">
-                        <div class="row g-0">
-                            <h5 class="col-12 text-left text-uppercase">estadisticas por metodo de pago</h5>
-                            <div class="col-lg-5 col-12">
-                                <canvas class="chartSale" id="chartSaleMethodPayments"></canvas>
-                            </div>
-                            <div class="col-lg-7 col-12">
+                            <div class="col-lg-8 col-12">
                                 <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
                                             <th>METODO DE PAGO</th>
-                                            <th class="text-center">GRAN TOTAL</th>
                                             <th class="text-center">CANTIDAD</th>
-                                            <th class="text-center">PESOS</th>
-                                            <th class="text-center">DOLARES</th>
+                                            <th class="text-center">GRAN TOTAL</th>
+                                            <th class="text-center">TOTAL DE IMPUESTOS</th>
+                                            <th class="text-center">TOTAL RECIBIDO</th>
+                                            <th class="text-center">TOTAL DE USD</th>
+                                            <th class="text-center">TOTAL DE MXN</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-
+                                        @foreach ($conciliationPayments['data'] as $keyP => $payment)
+                                            <tr>
+                                                <td>{{ $payment['name'] }}</td>
+                                                <td class="text-center">{{ $payment['quantity'] }}</td>
+                                                <td class="text-center">{{ $payment['total'] }}</td>
+                                                <td class="text-center">{{ $payment['total_taxes'] }}</td>
+                                                <td class="text-center">{{ $payment['total_received'] }}</td>
+                                                <td class="text-center">{{ $payment['USD']['total'] }}</td>
+                                                <td class="text-center">{{ $payment['MXN']['total'] }}</td>                                                
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
-
+                                            <th>TOTAL</th>
+                                            <th class="text-center">{{ $conciliationPayments['quantity'] }}</th>
+                                            <th class="text-center">{{ $conciliationPayments['total'] }}</th>
+                                            <th class="text-center">{{ $conciliationPayments['total_taxes'] }}</th>
+                                            <th class="text-center">{{ $conciliationPayments['total_received'] }}</th>
+                                            <th class="text-center">{{ $conciliationPayments['USD']['total'] }}</th>
+                                            <th class="text-center">{{ $conciliationPayments['MXN']['total'] }}</th> 
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -248,160 +284,106 @@
                         </div>
                     </div>
                     <hr>
-                    <div class="col-lg-12 col-12">
-                        <div class="row g-0">
-                            <h5 class="col-12 text-left text-uppercase">estadisticas por sitio</h5>
-                            <div class="col-lg-5 col-12">
-                                <canvas class="" id="chartSaleSites"></canvas>
-                            </div>
-                            <div class="col-lg-7 col-12">
-                                <table class="table table-chart table-chart-general">
-                                    <thead>
-                                        <tr>
-                                            <th>SITIO</th>
-                                            <th class="text-center">GRAN TOTAL</th>
-                                            <th class="text-center">CANTIDAD</th>
-                                            <th class="text-center">PESOS</th>
-                                            <th class="text-center">DOLARES</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="col-lg-12 col-12">
-                        <div class="row g-0">
-                            <h5 class="col-12 text-left text-uppercase">estadisticas por destino</h5>
-                            <div class="col-lg-5 col-12">
-                                <canvas class="" id="chartSaleDestinations"></canvas>
-                            </div>
-                            <div class="col-lg-7 col-12">
-                                <table class="table table-chart table-chart-general">
-                                    <thead>
-                                        <tr>
-                                            <th>DESTINO</th>
-                                            <th class="text-center">GRAN TOTAL</th>
-                                            <th class="text-center">CANTIDAD</th>
-                                            <th class="text-center">PESOS</th>
-                                            <th class="text-center">DOLARES</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                    </div>                    
-                </div>
-                <div class="col-lg-4 col-12">
-                    <div class="col-lg-12 col-12">
-                        <div class="row g-0">
-                            <h5 class="col-12 text-left text-uppercase">estadisticas por moneda</h5>
-                            <div class="col-lg-12 col-12">
-                                <canvas class="" id="chartSaleCurrencies"></canvas>
-                            </div>
-                            <div class="col-lg-12 col-12">
-                                <table class="table table-chart table-chart-general">
-                                    <thead>
-                                        <tr>
-                                            <th>MONEDA</th>
-                                            <th class="text-center">GRAN TOTAL</th>
-                                            <th class="text-center">CANTIDAD</th>
-                                            <th class="text-center">TOTAL</th>                                
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="col-lg-12 col-12">
-                        <div class="row g-0">
-                            <h5 class="col-12 text-left text-uppercase">estadisticas por origen de venta</h5>
-                            <div class="col-lg-12 col-12">
-                                <canvas class="" id="chartSaleOrigins"></canvas>
-                            </div>
-                            <div class="col-lg-12 col-12">
-                                <table class="table table-chart table-chart-general">
-                                    <thead>
-                                        <tr>
-                                            <th>ORIGEN</th>
-                                            <th class="text-center">GRAN TOTAL</th>
-                                            <th class="text-center">CANTIDAD</th>
-                                            <th class="text-center">PESOS</th>
-                                            <th class="text-center">DOLARES</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="col-lg-12 col-12">
-                        <div class="row g-0">
-                            <h5 class="col-12 text-left text-uppercase">estadisticas por vehículo</h5>
-                            <div class="col-lg-12 col-12">
-                                <canvas class="" id="chartSaleVehicles"></canvas>
-                            </div>
-                            <div class="col-lg-12 col-12">
-                                <table class="table table-chart table-chart-general">
-                                    <thead>
-                                        <tr>
-                                            <th>VEHÍCULO</th>
-                                            <th class="text-center">GRAN TOTAL</th>
-                                            <th class="text-center">CANTIDAD</th>
-                                            <th class="text-center">PESOS</th>
-                                            <th class="text-center">DOLARES</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                    </div>                    
                 </div>
             </div>
         </div>
-    </div>    
+    </div>
 
     <x-modals.filters.bookings :data="$data" :paymentstatus="$payment_status" :methods="$methods" :currencies="$currencies" :request="$request" />
     <x-modals.reports.columns />
-    <x-modals.new_payment_conciliation />    
+    <x-modals.new_payment_conciliation />
 @endsection
+
+@push('Js')
+    <script>
+        let payments = {
+            dataPaymentsConciliation: @json(( isset($conciliationPayments['data']) ? $conciliationPayments['data'] : [] )),
+            dataChartPaymentsConciliation: function(){
+                let object = [];
+                const systems = Object.entries(this.dataPaymentsConciliation);
+                systems.forEach( ([key, data]) => {
+                    object.push(data);
+                });
+                return object;
+            },
+            renderChartPaymentsConciliation: function(){
+                // Calcular el total de 'counter'
+                const totalCount = payments.dataChartPaymentsConciliation().reduce((sum, system) => sum + system.quantity, 0);
+                // Calcular el porcentaje de cada 'counter'
+                const percentages = payments.dataChartPaymentsConciliation().map(site => ((site.quantity / totalCount) * 100).toFixed(2) + '%');
+
+                if( document.getElementById('chartPaymentsConciliation') != null ){
+                    new Chart(document.getElementById('chartPaymentsConciliation'), {
+                        type: 'pie',
+                        data: {
+                            labels: payments.dataChartPaymentsConciliation().map(row => row.name),
+                            datasets: [
+                                {
+                                    data: payments.dataChartPaymentsConciliation().map(row => row.quantity),
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true, // Hacer el gráfico responsivo
+                            maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
+                            plugins: {
+                                legend: {
+                                    display: true,  // Mostrar las etiquetas
+                                    position: 'bottom', // Colocar las etiquetas debajo del gráfico
+                                    labels: {
+                                        padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
+                                        boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
+                                        font: {
+                                            size: 12, // Tamaño de la fuente de los labels
+                                            color: '#000' // Cambia el color de los labels a negro
+                                        },
+                                        color: '#000' // Asegura que el color de los labels sea negro
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function(tooltipItems) {
+                                            // Mostrar el nombre del sitio
+                                            return tooltipItems[0].label;
+                                        },
+                                        label: function(tooltipItem) {
+                                            // console.log(tooltipItem);
+                                            const index = tooltipItem.dataIndex;
+                                            const site = payments.dataChartPaymentsConciliation()[index];
+                                            // Mostrar el monto en pesos y dólares junto con el porcentaje
+                                            return [
+                                                // `${site.name}:`,
+                                                // `Porcentaje: ${percentages[index]}`,
+                                                // `TOTAL DE VENTA: $ ${site.gran_total.toLocaleString()}`,
+                                                // `TOTAL DE VENTA EN USD: $ ${site['accumulated']['USD'].total.toLocaleString()}`,
+                                                // `TOTAL DE VENTA EN MXN: $ ${site['accumulated']['MXN'].total.toLocaleString()}`,
+                                            ];
+                                        }
+                                    }
+                                },
+                                datalabels: {
+                                    display: true,
+                                    formatter: (value, context) => {
+                                        const total = context.chart._metasets[0].total;
+                                        const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                        return percentage; // Mostrar porcentaje en el gráfico
+                                    },
+                                    color: '#000',
+                                    font: {
+                                        weight: 'bold'
+                                    },
+                                    anchor: 'end',
+                                    align: 'start'
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
+                    });
+                }
+            },
+        };
+
+        console.log(payments.dataChartPaymentsConciliation());
+        payments.renderChartPaymentsConciliation();
+    </script>
+@endpush

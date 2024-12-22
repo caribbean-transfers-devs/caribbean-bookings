@@ -515,6 +515,8 @@ trait QueryTrait
                                         p.is_conciliated,
                                         p.conciliation_comment,
                                         p.created_at as created_payment,
+                                        p.updated_at as updated_payment,
+                                        p.date_conciliation as conciliation_payment,
 
                                         s.total_sales as total_sales,
 
@@ -563,5 +565,5 @@ trait QueryTrait
 
     private function orderByDateTime($a, $b) {
         return strtotime($b->created_at) - strtotime($a->created_at);
-    }    
+    }
 }

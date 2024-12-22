@@ -24,12 +24,7 @@ class ConciliationRepository
 
         $init = ( isset($request->startDate) ? $request->startDate." 00:00:00" : "" );
         $end = ( isset($request->endDate) ? $request->endDate." 23:59:59" : "" );
-
         $payments = $this->getPayPalPayments($init, $end);
-
-        //26J96896MD306042F : NOS INDICA UN ERROR Failed to retrieve payment
-        $data = $this->getPayment('72L93112TH167364Y');
-        // $data = $this->getOrder('81074207LV178403W');
 
         // $info = array(
         //     "status" => $data->original['status'],
@@ -39,31 +34,27 @@ class ConciliationRepository
         //     "net_amount" => $data->original['seller_receivable_breakdown']['net_amount']['value'],
         // );
 
-        // $data2 = array();
-        // if( !empty($payments) ){
-        //     foreach ($payments as $key => $payment) {
-        //         $dataPayment = $this->getPayment($payment->reference);
-        //         // if( !isset($dataPayment->original['status']) ){
-        //         //     dd($payment, $dataPayment);
-        //         // }
-        //         // if( isset($data->original['status']) && $data->original['status'] == "COMPLETED" ){
-        //         if( !empty($dataPayment) && isset($dataPayment->original['status']) && $dataPayment->original['status'] == "COMPLETED" && $dataPayment->original['amount']['value'] == $payment->total ){
-        //             // $item = Payment::find(34458);
-        //             $item = Payment::find($payment->id);
-        //             $item->is_conciliated = 1;
-        //             $item->total_fee = $dataPayment->original['seller_receivable_breakdown']['paypal_fee']['value'];
-        //             $item->total_net = $dataPayment->original['seller_receivable_breakdown']['net_amount']['value'];
-        //             $item->save();
-        //             array_push($data2, $item);
-        //         }
-        //     }
-        // }
+        $data2 = array();
+        if( !empty($payments) ){
+            foreach ($payments as $key => $payment) {
+                $dataPayment = $this->getPayment($payment->reference);
+                if( !empty($dataPayment) && isset($dataPayment->original['status']) && $dataPayment->original['status'] == "COMPLETED" && $dataPayment->original['amount']['value'] == $payment->total ){
+                    $item = Payment::find($payment->id);
+                    $item->is_conciliated = 1;
+                    $item->date_conciliation = Carbon::parse($dataPayment->original['create_time'])->format('Y-m-d H:i:s');
+                    $item->total_fee = $dataPayment->original['seller_receivable_breakdown']['paypal_fee']['value'];
+                    $item->total_net = $dataPayment->original['seller_receivable_breakdown']['net_amount']['value'];
+                    $item->save();
+                    array_push($data2, $item);
+                }
+            }
+        }
 
         return response()->json([
             // 'payments' => $payments,
             // 'count' => count($payments),
-            'data' => $data,
-            // 'data2' => $data2,
+            // 'data' => $data,
+            'data2' => $data2,
             // 'info' => $info,
             'message' => ( empty($payments) ? "No hay pagos para conciliar" : "Se conciliaron los pagos correctamente" ),
             'status' => ( empty($payments) ? "info" : "success" )

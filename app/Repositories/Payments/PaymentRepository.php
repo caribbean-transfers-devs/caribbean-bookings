@@ -12,6 +12,7 @@ use App\Repositories\Reservations\ReservationsRepository;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 //TRAIS
 use App\Traits\FollowUpTrait;
@@ -99,9 +100,12 @@ class PaymentRepository
             if( isset($request->is_conciliated) && $request->is_conciliated == 1 ){
                 $data_bank = ( $request->payment_method == "PAYPAL" ? $this->getPayment($request->reference) : array() );
                 $payment->is_conciliated = $request->is_conciliated;
-                $payment->conciliation_comment = $request->conciliation_comment;
+
+                ( $request->payment_method == "PAYPAL" && isset($data_bank->original['status']) && $data_bank->original['status'] ? $payment->date_conciliation = Carbon::parse($data_bank->original['create_time'])->format('Y-m-d H:i:s') : 0 );
+
                 $payment->total_fee = ( $request->payment_method == "PAYPAL" ? ( isset($data_bank->original['status']) && $data_bank->original['status'] ? $data_bank->original['seller_receivable_breakdown']['paypal_fee']['value'] : 0 ) : 0 );
                 $payment->total_net = ( $request->payment_method == "PAYPAL" ? ( isset($data_bank->original['status']) && $data_bank->original['status'] ? $data_bank->original['seller_receivable_breakdown']['net_amount']['value'] : 0 ) : $request->total );
+                $payment->conciliation_comment = $request->conciliation_comment;
             };
 
             $payment->updated_at = date('Y-m-d H:m:s');
