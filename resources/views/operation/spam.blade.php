@@ -70,143 +70,165 @@
                         </ul>
                     </div>
                 @endif
-                <table id="dataSpams" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
-                    <thead>
-                        <tr>        
-                            <th class="text-center"></th>
-                            <th class="text-center">Code</th>
-                            <th class="text-center"># Llamadas aceptadas</th>
-                            <th class="text-center">Sitio</th>
-                            <th class="text-center">Pickup</th>
-                            <th class="text-center">Tipo</th>
-                            <th class="text-center">Round Trip</th>
-                            <th class="text-center">Operación</th>
-                            <th class="text-center">Código</th>
-                            <th class="text-center">Cliente</th>
-                            <th class="text-center">Teléfono</th>
-                            <th class="text-center">Correo</th>
-                            <th class="text-center">Vehículo</th>
-                            <th class="text-center">Pasajeros</th>
-                            <th class="text-center">Desde</th>
-                            <th class="text-center">Hacia</th>
-                            <th class="text-center">Total</th>
-                            <th class="text-center">Moneda</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(sizeof($items)>=1)
-                            @foreach($items as $key => $value)
-                                @if( in_array($value->final_service_type, ["ARRIVAL", "TRANSFER"]) )
-                                    @php
-                                        $confirmation_type = $value->op_one_confirmation;
-                                        if($value->operation_type == "departure"):
-                                            $confirmation_type = $value->op_two_confirmation;
-                                        endif;
 
-                                        $payment = ( $value->total_sales - $value->total_payments );
-                                        if($payment < 0) $payment = 0;
+                <div class="row layout-top-spacing mb-3">
+                    <div class="col-md-12">
+                        <ul class="nav nav-pills" id="animateLine" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="animated-underline-pending-tab" data-bs-toggle="tab" href="#animated-underline-pending" role="tab" aria-controls="animated-underline-pending" aria-selected="false" tabindex="-1"> Reservas pendientes</button>
+                            </li>                
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="animated-underline-spam-tab" data-bs-toggle="tab" href="#animated-underline-spam" role="tab" aria-controls="animated-underline-spam" aria-selected="false" tabindex="-1"> Spam</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-                                        $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
-                                        $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
-                                        $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
-                                        $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
-
-                                        switch ($operation_status) {
-                                            case 'PENDING':
-                                                $label = 'secondary';
-                                                break;
-                                            case 'COMPLETED':
-                                                $label = 'success';
-                                                break;
-                                            case 'NOSHOW':
-                                                $label = 'warning';
-                                                break;
-                                            case 'CANCELLED':
-                                                $label = 'danger';
-                                                break;
-                                            default:
-                                                $label = 'secondary';
-                                                break;
-                                        }
-                                        
-                                        switch ($value->spam) {
-                                            case 'PENDING':
-                                                $spam = 'btn-secondary';
-                                                break;
-                                            case 'SENT':
-                                                $spam = 'btn-info';
-                                                break;
-                                            case 'LATER':
-                                                $spam = 'btn-warning';
-                                                break;
-                                            case 'CONFIRMED':
-                                                $spam = 'btn-success';
-                                                break;
-                                            case 'ACCEPT':
-                                                $spam = 'btn-success';
-                                                break;                                                
-                                            case 'REJECTED':
-                                                $spam = 'btn-danger';
-                                                break;
-                                            default:
-                                                $spam = 'btn-secondary';
-                                                break;
-                                        }
-
-                                        if( !isset( $resumen[ $value->spam ] ) ):
-                                            $resumen[ $value->spam ] = 0;
-                                        endif;
-                                        $resumen[ $value->spam ]++;
-                                    @endphp
-                                    <tr>
-                                        <td class="text-center">
-                                            <div class="btn-group" role="group">
-                                                <button id="actions" type="button" class="btn {{ $spam }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="{{$value->id}}">
-                                                    {{ $value->spam }}
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                                </button>                                                
-                                                <div class="dropdown-menu" aria-labelledby="actions">
-                                                    <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'PENDING','btn-secondary')"><i class="flaticon-home-fill-1 mr-1"></i> PENDING</a>
-                                                    <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'SENT','btn-info')"><i class="flaticon-home-fill-1 mr-1"></i> SENT</a>
-                                                    <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'LATER','btn-warning')"><i class="flaticon-home-fill-1 mr-1"></i> LATER</a>
-                                                    <div class="dropdown-divider"></div>
-                                                    <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'CONFIRMED','btn-success')"><i class="flaticon-home-fill-1 mr-1"></i> CONFIRMED</a>
-                                                    <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'REJECTED','btn-danger')"><i class="flaticon-home-fill-1 mr-1"></i> REJECTED</a>
-                                                </div>
-                                            </div>                                 
-                                        </td>
-                                        <td class="text-center">{{ $value->id }}</td>
-                                        <td class="text-center">{{ $value->spam_count }}</td>                                        
-                                        <td class="text-center">{{ $value->site_name }}</td>
-                                        <td class="text-center">{{ date("H:i", strtotime($operation_pickup)) }}</td>
-                                        <td class="text-center">{{ $value->final_service_type }}</td>
-                                        <td class="text-center">
-                                            @if ( $value->is_round_trip == 1 )
-                                                Si
-                                            @else
-                                                No
-                                            @endif
-                                        </td>
-                                        <td class="text-center"><span class="badge badge-light-{{ $label }} mb-2 me-4">{{ $operation_status }}</span></td>
-                                        <td class="text-center">
-                                            <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>                                                        
-                                        </td>
-                                        <td class="text-center">{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
-                                        <td class="text-center">{{ trim($value->client_phone) }}</td>
-                                        <td class="text-center">{{ trim(strtolower($value->client_email)) }}</td>
-                                        <td class="text-center">{{ $value->service_name }}</td>
-                                        <td class="text-center" class="text-center">{{ $value->passengers }}</td>
-                                        <td class="text-center">{{ $operation_from }}</td>
-                                        <td class="text-center">{{ $operation_to }}</td>                                                    
-                                        <td class="text-center">{{ number_format($value->total_sales,2) }}</td>
-                                        <td class="text-center">{{ $value->currency }}</td>
-                                    </tr>
+                <div class="tab-content" id="animateLineContent-4">
+                    <div class="tab-pane fade show active" id="animated-underline-pending" role="tabpanel" aria-labelledby="animated-underline-badge-pending">                    
+                        <table id="dataSpams" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                            <thead>
+                                <tr>        
+                                    <th class="text-center"></th>
+                                    <th class="text-center">Code</th>
+                                    <th class="text-center"># Llamadas aceptadas</th>
+                                    <th class="text-center">Sitio</th>
+                                    <th class="text-center">Pickup</th>
+                                    <th class="text-center">Tipo</th>
+                                    <th class="text-center">Round Trip</th>
+                                    <th class="text-center">Operación</th>
+                                    <th class="text-center">Código</th>
+                                    <th class="text-center">Cliente</th>
+                                    <th class="text-center">Teléfono</th>
+                                    <th class="text-center">Correo</th>
+                                    <th class="text-center">Vehículo</th>
+                                    <th class="text-center">Pasajeros</th>
+                                    <th class="text-center">Desde</th>
+                                    <th class="text-center">Hacia</th>
+                                    <th class="text-center">Total</th>
+                                    <th class="text-center">Moneda</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if(sizeof($items)>=1)
+                                    @foreach($items as $key => $value)
+                                        @if( in_array($value->final_service_type, ["ARRIVAL", "TRANSFER"]) )
+                                            @php
+                                                $confirmation_type = $value->op_one_confirmation;
+                                                if($value->operation_type == "departure"):
+                                                    $confirmation_type = $value->op_two_confirmation;
+                                                endif;
+        
+                                                $payment = ( $value->total_sales - $value->total_payments );
+                                                if($payment < 0) $payment = 0;
+        
+                                                $operation_status = (($value->operation_type == 'arrival')? $value->op_one_status : $value->op_two_status );
+                                                $operation_pickup = (($value->operation_type == 'arrival')? $value->op_one_pickup : $value->op_two_pickup );
+                                                $operation_from = (($value->operation_type == 'arrival')? $value->from_name.((!empty($value->flight_number))? ' ('.$value->flight_number.')' :'')  : $value->to_name );
+                                                $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
+        
+                                                switch ($operation_status) {
+                                                    case 'PENDING':
+                                                        $label = 'secondary';
+                                                        break;
+                                                    case 'COMPLETED':
+                                                        $label = 'success';
+                                                        break;
+                                                    case 'NOSHOW':
+                                                        $label = 'warning';
+                                                        break;
+                                                    case 'CANCELLED':
+                                                        $label = 'danger';
+                                                        break;
+                                                    default:
+                                                        $label = 'secondary';
+                                                        break;
+                                                }
+                                                
+                                                switch ($value->spam) {
+                                                    case 'PENDING':
+                                                        $spam = 'btn-secondary';
+                                                        break;
+                                                    case 'SENT':
+                                                        $spam = 'btn-info';
+                                                        break;
+                                                    case 'LATER':
+                                                        $spam = 'btn-warning';
+                                                        break;
+                                                    case 'CONFIRMED':
+                                                        $spam = 'btn-success';
+                                                        break;
+                                                    case 'ACCEPT':
+                                                        $spam = 'btn-success';
+                                                        break;                                                
+                                                    case 'REJECTED':
+                                                        $spam = 'btn-danger';
+                                                        break;
+                                                    default:
+                                                        $spam = 'btn-secondary';
+                                                        break;
+                                                }
+        
+                                                if( !isset( $resumen[ $value->spam ] ) ):
+                                                    $resumen[ $value->spam ] = 0;
+                                                endif;
+                                                $resumen[ $value->spam ]++;
+                                            @endphp
+                                            <tr>
+                                                <td class="text-center">
+                                                    <div class="btn-group" role="group">
+                                                        <button id="actions" type="button" class="btn {{ $spam }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="{{$value->id}}">
+                                                            {{ $value->spam }}
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                                        </button>                                                
+                                                        <div class="dropdown-menu" aria-labelledby="actions">
+                                                            <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'PENDING','btn-secondary')"><i class="flaticon-home-fill-1 mr-1"></i> PENDING</a>
+                                                            <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'SENT','btn-info')"><i class="flaticon-home-fill-1 mr-1"></i> SENT</a>
+                                                            <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'LATER','btn-warning')"><i class="flaticon-home-fill-1 mr-1"></i> LATER</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'CONFIRMED','btn-success')"><i class="flaticon-home-fill-1 mr-1"></i> CONFIRMED</a>
+                                                            <a href="javascript:void(0);" class="dropdown-item" onClick="updateSpam(event,{{$value->id}},'REJECTED','btn-danger')"><i class="flaticon-home-fill-1 mr-1"></i> REJECTED</a>
+                                                        </div>
+                                                    </div>                                 
+                                                </td>
+                                                <td class="text-center">{{ $value->id }}</td>
+                                                <td class="text-center">{{ $value->spam_count }}</td>                                        
+                                                <td class="text-center">{{ $value->site_name }}</td>
+                                                <td class="text-center">{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                                <td class="text-center">{{ $value->final_service_type }}</td>
+                                                <td class="text-center">
+                                                    @if ( $value->is_round_trip == 1 )
+                                                        Si
+                                                    @else
+                                                        No
+                                                    @endif
+                                                </td>
+                                                <td class="text-center"><span class="badge badge-light-{{ $label }} mb-2 me-4">{{ $operation_status }}</span></td>
+                                                <td class="text-center">
+                                                    <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>                                                        
+                                                </td>
+                                                <td class="text-center">{{ $value->client_first_name }} {{ $value->client_last_name }}</td>
+                                                <td class="text-center">{{ trim($value->client_phone) }}</td>
+                                                <td class="text-center">{{ trim(strtolower($value->client_email)) }}</td>
+                                                <td class="text-center">{{ $value->service_name }}</td>
+                                                <td class="text-center" class="text-center">{{ $value->passengers }}</td>
+                                                <td class="text-center">{{ $operation_from }}</td>
+                                                <td class="text-center">{{ $operation_to }}</td>                                                    
+                                                <td class="text-center">{{ number_format($value->total_sales,2) }}</td>
+                                                <td class="text-center">{{ $value->currency }}</td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
                                 @endif
-                            @endforeach
-                        @endif
-                    </tbody>
-                </table>
-                <div class="mt-3 px-2">
+                            </tbody>
+                        </table>                        
+                    </div>
+                    <div class="tab-pane fade show active" id="animated-underline-spam" role="tabpanel" aria-labelledby="animated-underline-badge-spam">
+                    </div>                    
+                </div>
+
+                
+                {{-- <div class="mt-3 px-2">
                     <h6>Resumen de envío de SPAM</h6>
                     <h6 class="text-info small">Aqui encontrarás el resumen conversiones generadas por los agentes.</h6>                        
                     <div class="table-responsive">
@@ -227,7 +249,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
