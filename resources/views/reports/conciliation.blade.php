@@ -145,28 +145,28 @@
                         @if(sizeof($conciliations)>=1)
                             @foreach($conciliations as $key => $conciliation)
                                 @php
-                                    if (!isset( $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))] )){
-                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))] = [
-                                            "name" => strtoupper(Str::slug($conciliation->payment_method)),
-                                            "total" => 0,
-                                            "total_taxes" => 0,
-                                            "total_received" => 0,
-                                            "USD" => [
-                                                "total" => 0,
-                                                "total_taxes" => 0,
-                                                "total_received" => 0,
-                                                "quantity" => 0,
-                                            ],
-                                            "MXN" => [
-                                                "total" => 0,
-                                                "total_taxes" => 0,
-                                                "total_received" => 0,
-                                                "quantity" => 0,
-                                            ],
-                                            "quantity" => 0,
-                                        ];
-                                    }                                    
                                     if( $conciliation->is_conciliated == 1 ){
+                                        if (!isset( $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))] )){
+                                            $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))] = [
+                                                "name" => strtoupper(Str::slug($conciliation->payment_method)),
+                                                "total" => 0,
+                                                "total_taxes" => 0,
+                                                "total_received" => 0,
+                                                "USD" => [
+                                                    "total" => 0,
+                                                    "total_taxes" => 0,
+                                                    "total_received" => 0,
+                                                    "quantity" => 0,
+                                                ],
+                                                "MXN" => [
+                                                    "total" => 0,
+                                                    "total_taxes" => 0,
+                                                    "total_received" => 0,
+                                                    "quantity" => 0,
+                                                ],
+                                                "quantity" => 0,
+                                            ];
+                                        }
                                         $conciliationPayments['total'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total * $exchange) : $conciliation->total );
                                         $conciliationPayments['total_taxes'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_fee * $exchange) : $conciliation->total_fee );
                                         $conciliationPayments['total_received'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_net * $exchange) : $conciliation->total_net );
@@ -227,8 +227,6 @@
 
     <div class="layer" id="layer">
         <div class="header-chart d-flex justify-content-between">
-            <div class="gran_total">
-            </div>
             <div class="btn_close">
                 <button class="btn btn-primary" id="closeLayer">Cerrar</button>
             </div>
