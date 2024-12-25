@@ -68,8 +68,13 @@ let components = {
 
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
-            "sZeroRecords": "No se encontraron resultados",             
-            "sInfo": ( action == "fixedheaderPagination" ? "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros" : "Mostrando _TOTAL_ registros" ),
+            "sZeroRecords": "No se encontraron resultados",
+            // "sZeroRecords": "",
+            // "sInfo": ( action == "fixedheaderPagination" ? "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros" : "Mostrando _TOTAL_ registros" ),
+            // "sInfo": function(){
+            //     const total = table.data().count(); // Verifica el total de registros en la tabla
+            //     return total > 0 ? "Mostrando _TOTAL_ registros" : "Mostrando 0 registros";
+            // },
             "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
             "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
             "sSearchPlaceholder": components.getTranslation("table.search") + "...",
@@ -78,6 +83,10 @@ let components = {
                 "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>', 
                 "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' 
             },
+        };
+        _settings.infoCallback = function(settings, start, end, max, total, pre) {
+            // Siempre muestra "Mostrando _TOTAL_ registros" independientemente del total
+            return `Mostrando ${total} registros`;
         };
 
         let __table = table.DataTable( _settings );
@@ -109,7 +118,7 @@ let components = {
             $(window).on('resize', function () {
                 __table.columns.adjust().draw();
             });
-        }
+        }        
     },
 
     actionTableChart: function(table, section = "general"){
