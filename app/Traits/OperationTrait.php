@@ -49,6 +49,20 @@ trait OperationTrait
         return '<button type="button" class="btn btn-'.( self::validatePreassignment($service) ? self::classServiceNumber($service->final_service_type) : 'danger' ).'">'.( self::validatePreassignment($service) ? self::typePreassignment($service) : 'ADD' ).'</button>';
     }
 
+    // ESTATUS CONFIRMACION
+
+    public static function serviceStatusConfirmation($service){
+        return ( $service->operation_type == 'arrival' ? $service->op_one_confirmation : $service->op_two_confirmation );
+    }
+
+    // BOTON DE CONFIRMACION
+    
+    public static function renderStatusConfirmation($service){
+        $confirmation_type = self::serviceStatusConfirmation($service);
+        $operation_type = "'".$service->operation_type."'";
+        return '<button type="button" class="btn  btn-order btn-'.( self::serviceStatusConfirmation($service) == 0 ? 'warning' : 'success' ).'" onClick="updateConfirmation(event,'.$service->id.','.$operation_type.','.$confirmation_type.','.$service->reservation_id.')">'.( self::serviceStatusConfirmation($service) == 0 ? 'N' : 'Y' ).'</button>';
+    }
+
     // ZONAS
 
     public static function classCutOffZone($service){

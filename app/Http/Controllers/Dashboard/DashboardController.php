@@ -22,9 +22,6 @@ class DashboardController extends Controller
 
     public function index(Request $request){
         $roles = session()->get('roles');
-        // if( ( !RoleTrait::hasPermission(42)) || ( !RoleTrait::hasPermission(62)) || ( !RoleTrait::hasPermission(63)) ){
-        //     abort(403, 'NO TIENE AUTORIZACIÓN.');
-        // }
         
         if( in_array(4, $roles['roles']) ){
             return $this->OperationRepository->reservations($request);

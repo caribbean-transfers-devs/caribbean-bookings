@@ -4,8 +4,6 @@
     use App\Traits\OperationTrait;
     use Illuminate\Support\Str;
     use Carbon\Carbon;
-@endphp
-@php
     $operationStatus = [
         "total" => 0,
         "gran_total" => 0,
@@ -235,6 +233,7 @@
                         </ul>
                     </div>
                 @endif
+
                 <table id="dataOperations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>

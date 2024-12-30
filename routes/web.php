@@ -15,6 +15,7 @@ use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
 
 use App\Http\Controllers\Reports\ReportsController;
+use App\Http\Controllers\Management\ManagementController;
 use App\Http\Controllers\Reports\CashController as ReportCash;
 
 use App\Http\Controllers\Pos\PosController;
@@ -53,10 +54,7 @@ Route::group(['middleware' => ['auth']], function () {
     //REPORTES
         //PAGOS
         Route::get('/reports/payments', [ReportsController::class, 'payments'])->name('reports.payment');
-        Route::post('/reports/payments', [ReportsController::class, 'payments'])->name('reports.payment.action');
-        //VENTAS
-        // Route::get('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales');
-        // Route::post('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales.action');
+        Route::post('/reports/payments', [ReportsController::class, 'payments'])->name('reports.payment.action');        
         //EFECTIVO
         Route::get('/reports/cash', [ReportsController::class, 'cash'])->name('reports.cash');
         Route::post('/reports/cash', [ReportsController::class, 'cash'])->name('reports.cash.action');
@@ -70,7 +68,7 @@ Route::group(['middleware' => ['auth']], function () {
         //COMISIONES VERSION 2
         Route::get('/reports/commissions2', [ReportsController::class, 'commissions'])->name('reports.commissions2');
         Route::post('/reports/commissions2', [ReportsController::class, 'commissions'])->name('reports.commissions2.action');
-        //RESERVACIONES
+        //VENTAS
         Route::get('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales');
         Route::post('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales.action');
         //OPERACIONES
@@ -82,12 +80,13 @@ Route::group(['middleware' => ['auth']], function () {
 
     //GESTION
         //CONFIRMACIONES
-        Route::get('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation');
-        Route::post('/operation/confirmation', [OperationController::class, 'confirmation'])->name('operation.confirmation.search');
-        Route::put('/operation/confirmation/update-status', [OperationController::class, 'updateStatusConfirmation'])->name('operation.confirmation.update'); 
+        Route::get('/operation/confirmation', [ManagementController::class, 'confirmation'])->name('operation.confirmation');
+        Route::post('/operation/confirmation', [ManagementController::class, 'confirmation'])->name('operation.confirmation.search');
         //SPAM
-        Route::get('/operation/spam', [OperationController::class, 'spam'])->name('operation.spam');
-        Route::post('/operation/spam', [OperationController::class, 'spam'])->name('operation.spam.search');
+        Route::get('/operation/aftersales', [ManagementController::class, 'afterSales'])->name('operation.spam');
+        Route::post('/operation/aftersales', [ManagementController::class, 'afterSales'])->name('operation.spam.search');
+
+        Route::put('/operation/confirmation/update-status', [OperationController::class, 'updateStatusConfirmation'])->name('operation.confirmation.update');
         Route::get('/operation/spam/exportExcel', [OperationController::class, 'exportExcel'])->name('operation.spam.exportExcel');
         Route::put('/operation/spam/update-status', [OperationController::class, 'spamUpdate'])->name('operation.spam.update');
         Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
@@ -95,6 +94,7 @@ Route::group(['middleware' => ['auth']], function () {
         //RESERVACIONES
         Route::get('/operation/reservations', [OperationController::class, 'reservations'])->name('operation.reservations');
         Route::post('/operation/reservations', [OperationController::class, 'reservations'])->name('operation.reservations.search');
+
         //OPERACIONES
         Route::get('/operation/board', [Operations::class, 'index'])->name('operation.index');
         Route::post('/operation/board', [Operations::class, 'index'])->name('operation.index.search');    

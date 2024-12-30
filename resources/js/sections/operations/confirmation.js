@@ -12,6 +12,8 @@ if ( document.getElementById('lookup_date') != null ) {
 
 if( document.querySelector('.table-rendering') != null ){
     components.actionTable($('.table-rendering'), 'fixedheader');
+    console.log(__table_render);
+    
 }
 components.formReset();
 
