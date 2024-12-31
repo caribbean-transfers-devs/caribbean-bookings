@@ -555,6 +555,12 @@ window.addEventListener("DOMContentLoaded", function() {
             components.loadScreen();
         });
     }
+
+    console.log(__table_render);
+    if (__table_render != null) {
+        __table_render.columns.adjust();
+        __table_render.columns.adjust().draw();
+    }    
 });
 
 window.addEventListener('resize', function() {

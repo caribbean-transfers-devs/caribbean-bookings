@@ -62,6 +62,8 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
 
         //STYLES MANAGEMENT
         mix.sass('resources/scss/sections/_management_confirmation.scss', data.assets + "css/sections/management_confirmation.min.css"); //MANAGEMENT CONFIRMATION
+        mix.sass('resources/scss/sections/_management_aftersales.scss', data.assets + "css/sections/management_aftersales.min.css"); //MANAGEMENT POST VENTA
+
         mix.sass('resources/scss/sections/_management_spam.scss', data.assets + "css/sections/management_spam.min.css"); //MANAGEMENT SPAM
         mix.sass('resources/scss/sections/_management_reservations.scss', data.assets + "css/sections/management_reservations.min.css"); //MANAGEMENT RESERVATIONS
         mix.sass('resources/scss/sections/operations.scss', data.assets + "css/sections/operations.min.css"); //MANAGEMENT OPERATIONS        
