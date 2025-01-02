@@ -2,10 +2,9 @@
     use App\Traits\RoleTrait;
     use App\Traits\BookingTrait;
     use App\Traits\OperationTrait;
-    $resumen = [];
 @endphp
 @extends('layout.app')
-@section('title') SPAM @endsection
+@section('title') POST Venta @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/management_aftersales.min.css') }}" rel="preload" as="style" >
@@ -24,40 +23,40 @@
 @section('content')
     @php
         $buttons = array();
-        if (RoleTrait::hasPermission(41)){
-            array_push($buttons,
-                array(
-                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtrar',
-                    'className' => 'btn btn-primary __btn_create',
-                    'attr' => array(
-                        'data-title' =>  "Filtros de spam",
-                        'data-bs-toggle' => 'modal',
-                        'data-bs-target' => '#filterModal'
-                    )
-                )
-            );
+        // if (RoleTrait::hasPermission(41)){
+        //     array_push($buttons,
+        //         array(
+        //             'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtrar',
+        //             'className' => 'btn btn-primary __btn_create',
+        //             'attr' => array(
+        //                 'data-title' =>  "Filtros de spam",
+        //                 'data-bs-toggle' => 'modal',
+        //                 'data-bs-target' => '#filterModal'
+        //             )
+        //         )
+        //     );
 
-            array_push($buttons,
-                array(
-                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar reporte de excel',
-                    'className' => 'btn btn-primary',
-                    'extend' => 'excelHtml5',
-                )
-            );
-        }
-        if (RoleTrait::hasPermission(70)){
-            array_push($buttons,
-                array(
-                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar teléfonia de Box in plan',
-                    'className' => 'btn btn-primary __btn_export',
-                    'attr' => array(
-                        'data-title' =>  "Generar reporte de excel",
-                        'data-bs-toggle' => 'modal',
-                        'data-bs-target' => '#filterModalExport'
-                    )
-                )
-            );
-        }
+        //     array_push($buttons,
+        //         array(
+        //             'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar reporte de excel',
+        //             'className' => 'btn btn-primary',
+        //             'extend' => 'excelHtml5',
+        //         )
+        //     );
+        // }
+        // if (RoleTrait::hasPermission(70)){
+        //     array_push($buttons,
+        //         array(
+        //             'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar teléfonia de Box in plan',
+        //             'className' => 'btn btn-primary __btn_export',
+        //             'attr' => array(
+        //                 'data-title' =>  "Generar reporte de excel",
+        //                 'data-bs-toggle' => 'modal',
+        //                 'data-bs-target' => '#filterModalExport'
+        //             )
+        //         )
+        //     );
+        // }
     @endphp
 
     @if ($errors->any())
@@ -71,7 +70,11 @@
         </div>
     @endif
 
-    <div class="row layout-top-spacing mb-3">
+    <div class="layout-top-spacing widget-content widget-content-area br-8 mb-3 p-2">
+        <button class="btn btn-primary _btn_create" data-title="Filtros de spam" data-bs-toggle="modal" data-bs-target="#filterModal"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtrar</button>
+    </div>
+
+    <div class="row mb-3">
         <div class="col-md-12">
             <ul class="nav nav-pills" id="animateLine" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -213,12 +216,7 @@
                                                         default:
                                                             $spam_status = 'btn-secondary';
                                                             break;
-                                                    }
-                
-                                                    if( !isset( $resumen[ $spam->spam ] ) ):
-                                                        $resumen[ $spam->spam ] = 0;
-                                                    endif;
-                                                    $resumen[ $spam->spam ]++;
+                                                    }        
                                                 @endphp
                                                 <tr>
                                                     <td class="text-center">
@@ -274,32 +272,6 @@
             </div>
         </div>                    
     </div>
-    
-    {{-- <div class="mt-3 px-2">
-        <h6>Resumen de envío de SPAM</h6>
-        <h6 class="text-info small">Aqui encontrarás el resumen conversiones generadas por los agentes.</h6>                        
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>                                                        
-                        <th>Estatus</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($resumen as $key => $value)
-                        <tr>
-                            <td class="text-start">{{ $key }}</td>
-                            <td>{{ $value }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div> --}}
 
     <x-modals.filters.bookings :data="$data" />
-    @if (RoleTrait::hasPermission(70))
-        <x-modals.reservations.exports :data="$data" />
-    @endif
 @endsection

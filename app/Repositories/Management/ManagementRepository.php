@@ -48,7 +48,7 @@ class ManagementRepository
         ]);
     }
 
-    public function afterSales($rquest){
+    public function afterSales($request){
         ini_set('memory_limit', '-1'); // Sin límite
         set_time_limit(120); // Aumenta el límite a 60 segundos
 
@@ -95,6 +95,7 @@ class ManagementRepository
             'spams' => $spams,
             'bookings' => $bookings,
             'data' => $data,
+            'request' => $request->input()
         ]);        
     }
 }
