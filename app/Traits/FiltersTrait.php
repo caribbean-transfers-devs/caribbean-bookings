@@ -100,8 +100,12 @@ trait FiltersTrait
     }
 
     //CONDUCTOR
-    public function Drivers(){
-        return Driver::orderBy('names','ASC')->get();
+    public function Drivers($action = "filters"){
+        if( $action == "filters" ){
+            return Driver::orderBy('names','ASC')->get();
+        }else{
+            return Driver::where('status',1)->orderBy('names','ASC')->get();
+        }
     }
 
     //ESTATUS DE OPERACIÓN
