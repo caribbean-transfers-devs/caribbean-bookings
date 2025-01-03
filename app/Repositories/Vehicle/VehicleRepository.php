@@ -17,7 +17,7 @@ class VehicleRepository
 {
     public function index($request)
     {
-        try {            
+        try {
             $vehicles = Vehicle::with('enterprise','destination_service','destination')->get();
             return view('vehicles.index', [
                 'breadcrumbs' => [
@@ -40,7 +40,7 @@ class VehicleRepository
             return view('vehicles.new', [
                 'breadcrumbs' => [
                     [
-                        "route" => route('vehicles.index'),
+                        "route" => route("vehicles.index"),
                         "name" => "Listado de vehículos",
                         "active" => false
                     ],
@@ -48,10 +48,10 @@ class VehicleRepository
                         "route" => "",
                         "name" => "Nuevo vehículo",
                         "active" => true
-                    ]
-                ],                
-                'enterprises' => $enterprises, 
-                'services' => $services,
+                    ]                    
+                ],
+                'enterprises' => $enterprises,
+                'services' => $services
             ]);
         } catch (Exception $e) {
         }
@@ -67,6 +67,7 @@ class VehicleRepository
             $vehicle->name = $request->name;
             $vehicle->unit_code = $request->unit_code;
             $vehicle->plate_number = $request->plate_number;
+            $vehicle->status = $request->status;
             $vehicle->save();
 
             DB::commit();
@@ -85,21 +86,21 @@ class VehicleRepository
             $enterprises = Enterprise::all();           
             $services = DestinationService::all();            
             $vehicle = Vehicle::find($id);
-            return view('vehicles.new',[
+            return view('vehicles.new', [
                 'breadcrumbs' => [
                     [
-                        "route" => route('vehicles.index'),
+                        "route" => route("vehicles.index"),
                         "name" => "Listado de vehículos",
                         "active" => false
                     ],
                     [
                         "route" => "",
-                        "name" => "Editar el vehículo: ".$vehicle->name,
+                        "name" => "Editar vehículo: ".$vehicle->name,
                         "active" => true
-                    ]
-                ],                
-                'enterprises' => $enterprises, 
-                'services' => $services, 
+                    ]                    
+                ],
+                'enterprises' => $enterprises,
+                'services' => $services,
                 'vehicle' => $vehicle,
             ]);
         } catch (Exception $e) {
@@ -116,6 +117,7 @@ class VehicleRepository
             $vehicle->name = $request->name;
             $vehicle->unit_code = $request->unit_code;
             $vehicle->plate_number = $request->plate_number;
+            $vehicle->status = $request->status;
             $vehicle->save();
 
             DB::commit();
@@ -131,10 +133,14 @@ class VehicleRepository
 
     public function destroy($request, $id){
         try {
+            DB::beginTransaction();
             $vehicle = Vehicle::find($id);
             $vehicle->delete();
+            DB::commit();
             return redirect()->route('vehicles.index')->with('success', 'Se elimimo correctamente el vehículo.');
         } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->route('vehicles.index')->with('danger', 'Error al eliminar el vehículo.');
         }
     } 
 }

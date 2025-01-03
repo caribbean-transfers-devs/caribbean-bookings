@@ -34,19 +34,12 @@
         endif;
 
         //REPORTES
-        if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(44) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71) || RoleTrait::hasPermission(97) || RoleTrait::hasPermission(98)):
+        if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71) || RoleTrait::hasPermission(97) || RoleTrait::hasPermission(98) || RoleTrait::hasPermission(99)):
             // if(RoleTrait::hasPermission(43)):
             //     $links_reports[] = [
             //         'name' => 'Pagos',
             //         'route' => route('reports.payment'),
             //         'active' => request()->routeIs('reports.payment','reports.payment.action'),
-            //     ];
-            // endif;
-            // if(RoleTrait::hasPermission(44)):
-            //     $links_reports[] = [
-            //         'name' => 'Ventas',
-            //         'route' => route('reports.sales'),
-            //         'active' => request()->routeIs('reports.sales','reports.sales.action'),
             //     ];
             // endif;
             if(RoleTrait::hasPermission(45)):
@@ -84,11 +77,13 @@
                     'active' => request()->routeIs('reports.operations','reports.operations.action'),
                 ];
             endif;
+            if(RoleTrait::hasPermission(99)):
                 $links_reports[] = [
                     'name' => 'Conciliacion',
                     'route' => route('reports.conciliation'),
                     'active' => request()->routeIs('reports.conciliation','reports.conciliation.action'),
                 ];
+            endif;
             array_push($links,[
                 'type' => 'multiple',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>',
@@ -170,7 +165,7 @@
                     'route' => route('operation.index'),
                     'active' => request()->routeIs('operation.index','operation.index.search'),
                 ];
-            endif;            
+            endif;
             array_push($links,[
                 'type' => 'multiple',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>',

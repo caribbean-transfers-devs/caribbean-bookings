@@ -47,7 +47,7 @@
                                     @method('PUT')
                                 @endif
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="enterprise_id">Selecciona una empresa</label>
                                             <select id="enterprise_id" name="enterprise_id" class="form-control mb-3">
@@ -73,6 +73,26 @@
                                         <div class="form-group">
                                             <label for="phone">Teléfono</label>
                                             <input type="text" id="phone" name="phone" class="form-control mb-3" placeholder="Teléfono" value="{{ ( isset($driver->phone) ? $driver->phone : '' ) }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="vehicle_id">Selecciona un vehículo</label>
+                                            <select id="vehicle_id" name="vehicle_id" class="form-control mb-3">
+                                                <option value="">Elige una opción</option>
+                                                @foreach ($units as $unit)
+                                                    <option {{ isset($driver->vehicle_id) && $driver->vehicle_id == $unit->id ? 'selected' : '' }} value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="status">Selecciona el estatus</label>
+                                            <select id="status" name="status" class="form-control mb-3">
+                                                <option {{ isset($driver->status) && $driver->status == 1 ? 'selected' : '' }} value="1">Activo</option>
+                                                <option {{ isset($driver->status) && $driver->status == 0 ? 'selected' : '' }} value="0">Inactivo</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">

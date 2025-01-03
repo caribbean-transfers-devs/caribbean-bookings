@@ -106,13 +106,21 @@ trait FiltersTrait
     }
 
     //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADO COMO LOS VEHICULOS QUE TENEMOS
-    public function Units(){
-        return Vehicle::all();
+    public function Units($action = "filters"){
+        if( $action == "filters" ){
+            return Vehicle::all();
+        }else{
+            return Vehicle::where('status',1)->get();
+        }
     }
 
     //CONDUCTOR
-    public function Drivers(){
-        return Driver::orderBy('names','ASC')->get();
+    public function Drivers($action = "filters"){
+        if( $action == "filters" ){
+            return Driver::orderBy('names','ASC')->get();
+        }else{
+            return Driver::where('status',1)->orderBy('names','ASC')->get();
+        }
     }
 
     //ESTATUS DE OPERACIÓN

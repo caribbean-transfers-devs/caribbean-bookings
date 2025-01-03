@@ -429,8 +429,8 @@
                                     @else
                                         <select class="form-control vehicles selectpicker" data-live-search="true" id="vehicle_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
                                             <option value="0">Selecciona un vehículo</option>
-                                            @if ( isset($vehicles) && count($vehicles) >= 1 )
-                                                @foreach ($units as $unit)
+                                            @if ( isset($units2) && count($units2) >= 1 )
+                                                @foreach ($units2 as $unit)
                                                     <option {{ ( $vehicle_d != NULL && $vehicle_d == $unit->id ) ? 'selected' : '' }} value="{{ $unit->id }}">{{ $unit->name }} - {{ $unit->destination_service->name }} - {{ $unit->enterprise->names }}</option>
                                                 @endforeach
                                             @endif
@@ -443,8 +443,8 @@
                                     @else
                                         <select class="form-control drivers selectpicker" data-live-search="true" id="driver_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
                                             <option value="0">Selecciona un conductor</option>
-                                            @if ( isset($drivers) && count($drivers) >= 1 )
-                                                @foreach ($drivers as $driver)
+                                            @if ( isset($drivers2) && count($drivers2) >= 1 )
+                                                @foreach ($drivers2 as $driver)
                                                     <option {{ ( $driver_d != NULL && $driver_d == $driver->id ) ? 'selected' : '' }} value="{{ $driver->id }}">{{ $driver->names }} {{ $driver->surnames }}</option>
                                                 @endforeach
                                             @endif

@@ -209,12 +209,25 @@
                     object.push(data);
                 });
                 return object;
-            },
+            },            
+            generateUniqueColors: function(dataLength) { // Generar colores únicos dinámicamente
+                const colors = [];
+                for (let i = 0; i < dataLength; i++) {
+                    let color;
+                    do {
+                        color = `hsl(${Math.floor(Math.random() * 360)}, 70%, 70%)`;
+                    } while (colors.includes(color)); // Asegurarse de que el color no se repita
+                    colors.push(color);
+                }
+                return colors;
+            },        
             renderChartSalesUsers: function(){
                 // Calcular el total de 'counter'
                 const totalCount = commissions.dataChartUsers().reduce((sum, system) => sum + system.QUANTITY, 0);
                 // Calcular el porcentaje de cada 'counter'
                 const percentages = commissions.dataChartUsers().map(site => ((site.QUANTITY / totalCount) * 100).toFixed(2) + '%');
+                // Generar colores únicos para los datos
+                const uniqueColors = commissions.generateUniqueColors(commissions.dataChartUsers().length);                
 
                 if( document.getElementById('ChartSalesUsers') != null ){
                     new Chart(document.getElementById('ChartSalesUsers'), {
@@ -224,6 +237,9 @@
                             datasets: [
                                 {
                                     data: commissions.dataChartUsers().map(row => row.QUANTITY),
+                                    backgroundColor: uniqueColors, // Aplicar colores únicos al dataset
+                                    borderColor: '#fff', // Opcional: añadir bordes blancos
+                                    borderWidth: 2 // Opcional: tamaño del borde
                                 }
                             ]
                         },

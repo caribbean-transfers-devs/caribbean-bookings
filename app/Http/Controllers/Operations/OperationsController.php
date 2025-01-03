@@ -107,7 +107,9 @@ class OperationsController extends Controller
             'vehicles' => $this->Vehicles(),
             'zones' => $this->Zones(),
             'units' => $this->Units(), //LAS UNIDADES DADAS DE ALTA
+            'units2' => $this->Units('active'), //LAS UNIDADES DADAS DE ALTA
             'drivers' => $this->Drivers(),
+            'drivers2' => $this->Drivers('active'),
             'data' => $data,
             'request' => $request->input(),
         ]);

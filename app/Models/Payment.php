@@ -12,8 +12,7 @@ class Payment extends Model
 
     public $timestamps = false;
 
-    public function reservation()
-    {
+    public function reservation(){
         return $this->belongsTo(Reservation::class);
     }
     

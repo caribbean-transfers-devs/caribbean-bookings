@@ -19,6 +19,8 @@ const translations = {
     }
 };
 
+var __table_render = null;
+
 let components = {
     getTranslation: function(item){
         return (translations[language][item]) ? translations[language][item] : 'Translate not found';
@@ -89,34 +91,22 @@ let components = {
             return `Mostrando ${total} registros`;
         };
 
-        let __table = table.DataTable( _settings );
+        __table_render = table.DataTable( _settings );        
 
         if( action == "fixedheader" || action == "fixedheaderPagination" ){
             // Ajustar encabezado fijo al scroll dentro del contenedor
-            // new $.fn.dataTable.FixedHeader(__table, {
+            // new $.fn.dataTable.FixedHeader(__table_render, {
             //     header: true, // Habilita encabezado fijo
             //     footer: false // Opcional: deshabilitar footer fijo si no lo necesitas
             // });
 
-            // // Corrige el ancho al inicializar
-            table.on('init', function () {
-                __table.columns.adjust().draw();
-            });
-
             // Corrige el ancho al inicializar
             table.on('init', function () {
-                __table.columns.adjust().draw();
-                // setTimeout(function () {
-                //     table.DataTable( _settings ).columns.adjust().draw();
-                // }, 100); // Agrega un pequeño retraso para garantizar que el DOM esté completamente cargado                
+                __table_render.columns.adjust().draw();
             });
 
             table.on('draw', function () {
-                __table.columns.adjust();
-            });
-
-            $(window).on('resize', function () {
-                __table.columns.adjust().draw();
+                __table_render.columns.adjust();
             });
         }        
     },
@@ -549,6 +539,13 @@ window.addEventListener('popstate', function (event) {
     // components.removeLoadScreen();
 });
 
+window.onload = function () {
+    console.log(__table_render);
+    if (__table_render != null) {
+        __table_render.columns.adjust().draw();
+    }
+};
+
 window.addEventListener("DOMContentLoaded", function() {
     //OCULTAMOS LOADING CUANDO DOM ESTA CARGADO COMPLETAMENTE
     components.removeLoadScreen();
@@ -574,4 +571,16 @@ window.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    console.log(__table_render);
+    if (__table_render != null) {
+        __table_render.columns.adjust();
+        __table_render.columns.adjust().draw();
+    }    
+});
+
+window.addEventListener('resize', function() {
+    console.log(__table_render);
+    if (__table_render != null) {
+        __table_render.columns.adjust().draw();        
+    }
 });

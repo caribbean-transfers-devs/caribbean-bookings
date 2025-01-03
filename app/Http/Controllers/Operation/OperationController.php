@@ -23,16 +23,9 @@ class OperationController extends Controller
         $this->OperationRepository = $OperationRepository;
     }
 
-    public function confirmation(Request $request){
-        if(!$this->hasPermission(39)){
-            abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }
-        return $this->OperationRepository->confirmation($request);
-    }
-
     public function statusUpdate(Request $request){
         return $this->OperationRepository->statusUpdate($request);        
-    }    
+    }
 
     public function reservations(Request $request){
         if(RoleTrait::hasPermission(10)){
@@ -56,12 +49,12 @@ class OperationController extends Controller
         return $operationRepository->updateUnlock($request);        
     }
 
-    public function spam(Request $request, SpamRepository $spamRepository){
-        if(!$this->hasPermission(47)){
-            abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }
-        return $spamRepository->index($request);
-    }
+    // public function spam(Request $request, SpamRepository $spamRepository){
+    //     if(!$this->hasPermission(47)){
+    //         abort(403, 'NO TIENE AUTORIZACIÓN.');
+    //     }
+    //     return $spamRepository->index($request);
+    // }
 
     public function exportExcel(Request $request, SpamRepository $spamRepository){
         if(!$this->hasPermission(47)){

@@ -30,13 +30,6 @@ class ReportsController extends Controller
         return $this->ReportsRepository->payments($request);        
     }
 
-    // public function sales(Request $request){
-    //     if(!$this->hasPermission(44)){
-    //         abort(403, 'NO TIENE AUTORIZACIÓN.');
-    //     }
-    //     return $this->ReportsRepository->sales($request);        
-    // }
-
     public function cash(Request $request){
         if(!$this->hasPermission(50)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');

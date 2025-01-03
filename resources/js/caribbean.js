@@ -247,7 +247,7 @@ var App = function() {
         onRefresh: function() {
             var windowWidth = window.innerWidth;
             if ( windowWidth > MediaSize.md ) {
-                console.log("onToggleSidebarSubmenu onRefresh");
+                // console.log("onToggleSidebarSubmenu onRefresh");
                 categoryScroll.scrollCat();
                 toggleFunction.sidebar();
                 toggleFunction.onToggleSidebarSubmenu();
@@ -258,7 +258,7 @@ var App = function() {
             window.addEventListener('resize', function(event) {                
                 event.preventDefault();                
                 var windowWidth = window.innerWidth;
-                console.log(windowWidth, "onToggleSidebarSubmenu onResize");
+                // console.log(windowWidth, "onToggleSidebarSubmenu onResize");
                 if ( windowWidth > MediaSize.md ) {
                     toggleFunction.onToggleSidebarSubmenu();
                 }
