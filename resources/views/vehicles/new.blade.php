@@ -40,13 +40,14 @@
                                     {{ session('danger') }}
                                 </div>
                             @endif
+
                             <form action="{{ isset($vehicle) ? route('vehicles.update', $vehicle->id) : route('vehicles.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @if ( isset($vehicle) )
                                     @method('PUT')
                                 @endif
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="enterprise_id">Selecciona una empresa</label>
                                             <select id="enterprise_id" name="enterprise_id" class="form-control mb-3">
@@ -56,7 +57,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="destination_service_id">Selecciona un servicio</label>
                                             <select id="destination_service_id" name="destination_service_id" class="form-control mb-3">
@@ -84,6 +85,15 @@
                                             <input type="text" id="plate_number" name="plate_number" class="form-control mb-3" placeholder="Número de placa" value="{{ ( isset($vehicle->plate_number) ? $vehicle->plate_number : '' ) }}">
                                         </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="status">Selecciona el estatus</label>
+                                            <select id="status" name="status" class="form-control mb-3">
+                                                <option {{ isset($vehicle->status) && $vehicle->status == 1 ? 'selected' : '' }} value="1">Activo</option>
+                                                <option {{ isset($vehicle->status) && $vehicle->status == 0 ? 'selected' : '' }} value="0">Inactivo</option>
+                                            </select>
+                                        </div>
+                                    </div>                                    
                                     <div class="col-12 d-flex justify-content-between">
                                         <a class="btn btn-danger" href="{{ route('vehicles.index') }}">Cancelar</a>
                                         <button type="submit" class="btn btn-primary">{{ ( isset($vehicle) ? 'Actualizar' : 'Guardar' ) }}</button>

@@ -9,16 +9,30 @@ use Illuminate\Http\Response;
 use App\Models\Enterprise;
 use App\Models\Driver;
 
+//TRAIT
+use App\Traits\FiltersTrait;
+
 //FACADES
 use Illuminate\Support\Facades\DB;
 
 class DriverRepository
 {
+    use FiltersTrait;
+
     public function index($request)
     {
         try {
-            $drivers = Driver::with('enterprise','destination')->get();
-            return view('drivers.index', compact('drivers'));
+            $drivers = Driver::with('enterprise','destination','vehicle')->get();
+            return view('drivers.index', [
+                'breadcrumbs' => [
+                    [
+                        "route" => "",
+                        "name" => "Listado de conductores",
+                        "active" => true
+                    ]
+                ],
+                'drivers' => $drivers,
+            ]);
         } catch (Exception $e) {
         }
     }
@@ -26,7 +40,22 @@ class DriverRepository
     public function create($request){
         try {
             $enterprises = Enterprise::all();
-            return view('drivers.new', compact('enterprises'));
+            return view('drivers.new', [
+                'breadcrumbs' => [
+                    [
+                        "route" => route("drivers.index"),
+                        "name" => "Listado de conductores",
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Nuevo conductor",
+                        "active" => true
+                    ]                    
+                ],
+                'enterprises' => $enterprises,
+                'units' => $this->Units('active'),
+            ]);
         } catch (Exception $e) {
         }
     }
@@ -40,6 +69,8 @@ class DriverRepository
             $driver->names = strtolower($request->names);
             $driver->surnames = strtolower($request->surnames);
             $driver->phone = $request->phone;
+            ( isset($request->vehicle_id) ? $driver->vehicle_id = $request->vehicle_id : "" );
+            $driver->status = $request->status;
             $driver->save();
 
             DB::commit();
@@ -57,7 +88,23 @@ class DriverRepository
         try {
             $enterprises = Enterprise::all();
             $driver = Driver::find($id);
-            return view('drivers.new',compact('enterprises','driver'));
+            return view('drivers.new', [
+                'breadcrumbs' => [
+                    [
+                        "route" => route("drivers.index"),
+                        "name" => "Listado de conductores",
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Editar conductor: ".$driver->name." ".$driver->surnames,
+                        "active" => true
+                    ]                    
+                ],
+                'enterprises' => $enterprises,
+                'driver' => $driver,
+                'units' => $this->Units('active'),
+            ]);
         } catch (Exception $e) {
         }
     }
@@ -71,6 +118,8 @@ class DriverRepository
             $driver->names = strtolower($request->names);
             $driver->surnames = strtolower($request->surnames);
             $driver->phone = $request->phone;
+            ( isset($request->vehicle_id) ? $driver->vehicle_id = $request->vehicle_id : "" );
+            $driver->status = $request->status;
             $driver->save();
 
             DB::commit();
@@ -86,10 +135,14 @@ class DriverRepository
 
     public function destroy($request, $id){
         try {
+            DB::beginTransaction();
             $driver = Driver::find($id);
             $driver->delete();
-            return redirect()->route('drivers.index')->with('success', 'Se elimimo correctamente la empresa.');
+            DB::commit();
+            return redirect()->route('drivers.index')->with('success', 'Se elimimo correctamente el conductor.');
         } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->route('drivers.index')->with('danger', 'Error al eliminar el conductor.');
         }
     } 
 }

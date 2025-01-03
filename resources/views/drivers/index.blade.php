@@ -37,6 +37,7 @@
                         </ul>
                     </div>
                 @endif
+                
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
@@ -45,6 +46,8 @@
                             <th>Nombres</th>
                             <th>Apellido</th>
                             <th>Teléfono</th>
+                            <th>Vehículo</th>
+                            <th>Estatus</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -56,6 +59,8 @@
                                 <td>{{ $driver->names }}</td>
                                 <td>{{ $driver->surnames }}</td>
                                 <td>{{ $driver->phone }}</td>
+                                <td>{{ isset($driver->vehicle->name) ? $driver->vehicle->name : 'Ninguno' }}</td>
+                                <td><button class="btn btn-{{ $driver->status == 1 ? 'success' : 'warning' }}">{{ $driver->status == 1 ? 'Activo' : 'inactivo' }}</button></td>
                                 <td>
                                     <div class="d-flex gap-3">
                                         <a class="btn btn-primary" href="{{ route('drivers.edit', [$driver->id]) }}">Editar</a>

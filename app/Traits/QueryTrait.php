@@ -28,6 +28,7 @@ trait QueryTrait
                                     rez.open_credit,
                                     rez.is_complete,
                                     rez.created_at,
+                                    site.type_site AS type_site,
                                     site.name AS site_name,
                                     origin.code AS origin_code,
                                     tc.name_es AS cancellation_reason,
@@ -130,7 +131,7 @@ trait QueryTrait
                                         GROUP BY it.reservation_id, it.is_round_trip
                                     ) as it ON it.reservation_id = rez.id
                                     WHERE 1=1 {$query}
-                                GROUP BY rez.id, site.name {$query2}",
+                                GROUP BY rez.id, site.type_site, site.name {$query2}",
                                     $queryData);
 
         if(sizeof( $bookings ) > 0):
@@ -163,6 +164,7 @@ trait QueryTrait
                                 us.status AS employee_status,
                                 us.name AS employee,
                                 site.id as site_code,
+                                site.type_site AS type_site,
                                 site.name as site_name,
                                 origin.code AS origin_code,
                                 tc.name_es AS cancellation_reason,
@@ -337,6 +339,7 @@ trait QueryTrait
                                 us.status AS employee_status,
                                 us.name AS employee,
                                 site.id as site_code,
+                                site.type_site AS type_site,
                                 site.name as site_name,
                                 origin.code AS origin_code,
                                 tc.name_es AS cancellation_reason,

@@ -37,6 +37,7 @@
                         </ul>
                     </div>
                 @endif
+                
                 <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
@@ -46,6 +47,7 @@
                             <th>Nombre</th>
                             <th>Código de la unidad</th>
                             <th>Número de placa</th>
+                            <th>Estatus</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -58,6 +60,7 @@
                                 <td>{{ $vehicle->name }}</td>
                                 <td>{{ $vehicle->unit_code }}</td>
                                 <td>{{ $vehicle->plate_number }}</td>
+                                <td><button class="btn btn-{{ $vehicle->status == 1 ? 'success' : 'warning' }}">{{ $vehicle->status == 1 ? 'Activo' : 'inactivo' }}</button></td>
                                 <td>
                                     <div class="d-flex gap-3">
                                         <a class="btn btn-primary" href="{{ route('vehicles.edit', [$vehicle->id]) }}">Editar</a>

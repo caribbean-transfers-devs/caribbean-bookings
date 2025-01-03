@@ -91,8 +91,12 @@ trait FiltersTrait
     }
 
     //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADO COMO LOS VEHICULOS QUE TENEMOS
-    public function Units(){
-        return Vehicle::all();
+    public function Units($action = "filters"){
+        if( $action == "filters" ){
+            return Vehicle::all();
+        }else{
+            return Vehicle::where('status',1)->get();
+        }
     }
 
     //CONDUCTOR

@@ -118,48 +118,51 @@
                                 </thead>
                                 <tbody>
                                     @if(sizeof($bookings) >= 1)
-                                        @foreach ($bookings as $item)
-                                            <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
-                                                <td class="text-center">{{ $item->reservation_id }}</td>
+                                        @foreach ($bookings as $booking)
+                                            @php
+                                                // dump($booking);
+                                            @endphp
+                                            <tr class="{{ ( $booking->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $booking->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$booking->reservation_id : '' ) }}" style="{{ ( $booking->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $booking->reservation_id }}" data-is_round_trip="{{ $booking->is_round_trip }}">
+                                                <td class="text-center">{{ $booking->reservation_id }}</td>
                                                 <td class="text-center">
                                                     @php
                                                         $codes_string = "";
-                                                        $codes = explode(",",$item->reservation_codes);
+                                                        $codes = explode(",",$booking->reservation_codes);
                                                         foreach ($codes as $key => $code) {
                                                             $codes_string .= '<p class="mb-1">'.$code.'</p>';
                                                         }
                                                     @endphp
                                                     @if (RoleTrait::hasPermission(38))
-                                                        <a href="/reservations/detail/{{ $item->reservation_id }}"><?=$codes_string?></a>
+                                                        <a href="/reservations/detail/{{ $booking->reservation_id }}/?trackingType=Bookign&bookingtracking={{ $booking->type_site }}"><?=$codes_string?></a>
                                                     @else
                                                         <?=$codes_string?>
                                                     @endif
                                                 </td>
-                                                <td class="text-center"><?=( !empty($item->reference) ? '<p class="mb-1">'.$item->reference.'</p>' : '' )?></td>
-                                                <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
-                                                <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
-                                                <td class="text-center">{{ $item->site_name }}</td>
-                                                <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' }}</td>
-                                                <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }}">{{ BookingTrait::statusBooking($item->reservation_status) }}</button></td>
-                                                <td class="text-center">{{ $item->full_name }}</td>
-                                                <td class="text-center">{{ $item->service_type_name }}</td>
-                                                <td class="text-center">{{ $item->passengers }}</td>                                    
-                                                <td class="text-center">{{ $item->from_name }}</td>
-                                                <td class="text-center">{{ $item->to_name }}</td>
-                                                <td class="text-center" <?=BookingTrait::classStatusPayment($item)?>>{{ BookingTrait::statusPayment($item->payment_status) }}</td>
-                                                <td class="text-center" <?=BookingTrait::classStatusPayment($item)?>>{{ number_format(($item->total_sales),2) }}</td>
-                                                <td class="text-center" {{ (($item->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>                                
-                                                <td class="text-center">{{ $item->currency }}</td>
-                                                <td class="text-center">{{ $item->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $item->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                                <td class="text-center"><?=( !empty($booking->reference) ? '<p class="mb-1">'.$booking->reference.'</p>' : '' )?></td>
+                                                <td class="text-center">{{ date("Y-m-d", strtotime($booking->created_at)) }}</td>
+                                                <td class="text-center">{{ date("H:i", strtotime($booking->created_at)) }}</td>
+                                                <td class="text-center">{{ $booking->site_name }}</td>
+                                                <td class="text-center">{{ !empty($booking->origin_code) ? $booking->origin_code : 'PAGINA WEB' }}</td>
+                                                <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($booking->reservation_status) }}">{{ BookingTrait::statusBooking($booking->reservation_status) }}</button></td>
+                                                <td class="text-center">{{ $booking->full_name }}</td>
+                                                <td class="text-center">{{ $booking->service_type_name }}</td>
+                                                <td class="text-center">{{ $booking->passengers }}</td>                                    
+                                                <td class="text-center">{{ $booking->from_name }}</td>
+                                                <td class="text-center">{{ $booking->to_name }}</td>
+                                                <td class="text-center" <?=BookingTrait::classStatusPayment($booking)?>>{{ BookingTrait::statusPayment($booking->payment_status) }}</td>
+                                                <td class="text-center" <?=BookingTrait::classStatusPayment($booking)?>>{{ number_format(($booking->total_sales),2) }}</td>
+                                                <td class="text-center" {{ (($booking->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($booking->total_balance,2) }}</td>                                
+                                                <td class="text-center">{{ $booking->currency }}</td>
+                                                <td class="text-center">{{ $booking->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $booking->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
                                             </tr>
                                         @endforeach
                                     @endif
                                 </tbody>
-                            </table>                            
+                            </table>
                         </div>
                     </div>
                 </div>
-            </div>                        
+            </div>
         </div>
         <div class="tab-pane fade" id="animated-underline-spam" role="tabpanel" aria-labelledby="animated-underline-badge-spam">
             <div class="row">
@@ -265,12 +268,12 @@
                                         @endforeach
                                     @endif
                                 </tbody>
-                            </table>                            
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>                    
+        </div>
     </div>
 
     <x-modals.filters.bookings :data="$data" />
