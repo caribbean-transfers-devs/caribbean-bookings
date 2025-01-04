@@ -1,5 +1,14 @@
 @php
     use App\Traits\RoleTrait;
+    $totals = [
+        'QUANTITY' => 0,
+        'USD' => 0,
+        'MXN' => 0,
+        'TOTAL' => 0,
+        'TOTAL_CONFIRMED' => 0,
+        'TOTAL_PENDING' => 0,
+        'COMMISSION' => 0,
+    ]
 @endphp
 @props(['users'])
 <!-- Modal -->
@@ -57,10 +66,18 @@
                                                 $commission = 0.05 * $total;
                                             endif;
                                             $users[$key]['COMMISSION'] = $commission;
+
+                                            $totals['QUANTITY'] += $value['QUANTITY'];
+                                            $totals['USD'] += $value['USD'];
+                                            $totals['MXN'] += $value['MXN'];
+                                            $totals['TOTAL'] += $value['TOTAL'];
+                                            $totals['TOTAL_CONFIRMED'] += $value['TOTAL_CONFIRMED'];
+                                            $totals['TOTAL_PENDING'] += $value['TOTAL_PENDING'];
+                                            $totals['COMMISSION'] += $commission;
                                         @endphp
                                         <tr>
                                             <td class="text-center">{{ $value['NAME'] }}</td>
-                                            <td class="text-center">{{ $value['QUANTITY'] }}</td>                                            
+                                            <td class="text-center">{{ $value['QUANTITY'] }}</td>
                                             <td class="text-center">{{ number_format($value['USD'],2) }}</td>
                                             <td class="text-center">{{ number_format($value['MXN'],2) }}</td>
                                             <td class="text-center">{{ number_format($value['TOTAL'],2) }}</td>
@@ -73,6 +90,18 @@
                                     @endforeach
                                 @endif
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center">TOTALES</th>
+                                    <th class="text-center">{{ $totals['QUANTITY'] }}</th>
+                                    <th class="text-center">{{ number_format($totals['USD'],2) }}</th>
+                                    <th class="text-center">{{ number_format($totals['MXN'],2) }}</th>
+                                    <th class="text-center">{{ number_format($totals['TOTAL'],2) }}</th>
+                                    <th class="text-center">{{ number_format($totals['TOTAL_CONFIRMED'],2) }}</th>
+                                    <th class="text-center">{{ number_format($totals['TOTAL_PENDING'],2) }}</th>
+                                    <th class="text-center">{{ number_format($totals['COMMISSION'],2) }}</th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                     <hr>

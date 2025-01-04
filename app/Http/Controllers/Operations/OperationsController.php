@@ -639,7 +639,7 @@ class OperationsController extends Controller
             }
 
             //VALIDAMOS SI LA REFERENCIA YA EXISTE
-            if( $request->type_service == "PRIVATE" ){
+            // if( $request->type_service == "PRIVATE" ){
                 $duplicated_reservation = Reservation::where('reference', $request->reference)->count();
                 if( $duplicated_reservation ) {
                     return response()->json([
@@ -649,14 +649,14 @@ class OperationsController extends Controller
                         'message' => 'Ese folio ya ha sido registrado',
                     ], Response::HTTP_BAD_REQUEST); 
                 }
-            }
+            // }
 
-            if( $request->type_service == "SHARED" ){
-                $duplicated_reservation = Reservation::where('reference', $request->reference)->first();
-                if( $duplicated_reservation != NULL ){
-                    $reservation = $duplicated_reservation;
-                }
-            }
+            // if( $request->type_service == "SHARED" ){
+            //     $duplicated_reservation = Reservation::where('reference', $request->reference)->first();
+            //     if( $duplicated_reservation != NULL ){
+            //         $reservation = $duplicated_reservation;
+            //     }
+            // }
 
             //FORMATEAMOS LA FECHA DEL SERVICIO PARA PODER VER SI ACTUALIZAREMOS LA TABLA
             // Crear una instancia de DateTime a partir de la cadena de fecha y hora
@@ -690,7 +690,7 @@ class OperationsController extends Controller
             }
 
             // Creando reservación
-            if( ($request->type_service == "PRIVATE") || ($request->type_service == "SHARED" && $duplicated_reservation == NULL) ){
+            //if( ($request->type_service == "PRIVATE") || ($request->type_service == "SHARED" && $duplicated_reservation == NULL) ){
                 $reservation = new Reservation;
                 $reservation->client_first_name = $request->client_first_name;
                 $reservation->client_last_name = $request->client_last_name;
@@ -713,15 +713,15 @@ class OperationsController extends Controller
 
                 // Creando follow_up
                 $this->create_followUps($reservation->id, 'SE CAPTURÓ LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES', 'HISTORY', auth()->user()->name);
-            }
+            //}
 
             $item = new ReservationsItem();
             $item->reservation_id = $reservation->id;
             $item->code = $this->generateCode();
-            if( $request->type_service == "SHARED" ){
-                $item->client_first_name = $request->client_first_name;
-                $item->client_last_name = $request->client_last_name;
-            }
+            // if( $request->type_service == "SHARED" ){
+            //     $item->client_first_name = $request->client_first_name;
+            //     $item->client_last_name = $request->client_last_name;
+            // }
             $item->destination_service_id = $request->destination_service_id;
             $item->from_name = $request->from_name ? $request->from_name : $from_zone->name;
             $item->from_lat = $from_lat;

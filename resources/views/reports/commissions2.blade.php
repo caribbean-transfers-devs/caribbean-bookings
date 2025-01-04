@@ -190,7 +190,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$search" />    
+    <x-modals.filters.bookings :data="$search" />
     <x-modals.reports.columns />
     <x-modals.reports.commissions :users="$users" />
     <x-modals.reservations.payments />
