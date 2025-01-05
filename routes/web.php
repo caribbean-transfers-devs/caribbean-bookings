@@ -16,8 +16,6 @@ use App\Http\Controllers\Reports\ReportsController;
 use App\Http\Controllers\Management\ManagementController;
 use App\Http\Controllers\Reports\CashController as ReportCash;
 
-use App\Http\Controllers\Pos\PosController;
-
 use App\Http\Controllers\Reservations\ReservationsController;
 use App\Http\Controllers\RoleController;
 
@@ -145,8 +143,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/tpv/quote', [TpvController::class, 'quote'])->name('tpv.quote');
     Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
     Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
-    // Route::get('/punto-de-venta', [PosController::class, 'index'])->name('pos.index');
-    // Route::post('/punto-de-venta', [PosController::class, 'index'])->name('pos.index.action');
 
     Route::resource('/enterprises', EnterpriseController::class);
     Route::get('/enterprises/{enterprise}', [SitesController::class, 'index'])->name('enterprise.sites');
@@ -164,16 +160,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/StoreIP', [UserController::class, 'store_ips'])->name('users.store_ips');
     Route::delete('/DeleteIPs/{ip}', [UserController::class, 'delete_ips'])->name('users.delete_ips');
     Route::resource('/roles', RoleController::class);
-
-    Route::get('/punto-de-venta/detail/{id}', [PosController::class, 'detail'])->where('id', '[0-9]+');
-    Route::get('/punto-de-venta/capture', [PosController::class, 'capture'])->name('pos.capture');
-    Route::post('/punto-de-venta/capture/create', [PosController::class, 'create'])->name('pos.capture.create');
-    Route::post('/punto-de-venta/capture/update', [PosController::class, 'update'])->name('pos.capture.update');
-    Route::get('/punto-de-venta/vendors', [PosController::class, 'vendors'])->name('pos.vendors');
-    Route::post('/punto-de-venta/vendors/create', [PosController::class, 'createVendor'])->name('pos.vendors.create');
-    Route::put('/punto-de-venta/vendors/edit', [PosController::class, 'editVendor'])->name('pos.vendors.edit');
-    Route::delete('/punto-de-venta/vendors/delete', [PosController::class, 'deleteVendor'])->name('pos.vendors.delete');
-    Route::put('/punto-de-venta/edit-created-at', [PosController::class, 'editCreatedAt'])->name('pos.editCreatedAt');
 
     //TIPO DE CAMBIO PARA REPORTES
     Route::get('/config/exchange-reports', [ExchangeReportsController::class, 'index'])->name('config.exchanges');
