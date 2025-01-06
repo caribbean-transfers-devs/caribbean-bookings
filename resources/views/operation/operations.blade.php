@@ -370,7 +370,7 @@
                                         </div>                                        
                                     </div>
                                 </td>
-                                <td class="text-center">{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                <td class="text-center">{{ OperationTrait::setDateTime($value, "time") }}</td>
                                 <td class="text-center">
                                     <span>{{ $value->full_name }}</span>
                                     @if(!empty($value->reference))
@@ -423,7 +423,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center"><?=OperationTrait::setOperationTime($value)?></td>
-                                <td class="text-center"><?=OperationTrait::setOperatingCost($operation)?></td>
+                                <td class="text-center"><?=OperationTrait::setOperatingCost($value)?></td>
                                 <td class="text-center">
                                     @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
                                         <?=OperationTrait::renderServiceStatus($value)?>

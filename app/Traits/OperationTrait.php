@@ -111,6 +111,8 @@ trait OperationTrait
         return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ), 'OPERATION').'">'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status )).'</button>';
     }
     public static function renderServiceOptionsStatus($key,$service){
+        // <div class="dropdown-divider"></div>
+        // <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="CANCELLED" data-item="'. $service->id .'" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>        
         return '<div class="btn-group" role="group">
                     <button id="optionsBooking'.$key.$service->id.'" data-item="'.$key.$service->id.'" type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ), 'OPERATION').' dropdown-toggle btn_status_action" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span>'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status )).'</span>
@@ -120,8 +122,6 @@ trait OperationTrait
                         <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="PENDING" data-item="'. $service->id .'" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
                         <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="COMPLETED" data-item="'. $service->id.'}" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
                         <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="NOSHOW" data-item="'. $service->id .'" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="CANCELLED" data-item="'. $service->id .'" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>
                     </div>                    
                 </div>';
     } 
