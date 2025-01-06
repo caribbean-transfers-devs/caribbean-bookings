@@ -23,6 +23,7 @@ use App\Traits\RoleTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
 use App\Traits\FollowUpTrait;
+use App\Traits\OperationTrait;
 
 //EXCEPTION
 use Exception;
@@ -90,9 +91,31 @@ class OperationsController extends Controller
         }
 
         $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
+        
+        $not_preassigned = [];
+        $preassigned = [];        
+        foreach ($items as $item) {
+            if( !OperationTrait::validatePreassignment($item) ){
+                $not_preassigned[] = $item;
+            }else{
+                $preassigned[] = $item;
+            }
+        }
+
+        // Ordenamos los preasignados por hora en orden ascendente
+        usort($preassigned, function ($a, $b) {
+            // Validamos la hora según el tipo
+            $timeA = ($a->op_type === "TYPE_ONE") ? $a->pickup_from : $a->pickup_to;
+            $timeB = ($b->op_type === "TYPE_ONE") ? $b->pickup_from : $b->pickup_to;
+
+            // Comparación de tiempos
+            return strtotime($timeA) <=> strtotime($timeB);
+        });
+
+        $sorted_reservations = array_merge($not_preassigned, $preassigned);
 
         return view('operation.operations', [
-            'items' => $items,
+            'items' => $sorted_reservations,
             'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ),
             'nexDate' => date('Y-m-d', strtotime($request->date . ' +1 day')),
             'breadcrumbs' => [
@@ -1234,5 +1257,5 @@ class OperationsController extends Controller
         $writer->save($temp_file);
 
         return ResponseFile::download($temp_file, $fileName)->deleteFileAfterSend(true);        
-    }    
+    }
 }

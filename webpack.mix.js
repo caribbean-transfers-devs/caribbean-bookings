@@ -18,15 +18,6 @@ mix.copy('resources/js/datatables.js', data.assets + "js/datatables.js");
 mix.copy('resources/js/sweetalert2.all.min.js', data.assets + "js/sweetalert2.js");
 
 mix.copy('resources/js/views/reservations/reservationsIndex.js', data.assets + "js/views/reservations/reservationsIndex.js");
-mix.sass('resources/scss/pos/index.scss', data.assets + "css/pos/index.min.css");
-mix.sass('resources/scss/pos/detail.scss', data.assets + "css/pos/detail.min.css");
-mix.sass('resources/scss/pos/capture.scss', data.assets + "css/pos/capture.min.css");
-mix.sass('resources/scss/pos/vendors.scss', data.assets + "css/pos/vendors.min.css");
-
-mix.copy('resources/js/views/pos/index.js', data.assets + "js/views/pos/index.min.js");
-mix.copy('resources/js/views/pos/detail.js', data.assets + "js/views/pos/detail.min.js");
-mix.copy('resources/js/views/pos/capture.js', data.assets + "js/views/pos/capture.min.js");
-mix.copy('resources/js/views/pos/vendors.js', data.assets + "js/views/pos/vendors.min.js");
 
 mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/admin.min.css");
 

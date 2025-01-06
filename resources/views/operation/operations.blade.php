@@ -1,11 +1,15 @@
 @php
     use App\Traits\RoleTrait;
+    use App\Traits\BookingTrait;
+    use App\Traits\OperationTrait;
+    use Illuminate\Support\Str;
+    use Carbon\Carbon;    
     $arrivalTimeGroup = [];
     $departureTimeGroup = [];
     $generalTimeGroup = []; // Arreglo para agrupar los datos
 @endphp
 @extends('layout.custom')
-@section('title') Operación @endsection
+@section('title') Gestion De Operación @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="preload" as="style" >
@@ -206,27 +210,27 @@
             <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>INDICADORES</th>
-                        <th>HORA</th>
-                        <th>CLIENTE</th>
-                        <th class="text-center">TIPO DE SERVICIO</th>
-                        <th>PAX</th>
-                        <th>ORIGEN</th>
-                        <th>DESTINO</th>
-                        <th>AGENCIA</th>
-                        <th>UNIDAD</th>
-                        <th>CONDUCTOR</th>
+                        <th class="text-center">#</th>
+                        <th class="text-center">INDICADORES</th>
+                        <th class="text-center">HORA</th>
+                        <th class="text-center">CLIENTE</th>
+                        <th class="text-center" class="text-center">TIPO DE SERVICIO</th>
+                        <th class="text-center">PAX</th>
+                        <th class="text-center">ORIGEN</th>
+                        <th class="text-center">DESTINO</th>
+                        <th class="text-center">AGENCIA</th>
+                        <th class="text-center">UNIDAD</th>
+                        <th class="text-center">CONDUCTOR</th>
                         <th class="text-center">ESTATUS OPERACIÓN</th>
                         <th class="text-center">HORA OPERACIÓN</th>
                         <th class="text-center">COSTO OPERATIVO</th>
                         <th class="text-center">ESTATUS RESERVACIÓN</th>
-                        <th>CÓDIGO</th>
-                        <th>VEHÍCULO</th>
-                        <th>PAGO</th>
-                        <th>TOTAL</th>
-                        <th>MONEDA</th>
-                        <th></th>
+                        <th class="text-center">CÓDIGO</th>
+                        <th class="text-center">VEHÍCULO</th>
+                        <th class="text-center">PAGO</th>
+                        <th class="text-center">TOTAL</th>
+                        <th class="text-center">MONEDA</th>
+                        <th class="text-center"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -254,12 +258,6 @@
                                 $preassignment = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_preassignment : $value->op_two_preassignment );
                                 $comment =       ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_comments : $value->op_two_comments );
 
-                                //ESTATUS
-                                $status_operation = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->one_service_operation_status : $value->two_service_operation_status );
-                                $time_operation =   ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_time_operation : $value->op_two_time_operation );
-                                $cost_operation =   ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_operating_cost : $value->op_two_operating_cost );
-                                $status_booking =   ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->one_service_status : $value->two_service_status );
-
                                 $operation_pickup = (($value->operation_type == 'arrival')? $value->pickup_from : $value->pickup_to );
                                 $operation_from = (($value->operation_type == 'arrival')? $value->from_name.( (!empty($value->flight_number)) ? ' ('.$value->flight_number.')' : '' )  : $value->to_name );
                                 $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
@@ -267,39 +265,6 @@
                                 $vehicle_d = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->vehicle_id_one : $value->vehicle_id_two );
                                 $driver_d =  ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->driver_id_one : $value->driver_id_two );                                
                                 $close_operation = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_operation_close : $value->op_two_operation_close );
-
-                                $vehicle_name = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? ( $value->vehicle_one_name != null ? $value->vehicle_one_name : 'Selecciona un vehículo' ) : ( $value->vehicle_two_name != null ? $value->vehicle_two_name : 'Selecciona un vehículo' ) );
-                                $driver_name =  ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? ( $value->driver_one_name != null ? $value->driver_one_name : 'Selecciona un conductor' ) : ( $value->driver_two_name != null ? $value->driver_two_name : 'Selecciona un conductor' ) );
-
-                                switch ($status_operation) {
-                                    case 'E':
-                                        $label = 'info';
-                                        break;
-                                    case 'C':
-                                        $label = 'warning';
-                                        break;
-                                    case 'OK':
-                                        $label = 'success';
-                                        break;
-                                    default:
-                                        $label = 'secondary';
-                                        break;
-                                }
-
-                                switch ($status_booking) {
-                                    case 'COMPLETED':
-                                        $label2 = 'success';
-                                        break;
-                                    case 'NOSHOW':
-                                        $label2 = 'warning';
-                                        break;
-                                    case 'CANCELLED':
-                                        $label2 = 'danger';
-                                        break;
-                                    default:
-                                        $label2 = 'secondary';
-                                        break;
-                                }
 
                                 //LOGISTICA PARA GRAFICAS
                                     // Obtener la hora formateada
@@ -349,7 +314,6 @@
                                         // $departureTimeGroup[$hour]['data'][$index][] = $value;
                                         $departureTimeGroup[$hour]['quantity']++;
                                     }
-
                                     if( $value->final_service_type == "ARRIVAL" || $value->final_service_type == "DEPARTURE" || $value->final_service_type == "TRANSFER" ){
                                         // Inicializar el índice si no existe
                                         if (!isset($generalTimeGroup[$hour])) {
@@ -371,14 +335,14 @@
 
                             @endphp
                             <tr class="item-{{ $key.$value->id }} {{ $class_agency }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
-                                <td>
+                                <td class="text-center">
                                     @if ( $flag_preassignment )
                                         <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : '' }}">{{ $preassignment }}</button>
                                     @else
                                         <button type="button" class="btn btn-danger text-uppercase btn_operations {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : 'add_preassignment' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
                                     @endif
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <div class="d-flex gap-2 w-100">
                                         <div class="d-flex gap-2 comment-default">
                                             @if ( !empty($value->messages) )
@@ -406,26 +370,26 @@
                                         </div>                                        
                                     </div>
                                 </td>
-                                <td>{{ date("H:i", strtotime($operation_pickup)) }}</td>
-                                <td>
+                                <td class="text-center">{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                <td class="text-center">
                                     <span>{{ $value->full_name }}</span>
                                     @if(!empty($value->reference))
                                         [{{ $value->reference }}]
                                     @endif
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     {{ $value->final_service_type }}
                                     @if ( $value->final_service_type == "ARRIVAL" )
                                         <span class="badge badge-{{ $value->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $value->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
                                     @endif
                                 </td>
                                 <td class="text-center">{{ $value->passengers }}</td>
-                                <td style="{{ ( $cut_off_zone >= 3 ? 'background-color:#e2a03f;color:#fff;' : ( $cut_off_zone >= 2 && $cut_off_zone < 3 ? 'background-color:#805dca;color:#fff;' : '' ) ) }}">{{ $operation_from }}</td>
-                                <td>{{ $operation_to }}</td>
-                                <td>{{ $value->site_name }}</td>
-                                <td data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}" data-name="{{ $vehicle_name }}">
+                                <td class="text-center" style="{{ ( $cut_off_zone >= 3 ? 'background-color:#e2a03f;color:#fff;' : ( $cut_off_zone >= 2 && $cut_off_zone < 3 ? 'background-color:#805dca;color:#fff;' : '' ) ) }}">{{ $operation_from }}</td>
+                                <td class="text-center">{{ $operation_to }}</td>
+                                <td class="text-center">{{ $value->site_name }}</td>
+                                <td class="text-center" data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}" data-name="{{ OperationTrait::setOperationUnit($value) }}">
                                     @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
-                                        {{ $vehicle_name }}
+                                        {{ OperationTrait::setOperationUnit($value) }}
                                     @else
                                         <select class="form-control vehicles selectpicker" data-live-search="true" id="vehicle_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
                                             <option value="0">Selecciona un vehículo</option>
@@ -437,9 +401,9 @@
                                         </select>
                                     @endif
                                 </td>
-                                <td data-order="{{ ( $driver_d != NULL ) ? $driver_d : 0 }}" data-name="{{ $driver_name }}">
+                                <td class="text-center" data-order="{{ ( $driver_d != NULL ) ? $driver_d : 0 }}" data-name="{{ OperationTrait::setOperationDriver($value) }}">
                                     @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
-                                        {{ $driver_name }}
+                                        {{  OperationTrait::setOperationDriver($value) }}
                                     @else
                                         <select class="form-control drivers selectpicker" data-live-search="true" id="driver_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
                                             <option value="0">Selecciona un conductor</option>
@@ -453,62 +417,30 @@
                                 </td>
                                 <td class="text-center">
                                     @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
-                                        <div class="btn-group" role="group">
-                                            <button id="optionsOperation{{ $key.$value->id }}" type="button" class="btn btn-{{ $label }} dropdown-toggle btn_status_action {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : '' }}">
-                                                <span>{{ $status_operation }}</span>
-                                            </button>
-                                        </div>                                      
+                                        <?=OperationTrait::renderOperationStatus($value)?>
                                     @else
-                                        <div class="btn-group" role="group">
-                                            <button id="optionsOperation{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" type="button" class="btn btn-{{ $label }} dropdown-toggle btn_status_action" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span>{{ $status_operation }}</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                            </button>
-                                            <div class="dropdown-menu" aria-labelledby="optionsOperation{{ $key.$value->id }}">
-                                                <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-status="PENDING" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                                <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-status="E" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> E</a>
-                                                <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-status="C" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> C</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-status="OK" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Ok</a>
-                                            </div>
-                                        </div>
+                                        <?=OperationTrait::renderOperationOptionsStatus($key,$value)?>
                                     @endif
                                 </td>
-                                <td class="text-center">{{ ( $time_operation != NULL )  ? date("H:i", strtotime($time_operation)) : $time_operation }}</td>
-                                <td class="text-center">{{ $cost_operation }}</td>
+                                <td class="text-center"><?=OperationTrait::setOperationTime($value)?></td>
+                                <td class="text-center"><?=OperationTrait::setOperatingCost($operation)?></td>
                                 <td class="text-center">
                                     @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
-                                        <div class="btn-group" role="group">
-                                            <button id="optionsBooking{{ $key.$value->id }}" type="button" class="btn btn-{{ $label2 }} dropdown-toggle btn_status_action {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : '' }}">
-                                                <span>{{ $status_booking }}</span>
-                                            </button>
-                                        </div>
+                                        <?=OperationTrait::renderServiceStatus($value)?>
                                     @else
-                                        <div class="btn-group" role="group">
-                                            <button id="optionsBooking{{ $key.$value->id }}" data-item="{{ $key.$value->id }}" type="button" class="btn btn-{{ $label2 }} dropdown-toggle btn_status_action" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span>{{ $status_booking }}</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                            </button>
-                                            <div class="dropdown-menu" aria-labelledby="optionsBooking{{ $key.$value->id }}">
-                                                <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-status="PENDING" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
-                                                <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-status="COMPLETED" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Completado</a>
-                                                <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-status="NOSHOW" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-status="CANCELLED" data-item="{{ $value->id }}" data-booking="{{ $value->reservation_id }}" data-key="{{ $key.$value->id }}"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>
-                                            </div>
-                                        </div>
+                                        <?=OperationTrait::renderServiceOptionsStatus($key,$value)?>
                                     @endif
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     @if (RoleTrait::hasPermission(38))
                                         <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
                                     @else
                                         {{ $value->code }}
                                     @endif
                                 </td>
-                                <td style="{{ ( $value->service_type_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_type_name }}</td>
+                                <td class="text-center" style="{{ ( $value->service_type_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_type_name }}</td>
                                 <td class="text-center" style="{{ ( $value->reservation_status == "PENDING" || $value->reservation_status == "PENDIENTE" || ( $value->reservation_status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ $value->reservation_status }}</td>
-                                <td class="text-end" style="{{ ( $value->reservation_status == "PENDING" || $value->reservation_status == "PENDIENTE" || ( $value->reservation_status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($value->total_sales,2) }}</td>
+                                <td class="text-center" style="{{ ( $value->reservation_status == "PENDING" || $value->reservation_status == "PENDIENTE" || ( $value->reservation_status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($value->total_sales,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">

@@ -264,7 +264,7 @@
                             <th class="text-center">HACIA</th>
                             <th class="text-center">FECHA DE SERVICIO</th>
                             <th class="text-center">HORA DE SERVICIO</th>
-                            <th class="text-center">ESTATUS DE SERVICIO</th>
+                            <th class="text-center">ESTATUS DE SERVICIO</th><!-- ESTATUS DE RESERVACION -->
                             <th class="text-center">UNIDAD DE OPERACIÓN</th>
                             <th class="text-center">CONDUCTOR DE OPERACIÓN</th>
                             <th class="text-center">HORA DE OPERACIÓN</th>

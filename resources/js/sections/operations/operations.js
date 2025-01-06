@@ -201,8 +201,8 @@ let setup = {
         _settings.deferRender = true;
         _settings.responsive = true;
         _settings.buttons =  _buttons;
-        _settings.order = [[ 2, "asc" ]];
-        // _settings.order = [];
+        // _settings.order = [[ 2, "asc" ]];
+        _settings.order = [];
         _settings.paging = false;
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
