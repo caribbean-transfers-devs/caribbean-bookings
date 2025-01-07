@@ -63,6 +63,12 @@ trait OperationTrait
         return '<button type="button" class="btn  btn-order btn-'.( self::serviceStatusConfirmation($service) == 0 ? 'warning' : 'success' ).'" onClick="updateConfirmation(event,'.$service->id.','.$operation_type.','.$confirmation_type.','.$service->reservation_id.')">'.( self::serviceStatusConfirmation($service) == 0 ? 'N' : 'Y' ).'</button>';
     }
 
+    //COLOR AGENCY
+
+    public static function setClassColorAgency(){
+        
+    }
+
     // ZONAS
 
     public static function classCutOffZone($service){
@@ -92,8 +98,10 @@ trait OperationTrait
     public static function setDateTime($service, $type = "date"){
         if ($type == "date") {
             return date("Y-m-d", strtotime(( $service->operation_type == 'arrival' ? $service->pickup_from : $service->pickup_to )));
-        }else{
+        }else if ($type == "time"){
             return date("H:i", strtotime(( $service->operation_type == 'arrival' ? $service->pickup_from : $service->pickup_to )));
+        }else{
+            return ( $service->operation_type == 'arrival' ? $service->pickup_from : $service->pickup_to );
         }
     }
 

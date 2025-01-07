@@ -244,13 +244,6 @@
                                 // $color = "color: #".( $value->site_code == 29 || $value->site_code == 30 ? "FFFFFF" : "515365" ).";";
                                 $class_agency = ( $value->site_code == 29 || $value->site_code == 30 ?  "agency_".$value->site_code : "" );
 
-                                //SABER EL NIVEL DE CUT OFF
-                                $cut_off_zone = ( $value->final_service_type == 'ARRIVAL' || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->zone_one_cut_off : $value->zone_two_cut_off );
-
-                                // $payment = ( $value->total_sales - $value->total_payments );
-                                // if($payment < 0) $payment = 0;
-                                // $payment = $value->total_sales;
-
                                 //PREASIGNACION
                                 $flag_preassignment = ( ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ) && $value->op_one_preassignment != "" ? true : ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && ( $value->is_round_trip == 1 ) && $value->op_two_preassignment != "" ? true : false ) );
                                 $flag_comment =       ( ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ) && $value->op_one_comments != "" ? true : ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && ( $value->is_round_trip == 1 ) && $value->op_two_comments != "" ? true : false ) );
@@ -258,19 +251,15 @@
                                 $preassignment = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_preassignment : $value->op_two_preassignment );
                                 $comment =       ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_comments : $value->op_two_comments );
 
-                                $operation_pickup = (($value->operation_type == 'arrival')? $value->pickup_from : $value->pickup_to );
-                                $operation_from = (($value->operation_type == 'arrival')? $value->from_name.( (!empty($value->flight_number)) ? ' ('.$value->flight_number.')' : '' )  : $value->to_name );
-                                $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
-
                                 $vehicle_d = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->vehicle_id_one : $value->vehicle_id_two );
                                 $driver_d =  ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->driver_id_one : $value->driver_id_two );                                
                                 $close_operation = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_operation_close : $value->op_two_operation_close );
 
                                 //LOGISTICA PARA GRAFICAS
                                     // Obtener la hora formateada
-                                    $time = date("H:i", strtotime($operation_pickup)); //EXTRAEMOS LA HORA DE LA FECHA
-                                    $hour = date("H", strtotime($operation_pickup)); //EXTRAEMOS LA HORA                                
-                                    $minutes = date("i", strtotime($operation_pickup)); //EXTRAEMOS LOS SEGUNDOS
+                                    $time = date("H:i", strtotime(OperationTrait::setDateTime($value, "null"))); //EXTRAEMOS LA HORA DE LA FECHA
+                                    $hour = date("H", strtotime(OperationTrait::setDateTime($value, "null"))); //EXTRAEMOS LA HORA                                
+                                    $minutes = date("i", strtotime(OperationTrait::setDateTime($value, "null"))); //EXTRAEMOS LOS SEGUNDOS
 
                                     // Agrupar por intervalo de 15 minutos
                                     if ($minutes < 15) {
@@ -332,7 +321,6 @@
                                         // $generalTimeGroup[$hour]['data'][$index][] = $value;
                                         $generalTimeGroup[$hour]['quantity']++;
                                     }
-
                             @endphp
                             <tr class="item-{{ $key.$value->id }} {{ $class_agency }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
                                 <td class="text-center">
@@ -384,8 +372,8 @@
                                     @endif
                                 </td>
                                 <td class="text-center">{{ $value->passengers }}</td>
-                                <td class="text-center" style="{{ ( $cut_off_zone >= 3 ? 'background-color:#e2a03f;color:#fff;' : ( $cut_off_zone >= 2 && $cut_off_zone < 3 ? 'background-color:#805dca;color:#fff;' : '' ) ) }}">{{ $operation_from }}</td>
-                                <td class="text-center">{{ $operation_to }}</td>
+                                <td class="text-center" <?=OperationTrait::classCutOffZone($value)?>>{{ OperationTrait::setFrom($value, "name") }} {{ $value->operation_type == 'arrival' && !empty($value->flight_number) ? ' ('.$value->flight_number.')' : '' }}</td>
+                                <td class="text-center">{{ OperationTrait::setTo($value, "name") }}</td>
                                 <td class="text-center">{{ $value->site_name }}</td>
                                 <td class="text-center" data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}" data-name="{{ OperationTrait::setOperationUnit($value) }}">
                                     @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
@@ -465,11 +453,6 @@
         </div>
     </div>
 
-    @php
-        // dump($arrivalTimeGroup);
-        // dump($departureTimeGroup);
-        // dump($generalTimeGroup);
-    @endphp
     <div class="layer" id="layer">
         <div class="header-chart d-flex justify-content-between">
             <div class="btn_close">                
