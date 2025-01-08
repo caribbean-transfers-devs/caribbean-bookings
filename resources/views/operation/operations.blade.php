@@ -351,7 +351,7 @@
                                         </div>
                                         <div class="upload_new" id="upload_new_{{ $key.$value->id }}">
                                             @if ( !empty($value->pictures) )
-                                                <div class="btn btn-primary btn_operations bs-tooltip" title="Esta reservación tiene imagenes">
+                                                <div class="btn btn-primary btn_operations __open_modal_media bs-tooltip" title="Esta reservación tiene imagenes" data-code="{{ $value->reservation_id }}">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                                 </div>
                                             @endif
@@ -480,9 +480,10 @@
 
     <x-modals.filters.bookings :data="$data" :websites="$websites" :units="$units" :drivers="$drivers" :reservationstatus="$reservation_status" />
     <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :vehicles="$vehicles" />
-    <x-modals.reservations.comments />
-    <x-modals.reservations.operation_messages_history />
-    <x-modals.reservations.operation_data_customer />
+    <x-modals.reservations.comments /> <!-- MODAL PARA PODER AGREGAR COMENTARIO DE OPERACION Y IMAGENES -->
+    <x-modals.reservations.operation_messages_history /> <!-- HISTORIAL DE MENSAJES DE LA RESERVACION -->
+    <x-modals.reservations.operation_media_history /> <!-- HISTORIAL DE MEDIA DE LA RESERVACION -->
+    <x-modals.reservations.operation_data_customer /> <!-- INFORMACIÓN DEL CLIENTE -->
     <x-modals.reservations.operation_confirmations />
     <x-modals.reservations.operation_data_whatsapp />    
 @endsection

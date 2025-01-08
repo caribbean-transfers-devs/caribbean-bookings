@@ -28,7 +28,8 @@ trait DigitalOceanTrait
     {
         $validator = Validator::make($request->all(), [
             'folder' => 'required|string',            
-            'file' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:5120'
+            'file' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:5120',
+            'type_media' => 'required|string|in:GENERAL,CANCELLATION,OPERATION,REFUND',
         ]);
 
         if ($validator->fails()) {
@@ -59,6 +60,7 @@ trait DigitalOceanTrait
             $media->reservation_id = $request->input('folder');
             $media->path = $filePath;
             $media->url = $result['ObjectURL'];
+            $media->type_media = $request->type_media;
             $media->save();
 
             $repo = new ReservationsRepository();
@@ -69,7 +71,8 @@ trait DigitalOceanTrait
                     'success' => true,
                     'message' => 'Image uploaded successfully',
                     'data' => array(
-                        "item"  => $request->id,
+                        "item"  => $request->id, //ITEM DE LA TABLA DE OPERACIONES
+                        "reservation" => $request->folder, // EL ID DE LA RESERVACIÓN
                         "status"  => 1,
                         "message" => "Se agrego una imagen a la reserva: ".$request->folder.", por ".auth()->user()->name
                     )

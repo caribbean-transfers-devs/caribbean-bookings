@@ -540,7 +540,6 @@ window.addEventListener('popstate', function (event) {
 });
 
 window.onload = function () {
-    console.log(__table_render);
     if (__table_render != null) {
         __table_render.columns.adjust().draw();
     }
@@ -571,7 +570,6 @@ window.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    console.log(__table_render);
     if (__table_render != null) {
         __table_render.columns.adjust();
         __table_render.columns.adjust().draw();
@@ -579,7 +577,6 @@ window.addEventListener("DOMContentLoaded", function() {
 });
 
 window.addEventListener('resize', function() {
-    console.log(__table_render);
     if (__table_render != null) {
         __table_render.columns.adjust().draw();        
     }

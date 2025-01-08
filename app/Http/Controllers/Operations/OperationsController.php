@@ -834,8 +834,9 @@ class OperationsController extends Controller
                 'success' => true,
                 'message' => 'Se '.$action.' comentario exitosamente...',
                 'data' => array(
-                    "item"  => $request->id,
-                    "value"  => $request->comment,
+                    "item"  => $request->id, //ITEM DE LA TABLA DE OPERACIONES
+                    "value"  => $request->comment, // EL MENSAJE QUE SE COLOGO
+                    "reservation" => $service->reservation_id, // EL ID DE LA RESERVACIÓN
                     "status"  => 1,
                     "message" => "Se agrego un comentario al servicio: ".$request->code.", por ".auth()->user()->name
                 )

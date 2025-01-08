@@ -100,9 +100,16 @@ class DetailRepository
     }
 
     public function getMedia($request){
-        $media = ReservationsMedia::where('reservation_id', $request->id)
-                          ->orderBy('id', 'desc')
-                          ->get();
+        if( isset($request->type) ){
+            $media = ReservationsMedia::where('reservation_id', $request->id)
+                                        ->where('type_media', 'OPERATION')
+                                        ->orderBy('id', 'desc')
+                                        ->get();
+        }else{
+            $media = ReservationsMedia::where('reservation_id', $request->id)
+                                        ->orderBy('id', 'desc')
+                                        ->get();
+        }
 
         return view('reservations.media', compact('media'));        
     }
