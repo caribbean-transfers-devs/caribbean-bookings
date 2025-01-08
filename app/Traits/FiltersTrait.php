@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
 //MODELS
+use App\Models\User;
 use App\Models\OriginSale;
 use App\Models\Enterprise;
 use App\Models\Vehicle;
@@ -29,7 +30,11 @@ trait FiltersTrait
             return $report->exchange; // Ejemplo: 25.50
         } else {
             return 18;
-        }                                
+        }
+    }
+
+    public function Users(){
+        return User::where('status', 1)->get();
     }
 
     public function Enterprises(){
