@@ -13,6 +13,7 @@ use App\Models\Payment;
 //TRAITS
 use App\Traits\QueryTrait;
 use App\Traits\PayPalTrait;
+// use App\Traits\StripeTrait;
 
 class ConciliationRepository
 {
@@ -59,5 +60,15 @@ class ConciliationRepository
             'message' => ( empty($payments) ? "No hay pagos para conciliar" : "Se conciliaron los pagos correctamente" ),
             'status' => ( empty($payments) ? "info" : "success" )
         ], Response::HTTP_OK);
+    }
+
+    public function StripePayments(){
+        ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
+
+        // $data = $this->getPaymentInfo('ch_3QX4izAUOjRsxU4D3oCgAG6L');
+        $data = array();
+
+        return $data;
     }
 }

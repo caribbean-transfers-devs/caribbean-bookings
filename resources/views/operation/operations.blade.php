@@ -86,6 +86,18 @@
                 )
             ),
             array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
+                'titleAttr' => 'Administrar columnas',
+                'className' => 'btn btn-primary __btn_columns',
+                'attr' => array(
+                    'data-title' =>  "Filtro de reservaciones",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#columnsModal',
+                    'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
+                    'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
+                )                
+            ),
+            array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas',
                 'titleAttr' => 'Ver graficas',
                 'className' => 'btn btn-primary',
@@ -207,7 +219,7 @@
                 </div>
             </div> --}}
 
-            <table id="zero-config" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+            <table id="dataManagementOperations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                 <thead>
                     <tr>
                         <th class="text-center">#</th>
@@ -244,13 +256,6 @@
                                 // $color = "color: #".( $value->site_code == 29 || $value->site_code == 30 ? "FFFFFF" : "515365" ).";";
                                 $class_agency = ( $value->site_code == 29 || $value->site_code == 30 ?  "agency_".$value->site_code : "" );
 
-                                //SABER EL NIVEL DE CUT OFF
-                                $cut_off_zone = ( $value->final_service_type == 'ARRIVAL' || ( ( $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->zone_one_cut_off : $value->zone_two_cut_off );
-
-                                // $payment = ( $value->total_sales - $value->total_payments );
-                                // if($payment < 0) $payment = 0;
-                                // $payment = $value->total_sales;
-
                                 //PREASIGNACION
                                 $flag_preassignment = ( ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ) && $value->op_one_preassignment != "" ? true : ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && ( $value->is_round_trip == 1 ) && $value->op_two_preassignment != "" ? true : false ) );
                                 $flag_comment =       ( ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ) && $value->op_one_comments != "" ? true : ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && ( $value->is_round_trip == 1 ) && $value->op_two_comments != "" ? true : false ) );
@@ -258,19 +263,15 @@
                                 $preassignment = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_preassignment : $value->op_two_preassignment );
                                 $comment =       ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_comments : $value->op_two_comments );
 
-                                $operation_pickup = (($value->operation_type == 'arrival')? $value->pickup_from : $value->pickup_to );
-                                $operation_from = (($value->operation_type == 'arrival')? $value->from_name.( (!empty($value->flight_number)) ? ' ('.$value->flight_number.')' : '' )  : $value->to_name );
-                                $operation_to = (($value->operation_type == 'arrival')? $value->to_name : $value->from_name );
-
                                 $vehicle_d = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->vehicle_id_one : $value->vehicle_id_two );
                                 $driver_d =  ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->driver_id_one : $value->driver_id_two );                                
                                 $close_operation = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_operation_close : $value->op_two_operation_close );
 
                                 //LOGISTICA PARA GRAFICAS
                                     // Obtener la hora formateada
-                                    $time = date("H:i", strtotime($operation_pickup)); //EXTRAEMOS LA HORA DE LA FECHA
-                                    $hour = date("H", strtotime($operation_pickup)); //EXTRAEMOS LA HORA                                
-                                    $minutes = date("i", strtotime($operation_pickup)); //EXTRAEMOS LOS SEGUNDOS
+                                    $time = date("H:i", strtotime(OperationTrait::setDateTime($value, "null"))); //EXTRAEMOS LA HORA DE LA FECHA
+                                    $hour = date("H", strtotime(OperationTrait::setDateTime($value, "null"))); //EXTRAEMOS LA HORA                                
+                                    $minutes = date("i", strtotime(OperationTrait::setDateTime($value, "null"))); //EXTRAEMOS LOS SEGUNDOS
 
                                     // Agrupar por intervalo de 15 minutos
                                     if ($minutes < 15) {
@@ -288,30 +289,18 @@
                                         if ( !isset($arrivalTimeGroup[$hour]) ) {
                                             $arrivalTimeGroup[$hour] = [
                                                 'name' => $hour,
-                                                // 'data' => [],     // Lista de reservas
                                                 'quantity' => 0,  // Contador
                                             ];
                                         }
-                                        // if (!isset($arrivalTimeGroup[$hour]['data'][$index])) {
-                                        //     $arrivalTimeGroup[$hour]['data'][$index] = [];
-                                        // }
-                                        // $arrivalTimeGroup[$hour][] = $time;
-                                        // $arrivalTimeGroup[$hour]['data'][$index][] = $value;
                                         $arrivalTimeGroup[$hour]['quantity']++;                                        
                                     }
                                     if( $value->final_service_type == "DEPARTURE" || $value->final_service_type == "TRANSFER" ){
                                         if ( !isset($departureTimeGroup[$hour]) ) {
                                             $departureTimeGroup[$hour] = [
                                                 'name' => $hour,
-                                                // 'data' => [],     // Lista de reservas
                                                 'quantity' => 0,  // Contador
                                             ];
                                         }
-                                        // if (!isset($departureTimeGroup[$hour]['data'][$index])) {
-                                        //     $departureTimeGroup[$hour]['data'][$index] = [];
-                                        // }
-                                        // $departureTimeGroup[$hour][] = $time;
-                                        // $departureTimeGroup[$hour]['data'][$index][] = $value;
                                         $departureTimeGroup[$hour]['quantity']++;
                                     }
                                     if( $value->final_service_type == "ARRIVAL" || $value->final_service_type == "DEPARTURE" || $value->final_service_type == "TRANSFER" ){
@@ -319,20 +308,11 @@
                                         if (!isset($generalTimeGroup[$hour])) {
                                             $generalTimeGroup[$hour] = [
                                                 'name' => $hour,
-                                                // 'data' => [],     // Lista de reservas
                                                 'quantity' => 0,  // Contador
                                             ];
                                         }
-                                        // if (!isset($generalTimeGroup[$hour][$index])) {
-                                        //     $generalTimeGroup[$hour]['data'][$index] = [];
-                                        // }
-
-                                        // $generalTimeGroup[$hour][]['data'] = $time;
-                                        // Agregar la reserva a la lista de datos y aumentar el contador
-                                        // $generalTimeGroup[$hour]['data'][$index][] = $value;
                                         $generalTimeGroup[$hour]['quantity']++;
                                     }
-
                             @endphp
                             <tr class="item-{{ $key.$value->id }} {{ $class_agency }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
                                 <td class="text-center">
@@ -363,14 +343,14 @@
                                         </div>
                                         <div class="upload_new" id="upload_new_{{ $key.$value->id }}">
                                             @if ( !empty($value->pictures) )
-                                                <div class="btn btn-primary btn_operations bs-tooltip" title="Esta reservación tiene imagenes">
+                                                <div class="btn btn-primary btn_operations __open_modal_media bs-tooltip" title="Esta reservación tiene imagenes" data-code="{{ $value->reservation_id }}">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                                 </div>
                                             @endif
                                         </div>                                        
                                     </div>
                                 </td>
-                                <td class="text-center">{{ date("H:i", strtotime($operation_pickup)) }}</td>
+                                <td class="text-center">{{ OperationTrait::setDateTime($value, "time") }}</td>
                                 <td class="text-center">
                                     <span>{{ $value->full_name }}</span>
                                     @if(!empty($value->reference))
@@ -384,8 +364,8 @@
                                     @endif
                                 </td>
                                 <td class="text-center">{{ $value->passengers }}</td>
-                                <td class="text-center" style="{{ ( $cut_off_zone >= 3 ? 'background-color:#e2a03f;color:#fff;' : ( $cut_off_zone >= 2 && $cut_off_zone < 3 ? 'background-color:#805dca;color:#fff;' : '' ) ) }}">{{ $operation_from }}</td>
-                                <td class="text-center">{{ $operation_to }}</td>
+                                <td class="text-center" <?=OperationTrait::classCutOffZone($value)?>>{{ OperationTrait::setFrom($value, "name") }} {{ $value->operation_type == 'arrival' && !empty($value->flight_number) ? ' ('.$value->flight_number.')' : '' }}</td>
+                                <td class="text-center">{{ OperationTrait::setTo($value, "name") }}</td>
                                 <td class="text-center">{{ $value->site_name }}</td>
                                 <td class="text-center" data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}" data-name="{{ OperationTrait::setOperationUnit($value) }}">
                                     @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
@@ -423,7 +403,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center"><?=OperationTrait::setOperationTime($value)?></td>
-                                <td class="text-center"><?=OperationTrait::setOperatingCost($operation)?></td>
+                                <td class="text-center"><?=OperationTrait::setOperatingCost($value)?></td>
                                 <td class="text-center">
                                     @if ( RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 )
                                         <?=OperationTrait::renderServiceStatus($value)?>
@@ -465,11 +445,6 @@
         </div>
     </div>
 
-    @php
-        // dump($arrivalTimeGroup);
-        // dump($departureTimeGroup);
-        // dump($generalTimeGroup);
-    @endphp
     <div class="layer" id="layer">
         <div class="header-chart d-flex justify-content-between">
             <div class="btn_close">                
@@ -496,10 +471,12 @@
     </div>
 
     <x-modals.filters.bookings :data="$data" :websites="$websites" :units="$units" :drivers="$drivers" :reservationstatus="$reservation_status" />
+    <x-modals.reports.columns />
     <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :vehicles="$vehicles" />
-    <x-modals.reservations.comments />
-    <x-modals.reservations.operation_messages_history />
-    <x-modals.reservations.operation_data_customer />
+    <x-modals.reservations.comments /> <!-- MODAL PARA PODER AGREGAR COMENTARIO DE OPERACION Y IMAGENES -->
+    <x-modals.reservations.operation_messages_history /> <!-- HISTORIAL DE MENSAJES DE LA RESERVACION -->
+    <x-modals.reservations.operation_media_history /> <!-- HISTORIAL DE MEDIA DE LA RESERVACION -->
+    <x-modals.reservations.operation_data_customer /> <!-- INFORMACIÓN DEL CLIENTE -->
     <x-modals.reservations.operation_confirmations />
     <x-modals.reservations.operation_data_whatsapp />    
 @endsection

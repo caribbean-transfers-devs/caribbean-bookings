@@ -47,6 +47,11 @@ return [
         'apiUrl' => env('PAYPAL_API_URL'),
         'clientID' => env('PAYPAL_CLIENT_ID'),
         'secretKey' => env('PAYPAL_CLIENT_SECRET'),
+    ],
+    'stripe' => [
+        'apiUrl' => env('STRIPE_API_URL'),
+        'clientID' => env('STRIPE_CLIENT'),
+        'secretKey' => env('STRIPE_SECRET'),
     ],    
     'digital_ocean' => [
         'key' => env('DO_SPACES_KEY'),

@@ -1,4 +1,4 @@
-@props(['data','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','istoday','isbalance','isduplicated','isagency','request'])
+@props(['data','users','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','istoday','isbalance','isduplicated','isagency','request'])
 @php
     $date = "";
     if( is_array($data) ){
@@ -21,7 +21,7 @@
                 <div class="modal-body">
                     @csrf
                     @php
-                        // dump($data);
+                        // dump($users);
                         // dump($request);
                     @endphp
                     <div class="top">
@@ -95,8 +95,16 @@
                         @endif
                     </div>
                     
-                    @if ( (isset($websites) && !empty($websites)) || (isset($origins) && !empty($origins)) || (isset($reservationstatus) && !empty($reservationstatus)) || (isset($servicesoperation) && !empty($servicesoperation)) || (isset($vehicles) && !empty($vehicles)) || (isset($zones) && !empty($zones)) || (isset($serviceoperationstatus) && !empty($serviceoperationstatus)) || (isset($units) && !empty($units)) || (isset($drivers) && !empty($drivers)) || (isset($operationstatus) && !empty($operationstatus)) || (isset($paymentstatus) && !empty($paymentstatus)) || (!empty($methods)) || (isset($iscommissionable)) || (isset($ispayarrival)) || (!empty($cancellations)) || (isset($isbalance)) )
+                    @if ( (isset($users) && !empty($users)) || (isset($websites) && !empty($websites)) || (isset($origins) && !empty($origins)) || (isset($reservationstatus) && !empty($reservationstatus)) || (isset($servicesoperation) && !empty($servicesoperation)) || (isset($vehicles) && !empty($vehicles)) || (isset($zones) && !empty($zones)) || (isset($serviceoperationstatus) && !empty($serviceoperationstatus)) || (isset($units) && !empty($units)) || (isset($drivers) && !empty($drivers)) || (isset($operationstatus) && !empty($operationstatus)) || (isset($paymentstatus) && !empty($paymentstatus)) || (!empty($methods)) || (isset($iscommissionable)) || (isset($ispayarrival)) || (!empty($cancellations)) || (isset($isbalance)) )
                         <div class="row g-0 bottom">
+
+                            @if ( isset($users) && !empty($users) )
+                                <select class="form-control selectpicker" title="Vendedor" data-live-search="true" data-selected-text-format="count > 1" name="user[]" id="user" data-value="{{ json_encode($data['user']) }}" multiple data-actions-box="true">                            
+                                    @foreach ($users as $key => $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }}</option> 
+                                    @endforeach
+                                </select>
+                            @endif
 
                             @if ( isset($websites) && !empty($websites) )
                                 <select class="form-control selectpicker" title="Sitio Web" data-live-search="true" data-selected-text-format="count > 1" name="site[]" id="site" data-value="{{ json_encode($data['site']) }}" multiple data-actions-box="true">                            

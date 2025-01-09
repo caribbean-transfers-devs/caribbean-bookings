@@ -642,7 +642,13 @@ class ReportsRepository
     public function commissions2($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
-        set_time_limit(120); // Aumenta el límite a 60 segundos        
+        set_time_limit(120); // Aumenta el límite a 60 segundos
+
+        $data = [
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
+            "user" => ( isset($request->user) ? $request->user : 0 ),
+        ];
         
         // $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.call_center_agent_id = 27 ";
         // $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 AND rez.call_center_agent_id = 27 ";
@@ -651,13 +657,19 @@ class ReportsRepository
         $havingConditions = []; $queryHaving = "";
         $queryData = [
             'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
-            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",            
         ];
+
+        //VENDEDOR
+        if(isset( $request->user ) && !empty( $request->user )){
+            $params = $this->parseArrayQuery($request->user);
+            $queryOne .= " AND us.id IN ($params) ";
+            $queryTwo .= " AND us.id IN ($params) ";
+        }        
     
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
         $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);        
 
-        // dd($items);
         // Filtrar el arreglo para conservar solo los elementos con employee_status igual a 1
         $filteredCommissions = array_filter($items, function($item) {
             return $item->employee_status == 1;
@@ -670,12 +682,14 @@ class ReportsRepository
             'breadcrumbs' => [
                 [
                     "route" => "",
-                    "name" => "Reporte de comisiones del ". date("Y-m-d", strtotime($queryData['init'])) ." al ". date("Y-m-d", strtotime($queryData['end'])),
+                    "name" => "Reporte de comisiones del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
                     "active" => true
                 ]
-            ],
-            'search' => $queryData, 
+            ],       
             'operations' => $filteredCommissions,
+            'users' => $this->Users(),
+            'data' => $data,
+            'request' => $request->input(),
         ]);        
     }
 

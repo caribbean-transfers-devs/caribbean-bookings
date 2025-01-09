@@ -108,7 +108,6 @@ function sendMail(code,mail,languague){
             });
         }
     });
-    
 }
 
 function sendInvitation(event, item_id, lang = 'en'){
@@ -828,13 +827,66 @@ Dropzone.options.uploadForm = {
     acceptedFiles: 'image/*,.pdf', // Solo permitir imágenes y archivos PDF
     dictDefaultMessage: 'Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...',
     addRemoveLinks: false,
-    autoProcessQueue: true,
+    autoProcessQueue: false, // Desactivar procesamiento automático para usar SweetAlert
     uploadMultiple: false,
     headers: {
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     },
-    init: function() {        
+    init: function() {
+        const dropzone = this;
+        let selectedOption = null; // Variable para almacenar la opción seleccionada
+
+        // Interceptar el evento "addedfile"
+        this.on("addedfile", function(file) {
+            Swal.fire({
+                title: 'Seleccione una opción',
+                text: "Debe seleccionar una opción antes de guardar la imagen",
+                icon: 'question',
+                input: 'select',
+                inputOptions: {
+                    'GENERAL': 'General',
+                    'CANCELLATION': 'Cancelación',
+                    'OPERATION': 'Operación',
+                    'REFUND': 'Reembolso'
+                },
+                inputPlaceholder: 'Seleccione una opción',
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: (value) => {
+                    return new Promise((resolve) => {
+                        if (!value) {
+                            Swal.showValidationMessage('Debe seleccionar una opción');
+                        } else {
+                            resolve(value);
+                        }
+                    });
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Guardar la opción seleccionada
+                    selectedOption = result.value;                    
+                    // Si el usuario confirma, enviar el archivo
+                    // Procesar el archivo
+                    dropzone.processFile(file);
+                    console.log('Opción seleccionada:', result.value);
+                } else {
+                    // Si el usuario cancela, eliminar el archivo
+                    dropzone.removeFile(file);
+                }
+            });
+        });
+
+        // Añadir el valor seleccionado a los datos enviados
+        this.on("sending", function(file, xhr, formData) {
+            if (selectedOption) {
+                formData.append("type_media", selectedOption); // Agregar la opción seleccionada
+            }
+        });
+
         this.on("success", function(file, response) {
+            // Limpiar el área de Dropzone
+            this.removeAllFiles(true); // 'true' evita que se activen eventos adicionales            
             loadContent();
         });
         this.on("error", function(file, errorMessage) {

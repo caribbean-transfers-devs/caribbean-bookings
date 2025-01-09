@@ -303,13 +303,66 @@ Dropzone.options.uploadForm = {
     acceptedFiles: 'image/*,.pdf', // Solo permitir imágenes y archivos PDF
     dictDefaultMessage: 'Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...',
     addRemoveLinks: false,
-    autoProcessQueue: true,
+    autoProcessQueue: false,
     uploadMultiple: false,
     headers: {
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     },
     init: function() {
+        const dropzone = this;
+        let selectedOption = null; // Variable para almacenar la opción seleccionada
+
+        // Interceptar el evento "addedfile"
+        this.on("addedfile", function(file) {
+            Swal.fire({
+                title: 'Seleccione una opción',
+                text: "Debe seleccionar una opción antes de guardar la imagen",
+                icon: 'question',
+                input: 'select',
+                inputOptions: {
+                    'GENERAL': 'General',
+                    'CANCELLATION': 'Cancelación',
+                    'OPERATION': 'Operación',
+                    'REFUND': 'Reembolso'
+                },
+                inputPlaceholder: 'Seleccione una opción',
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: (value) => {
+                    return new Promise((resolve) => {
+                        if (!value) {
+                            Swal.showValidationMessage('Debe seleccionar una opción');
+                        } else {
+                            resolve(value);
+                        }
+                    });
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Guardar la opción seleccionada
+                    selectedOption = result.value;                    
+                    // Si el usuario confirma, enviar el archivo
+                    // Procesar el archivo
+                    dropzone.processFile(file);
+                    console.log('Opción seleccionada:', result.value);
+                } else {
+                    // Si el usuario cancela, eliminar el archivo
+                    dropzone.removeFile(file);
+                }
+            });
+        });
+
+        // Añadir el valor seleccionado a los datos enviados
+        this.on("sending", function(file, xhr, formData) {
+            if (selectedOption) {
+                formData.append("type_media", selectedOption); // Agregar la opción seleccionada
+            }
+        });
+
         this.on("success", function(file, response) {
+            // Limpiar el área de Dropzone
+            this.removeAllFiles(true); // 'true' evita que se activen eventos adicionales
             if (response.hasOwnProperty('success') && response.success) {
                 Swal.fire({
                     icon: 'success',
@@ -381,31 +434,53 @@ function history(){
             __open_modal_history.addEventListener('click', function(){
       
                 //DECLARACION DE VARIABLES
-                const __type = this.dataset.type;
-                const __comment = ( this.dataset.comment != undefined ? this.dataset.comment : '' );
+                const { type, comment } = this.dataset;
                 const __modal = document.getElementById('historyModal');
+                const __content = document.getElementById('wrapper_history');
     
-                if (__type == "history") {
+                if (type == "history") {
                     $.ajax({
                         url: `/operation/history/get`,
                         type: 'GET',
                         data: { code: this.dataset.code },
                         success: function(resp) {
-                            if ( resp.success ) {
-                                const content = document.getElementById('wrapper_history');
-                                content.innerHTML = resp.message;
+                            if ( resp.success ) {                                
+                                __content.innerHTML = resp.message;
                                 $(__modal).modal('show');
                             }
                         }
                     });
                 }else{
-                    const content = document.getElementById('wrapper_history');
-                    content.innerHTML = __comment;
+                    __content.innerHTML = comment;
                     $(__modal).modal('show');
                 }
             });
         });
-    }    
+    }
+}
+
+function mediaBooking(){
+    setup.bsTooltip();
+    const __open_modal_medias = document.querySelectorAll('.__open_modal_media');
+    if( __open_modal_medias.length > 0 ){
+        __open_modal_medias.forEach(__open_modal_media => {
+            __open_modal_media.addEventListener('click', function(){
+      
+                //DECLARACION DE VARIABLES
+                const { code } = this.dataset;
+                console.log(code);
+                $("#historyMediaModal").modal('show');
+                $('#media-listing').load('/reservations/upload/' + code + '?type=OPERATION', function(response, status, xhr) {
+                    console.log(response);
+                    console.log(status);
+                    console.log(xhr);
+                    if (status == "error") {
+                        $('#media-listing').html('Error al cargar el contenido');
+                    }
+                });
+            });
+        });
+    }
 }
 
 //FUNCIONALIDAD DEL AUTOCOMPLET
@@ -483,8 +558,10 @@ form.addEventListener('submit', function (event) {
 });
 
 //FUNCIONADA PARA EXTRACION DE INFORMACION DE DATOS PARA ENVIAR POR WHATSAPP
-$('#zero-config').on('click', '.extract_whatsapp', function() {
+$('#dataManagementOperations').on('click', '.extract_whatsapp', function() {
     // Obtener la fila en la que se encuentra el botón
+    console.log("hola");
+    
     var fila = $(this).closest('tr');
 
     // Extraer la información de las celdas de la fila
@@ -577,7 +654,7 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
 });
 
 //FUNCIONADA PARA EXTRACION DE INFORMACION DE DATOS DE CONFIRMACION PARA ENVIAR POR WHATSAPP
-$('#zero-config').on('click', '.extract_confirmation', function() {
+$('#dataManagementOperations').on('click', '.extract_confirmation', function() {
     const  __language = this.dataset.language;
     const  __terminal1 = document.getElementById('terminal1');
     const  __terminal2 = document.getElementById('terminal2');
@@ -929,6 +1006,7 @@ if (__btn_update_status_bookings.length > 0) {
 }
 
 history();
+mediaBooking();
 
 if( __open_modal_customers.length > 0 ){
     __open_modal_customers.forEach(__open_modal_customer => {
@@ -968,32 +1046,31 @@ if( __open_modal_comments.length > 0 ){
           const __form_label = __modal.querySelector('.form-label');
 
           //SETEAMOS VALORES EN EL MODAL
-        //   __title_modal.innerHTML = ( this.dataset.status == 0 ? "Agregar comentario" : "Editar comentario" );
           __form_label.innerHTML = ( this.dataset.status == 0 ? "Ingresa el comentario" : "Editar el comentario" );
+
+          //APLICA PARA COMENTARIOS
           document.getElementById('id_item').value = this.dataset.id;
           document.getElementById('code_item').value = this.dataset.code;
           document.getElementById('operation_item').value = this.dataset.operation;
           document.getElementById('type_item').value = this.dataset.type;
 
+          //APLICA PARA MEDIA, CARGA DE IMAGENES
           document.getElementById('id').value = this.dataset.id;
           document.getElementById('reservation_id').value = this.dataset.reservation;
           document.getElementById('reservation_item').value = this.dataset.code;
 
           if (this.dataset.status == 1) {
-              $.ajax({
-                  url: `/operation/comment/get`,
-                  type: 'GET',
-                  data: { item_id: this.dataset.code, operation: this.dataset.operation, type: this.dataset.type },
-                  // beforeSend: function() {
-                  //     components.loadScreen();
-                  // },
-                  success: function(resp) {
-                      document.getElementById('comment_item').value = resp.message;
-                      $(__modal).modal('show');
-                  }
-              });
+            $.ajax({
+                url: `/operation/comment/get`,
+                type: 'GET',
+                data: { item_id: this.dataset.code, operation: this.dataset.operation, type: this.dataset.type },
+                success: function(resp) {
+                    document.getElementById('comment_item').value = resp.message;
+                    $(__modal).modal('show');
+                }
+            });
           }else{
-              $(__modal).modal('show');
+            $(__modal).modal('show');
           }
       });
   });
@@ -1153,14 +1230,14 @@ document.addEventListener('keydown', resetTimer);
 resetTimer(); 
 
 window.addEventListener('scroll', function() {
-  let __table_private = document.getElementById('operation-private');
-  let __table_shared = document.getElementById('operation-shared');
+  let __table_private = document.getElementById('dataManagementOperations');
+//   let __table_shared = document.getElementById('operation-shared');
 
   let __thead_private = __table_private.querySelector('thead');
   let __offset_private = __table_private.getBoundingClientRect().top;
 
-  let __thead_shared = __table_shared.querySelector('thead');
-  let __offset_shared = __table_shared.getBoundingClientRect().top;
+//   let __thead_shared = __table_shared.querySelector('thead');
+//   let __offset_shared = __table_shared.getBoundingClientRect().top;
 
   if (window.scrollY > __offset_private) {
     __thead_private.classList.add('fixed-header');
@@ -1168,11 +1245,11 @@ window.addEventListener('scroll', function() {
     __thead_private.classList.remove('fixed-header');
   }
 
-  if (window.scrollY > __offset_shared) {
-    __thead_shared.classList.add('fixed-header');
-  } else {
-    __thead_shared.classList.remove('fixed-header');
-  }  
+//   if (window.scrollY > __offset_shared) {
+//     __thead_shared.classList.add('fixed-header');
+//   } else {
+//     __thead_shared.classList.remove('fixed-header');
+//   }
 });
 
 //BOTONES 
@@ -1239,6 +1316,8 @@ if( document.getElementById('btn_dowload_operation_comission') != null ){
         });
     });
 }
+
+components.renderCheckboxColumns('dataManagementOperations', 'columns');
 
 //EVENTOS SOCKET IO, ESCUCHAN DE LADO DEL CLIENTE
 socket.on("addPreassignmentClient", function(data){
@@ -1375,6 +1454,7 @@ socket.on("addCommentClient", function(data){
     __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver mensaje de operaciones" data-type="comment" data-comment="'+ data.value +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>'
 
     history();
+    setup.bsTooltip();
     Snackbar.show({
         text: data.message,
         duration: 5000,
@@ -1390,8 +1470,9 @@ socket.on("uploadBookingClient", function(data){
 
     //DECLARACION DE VARIABLES
     const __comment_new = document.getElementById('upload_new_' + data.item);
-    __comment_new.innerHTML = '<div class="btn btn-primary btn_operations bs-tooltip" title="Esta reservación tiene imagenes"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>'
+    __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_media bs-tooltip" title="Esta reservación tiene imagenes" data-code="'+ data.reservation +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>'
 
+    mediaBooking();
     setup.bsTooltip();
     Snackbar.show({
         text: data.message,

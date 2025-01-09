@@ -46,7 +46,7 @@ trait PayPalTrait
 
         // Realiza la solicitud para obtener la orden
         $response = Http::withToken($accessToken)
-            ->get($this->apiUrl . '/v2/checkout/orders/' . $orderId);
+                    ->get($this->apiUrl . '/v2/checkout/orders/' . $orderId);
 
         if ($response->successful()) {
             return response()->json($response->json());
@@ -98,5 +98,5 @@ trait PayPalTrait
             }
             return response()->json(['error' => 'Failed to retrieve payment: ' . $response->body()], $response->status());
         }
-    }    
+    }
 }
