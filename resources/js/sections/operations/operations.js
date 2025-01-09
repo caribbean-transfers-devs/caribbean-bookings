@@ -1315,6 +1315,8 @@ if( document.getElementById('btn_dowload_operation_comission') != null ){
     });
 }
 
+components.renderCheckboxColumns('dataManagementOperations', 'columns');
+
 //EVENTOS SOCKET IO, ESCUCHAN DE LADO DEL CLIENTE
 socket.on("addPreassignmentClient", function(data){
     console.log("asignacion");

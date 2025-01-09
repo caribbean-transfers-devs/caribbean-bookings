@@ -26,4 +26,9 @@ class ConciliationController extends Controller
     {
         return $this->ConciliationRepository->PayPalPayments($request);
     }
+
+    public function StripePayments(Request $request)
+    {
+        return $this->ConciliationRepository->StripePayments($request);
+    }    
 }
