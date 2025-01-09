@@ -367,7 +367,7 @@ class SpamRepository
                             WHERE fup.type = 'COMMENTS' AND fup.categories = 'SPAM'
                             GROUP BY fup.reservation_id
                         ) as comments_ ON comments_.reservation_id = rez.id
-                        WHERE rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND DATE(rit.op_one_pickup) = :filter_date AND rit.is_round_trip = 0 AND rit.op_one_status IN('PENDING','CONFIRMED')",  $search);
+                        WHERE rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND DATE(rit.op_one_pickup) = :filter_date AND rit.is_round_trip = 0 AND rit.op_one_status IN('PENDING','COMPLETED')",  $search);
 
         if($search):
             foreach($search as $key => $value):
