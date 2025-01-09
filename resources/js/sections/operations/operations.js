@@ -558,8 +558,10 @@ form.addEventListener('submit', function (event) {
 });
 
 //FUNCIONADA PARA EXTRACION DE INFORMACION DE DATOS PARA ENVIAR POR WHATSAPP
-$('#zero-config').on('click', '.extract_whatsapp', function() {
+$('#dataManagementOperations').on('click', '.extract_whatsapp', function() {
     // Obtener la fila en la que se encuentra el botón
+    console.log("hola");
+    
     var fila = $(this).closest('tr');
 
     // Extraer la información de las celdas de la fila
@@ -652,7 +654,7 @@ $('#zero-config').on('click', '.extract_whatsapp', function() {
 });
 
 //FUNCIONADA PARA EXTRACION DE INFORMACION DE DATOS DE CONFIRMACION PARA ENVIAR POR WHATSAPP
-$('#zero-config').on('click', '.extract_confirmation', function() {
+$('#dataManagementOperations').on('click', '.extract_confirmation', function() {
     const  __language = this.dataset.language;
     const  __terminal1 = document.getElementById('terminal1');
     const  __terminal2 = document.getElementById('terminal2');
@@ -1228,7 +1230,7 @@ document.addEventListener('keydown', resetTimer);
 resetTimer(); 
 
 window.addEventListener('scroll', function() {
-  let __table_private = document.getElementById('zero-config');
+  let __table_private = document.getElementById('dataManagementOperations');
 //   let __table_shared = document.getElementById('operation-shared');
 
   let __thead_private = __table_private.querySelector('thead');
