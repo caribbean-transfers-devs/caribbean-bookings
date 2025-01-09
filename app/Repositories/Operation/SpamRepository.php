@@ -349,9 +349,10 @@ class SpamRepository
         ];
 
         $search = DB::select("SELECT rez.id as rez_id, rit.id as rit_id, rit.code, CONCAT(rez.client_first_name, ' ', rez.client_last_name) as client_full_name, rez.client_phone, rit.spam, COALESCE(comments_.counter, 0) AS counter, comments_.last_date, comments_.last_user,
-        rit.from_name, rit.to_name
+        rit.from_name, rit.to_name, two_zone.is_primary
                             FROM reservations_items as rit
                         INNER JOIN reservations as rez ON rez.id = rit.reservation_id
+                        INNER JOIN zones as two_zone ON two_zone.id = rit.to_zone
                         LEFT JOIN (
                             SELECT fup.reservation_id as reservation_id, count(*) as counter,  MAX(fup.created_at) AS last_date,
                                     (SELECT usr.name
@@ -367,7 +368,8 @@ class SpamRepository
                             WHERE fup.type = 'COMMENTS' AND fup.categories = 'SPAM'
                             GROUP BY fup.reservation_id
                         ) as comments_ ON comments_.reservation_id = rez.id
-                        WHERE rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND DATE(rit.op_one_pickup) = :filter_date AND rit.is_round_trip = 0 AND rit.op_one_status IN('PENDING','COMPLETED')",  $search);
+                        WHERE rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND DATE(rit.op_one_pickup) = :filter_date AND rit.is_round_trip = 0 AND rit.op_one_status IN('PENDING','COMPLETED')
+                        HAVING is_primary = 0",  $search);
 
         if($search):
             foreach($search as $key => $value):
@@ -520,7 +522,7 @@ class SpamRepository
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         
     }
