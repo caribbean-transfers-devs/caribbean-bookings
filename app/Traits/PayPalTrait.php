@@ -12,7 +12,7 @@ trait PayPalTrait
     private $clientSecret;
     private $apiUrl;
 
-    public function __construct()
+    public function initPayPal()
     {
         $this->clientId = config('services.paypal.clientID');
         $this->clientSecret = config('services.paypal.secretKey');

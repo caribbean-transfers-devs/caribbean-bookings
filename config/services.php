@@ -50,8 +50,10 @@ return [
     ],
     'stripe' => [
         'apiUrl' => env('STRIPE_API_URL'),
-        'clientID' => env('STRIPE_CLIENT'),
-        'secretKey' => env('STRIPE_SECRET'),
+        'clientIDSecondary' => env('STRIPE_CLIENT_ACCOUNT_SECONDARY'),
+        'secretKeySecondary' => env('STRIPE_SECRET_ACCOUNT_SECONDARY'),
+        'clientIDPrimary' => env('STRIPE_CLIENT_ACCOUNT_PRIMARY'),
+        'secretKeyPrimary' => env('STRIPE_SECRET_ACCOUNT_PRIMARY'),        
     ],    
     'digital_ocean' => [
         'key' => env('DO_SPACES_KEY'),
