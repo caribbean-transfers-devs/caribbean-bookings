@@ -14,6 +14,8 @@ use App\Http\Controllers\Payments\PaymentsController;
 
 use App\Http\Controllers\Reports\ReportsController;
 use App\Http\Controllers\Management\ManagementController;
+use App\Http\Controllers\Operation\SpamController as SPAM;
+use App\Http\Controllers\Operation\PendingController as PENDING;
 use App\Http\Controllers\Reports\CashController as ReportCash;
 
 use App\Http\Controllers\Reservations\ReservationsController;
@@ -85,8 +87,16 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/operation/confirmation', [ManagementController::class, 'confirmation'])->name('operation.confirmation');
         Route::post('/operation/confirmation', [ManagementController::class, 'confirmation'])->name('operation.confirmation.search');
         //SPAM
-        Route::get('/operation/aftersales', [ManagementController::class, 'afterSales'])->name('operation.spam');
-        Route::post('/operation/aftersales', [ManagementController::class, 'afterSales'])->name('operation.spam.search');
+        //Route::get('/operation/aftersales', [ManagementController::class, 'afterSales'])->name('operation.spam');
+        //Route::post('/operation/aftersales', [ManagementController::class, 'afterSales'])->name('operation.spam.search');        
+        Route::match(['get', 'post'], '/after-sales', [ManagementController::class, 'afterSales'])->name('operation.after.sales');
+        Route::match(['post'], '/operation/spam/get', [SPAM::class, 'get'])->name('operation.spam.get');
+        Route::match(['post'], '/operation/spam/get/basic-information', [SPAM::class, 'getBasicInformation'])->name('operation.spam.get.basicInformation');
+        Route::match(['post'], '/operation/spam/history/get', [SPAM::class, 'getHistory'])->name('operation.spam.get.history');
+        Route::match(['post'], '/operation/spam/history/add', [SPAM::class, 'addHistory'])->name('operation.spam.add.history');
+
+        Route::match(['post'], '/operation/pending/get', [PENDING::class, 'get'])->name('operation.pending.get');
+        
 
         Route::put('/operation/confirmation/update-status', [OperationController::class, 'updateStatusConfirmation'])->name('operation.confirmation.update');
         Route::get('/operation/spam/exportExcel', [OperationController::class, 'exportExcel'])->name('operation.spam.exportExcel');
