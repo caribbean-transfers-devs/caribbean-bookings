@@ -194,7 +194,7 @@
                                     <td class="text-center">{{ $conciliation->payment_method }}</td>
                                     <td class="text-center">{{ $conciliation->description }}</td>
                                     <td class="text-center">{{ $conciliation->reference }}</td>
-                                    <td class="text-center">{{ number_format($conciliation->total, 2) }}</td>
+                                    <td class="text-center">{{ number_format(( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? $conciliation->total / $conciliation->exchange_rate : $conciliation->total ), 2) }}</td>
 
                                     <td class="text-center">{{ number_format($conciliation->payment_method == "PAYPAL"  ? $conciliation->total_fee : 0, 2) }}</td>
                                     <td class="text-center">{{ number_format($conciliation->payment_method == "PAYPAL"  ? $conciliation->total_net : 0, 2) }}</td>                                    

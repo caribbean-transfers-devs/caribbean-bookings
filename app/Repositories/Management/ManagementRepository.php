@@ -48,7 +48,8 @@ class ManagementRepository
         ]);
     }
 
-    public function afterSalesOLD($request){
+    public function afterSalesOLD($request)
+    {
         ini_set('memory_limit', '-1'); // Sin límite
         set_time_limit(120); // Aumenta el límite a 60 segundos
 
@@ -99,7 +100,16 @@ class ManagementRepository
         ]);        
     }
 
-    public function afterSales($request){
-        return view('management.after-sale', []);
+    public function afterSales($request)
+    {
+        return view('management.after-sale', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Gestion de post venta",
+                    "active" => true
+                ]
+            ],            
+        ]);
     }
 }

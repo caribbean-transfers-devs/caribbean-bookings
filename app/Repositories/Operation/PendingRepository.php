@@ -37,6 +37,9 @@ class PendingRepository
                                 rez.is_complete,
                                 rez.created_at,
                                 site.type_site AS type_site,
+                                us.name AS employee,
+                                usc.name AS employee_after_sale,
+                                usp.name AS employee_pull,                                
                                 site.name AS site_name,
                                 origin.code AS origin_code,
                                 tc.name_es AS cancellation_reason,
@@ -73,6 +76,9 @@ class PendingRepository
                                 END AS payment_status                                
                             FROM reservations as rez
                                 INNER JOIN sites as site ON site.id = rez.site_id
+                                LEFT OUTER JOIN users as us ON us.id = rez.call_center_agent_id
+                                LEFT OUTER JOIN users as usc ON usc.id = rez.agent_id_after_sales
+                                LEFT OUTER JOIN users as usp ON usp.id = rez.agent_id_pull_sales
                                 LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
                                 LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
                                 LEFT JOIN (
@@ -130,10 +136,12 @@ class PendingRepository
                                         INNER JOIN reservations as rez ON rez.id = it.reservation_id
                                     GROUP BY it.reservation_id, it.is_round_trip
                                 ) as it ON it.reservation_id = rez.id
-                                WHERE 1=1 AND DATE(rez.created_at) = :date AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0
+                                WHERE 1=1  AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0
                             GROUP BY rez.id, site.type_site, site.name
-                                    HAVING payment_status = :status ORDER BY rez.created_at DESC;", ["date" => date("Y-m-d"), "status" => "PENDING"]);
+                                    HAVING payment_status = :status ORDER BY rez.created_at DESC;", ["status" => "PENDING"]);
 
-       return view('management.pending.view', [ "items" => $items ]);
+        // AND DATE(rez.created_at) = :date
+        // "date" => date("Y-m-d"), 
+        return view('management.pending.view', [ "items" => $items ]);
     }
 }

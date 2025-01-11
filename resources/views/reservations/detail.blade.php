@@ -666,6 +666,8 @@
     <x-modals.new_payment_reservation>
         <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
         <x-slot name="currency">{{ $reservation->currency }}</x-slot>
+        <x-slot name="type_site">{{ isset($request['bookingtracking']) ? $request['bookingtracking'] : '' }}</x-slot>
+        <x-slot name="platform">{{ isset($request['trackingType']) ? $request['trackingType'] : 'GENERAL' }}</x-slot>
     </x-modals.new_payment_reservation>
     <x-modals.new_follow_reservation>
         <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>

@@ -50,6 +50,17 @@ class PaymentRepository
 
             $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency, 'HISTORY', 'CREATE_PAYMENT');
 
+            if( isset($request->type_site) && !empty($request->type_site) ){
+                $reservation = Reservation::find($request->reservation_id);
+                if( $request->type_site == "CALLCENTER" ){
+                    $reservation->agent_id_after_sales = auth()->user()->id;
+                }else{
+                    $reservation->agent_id_pull_sales = auth()->user()->id;
+                }
+                $reservation->type_after_sales = ( $request->platform == "Bookign" ? "PENDING" : "SPAM" );
+                $reservation->save();
+            }
+
             DB::commit();
 
             // Payment created successfully
@@ -62,6 +73,7 @@ class PaymentRepository
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error al crear el pago, contacte a soporte',
+                // 'message' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

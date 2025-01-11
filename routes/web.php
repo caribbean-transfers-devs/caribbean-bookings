@@ -88,13 +88,13 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/operation/confirmation', [ManagementController::class, 'confirmation'])->name('operation.confirmation.search');
         //SPAM
         //Route::get('/operation/aftersales', [ManagementController::class, 'afterSales'])->name('operation.spam');
-        //Route::post('/operation/aftersales', [ManagementController::class, 'afterSales'])->name('operation.spam.search');        
+        //Route::post('/operation/aftersales', [ManagementController::class, 'afterSales'])->name('operation.spam.search');
+
         Route::match(['get', 'post'], '/after-sales', [ManagementController::class, 'afterSales'])->name('operation.after.sales');
         Route::match(['post'], '/operation/spam/get', [SPAM::class, 'get'])->name('operation.spam.get');
         Route::match(['post'], '/operation/spam/get/basic-information', [SPAM::class, 'getBasicInformation'])->name('operation.spam.get.basicInformation');
         Route::match(['post'], '/operation/spam/history/get', [SPAM::class, 'getHistory'])->name('operation.spam.get.history');
         Route::match(['post'], '/operation/spam/history/add', [SPAM::class, 'addHistory'])->name('operation.spam.add.history');
-
         Route::match(['post'], '/operation/pending/get', [PENDING::class, 'get'])->name('operation.pending.get');
         
 

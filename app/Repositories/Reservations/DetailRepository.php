@@ -95,7 +95,8 @@ class DetailRepository
             'zones' => $zones,
             'types_cancellations' => $types_cancellations,
             'media' => $media,
-            'origins' => $this->Origins()
+            'origins' => $this->Origins(),
+            'request' => $request->input(),
         ]);
     }
 

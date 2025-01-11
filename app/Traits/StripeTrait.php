@@ -25,167 +25,70 @@ trait StripeTrait
         $this->clientSecretStripeS = config('services.stripe.secretKeySecondary');
         $this->clientIdStripeP = config('services.stripe.clientIDPrimary');
         $this->clientSecretStripeP = config('services.stripe.secretKeyPrimary');
-        
-        // \Stripe\Stripe::setApiKey(env('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'));
     }
 
-    /**
-     * Realiza una solicitud a la API de Stripe.
-     *
-     * @param string $endpoint
-     * @param string $method
-     * @param array $params
-     * @return array
-     */
-    public function stripeRequest($endpoint, $method = 'GET', $params = [])
-    {
-        try {
-            $response = Http::withToken($this->clientSecretStripe)->$method($this->apiUrlStripe . $endpoint, $params);
+    public function getBalanceInfo(){
 
-            // Validar si la solicitud fue exitosa
-            if ($response->successful()) {
-                return [
-                    'status' => 'success',
-                    'data' => $response->json(),
-                ];
-            }
-
-            // Manejar errores
-            return [
-                'status' => 'error',
-                'message' => $response->json('error.message'),
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ];
-        }
     }
-
-    // public function getPaymentInfo($paymentReference)
-    // {
-    //     try {    
-    //         // Realizar la solicitud a Stripe
-    //         // /{$paymentReference}
-    //         $response = Http::withToken($this->clientSecretStripeS)
-    //                     ->get($this->apiUrlStripe . "/v1/payment_intents/{$paymentReference}");
-    
-    //         // Verificar si la respuesta es exitosa
-    //         if ($response->successful()) {
-    //             $data = $response->json();
-    
-    //             return response()->json([
-    //                 'status' => 'success',
-    //                 'payment_id' => $data['id'],
-    //                 'amount' => $data['amount'] / 100, // Stripe usa centavos
-    //                 'currency' => $data['currency'],
-    //                 'status' => $data['status'],
-    //                 'metadata' => $data['metadata'],
-    //             ]);
-    //         } else {
-    //             return response()->json([
-    //                 'status' => 'error',
-    //                 'message' => $response->json('error.message'),
-    //             ], $response->status());
-    //         }
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
-    // public function getPaymentInfo($paymentReference)
-    // {
-    //     try {
-    //         // Recuperar información del PaymentIntent
-    //         // $paymentIntent = PaymentIntent::retrieve($paymentReference);
-    //         $stripeSecret = env('STRIPE_SECRET_ACCOUNT_SECONDARY');
-
-    //         // Realizar la solicitud a Stripe
-    //         $response = Http::withToken($stripeSecret)->get("https://api.stripe.com/v1/payment_intents/{$paymentReference}");
-  
-    //         // // Retornar información útil
-    //         // return response()->json([
-    //         //     'status' => 'success',
-    //         //     'payment_id' => $paymentIntent->id,
-    //         //     'amount' => $paymentIntent->amount / 100, // Stripe usa centavos
-    //         //     'currency' => $paymentIntent->currency,
-    //         //     'status' => $paymentIntent->status,
-    //         //     'metadata' => $paymentIntent->metadata, // Información adicional (opcional)
-    //         // ]);
-
-    //         // Verificar si la respuesta es exitosa
-    //         if ($response->successful()) {
-    //             $data = $response->json();
-
-    //             return response()->json([
-    //                 'status' => 'success',
-    //                 'payment_id' => $data['id'],
-    //                 'amount' => $data['amount'] / 100, // Stripe usa centavos
-    //                 'currency' => $data['currency'],
-    //                 'status' => $data['status'],
-    //                 'metadata' => $data['metadata'],
-    //             ]);
-    //         } else {
-    //             return response()->json([
-    //                 'status' => 'error',
-    //                 'message' => $response->json('error.message'),
-    //             ], $response->status());
-    //         }            
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => $e->getMessage(),
-    //         ], 400);
-    //     }
-    // }
 
     public function getPaymentInfo($paymentReference)
     {
-        $stripeSecret = env('STRIPE_SECRET_ACCOUNT_SECONDARY');
+        try {    
+            // Realizar la solicitud a Stripe
+            $response = Http::withToken($this->clientSecretStripeS)
+                        ->get($this->apiUrlStripe . "/v1/payment_intents/{$paymentReference}");
     
-        // Configurar el curl
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://api.stripe.com/v1/payment_intents/{$paymentReference}");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Authorization: Bearer $stripeSecret",
-        ]);
+            // Verificar si la respuesta es exitosa
+            if ($response->successful()) {
+                $data = $response->json();                
+
+                echo "Monto Cobrado: " . $charge->amount . "\n";
+                echo "Tarifa de Stripe: " . $balanceTransaction->fee . "\n";
+                echo "Total a Recibir: " . $balanceTransaction->net . "\n";
+
+
+                if ($charge->status === 'succeeded') {
+                    echo "El cargo fue aprobado.\n";
+                } else {
+                    echo "El cargo no fue aprobado.\n";
+                }
+
+                $refunds = $data->refunds->data;
+                if (count($refunds) > 0) {
+                    echo "Reembolsos realizados:\n";
+                
+                    foreach ($refunds as $refund) {
+                        echo "- Reembolso ID: " . $refund->id . ", Monto: " . $refund->amount . "\n";
+                
+                        // Obtener el balance del reembolso
+                        $refundTransaction = \Stripe\BalanceTransaction::retrieve($refund->balance_transaction);
+                        echo "  Impacto del reembolso en balance: " . $refundTransaction->amount . "\n";
+                        echo "  Tarifas asociadas al reembolso: " . $refundTransaction->fee . "\n";
+                        echo "  Total neto del reembolso: " . $refundTransaction->net . "\n";
+                    }
+                } else {
+                    echo "No hay reembolsos asociados a este cargo.\n";
+                }                
     
-        // Ejecutar la solicitud
-        $response = curl_exec($ch);
-    
-        // Manejo de errores
-        if (curl_errno($ch)) {
+                return response()->json([
+                    'status' => 'success',
+                    'payment_id' => $data['id'],
+                    'amount' => $data['amount'] / 100, // Stripe usa centavos
+                    'currency' => $data['currency'],
+                    'status' => $data['status'],
+                    'metadata' => $data['metadata'],
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $response->json('error.message'),
+                ], $response->status());
+            }
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => curl_error($ch),
+                'message' => $e->getMessage(),
             ], 500);
         }
-    
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-    
-        // Procesar la respuesta
-        $data = json_decode($response, true);
-    
-        if ($httpCode == 200) {
-            return response()->json([
-                'status' => 'success',
-                'payment_id' => $data['id'],
-                'amount' => $data['amount'] / 100,
-                'currency' => $data['currency'],
-                'status' => $data['status'],
-                'metadata' => $data['metadata'],
-            ]);
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => $data['error']['message'] ?? 'An error occurred',
-            ], $httpCode);
-        }
-    }    
+    }  
 }

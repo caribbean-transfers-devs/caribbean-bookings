@@ -4,6 +4,7 @@
         <thead>
             <tr>
                 <th scope="col">Código</th>
+                <th scope="col">Sitio</th>
                 <th class="" scope="col">Nombre</th>
                 <th class="" scope="col">Servicio</th>
                 <th class="" scope="col">Pax</th>
@@ -16,9 +17,21 @@
         <tbody>
             @if(sizeof($items) > 0)
                 @foreach($items as $key => $value)
-                    <tr>
+                    <tr class="{{ strtolower($value->type_site) }}">
                         <td>
-                            <a href="/reservations/detail/{{ $value->reservation_id }}" class="btn btn-outline-dark _effect--ripple waves-effect waves-light" style="width:100%;" target="_blank">{{ $value->reservation_codes }}</a>
+                            <a href="/reservations/detail/{{ $value->reservation_id }}/?trackingType=Bookign&bookingtracking={{ $value->type_site }}" class="btn btn-outline-dark _effect--ripple waves-effect waves-light" style="width:100%;" target="_blank">{{ $value->reservation_codes }}</a>
+                        </td>
+                        <td>
+                            <button class="btn btn-{{ $value->type_site == "CALLCENTER" ? 'primary' : 'secondary' }}">{{ $value->site_name }}</button>
+                            @if ( $value->type_site == "CALLCENTER" )
+                                @if ( !empty($value->employee_after_sale) )
+                                    {{ $value->employee_after_sale }}
+                                @endif
+                            @else
+                                @if ( !empty($value->employee_pull) )
+                                    {{ $value->employee_pull }}
+                                @endif
+                            @endif
                         </td>
                         <td>{{ $value->full_name }}</td>
                         <td class="text-center">{{ $value->service_type_name }}</td>

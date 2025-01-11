@@ -520,6 +520,7 @@ trait QueryTrait
                                         p.id as code_payment,
                                         p.payment_method,
                                         p.description,
+                                        p.exchange_rate,
                                         p.total,
                                         p.total_fee,
                                         p.total_net,

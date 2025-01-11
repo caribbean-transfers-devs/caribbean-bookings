@@ -45,6 +45,9 @@
                     </div>
                     <input type="hidden" name="reservation_id" value="{{ $reservation_id }}" id="reserv_id_pay">
                     <input type="hidden" name="operation" value="multiplication" id="operation_pay">
+
+                    <input type="hidden" name="type_site" value="{{ $type_site }}">
+                    <input type="hidden" name="platform" value="{{ $platform }}">
                 </form>
                 <input type="hidden" id="type_form_pay" value="1">
                 <input type="hidden" id="payment_id">
