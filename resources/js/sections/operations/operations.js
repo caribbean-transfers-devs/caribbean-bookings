@@ -1252,14 +1252,14 @@ document.addEventListener('keydown', resetTimer);
 resetTimer(); 
 
 window.addEventListener('scroll', function() {
-  let __table_private = document.getElementById('dataManagementOperations');
-//   let __table_shared = document.getElementById('operation-shared');
+  let __table_private = document.getElementById('dataManagementOperationsPrivate');
+  let __table_shared = document.getElementById('dataManagementOperationsShared');
 
   let __thead_private = __table_private.querySelector('thead');
   let __offset_private = __table_private.getBoundingClientRect().top;
 
-//   let __thead_shared = __table_shared.querySelector('thead');
-//   let __offset_shared = __table_shared.getBoundingClientRect().top;
+  let __thead_shared = __table_shared.querySelector('thead');
+  let __offset_shared = __table_shared.getBoundingClientRect().top;
 
   if (window.scrollY > __offset_private) {
     __thead_private.classList.add('fixed-header');
@@ -1267,11 +1267,11 @@ window.addEventListener('scroll', function() {
     __thead_private.classList.remove('fixed-header');
   }
 
-//   if (window.scrollY > __offset_shared) {
-//     __thead_shared.classList.add('fixed-header');
-//   } else {
-//     __thead_shared.classList.remove('fixed-header');
-//   }
+  if (window.scrollY > __offset_shared) {
+    __thead_shared.classList.add('fixed-header');
+  } else {
+    __thead_shared.classList.remove('fixed-header');
+  }
 });
 
 //BOTONES 
@@ -1339,7 +1339,8 @@ if( document.getElementById('btn_dowload_operation_comission') != null ){
     });
 }
 
-components.renderCheckboxColumns('dataManagementOperations', 'columns');
+components.renderCheckboxColumns('dataManagementOperationsPrivate', 'columns');
+components.renderCheckboxColumns('dataManagementOperationsShared', 'columns');
 
 //EVENTOS SOCKET IO, ESCUCHAN DE LADO DEL CLIENTE
 socket.on("addPreassignmentClient", function(data){

@@ -53,11 +53,16 @@ class OperationsController extends Controller
             "driver" => ( isset($request->driver) ? $request->driver : 0 ),
         ];
 
-        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
-        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
+        $queryOnePR = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND type_service = 'PRIVATE' ";
+        $queryTwoPR = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 AND type_service = 'PRIVATE' ";
+
+        $queryOneSH = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND type_service = 'SHARED' ";
+        $queryTwoSH = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 AND type_service = 'SHARED' ";
+
         // $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two  ";
         // $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four  AND it.is_round_trip = 1 ";
-        $havingConditions = []; $queryHaving = "";
+        $havingConditionsPR = []; $queryHavingPR = "";
+        $havingConditionsSH = []; $queryHavingSH = "";
         $queryData = [
             'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") )." 00:00:00",
             'end' => ( isset( $request->date ) ? $request->date : date("Y-m-d") )." 23:59:59"
@@ -66,44 +71,66 @@ class OperationsController extends Controller
         //SITIO
         if( isset($request->site) && !empty($request->site) ){
             $params = $this->parseArrayQuery($request->site);
-            $queryOne .= " AND site.id IN ($params) ";
-            $queryTwo .= " AND site.id IN ($params) ";
+            $queryOnePR .= " AND site.id IN ($params) ";
+            $queryTwoPR .= " AND site.id IN ($params) ";
+
+            $queryOneSH .= " AND site.id IN ($params) ";
+            $queryTwoSH .= " AND site.id IN ($params) ";            
         }
 
         //ESTATUS DE RESERVACIÓN
         if(isset( $request->reservation_status ) && !empty( $request->reservation_status )){
             $params = $this->parseArrayQuery($request->reservation_status,"single");
-            $havingConditions[] = " reservation_status IN (".$params.") ";
+            $havingConditionsPR[] = " reservation_status IN (".$params.") ";
+            $havingConditionsSH[] = " reservation_status IN (".$params.") ";
         }
 
         //UNIDAD ASIGNADA AL SERVICIO
         if( isset($request->unit) && !empty($request->unit) ){
             $params = $this->parseArrayQuery($request->unit);
-            $queryOne .= " AND it.vehicle_id_one IN ($params) ";
-            $queryTwo .= " AND it.vehicle_id_two IN ($params) ";            
+            $queryOnePR .= " AND it.vehicle_id_one IN ($params) ";
+            $queryTwoPR .= " AND it.vehicle_id_two IN ($params) ";
+
+            $queryOneSH .= " AND it.vehicle_id_one IN ($params) ";
+            $queryTwoSH .= " AND it.vehicle_id_two IN ($params) ";
         }
 
         //CONDUCTOR ASIGNADO AL SERVICIO
         if( isset($request->driver) && !empty($request->driver) ){
             $params = $this->parseArrayQuery($request->driver);
-            $queryOne .= " AND it.driver_id_one IN ($params) ";
-            $queryTwo .= " AND it.driver_id_two IN ($params) ";            
+            $queryOnePR .= " AND it.driver_id_one IN ($params) ";
+            $queryTwoPR .= " AND it.driver_id_two IN ($params) ";
+
+            $queryOneSH .= " AND it.driver_id_one IN ($params) ";
+            $queryTwoSH .= " AND it.driver_id_two IN ($params) ";            
         }
 
-        $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
+        $items_private = $this->queryOperations($queryOnePR, $queryTwoPR, $queryHavingPR, $queryData);
+        $items_shared = $this->queryOperations($queryOneSH, $queryTwoSH, $queryHavingSH, $queryData);
         
-        $not_preassigned = [];
-        $preassigned = [];        
-        foreach ($items as $item) {
-            if( !OperationTrait::validatePreassignment($item) ){
-                $not_preassigned[] = $item;
+        $not_preassigned_private = [];
+        $preassigned_private = [];
+        $not_preassigned_shared = [];
+        $preassigned_shared = [];
+
+        foreach ($items_private as $private) {
+            if( !OperationTrait::validatePreassignment($private) ){
+                $not_preassigned_private[] = $private;
             }else{
-                $preassigned[] = $item;
+                $preassigned_private[] = $private;
             }
         }
 
+        foreach ($items_shared as $shared) {
+            if( !OperationTrait::validatePreassignment($shared) ){
+                $not_preassigned_shared[] = $shared;
+            }else{
+                $preassigned_shared[] = $shared;
+            }
+        }        
+
         // Ordenamos los preasignados por hora en orden ascendente
-        usort($preassigned, function ($a, $b) {
+        usort($preassigned_private, function ($a, $b) {
             // Validamos la hora según el tipo
             $timeA = ($a->op_type === "TYPE_ONE") ? $a->pickup_from : $a->pickup_to;
             $timeB = ($b->op_type === "TYPE_ONE") ? $b->pickup_from : $b->pickup_to;
@@ -111,11 +138,21 @@ class OperationsController extends Controller
             // Comparación de tiempos
             return strtotime($timeA) <=> strtotime($timeB);
         });
+        usort($preassigned_shared, function ($a, $b) {
+            // Validamos la hora según el tipo
+            $timeA = ($a->op_type === "TYPE_ONE") ? $a->pickup_from : $a->pickup_to;
+            $timeB = ($b->op_type === "TYPE_ONE") ? $b->pickup_from : $b->pickup_to;
 
-        $sorted_reservations = array_merge($not_preassigned, $preassigned);
+            // Comparación de tiempos
+            return strtotime($timeA) <=> strtotime($timeB);
+        });        
+
+        $sorted_reservations_private = array_merge($not_preassigned_private, $preassigned_private);
+        $sorted_reservations_shared = array_merge($not_preassigned_shared, $preassigned_shared);
 
         return view('operation.operations', [
-            'items' => $sorted_reservations,
+            'privates' => $sorted_reservations_private,
+            'shareds' => $sorted_reservations_shared,
             'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ),
             'nexDate' => date('Y-m-d', strtotime($request->date . ' +1 day')),
             'breadcrumbs' => [
@@ -668,7 +705,7 @@ class OperationsController extends Controller
             }
 
             //VALIDAMOS SI LA REFERENCIA YA EXISTE
-            // if( $request->type_service == "PRIVATE" ){
+            if( $request->type_service == "PRIVATE" ){
                 $duplicated_reservation = Reservation::where('reference', $request->reference)->count();
                 if( $duplicated_reservation ) {
                     return response()->json([
@@ -678,14 +715,14 @@ class OperationsController extends Controller
                         'message' => 'Ese folio ya ha sido registrado',
                     ], Response::HTTP_BAD_REQUEST); 
                 }
-            // }
+            }
 
-            // if( $request->type_service == "SHARED" ){
-            //     $duplicated_reservation = Reservation::where('reference', $request->reference)->first();
-            //     if( $duplicated_reservation != NULL ){
-            //         $reservation = $duplicated_reservation;
-            //     }
-            // }
+            if( $request->type_service == "SHARED" ){
+                $duplicated_reservation = Reservation::where('reference', $request->reference)->first();
+                if( $duplicated_reservation != NULL ){
+                    $reservation = $duplicated_reservation;
+                }
+            }
 
             //FORMATEAMOS LA FECHA DEL SERVICIO PARA PODER VER SI ACTUALIZAREMOS LA TABLA
             // Crear una instancia de DateTime a partir de la cadena de fecha y hora
@@ -719,7 +756,7 @@ class OperationsController extends Controller
             }
 
             // Creando reservación
-            //if( ($request->type_service == "PRIVATE") || ($request->type_service == "SHARED" && $duplicated_reservation == NULL) ){
+            if( ($request->type_service == "PRIVATE") || ($request->type_service == "SHARED" && $duplicated_reservation == NULL) ){
                 $reservation = new Reservation;
                 $reservation->client_first_name = $request->client_first_name;
                 $reservation->client_last_name = $request->client_last_name;
@@ -742,15 +779,15 @@ class OperationsController extends Controller
 
                 // Creando follow_up
                 $this->create_followUps($reservation->id, 'SE CAPTURÓ LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES', 'HISTORY', auth()->user()->name);
-            //}
+            }
 
             $item = new ReservationsItem();
             $item->reservation_id = $reservation->id;
             $item->code = $this->generateCode();
-            // if( $request->type_service == "SHARED" ){
-            //     $item->client_first_name = $request->client_first_name;
-            //     $item->client_last_name = $request->client_last_name;
-            // }
+            if( $request->type_service == "SHARED" ){
+                $item->client_first_name2 = $request->client_first_name;
+                $item->client_last_name2 = $request->client_last_name;
+            }
             $item->destination_service_id = $request->destination_service_id;
             $item->from_name = $request->from_name ? $request->from_name : $from_zone->name;
             $item->from_lat = $from_lat;
@@ -767,6 +804,7 @@ class OperationsController extends Controller
             $item->op_one_status = 'PENDING';
             $item->op_one_pickup = $request->departure_date;
             $item->op_two_status = 'PENDING';
+            $item->type_service = $request->type_service;
             if( isset($request->is_open) && $request->is_open == 1 ){
                 $item->is_open = $request->is_open;
                 $item->open_service_time = $request->open_service_time;
@@ -805,6 +843,7 @@ class OperationsController extends Controller
                     'message' => $e->getMessage()
                 ],
                 'message' => 'Internal Server'
+                // 'message' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
