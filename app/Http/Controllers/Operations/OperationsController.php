@@ -629,7 +629,7 @@ class OperationsController extends Controller
         try {
             DB::beginTransaction();
 
-            $validator = Validator::make($request->all(), [
+            $errors = [
                 'reference' => 'required|string|max:255',
                 'site_id' => 'required|integer|exists:sites,id',
                 'language' => 'required|in:en,es',
@@ -649,7 +649,13 @@ class OperationsController extends Controller
 
                 'sold_in_currency' => 'required|in:MXN,USD',
                 'total' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
-            ]);
+            ];
+
+            if( isset($request->is_open) && $request->is_open == 1 ){
+                $errors['open_service_time'] = 'required|numeric';
+            }
+
+            $validator = Validator::make($request->all(), $errors);
 
             if ($validator->fails()) {
                 return response()->json([
@@ -761,6 +767,10 @@ class OperationsController extends Controller
             $item->op_one_status = 'PENDING';
             $item->op_one_pickup = $request->departure_date;
             $item->op_two_status = 'PENDING';
+            if( isset($request->is_open) && $request->is_open == 1 ){
+                $item->is_open = $request->is_open;
+                $item->open_service_time = $request->open_service_time;
+            }
             $item->created_at = Carbon::now();
             $item->updated_at = Carbon::now();
             $item->save();

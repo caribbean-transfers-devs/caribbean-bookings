@@ -222,6 +222,8 @@ trait QueryTrait
                                 it.op_two_comments,
                                 it.vehicle_id_two,
                                 it.driver_id_two,
+                                it.is_open,
+                                it.open_service_time,
 
                                 CASE 
                                     WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
@@ -397,6 +399,8 @@ trait QueryTrait
                                 it.op_two_comments,
                                 it.vehicle_id_two,
                                 it.driver_id_two,
+                                it.is_open,
+                                it.open_service_time,
 
                                 CASE
                                     WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'

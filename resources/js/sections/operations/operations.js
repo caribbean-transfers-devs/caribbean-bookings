@@ -410,6 +410,8 @@ const __copy_data_customer = document.querySelector('.copy_data_customer');
 const __copy_confirmation = document.querySelector('.copy_confirmation'); //* ===== BUTTON TO COPY CONFIRMATION CONTENT ===== */
 const __send_confirmation_whatsapp = document.querySelector('.send_confirmation_whatsapp'); //* ===== BUTTON TO COPY CONFIRMATION CONTENT ===== */
 
+const __is_open = document.getElementById('is_open');
+
 //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
 const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhost:4000': 'https://socket-caribbean-transfers.up.railway.app' );
 console.log(socket);
@@ -526,8 +528,7 @@ form.addEventListener('submit', function (event) {
 
     $('#sold_in_currency').prop('disabled', false);
     $('#total').prop('disabled', false);
-
-    let _params = components.serialize(this,'object');
+    let _params = components.serialize(this,'object');    
 
     $.ajax({
         type: "POST", // Método HTTP de la solicitud
@@ -688,6 +689,27 @@ $('#dataManagementOperations').on('click', '.extract_confirmation', function() {
 //       $("#operationModal").modal('show');
 //   });
 // }
+
+if( __is_open != null ){
+    __is_open.addEventListener('change', function(){
+        const _checkbox_box = document.querySelector('.checkbox_box');
+        const _checkbox_time = document.querySelector('.checkbox_time');
+        const _open_service_time = document.getElementById('open_service_time');
+        if (this.checked) {
+            this.value = 1;
+            _checkbox_box.classList.remove('col-lg-12');
+            _checkbox_box.classList.add('col-lg-6');
+            _checkbox_time.classList.remove('d-none');
+            _open_service_time.setAttribute('name','open_service_time');
+        } else {
+            this.value = 0;
+            _checkbox_box.classList.remove('col-lg-6');
+            _checkbox_box.classList.add('col-lg-12');
+            _checkbox_time.classList.add('d-none');
+            _open_service_time.removeAttribute('name');
+        }
+    });
+}
 
 if( __btn_preassignment != null ){
   __btn_preassignment.addEventListener('click', function() {
