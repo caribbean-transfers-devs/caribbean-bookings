@@ -97,6 +97,7 @@ class DetailRepository
             'media' => $media,
             'origins' => $this->Origins(),
             'request' => $request->input(),
+            'data_user' => auth()->user()
         ]);
     }
 

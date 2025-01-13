@@ -50,7 +50,11 @@ class PaymentRepository
 
             $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency, 'HISTORY', 'CREATE_PAYMENT');
 
-            if( isset($request->type_site) && !empty($request->type_site) ){
+            //AQUI REGISTRAMOS EL PAGO, PARA SABER SI UN AGENTE O SUPERVISOR DE CALLCENTER LE ESTA DANDO SEGUIMIENTO, LO HACEMOS MEDIANTE EL ROL
+            // 3 Gerente - Call Center
+            // 4 Agente - Call Center
+            $roles = session()->get('roles');
+            if( isset($request->type_site) && !empty($request->type_site) && ( in_array(3, $roles['roles']) || in_array(4, $roles['roles']) ) ){
                 $reservation = Reservation::find($request->reservation_id);
                 if( $request->type_site == "CALLCENTER" ){
                     $reservation->agent_id_after_sales = auth()->user()->id;

@@ -54,7 +54,6 @@ Route::group(['middleware' => ['auth']], function () {
     //BOTS 
     Route::get('/bot/conciliation/paypal', [ConciliationController::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
     Route::get('/bot/conciliation/stripe', [ConciliationController::class, 'StripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
-
     
 
     //REPORTES

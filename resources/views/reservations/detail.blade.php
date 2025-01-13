@@ -34,6 +34,7 @@
 @endpush
 
 @section('content')
+    {{-- @dump($reservation); --}}
     <div class="row layout-top-spacing">
         <div class="col-xxl-3 col-xl-4 col-12">
             <div class="card">
@@ -666,8 +667,8 @@
     <x-modals.new_payment_reservation>
         <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
         <x-slot name="currency">{{ $reservation->currency }}</x-slot>
-        <x-slot name="type_site">{{ isset($request['bookingtracking']) ? $request['bookingtracking'] : '' }}</x-slot>
-        <x-slot name="platform">{{ isset($request['trackingType']) ? $request['trackingType'] : 'GENERAL' }}</x-slot>
+        <x-slot name="type_site">{{ isset($request['bookingtracking']) ? $request['bookingtracking'] : $reservation->site->type_site }}</x-slot>
+        <x-slot name="platform">{{ isset($request['trackingType']) ? $request['trackingType'] : ( $data['status'] == "PENDING" ? 'Bookign' : 'GENERAL' ) }}</x-slot>
     </x-modals.new_payment_reservation>
     <x-modals.new_follow_reservation>
         <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
