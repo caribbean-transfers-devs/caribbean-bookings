@@ -1,0 +1,59 @@
+{
+    "id": "5DP16118HX894130P",
+    "amount": {
+        "currency_code": "USD",
+        "value": "101.00"
+    },
+    "final_capture": true,
+    "seller_protection": {
+        "status": "ELIGIBLE",
+        "dispute_categories": [
+            "ITEM_NOT_RECEIVED",
+            "UNAUTHORIZED_TRANSACTION"
+        ]
+    },
+    "seller_receivable_breakdown": {
+        "gross_amount": {
+            "currency_code": "USD",
+            "value": "101.00"
+        },
+        "paypal_fee": {
+            "currency_code": "USD",
+            "value": "4.45"
+        },
+        "net_amount": {
+            "currency_code": "USD",
+            "value": "96.55"
+        }
+    },
+    "invoice_id": "43873",
+    "status": "COMPLETED",
+    "supplementary_data": {
+        "related_ids": {
+            "order_id": "8KL5937484750645X"
+        }
+    },
+    "payee": {
+        "email_address": "rivieramayataxi@gmail.com",
+        "merchant_id": "FEUB9DWMNTV6L"
+    },
+    "create_time": "2025-01-01T14:05:04Z",
+    "update_time": "2025-01-01T14:05:04Z",
+    "links": [
+        {
+            "href": "https://api.paypal.com/v2/payments/captures/5DP16118HX894130P",
+            "rel": "self",
+            "method": "GET"
+        },
+        {
+            "href": "https://api.paypal.com/v2/payments/captures/5DP16118HX894130P/refund",
+            "rel": "refund",
+            "method": "POST"
+        },
+        {
+            "href": "https://api.paypal.com/v2/checkout/orders/8KL5937484750645X",
+            "rel": "up",
+            "method": "GET"
+        }
+    ]
+}

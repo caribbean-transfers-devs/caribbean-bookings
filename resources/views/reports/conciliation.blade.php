@@ -63,9 +63,23 @@
                     'data-bs-target' => '#filterModal'
                 )
             ),
+            // array(  
+            //     'text' => '<button id="btndefault" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div class="dropdown-menu" aria-labelledby="btndefault"><a href="javascript:void(0);" class="dropdown-item __btn_conciliation_paypal"><i class="flaticon-home-fill-1 mr-1"></i>Conciliar PayPal</a><a href="javascript:void(0);" class="dropdown-item __btn_conciliation_stripe"><i class="flaticon-home-fill-1 mr-1"></i>Conciliar Stripe</a></div>',
+            //     'className' => 'btn-group',
+            //     'attr' => array(
+            //         'role' => "group"
+            //     )
+            // ),
+            // array(
+            //     'text' => '<div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">Acciones</button><ul class="dropdown-menu" aria-labelledby="dropdownMenuButton"><li><a class="dropdown-item" href="#">Opción 1</a></li><li><a class="dropdown-item" href="#">Opción 2</a></li><li><a class="dropdown-item" href="#">Opción 3</a></li></ul></div>',
+            // ),            
             array(  
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Conciliar PayPal',
                 'className' => 'btn btn-primary __btn_conciliation_paypal',
+            ),
+            array(  
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Conciliar Stripe',
+                'className' => 'btn btn-primary __btn_conciliation_stripe',
             ),
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
@@ -122,7 +136,9 @@
                         <tr>
                             <th class="text-center">ID</th>
                             <th class="text-center">METODO DE PAGO</th>
-                            <th class="text-center">DESCRIPCIÓN DEL PAGO</th>
+                            <th class="text-center">CONCILIADO</th>
+                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>
+                            {{-- <th class="text-center">DESCRIPCIÓN DEL PAGO</th> --}}
                             <th class="text-center">REFERENCIA</th>
                             <th class="text-center">TOTAL DE PAGO</th>
                             <th class="text-center">TOTAL DE COMISIÓN</th>
@@ -132,13 +148,10 @@
                             <th class="text-center">FECHA DE PAGO</th>
                             <th class="text-center">FECHA EN QUE SE RECIBIO EL PAGO</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
-                            <th class="text-center">MONEDA DE RESERVACIÓN</th>
-                            <th class="text-center">CONCILIADO</th>
+                            <th class="text-center">MONEDA DE RESERVACIÓN</th>                            
                             <th class="text-center">NOMBRE DEL CLIENTE</th>
                             <th class="text-center">TELÉFONO DEL CLIENTE</th>
                             <th class="text-center">CORREO DEL CLIENTE</th>
-                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>                            
-
                         </tr>
                     </thead>
                     <tbody>
@@ -167,22 +180,22 @@
                                                 "quantity" => 0,
                                             ];
                                         }
-                                        $conciliationPayments['total'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total * $exchange) : $conciliation->total );
-                                        $conciliationPayments['total_taxes'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_fee * $exchange) : $conciliation->total_fee );
-                                        $conciliationPayments['total_received'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_net * $exchange) : $conciliation->total_net );
+                                        $conciliationPayments['total'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total * $exchange) : ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total / $conciliation->exchange_rate ) * $exchange) : $conciliation->total ) );
+                                        $conciliationPayments['total_taxes'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_fee * $exchange) : ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total_fee / $conciliation->exchange_rate ) * $exchange) : $conciliation->total_fee ) );
+                                        $conciliationPayments['total_received'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_net * $exchange) : ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total_net / $conciliation->exchange_rate ) * $exchange) : $conciliation->total_net ) );
 
-                                        $conciliationPayments[$conciliation->currency_payment]['total'] += $conciliation->total;
-                                        $conciliationPayments[$conciliation->currency_payment]['total_taxes'] += $conciliation->total_fee;
-                                        $conciliationPayments[$conciliation->currency_payment]['total_received'] += $conciliation->total_net;
+                                        $conciliationPayments[$conciliation->currency_payment]['total'] += ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total / $conciliation->exchange_rate ) * $exchange) : $conciliation->total );
+                                        $conciliationPayments[$conciliation->currency_payment]['total_taxes'] += ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total_fee / $conciliation->exchange_rate ) * $exchange) : $conciliation->total_fee );
+                                        $conciliationPayments[$conciliation->currency_payment]['total_received'] += ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total_net / $conciliation->exchange_rate ) * $exchange) : $conciliation->total_net );
                                         $conciliationPayments[$conciliation->currency_payment]['quantity']++;
 
-                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['total'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total * $exchange) : $conciliation->total );
-                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['total_taxes'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_fee * $exchange) : $conciliation->total_fee );
-                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['total_received'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_net * $exchange) : $conciliation->total_net );
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['total'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total * $exchange) : ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total / $conciliation->exchange_rate ) * $exchange) : $conciliation->total ) );
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['total_taxes'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_fee * $exchange) : ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total_fee / $conciliation->exchange_rate ) * $exchange) : $conciliation->total_fee ) );
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['total_received'] += ( $conciliation->currency_payment == "USD" ? ($conciliation->total_net * $exchange) : ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total_net / $conciliation->exchange_rate ) * $exchange) : $conciliation->total_net ) );
 
-                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['total'] += $conciliation->total;
-                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['total_taxes'] += $conciliation->total_fee;
-                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['total_received'] += $conciliation->total_net;
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['total'] += ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total / $conciliation->exchange_rate ) * $exchange) : $conciliation->total );
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['total_taxes'] += ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total_fee / $conciliation->exchange_rate ) * $exchange) : $conciliation->total_fee );
+                                        $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['total_received'] += ( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? (( $conciliation->total_net / $conciliation->exchange_rate ) * $exchange) : $conciliation->total_net );
                                         $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))][$conciliation->currency_payment]['quantity']++;
 
                                         $conciliationPayments['data'][strtoupper(Str::slug($conciliation->payment_method))]['quantity']++;
@@ -191,13 +204,20 @@
                                 @endphp
                                 <tr>
                                     <td class="text-center">{{ $conciliation->reservation_id }}</td>
-                                    <td class="text-center">{{ $conciliation->payment_method }}</td>
-                                    <td class="text-center">{{ $conciliation->description }}</td>
+                                    <td class="text-center">
+                                        {{ $conciliation->payment_method }}
+                                        @if ( $conciliation->is_refund == 1 )
+                                        <button class="btn btn-success" type="button">Tiene reembolso</button>
+                                        @endif
+                                    </td>
+                                    <td class="text-center"><button class="btn btn-{{ $conciliation->is_conciliated == 1 ? 'success' : 'danger' }} __btn_conciliation bs-tooltip" data-reservation="{{ $conciliation->reservation_id }}" data-payment="{{ $conciliation->code_payment }}" data-currency="{{ $conciliation->currency_payment }}" title="{{ $conciliation->is_conciliated == 1 ? 'Click para ver la conciliación' : 'click para conciliar el pago' }}">{{ $conciliation->is_conciliated == 1 ? 'SÍ' : 'NO' }}</button></td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($conciliation->reservation_status) }}">{{ BookingTrait::statusBooking($conciliation->reservation_status) }}</button></td>
+                                    {{-- <td class="text-center">{{ $conciliation->description }}</td> --}}
                                     <td class="text-center">{{ $conciliation->reference }}</td>
                                     <td class="text-center">{{ number_format(( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? $conciliation->total / $conciliation->exchange_rate : $conciliation->total ), 2) }}</td>
 
-                                    <td class="text-center">{{ number_format($conciliation->payment_method == "PAYPAL"  ? $conciliation->total_fee : 0, 2) }}</td>
-                                    <td class="text-center">{{ number_format($conciliation->payment_method == "PAYPAL"  ? $conciliation->total_net : 0, 2) }}</td>                                    
+                                    <td class="text-center">{{ number_format(( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? $conciliation->total_fee / $conciliation->exchange_rate : $conciliation->total_fee ), 2) }}</td>
+                                    <td class="text-center">{{ number_format(( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? $conciliation->total_net / $conciliation->exchange_rate : $conciliation->total_net ), 2) }}</td>
 
                                     <td class="text-center">{{ $conciliation->currency_payment }}</td>
                                     <td class="text-center">{{ $conciliation->conciliation_comment }}</td>
@@ -210,12 +230,10 @@
                                         [{{ date("H:m", strtotime($conciliation->conciliation_payment)) }}]
                                     </td>                                    
                                     <td class="text-center">{{ number_format($conciliation->total_sales, 2) }}</td>
-                                    <td class="text-center">{{ $conciliation->currency }}</td>
-                                    <td class="text-center"><button class="btn btn-{{ $conciliation->is_conciliated == 1 ? 'success' : 'danger' }} __btn_conciliation bs-tooltip" data-reservation="{{ $conciliation->reservation_id }}" data-payment="{{ $conciliation->code_payment }}" data-currency="{{ $conciliation->currency_payment }}" title="{{ $conciliation->is_conciliated == 1 ? 'Click para ver la conciliación' : 'click para conciliar el pago' }}">{{ $conciliation->is_conciliated == 1 ? 'SÍ' : 'NO' }}</button></td>
+                                    <td class="text-center">{{ $conciliation->currency }}</td>                                    
                                     <td class="text-center">{{ $conciliation->full_name }}</td>
                                     <td class="text-center">{{ $conciliation->client_phone }}</td>
-                                    <td class="text-center">{{ $conciliation->client_email }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($conciliation->reservation_status) }}">{{ BookingTrait::statusBooking($conciliation->reservation_status) }}</button></td>
+                                    <td class="text-center">{{ $conciliation->client_email }}</td>                                    
                                 </tr>
                             @endforeach
                         @endif
@@ -258,11 +276,11 @@
                                             <tr>
                                                 <td>{{ $payment['name'] }}</td>
                                                 <td class="text-center">{{ $payment['quantity'] }}</td>
-                                                <td class="text-center">{{ $payment['total'] }}</td>
-                                                <td class="text-center">{{ $payment['total_taxes'] }}</td>
-                                                <td class="text-center">{{ $payment['total_received'] }}</td>
-                                                <td class="text-center">{{ $payment['USD']['total'] }}</td>
-                                                <td class="text-center">{{ $payment['MXN']['total'] }}</td>                                                
+                                                <td class="text-center">{{ number_format($payment['total'],2) }}</td>
+                                                <td class="text-center">{{ number_format($payment['total_taxes'],2) }}</td>
+                                                <td class="text-center">{{ number_format($payment['total_received'],2) }}</td>
+                                                <td class="text-center">{{ number_format($payment['USD']['total'],2) }}</td>
+                                                <td class="text-center">{{ number_format($payment['MXN']['total'],2) }}</td>                                                
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -270,11 +288,11 @@
                                         <tr>
                                             <th>TOTAL</th>
                                             <th class="text-center">{{ $conciliationPayments['quantity'] }}</th>
-                                            <th class="text-center">{{ $conciliationPayments['total'] }}</th>
-                                            <th class="text-center">{{ $conciliationPayments['total_taxes'] }}</th>
-                                            <th class="text-center">{{ $conciliationPayments['total_received'] }}</th>
-                                            <th class="text-center">{{ $conciliationPayments['USD']['total'] }}</th>
-                                            <th class="text-center">{{ $conciliationPayments['MXN']['total'] }}</th> 
+                                            <th class="text-center">{{ number_format($conciliationPayments['total'],2) }}</th>
+                                            <th class="text-center">{{ number_format($conciliationPayments['total_taxes'],2) }}</th>
+                                            <th class="text-center">{{ number_format($conciliationPayments['total_received'],2) }}</th>
+                                            <th class="text-center">{{ number_format($conciliationPayments['USD']['total'],2) }}</th>
+                                            <th class="text-center">{{ number_format($conciliationPayments['MXN']['total'],2) }}</th> 
                                         </tr>
                                     </tfoot>
                                 </table>

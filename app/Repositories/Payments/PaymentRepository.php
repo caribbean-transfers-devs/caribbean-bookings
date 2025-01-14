@@ -8,11 +8,14 @@ use App\Models\ReservationFollowUp;
 use App\Models\SalesType;
 use App\Models\User;
 use App\Models\UserRole;
-use App\Repositories\Reservations\ReservationsRepository;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+
+//REPOSITORY
+use App\Repositories\Reservations\ReservationsRepository;
+use App\Repositories\Accounting\ConciliationRepository;
 
 //TRAIS
 use App\Traits\FollowUpTrait;
@@ -50,7 +53,11 @@ class PaymentRepository
 
             $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency, 'HISTORY', 'CREATE_PAYMENT');
 
-            if( isset($request->type_site) && !empty($request->type_site) ){
+            //AQUI REGISTRAMOS EL PAGO, PARA SABER SI UN AGENTE O SUPERVISOR DE CALLCENTER LE ESTA DANDO SEGUIMIENTO, LO HACEMOS MEDIANTE EL ROL
+            // 3 Gerente - Call Center
+            // 4 Agente - Call Center
+            $roles = session()->get('roles');
+            if( isset($request->type_site) && !empty($request->type_site) && ( in_array(3, $roles['roles']) || in_array(4, $roles['roles']) ) ){
                 $reservation = Reservation::find($request->reservation_id);
                 if( $request->type_site == "CALLCENTER" ){
                     $reservation->agent_id_after_sales = auth()->user()->id;
@@ -110,19 +117,24 @@ class PaymentRepository
             $payment->reference = $request->reference;
 
             if( isset($request->is_conciliated) && $request->is_conciliated == 1 ){
-                $data_bank = ( $request->payment_method == "PAYPAL" ? $this->getPayment($request->reference) : array() );
-                $payment->is_conciliated = $request->is_conciliated;
+                $conciliation = new ConciliationRepository();
+                if( $request->payment_method == "PAYPAL" ){
+                    $conciliation->conciliationPayPalPayment($request, $payment);
+                }
 
-                ( $request->payment_method == "PAYPAL" && isset($data_bank->original['status']) && $data_bank->original['status'] ? $payment->date_conciliation = Carbon::parse($data_bank->original['create_time'])->format('Y-m-d H:i:s') : 0 );
+                if( $request->payment_method == "STRIPE" || $request->payment_method == "CARD" ){
+                    $conciliation->conciliationStripePayment($request, $payment);
+                }
 
-                $payment->total_fee = ( $request->payment_method == "PAYPAL" ? ( isset($data_bank->original['status']) && $data_bank->original['status'] ? $data_bank->original['seller_receivable_breakdown']['paypal_fee']['value'] : 0 ) : 0 );
-                $payment->total_net = ( $request->payment_method == "PAYPAL" ? ( isset($data_bank->original['status']) && $data_bank->original['status'] ? $data_bank->original['seller_receivable_breakdown']['net_amount']['value'] : 0 ) : $request->total );
-                $payment->conciliation_comment = $request->conciliation_comment;
+                if( $request->payment_method != "PAYPAL" && $request->payment_method != "STRIPE" && $request->payment_method != "CARD" ){
+                    $payment->is_conciliated = $request->is_conciliated;
+                    $payment->conciliation_comment = $request->conciliation_comment;
+                }
             };
 
             $payment->updated_at = date('Y-m-d H:m:s');
 
-            $payment->save();            
+            $payment->save();
 
             DB::commit();
 

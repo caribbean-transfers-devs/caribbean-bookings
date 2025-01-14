@@ -39,64 +39,110 @@ trait PayPalTrait
     }
 
     // Método para obtener una orden por su referencia
-    public function getOrder($orderId)
+    public function getOrderInfo($orderId)
     {
-        // Verifica si el token de acceso ya está en caché
-        $accessToken = cache('paypal_access_token') ?? $this->authenticate();
+        try {
+            // Verifica si el token de acceso ya está en caché
+            $accessToken = cache('paypal_access_token') ?? $this->authenticate();
 
-        // Realiza la solicitud para obtener la orden
-        $response = Http::withToken($accessToken)
-                    ->get($this->apiUrl . '/v2/checkout/orders/' . $orderId);
+            // Realiza la solicitud para obtener la orden
+            // Endpoint para obtener detalles de una orden por Referencia de transacción
+            $response = Http::withToken($accessToken)
+                            ->timeout(120) // Aumentar el timeout a 60 segundos
+                            // ->withOptions([
+                            //     'verify' => false, // Desactivar temporalmente la verificación SSL
+                            //     'debug' => true,   // Habilitar logs de depuración
+                            // ])            
+                            ->get($this->apiUrl . '/v2/checkout/orders/' . $orderId);
 
-        if ($response->successful()) {
-            return response()->json($response->json());
-        } else {
-            // Si el token expiró, vuelve a autenticarse y reintenta
-            if ($response->status() == 401) {
-                $accessToken = $this->authenticate();
-                $response = Http::withToken($accessToken)
-                    ->get($this->apiUrl . '/v2/checkout/orders/' . $orderId);
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                // Si el token expiró, vuelve a autenticarse y reintenta
+                if ($response->status() == 401) {
+                    $accessToken = $this->authenticate();
+                    $response = Http::withToken($accessToken)
+                                    ->timeout(120) // Aumentar el timeout a 60 segundos
+                                    // ->withOptions([
+                                    //     'verify' => false, // Desactivar temporalmente la verificación SSL
+                                    //     'debug' => true,   // Habilitar logs de depuración
+                                    // ])                    
+                                    ->get($this->apiUrl . '/v2/checkout/orders/' . $orderId);
 
-                if ($response->successful()) {
-                    return response()->json($response->json());
+                    if ($response->successful()) {
+                        return response()->json($response->json());
+                    } else {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => $response->json('error.message'),
+                        ], $response->status());
+                    }
                 }
+                return response()->json([
+                    'status' => 'error',
+                    'error' => 'Failed to retrieve order: ' . $response->body(),
+                    'message' => $response->json('error.message')
+                ], $response->status());
             }
-            return response()->json(['error' => 'Failed to retrieve order: ' . $response->body()], $response->status());
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 
     // Método para buscar un pago por referencia
-    public function getPayment($transactionId)
+    public function getPaymentInfo($paymentReference)
     {
-        $accessToken = cache('paypal_access_token') ?? $this->authenticate();
+        try {
+            // Verifica si el token de acceso ya está en caché
+            $accessToken = cache('paypal_access_token') ?? $this->authenticate();
 
-        // Endpoint para obtener detalles de un pago por ID de transacción
-        $response = Http::withToken($accessToken)
-                        ->timeout(120) // Aumentar el timeout a 60 segundos
-                        // ->withOptions([
-                        //     'verify' => false, // Desactivar temporalmente la verificación SSL
-                        //     'debug' => true,   // Habilitar logs de depuración
-                        // ])
-                        ->get($this->apiUrl . '/v2/payments/captures/' . $transactionId);
-
-        if ($response->successful()) {
-            return response()->json($response->json());
-        } else {
-            if ($response->status() == 401) {
-                $accessToken = $this->authenticate();
-                $response = Http::withToken($accessToken)
-                                ->timeout(120) // Aumentar el timeout a 60 segundos
-                                // ->withOptions([
-                                //     'verify' => false, // Desactivar temporalmente la verificación SSL
-                                //     'debug' => true,   // Habilitar logs de depuración
-                                // ])
-                                ->get($this->apiUrl . '/v2/payments/captures/' . $transactionId);
-
-                if ($response->successful()) {
-                    return response()->json($response->json());
+            // Realiza la solicitud para obtener el pago
+            // Endpoint para obtener detalles de un pago por ID de transacción
+            $response = Http::withToken($accessToken)
+                            ->timeout(120) // Aumentar el timeout a 60 segundos
+                            // ->withOptions([
+                            //     'verify' => false, // Desactivar temporalmente la verificación SSL
+                            //     'debug' => true,   // Habilitar logs de depuración
+                            // ])
+                            ->get($this->apiUrl . '/v2/payments/captures/' . $paymentReference);
+    
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                // Si el token expiró, vuelve a autenticarse y reintenta
+                if ($response->status() == 401) {
+                    $accessToken = $this->authenticate();
+                    $response = Http::withToken($accessToken)
+                                    ->timeout(120) // Aumentar el timeout a 60 segundos
+                                    // ->withOptions([
+                                    //     'verify' => false, // Desactivar temporalmente la verificación SSL
+                                    //     'debug' => true,   // Habilitar logs de depuración
+                                    // ])
+                                    ->get($this->apiUrl . '/v2/payments/captures/' . $paymentReference);
+    
+                    if ($response->successful()) {
+                        return response()->json($response->json());
+                    } else {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => $response->json('error.message'),
+                        ], $response->status());
+                    }
                 }
+                return response()->json([
+                    'status' => 'error',
+                    'error' => 'Failed to retrieve payment: ' . $response->body(),
+                    'message' => $response->json('error.message')
+                ], $response->status());
             }
-            return response()->json(['error' => 'Failed to retrieve payment: ' . $response->body()], $response->status());
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 }
