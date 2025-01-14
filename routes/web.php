@@ -12,6 +12,8 @@ use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
 use App\Http\Controllers\Payments\PaymentsController;
 
+use App\Http\Controllers\Finance\SalesController as SaleFinance;
+
 use App\Http\Controllers\Reports\ReportsController;
 use App\Http\Controllers\Management\ManagementController;
 use App\Http\Controllers\Operation\SpamController as SPAM;
@@ -57,10 +59,15 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/conciliation/paypal/{reference}', [ConciliationController::class, 'PayPalPaymenReference'])->name('bot.paypal.reference')->withoutMiddleware(['auth']);
     Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
 
+    //FINANZAS    
+    //PAGOS
+    Route::get('/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales');
+    Route::post('/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales.action');
+
     //REPORTES
         //PAGOS
         Route::get('/reports/payments', [ReportsController::class, 'payments'])->name('reports.payment');
-        Route::post('/reports/payments', [ReportsController::class, 'payments'])->name('reports.payment.action');        
+        Route::post('/reports/payments', [ReportsController::class, 'payments'])->name('reports.payment.action');
         //EFECTIVO
         Route::get('/reports/cash', [ReportsController::class, 'cash'])->name('reports.cash');
         Route::post('/reports/cash', [ReportsController::class, 'cash'])->name('reports.cash.action');
