@@ -527,6 +527,7 @@ trait QueryTrait
                                         p.currency as currency_payment,
                                         p.reference,
                                         p.is_conciliated,
+                                        p.is_refund,
                                         p.conciliation_comment,
                                         p.created_at as created_payment,
                                         p.updated_at as updated_payment,
@@ -559,22 +560,22 @@ trait QueryTrait
     }
 
     //TRAEREMOS PAGOS DE PAYPAL QUE TENGA FECHA DE AGREGACIÓN Y NO AYAN SIDO ELIMINADOS
-    public function getPayPalPayments($init = "", $end = ""){
+    public function getPaymentsConciliation($method = "", $init = "", $end = ""){
         $query = ( $init != "" && $end != "" ? ' AND p.created_at BETWEEN "'.$init.'" AND "'.$end.'" ' : "" );
        return DB::select("SELECT 
-                                p.*,
-                                rez.id AS reservation_id,
-                                rez.is_cancelled,
-                                rez.is_duplicated
+                                    p.*,
+                                    rez.id AS reservation_id,
+                                    rez.is_cancelled,
+                                    rez.is_duplicated
                                 FROM payments AS p
-                                INNER JOIN reservations AS rez ON p.reservation_id = rez.id
+                                    INNER JOIN reservations AS rez ON p.reservation_id = rez.id
                                 WHERE 
-                                    p.payment_method = 'PAYPAL' AND
+                                    p.payment_method = :method AND
                                     p.created_at IS NOT NULL AND
                                     p.deleted_at IS NULL AND
                                     p.is_conciliated = 0 AND
                                     rez.is_cancelled = 0 AND
-                                    rez.is_duplicated = 0 ".$query." ");
+                                    rez.is_duplicated = 0 ".$query." ", ['method' => $method]);
     }
 
     private function orderByDateTime($a, $b) {
