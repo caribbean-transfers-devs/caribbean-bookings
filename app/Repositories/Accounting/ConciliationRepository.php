@@ -62,6 +62,11 @@ class ConciliationRepository
         return $this->getPaymentInfo($reference);
     }
 
+    public function PayPalPaymenOrder($request, $id)
+    {
+        return $this->getOrderInfo($id);
+    }
+
     public function conciliationPayPalPayment($request, $payment)
     {
         $charge = $this->getPaymentInfo($payment->reference);

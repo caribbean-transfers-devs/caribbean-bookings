@@ -57,6 +57,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/bot/conciliation/paypal', [ConciliationController::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
     Route::get('/bot/conciliation/stripe', [ConciliationController::class, 'StripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
     Route::get('/conciliation/paypal/{reference}', [ConciliationController::class, 'PayPalPaymenReference'])->name('bot.paypal.reference')->withoutMiddleware(['auth']);
+    Route::get('/conciliation/paypalOrder/{id}', [ConciliationController::class, 'PayPalPaymenOrder'])->name('bot.paypal.order')->withoutMiddleware(['auth']);
     Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
 
     //FINANZAS    

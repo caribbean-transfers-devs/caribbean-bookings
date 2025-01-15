@@ -36,6 +36,10 @@ class ConciliationController extends Controller
         return $this->ConciliationRepository->PayPalPaymenReference($request, $reference);
     }
 
+    public function PayPalPaymenOrder(Request $request, $id){
+        return $this->ConciliationRepository->PayPalPaymenOrder($request, $id);
+    }    
+
     public function StripePaymentReference(Request $request, $reference){
         return $this->ConciliationRepository->StripePaymentReference($request, $reference);
     }    
