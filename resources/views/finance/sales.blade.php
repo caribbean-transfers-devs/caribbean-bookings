@@ -41,7 +41,7 @@
                         <div class="row">
                             <div class="col-6">
                                 <div class="card">
-                                    {{ count($paypal) }}
+                                    {{ count($paypal) }} - PAYPAL
                                 </div>
                                 <div class="table-responsive">
                                     <table id="data" class="table dt-table-hover">
@@ -102,7 +102,7 @@
                             </div>
                             <div class="col-6">
                                 <div class="card">
-                                    {{ count($paypal2) }}
+                                    {{ count($paypal2) }} - STRIPE
                                 </div>                                
                                 <div class="table-responsive">
                                     <table id="data" class="table dt-table-hover">
@@ -117,8 +117,8 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @if(sizeof($paypal) >= 1)
-                                                @foreach ($paypal as $item2)
+                                            @if(sizeof($stripe) >= 1)
+                                                @foreach ($stripe as $item2)
                                                     @php
                                                         $total_general2 += ( $item2->currency == "USD" ? $item2->total_sales * $exchange : $item2->total_sales );
                                                         // $total_conciliation2 += ( $item2->is_conciliated == 1 ? number_format(( $item2->currency == "USD" ? $item2->total * $exchange : $item2->total ),2) : 0 );
