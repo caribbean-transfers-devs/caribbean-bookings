@@ -1,0 +1,59 @@
+{
+    "id": "38K79160EX387452A",
+    "amount": {
+        "currency_code": "USD",
+        "value": "520.00"
+    },
+    "final_capture": true,
+    "seller_protection": {
+        "status": "ELIGIBLE",
+        "dispute_categories": [
+            "ITEM_NOT_RECEIVED",
+            "UNAUTHORIZED_TRANSACTION"
+        ]
+    },
+    "seller_receivable_breakdown": {
+        "gross_amount": {
+            "currency_code": "USD",
+            "value": "520.00"
+        },
+        "paypal_fee": {
+            "currency_code": "USD",
+            "value": "21.46"
+        },
+        "net_amount": {
+            "currency_code": "USD",
+            "value": "498.54"
+        }
+    },
+    "invoice_id": "INV2-LUPJ-3U8A-76MR-J3Z3",
+    "status": "COMPLETED",
+    "supplementary_data": {
+        "related_ids": {
+            "order_id": "8W751565JA4193108"
+        }
+    },
+    "payee": {
+        "email_address": "rivieramayataxi@gmail.com",
+        "merchant_id": "FEUB9DWMNTV6L"
+    },
+    "create_time": "2024-03-18T02:36:06Z",
+    "update_time": "2024-03-18T02:36:06Z",
+    "links": [
+        {
+            "href": "https://api.paypal.com/v2/payments/captures/38K79160EX387452A",
+            "rel": "self",
+            "method": "GET"
+        },
+        {
+            "href": "https://api.paypal.com/v2/payments/captures/38K79160EX387452A/refund",
+            "rel": "refund",
+            "method": "POST"
+        },
+        {
+            "href": "https://api.paypal.com/v2/checkout/orders/8W751565JA4193108",
+            "rel": "up",
+            "method": "GET"
+        }
+    ]
+}

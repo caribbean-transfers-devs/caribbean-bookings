@@ -6,6 +6,8 @@
     $total_conciliation = 0;
     $total_general2 = 0;
     $total_conciliation2 = 0;
+
+    $total = 0;
 @endphp
 @extends('layout.app')
 @section('title') Reporte De Ventas @endsection
@@ -161,6 +163,41 @@
                                     </table>
                                 </div>
                             </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    {{ count($payments) }}
+                                </div>                                
+                                <div class="table-responsive">
+                                    <table id="data" class="table dt-table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">CODE</th>
+                                                <th class="text-center">MONEDA</th>
+                                                <th class="text-center">VENTA</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if(sizeof($payments) >= 1)
+                                                @foreach ($payments as $item3)
+                                                    @php
+                                                        $total += ( $item3->currency_payment == "USD" ? $item3->total * $exchange : $item3->total );
+                                                    @endphp
+                                                    <tr>
+                                                        <th class="text-center">{{ $item3->reservation_id }}</th>
+                                                        <td class="text-center">{{ $item3->currency_payment }}</td>
+                                                        <td class="text-center">{{ number_format(( $item3->currency_payment == "USD" ? $item3->total * $exchange : $item3->total ),2) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            @endif
+                                        </tbody>
+                                        <tfoot>
+                                            <th class="text-center"></th>
+                                            <th class="text-center"></th>
+                                            <th class="text-center">{{ number_format($total,2) }}</th>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>                            
                         </div>
                     </div>
                 </div>

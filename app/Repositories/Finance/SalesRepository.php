@@ -35,6 +35,39 @@ class SalesRepository
         //     'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
         // ];
 
+        $payments = DB::select("SELECT 
+
+                                p.id as code_payment,
+                                p.reservation_id,
+                                p.payment_method,
+                                p.description,
+                                p.exchange_rate,
+                                p.total,
+                                p.total_fee,
+                                p.total_net,
+                                p.currency as currency_payment,
+                                p.reference,
+                                p.is_conciliated,
+                                p.is_refund,
+                                p.conciliation_comment,
+                                p.created_at as created_payment,
+                                p.updated_at as updated_payment,
+                                p.date_conciliation as conciliation_payment,                                
+
+                                site.type_site AS type_site,
+                                site.name AS site_name
+
+                            FROM payments as p
+                                INNER JOIN reservations as rez ON p.reservation_id = rez.id
+                                INNER JOIN sites as site ON site.id = rez.site_id
+                                WHERE 1=1 AND p.created_at BETWEEN :init AND :end AND p.payment_method = :method
+                                AND p.created_at IS NOT NULL AND p.deleted_at IS NULL
+                                ORDER BY rez.created_at DESC", [
+                                    "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00", 
+                                    "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59", 
+                                    "method" => "STRIPE"
+                                ]);
+
         $payment_paypal = DB::select("SELECT 
                                 rez.id AS reservation_id, 
                                 CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name,
@@ -140,7 +173,7 @@ class SalesRepository
                                         INNER JOIN reservations as rez ON rez.id = it.reservation_id
                                     GROUP BY it.reservation_id, it.is_round_trip
                                 ) as it ON it.reservation_id = rez.id
-                                WHERE 1=1 AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND p.payment_method = :method
+                                WHERE 1=1 AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND p.payment_method = :method
                                 GROUP BY rez.id, site.type_site, site.name, rez.client_first_name, rez.client_last_name,
                                 rez.client_email, rez.client_phone, rez.currency, rez.is_cancelled,
                                 rez.is_commissionable, rez.site_id, rez.pay_at_arrival, rez.reference,
@@ -151,7 +184,7 @@ class SalesRepository
                                 p.is_refund, p.conciliation_comment, p.created_at, p.updated_at,
                                 p.date_conciliation, it.op_one_pickup_today, it.op_two_pickup_today,
                                 it.is_round_trip, s.total_sales
-                                HAVING is_today != 0 ORDER BY rez.created_at DESC", [
+                                ORDER BY rez.created_at DESC", [
                                     "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00", 
                                     "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59", 
                                     "method" => "PAYPAL"
@@ -263,6 +296,7 @@ class SalesRepository
                                     GROUP BY it.reservation_id, it.is_round_trip
                                 ) as it ON it.reservation_id = rez.id
                                 WHERE 1=1 AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND p.payment_method = :method
+                                AND p.created_at IS NOT NULL AND p.deleted_at IS NULL
                                 GROUP BY rez.id, site.type_site, site.name, rez.client_first_name, rez.client_last_name,
                                 rez.client_email, rez.client_phone, rez.currency, rez.is_cancelled,
                                 rez.is_commissionable, rez.site_id, rez.pay_at_arrival, rez.reference,
@@ -273,7 +307,7 @@ class SalesRepository
                                 p.is_refund, p.conciliation_comment, p.created_at, p.updated_at,
                                 p.date_conciliation, it.op_one_pickup_today, it.op_two_pickup_today,
                                 it.is_round_trip, s.total_sales
-                                HAVING is_today != 0 ORDER BY rez.created_at DESC", [
+                                ORDER BY rez.created_at DESC", [
                                     "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00", 
                                     "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59", 
                                     "method" => "STRIPE"
@@ -438,6 +472,7 @@ class SalesRepository
             "paypal" => $payment_paypal,
             "stripe" => $payment_stripe,
             "paypal2" => $payment_paypal,
+            "payments" => $payments,
             'exchange' => $this->Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
             // 'exchange' => $this->Exchange("2024-12-01 00:00:00", "2024-12-31 23:59:59"),
             'data' => $data,
