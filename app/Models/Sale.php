@@ -10,7 +10,7 @@ class Sale extends Model
 {
     use HasFactory,SoftDeletes;
 
-    public $timestamps = false;
+    // public $timestamps = false;
 
     public function reservation()
     {

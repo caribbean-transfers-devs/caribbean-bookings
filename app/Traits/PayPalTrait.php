@@ -220,7 +220,7 @@ trait PayPalTrait
     }
 
     public function getPayPalOrders($startTime = null, $endTime = null, $page = 1, $pageSize = 10) {
-
+        $this->clientId, $this->clientSecret
         $accessToken = $this->getPayPalAccessToken("Aey5LnUV8XnM2yK7aWSJmK9ybHRO-SdDRcDTrUomDo6NZrxuMNJkFN99yw5y_0b91cyQqISWFI4pfOWe", "EJ8XWB75doTcu2_DGyjVb3hrYPqQA5u2O91HnV__F5w4r3FVxGwQcpmDHR0dOTVz0UhvEnDOUOkzGk15");
 
         $url = "https://api.paypal.com/v2/checkout/orders?page=$page&page_size=$pageSize";

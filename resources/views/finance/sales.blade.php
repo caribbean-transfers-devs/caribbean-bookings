@@ -163,7 +163,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="col-12">
+                            {{-- <div class="col-12">
                                 <div class="card">
                                     {{ count($payments) }}
                                 </div>                                
@@ -197,7 +197,7 @@
                                         </tfoot>
                                     </table>
                                 </div>
-                            </div>                            
+                            </div>                             --}}
                         </div>
                     </div>
                 </div>
