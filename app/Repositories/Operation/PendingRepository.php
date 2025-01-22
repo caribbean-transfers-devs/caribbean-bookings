@@ -136,9 +136,11 @@ class PendingRepository
                                         INNER JOIN reservations as rez ON rez.id = it.reservation_id
                                     GROUP BY it.reservation_id, it.is_round_trip
                                 ) as it ON it.reservation_id = rez.id
-                                WHERE 1=1 AND DATE(rez.created_at) = :date AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0
+                                WHERE 1=1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0
                             GROUP BY rez.id, site.type_site, site.name
-                                    HAVING payment_status = :status ORDER BY rez.created_at DESC;", ["date" => date("Y-m-d"), "status" => "PENDING"]);
+                                    HAVING payment_status = :status ORDER BY rez.created_at DESC;", ["status" => "PENDING"]);
+                                    // AND DATE(rez.created_at) = :date 
+                                    // "date" => date("Y-m-d"), 
 
         return view('management.pending.view', [ "items" => $items ]);
     }
