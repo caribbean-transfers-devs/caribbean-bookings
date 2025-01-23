@@ -515,7 +515,7 @@ let pickerInit = flatpickr("#departure_date", {
     mode: "single",
     dateFormat: "Y-m-d H:i",
     enableTime: true,
-    minDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+    // minDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
 });
 
 //FUNCIONALIDAD DE CAMBIO DE MONEDA
