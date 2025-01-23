@@ -44,6 +44,16 @@
                                         <option value="es">Español</option>
                                         <option value="en">Ingles</option>
                                     </select>
+                                </div>
+                                <div class="col-12 col-lg-12 checkbox_box d-flex align-items-center">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" name="is_open" id="is_open" value="0">
+                                        <label class="form-check-label" for="is_open">Es un servicio abierto</label>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6 d-none checkbox_time">
+                                    <label class="form-label" for="open_service_time">Ingresa el tiempo</label>
+                                    <input type="number" step=".01" class="form-control" id="open_service_time" >
                                 </div>                                
                             </div>
                         </div>

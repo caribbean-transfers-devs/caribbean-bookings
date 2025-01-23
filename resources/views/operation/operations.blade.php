@@ -40,8 +40,12 @@
         .agency_30{
             background-color: #00467e !important;
         }
+        .is_open{
+            background-color: #e2a03f !important;
+        }
 
-        .agency_29 td{
+        .agency_29 td,
+        .is_open td{
             color: #000000 !important;
         }
         .agency_30 td{
@@ -254,7 +258,7 @@
                                 //SABER SI SON ARRIVAL, DEPARTURE O TRANSFER, MEDIANTE UN COLOR DE FONDO
                                 $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "f2eafa" : "dbe0f9" ) ).";";
                                 // $color = "color: #".( $value->site_code == 29 || $value->site_code == 30 ? "FFFFFF" : "515365" ).";";
-                                $class_agency = ( $value->site_code == 29 || $value->site_code == 30 ?  "agency_".$value->site_code : "" );
+                                $class_agency = ( $value->site_code == 29 || $value->site_code == 30 ? "agency_".$value->site_code : ( $value->is_open ? "is_open" : "" ) );
 
                                 //PREASIGNACION
                                 $flag_preassignment = ( ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ) && $value->op_one_preassignment != "" ? true : ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && ( $value->is_round_trip == 1 ) && $value->op_two_preassignment != "" ? true : false ) );
