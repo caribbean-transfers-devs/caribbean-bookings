@@ -1183,7 +1183,6 @@ class ReportsRepository
             "is_balance" => ( isset($request->is_balance) ? $request->is_balance : NULL ),
             "is_today" => ( isset($request->is_today) ? $request->is_today : 0 ),
             "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : 0 ),
-            "is_agency" => ( isset($request->is_agency) ? $request->is_agency : 0 ),
         ];
         
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND site.is_cxc = 1 ';
@@ -1311,12 +1310,7 @@ class ReportsRepository
         }
         if(isset( $request->is_duplicated )){
             $query .= " AND rez.is_duplicated IN (1,0) ";
-        }
-
-        //VER AGENCIAS
-        if(!isset( $request->is_agency )){
-            $query .= " AND site.type_site != 'AGENCY' ";
-        }        
+        }     
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
             $data['filter_text'] = $request->filter_text;
