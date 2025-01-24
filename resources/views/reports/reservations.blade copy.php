@@ -147,7 +147,7 @@
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
                 'className' => 'btn btn-primary __btn_create',
                 'attr' => array(
-                    'data-title' =>  "Filtro de reservaciones",
+                    'data-title' =>  "Filtros de ventas",
                     'data-bs-toggle' => 'modal',
                     'data-bs-target' => '#filterModal',
                 )
@@ -202,7 +202,7 @@
                     </div>
                 @endif
                 
-                <table id="dataReceivable" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataBookings" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
                             <th class="text-center">ID</th>
@@ -556,13 +556,15 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($bookingsStatus['data'] as $keyStatus => $status )
-                                            <tr>
-                                                <th>{{ $status['name'] }}</th>
-                                                <td class="text-center">{{ number_format($status['gran_total'],2) }}</td>
-                                                <td class="text-center">{{ $status['counter'] }}</td>
-                                                <td class="text-center">{{ number_format($status['MXN']['total'],2) }}</td>
-                                                <td class="text-center">{{ number_format($status['USD']['total'],2) }}</td>
-                                            </tr>
+                                            @if ( $keyStatus != "CANCELLED" )
+                                                <tr>
+                                                    <th>{{ $status['name'] }}</th>
+                                                    <td class="text-center">{{ number_format($status['gran_total'],2) }}</td>
+                                                    <td class="text-center">{{ $status['counter'] }}</td>
+                                                    <td class="text-center">{{ number_format($status['MXN']['total'],2) }}</td>
+                                                    <td class="text-center">{{ number_format($status['USD']['total'],2) }}</td>
+                                                </tr>
+                                            @endif
                                         @endforeach
                                     </tbody>
                                     <tfoot>
@@ -575,6 +577,40 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+
+                                <table class="table table-chart table-chart-general">
+                                    <thead>
+                                        <tr>
+                                            <th>ESTATUS</th>
+                                            <th class="text-center">GRAN TOTAL</th>
+                                            <th class="text-center">CANTIDAD</th>
+                                            <th class="text-center">PESOS</th>
+                                            <th class="text-center">DOLARES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($bookingsStatus['data'] as $keyStatus => $status )
+                                            @if ( $keyStatus == "CANCELLED" )
+                                                <tr>
+                                                    <th>{{ $status['name'] }}</th>
+                                                    <td class="text-center">{{ number_format($status['gran_total'],2) }}</td>
+                                                    <td class="text-center">{{ $status['counter'] }}</td>
+                                                    <td class="text-center">{{ number_format($status['MXN']['total'],2) }}</td>
+                                                    <td class="text-center">{{ number_format($status['USD']['total'],2) }}</td>
+                                                </tr>
+                                            @endif
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>TOTAL</th>
+                                            <th class="text-center">{{ number_format(( isset($bookingsStatus['data']['CANCELLED']['gran_total']) ? $bookingsStatus['data']['CANCELLED']['gran_total'] : 0 ),2) }}</th>
+                                            <th class="text-center">{{ ( isset($bookingsStatus['data']['CANCELLED']['counter']) ? $bookingsStatus['data']['CANCELLED']['counter'] : 0 ) }}</th>
+                                            <th class="text-center">{{ number_format(( isset($bookingsStatus['data']['CANCELLED']['MXN']['total']) ? $bookingsStatus['data']['CANCELLED']['MXN']['total'] : 0 ),2) }}</th>
+                                            <th class="text-center">{{ number_format(( isset($bookingsStatus['data']['CANCELLED']['USD']['total']) ? $bookingsStatus['data']['CANCELLED']['USD']['total'] : 0 ),2) }}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>                                
                             </div>
                         </div>
                     </div>
@@ -710,9 +746,6 @@
                         <div class="row g-0">
                             <h5 class="col-12 text-left text-uppercase">estadisticas por moneda</h5>
                             <div class="col-lg-12 col-12">
-                                <canvas class="" id="chartSaleCurrencies"></canvas>
-                            </div>
-                            <div class="col-lg-12 col-12">
                                 <table class="table table-chart table-chart-general">
                                     <thead>
                                         <tr>
@@ -748,9 +781,6 @@
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
                             <h5 class="col-12 text-left text-uppercase">estadisticas por origen de venta</h5>
-                            <div class="col-lg-12 col-12">
-                                <canvas class="" id="chartSaleOrigins"></canvas>
-                            </div>
                             <div class="col-lg-12 col-12">
                                 <table class="table table-chart table-chart-general">
                                     <thead>
@@ -790,9 +820,6 @@
                     <div class="col-lg-12 col-12">
                         <div class="row g-0">
                             <h5 class="col-12 text-left text-uppercase">estadisticas por vehículo</h5>
-                            <div class="col-lg-12 col-12">
-                                <canvas class="" id="chartSaleVehicles"></canvas>
-                            </div>
                             <div class="col-lg-12 col-12">
                                 <table class="table table-chart table-chart-general">
                                     <thead>
@@ -845,9 +872,6 @@
             dataMethodPayments: @json(( isset($dataMethodPayments['data']) ? $dataMethodPayments['data'] : [] )),
             dataSites: @json(( isset($dataSites['data']) ? $dataSites['data'] : [] )),
             dataDestinations: @json(( isset($dataDestinations['data']) ? $dataDestinations['data'] : [] )),
-            dataCurrency: @json(( isset($dataCurrency['data']) ? $dataCurrency['data'] : [] )),
-            dataVehicles: @json(( isset($dataVehicles['data']) ? $dataVehicles['data'] : [] )),
-            dataOriginSale: @json(( isset($dataOriginSale['data']) ? $dataOriginSale['data'] : [] )),
             dataChartSaleStatus: function(){
                 let object = [];
                 const systems = Object.entries(this.dataStatus);
@@ -1190,192 +1214,11 @@
                     });
                 }
             },
-            dataChartSaleCurrencies: function(){
-                let object = [];
-                const systems = Object.entries(this.dataCurrency);
-                systems.forEach( ([key, data]) => {
-                    // console.log(key);
-                    // console.log(data);
-                    object.push(data);
-                });
-                return object;
-            },
-            renderChartSaleCurrencies: function(){
-                // Calcular el total de 'counter'
-                const totalCount = sales.dataChartSaleCurrencies().reduce((sum, system) => sum + system.counter, 0);
-                // Calcular el porcentaje de cada 'counter'
-                const percentages = sales.dataChartSaleCurrencies().map(site => ((site.counter / totalCount) * 100).toFixed(2) + '%');
-                
-                if( document.getElementById('chartSaleCurrencies') != null ){
-                    new Chart(document.getElementById('chartSaleCurrencies'), {
-                        type: 'bar',
-                        data: {
-                            labels: sales.dataChartSaleCurrencies().map(row => row.name),
-                            datasets: [
-                                {
-                                    label: 'MONEDAS', // Etiqueta para el conjunto de datos
-                                    data: sales.dataChartSaleCurrencies().map(row => row.counter),
-                                    // backgroundColor: sales.dataChartSaleCurrencies().map(row => row.background) || '#007bff', // Puedes usar colores personalizados o un color por defecto
-                                    borderWidth: 1
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true, // Hacer el gráfico responsivo
-                            maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
-                            scales: {
-                                y: {
-                                    beginAtZero: true, // Asegurar que el eje Y comience desde 0
-                                    ticks: {
-                                        callback: function(value) {
-                                            return value.toLocaleString(); // Formato de números en el eje Y
-                                        }
-                                    }
-                                }
-                            },                            
-                            plugins: {                              
-                                // tooltip: {
-                                //     callbacks: {
-                                //         title: function(tooltipItems) {
-                                //             // Mostrar el nombre del sitio
-                                //             return tooltipItems[0].label;
-                                //         },
-                                //         label: function(tooltipItem) {
-                                //             console.log(tooltipItem);                                            
-                                //             const index = tooltipItem.dataIndex;
-                                //             const site = sales.dataChartSaleCurrencies()[index];
-                                //             // Mostrar el monto en pesos y dólares junto con el porcentaje
-                                //             return [
-                                //                 `TOTAL DE VENTA: $ ${site.gran_total.toLocaleString()}`,
-                                //                 `TOTAL DE VENTA EN USD: $ ${site['accumulated']['USD'].total.toLocaleString()}`,
-                                //                 `TOTAL DE VENTA EN MXN: $ ${site['accumulated']['MXN'].total.toLocaleString()}`,
-                                //             ];
-                                //         }
-                                //     }
-                                // },
-                                // datalabels: {
-                                //     display: true,
-                                //     formatter: (value, context) => {  
-                                //         console.log(value, context);                                                                          
-                                //         const total = context.chart._metasets[0].total;
-                                //         const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                //         return percentage; // Mostrar porcentaje en el gráfico
-                                //     },
-                                //     color: '#000',
-                                //     font: {
-                                //         weight: 'bold'
-                                //     },
-                                //     anchor: 'end',
-                                //     align: 'start'
-                                // }
-                            }
-                        },
-                        plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
-                    });
-                }
-            },
-            dataChartSaleVehicles: function(){
-                let object = [];
-                const systems = Object.entries(this.dataVehicles);
-                systems.forEach( ([key, data]) => {
-                    object.push(data);
-                });
-                return object;
-            },
-            renderChartSaleVehicles: function(){
-                // Calcular el total de 'counter'
-                const totalCount = sales.dataChartSaleVehicles().reduce((sum, system) => sum + system.counter, 0);
-                // Calcular el porcentaje de cada 'counter'
-                const percentages = sales.dataChartSaleVehicles().map(site => ((site.counter / totalCount) * 100).toFixed(2) + '%');
-                
-                if( document.getElementById('chartSaleVehicles') != null ){
-                    new Chart(document.getElementById('chartSaleVehicles'), {
-                        type: 'bar',
-                        data: {
-                            labels: sales.dataChartSaleVehicles().map(row => row.name),
-                            datasets: [
-                                {
-                                    label: 'VEHÍCULOS', // Etiqueta para el conjunto de datos
-                                    data: sales.dataChartSaleVehicles().map(row => row.counter),
-                                    borderWidth: 1
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true, // Hacer el gráfico responsivo
-                            maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
-                            scales: {
-                                y: {
-                                    beginAtZero: true, // Asegurar que el eje Y comience desde 0
-                                    ticks: {
-                                        callback: function(value) {
-                                            return value.toLocaleString(); // Formato de números en el eje Y
-                                        }
-                                    }
-                                }
-                            },                            
-                            plugins: {
-                            }
-                        },
-                        plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
-                    });
-                }
-            },
-            dataChartSaleOrigins: function(){
-                let object = [];
-                const systems = Object.entries(this.dataOriginSale);
-                systems.forEach( ([key, data]) => {
-                    object.push(data);
-                });
-                return object;
-            },
-            renderChartSaleOrigins: function(){
-                // Calcular el total de 'counter'
-                const totalCount = sales.dataChartSaleOrigins().reduce((sum, system) => sum + system.counter, 0);
-                // Calcular el porcentaje de cada 'counter'
-                const percentages = sales.dataChartSaleOrigins().map(site => ((site.counter / totalCount) * 100).toFixed(2) + '%');
-                
-                if( document.getElementById('chartSaleOrigins') != null ){
-                    new Chart(document.getElementById('chartSaleOrigins'), {
-                        type: 'bar',
-                        data: {
-                            labels: sales.dataChartSaleOrigins().map(row => row.name),
-                            datasets: [
-                                {
-                                    label: 'ORIGENES DE VENTA', // Etiqueta para el conjunto de datos
-                                    data: sales.dataChartSaleOrigins().map(row => row.counter),
-                                    borderWidth: 1
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true, // Hacer el gráfico responsivo
-                            maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
-                            scales: {
-                                y: {
-                                    beginAtZero: true, // Asegurar que el eje Y comience desde 0
-                                    ticks: {
-                                        callback: function(value) {
-                                            return value.toLocaleString(); // Formato de números en el eje Y
-                                        }
-                                    }
-                                }
-                            },                            
-                            plugins: {
-                            }
-                        },
-                        plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
-                    });
-                }
-            },
         };
 
         sales.renderChartSaleStatus();
         sales.renderChartSaleMethodPayments();
         sales.renderChartSaleSites();
         sales.renderChartSaleDestinations();
-        sales.renderChartSaleCurrencies();
-        sales.renderChartSaleVehicles();
-        sales.renderChartSaleOrigins();
     </script>
 @endpush

@@ -116,8 +116,8 @@
 @section('title') Reporte De Reservaciones @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/report_reservations.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/report_reservations.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/report_receivable.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/report_receivable.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -128,7 +128,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    <script src="{{ mix('assets/js/sections/reports/reservations.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/reports/receivable.min.js') }}"></script>
     <script>
         document.getElementById('showLayer').addEventListener('click', function() {
             document.getElementById('layer').classList.add('active');
@@ -147,7 +147,7 @@
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
                 'className' => 'btn btn-primary __btn_create',
                 'attr' => array(
-                    'data-title' =>  "Filtro de reservaciones",
+                    'data-title' =>  "Filtros de cuentas por cobrar",
                     'data-bs-toggle' => 'modal',
                     'data-bs-target' => '#filterModal',
                 )
@@ -202,7 +202,7 @@
                     </div>
                 @endif
                 
-                <table id="dataReceivable" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataBookings" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
                             <th class="text-center">ID</th>
@@ -454,7 +454,12 @@
                                     <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ $item->site_name }}</td>
                                     <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }}">{{ BookingTrait::statusBooking($item->reservation_status) }}</button></td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }}">{{ BookingTrait::statusBooking($item->reservation_status) }}</button>
+                                        @if ( $item->is_conciliated == 0 && $item->reservation_status == "CREDIT" )
+                                            <button class="btn btn-primary __btn_conciliation mt-2" data-reservation="{{ $item->reservation_id }}">CONCILIAR PAGO</button>
+                                        @endif
+                                    </td>
                                     <td class="text-center">{{ $item->full_name }}</td>
                                     <td class="text-center">{{ $item->client_phone }}</td>
                                     <td class="text-center">{{ $item->client_email }}</td>
@@ -835,6 +840,7 @@
 
     <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :istoday="1" :isbalance="1" :isduplicated="1" :isagency="1" :request="$request" />
     <x-modals.reports.columns />
+    <x-modals.new_payment_conciliation />
     <x-modals.reservations.payments />
 @endsection
 

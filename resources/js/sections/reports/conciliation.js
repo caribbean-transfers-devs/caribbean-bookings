@@ -25,6 +25,7 @@ const __btn_conciliations = document.querySelectorAll('.__btn_conciliation');
 const __close_modals = document.querySelectorAll('.__close_modal');
 const __type_pay = document.getElementById('type_form_pay');
 const __code_pay = document.getElementById('payment_id');
+const __is_conciliated = document.getElementById('servicePaymentsConciliationModal');
 
 //ACCION PARA CREAR
 if( __create != null ){
@@ -207,6 +208,25 @@ if( __btn_conciliations.length > 0 ){
             });            
         });
     });
+}
+
+if( __is_conciliated != null ){
+    changeIsConciliation(__is_conciliated);
+    __is_conciliated.addEventListener('change', function(event){
+        event.preventDefault();
+        changeIsConciliation(this);
+    });
+
+    function changeIsConciliation(DOM){
+        console.log(DOM.value);
+        
+        const __box_comment = document.querySelector('.box_comment');        
+        if( DOM.value == 1 ){
+            __box_comment.classList.remove('d-none');
+        }else{
+            __box_comment.classList.add('d-none');
+        }
+    }
 }
 
 $("#servicePaymentsCurrencyModal").on('change', function(){

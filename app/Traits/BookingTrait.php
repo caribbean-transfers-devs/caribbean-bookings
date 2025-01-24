@@ -20,7 +20,8 @@ trait BookingTrait
                 break;
             case 'DUPLICATED':
                 return 'secondary';
-                break;                
+                break;
+            case 'CREDIT':
             case 'OPENCREDIT':
             case 'E':
                 return 'info';
@@ -38,6 +39,9 @@ trait BookingTrait
                 break;
             case 'CANCELLED':
                 return 'CANCELADO';
+                break;
+            case 'CREDIT':
+                return 'CRÉDITO';
                 break;
             case 'DUPLICATED':
                 return 'DUPLICADO';

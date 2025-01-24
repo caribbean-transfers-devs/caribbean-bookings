@@ -21,7 +21,7 @@ class PaymentRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'reservation_id' => 'required|exists:reservations,id',
             'total' => 'required|numeric',
             'exchange_rate' => 'required|numeric',
@@ -29,6 +29,10 @@ class PaymentRequest extends FormRequest
             'currency' => 'required|in:USD,MXN',
             'reference' => 'required|string|max:255',
         ];
+        if( $this->input('is_conciliated') && $this->input('is_conciliated') == 1 ){
+            $rules['conciliation_comment'] = 'required|string|max:255';
+        }
+        return $rules;
     }
 
     /**
@@ -36,7 +40,7 @@ class PaymentRequest extends FormRequest
      */
     public function messages(): array
     {
-        return [
+        $rules_messages = [
             'reservation_id.required' => 'La reservación es requerida',
             'reservation_id.exists' => 'La reservación no existe',
             'total.required' => 'El total es requerido',
@@ -50,5 +54,10 @@ class PaymentRequest extends FormRequest
             'reference.required' => 'La referencia es requerida',
             'reference.max' => 'La referencia no puede ser mayor a 255 caracteres',
         ];
+        if( $this->input('is_conciliated') && $this->input('is_conciliated') == 1 ){
+            $rules_messages['conciliation_comment.required'] = 'Por favor, ingresa un comentario';
+            $rules_messages['conciliation_comment.max'] = 'El comentario no puede ser mayor a 255 caracteres';
+        }
+        return $rules_messages;
     }
 }

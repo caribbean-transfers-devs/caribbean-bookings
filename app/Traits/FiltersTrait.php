@@ -75,6 +75,7 @@ trait FiltersTrait
         return array(
             "CONFIRMED" => "Confirmado",
             "PENDING" => "Pendiente",
+            "CREDIT" => "Crédito",
             "OPENCREDIT" => "Credito abierto",
             "CANCELLED" => "Cancelado",
             "DUPLICATED" => "Duplicado",

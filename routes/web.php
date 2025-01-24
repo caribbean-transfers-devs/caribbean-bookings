@@ -92,6 +92,9 @@ Route::group(['middleware' => ['auth']], function () {
         //PAGOS
         Route::get('/reports/conciliation', [ReportsController::class, 'conciliation'])->name('reports.conciliation');
         Route::post('/reports/conciliation', [ReportsController::class, 'conciliation'])->name('reports.conciliation.action');
+        //CUENTAS POR COBRAR
+        Route::get('/reports/accounts-receivable', [ReportsController::class, 'receivable'])->name('reports.receivable');
+        Route::post('/reports/accounts-receivable', [ReportsController::class, 'receivable'])->name('reports.receivable.action');
 
     //GESTION
         //CONFIRMACIONES

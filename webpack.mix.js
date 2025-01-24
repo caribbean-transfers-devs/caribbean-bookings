@@ -50,6 +50,7 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
         mix.sass('resources/scss/sections/_report_reservations.scss', data.assets + "css/sections/report_reservations.min.css"); //RESERVATIONS
         mix.sass('resources/scss/sections/_report_operations.scss', data.assets + "css/sections/report_operations.min.css"); //OPERATIONS
         mix.sass('resources/scss/sections/_report_conciliation.scss', data.assets + "css/sections/report_conciliation.min.css"); //CONCILIATION
+        mix.sass('resources/scss/sections/_report_receivable.scss', data.assets + "css/sections/report_receivable.min.css"); //CUENTAS POR COBRAR
 
         //STYLES MANAGEMENT
         mix.sass('resources/scss/sections/_management_confirmation.scss', data.assets + "css/sections/management_confirmation.min.css"); //MANAGEMENT CONFIRMATION
@@ -109,6 +110,7 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/reservations.js'], data.assets + "js/sections/reports/reservations.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/operations.js'], data.assets + "js/sections/reports/operations.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/conciliation.js'], data.assets + "js/sections/reports/conciliation.min.js");
+        mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/receivable.js'], data.assets + "js/sections/reports/receivable.min.js");
 
         //MANAGEMENT
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/operations/confirmation.js'], data.assets + "js/sections/operations/confirmation.min.js");

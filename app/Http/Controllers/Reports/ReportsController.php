@@ -69,4 +69,8 @@ class ReportsController extends Controller
     public function conciliation(Request $request){
         return $this->ReportsRepository->conciliation($request);
     }
+
+    public function receivable(Request $request){
+        return $this->ReportsRepository->receivable($request);
+    }
 }

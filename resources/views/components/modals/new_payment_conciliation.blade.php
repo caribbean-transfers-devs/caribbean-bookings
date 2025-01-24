@@ -47,7 +47,7 @@
                                 <option value="1">Sí</option>
                             </select>
                         </div>
-                        <div class="col-sm-12 col-md-12">
+                        <div class="col-sm-12 col-md-12 box_comment d-none">
                             <label class="form-label" for="servicePaymentsMessageConciliationModal">Mensaje de conciliación</label>
                             <textarea class="form-control" id="servicePaymentsMessageConciliationModal" name="conciliation_comment" cols="5" rows="5"></textarea>
                         </div>

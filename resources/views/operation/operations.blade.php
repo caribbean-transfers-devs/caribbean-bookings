@@ -423,8 +423,8 @@
                                     @endif
                                 </td>
                                 <td class="text-center" style="{{ ( $value->service_type_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_type_name }}</td>
-                                <td class="text-center" style="{{ ( $value->reservation_status == "PENDING" || $value->reservation_status == "PENDIENTE" || ( $value->reservation_status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ $value->reservation_status }}</td>
-                                <td class="text-center" style="{{ ( $value->reservation_status == "PENDING" || $value->reservation_status == "PENDIENTE" || ( $value->reservation_status == "CONFIRMADO" && $value->payment_type_name == "CASH" ) ? 'background-color:#e7515a;' : 'background-color:#00ab55;' ) }}color:#fff;">{{ number_format($value->total_sales,2) }}</td>
+                                <td class="text-center" <?=BookingTrait::classStatusPayment($value)?>>{{ BookingTrait::statusPayment($value->payment_status) }}</td>
+                                <td class="text-center" <?=BookingTrait::classStatusPayment($value)?>>{{ number_format($value->total_sales,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">

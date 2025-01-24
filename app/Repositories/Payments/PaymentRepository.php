@@ -45,8 +45,13 @@ class PaymentRepository
             $payment->created_at = date('Y-m-d H:m:s');
             $payment->updated_at = date('Y-m-d H:m:s');
 
-            ( isset($request->is_conciliated) ? $payment->is_conciliated = $request->is_conciliated : "" );
-            ( isset($request->conciliation_comment) ? $payment->conciliation_comment = $request->conciliation_comment : "" );
+            if( isset($request->is_conciliated) && $request->is_conciliated == 1 ){
+                if( $request->payment_method != "PAYPAL" && $request->payment_method != "STRIPE" && $request->payment_method != "CARD" ){
+                    $payment->is_conciliated = $request->is_conciliated;
+                    $payment->total_net = $request->total;
+                    $payment->conciliation_comment = $request->conciliation_comment;
+                }                
+            }
 
             $payment->user_id = auth()->user()->id;
             $payment->save();
@@ -128,6 +133,7 @@ class PaymentRepository
 
                 if( $request->payment_method != "PAYPAL" && $request->payment_method != "STRIPE" && $request->payment_method != "CARD" ){
                     $payment->is_conciliated = $request->is_conciliated;
+                    $payment->total_net = $request->total;
                     $payment->conciliation_comment = $request->conciliation_comment;
                 }
             };

@@ -51,10 +51,12 @@ trait QueryTrait
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,                                    
                                     COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+                                    SUM(p.is_conciliated) as is_conciliated,
                                     CASE
                                         WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
                                         WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                         WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                        WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                         ELSE 'UNKNOWN'
@@ -86,6 +88,7 @@ trait QueryTrait
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id,
+                                            is_conciliated,
                                             ROUND(SUM(CASE 
                                                 WHEN operation = 'multiplication' THEN total * exchange_rate
                                                 WHEN operation = 'division' THEN total / exchange_rate
@@ -101,7 +104,7 @@ trait QueryTrait
                                                     reference
                                             ) ORDER BY payment_method ASC SEPARATOR ', ') AS payment_details
                                         FROM payments
-                                        GROUP BY reservation_id
+                                        GROUP BY reservation_id, is_conciliated
                                     ) as p ON p.reservation_id = rez.id
                                     LEFT JOIN (
                                         SELECT  
@@ -131,7 +134,7 @@ trait QueryTrait
                                         GROUP BY it.reservation_id, it.is_round_trip
                                     ) as it ON it.reservation_id = rez.id
                                     WHERE 1=1 {$query}
-                                GROUP BY rez.id, site.type_site, site.name {$query2}",
+                                GROUP BY rez.id, site.type_site, site.name, site.is_cxc {$query2}",
                                     $queryData);
 
         if(sizeof( $bookings ) > 0):
@@ -252,6 +255,7 @@ trait QueryTrait
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                 CASE
+                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAID'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
                                     ELSE 'PENDING'
                                 END AS payment_status,
@@ -429,6 +433,7 @@ trait QueryTrait
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                 CASE
+                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAID'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
                                     ELSE 'PENDING'
                                 END AS payment_status,
