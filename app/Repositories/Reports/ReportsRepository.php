@@ -874,7 +874,7 @@ class ReportsRepository
         // dd($query, $queryHaving, $queryData);
         $bookings = $this->queryBookings($query, $queryHaving, $queryData);
         
-        return view('reports.reservations', [
+        return view('reports.reservations_new', [
             'breadcrumbs' => [
                 [
                     "route" => "",
@@ -1059,7 +1059,7 @@ class ReportsRepository
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
 
-        return view('reports.operations', [
+        return view('reports.operations_new', [
             'breadcrumbs' => [
                 [
                     "route" => "",

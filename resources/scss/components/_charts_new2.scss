@@ -1,0 +1,135 @@
+@import "../../plugins/bootstrap-select/select";
+
+#chartsModal2{
+  .modal-content{
+      background-color: #fafbfc;
+      font-family: Arial, sans-serif;
+
+      .modal-header{
+          h5{
+              color: #425466;
+              font-size: 18px;
+              font-weight: 700;
+              line-height: 24.15px;
+              letter-spacing: 0;
+          }
+      }
+
+      .modal-body{
+        background-color: #ffffff;
+        padding: 0;
+        max-height: 650px;
+        overflow-y: scroll;
+
+        .container_left, .container_right{
+          display: flex;
+          flex-direction: column;
+          
+          >div{
+            border-bottom: 1px solid #CCD6EB;
+            padding: 0.75rem; /*12*/
+            display: flex;
+            flex-direction: column;                
+            gap: 10px;
+
+            h6{
+              color: #425466;
+              font-size: 16px;
+              font-weight: 700;
+              letter-spacing: 0;
+              margin: 0 ;
+            }
+
+            .table-responsive {
+              border-radius: 8px;
+              // border: 1px solid #CCD6EB; // Bordes claros
+            
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                font-family: "Arial", sans-serif;
+                border-radius: 5px;
+                overflow: hidden; // Asegura que el borde redondeado aplique a la tabla
+            
+                thead, tfoot {            
+                  tr{
+                    th {
+                      background-color: rgba(51, 102, 255, 0.13) !important; // Fondo azul claro
+                      padding: 0.5rem;
+                      font-size: 0.625rem;
+                      font-weight: 600;
+                      color: #425466;
+                      text-align: left;
+                      border: 1px solid #CCD6EB; // Bordes claros
+                    }
+                  }
+                }
+            
+                tbody {
+                  tr {
+                    th, td {
+                      padding: 0.5rem;
+                      font-size: 0.625rem;
+                      color: #425466;
+                      text-align: left;
+                      border: 1px solid #CCD6EB; // Bordes sutiles
+            
+                      &:first-child {
+                        font-weight: 600; // Estatus en negrita
+                      }
+                    }
+                  }
+                }
+            
+                tfoot {
+                  tr {                        
+                    th, td {
+                      background-color: rgba(0, 172, 71, 0.13) !important; // Fondo verde claro para el total
+                    }
+                  }
+                }
+              }
+            }
+
+            >div:not(.table-responsive){ // Aplica solo si el segundo >div no tiene la clase table-responsive
+              display: flex;
+              flex-direction: column-reverse;
+              gap: 10px;
+              h6{
+                margin-bottom: 10px;
+              }
+            }
+            
+            &:last-child{
+              border: 0;
+            }
+          }          
+        }
+
+        @media (min-width: 992px) {
+            max-height: auto;
+            overflow: auto;                    
+            display: grid;
+            grid-template-columns: 1fr 430px;
+
+            .container_left, .container_right{
+              max-height: 650px;
+              overflow-y: scroll;
+
+              >div{
+
+                >div:not(.table-responsive){ // Aplica solo si el segundo >div no tiene la clase table-responsive
+                  display: grid;
+                  grid-template-columns: 300px 1fr;
+                }
+              }
+            }
+
+            .container_left{
+              border-right: 1px solid #CCD6EB;
+            }
+        }          
+      }
+  }
+}
+  

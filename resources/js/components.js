@@ -114,13 +114,12 @@ let components = {
     actionTableChart: function(table, section = "general"){
         const _settings = {};
 
-        _settings.dom = `<'table-responsive'tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+        _settings.dom = `<'table-responsive'tr>`;
         _settings.deferRender = true;
         _settings.responsive = false;
         if (section == "driver") {
             _settings.order = [[3, 'desc']];
-            _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
+            // _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
         }else if(section == "commissions"){
             _settings.order = [[1, 'desc']];
         }else{
