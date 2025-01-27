@@ -162,6 +162,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);
+    Route::match(['post'], '/payments/conciliation', [PaymentsController::class, 'conciliation'])->name('payments.conciliation');
 
     Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
     Route::get('/tpv/edit/{code}', [TpvController::class, 'index'])->name('tpv.new');

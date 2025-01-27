@@ -12,7 +12,7 @@ if ( document.getElementById('lookup_date') != null ) {
 }
 
 if( document.querySelector('.table-rendering') != null ){
-    components.actionTable($('.table-rendering'), 'fixedheaderPagination');
+    components.actionTable($('.table-rendering'), 'fixedheaderPaginationCheck');
     components.actionTableChart($('.table-chart-general'), 'general');
 }
 components.formReset();
@@ -159,6 +159,86 @@ if( __payment_infos.length > 0 ){
         });        
     });
 }
+
+// Lógica Para Seleccionar/Deseleccionar todos los checkboxes
+// $('#select-all').on('change', function () {
+//     const rows = __table_render.rows({ search: 'applied' }).nodes();
+//     console.log(rows);    
+//     $('input[type="checkbox"]', rows).prop('checked', this.checked);
+// });
+// document.getElementById('select-all').addEventListener('click', function () {
+//     const rows = __table_render.rows({ search: 'applied' }).nodes();
+//     console.log(rows);    
+//     rows.forEach(row => {
+//         const checkboxes = row.querySelectorAll('input[type="checkbox"]');
+//         checkboxes.forEach(checkbox => {
+//             checkbox.checked = this.checked;
+//         });
+//     });
+// });
+document.getElementById('select-all').addEventListener('change', function () {
+    const isChecked = this.checked;
+    const checkboxes = document.querySelectorAll('.row-check');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = isChecked;
+    });
+});
+
+// Lógica para sincronizar el checkbox "select-all" con las filas seleccionadas
+document.querySelector('#dataReceivable tbody').addEventListener('change', function (event) {
+    if (event.target.classList.contains('row-check')) {
+        const allCheckboxes = document.querySelectorAll('.row-check');
+        const checkedCheckboxes = document.querySelectorAll('.row-check:checked');
+        const allChecked = allCheckboxes.length === checkedCheckboxes.length;
+        document.getElementById('select-all').checked = allChecked;
+    }
+});
+
+document.getElementById('processSelected').addEventListener('click', function () {
+    let selectedIds = [];
+    const checkboxes = document.querySelectorAll('.row-check:checked');
+
+    checkboxes.forEach(function (checkbox) {
+        selectedIds.push(checkbox.value); // Obtén los IDs de las filas seleccionadas
+    });
+
+    if (selectedIds.length === 0) {
+        components.proccessResponse({
+            status: "error",
+            message: "No hay reservas seleccionadas.",
+            reload: false
+        });
+        return;
+    }
+
+    // Aquí puedes procesar los IDs seleccionados
+    console.log('IDs seleccionados:', selectedIds);
+
+    let __params = {ids: selectedIds};
+    components.request_exec_ajax( _LOCAL_URL + "/payments/conciliation", 'POST', __params );
+
+    // Ejemplo: enviar los datos mediante fetch
+    // fetch('/process-selected', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ ids: selectedIds }),
+    // })
+    // .then(response => {
+    //     if (response.ok) {
+    //         return response.json();
+    //     }
+    //     throw new Error('Error al procesar los datos.');
+    // })
+    // .then(data => {
+    //     alert('Datos procesados correctamente.');
+    // })
+    // .catch(error => {
+    //     alert(error.message);
+    // });
+});
+
 
 components.renderCheckboxColumns('dataReceivable', 'columns');
 components.setValueSelectpicker();

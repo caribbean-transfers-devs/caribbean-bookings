@@ -185,4 +185,59 @@ class PaymentRepository
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function conciliation($request){
+        try {
+            //code...
+            DB::beginTransaction();
+            if( isset($request->ids) && !empty($request->ids) ){
+                foreach ($request->ids as $key => $id) {
+                    $reservation = Reservation::with('sales')->where('id', $id)->first();
+                    $total = 0;
+                    foreach ($reservation->sales as $key => $sale) {
+                        $total += $sale->total;
+                    }
+
+                    $payment = new Payment();
+                    $payment->description = 'Panel';
+                    $payment->total = $total;
+                    $payment->exchange_rate = 1.00;
+                    $payment->status = 1;
+                    $payment->operation = ( $reservation->currency == "USD" ? "multiplication" : "division" );
+                    $payment->payment_method = "TRANSFER";
+                    $payment->currency = $reservation->currency;
+                    $payment->reservation_id = $id;
+                    $payment->reference = "CONCILIACION-".$id;
+                    $payment->user_id = auth()->user()->id;
+                    $payment->is_conciliated = 1;
+                    $payment->total_net = $total;
+                    $payment->conciliation_comment = "";
+
+                    $payment->save();
+
+                    $this->create_followUps($id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: TRANSFER, por un monto de: '.$total.' '.$reservation->currency, 'HISTORY', 'CREATE_PAYMENT');
+                }
+
+                DB::commit();
+
+                // Payment created successfully
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'El pago se creo correctamente',
+                ], Response::HTTP_CREATED);                
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => "No se encontron reservas para procesar.",
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                // 'message' => 'Error al crear el pago, contacte a soporte',
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

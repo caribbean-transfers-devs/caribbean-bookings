@@ -123,18 +123,18 @@
                                                 @foreach ($dataCurrency['data'] as $keyCurrency => $currency )
                                                     <tr>
                                                         <th>{{ $currency['name'] }}</th>
-                                                        <td class="text-center">{{ number_format($currency['gran_total'],2) }}</td>
-                                                        <td class="text-center">{{ $currency['counter'] }}</td>
                                                         <td class="text-center">{{ number_format($currency['total'],2) }}</td>
+                                                        <td class="text-center">{{ number_format($currency['gran_total'],2) }}</td>
+                                                        <td class="text-center">{{ $currency['counter'] }}</td>                                                        
                                                     </tr>
                                                 @endforeach
                                             </tbody>
                                             <tfoot>
                                                 <tr>
                                                     <th>TOTAL</th>
+                                                    <th class="text-center">{{ number_format($dataCurrency['total'],2) }}</th>
                                                     <th class="text-center">{{ number_format($dataCurrency['gran_total'],2) }}</th>
                                                     <th class="text-center">{{ $dataCurrency['counter'] }}</th>
-                                                    <th class="text-center">{{ number_format($dataCurrency['total'],2) }}</th>
                                                 </tr>
                                             </tfoot>
                                         </table>

@@ -165,6 +165,13 @@
                 )                
             ),
             array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Conciliar Reservas',
+                'className' => 'btn btn-primary',
+                'attr' => array(
+                    'id' =>  "processSelected",
+                )
+            ),            
+            array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas',
                 'titleAttr' => 'Ver graficas',
                 'className' => 'btn btn-primary',
@@ -202,9 +209,15 @@
                     </div>
                 @endif
                 
-                <table id="dataBookings" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataReceivable" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
+                            <th class="text-center">
+                                <div class="form-check form-check-primary">
+                                    <input class="form-check-input chk-parent" type="checkbox" id="select-all">
+                                </div>
+                            </th> <!-- Checkbox para seleccionar todos -->
+                            <th class="text-center">CONCILIADO</th>
                             <th class="text-center">ID</th>
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
@@ -433,6 +446,16 @@
                                     $dataOriginSale['counter']++;
                                 @endphp
                                 <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
+                                    <td class="text-center">
+                                        @if ( $item->is_conciliated == 0 && $item->reservation_status == "CREDIT" )
+                                            <div class="form-check form-check-primary">
+                                                <input class="form-check-input chk-chk row-check" type="checkbox" value="{{ $item->reservation_id }}">
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn {{ $item->is_conciliated == 0 && $item->reservation_status == "CREDIT" ? 'btn-danger __btn_conciliation' : 'btn-success' }} mt-2" data-reservation="{{ $item->reservation_id }}">{{ $item->is_conciliated == 0 && $item->reservation_status == "CREDIT" ? "CONCILIAR PAGO" : "PAGO CONCILIADO" }}</button>
+                                    </td>
                                     <td class="text-center">{{ $item->reservation_id }}</td>
                                     <td class="text-center"><span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
@@ -456,9 +479,6 @@
                                     <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' }}</td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }}">{{ BookingTrait::statusBooking($item->reservation_status) }}</button>
-                                        @if ( $item->is_conciliated == 0 && $item->reservation_status == "CREDIT" )
-                                            <button class="btn btn-primary __btn_conciliation mt-2" data-reservation="{{ $item->reservation_id }}">CONCILIAR PAGO</button>
-                                        @endif
                                     </td>
                                     <td class="text-center">{{ $item->full_name }}</td>
                                     <td class="text-center">{{ $item->client_phone }}</td>

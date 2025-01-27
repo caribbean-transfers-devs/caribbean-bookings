@@ -17,8 +17,6 @@ mix.copy('resources/js/base.js', data.assets + "js/base.min.js");
 mix.copy('resources/js/datatables.js', data.assets + "js/datatables.js");
 mix.copy('resources/js/sweetalert2.all.min.js', data.assets + "js/sweetalert2.js");
 
-mix.copy('resources/js/views/reservations/reservationsIndex.js', data.assets + "js/views/reservations/reservationsIndex.js");
-
 mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/admin.min.css");
 
 /************************************************************
