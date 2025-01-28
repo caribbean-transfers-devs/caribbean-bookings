@@ -2,16 +2,13 @@
 
 namespace App\Repositories\Sales;
 
-use App\Models\Reservation;
-use App\Models\ReservationFollowUp;
-use App\Models\Sale;
-use App\Models\SalesType;
-use App\Models\User;
-use App\Models\UserRole;
-use App\Repositories\Reservations\ReservationsRepository;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+
+//MODELS
+use App\Models\Reservation;
+use App\Models\Sale;
 
 //TRAIS
 use App\Traits\FollowUpTrait;
@@ -91,10 +88,8 @@ class SaleRepository
     {
         try {
             DB::beginTransaction();
-            //SEND A FOLLOW UP SAYING IT WAS DELETED
+
             $reservation = Reservation::find($sale->reservation_id);
-            // $repo = new ReservationsRepository();
-            // $repo->create_followUps($reservation->id, 'Venta eliminada por '.auth()->user()->name, 'HISTORY', 'ELIMINACIÓN');
             $sale->delete();
 
             $this->create_followUps($sale->reservation_id, 'El usuario: '.auth()->user()->name.', elimino la venta con ID: '.$sale->id.', por un monto de: '.$sale->total, 'HISTORY', 'DELETE_SALE');

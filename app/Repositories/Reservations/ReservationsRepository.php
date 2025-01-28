@@ -16,16 +16,18 @@ use App\Models\Sale;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 //TRAITS
 use App\Traits\MailjetTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
+use App\Traits\FollowUpTrait;
 use App\Traits\Reports\PaymentsTrait;
 
 class ReservationsRepository
 {
-    use MailjetTrait, FiltersTrait, QueryTrait, PaymentsTrait;
+    use MailjetTrait, FiltersTrait, QueryTrait, FollowUpTrait, PaymentsTrait;
 
     public function reservationPayments($reservation){
         return $this->getPayments($reservation->id);
@@ -717,22 +719,11 @@ class ReservationsRepository
     }
 
     public function follow_ups($request){
-        $check = $this->create_followUps($request->reservation_id, $request->text, $request->type, $request->name);
+        $check = $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", agrego el siguiente comentario: ".$request->text, $request->type, Str::slug(strtoupper($request->name)));
         if($check){
             return response()->json(['message' => 'Follow up created successfully','success' => true], Response::HTTP_OK);
         }else{
             return response()->json(['message' => 'Error creating follow up','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }    
-
-    public function create_followUps($reservation_id, $text, $type, $name = null){
-        $follow_up = new ReservationFollowUp();
-        $follow_up->reservation_id = $reservation_id;
-        $follow_up->text = $text;
-        $follow_up->type = $type;
-        $follow_up->name = $name;
-        $follow_up->save();
-
-        return $follow_up->id;
     }
 }

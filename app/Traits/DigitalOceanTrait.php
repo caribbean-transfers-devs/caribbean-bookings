@@ -5,10 +5,13 @@ use Aws\S3\S3Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ReservationsMedia;
-use App\Repositories\Reservations\ReservationsRepository;
+
+//TRAIS
+use App\Traits\FollowUpTrait;
 
 trait DigitalOceanTrait
 {
+    use FollowUpTrait;
     
     private function getS3Client()
     {
@@ -63,8 +66,7 @@ trait DigitalOceanTrait
             $media->type_media = $request->type_media;
             $media->save();
 
-            $repo = new ReservationsRepository();
-            $repo->create_followUps($request->input('folder'), "El usuario: ".auth()->user()->name.", ha agregado el archivo multimedia: ".$file->getClientOriginalName(), 'HISTORY', 'MEDIA');
+            $this->create_followUps($request->input('folder'), "El usuario: ".auth()->user()->name.", ha agregado el archivo multimedia: ".$file->getClientOriginalName(), 'HISTORY', 'MEDIA');
             
             if( isset($request->type_action) && $request->type_action == "upload" ){
                 return response()->json([
@@ -111,8 +113,7 @@ trait DigitalOceanTrait
                     'Key'    => $media->path,
                 ]);
                 
-                $repo = new ReservationsRepository();
-                $repo->create_followUps($media->reservation_id, "El usuario: ".auth()->user()->name.", ha eliminado el archivo multimedia: ".$request->name, 'HISTORY', 'MEDIA');
+                $this->create_followUps($media->reservation_id, "El usuario: ".auth()->user()->name.", ha eliminado el archivo multimedia: ".$request->name, 'HISTORY', 'MEDIA');
                 
                 $media->delete();
 

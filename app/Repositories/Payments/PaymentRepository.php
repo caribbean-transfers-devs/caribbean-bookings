@@ -2,19 +2,16 @@
 
 namespace App\Repositories\Payments;
 
-use App\Models\Payment;
-use App\Models\Reservation;
-use App\Models\ReservationFollowUp;
-use App\Models\SalesType;
-use App\Models\User;
-use App\Models\UserRole;
-use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Exception;
 use Carbon\Carbon;
 
+//MODELS
+use App\Models\Reservation;
+use App\Models\Payment;
+
 //REPOSITORY
-use App\Repositories\Reservations\ReservationsRepository;
 use App\Repositories\Accounting\ConciliationRepository;
 
 //TRAIS
@@ -30,30 +27,24 @@ class PaymentRepository
         try {
             DB::beginTransaction();
             
-            $payment = new Payment();
-            $payment->reservation_id = $request->reservation_id;
+            $payment = new Payment();            
             $payment->description = 'Panel';
-            $payment->total = $request->total;
-            $payment->status = 1;
+            $payment->total = $request->total;            
             $payment->exchange_rate = $request->exchange_rate;
+            $payment->status = 1;
             $payment->operation = $request->operation;
             $payment->payment_method = $request->payment_method;
             $payment->currency = $request->currency;
             $payment->reservation_id = $request->reservation_id;
             $payment->reference = $request->reference;
-
-            $payment->created_at = date('Y-m-d H:m:s');
-            $payment->updated_at = date('Y-m-d H:m:s');
-
+            $payment->user_id = auth()->user()->id;
             if( isset($request->is_conciliated) && $request->is_conciliated == 1 ){
                 if( $request->payment_method != "PAYPAL" && $request->payment_method != "STRIPE" && $request->payment_method != "CARD" ){
                     $payment->is_conciliated = $request->is_conciliated;
                     $payment->total_net = $request->total;
                     $payment->conciliation_comment = $request->conciliation_comment;
-                }                
+                }
             }
-
-            $payment->user_id = auth()->user()->id;
             $payment->save();
 
             $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency, 'HISTORY', 'CREATE_PAYMENT');
@@ -110,17 +101,15 @@ class PaymentRepository
                 $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', '.( $request->is_conciliated == 0 ? "desconcilio" : "concilio" ).' el pago con ID: '.$payment->id.' de ( tipo: '.$payment->payment_method.', por un monto de: '.$payment->total.' '.$payment->currency.' )', 'HISTORY', 'PAYMENT_CONCILIATION');
             }
 
-            $payment->reservation_id = $request->reservation_id;
             $payment->description = 'Panel';
             $payment->total = $request->total;
-            $payment->status = 1;
-            $payment->operation = $request->operation;
             $payment->exchange_rate = $request->exchange_rate;
+            $payment->status = 1;
+            $payment->operation = $request->operation;            
             $payment->payment_method = $request->payment_method;
             $payment->currency = $request->currency;
             $payment->reservation_id = $request->reservation_id;
-            $payment->reference = $request->reference;
-
+            $payment->reference = $request->reference;            
             if( isset($request->is_conciliated) && $request->is_conciliated == 1 ){
                 $conciliation = new ConciliationRepository();
                 if( $request->payment_method == "PAYPAL" ){
@@ -137,9 +126,6 @@ class PaymentRepository
                     $payment->conciliation_comment = $request->conciliation_comment;
                 }
             };
-
-            $payment->updated_at = date('Y-m-d H:m:s');
-
             $payment->save();
 
             DB::commit();
@@ -162,17 +148,14 @@ class PaymentRepository
     {
         try {
             DB::beginTransaction();
-            //SEND A FOLLOW UP SAYING IT WAS DELETED
+            
             $reservation = Reservation::find($payment->reservation_id);
-            // $repo = new ReservationsRepository();
-            // $repo->create_followUps($reservation->id, 'Pago eliminado por '.auth()->user()->name, 'HISTORY', 'ELIMINACIÓN');
             $payment->delete();
 
             $this->create_followUps($payment->reservation_id, 'El usuario: '.auth()->user()->name.', elimino el pago con ID: '.$payment->id.', por un monto de: '.$payment->total.' '.$payment->currency, 'HISTORY', 'DELETE_PAYMENT');
 
             DB::commit();
 
-            // Payment deleted successfully
             return response()->json([
                 'status' => 'success',
                 'message' => 'El pago se elimino correctamente'
@@ -188,8 +171,8 @@ class PaymentRepository
 
     public function conciliation($request){
         try {
-            //code...
             DB::beginTransaction();
+
             if( isset($request->ids) && !empty($request->ids) ){
                 foreach ($request->ids as $key => $id) {
                     $reservation = Reservation::with('sales')->where('id', $id)->first();
@@ -212,7 +195,6 @@ class PaymentRepository
                     $payment->is_conciliated = 1;
                     $payment->total_net = $total;
                     $payment->conciliation_comment = "";
-
                     $payment->save();
 
                     $this->create_followUps($id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: TRANSFER, por un monto de: '.$total.' '.$reservation->currency, 'HISTORY', 'CREATE_PAYMENT');
@@ -220,7 +202,6 @@ class PaymentRepository
 
                 DB::commit();
 
-                // Payment created successfully
                 return response()->json([
                     'status' => 'success',
                     'message' => 'El pago se creo correctamente',
