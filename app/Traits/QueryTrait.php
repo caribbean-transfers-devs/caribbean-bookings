@@ -67,7 +67,8 @@ trait QueryTrait
                                     END AS payment_status,
                                     GROUP_CONCAT(
                                         DISTINCT 
-                                        CASE 
+                                        CASE
+                                            WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
                                             WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
                                             ELSE 'CASH'
                                         END
