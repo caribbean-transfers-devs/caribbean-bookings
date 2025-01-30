@@ -12,6 +12,7 @@
 @section('title') Gestion De Operación @endsection
 
 @push('Css')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="stylesheet" >
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
@@ -61,6 +62,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
@@ -191,6 +193,7 @@
             </div>
         </div>
     @endif
+    <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
 
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 layout-spacing">
         <div class="widget-content widget-content-area br-8">
@@ -482,7 +485,7 @@
     <x-modals.reservations.operation_media_history /> <!-- HISTORIAL DE MEDIA DE LA RESERVACION -->
     <x-modals.reservations.operation_data_customer /> <!-- INFORMACIÓN DEL CLIENTE -->
     <x-modals.reservations.operation_confirmations />
-    <x-modals.reservations.operation_data_whatsapp />    
+    <x-modals.reservations.operation_data_whatsapp />
 @endsection
 
 @push('Js')

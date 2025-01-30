@@ -72,38 +72,48 @@ class ReservationsRepository
     }
 
     public function destroy($request, $reservation){
-        try {            
+        try {
             // Verificar si existe algún ítem relacionado con status COMPLETED
             $hasCompletedItems = $reservation->items()->where(function ($query) {
                 $query->where('op_one_status', 'COMPLETED')
                 ->orWhere('op_two_status', 'COMPLETED');
             })->exists();
 
-            // Cannot cancel the reservation because it has items with status COMPLETED
+            // No se puede cancelar la reserva porque tiene artículos con estado COMPLETADO
             if ($hasCompletedItems) {                
                 return response()->json(['status' => 'warning', 'message' => 'No se puede cancelar la reserva porque tiene servicios con estado COMPLETADO'], Response::HTTP_BAD_REQUEST);
             }
 
-            DB::beginTransaction();           
+            DB::beginTransaction();
+
             $reservation->is_cancelled = 1;
             ( isset($request->type) ? $reservation->cancellation_type_id = $request->type : '' );
             $reservation->save();
 
-            // Actualizar los estados de los ítems
+            // Actualizar los estados de los ítems y el ID por el tipo de cancelación
             $reservation->items()->update([
                 'op_one_status' => 'CANCELLED',
-                'op_two_status' => 'CANCELLED'
+                'op_one_cancellation_type_id' => $request->type,
+                'op_two_status' => 'CANCELLED',
+                'op_two_cancellation_type_id' => $request->type
             ]);
 
             $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", cancelo la reservación: ".$reservation->id, 'HISTORY', 'CANCELLATION_BOOKING');
             
             DB::commit();
             // Reservation cancelled successfully
-            return response()->json(['status' => 'success', 'message' => 'Reserva cancelada correctamente'], Response::HTTP_OK);
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Reserva cancelada correctamente'
+            ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
             // Error cancelling reservation
-            return response()->json(['status' => 'danger', 'message' => 'Error al cancelar la reserva'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json([
+                'status' => 'danger', 
+                'message' => 'Error al cancelar la reserva',
+                // 'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

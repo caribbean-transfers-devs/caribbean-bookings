@@ -110,6 +110,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
                 });
+            }
+            if( __chartSaleStatus != null ){
                 new Chart(__chartSaleStatus2, {
                     type: 'pie',
                     data: {
@@ -212,6 +214,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
                 });
+            }
+            if( __chartSaleMethodPayments2 != null ){
                 new Chart(__chartSaleMethodPayments2, {
                     type: 'pie',
                     data: {
@@ -314,6 +318,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
                 });
+            }
+            if( __chartSaleCurrency2 != null ){
                 new Chart(__chartSaleCurrency2, {
                     type: 'pie',
                     data: {
@@ -416,6 +422,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
                 });
+            }
+            if( __chartSaleVehicle2 != null ){
                 new Chart(__chartSaleVehicle2, {
                     type: 'pie',
                     data: {
@@ -460,7 +468,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
                     },
                     plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
-                });                
+                });
             }
         },
         dataChartServiceType: function(){
@@ -518,6 +526,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
                 });
+            }
+            if( __chartSaleServiceType2 != null ){
                 new Chart(__chartSaleServiceType2, {
                     type: 'pie',
                     data: {

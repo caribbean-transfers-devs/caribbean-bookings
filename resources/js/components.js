@@ -277,7 +277,9 @@ let components = {
             dataType: "json", // Tipo de datos que se espera en la respuesta del servidor
             contentType: 'application/json; charset=utf-8',
             beforeSend: function(){
-                components.loadScreen();
+                if( !_params.hasOwnProperty('loading') ){
+                    components.loadScreen();
+                }                
             },
             success: function(response) {
                 // Manejar la respuesta exitosa del servidor
@@ -524,6 +526,11 @@ let components = {
         }
     },
 
+    /**
+     * 
+     * @param {*} __table 
+     * @param {*} __storageName 
+     */
     validateColumnVisibility: function(__table, __storageName){
         const __DataTable = $(__table).DataTable(); //DOM DataTable
         const localStorageKey = __storageName; //El nombre del localStorage        

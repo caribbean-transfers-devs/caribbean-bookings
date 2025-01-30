@@ -18,6 +18,7 @@ use App\Models\Destination;
 use App\Models\DestinationService;
 
 //TRAIT
+use App\Traits\ApiTrait;
 use App\Traits\CodeTrait;
 use App\Traits\RoleTrait;
 use App\Traits\FiltersTrait;
@@ -37,8 +38,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class OperationsController extends Controller
 {
-
-    use CodeTrait, RoleTrait, FiltersTrait, QueryTrait, FollowUpTrait;
+    use ApiTrait, CodeTrait, RoleTrait, FiltersTrait, QueryTrait, FollowUpTrait;
 
     public function index(Request $request){
         ini_set('memory_limit', '-1'); // Sin límite
@@ -129,6 +129,7 @@ class OperationsController extends Controller
             'reservation_status' => $this->reservationStatus(),
             'vehicles' => $this->Vehicles(),
             'zones' => $this->Zones(),
+            'types_cancellations' => ApiTrait::makeTypesCancellations(),
             'units' => $this->Units(), //LAS UNIDADES DADAS DE ALTA
             'units2' => $this->Units('active'), //LAS UNIDADES DADAS DE ALTA
             'drivers' => $this->Drivers(),
