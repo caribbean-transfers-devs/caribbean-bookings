@@ -54,17 +54,19 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/', [DashboardController::class, 'index'])->name('dashboard.search');
 
     //BOTS 
-    Route::get('/bot/conciliation/paypal', [ConciliationController::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
-    Route::get('/bot/conciliation/stripe', [ConciliationController::class, 'StripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
-    Route::get('/conciliation/paypalOrders', [ConciliationController::class, 'PayPalPaymenOrders'])->name('bot.paypal.orders')->withoutMiddleware(['auth']);
-    Route::get('/conciliation/paypal/{reference}', [ConciliationController::class, 'PayPalPaymenReference'])->name('bot.paypal.reference')->withoutMiddleware(['auth']);
-    Route::get('/conciliation/paypalOrder/{id}', [ConciliationController::class, 'PayPalPaymenOrder'])->name('bot.paypal.order')->withoutMiddleware(['auth']);
-    Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
+        //PAYPAL
+        Route::get('/bot/conciliation/paypal', [ConciliationController::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
+        Route::get('/conciliation/paypalOrders', [ConciliationController::class, 'PayPalPaymenOrders'])->name('bot.paypal.orders')->withoutMiddleware(['auth']);
+        Route::get('/conciliation/paypal/{reference}', [ConciliationController::class, 'PayPalPaymenReference'])->name('bot.paypal.reference')->withoutMiddleware(['auth']);
+        Route::get('/conciliation/paypalOrder/{id}', [ConciliationController::class, 'PayPalPaymenOrder'])->name('bot.paypal.order')->withoutMiddleware(['auth']);
+        //STRIPE
+        Route::get('/bot/conciliation/stripe', [ConciliationController::class, 'StripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
+        Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
 
     //FINANZAS    
-    //PAGOS
-    Route::get('/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales');
-    Route::post('/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales.action');
+        //PAGOS
+        Route::get('/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales');
+        Route::post('/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales.action');
 
     //REPORTES
         //PAGOS
@@ -111,7 +113,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::match(['post'], '/operation/spam/history/add', [SPAM::class, 'addHistory'])->name('operation.spam.add.history');
         Route::match(['post'], '/operation/pending/get', [PENDING::class, 'get'])->name('operation.pending.get');
         
-
         Route::put('/operation/confirmation/update-status', [OperationController::class, 'updateStatusConfirmation'])->name('operation.confirmation.update');
         Route::get('/operation/spam/exportExcel', [OperationController::class, 'exportExcel'])->name('operation.spam.exportExcel');
         Route::put('/operation/spam/update-status', [OperationController::class, 'spamUpdate'])->name('operation.spam.update');
@@ -139,7 +140,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/operation/board/exportExcel', [Operations::class, 'exportExcelBoard'])->name('operation.board.exportExcel');
         Route::get('/operation/board/exportExcelCommission', [Operations::class, 'exportExcelBoardCommision'])->name('operation.board.exportExcelComission');
 
-    
+    //CONFIGURACIONES
     Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');
     Route::get('/reservation/payments/{reservation}', [ReservationsController::class, 'reservationPayments'])->name('reservation.payments');
     Route::put('/reservationsDuplicated/{reservation}', [ReservationsController::class, 'duplicated'])->name('reservations.duplicated');

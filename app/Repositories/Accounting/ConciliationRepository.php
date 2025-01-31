@@ -25,6 +25,8 @@ class ConciliationRepository
         $this->initStripe();        
     }
 
+    //PAYPAL
+
     public function PayPalPayments($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
@@ -85,6 +87,10 @@ class ConciliationRepository
         }
     }
 
+    //STRIPE 
+
+    //ESTE METODO ES EL QUE UTIIZA EL BOT PARA CONCILIAR VARIOS PAGOS AL MISMO TIEMPO
+    //ESTE METODO ES UTILIZADO PARA CONCILIAR VARIOS PAGOS AL MISMO TIEMPO MEDIANTE UN RANGO DE FECHAS ESPECIFICADOS
     public function StripePayments($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
@@ -114,7 +120,12 @@ class ConciliationRepository
 
     public function StripePaymentReference($request, $reference)
     {
-        return ( isset($requet->version) && $requet->version == "V2" ? $this->getPaymentInfoV2($reference) : $this->getPaymentInfoV1($reference) );
+        $response = $this->getPaymentInfoV1($reference);
+        if(  isset($response->original['id']) ){
+            return $response;
+        }else{
+            return $this->getPaymentInfoV2($reference);
+        }
     }    
 
     public function conciliationStripePayment($request, $payment)

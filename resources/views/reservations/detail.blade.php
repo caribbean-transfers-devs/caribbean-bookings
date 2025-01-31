@@ -401,8 +401,8 @@
                                                                     <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
                                                                     <a class="dropdown-item" href="#" onclick="setStatus(event,  'arrival', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
                                                                     <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
-                                                                    {{-- <hr>
-                                                                    <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a> --}}
+                                                                    <hr>
+                                                                    <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
                                                                 </div>
                                                             @else                                                                
                                                                 <button <?=$tooltip?> type="button" class="btn {{ $btn_op_one_type }} bs-tooltip">{{ BookingTrait::statusBooking($item->op_one_status) }}</button>                                
@@ -480,8 +480,8 @@
                                                                         <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
                                                                         <a class="dropdown-item" href="#" onclick="setStatus(event,  'departure', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
                                                                         <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
-                                                                        {{-- <hr>
-                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a> --}}
+                                                                        <hr>
+                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
                                                                     </div>
                                                                 @else
                                                                     <button <?=$tooltip?> type="button" class="btn {{ $btn_op_two_type }} bs-tooltip">{{ BookingTrait::statusBooking($item->op_two_status) }}</button> 
