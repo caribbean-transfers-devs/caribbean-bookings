@@ -111,9 +111,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
                 });
             }
-            if( __chartSaleStatus != null ){
+            if( __chartSaleStatus2 != null ){
                 new Chart(__chartSaleStatus2, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: charts.dataChartSaleStatus().map(row => row.name),
                         datasets: [
@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         plugins: {
                             legend: {
                                 display: true,  // Mostrar las etiquetas
-                                position: 'right', // Colocar las etiquetas debajo del gráfico
+                                position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                 labels: {
                                     padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                     boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             if( __chartSaleMethodPayments2 != null ){
                 new Chart(__chartSaleMethodPayments2, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: charts.dataChartSaleMethodPayments().map(row => row.name),
                         datasets: [
@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         plugins: {
                             legend: {
                                 display: true,  // Mostrar las etiquetas
-                                position: 'right', // Colocar las etiquetas debajo del gráfico
+                                position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                 labels: {
                                     padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                     boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             if( __chartSaleCurrency2 != null ){
                 new Chart(__chartSaleCurrency2, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: charts.dataChartSaleCurrency().map(row => row.name),
                         datasets: [
@@ -336,7 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         plugins: {
                             legend: {
                                 display: true,  // Mostrar las etiquetas
-                                position: 'right', // Colocar las etiquetas debajo del gráfico
+                                position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                 labels: {
                                     padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                     boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
@@ -425,7 +425,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             if( __chartSaleVehicle2 != null ){
                 new Chart(__chartSaleVehicle2, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: charts.dataChartVehicle().map(row => row.name),
                         datasets: [
@@ -440,7 +440,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         plugins: {
                             legend: {
                                 display: true,  // Mostrar las etiquetas
-                                position: 'right', // Colocar las etiquetas debajo del gráfico
+                                position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                 labels: {
                                     padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                     boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
@@ -529,7 +529,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             if( __chartSaleServiceType2 != null ){
                 new Chart(__chartSaleServiceType2, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: charts.dataChartServiceType().map(row => row.name),
                         datasets: [
@@ -544,7 +544,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         plugins: {
                             legend: {
                                 display: true,  // Mostrar las etiquetas
-                                position: 'right', // Colocar las etiquetas debajo del gráfico
+                                position: 'bottom', // Colocar las etiquetas debajo del gráfico
                                 labels: {
                                     padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
                                     boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
@@ -871,40 +871,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Agregamos un evento de scroll para el manejo de la activación
     // Función para manejar el scroll
-    __container.addEventListener('scroll', () => {
-        let activeSectionIndex = -1; // Índice inicial
-        let activeSectionId = null; // ID inicial 
+    if( __container != null ){
+        __container.addEventListener('scroll', () => {
+            let activeSectionIndex = -1; // Índice inicial
+            let activeSectionId = null; // ID inicial 
 
-        // Recorremos las secciones para verificar cuál está visible en el viewport
-        __sections.forEach((__section, __key) => {
-            const containerTop = __container.scrollTop; // Posición actual del scroll
-            const sectionTop = __section.offsetTop - __container.offsetTop; // Posición de la sección dentro del contenedor
-            const sectionHeight = __section.offsetHeight;
+            // Recorremos las secciones para verificar cuál está visible en el viewport
+            __sections.forEach((__section, __key) => {
+                const containerTop = __container.scrollTop; // Posición actual del scroll
+                const sectionTop = __section.offsetTop - __container.offsetTop; // Posición de la sección dentro del contenedor
+                const sectionHeight = __section.offsetHeight;
 
-            // Si el centro de la sección está visible dentro del área del contenedor
-            const isVisible = 
-                containerTop >= sectionTop - sectionHeight / 2 &&
-                containerTop < sectionTop + sectionHeight / 2;
-            
-            if (isVisible) {
-                activeSectionIndex = __key; // Guardar índice
-                activeSectionId = __section.id; // Guardar ID
+                // Si el centro de la sección está visible dentro del área del contenedor
+                const isVisible = 
+                    containerTop >= sectionTop - sectionHeight / 2 &&
+                    containerTop < sectionTop + sectionHeight / 2;
+                
+                if (isVisible) {
+                    activeSectionIndex = __key; // Guardar índice
+                    activeSectionId = __section.id; // Guardar ID
+                }
+            });
+
+            // Mostrar el índice y el ID de la sección activa
+            if (activeSectionId) {
+                console.log(`Sección activa: ID=${activeSectionId}, Índice=${activeSectionIndex}`);
             }
-        });
 
-        // Mostrar el índice y el ID de la sección activa
-        if (activeSectionId) {
-            console.log(`Sección activa: ID=${activeSectionId}, Índice=${activeSectionIndex}`);
-        }
-
-        // Activamos el enlace correspondiente en el menú
-        __links.forEach((__link) => {
-            __link.classList.remove("active");
-            if (__link.getAttribute("href") === `#${activeSectionId}`) {
-                __link.classList.add("active");
-            }
+            // Activamos el enlace correspondiente en el menú
+            __links.forEach((__link) => {
+                __link.classList.remove("active");
+                if (__link.getAttribute("href") === `#${activeSectionId}`) {
+                    __link.classList.add("active");
+                }
+            });
         });
-    });
+    }
 
     // Opcional: Smooth scrolling al hacer clic en los enlaces
     if( __links.length > 0 ){

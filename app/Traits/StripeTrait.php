@@ -23,6 +23,10 @@ trait StripeTrait
         $this->clientSecretStripeP = config('services.stripe.secretKeyPrimary');
     }
 
+    /*********************************************************************/
+    /****************************** BALANCE ******************************/
+    /*********************************************************************/
+
     // Método para buscar un balance por ID
     public function getBalanceInfoV1($balanceTransaction)
     {
@@ -73,7 +77,11 @@ trait StripeTrait
                 'message' => $e->getMessage(),
             ], 500);
         }        
-    }    
+    }
+
+    /*********************************************************************/
+    /****************************** CHARGES ******************************/
+    /*********************************************************************/
 
     // Método para buscar un cargo por referencia
     public function getPaymentInfoV1($paymentReference)

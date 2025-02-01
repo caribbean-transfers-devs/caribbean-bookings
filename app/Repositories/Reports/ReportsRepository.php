@@ -874,7 +874,7 @@ class ReportsRepository
         // dd($query, $queryHaving, $queryData);
         $bookings = $this->queryBookings($query, $queryHaving, $queryData);
         
-        return view('reports.reservations_new', [
+        return view('reports.sales_new', [
             'breadcrumbs' => [
                 [
                     "route" => "",
