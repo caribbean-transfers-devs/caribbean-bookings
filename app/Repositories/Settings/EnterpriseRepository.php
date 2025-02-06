@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Enterprise;
+namespace App\Repositories\Settings;
 
 use Exception;
 use Illuminate\Http\Response;
@@ -17,7 +17,7 @@ class EnterpriseRepository
     {
         try {
             $enterprises = Enterprise::all();
-            return view('enterprises.index', [
+            return view('settings.enterprises.index', [
                 'breadcrumbs' => [
                     [
                         "route" => "",
@@ -33,7 +33,7 @@ class EnterpriseRepository
 
     public function create($request){
         try {
-            return view('enterprises.new',[
+            return view('settings.enterprises.new',[
                 'breadcrumbs' => [
                     [
                         "route" => route('enterprises.index'),
@@ -42,7 +42,7 @@ class EnterpriseRepository
                     ],
                     [
                         "route" => "",
-                        "name" => "Nuevo empresa",
+                        "name" => "Nueva empresa",
                         "active" => true
                     ]
                 ],                
@@ -58,6 +58,8 @@ class EnterpriseRepository
             $enterprise = new Enterprise();
             $enterprise->names = strtolower($request->names);
             $enterprise->is_external = $request->is_external;
+            $enterprise->status = $request->status;
+            $enterprise->type_enterprise = $request->type_enterprise;
             $enterprise->save();
 
             DB::commit();
@@ -85,7 +87,7 @@ class EnterpriseRepository
     public function edit($request, $id){
         try {
             $enterprise = Enterprise::find($id);
-            return view('enterprises.new',[
+            return view('settings.enterprises.new',[
                 'breadcrumbs' => [
                     [
                         "route" => route('enterprises.index'),
@@ -111,6 +113,8 @@ class EnterpriseRepository
             $enterprise = Enterprise::find($id);
             $enterprise->names = strtolower($request->names);
             $enterprise->is_external = $request->is_external;
+            $enterprise->status = $request->status;
+            $enterprise->type_enterprise = $request->type_enterprise;            
             $enterprise->save();
 
             DB::commit();

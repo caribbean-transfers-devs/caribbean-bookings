@@ -14,13 +14,6 @@ $(function() {
             );
             return false;
         }
-
-
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
     
         $.ajax({
             url: `/config/rates/get`,
@@ -31,6 +24,7 @@ $(function() {
                 $("#rates-container").empty().html(`<div class="spinner-container"><div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div></div>`);
             },
             success: function(resp) {
+                console.log(resp);                
                 $("#rates-container").empty().html(resp);                      
             }
         }).fail(function(xhr, status, error) {
@@ -60,11 +54,6 @@ $(document).ready(function () {
 });
 
 function getInputs(destinationID){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
 
     $.ajax({
         url: `/config/rates/destination/${destinationID}/get`,
@@ -155,11 +144,7 @@ $(document).on('click', '#btn_add_rate', function (e) {
 });
 
 function deleteItem(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
+
     swal.fire({
         title: '¿Está seguro de eliminar la tarifa?',
         text: "Esta acción no se puede revertir",

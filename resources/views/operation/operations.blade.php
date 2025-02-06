@@ -52,6 +52,30 @@
         .agency_30 td{
             color: #ffffff !important;
         }
+
+        /*ESTILO DE CAMPANA*/
+.bell-button {
+    /* font-size: 24px; */
+    border: none;
+    background: none;
+    cursor: pointer;
+    position: relative;
+    /* animation: ring 1s infinite ease-in-out; */
+    transition: transform 0.3s;
+}
+.bell-button.active {
+    animation: ring 1s infinite ease-in-out;
+    box-shadow: 0 0 10px red, 0 0 20px red;
+}
+@keyframes ring {
+    0% { transform: rotate(0); }
+    15% { transform: rotate(-15deg); }
+    30% { transform: rotate(15deg); }
+    45% { transform: rotate(-10deg); }
+    60% { transform: rotate(10deg); }
+    75% { transform: rotate(-5deg); }
+    100% { transform: rotate(0); }
+}
     </style>
 @endpush
 
@@ -233,7 +257,7 @@
                         <th class="text-center">INDICADORES</th>
                         <th class="text-center">HORA</th>
                         <th class="text-center">CLIENTE</th>
-                        <th class="text-center" class="text-center">TIPO DE SERVICIO</th>
+                        <th class="text-center">TIPO DE SERVICIO</th>
                         <th class="text-center">PAX</th>
                         <th class="text-center">ORIGEN</th>
                         <th class="text-center">DESTINO</th>
@@ -340,6 +364,12 @@
                                             <div class="btn btn-primary btn_operations __open_modal_customer bs-tooltip" title="Ver datos del cliente" data-code="{{ $value->reservation_id }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                             </div>
+
+                                            @if ( $value->is_round_trip == 1 && $value->final_service_type == "DEPARTURE" && ( $value->one_service_status == "CANCELLED" || $value->one_service_status == "NOSHOW" ) )
+                                                <div class="btn btn-primary btn_operations active notifications bell-button bs-tooltip" data-json="<?=json_encode($value)?>" onclick="notificationInfo({{ json_encode($value) }})" title="Por favor de confirmar el regreso con el cliente"> 
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>                                                    
+                                                </div>                                                
+                                            @endif
                                         </div>
                                         <div class="comment_new" id="comment_new_{{ $key.$value->id }}">
                                             @if ( $flag_comment )
@@ -485,7 +515,7 @@
     <x-modals.reservations.operation_media_history /> <!-- HISTORIAL DE MEDIA DE LA RESERVACION -->
     <x-modals.reservations.operation_data_customer /> <!-- INFORMACIÓN DEL CLIENTE -->
     <x-modals.reservations.operation_confirmations />
-    <x-modals.reservations.operation_data_whatsapp />
+    <x-modals.reservations.operation_data_whatsapp />    
 @endsection
 
 @push('Js')

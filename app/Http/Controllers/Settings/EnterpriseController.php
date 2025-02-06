@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Enterprise;
+namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,8 +9,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests\EnterpriseRequest;
 
 //REPOSITORY
-use App\Repositories\Enterprise\EnterpriseRepository;
+use App\Repositories\Settings\EnterpriseRepository;
 
+//TRAITS
 use App\Traits\RoleTrait;
 
 class EnterpriseController extends Controller
@@ -24,7 +25,9 @@ class EnterpriseController extends Controller
 
     public function index(Request $request)
     {
-        return $this->EnterpriseRepository->index($request);
+        if(RoleTrait::hasPermission(73)){
+            return $this->EnterpriseRepository->index($request);
+        }
     }
 
     public function create(Request $request)

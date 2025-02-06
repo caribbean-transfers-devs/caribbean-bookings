@@ -19,7 +19,7 @@
             array(  
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Agregar un sitio',
                 'className' => 'btn btn-primary ',
-                'url' => route('sites.create.enterprise', [$enterprise])
+                'url' => route('sites.create')
             )
         );    
     @endphp
@@ -50,6 +50,7 @@
                 <table id="dataSites" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
+                            <th class="text-center">Empresa</th>
                             <th class="text-center">Nombre</th>
                             <th class="text-center">Link logo</th>
                             <th class="text-center">Dominio</th>
@@ -69,6 +70,7 @@
                     <tbody>
                         @foreach ($sites as $site)
                             <tr>
+                                <td class="text-center">{{ $site->enterprise->names }}</td>
                                 <td class="text-center">{{ $site->name }}</td>
                                 <td class="text-center">
                                     <img src="{{ $site->logo }}" alt="{{ $site->name }}" width="180" height="60">

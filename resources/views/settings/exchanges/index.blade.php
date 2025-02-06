@@ -19,7 +19,7 @@
             array(  
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Agregar un tipo de cambio',
                 'className' => 'btn btn-primary __btn_create',
-                'url' => route('config.exchanges.create')
+                'url' => route('exchanges.create')
             )
         );
     @endphp
@@ -66,8 +66,8 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
-                                        <a class="btn btn-primary" href="{{ route('config.exchanges.edit', [$exchange->id]) }}">Editar</a>
-                                        <form action="{{ route('config.exchanges.destroy', $exchange->id) }}" method="POST">
+                                        <a class="btn btn-primary" href="{{ route('exchanges.edit', [$exchange->id]) }}">Editar</a>
+                                        <form action="{{ route('exchanges.destroy', $exchange->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">Eliminar</button>

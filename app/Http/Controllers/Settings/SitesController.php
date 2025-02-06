@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Sites;
+namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,11 +9,11 @@ use Illuminate\Http\Request;
 use App\Http\Requests\SiteRequest;
 
 //REPOSITORY
-use App\Repositories\Sites\SitesRepository;
+use App\Repositories\Settings\SitesRepository;
 
-//MODEL
-use App\Models\Enterprise;
-use App\Models\Site;
+
+//TRAITS
+use App\Traits\RoleTrait;
 
 class SitesController extends Controller
 {
@@ -24,19 +24,21 @@ class SitesController extends Controller
         $this->SitesRepository = $SitesRepository;
     }
 
-    public function index(Enterprise $Enterprise)
+    public function index(Request $request)
     {
-        return $this->SitesRepository->index($Enterprise);
-    }    
-
-    public function create(Request $request, Enterprise $Enterprise)
-    {
-        return $this->SitesRepository->create($request, $Enterprise);
+        if(RoleTrait::hasPermission(102)){
+            return $this->SitesRepository->index($request);
+        }
     }
 
-    public function store(SiteRequest $request, Enterprise $Enterprise)
+    public function create(Request $request)
     {
-        return $this->SitesRepository->store($request, $Enterprise);
+        return $this->SitesRepository->create($request);
+    }
+
+    public function store(SiteRequest $request)
+    {
+        return $this->SitesRepository->store($request);
     }
 
     public function edit(Request $request, Site $Site)
@@ -52,5 +54,5 @@ class SitesController extends Controller
     public function destroy(Request $request, Site $Site)
     {
         return $this->SitesRepository->destroy($request, $Site);
-    }     
+    }
 }

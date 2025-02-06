@@ -387,6 +387,8 @@ const __send_confirmation_whatsapp = document.querySelector('.send_confirmation_
 
 const __is_open = document.getElementById('is_open');
 
+const __notifications = document.querySelectorAll('.notifications');
+
 //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
 const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhost:4000': 'https://socket-caribbean-transfers.up.railway.app' );
 console.log(socket);
@@ -671,13 +673,12 @@ $('#dataManagementOperations').on('click', '.extract_confirmation', function() {
     __terminal3.innerHTML = __message_terminal3;
 });
 
-//ABRE EL MODAL PARA PODER AGREGAR UN NUEVO SERVICIO
-// if ( __btn_addservice != null ) {
-//   __btn_addservice.addEventListener('click', function(event) {
-//       event.preventDefault();
-//       $("#operationModal").modal('show');
-//   });
-// }
+//NOTIFICACIONES PARA VER DETALLES DE RESERVA
+function notificationInfo(item){
+    console.log(item);    
+}
+
+
 
 if( __is_open != null ){
     __is_open.addEventListener('change', function(){

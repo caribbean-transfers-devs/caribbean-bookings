@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Configs;
+namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ExchangeRequest;
 
 //REPOSITORY
-use App\Repositories\Exchange\ExchangeReportsRepository;
+use App\Repositories\Settings\ExchangeReportsRepository;
 
 //TRAITS
 use App\Traits\RoleTrait;
@@ -26,7 +26,9 @@ class ExchangeReportsController extends Controller
 
     public function index(Request $request)
     {
-        return $this->ExchangeReportsRepository->index($request);
+        if(RoleTrait::hasPermission(103)){
+            return $this->ExchangeReportsRepository->index($request);
+        }
     }
 
     public function create(Request $request)

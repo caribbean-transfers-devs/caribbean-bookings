@@ -2,19 +2,15 @@
 @section('title') Tarifas @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/rates.min.css') }}" rel="preload" as="style">
-    <link href="{{ mix('/assets/css/sections/rates.min.css') }}" rel="stylesheet">
+    <link href="{{ mix('/assets/css/sections/settings_rates_enterprise.min.css') }}" rel="preload" as="style">
+    <link href="{{ mix('/assets/css/sections/settings_rates_enterprise.min.css') }}" rel="stylesheet">
 @endpush
 
 @push('Js')    
-    <script src="{{ mix('/assets/js/sections/rates.min.js') }}"></script>
+    <script src="{{ mix('/assets/js/sections/settings/rates_enterprise.min.js') }}"></script>
 @endpush
 
 @section('content')
-    @php
-        $buttons = array(
-        );
-    @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div id="filters" class="accordion">
@@ -28,7 +24,17 @@
                 </div>
                 <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
                     <div class="card-body">
-                        <form action="" class="search-container" method="GET" id="zoneForm">
+                        <div class="search-container">
+                            <div>
+                                <select name="enterpriseID" class="form-control" id="enterpriseID">
+                                    <option value="0">Seleccione una empresa empresa</option>
+                                    @if(sizeof($enterprises) >= 1)
+                                        @foreach ($enterprises as $enterprise)
+                                            <option value="{{ $enterprise->id }}">{{ $enterprise->names }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>                            
                             <div>
                                 <select name="destinationID" class="form-control" id="destinationID">
                                     <option value="0">Selecciona el destino</option>
@@ -52,20 +58,11 @@
                                 <select name="rateServicesID" class="form-control" id="rateServicesID">
                                     <option value="0">Selecciona el servicio</option>
                                 </select>
-                            </div>                                
-                            <div>
-                                <select name="rateGroupID" class="form-control" id="rateGroupID">
-                                    @if(sizeof($rate_groups) >= 1)
-                                        @foreach ($rate_groups as $value)
-                                            <option value="{{ $value->id }}">({{ $value->code }}) {{ $value->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            </div>                            
+                            </div>
                             <div>
                                 <button type="button" class="btn btn-primary btn-lg w-100" id="btnGetRates">Buscar</button>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
                 </div>

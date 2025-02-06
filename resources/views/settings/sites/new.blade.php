@@ -21,7 +21,7 @@
                     <div class="section general-info">
                         <div class="info">
                             @if ($errors->any())
-                                <div class="alert alert-light-primary alert-dismissible fade show border-0 mb-4" role="alert">
+                                <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x close" data-bs-dismiss="alert"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                                     <ul class="mb-0">
                                         @foreach ($errors->all() as $error)
@@ -41,13 +41,23 @@
                                 </div>
                             @endif
 
-                            <form action="{{ isset($enterprise) ? route('sites.store.enterprise', $enterprise->id) : route('sites.update', $site->id) }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ !isset($site) ? route('sites.store') : route('sites.update', $site->id) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                @if ( !isset($enterprise) )
+                                @if ( isset($site) )
                                     @method('PUT')
                                 @endif
 
                                 <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="enterprise_id">Seleccione una empresa</label>
+                                            <select name="enterprise_id" id="enterprise_id" class="form-control mb-3">
+                                                @foreach ($enterprises as $enterprise_v)
+                                                    <option value="{{ $enterprise_v->id }}">{{ $enterprise_v->names }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="name">Nombre del sitio</label>
@@ -144,8 +154,8 @@
                                         </div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">
-                                        <a class="btn btn-danger" href="{{ route('enterprise.sites', ( isset($enterprise) ? $enterprise->id : $site->enterprise_id )) }}">Cancelar</a>
-                                        <button type="submit" class="btn btn-primary">{{ ( isset($enterprise) ? 'Guardar' : 'Actualizar' ) }}</button>
+                                        <a class="btn btn-danger" href="{{ route('sites.index') }}">Cancelar</a>
+                                        <button type="submit" class="btn btn-primary">{{ ( !isset($site) ? 'Guardar' : 'Actualizar' ) }}</button>
                                     </div>
                                 </div>
                             </form>

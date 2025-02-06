@@ -165,7 +165,7 @@
                                             <tbody>
                                                 @foreach ($dataCurrency['data'] as $keyCurrency => $currency )
                                                     <tr>
-                                                        <th>{{ ucfirst(strtolower($currency['name'])) }}</th>
+                                                        <th>{{ $currency['name'] }}</th>
                                                         <td class="text-center">{{ $currency['counter'] }}</td>
                                                         <td class="text-center">{{ number_format($currency['total'],2) }}</td>
                                                         <td class="text-center">{{ number_format($currency['gran_total'],2) }}</td>

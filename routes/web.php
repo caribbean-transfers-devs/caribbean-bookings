@@ -2,12 +2,10 @@
 
 use App\Http\Controllers\Accounting\ConciliationController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Configs\ExchangeReportsController;
 use App\Http\Controllers\Configs\RatesController;
 use App\Http\Controllers\Configs\ZonesController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Driver\DriverController;
-use App\Http\Controllers\Enterprise\EnterpriseController;
 use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
 use App\Http\Controllers\Payments\PaymentsController;
@@ -24,10 +22,15 @@ use App\Http\Controllers\Reservations\ReservationsController;
 use App\Http\Controllers\RoleController;
 
 use App\Http\Controllers\Sales\SalesController;
-use App\Http\Controllers\Sites\SitesController;
 use App\Http\Controllers\Tpv\TpvController;
 use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Vehicle\VehicleController;
+
+//Settings
+use App\Http\Controllers\Settings\EnterpriseController;
+use App\Http\Controllers\Settings\SitesController;
+use App\Http\Controllers\Settings\ExchangeReportsController;
+use App\Http\Controllers\Settings\RatesEnterpriseController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -141,25 +144,25 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/operation/board/exportExcelCommission', [Operations::class, 'exportExcelBoardCommision'])->name('operation.board.exportExcelComission');
 
     //CONFIGURACIONES
-    Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');
-    Route::get('/reservation/payments/{reservation}', [ReservationsController::class, 'reservationPayments'])->name('reservation.payments');
-    Route::put('/reservationsDuplicated/{reservation}', [ReservationsController::class, 'duplicated'])->name('reservations.duplicated');
-    Route::put('/reservation/removeCommission/{reservation}', [ReservationsController::class, 'removeCommission'])->name('reservation.removeCommission');
-    Route::put('/reservationsOpenCredit/{reservation}', [ReservationsController::class, 'openCredit'])->name('reservations.openCredit');
-    Route::put('/reservationsEnablePlusService/{reservation}', [ReservationsController::class, 'enablePlusService'])->name('reservations.enablePlusService');
-    Route::put('/reservationsEnable/{reservation}', [ReservationsController::class, 'enable'])->name('reservations.enable');
-    Route::delete('/reservations/{reservation}', [ReservationsController::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA
-    Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');
-    Route::get('/GetExchange/{reservation}', [ReservationsController::class, 'get_exchange'])->name('reservations.get_exchange');
-    Route::post('/reservationsfollowups', [ReservationsController::class, 'followups'])->name('reservations.followups');
-    Route::put('/editreservitem/{item}', [ReservationsController::class, 'editreservitem'])->name('reservations.editreservitem');    
-    Route::post('/reservations/confirmation/contact-points', [ReservationsController::class, 'contactPoint'])->name('reservations.confirmation');
-    Route::post('/reservations/confirmation/arrival', [ReservationsController::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
-    Route::post('/reservations/confirmation/departure', [ReservationsController::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');
-    Route::post('/reservations/payment-request', [ReservationsController::class, 'paymentRequest'])->name('reservations.paymentRequest');
-    Route::post('/reservations/upload', [ReservationsController::class, 'uploadMedia'])->name('reservations.upload');
-    Route::get('/reservations/upload/{id}', [ReservationsController::class, 'getMedia'])->name('reservations.upload.getmedia');
-    Route::delete('/reservations/upload/{id}', [ReservationsController::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
+        Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');
+        Route::get('/reservation/payments/{reservation}', [ReservationsController::class, 'reservationPayments'])->name('reservation.payments');
+        Route::put('/reservationsDuplicated/{reservation}', [ReservationsController::class, 'duplicated'])->name('reservations.duplicated');
+        Route::put('/reservation/removeCommission/{reservation}', [ReservationsController::class, 'removeCommission'])->name('reservation.removeCommission');
+        Route::put('/reservationsOpenCredit/{reservation}', [ReservationsController::class, 'openCredit'])->name('reservations.openCredit');
+        Route::put('/reservationsEnablePlusService/{reservation}', [ReservationsController::class, 'enablePlusService'])->name('reservations.enablePlusService');
+        Route::put('/reservationsEnable/{reservation}', [ReservationsController::class, 'enable'])->name('reservations.enable');
+        Route::delete('/reservations/{reservation}', [ReservationsController::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA
+        Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');
+        Route::get('/GetExchange/{reservation}', [ReservationsController::class, 'get_exchange'])->name('reservations.get_exchange');
+        Route::post('/reservationsfollowups', [ReservationsController::class, 'followups'])->name('reservations.followups');
+        Route::put('/editreservitem/{item}', [ReservationsController::class, 'editreservitem'])->name('reservations.editreservitem');    
+        Route::post('/reservations/confirmation/contact-points', [ReservationsController::class, 'contactPoint'])->name('reservations.confirmation');
+        Route::post('/reservations/confirmation/arrival', [ReservationsController::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
+        Route::post('/reservations/confirmation/departure', [ReservationsController::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');
+        Route::post('/reservations/payment-request', [ReservationsController::class, 'paymentRequest'])->name('reservations.paymentRequest');
+        Route::post('/reservations/upload', [ReservationsController::class, 'uploadMedia'])->name('reservations.upload');
+        Route::get('/reservations/upload/{id}', [ReservationsController::class, 'getMedia'])->name('reservations.upload.getmedia');
+        Route::delete('/reservations/upload/{id}', [ReservationsController::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
 
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);
@@ -171,12 +174,22 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
     Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
 
-    Route::resource('/enterprises', EnterpriseController::class);
-    Route::get('/enterprises/{enterprise}', [SitesController::class, 'index'])->name('enterprise.sites');
-    
-    Route::resource('/sites', SitesController::class);
-    Route::get('/sites/create/{enterprise}', [SitesController::class, 'create'])->name('sites.create.enterprise');
-    Route::post('/sites/store/{enterprise}', [SitesController::class, 'store'])->name('sites.store.enterprise');
+        //EMPRESAS
+        Route::resource('/enterprises', EnterpriseController::class);
+        //SITIOS
+        Route::resource('/sites', SitesController::class);
+        //TIPO DE CAMBIO PARA REPORTES
+        Route::get('/config/exchange-reports', [ExchangeReportsController::class, 'index'])->name('exchanges.index');
+        Route::get('/config/exchange-reports/create', [ExchangeReportsController::class, 'create'])->name('exchanges.create');
+        Route::post('/config/exchange-reports/store', [ExchangeReportsController::class, 'store'])->name('exchanges.store');
+        Route::get('/config/exchange-reports/{exchage}/edit', [ExchangeReportsController::class, 'edit'])->name('exchanges.edit');
+        Route::put('/config/exchange-reports/{exchage}', [ExchangeReportsController::class, 'update'])->name('exchanges.update');
+        Route::delete('/config/exchange-reports/{exchage}', [ExchangeReportsController::class, 'destroy'])->name('exchanges.destroy');
+        //TARIFAS DE EMPRESAS
+        Route::get('/config/rates/enterprise', [RatesEnterpriseController::class, 'index'])->name('config.ratesEnterprise');
+        Route::get('/config/rates/enterprise/destination/{id}/get', [RatesEnterpriseController::class, 'items'])->name('config.ratesEnterpriseZones');
+        Route::post('/config/rates/enterprise/get', [RatesEnterpriseController::class, 'getRates'])->name('config.getRatesEnterprise');
+
 
     Route::resource('/vehicles', VehicleController::class);
     Route::resource('/drivers', DriverController::class);
@@ -187,14 +200,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/StoreIP', [UserController::class, 'store_ips'])->name('users.store_ips');
     Route::delete('/DeleteIPs/{ip}', [UserController::class, 'delete_ips'])->name('users.delete_ips');
     Route::resource('/roles', RoleController::class);
-
-    //TIPO DE CAMBIO PARA REPORTES
-    Route::get('/config/exchange-reports', [ExchangeReportsController::class, 'index'])->name('config.exchanges');
-    Route::get('/config/exchange-reports/create', [ExchangeReportsController::class, 'create'])->name('config.exchanges.create');
-    Route::post('/config/exchange-reports/store', [ExchangeReportsController::class, 'store'])->name('config.exchanges.store');
-    Route::get('/config/exchange-reports/{exchage}/edit', [ExchangeReportsController::class, 'edit'])->name('config.exchanges.edit');
-    Route::put('/config/exchange-reports/{exchage}', [ExchangeReportsController::class, 'update'])->name('config.exchanges.update');
-    Route::delete('/config/exchange-reports/{exchage}', [ExchangeReportsController::class, 'destroy'])->name('config.exchanges.destroy');
 
     Route::get('/config/destinations', [ZonesController::class, 'index'])->name('config.zones');
     Route::get('/config/destinations/{id}', [ZonesController::class, 'getZones'])->name('config.zones.getZones');

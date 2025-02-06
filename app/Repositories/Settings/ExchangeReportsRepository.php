@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Repositories\Exchange;
+namespace App\Repositories\Settings;
 
 use Exception;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 
 //MODELS
 use App\Models\ExchangeRateReport;
+
+//FACADES
+use Illuminate\Support\Facades\DB;
 
 class ExchangeReportsRepository{
     public function index($request){
@@ -28,7 +30,7 @@ class ExchangeReportsRepository{
             return view('settings.exchanges.new', [
                 'breadcrumbs' => [
                     [
-                        "route" => route('config.exchanges'),
+                        "route" => route('exchanges.index'),
                         "name" => "Listado de tipos de cambio",
                         "active" => false
                     ],                    
@@ -55,12 +57,12 @@ class ExchangeReportsRepository{
 
             DB::commit();
 
-            return redirect()->route('config.exchanges')->with('success', 'Tipo de cambio creado correctamente.');
+            return redirect()->route('exchanges.index')->with('success', 'Tipo de cambio creado correctamente.');
 
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('config.exchanges')->with('danger', 'Error al crear el tipo de cambio.');
+            return redirect()->route('exchanges.index')->with('danger', 'Error al crear el tipo de cambio.');
         }
     }
 
@@ -70,7 +72,7 @@ class ExchangeReportsRepository{
             return view('settings.exchanges.new',[
                 'breadcrumbs' => [
                     [
-                        "route" => route('config.exchanges'),
+                        "route" => route('exchanges.index'),
                         "name" => "Listado de tipos de cambio",
                         "active" => false
                     ],                    
@@ -98,12 +100,12 @@ class ExchangeReportsRepository{
 
             DB::commit();
 
-            return redirect()->route('config.exchanges')->with('success', 'Tipo de cambio actualizado correctamente.');
+            return redirect()->route('exchanges.index')->with('success', 'Tipo de cambio actualizado correctamente.');
 
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('config.exchanges.update', $id)->with('danger', 'Error al actualizar el tipo de cambio.');
+            return redirect()->route('exchanges.update', $id)->with('danger', 'Error al actualizar el tipo de cambio.');
         }
     }
 
@@ -111,9 +113,9 @@ class ExchangeReportsRepository{
         try {
             $exchange = ExchangeRateReport::find($id);
             $exchange->delete();
-            return redirect()->route('config.exchanges')->with('success', 'Se elimimo correctamente el tipo de cambio.');
+            return redirect()->route('exchanges.index')->with('success', 'Se elimimo correctamente el tipo de cambio.');
         } catch (Exception $e) {
-            return redirect()->route('config.exchanges')->with('danger', 'Error al eliminar el tipo de cambio.');
+            return redirect()->route('exchanges.index')->with('danger', 'Error al eliminar el tipo de cambio.');
         }
     }
 }

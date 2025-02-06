@@ -11,7 +11,7 @@ use App\Models\DestinationService;
 use App\Models\RatesTransfer;
 
 class RatesRepository{
-    public function index($request){        
+    public function index($request){
         $rate_groups = RatesGroup::all();
         $breadcrumbs = array(
             array(
@@ -23,7 +23,7 @@ class RatesRepository{
         return view('configs.rates', compact('rate_groups','breadcrumbs'));
     }
 
-    public function items($request){   
+    public function items($request){
         $data = [
             "zones" => [],
             "services" => []

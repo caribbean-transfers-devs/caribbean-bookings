@@ -50,8 +50,10 @@
                 <table id="dataEnterprises" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th class="text-center">Nombres</th>
-                            <th class="text-center">External</th>
+                            <th class="text-center">NOMBRE</th>
+                            <th class="text-center">EXTERNAL</th>
+                            <th class="text-center">ESTATUS</th>
+                            <th class="text-center">TIPO</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -60,12 +62,17 @@
                             <tr>
                                 <td class="text-center">{{ $enterprise->names }}</td>
                                 <td class="text-center">
-                                    <span class="badge badge-light-{{ ( $enterprise->is_external == 0 ) ? 'success' : 'danger' }} mb-2 me-4">{{ ( $enterprise->is_external == 0 ) ? 'Interno' : 'Externo' }}</span>
+                                    <button class="btn btn-{{ ( $enterprise->is_external == 0 ) ? 'success' : 'danger' }} mb-2">{{ ( $enterprise->is_external == 0 ) ? 'Interno' : 'Externo' }}</button>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-{{ ( $enterprise->status == 1 ) ? 'success' : 'danger' }} mb-2">{{ ( $enterprise->status == 1 ) ? 'Activo' : 'Inactivo' }}</button>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'success' : 'primary' }} mb-2">{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'Proveedor' : 'Cliente' }}</button>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
                                         <a class="btn btn-primary" href="{{ route('enterprises.edit', [$enterprise->id]) }}">Editar</a>
-                                        <a class="btn btn-primary" href="{{ route('enterprise.sites', [$enterprise]) }}">Sitios</a>
                                         <form action="{{ route('enterprises.destroy', $enterprise->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')

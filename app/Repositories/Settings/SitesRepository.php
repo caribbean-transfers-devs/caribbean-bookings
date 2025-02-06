@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Repositories\Sites;
+namespace App\Repositories\Settings;
 
 use Exception;
 use Illuminate\Http\Response;
 
 //MODELS
+use App\Models\Enterprise;
 use App\Models\Site;
 
 //FACADES
@@ -13,52 +14,47 @@ use Illuminate\Support\Facades\DB;
 
 class SitesRepository
 {
-    public function index($Enterprise)
+    public function index($request)
     {
-        try {            
-            $sites = Site::Where('enterprise_id', $Enterprise->id)->get();
-            return view('sites.index', [
+        try {
+            return view('settings.sites.index', [
                 'breadcrumbs' => [
                     [
-                        "route" => '/enterprises',
+                        "route" => '',
                         "name" => "Empresas",
                         "active" => false
                     ],                    
-                    [
-                        "route" => "",
-                        "name" => "Sitios de la empresa: " . $Enterprise->names,
-                        "active" => true
-                    ]
                 ],
-                'enterprise' => $Enterprise,
-                'sites' => $sites
+                'sites' => Site::all()
             ]);
         } catch (Exception $e) {
         }
     }
 
-    public function create($request, $Enterprise){
+    public function create($request)
+    {
         try {
-            return view('sites.new', [
+            return view('settings.sites.new', [
                 'breadcrumbs' => [
                     [
-                        "route" => route('enterprise.sites', $Enterprise->id),
-                        "name" => "Sitios de: ".$Enterprise->names,
-                        "active" => false
-                    ],
+                        "route" => route('sites.index'),
+                        "name" => "Listado de sitios",
+                        "active" => true
+                    ],                    
                     [
                         "route" => "",
                         "name" => "Crear un nuevo sitio",
-                        "active" => true
+                        "active" => false
                     ]
                 ],
-                "enterprise" => $Enterprise
+                "enterprises" => Enterprise::all(),
             ]);
         } catch (Exception $e) {
         }
     }
 
-    public function store($request, $Enterprise){
+    public function store($request)
+    {
         try {
             DB::beginTransaction();
 
@@ -76,53 +72,45 @@ class SitesRepository
             $Site->success_payment_url = $request->success_payment_url;
             $Site->cancel_payment_url = $request->cancel_payment_url;
             $Site->type_site = $request->type_site;
-            $Site->enterprise_id = $Enterprise->id;
+            $Site->enterprise_id = $request->enterprise_id;
             $Site->save();
 
             DB::commit();
 
-            // return response()->json([
-            //     'success' => true, 
-            //     'message' => 'Usuario creado correctamente',
-            // ], Response::HTTP_CREATED);
-
-            return redirect()->route('enterprise.sites', $Enterprise->id)->with('success', 'Sitio creado correctamente.');
+            return redirect()->route('sites.index')->with('success', 'Sitio creado correctamente.');
 
         } catch (Exception $e) {
             DB::rollBack();
 
-            // return response()->json([
-            //     'success' => false,
-            //     'message' => 'Error al crear el usuario',
-            //     'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-            // ]);
-
             return redirect()->route('sites.create')->with('danger', 'Error al crear el sitio.');
         }
-    }
+    }    
 
-    public function edit($request, $Site){
+    public function edit($request, $Site)
+    {
         try {
-            return view('sites.new',[
+            return view('settings.sites.new',[
                 'breadcrumbs' => [
                     [
-                        "route" => route('enterprise.sites', $Site->enterprise_id),
-                        "name" => "Sitios de: ".$Site->enterprise->names,
+                        "route" => route('sites.index'),
+                        "name" => "Listado de sitios",
                         "active" => false
                     ],
                     [
                         "route" => "",
-                        "name" => "Actualizar un nuevo sitio: ".$Site->name,
+                        "name" => "Actualizar sitio: ".$Site->name,
                         "active" => true
                     ]
                 ],                
-                'site' => $Site
+                'site' => $Site,
+                "enterprises" => Enterprise::all(),
             ]);
         } catch (Exception $e) {
         }
     }
 
-    public function update($request, $Site){
+    public function update($request, $Site)
+    {
         try {
             DB::beginTransaction();
 
@@ -139,34 +127,25 @@ class SitesRepository
             $Site->success_payment_url = $request->success_payment_url;
             $Site->cancel_payment_url = $request->cancel_payment_url;
             $Site->type_site = $request->type_site;
+            $Site->enterprise_id = $request->enterprise_id;
             $Site->save();
 
             DB::commit();
 
-            // return response()->json([
-            //     'success' => true, 
-            //     'message' => 'Usuario creado correctamente',
-            // ], Response::HTTP_CREATED);
-
-            return redirect()->route('enterprise.sites', $Site->enterprise_id)->with('success', 'Sitio creado correctamente.');
+            return redirect()->route('sites.index')->with('success', 'Sitio actualizado correctamente.');
 
         } catch (Exception $e) {
             DB::rollBack();
 
-            // return response()->json([
-            //     'success' => false,
-            //     'message' => 'Error al crear el usuario',
-            //     'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-            // ]);
-
-            return redirect()->route('enterprise.sites', $Site->enterprise_id)->with('danger', 'Error al actualizar sitio.');
+            return redirect()->route('sites.update', $Site->id)->with('danger', 'Error al actualizar sitio.');
         }
     }
 
-    public function destroy($request, $Site){
+    public function destroy($request, $Site)
+    {
         try {
             $Site->delete();
-            return redirect()->route('enterprise.sites', $Site->enterprise_id)->with('success', 'Se elimimo correctamente el sitio.');
+            return redirect()->route('sites.index')->with('success', 'Se elimimo correctamente el sitio.');
         } catch (Exception $e) {
         }
     }    

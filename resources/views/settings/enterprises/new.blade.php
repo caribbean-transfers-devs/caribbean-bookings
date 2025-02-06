@@ -47,18 +47,36 @@
                                     @method('PUT')
                                 @endif
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="names">Nombre de la empresa</label>
                                             <input type="text" id="names" name="names" class="form-control mb-3" placeholder="Nombre de la empresa" value="{{ ( isset($enterprise->names) ? $enterprise->names : '' ) }}">
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="is_external">Selecciona una opción</label>
+                                            <label for="is_external">Selecciona si es interno o externo</label>
                                             <select id="is_external" name="is_external" class="form-control mb-3">
                                                 <option {{ ( isset($enterprise->is_external) && $enterprise->is_external == 0 ) ? 'selected' : '' }} value="0">Interno</option>
                                                 <option {{ ( isset($enterprise->is_external) && $enterprise->is_external == 1 ) ? 'selected' : '' }} value="1">Externo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="is_external">Selecciona estatus</label>
+                                            <select id="is_external" name="status" class="form-control mb-3">
+                                                <option {{ ( isset($enterprise->status) && $enterprise->status == 1 ) ? 'selected' : '' }} value="1">Activo</option>
+                                                <option {{ ( isset($enterprise->status) && $enterprise->status == 0 ) ? 'selected' : '' }} value="0">Inactivo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="is_external">Selecciona tipo de empresa</label>
+                                            <select id="is_external" name="type_enterprise" class="form-control mb-3">
+                                                <option {{ ( isset($enterprise->type_enterprise) && $enterprise->type_enterprise == "PROVIDER" ) ? 'selected' : '' }} value="PROVIDER">Proveedor</option>
+                                                <option {{ ( isset($enterprise->type_enterprise) && $enterprise->type_enterprise == "CUSTOMER" ) ? 'selected' : '' }} value="CUSTOMER">Cliente</option>
                                             </select>
                                         </div>
                                     </div>

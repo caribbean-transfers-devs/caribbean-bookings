@@ -9,6 +9,30 @@
 @push('Css')
     <link href="{{ mix('/assets/css/sections/management_confirmation.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/management_confirmation.min.css') }}" rel="stylesheet" >
+    <style>
+        .bell-button {
+            /* font-size: 24px; */
+            border: none;
+            background: none;
+            cursor: pointer;
+            position: relative;
+            /* animation: ring 1s infinite ease-in-out; */
+            transition: transform 0.3s;
+        }
+        .bell-button.active {
+            animation: ring 1s infinite ease-in-out;
+            box-shadow: 0 0 10px red, 0 0 20px red;
+        }
+        @keyframes ring {
+            0% { transform: rotate(0); }
+            15% { transform: rotate(-15deg); }
+            30% { transform: rotate(15deg); }
+            45% { transform: rotate(-10deg); }
+            60% { transform: rotate(10deg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0); }
+        }        
+    </style>
 @endpush
 
 @push('Js')
@@ -51,7 +75,9 @@
                 <table id="dataConfirmations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
+                            <th class="text-center">ID</th>
                             <th class="text-center">ESTATUS DE CONFIRMACIÓN</th>
+                            <th class="text-center">NOTIFICACIÓN</th>
                             <th class="text-center">SITIO</th>
                             <th class="text-center">PICKUP</th>
                             <th class="text-center">TIPO</th>
@@ -70,11 +96,19 @@
                     </thead>
                     <tbody>
                         @if(sizeof($confirmations)>=1)
-                            @foreach($confirmations as $key => $confirmation)                         
+                            @foreach($confirmations as $key => $confirmation)                           
                                 <tr>
+                                    <td class="text-center">{{ $confirmation->reservation_id }}</td>
                                     <td class="text-center">
                                         @if (RoleTrait::hasPermission(40))
                                             <?=OperationTrait::renderStatusConfirmation($confirmation)?>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if ( $confirmation->is_round_trip == 1 && $confirmation->final_service_type == "DEPARTURE" && ( $confirmation->one_service_status == "CANCELLED" || $confirmation->one_service_status == "NOSHOW" ) )
+                                            <button class="btn btn-primary btn_operations active bell-button bs-tooltip" title="Por favor de confirmar el regreso con el cliente"> 
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>                                                    
+                                            </button>
                                         @endif
                                     </td>
                                     <td class="text-center">{{ $confirmation->site_name }}</td>

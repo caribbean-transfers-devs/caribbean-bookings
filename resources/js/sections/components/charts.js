@@ -50,6 +50,66 @@ document.addEventListener("DOMContentLoaded", function () {
         dataDrivers: __drivers?.value.trim() || "{}",
         dataUnits: __units?.value.trim() || "{}",
         dataOriginSale: __origins?.value.trim() || "{}",
+        settingsChart: function(_type, _option){
+            let _data;
+            switch (_option) {
+                case 'paymentMethod':
+                    _data = this.dataChartSaleMethodPayments();
+                    break;
+                case 'Currency':
+                    _data = this.dataChartSaleCurrency();
+                    break;
+                case 'Vehicle':
+                    _data = this.dataChartVehicle();
+                    break;
+                case 'serviceType':
+                    _data = this.dataChartServiceType();
+                    break
+                default:
+                    _data = this.dataChartSaleStatus();
+                    break;
+            };
+            return {
+                type: _type,
+                data: {
+                    labels: _data.map(row => {
+                        const total = _data.reduce((sum, item) => sum + item.counter, 0);
+                        const percentage = ((row.counter / total) * 100).toFixed(2) + '%';
+                        return `${row.name} (${percentage})`; // Agrega el porcentaje en la leyenda
+                    }),
+                    datasets: [
+                        {
+                            data: _data.map(row => row.counter),
+                            borderWidth: 0, // Hace las líneas del gráfico más delgadas
+                            cutout: '70%' // Reduce el grosor del doughnut
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, // Hacer el gráfico responsivo
+                    maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
+                    plugins: {
+                        legend: {
+                            display: true,  // Mostrar las etiquetas
+                            position: 'bottom', // Colocar las etiquetas debajo del gráfico
+                            labels: {
+                                padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
+                                boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
+                                font: {
+                                    size: 12, // Tamaño de la fuente de los labels
+                                    color: '#000' // Cambia el color de los labels a negro
+                                },
+                                color: '#000' // Asegura que el color de los labels sea negro
+                            }
+                        },
+                        datalabels: {
+                            display: false // Oculta los datalabels en el gráfico
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
+            }
+        },
         dataChartSaleStatus: function(){
             let object = [];
             const systems = Object.entries(JSON.parse(this.dataStatus));
@@ -59,11 +119,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return object;
         },
         renderChartSaleStatus: function(){
-            // // Calcular el total de 'counter'
-            // const totalCount = charts.dataChartSaleStatus().reduce((sum, system) => sum + system.counter, 0);
-            // // Calcular el porcentaje de cada 'counter'
-            // const percentages = charts.dataChartSaleStatus().map(site => ((site.counter / totalCount) * 100).toFixed(2) + '%');
-
             if( __chartSaleStatus != null ){
                 new Chart(__chartSaleStatus, {
                     type: 'pie',
@@ -112,51 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
             if( __chartSaleStatus2 != null ){
-                new Chart(__chartSaleStatus2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: charts.dataChartSaleStatus().map(row => row.name),
-                        datasets: [
-                            {
-                                data: charts.dataChartSaleStatus().map(row => row.counter),
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true, // Hacer el gráfico responsivo
-                        maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
-                        plugins: {
-                            legend: {
-                                display: true,  // Mostrar las etiquetas
-                                position: 'bottom', // Colocar las etiquetas debajo del gráfico
-                                labels: {
-                                    padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
-                                    boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
-                                    font: {
-                                        size: 12, // Tamaño de la fuente de los labels
-                                        color: '#000' // Cambia el color de los labels a negro
-                                    },
-                                    color: '#000' // Asegura que el color de los labels sea negro
-                                }
-                            },
-                            datalabels: {
-                                display: true,
-                                formatter: (value, context) => {                                                                                
-                                    const total = context.chart._metasets[0].total;
-                                    const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                    return percentage; // Mostrar porcentaje en el gráfico
-                                },
-                                color: '#000',
-                                font: {
-                                    weight: 'bold'
-                                },
-                                anchor: 'end',
-                                align: 'start'
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
-                });
+                new Chart(__chartSaleStatus2, this.settingsChart('doughnut','Status'));
             }
         },
         dataChartSaleMethodPayments: function(){
@@ -216,51 +227,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
             if( __chartSaleMethodPayments2 != null ){
-                new Chart(__chartSaleMethodPayments2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: charts.dataChartSaleMethodPayments().map(row => row.name),
-                        datasets: [
-                            {
-                                data: charts.dataChartSaleMethodPayments().map(row => row.counter),
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true, // Hacer el gráfico responsivo
-                        maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
-                        plugins: {
-                            legend: {
-                                display: true,  // Mostrar las etiquetas
-                                position: 'bottom', // Colocar las etiquetas debajo del gráfico
-                                labels: {
-                                    padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
-                                    boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
-                                    font: {
-                                        size: 12, // Tamaño de la fuente de los labels
-                                        color: '#000' // Cambia el color de los labels a negro
-                                    },
-                                    color: '#000' // Asegura que el color de los labels sea negro
-                                }
-                            },
-                            datalabels: {
-                                display: true,
-                                formatter: (value, context) => {
-                                    const total = context.chart._metasets[0].total;
-                                    const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                    return percentage; // Mostrar porcentaje en el gráfico
-                                },
-                                color: '#000',
-                                font: {
-                                    weight: 'bold'
-                                },
-                                anchor: 'end',
-                                align: 'start'
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
-                });                
+                new Chart(__chartSaleMethodPayments2, this.settingsChart('doughnut','paymentMethod'));
             }
         },
         dataChartSaleCurrency: function(){
@@ -320,51 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
             if( __chartSaleCurrency2 != null ){
-                new Chart(__chartSaleCurrency2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: charts.dataChartSaleCurrency().map(row => row.name),
-                        datasets: [
-                            {
-                                data: charts.dataChartSaleCurrency().map(row => row.counter),
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true, // Hacer el gráfico responsivo
-                        maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
-                        plugins: {
-                            legend: {
-                                display: true,  // Mostrar las etiquetas
-                                position: 'bottom', // Colocar las etiquetas debajo del gráfico
-                                labels: {
-                                    padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
-                                    boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
-                                    font: {
-                                        size: 12, // Tamaño de la fuente de los labels
-                                        color: '#000' // Cambia el color de los labels a negro
-                                    },
-                                    color: '#000' // Asegura que el color de los labels sea negro
-                                }
-                            },
-                            datalabels: {
-                                display: true,
-                                formatter: (value, context) => {                                                                                
-                                    const total = context.chart._metasets[0].total;
-                                    const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                    return percentage; // Mostrar porcentaje en el gráfico
-                                },
-                                color: '#000',
-                                font: {
-                                    weight: 'bold'
-                                },
-                                anchor: 'end',
-                                align: 'start'
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
-                });                
+                new Chart(__chartSaleCurrency2, this.settingsChart('doughnut','Currency'));
             }
         },
         dataChartVehicle: function(){
@@ -424,51 +347,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
             if( __chartSaleVehicle2 != null ){
-                new Chart(__chartSaleVehicle2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: charts.dataChartVehicle().map(row => row.name),
-                        datasets: [
-                            {
-                                data: charts.dataChartVehicle().map(row => row.counter),
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true, // Hacer el gráfico responsivo
-                        maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
-                        plugins: {
-                            legend: {
-                                display: true,  // Mostrar las etiquetas
-                                position: 'bottom', // Colocar las etiquetas debajo del gráfico
-                                labels: {
-                                    padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
-                                    boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
-                                    font: {
-                                        size: 12, // Tamaño de la fuente de los labels
-                                        color: '#000' // Cambia el color de los labels a negro
-                                    },
-                                    color: '#000' // Asegura que el color de los labels sea negro
-                                }
-                            },
-                            datalabels: {
-                                display: true,
-                                formatter: (value, context) => {                                                                                
-                                    const total = context.chart._metasets[0].total;
-                                    const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                    return percentage; // Mostrar porcentaje en el gráfico
-                                },
-                                color: '#000',
-                                font: {
-                                    weight: 'bold'
-                                },
-                                anchor: 'end',
-                                align: 'start'
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
-                });
+                new Chart(__chartSaleVehicle2, this.settingsChart('doughnut','Vehicle'));
             }
         },
         dataChartServiceType: function(){
@@ -528,51 +407,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
             if( __chartSaleServiceType2 != null ){
-                new Chart(__chartSaleServiceType2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: charts.dataChartServiceType().map(row => row.name),
-                        datasets: [
-                            {
-                                data: charts.dataChartServiceType().map(row => row.counter),
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true, // Hacer el gráfico responsivo
-                        maintainAspectRatio: false, // Permitir que el gráfico ajuste su altura además de su ancho
-                        plugins: {
-                            legend: {
-                                display: true,  // Mostrar las etiquetas
-                                position: 'bottom', // Colocar las etiquetas debajo del gráfico
-                                labels: {
-                                    padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
-                                    boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
-                                    font: {
-                                        size: 12, // Tamaño de la fuente de los labels
-                                        color: '#000' // Cambia el color de los labels a negro
-                                    },
-                                    color: '#000' // Asegura que el color de los labels sea negro
-                                }
-                            },
-                            datalabels: {
-                                display: true,
-                                formatter: (value, context) => {                                                                                
-                                    const total = context.chart._metasets[0].total;
-                                    const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                    return percentage; // Mostrar porcentaje en el gráfico
-                                },
-                                color: '#000',
-                                font: {
-                                    weight: 'bold'
-                                },
-                                anchor: 'end',
-                                align: 'start'
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
-                });                
+                new Chart(__chartSaleServiceType2, this.settingsChart('doughnut','serviceType'));
             }
         },
         dataChartSaleSites: function(){

@@ -595,7 +595,7 @@ window.addEventListener("DOMContentLoaded", function() {
             'X-CSRF-TOKEN': csrfToken
         },
         complete : function(xhr, status) {
-            console.log('complete', xhr, status);
+            // console.log('complete', xhr, status);
             components.removeLoadScreen();
         },
         error : function(xhr, status, error) {
