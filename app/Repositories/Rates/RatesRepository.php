@@ -77,7 +77,7 @@ class RatesRepository{
                                 WHERE rt.destination_id = :destination_id
                                 AND ( (rt.zone_one = :zone_one AND rt.zone_two = :zone_two) OR ( rt.zone_one = :zone_three AND rt.zone_two = :zone_four )  ) 
                                 AND rg.id = :rate_group
-                                {$query}", $params);
+                                {$query}", $params);        
 
         $data = [
             "destination_data" => $request->destination_id,

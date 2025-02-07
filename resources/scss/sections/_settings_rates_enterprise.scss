@@ -51,9 +51,9 @@
             gap: 15px;
             > div.single_{
                 display: grid;
-                grid-template-columns: 1fr 1fr;
-                grid-column-gap: 25px;
-                grid-row-gap: 25px;
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-column-gap: 15px;
+                grid-row-gap: 15px;
                 > button{
                     width: 100%;
                     min-height: 45px;
@@ -61,8 +61,8 @@
             }
             > div.multiple_{
                 display: grid;
-                grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-                grid-column-gap: 25px;
+                grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+                grid-column-gap: 15px;
             }
             p{
                 margin-bottom: 5px;

@@ -24,7 +24,7 @@
                 </div>
                 <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
                     <div class="card-body">
-                        <div class="search-container">
+                        <form action="" class="search-container" method="GET" id="zoneForm">
                             <div>
                                 <select name="enterpriseID" class="form-control" id="enterpriseID">
                                     <option value="0">Seleccione una empresa empresa</option>
@@ -62,7 +62,7 @@
                             <div>
                                 <button type="button" class="btn btn-primary btn-lg w-100" id="btnGetRates">Buscar</button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
                 </div>

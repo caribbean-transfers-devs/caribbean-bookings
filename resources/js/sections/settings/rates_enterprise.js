@@ -1,11 +1,13 @@
 //DECLARACION DE VARIABLES
-const _enterprise   = document.getElementById('enterpriseID');
-const _destination  = document.getElementById('destinationID');
-const _zoneOne      = document.getElementById('rateZoneOneId');
-const _zoneTwo      = document.getElementById('rateZoneTwoId');
-const _service      = document.getElementById('rateServicesID');
-const _btnQuoteRate = document.getElementById('btnGetRates');
-const _container    = document.getElementById('rates-container');
+const _enterprise       = document.getElementById('enterpriseID');
+const _destination      = document.getElementById('destinationID');
+const _zoneOne          = document.getElementById('rateZoneOneId');
+const _zoneTwo          = document.getElementById('rateZoneTwoId');
+const _service          = document.getElementById('rateServicesID');
+const _btnQuoteRate     = document.getElementById('btnGetRates');
+const _container        = document.getElementById('rates-container');
+const _btnUpdateRates   = document.getElementById('btnUpdateRates');
+
 //FUNCIONES ANONIMAS
 let rates = {
     getInputs: function(destinationID){
@@ -13,11 +15,13 @@ let rates = {
             url: `/config/rates/enterprise/destination/${destinationID}/get`,
             type: 'GET',
             beforeSend: function() {
+                _btnQuoteRate.setAttribute('disabled', true);
                 _zoneOne.innerHTML  = '<option>Buscando...</option>';
                 _zoneTwo.innerHTML  = '<option>Buscando...</option>';
                 _service.innerHTML    = '<option>Buscando...</option>';
             },
-            success: function(resp) {         
+            success: function(resp) {
+                _btnQuoteRate.removeAttribute('disabled');
                 for (const key in resp) {
                     if (resp.hasOwnProperty(key)) {
                         const data = resp[key];    
@@ -60,13 +64,9 @@ if( _destination != null ){
 if( _btnQuoteRate != null ){
     _btnQuoteRate.addEventListener('click', function(event){
         event.preventDefault();
-        let _enterpriseID   = _enterprise.value;
-        let _destinationID  = _destination.value;
-        let _zoneOneID      = _zoneOne.value;
-        let _zoneTwoID      = _zoneTwo.value;
-        let _serviceID      = _service.value;
+        console.log(_enterprise.value, _destination.value, _zoneOne.value, _zoneTwo.value, _service.value);
         
-        if(_enterpriseID || _destinationID == 0 || _zoneOneID == 0 || _zoneTwoID == 0  || _serviceID == 0){
+        if( _destination.value == 0 || _zoneOne.value == 0 || _zoneTwo.value == 0 ){
             Swal.fire({
                 icon: "error",
                 html: "Debe seleccionar todos los inputs...",
@@ -75,208 +75,230 @@ if( _btnQuoteRate != null ){
             return false;
         }
 
-        Swal.fire({
-            title: "Procesando solicitud...",
-            text: "Por favor, espera mientras se cargan las tarifas.", //Realiza la function de HTML en el Swal
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });        
+        if( _enterprise.value == 0 ){
+            Swal.fire({
+                icon: "error",
+                html: "Selecciona una empresa...",
+                allowOutsideClick: false,          
+            });
+            return false;            
+        }
+
+        let swalLoading = Swal.fire({
+                                    title: "Procesando solicitud...",
+                                    text: "Por favor, espera mientras se cargan las tarifas.",
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        Swal.showLoading();
+                                    }
+                            });
 
         $.ajax({
             url: `/config/rates/enterprise/get`,
             type: 'POST',
-            data: { enterprise_id: _enterpriseID, destination_id: _destinationID, from_id: _zoneOneID, to_id: _zoneTwoID, service_id: _serviceID },
+            data: { 
+                enterprise_id: _enterprise.value, 
+                destination_id: _destination.value, 
+                from_id: _zoneOne.value, 
+                to_id: _zoneTwo.value, 
+                service_id: _service.value 
+            },
             dataType: 'html',
             beforeSend: function() {
                 _container.innerHTML = '<div class="spinner-container"><div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div></div>';
             },
             success: function(resp) {
+                Swal.close(); // Cierra el Swal al recibir respuesta
                 _container.innerHTML = resp;
+            },
+            error: function() {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Hubo un problema al cargar las tarifas. Inténtelo de nuevo.",
+                    allowOutsideClick: false,
+                });
             }
         });        
     })
 }
 
-    // $('#btnGetRates').on('click', function (e) {
-    //     var destinationID = $("#destinationID").find("option:selected").val();
-    //     var rateZoneOneId = $("#rateZoneOneId").find("option:selected").val();
-    //     var rateZoneTwoId = $("#rateZoneTwoId").find("option:selected").val();
-    //     var rateServicesID = $("#rateServicesID").find("option:selected").val();
-    //     var rateGroupID = $("#rateGroupID").find("option:selected").val();
+document.addEventListener('click', function (event) {
+    // console.log(event.target);
+    // console.log(event.target.id);
 
-    //     if(destinationID == 0 || rateZoneOneId == 0 || rateZoneTwoId == 0  || rateGroupID == 0){
-    //         Swal.fire(
-    //             '¡ERROR!',
-    //             'Debe seleccionar todos los inputs',
-    //             'error'
-    //         );
-    //         return false;
-    //     }
+    if (event.target && event.target.id === 'btn_add_rate') {
+        event.preventDefault();
+        const _form         = document.getElementById("newPriceForm");
+        const _formData     = new FormData(_form);
+        const _btnAddRate   = document.getElementById('btn_add_rate');
+        _btnAddRate.disabled = true;
+        _btnAddRate.textContent = "Enviando...";
 
+        Swal.fire({
+            title: "Procesando solicitud...",
+            text: "Por favor, espera mientras se guarda la tarifa.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
-    //     $.ajaxSetup({
-    //         headers: {
-    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    //         }
-    //     });
-    
-    //     $.ajax({
-    //         url: `/config/rates/get`,
-    //         type: 'POST',
-    //         data: { destination_id: destinationID, from_id: rateZoneOneId, to_id: rateZoneTwoId, service_id: rateServicesID, rate_group: rateGroupID },
-    //         dataType: 'html',
-    //         beforeSend: function() {
-    //             $("#rates-container").empty().html(`<div class="spinner-container"><div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div></div>`);
-    //         },
-    //         success: function(resp) {
-    //             $("#rates-container").empty().html(resp);                      
-    //         }
-    //     }).fail(function(xhr, status, error) {
-    //         console.log(xhr);
-    //         Swal.fire(
-    //             '¡ERROR!',
-    //             xhr.responseJSON.message,
-    //             'error'
-    //         );
-    //     });
-
-
-    // });
-
-
-$(document).on('click', '#btn_add_rate', function (e) {
-    e.preventDefault();
-
-    let frm_data = $("#newPriceForm").serializeArray();
-    $.ajax({
-        url: '/config/rates/new',
-        type: 'POST',
-        data: frm_data,
-        beforeSend: function() {        
-            $("#btn_add_rate").prop('disabled', true).text("Enviando...");
-        },
-        success: function(resp) {
-
+        fetch('/config/rates/enterprise/new', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            },            
+            body: _formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
+        .then(data => {
             Swal.fire({
                 title: '¡Éxito!',
                 icon: 'success',
-                html: 'Tarifa guardada con éxito. Será redirigido en <b></b>',
-                timer: 2500,
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading()
-                    const b = Swal.getHtmlContainer().querySelector('b')
-                    timerInterval = setInterval(() => {
-                        b.textContent = (Swal.getTimerLeft() / 1000)
-                            .toFixed(0)
-                    }, 100)
-                },
-                willClose: () => {
-                    clearInterval(timerInterval)
-                }
-            }).then((result) => {
-                $("#btnGetRates").click();
-            })         
-        }
-    }).fail(function(xhr, status, error) {
-        Swal.fire(
-            '¡ERROR!',
-            xhr.responseJSON.message,
-            'error'
-        )
-        $("#btn_add_rate").prop('disabled', false).text("Agregar Tarifa");
-    });
+                html: 'Tarifa guardada con éxito.',
+                allowOutsideClick: false,
+            }).then(() => {
+                Swal.close(); // Cierra el Swal al recibir respuesta
+                _btnQuoteRate.click();
+            });
+        })
+        .catch(error => {
+            Swal.fire(
+                '¡ERROR!',
+                error.message || 'Ocurrió un error',
+                'error'
+            );
+            _btnAddRate.disabled = false;
+            _btnAddRate.textContent = "Agregar Tarifa";
+        });        
+    }
 
+    if (event.target.classList.contains('btnUpdateRates')) {
+        event.preventDefault();
+        const _form             = document.getElementById("editPriceForm");
+        const _formData         = new FormData(_form);
+        _formData.append('_method', 'PUT');
+        const _btnUpdateRates   = document.querySelectorAll(".btnUpdateRates");
+        _btnUpdateRates.forEach(_update => {
+            _update.disabled = true;
+            _update.textContent = "Actualizando...";
+        });
+
+        Swal.fire({
+            title: "Procesando solicitud...",
+            text: "Por favor, espera mientras se actualizan las tarifas.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('/config/rates/enterprise/update', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: _formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
+        .then(data => {
+            Swal.fire({
+                title: '¡Éxito!',
+                icon: 'success',
+                html: 'Tarifas actualizadas con éxito.',
+                allowOutsideClick: false,
+            }).then(() => {
+                Swal.close(); // Cierra el Swal al recibir respuesta
+                _btnQuoteRate.click();
+            });
+        })
+        .catch(error => {
+            Swal.fire(
+                '¡ERROR!',
+                error.message || 'Ocurrió un error',
+                'error'
+            );
+            _btnUpdateRates.forEach(_update => {
+                _update.disabled = false;
+                _update.textContent = "Actualizar Tarifas";
+            });
+        });        
+    }
 });
 
 function deleteItem(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-    swal.fire({
+    Swal.fire({
         title: '¿Está seguro de eliminar la tarifa?',
-        text: "Esta acción no se puede revertir",
+        text: 'Esta acción no se puede revertir',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
+        cancelButtonText: 'Cancelar',
+        allowOutsideClick: false,
     }).then((result) => {
-        if (result.value) {
-            $.ajax({
-                url: '/config/rates/delete',
-                type: 'DELETE',
-                data: { id: id},
-                dataType: 'json',
-                beforeSend: function() {
-                    $('[data-id="'+id+'"]').prop('disabled', true).text("Eliminando...");
-                },
-                success: function (data) {
-                    swal.fire({
-                        title: 'Tarifa eliminada',
-                        text: 'La tarifa ha sido eliminada con éxito',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        $("#btnGetRates").click();
-                    });
+        if (result.isConfirmed) {
+            const _button = document.querySelector(`[data-id="${id}"]`);
+            if (_button) {
+                _button.disabled = true;
+                _button.textContent = "Eliminando...";
+            }
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se elimina la tarifa.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
-            }).fail(function(xhr, status, error) {
-                $('[data-id="'+id+'"]').prop('disabled', true).text("Eliminar");
+            });            
+
+            fetch('/config/rates/enterprise/delete', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: 'Tarifa eliminada',
+                    icon: 'success',
+                    html: 'La tarifa ha sido eliminada con éxito.',
+                    allowOutsideClick: false,
+                }).then(() => {
+                    Swal.close(); // Cierra el Swal al recibir respuesta
+                    _btnQuoteRate.click();
+                });
+            })
+            .catch(error => {
                 Swal.fire(
                     '¡ERROR!',
-                    xhr.responseJSON.message,
+                    error.message || 'Ocurrió un error inesperado',
                     'error'
                 );
+                if (button) {
+                    _button.disabled = false;
+                    _button.textContent = "Eliminar";
+                }                
             });
         }
     });
 }
-
-$(document).on('click', '.btnUpdateRates', function(e){
-    e.preventDefault();
-
-    let frm_data = $("#editPriceForm").serializeArray();
-    $.ajax({
-        url: '/config/rates/update',
-        type: 'PUT',
-        data: frm_data,
-        beforeSend: function() {        
-            $(".btnUpdateRates").prop('disabled', true).text("Actualizando...");
-        },
-        success: function(resp) {
-
-            Swal.fire({
-                title: '¡Éxito!',
-                icon: 'success',
-                html: 'Tarifas actualizadas con éxito. Será redirigido en <b></b>',
-                timer: 2500,
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading()
-                    const b = Swal.getHtmlContainer().querySelector('b')
-                    timerInterval = setInterval(() => {
-                        b.textContent = (Swal.getTimerLeft() / 1000)
-                            .toFixed(0)
-                    }, 100)
-                },
-                willClose: () => {
-                    clearInterval(timerInterval)
-                }
-            }).then((result) => {
-                $("#btnGetRates").click();
-            }) 
-        }
-    }).fail(function(xhr, status, error) {
-        Swal.fire(
-            '¡ERROR!',
-            xhr.responseJSON.message,
-            'error'
-        )
-        $(".btnUpdateRates").prop('disabled', true).text("Actualizar Tarifas");
-    });
-
-});

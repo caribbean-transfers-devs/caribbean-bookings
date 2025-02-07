@@ -4,10 +4,11 @@
 
 @if(sizeof($rates) >= 1)
     <form id="editPriceForm">
-        @if (RoleTrait::hasPermission(34))
+        @if (RoleTrait::hasPermission(106))
             <button type="button" class="btn btn-success btnUpdateRates">Actualizar Tarifas</button>
         @endif
         @foreach($rates as $key => $value)
+            {{-- @dump($value) --}}
             <div class="item">
                 <input type="hidden" name="price[{{ $value->id }}][id]" value="{{ $value->id }}">
                 <div class="top_">
@@ -26,8 +27,12 @@
                                 <p>Round Trip</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][round_trip]" value="{{ $value->round_trip }}">
                             </div>
+                            <div>                                    
+                                <p>Costo operativo</p>
+                                <input type="text" class="form-control" name="price[{{ $value->id }}][operating_cost]" value="{{ $value->operating_cost }}">
+                            </div>
                         </div>
-                        @if (RoleTrait::hasPermission(35))
+                        @if (RoleTrait::hasPermission(107))
                             <button class="btn btn-sm btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
                         @endif
                     </div>
@@ -60,8 +65,12 @@
                                 <p>Up RT (>8)</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][up_8_rt]" value="{{ $value->up_8_rt }}">
                             </div>
+                            <div>                                    
+                                <p>Costo operativo</p>
+                                <input type="text" class="form-control" name="price[{{ $value->id }}][operating_cost]" value="{{ $value->operating_cost }}">
+                            </div>
                         </div>
-                        @if (RoleTrait::hasPermission(35))
+                        @if (RoleTrait::hasPermission(107))
                             <button class="btn btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
                         @endif
                     </div>
@@ -69,14 +78,14 @@
                 
             </div>
         @endforeach
-        @if (RoleTrait::hasPermission(34))
+        @if (RoleTrait::hasPermission(106))
             <button type="button" class="btn btn-success btnUpdateRates">Actualizar Tarifas</button>
         @endif
     </form>
 @else
     @if ( isset( $data['from_data'] ) && !empty( $data['from_data'] ) )
     <form class="item" id="newPriceForm">
-        <input type="hidden" name="rate_group_id" value="{{ $data['rate_group_data']['id'] }}"/>
+        <input type="hidden" name="enterprise_id" value="{{ $data['enterprise_data']['id'] }}"/>
         <input type="hidden" name="destination_service_id" value="{{ $data['service_data']['id'] }}"/>
         <input type="hidden" name="destination_service_type" value="{{ $data['service_data']['price_type'] }}"/>
         <input type="hidden" name="destination_id" value="{{ $data['destination_data'] }}"/>
@@ -87,7 +96,7 @@
             <p><strong>Desde:</strong> {{ $data['from_data']['name'] }}</p>
             <p><strong>Hacia:</strong> {{ $data['to_data']['name'] }}</p>
             <p><strong>Servicio:</strong> {{ $data['service_data']['name'] }}</p>                    
-            <p><strong>Grupo de tarifa:</strong> ({{ $data['rate_group_data']['code'] }}) {{ $data['rate_group_data']['name'] }}</p>
+            <p><strong>Empresa:</strong> ({{ $data['enterprise_data']['id'] }}) {{ $data['enterprise_data']['names'] }}</p>
         </div>
         @if($data['service_data']['price_type'] == "vehicle" || $data['service_data']['price_type'] == "shared")
             <div class="bottom_">
@@ -100,8 +109,12 @@
                         <p>Round Trip</p>
                         <input type="text" class="form-control" value="0.00" name="round_trip">
                     </div>
+                    <div>
+                        <p>Costo operativo</p>
+                        <input type="text" class="form-control" value="0.00" name="operating_cost">
+                    </div>
                 </div>
-                @if (RoleTrait::hasPermission(33))
+                @if (RoleTrait::hasPermission(105))
                     <button class="btn btn-sm btn-success" type="button" id="btn_add_rate">Agregar Tarifa</button>
                 @endif
             </div>
@@ -134,8 +147,12 @@
                         <p>Round Trip (>8)</p>
                         <input type="text" class="form-control" value="0.00" name="up_8_rt">
                     </div>
+                    <div>                                    
+                        <p>Costo operativo</p>
+                        <input type="text" class="form-control" value="0.00" name="operating_cost">
+                    </div>
                 </div>
-                @if (RoleTrait::hasPermission(33))
+                @if (RoleTrait::hasPermission(105))
                     <button class="btn btn-sm btn-success" type="button" id="btn_add_rate">Agregar Tarifa</button>
                 @endif
             </div>

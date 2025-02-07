@@ -190,6 +190,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/config/rates/enterprise/destination/{id}/get', [RatesEnterpriseController::class, 'items'])->name('config.ratesEnterpriseZones');
         Route::post('/config/rates/enterprise/get', [RatesEnterpriseController::class, 'getRates'])->name('config.getRatesEnterprise');
 
+        Route::post('/config/rates/enterprise/new', [RatesEnterpriseController::class, 'newRates'])->name('config.newRatesEnterprise');
+        Route::delete('/config/rates/enterprise/delete', [RatesEnterpriseController::class, 'deleteRates'])->name('config.deleteRatesEnterprise');
+        Route::put('/config/rates/enterprise/update', [RatesEnterpriseController::class, 'updateRates'])->name('config.updateRatesEnterprise');
+
 
     Route::resource('/vehicles', VehicleController::class);
     Route::resource('/drivers', DriverController::class);
