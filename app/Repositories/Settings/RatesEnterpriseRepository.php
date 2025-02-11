@@ -109,13 +109,13 @@ class RatesEnterpriseRepository{
             $rate->zone_one = $request->zone_one;
             $rate->zone_two = $request->zone_two;
             $rate->one_way = isset($request->one_way) ? $request->one_way : '0.00';
-            $rate->round_trip = isset($request->round_trip) ? $request->round_trip : '0.00';
+            // $rate->round_trip = isset($request->round_trip) ? $request->round_trip : '0.00';
             $rate->ow_12 = isset($request->ow_12) ? $request->ow_12 : '0.00';
-            $rate->rt_12 = isset($request->rt_12) ? $request->rt_12 : '0.00';
+            // $rate->rt_12 = isset($request->rt_12) ? $request->rt_12 : '0.00';
             $rate->ow_37 = isset($request->ow_37) ? $request->ow_37 : '0.00';
-            $rate->rt_37 = isset($request->rt_37) ? $request->rt_37 : '0.00';
+            // $rate->rt_37 = isset($request->rt_37) ? $request->rt_37 : '0.00';
             $rate->up_8_ow = isset($request->up_8_ow) ? $request->up_8_ow : '0.00';
-            $rate->up_8_rt = isset($request->up_8_rt) ? $request->up_8_rt : '0.00';
+            // $rate->up_8_rt = isset($request->up_8_rt) ? $request->up_8_rt : '0.00';
             $rate->operating_cost = isset($request->operating_cost) ? $request->operating_cost : '0.00';
             $rate->save();
 
@@ -165,13 +165,13 @@ class RatesEnterpriseRepository{
                 $item = RatesEnterprise::find( $value['id'] );            
                 if ($item) {
                     $item->one_way = (( isset($value['one_way']) && !empty($value['one_way']) )? $value['one_way'] : '0.00' );
-                    $item->round_trip = (( isset($value['round_trip']) && !empty($value['round_trip']) )? $value['round_trip'] : '0.00' );
+                    // $item->round_trip = (( isset($value['round_trip']) && !empty($value['round_trip']) )? $value['round_trip'] : '0.00' );
                     $item->ow_12 = (( isset($value['ow_12']) && !empty($value['ow_12']) )? $value['ow_12'] : '0.00' );
-                    $item->rt_12 = (( isset($value['rt_12']) && !empty($value['rt_12']) )? $value['rt_12'] : '0.00' );
+                    // $item->rt_12 = (( isset($value['rt_12']) && !empty($value['rt_12']) )? $value['rt_12'] : '0.00' );
                     $item->ow_37 = (( isset($value['ow_37']) && !empty($value['ow_37']) )? $value['ow_37'] : '0.00' );
-                    $item->rt_37 = (( isset($value['rt_37']) && !empty($value['rt_37']) )? $value['rt_37'] : '0.00' );
+                    // $item->rt_37 = (( isset($value['rt_37']) && !empty($value['rt_37']) )? $value['rt_37'] : '0.00' );
                     $item->up_8_ow = (( isset($value['up_8_ow']) && !empty($value['up_8_ow']) )? $value['up_8_ow'] : '0.00' );
-                    $item->up_8_rt = (( isset($value['up_8_rt']) && !empty($value['up_8_rt']) )? $value['up_8_rt'] : '0.00' );
+                    // $item->up_8_rt = (( isset($value['up_8_rt']) && !empty($value['up_8_rt']) )? $value['up_8_rt'] : '0.00' );
                     $item->operating_cost = (( isset($value['operating_cost']) && !empty($value['operating_cost']) )? $value['operating_cost'] : '0.00' );
                     $item->save();
                 }

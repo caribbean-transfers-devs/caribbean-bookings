@@ -176,7 +176,7 @@ document.addEventListener('click', function (event) {
             );
             _btnAddRate.disabled = false;
             _btnAddRate.textContent = "Agregar Tarifa";
-        });        
+        });
     }
 
     if (event.target.classList.contains('btnUpdateRates')) {

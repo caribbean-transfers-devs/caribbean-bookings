@@ -23,11 +23,11 @@
                                 <p>One way</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][one_way]" value="{{ $value->one_way }}">
                             </div>
-                            {{-- <div>                                    
+                            <div>                                    
                                 <p>Round Trip</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][round_trip]" value="{{ $value->round_trip }}">
-                            </div> --}}
-                            <div>
+                            </div>
+                            <div>                                    
                                 <p>Costo operativo</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][operating_cost]" value="{{ $value->operating_cost }}">
                             </div>
@@ -45,26 +45,26 @@
                                 <p>One Way (1-2)</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][ow_12]" value="{{ $value->ow_12 }}">
                             </div>
-                            {{-- <div>
+                            <div>
                                 <p>Round Trip (1-2)</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][rt_12]" value="{{ $value->rt_12 }}">
-                            </div> --}}
+                            </div>
                             <div>
                                 <p>One Way (3-7)</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][ow_37]" value="{{ $value->ow_37 }}">
                             </div>
-                            {{-- <div>
+                            <div>
                                 <p>Round Trip (3-7)</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][rt_37]" value="{{ $value->rt_37 }}">
-                            </div> --}}
+                            </div>
                             <div>
                                 <p>Up OW (> 8)</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][up_8_ow]" value="{{ $value->up_8_ow }}">
                             </div>
-                            {{-- <div>
+                            <div>
                                 <p>Up RT (>8)</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][up_8_rt]" value="{{ $value->up_8_rt }}">
-                            </div> --}}
+                            </div>
                             <div>                                    
                                 <p>Costo operativo</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][operating_cost]" value="{{ $value->operating_cost }}">
@@ -105,10 +105,10 @@
                         <p>One way</p>
                         <input type="text" class="form-control" value="0.00" name="one_way">
                     </div>
-                    {{-- <div>                                    
+                    <div>                                    
                         <p>Round Trip</p>
                         <input type="text" class="form-control" value="0.00" name="round_trip">
-                    </div> --}}
+                    </div>
                     <div>
                         <p>Costo operativo</p>
                         <input type="text" class="form-control" value="0.00" name="operating_cost">
@@ -127,26 +127,26 @@
                         <p>One Way (1-2)</p>
                         <input type="text" class="form-control" value="0.00" name="ow_12">
                     </div>
-                    {{-- <div>
+                    <div>
                         <p>Round Trip (1-2)</p>
                         <input type="text" class="form-control" value="0.00" name="rt_12">
-                    </div> --}}
+                    </div>
                     <div>
                         <p>One Way (3-7)</p>
                         <input type="text" class="form-control" value="0.00" name="ow_37">
                     </div>
-                    {{-- <div>
+                    <div>
                         <p>Round Trip (3-7)</p>
                         <input type="text" class="form-control" value="0.00" name="rt_37">
-                    </div> --}}
+                    </div>
                     <div>
                         <p>One Way (> 8)</p>
                         <input type="text" class="form-control" value="0.00" name="up_8_ow">
                     </div>
-                    {{-- <div>
+                    <div>
                         <p>Round Trip (>8)</p>
                         <input type="text" class="form-control" value="0.00" name="up_8_rt">
-                    </div> --}}
+                    </div>
                     <div>                                    
                         <p>Costo operativo</p>
                         <input type="text" class="form-control" value="0.00" name="operating_cost">
