@@ -24,6 +24,8 @@ class EnterpriseRequest extends FormRequest
         return [
             'names' => 'required|string|max:255',
             'is_external' => 'required|integer|in:1,0',
+            'status' => 'required|integer|in:1,0',
+            'type_enterprise' => 'required|string|in:PROVIDER,CUSTOMER',
         ];
     }
 

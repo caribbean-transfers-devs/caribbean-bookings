@@ -46,7 +46,7 @@
                                 </div>
                             @endif
 
-                            <form action="{{ isset($exchange) ? route('config.exchanges.update', $exchange->id) : route('config.exchanges.store') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ isset($exchange) ? route('exchanges.update', $exchange->id) : route('exchanges.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @if ( isset($exchange) )
                                     @method('PUT')
@@ -71,7 +71,7 @@
                                         </div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">
-                                        <a class="btn btn-danger" href="{{ route('config.exchanges') }}">Cancelar</a>
+                                        <a class="btn btn-danger" href="{{ route('exchanges.index') }}">Cancelar</a>
                                         <button type="submit" class="btn btn-primary">{{ ( isset($driver) ? 'Actualizar' : 'Guardar' ) }}</button>
                                     </div>
                                 </div>

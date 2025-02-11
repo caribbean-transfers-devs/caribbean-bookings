@@ -349,7 +349,7 @@ class SpamRepository
         ];
 
         $search = DB::select("SELECT rez.id as rez_id, rit.id as rit_id, rit.code, CONCAT(rez.client_first_name, ' ', rez.client_last_name) as client_full_name, rez.client_phone, rit.spam, COALESCE(comments_.counter, 0) AS counter, comments_.last_date, comments_.last_user,
-        rit.from_name, rit.to_name, two_zone.is_primary
+        rit.from_name, rit.to_name, two_zone.is_primary, rit.passengers
                             FROM reservations_items as rit
                         INNER JOIN reservations as rez ON rez.id = rit.reservation_id
                         INNER JOIN zones as two_zone ON two_zone.id = rit.to_zone

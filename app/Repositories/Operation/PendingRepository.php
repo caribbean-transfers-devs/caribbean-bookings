@@ -58,6 +58,8 @@ class PendingRepository
                                 GROUP_CONCAT(DISTINCT it.two_service_status ORDER BY it.two_service_status ASC SEPARATOR ',') AS two_service_status,
                                 SUM(it.passengers) as passengers,
                                 COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
+                                -- MAX(it.latest_op_one_pickup) as latest_op_one_pickup,
+                                -- MAX(it.latest_op_two_pickup) as latest_op_two_pickup,
                                 SUM(it.is_round_trip) as is_round_trip,
                                 COALESCE(SUM(s.total_sales), 0) as total_sales,
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,                                    
@@ -128,7 +130,9 @@ class PendingRepository
                                         GROUP_CONCAT(DISTINCT it.op_one_status ORDER BY it.op_one_status ASC SEPARATOR ',') AS one_service_status,
                                         GROUP_CONCAT(DISTINCT it.op_two_status ORDER BY it.op_two_status ASC SEPARATOR ',') AS two_service_status,
                                         MAX(CASE WHEN DATE(it.op_one_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_one_pickup_today,
-                                        MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_two_pickup_today
+                                        MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_two_pickup_today,
+                                        MAX(it.op_one_pickup) AS latest_op_one_pickup,
+                                        MAX(it.op_two_pickup) AS latest_op_two_pickup
                                     FROM reservations_items as it
                                         INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                         INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
@@ -136,9 +140,26 @@ class PendingRepository
                                         INNER JOIN reservations as rez ON rez.id = it.reservation_id
                                     GROUP BY it.reservation_id, it.is_round_trip
                                 ) as it ON it.reservation_id = rez.id
-                                WHERE 1=1 AND DATE(rez.created_at) = :date AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0
-                            GROUP BY rez.id, site.type_site, site.name
-                                    HAVING payment_status = :status ORDER BY rez.created_at DESC;", ["date" => date("Y-m-d"), "status" => "PENDING"]);
+                                WHERE 1=1 
+                                    AND DATE(rez.created_at) >= :date 
+                                    AND site.type_site <> :type_site 
+                                    AND rez.is_cancelled = 0 
+                                    AND rez.is_duplicated = 0 
+                                    AND rez.open_credit = 0
+                                    AND (DATE(it.latest_op_one_pickup) >= :in OR DATE(it.latest_op_two_pickup) >= :out)
+                            GROUP BY 
+    rez.id, rez.client_first_name, rez.client_last_name, rez.client_email, rez.client_phone, rez.currency, 
+    rez.is_cancelled, rez.is_commissionable, rez.site_id, rez.pay_at_arrival, rez.reference, rez.affiliate_id, 
+    rez.terminal, rez.comments, rez.is_duplicated, rez.open_credit, rez.is_complete, rez.created_at, 
+    site.type_site, us.name, usc.name, usp.name, site.name, origin.code, tc.name_es                            
+                                    HAVING payment_status = :status ORDER BY rez.created_at DESC;", [
+                                        "date" => date("Y-m-d"), 
+                                        "in" => date("Y-m-d"), 
+                                        "out" => date("Y-m-d"), 
+                                        "type_site" => "AGENCY", 
+                                        "status" => "PENDING"]);
+                                    // AND DATE(rez.created_at) = :date 
+                                    // "date" => date("Y-m-d"),
 
         return view('management.pending.view', [ "items" => $items ]);
     }

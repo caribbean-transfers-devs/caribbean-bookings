@@ -16,12 +16,16 @@ trait BookingTrait
                 return ( $status == "PENDING" && $section == "OPERATION" ? 'secondary' : 'warning' );
                 break;
             case 'CANCELLED':
+            case 'CANCELLATION':
                 return 'danger';
                 break;
             case 'DUPLICATED':
+            case 'OPERATION':
                 return 'secondary';
-                break;                
+                break;
+            case 'CREDIT':
             case 'OPENCREDIT':
+            case 'REFUND':
             case 'E':
                 return 'info';
                 break;
@@ -38,6 +42,12 @@ trait BookingTrait
                 break;
             case 'CANCELLED':
                 return 'CANCELADO';
+                break;
+            case 'CANCELLATION':
+                return 'CANCELACIÓN';
+                break;
+            case 'CREDIT':
+                return 'CRÉDITO';
                 break;
             case 'DUPLICATED':
                 return 'DUPLICADO';
@@ -60,6 +70,15 @@ trait BookingTrait
             case 'OK':
                 return 'OK';
                 break;
+            case 'GENERAL':
+                return 'GENERAL';
+                break;
+            case 'OPERATION':
+                return 'OPERACIÓN';
+                break;
+            case 'REFUND':
+                return 'REEMBOLSO';
+                break;
             default:
                 return 'CONFIRMADO';
                 break;
@@ -73,6 +92,10 @@ trait BookingTrait
             $span .= '<button type="button" class="btn btn-'.self::classStatusBooking($item).' mb-2">'.self::statusBooking($item).'</button>';
         }
         return $span;
+    }
+
+    public static function renderCategoryPicture($status){
+        return '<button type="button" class="btn btn-'.self::classStatusBooking($status).' btn-sm">'.self::statusBooking($status).'</button>';
     }
 
     public static function classStatusPayment($service){

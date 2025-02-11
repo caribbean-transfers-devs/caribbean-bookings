@@ -63,7 +63,7 @@
                                 </select>
                             </div>                            
                             <div>
-                                <button type="button" class="btn btn-primary btn-lg btn-filter w-100" id="btnGetRates">Buscar</button>
+                                <button type="button" class="btn btn-primary btn-lg w-100" id="btnGetRates">Buscar</button>
                             </div>
                         </form>
                     </div>

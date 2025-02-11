@@ -8,11 +8,6 @@
             <button type="button" class="btn btn-success btnUpdateRates">Actualizar Tarifas</button>
         @endif
         @foreach($rates as $key => $value)
-            @php
-                // echo "<pre>";
-                // print_r($value);
-                // die();
-            @endphp
             <div class="item">
                 <input type="hidden" name="price[{{ $value->id }}][id]" value="{{ $value->id }}">
                 <div class="top_">

@@ -1,0 +1,26 @@
+
+.box_cancelation{
+    color: inherit;
+
+    label {
+        display: flex;
+        justify-content: center;
+        margin: 1em auto 0;
+    }
+    
+    select, .dropzone{
+        margin: 1em 0 3px;
+    }
+
+    select{
+        background: transparent;
+        color: inherit;
+        font-family: inherit;
+        // font-size: 1.125em;
+        line-height: inherit;
+        max-width: 100%;
+        min-width: 50%;
+        padding: .375em .625em;
+        height: auto;        
+    }
+}

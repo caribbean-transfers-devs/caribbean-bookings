@@ -26,7 +26,7 @@ class DashboardController extends Controller
     public function index(Request $request){
         $roles = session()->get('roles');
         
-        if( in_array(4, $roles['roles']) ){
+        if( in_array(3, $roles['roles']) || in_array(4, $roles['roles']) ){
             return $this->ManagementRepository->afterSales($request);
         }else{
             return $this->DashboardRepository->index($request);

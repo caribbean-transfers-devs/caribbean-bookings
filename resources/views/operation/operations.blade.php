@@ -12,6 +12,7 @@
 @section('title') Gestion De Operación @endsection
 
 @push('Css')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/operations.min.css') }}" rel="stylesheet" >
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
@@ -51,6 +52,30 @@
         .agency_30 td{
             color: #ffffff !important;
         }
+
+        /*ESTILO DE CAMPANA*/
+.bell-button {
+    /* font-size: 24px; */
+    border: none;
+    background: none;
+    cursor: pointer;
+    position: relative;
+    /* animation: ring 1s infinite ease-in-out; */
+    transition: transform 0.3s;
+}
+.bell-button.active {
+    animation: ring 1s infinite ease-in-out;
+    box-shadow: 0 0 10px red, 0 0 20px red;
+}
+@keyframes ring {
+    0% { transform: rotate(0); }
+    15% { transform: rotate(-15deg); }
+    30% { transform: rotate(15deg); }
+    45% { transform: rotate(-10deg); }
+    60% { transform: rotate(10deg); }
+    75% { transform: rotate(-5deg); }
+    100% { transform: rotate(0); }
+}
     </style>
 @endpush
 
@@ -61,6 +86,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
@@ -100,6 +126,7 @@
             </div>
         </div>
     @endif
+    <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
 
     <div class="layout-top-spacing widget-content widget-content-area br-8 mb-3 p-2">
         <button class="btn btn-primary _btn_create" data-title="Filtros de operacion" data-bs-toggle="modal" data-bs-target="#filterModal"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros</button>
@@ -830,4 +857,4 @@
             });
         }
     </script>
-@endpush
+@endpush    

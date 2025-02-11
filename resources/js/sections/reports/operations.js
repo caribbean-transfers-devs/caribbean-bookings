@@ -20,13 +20,29 @@ components.formReset();
 
 //DECLARACION DE VARIABLES
 const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
+const __charts = document.querySelector('.__btn_chart');
+const __charts2 = document.querySelector('.__btn_chart2');
 const __title_modal = document.getElementById('filterModalLabel');
+const __title_modal_charts = document.getElementById('chartsModalLabel');
+const __title_modal_charts2 = document.getElementById('chartsModalLabel2');
 const __payment_infos = document.querySelectorAll('.__payment_info');
 
 //ACCION PARA CREAR
 if( __create != null ){
     __create.addEventListener('click', function () {
         __title_modal.innerHTML = this.dataset.title;
+    });
+}
+
+//ACCION PARA MOSTRAR EL MODAL DE GRAFICAS
+if( __charts != null ){
+    __charts.addEventListener('click', function () {
+        __title_modal_charts.innerHTML = this.dataset.title;
+    });
+}
+if( __charts2 != null ){
+    __charts2.addEventListener('click', function () {
+        __title_modal_charts2.innerHTML = this.dataset.title;
     });
 }
 

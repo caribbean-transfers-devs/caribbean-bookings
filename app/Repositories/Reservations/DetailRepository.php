@@ -42,7 +42,7 @@ class DetailRepository
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
         $sellers = User::whereIn('id', $users_ids)->get();        
         $sales_types = SalesType::all();
-        $services_types = DestinationService::where('status',1)->where('destination_id',$reservation->destination_id)->get();
+        $services_types = DestinationService::where('destination_id',$reservation->destination_id)->get();
         $zones = Zones::where('destination_id', 1)->get();
         $sites = Site::get();
         $types_cancellations = ApiTrait::makeTypesCancellations();
@@ -97,6 +97,7 @@ class DetailRepository
             'media' => $media,
             'origins' => $this->Origins(),
             'request' => $request->input(),
+            'data_user' => auth()->user()
         ]);
     }
 

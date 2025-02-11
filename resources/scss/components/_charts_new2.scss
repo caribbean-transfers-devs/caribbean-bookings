@@ -1,0 +1,192 @@
+@import "../../plugins/bootstrap-select/select";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+#chartsModal2{
+  .modal-content{
+      background-color: #fafbfc;
+      font-family: Arial, sans-serif;
+
+      .modal-header{
+          h5{
+              color: #425466;
+              font-size: 20px;
+              font-weight: 700;
+              line-height: 24.15px;
+              letter-spacing: 0;
+          }
+
+          >.items_status{
+            display: flex;
+            gap: 10px;
+
+            >.btn{
+              font-family: "Poppins", serif;
+              font-size: 16px;
+              font-weight: 400;
+              text-align: center;
+              padding: 0.375rem;
+            }
+          }
+      }
+
+      .modal-body{
+        background-color: #ffffff;
+        padding: 0;
+        max-height: 650px;
+        overflow-y: scroll;
+
+        .container_left, .container_right{
+          display: flex;
+          flex-direction: column;
+          
+          >div{
+            border-bottom: 1px solid #CCD6EB;
+            padding: 0.75rem; /*12*/
+            display: flex;
+            flex-direction: column;                
+            gap: 10px;
+
+            h6{
+              color: #425466;
+              font-size: 16px;
+              font-weight: 700;
+              letter-spacing: 0;
+              margin: 0 ;
+            }
+
+            .table-responsive {
+              border-radius: 8px;
+              // border: 1px solid #CCD6EB; // Bordes claros              
+            
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                font-family: "Poppins", serif;
+                border-radius: 5px;
+                overflow: hidden; // Asegura que el borde redondeado aplique a la tabla
+            
+                thead, tfoot {            
+                  tr{
+                    th {
+                      background-color: rgba(251, 86, 7, 0.72) !important; // Fondo azul claro
+                      padding: 0.5rem; /*8px*/
+                      font-size: 0.75rem; /*12px*/
+                      color: #16161D;
+                      text-align: left;
+                      border: 1px solid #CCD6EB; // Bordes claros
+
+                      &:first-child {
+                        font-weight: 600; // Estatus en negrita
+                      }                      
+                    }
+                  }
+                }
+            
+                tbody {
+                  tr {
+                    th, td {
+                      padding: 0.5rem;
+                      font-size: 0.75rem;
+                      color: #425466;
+                      text-align: left;
+                      border: 1px solid #CCD6EB; // Bordes sutiles
+
+                      &:first-child {
+                        font-weight: 400;
+                      }                             
+                    }
+                  }
+                }
+            
+                tfoot {
+                  tr {                        
+                    th, td {
+                      // background-color: rgba(204, 214, 235, 1) !important; // Fondo verde claro para el total
+                      background-color: rgba(218, 218, 218, 1) !important; // Fondo verde claro para el total
+                      &:first-child {
+                        font-weight: 400;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            >div:not(.table-responsive){ // Aplica solo si el segundo >div no tiene la clase table-responsive
+              display: flex;
+              flex-direction: column-reverse;
+              gap: 10px;
+              h6{
+                margin-bottom: 10px;
+              }
+            }
+            
+            &:last-child{
+              border: 0;
+            }
+          }          
+        }
+
+        @media (min-width: 992px) {
+            max-height: auto;
+            overflow: auto;                    
+            display: grid;
+            grid-template-columns: 1fr 430px;
+
+            .container_left, .container_right{
+              max-height: 650px;
+              overflow-y: scroll;
+            }
+
+            .container_left{
+              border-right: 1px solid #CCD6EB;
+            }
+        }
+
+        @media (min-width: 1100px) {
+          .container_left, .container_right{
+            max-height: 650px;
+            overflow-y: scroll;
+
+            >div{
+
+              >div:not(.table-responsive){ // Aplica solo si el segundo >div no tiene la clase table-responsive
+                display: grid;
+                grid-template-columns: 300px 1fr;
+
+                >div.chart-container{
+                  position: relative;
+                  margin: auto;
+                  width: 100%;
+                  height: 35vh;                
+                }                
+              }
+            }
+          }          
+        }
+
+        @media (min-width: 1200px) {
+          grid-template-columns: 1fr 500px;
+
+          .container_left, .container_right{
+            >div{
+              >div:not(.table-responsive){ // Aplica solo si el segundo >div no tiene la clase table-responsive
+                grid-template-columns: 350px 1fr;
+              }
+            }
+          }          
+        }
+      }
+  }
+
+  .modal-dialog{
+    @media (min-width: 992px) {
+      max-width: 1140px;
+    }
+
+    @media (min-width: 1200px) {
+      max-width: 1400px;
+    }
+  }
+}
+  

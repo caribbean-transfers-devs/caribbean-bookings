@@ -48,7 +48,7 @@ class RatesController extends Controller
     }
 
     public function updateRates(RatesUpdateRequest $request, RatesRepository $ratesRepository){
-        if(!RoleTrait::hasPermission(35)){
+        if(!RoleTrait::hasPermission(34)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $ratesRepository->updateRates($request);

@@ -11,16 +11,6 @@ use App\Models\ReservationFollowUp;
 
 trait FollowUpTrait
 {
-    public function follow_ups($request)
-    {
-        $check = $this->create_followUps($request->reservation_id, $request->text, $request->type, $request->name);
-        if($check){
-            return response()->json(['message' => 'Follow up created successfully','success' => true], Response::HTTP_OK);
-        }else{
-            return response()->json(['message' => 'Error creating follow up','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
     public function create_followUps($reservation_id, $text, $type, $name = null)
     {
         $follow_up = new ReservationFollowUp();

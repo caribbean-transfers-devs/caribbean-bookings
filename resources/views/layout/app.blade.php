@@ -7,9 +7,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title') | Bookings</title>
-	<meta name="description" content="Caribbean Transfers | Affiliates">
+	<meta name="description" content="Caribbean Transfers | Bookings">
     <link rel="preconnect" href="https://fonts.gstatic.com">
-	<link rel="shortcut icon" href="/assets/img/icons/favicon-32x32.png">
+	<link rel="shortcut icon" href="/assets/img/icons/icon-48x48.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
     <link href="{{ mix('/assets/css/core/core.min.css') }}" rel="preload" as="style" >

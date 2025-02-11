@@ -18,6 +18,12 @@
 @push('Css')
     <link href="{{ mix('/assets/css/sections/new_spam.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/new_spam.min.css') }}" rel="stylesheet" >
+    <style>
+        .table-wrapper {
+            max-height: 700px; /* Altura máxima del contenedor */
+            overflow-y: auto;  /* Habilitar desplazamiento vertical */
+        }        
+    </style>
 @endpush
 
 @push('Js')

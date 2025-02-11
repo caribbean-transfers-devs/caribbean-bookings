@@ -5,10 +5,13 @@ use Aws\S3\S3Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ReservationsMedia;
-use App\Repositories\Reservations\ReservationsRepository;
+
+//TRAIS
+use App\Traits\FollowUpTrait;
 
 trait DigitalOceanTrait
 {
+    use FollowUpTrait;
     
     private function getS3Client()
     {
@@ -29,18 +32,17 @@ trait DigitalOceanTrait
         $validator = Validator::make($request->all(), [
             'folder' => 'required|string',            
             'file' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:5120',
-            'type_media' => 'required|string|in:GENERAL,CANCELLATION,OPERATION,REFUND',
+            'type_media' => 'required|string|in:GENERAL,CANCELLATION,OPERATION,REFUND,NOSHOW',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                    'error' => [
-                        'code' => 'required_params',
-                        'message' =>  $validator->errors()->all() 
-                    ]
-                ], 404);
+                'error' => [
+                    'code' => 'required_params',
+                    'message' =>  $validator->errors()->all()
+                ]
+            ], 404);
         }
-
 
         $client = $this->getS3Client();
         $file = $request->file('file');
@@ -63,13 +65,12 @@ trait DigitalOceanTrait
             $media->type_media = $request->type_media;
             $media->save();
 
-            $repo = new ReservationsRepository();
-            $repo->create_followUps($request->input('folder'), "El usuario: ".auth()->user()->name.", ha agregado el archivo multimedia: ".$file->getClientOriginalName(), 'HISTORY', 'MEDIA');
+            $this->create_followUps($request->input('folder'), "El usuario: ".auth()->user()->name.", ha agregado el archivo multimedia: ".$file->getClientOriginalName(), 'HISTORY', 'MEDIA');
             
             if( isset($request->type_action) && $request->type_action == "upload" ){
                 return response()->json([
                     'success' => true,
-                    'message' => 'Image uploaded successfully',
+                    'message' => 'Imagen cargada exitosamente',
                     'data' => array(
                         "item"  => $request->id, //ITEM DE LA TABLA DE OPERACIONES
                         "reservation" => $request->folder, // EL ID DE LA RESERVACIÓN
@@ -78,10 +79,17 @@ trait DigitalOceanTrait
                     )
                 ]);
             }else{
-                return response()->json(['message' => 'Image uploaded successfully', 'url' => $result['ObjectURL']]);
+                return response()->json([
+                    'status' => "success",
+                    'message' => 'Imagen cargada exitosamente', 
+                    'url' => $result['ObjectURL']]);
             }
         } catch (Aws\Exception\AwsException $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => "error",
+                'message' => "Error al cargar la imagen",
+                // 'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -111,8 +119,7 @@ trait DigitalOceanTrait
                     'Key'    => $media->path,
                 ]);
                 
-                $repo = new ReservationsRepository();
-                $repo->create_followUps($media->reservation_id, "El usuario: ".auth()->user()->name.", ha eliminado el archivo multimedia: ".$request->name, 'HISTORY', 'MEDIA');
+                $this->create_followUps($media->reservation_id, "El usuario: ".auth()->user()->name.", ha eliminado el archivo multimedia: ".$request->name, 'HISTORY', 'MEDIA');
                 
                 $media->delete();
 

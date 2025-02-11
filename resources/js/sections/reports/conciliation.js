@@ -19,11 +19,13 @@ components.formReset();
 //DECLARACION DE VARIABLES
 const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
 const __btn_conciliation_paypal = document.querySelector('.__btn_conciliation_paypal');
+const __btn_conciliation_stripe = document.querySelector('.__btn_conciliation_stripe');
 const __title_modal = document.getElementById('filterModalLabel');
 const __btn_conciliations = document.querySelectorAll('.__btn_conciliation');
 const __close_modals = document.querySelectorAll('.__close_modal');
 const __type_pay = document.getElementById('type_form_pay');
 const __code_pay = document.getElementById('payment_id');
+const __is_conciliated = document.getElementById('servicePaymentsConciliationModal');
 
 //ACCION PARA CREAR
 if( __create != null ){
@@ -32,6 +34,7 @@ if( __create != null ){
     });
 }
 
+//PAYPAL
 if( __btn_conciliation_paypal != null ){
     __btn_conciliation_paypal.addEventListener('click', function(event){
         event.preventDefault();
@@ -75,6 +78,70 @@ if( __btn_conciliation_paypal != null ){
                 $.ajax({
                     type: "GET",
                     url: _LOCAL_URL + "/bot/conciliation/paypal",
+                    data: { startDate, endDate }, // Envío de fechas
+                    dataType: "json",
+                    beforeSend: function(){
+                        components.loadScreen();
+                    },
+                    success: function(response) {
+                        // Manejar la respuesta exitosa del servidor
+                        Swal.fire({
+                            icon: response.status,
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    }
+                });
+            }
+        });
+    });
+}
+
+//STRIPE
+if( __btn_conciliation_stripe != null ){
+    __btn_conciliation_stripe.addEventListener('click', function(event){
+        event.preventDefault();
+        swal.fire({
+            title: '¿Esta seguro de conciliar los pagos de Stripe?',
+            html: `
+                <div class="w-100 d-flex justify-content-between gap-3">
+                    <div class="w-50">
+                        <label for="startDate">Fecha Inicio:</label>
+                        <input id="startDate" type="date" class="form-control">
+                    </div>
+                    <div class="w-50">
+                        <label for="endDate">Fecha Fin:</label>
+                        <input id="endDate" type="date" class="form-control">
+                    </div>
+                </div>
+            `,            
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+        
+                if (!startDate || !endDate) {
+                    Swal.showValidationMessage('Por favor seleccione un rango de fechas válido.');
+                    return false;
+                }
+        
+                if (new Date(startDate) > new Date(endDate)) {
+                    Swal.showValidationMessage('La fecha de inicio no puede ser mayor que la fecha de fin.');
+                    return false;
+                }
+        
+                return { startDate, endDate };
+            }
+        }).then((result) => {
+            if(result.isConfirmed == true){
+                const { startDate, endDate } = result.value;
+                $.ajax({
+                    type: "GET",
+                    url: _LOCAL_URL + "/bot/conciliation/stripe",
                     data: { startDate, endDate }, // Envío de fechas
                     dataType: "json",
                     beforeSend: function(){
@@ -141,6 +208,25 @@ if( __btn_conciliations.length > 0 ){
             });            
         });
     });
+}
+
+if( __is_conciliated != null ){
+    changeIsConciliation(__is_conciliated);
+    __is_conciliated.addEventListener('change', function(event){
+        event.preventDefault();
+        changeIsConciliation(this);
+    });
+
+    function changeIsConciliation(DOM){
+        console.log(DOM.value);
+        
+        const __box_comment = document.querySelector('.box_comment');        
+        if( DOM.value == 1 ){
+            __box_comment.classList.remove('d-none');
+        }else{
+            __box_comment.classList.add('d-none');
+        }
+    }
 }
 
 $("#servicePaymentsCurrencyModal").on('change', function(){

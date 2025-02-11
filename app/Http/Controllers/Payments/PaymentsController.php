@@ -36,4 +36,9 @@ class PaymentsController extends Controller
             return $paymentRepository->destroy($request,$payment);
         }
     }
+
+    public function conciliation(Request $request, PaymentRepository $paymentRepository)
+    {
+        return $paymentRepository->conciliation($request);
+    }
 }

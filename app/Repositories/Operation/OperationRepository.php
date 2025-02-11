@@ -236,22 +236,27 @@ class OperationRepository
         }
     }    
 
+    /**
+     * NOS AYUDA A PODER CAMBIAR EL ESTATUS DEL SERVICIO, EN LOS DETALLES DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+     */
     public function statusUpdate($request)
     {
         try {
-            DB::beginTransaction();            
+            DB::beginTransaction();
             $item = ReservationsItem::find($request->item_id);
+
+            $this->create_followUps($request->rez_id, "El usuario: ".auth()->user()->name.", actualizo es estatus del servicio de: (".$request->type.") de ".( $request->type == "arrival" ? $item->op_one_status : $item->op_two_status  ). " a ".$request->status, 'HISTORY', "ESTATUS DE RESERVACIÓN");
+
             if($request->type == "arrival"):
                 $item->op_one_status = $request->status;
-                $item->op_one_cancellation_type_id = $request->type_cancel;
+                $item->op_one_cancellation_type_id = ( is_numeric($request->type_cancel) ? $request->type_cancel : NULL );
             endif;
             if($request->type == "departure"):
                 $item->op_two_status = $request->status;
-                $item->op_two_cancellation_type_id = $request->type_cancel;
-            endif;            
-            $item->save();
-
-            $this->create_followUps($request->rez_id, "El usuario: ".auth()->user()->name.", actualizo es estatus de reservación de: (".$request->type.") a ".$request->status, 'HISTORY', "ESTATUS DE RESERVACIÓN");        
+                $item->op_two_cancellation_type_id = ( is_numeric($request->type_cancel) ? $request->type_cancel : NULL );
+            endif;
+            $item->save();            
     
             DB::commit();
             return response()->json([

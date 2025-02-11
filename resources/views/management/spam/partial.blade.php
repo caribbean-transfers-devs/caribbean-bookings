@@ -6,6 +6,7 @@
                 <th class="" scope="col">Nombre</th>                    
                 <th scope="col">Desde</th>
                 <th scope="col">Hacia</th>
+                <th class="text-center" scope="col">Pax</th>
                 <th class="text-center" scope="col">Seguimiento</th>
                 <th class="text-center" scope="col">Estatus</th>
             </tr>
@@ -19,12 +20,12 @@
                     <td class="text-left">{{ $value->client_full_name }}</td>                    
                     <td class="text-left">{{ $value->from_name }}</td>
                     <td class="text-left">{{ $value->to_name }}</td>
+                    <td class="text-center">{{ $value->passengers }}</td>
 
                     @if($value->last_date)
                         <td class="text-center bs-tooltip" title="{{$value->last_user}}">{{date("m/d H:i", strtotime($value->last_date))}}</td>                            
                     @else
-                        <td class="text-center"><span class="badge badge-light-danger" style="font-size:7pt;">Sin seguimiento</span></td>
-                        
+                        <td class="text-center"><span class="badge badge-light-danger" style="font-size:7pt;">Sin seguimiento</span></td>                        
                     @endif
 
                     <td class="text-center">

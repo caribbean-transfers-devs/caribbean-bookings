@@ -10,7 +10,7 @@ class Payment extends Model
 {
     use HasFactory,SoftDeletes;
 
-    public $timestamps = false;
+    // public $timestamps = false;
 
     public function reservation(){
         return $this->belongsTo(Reservation::class);

@@ -26,6 +26,20 @@ let components = {
         return (translations[language][item]) ? translations[language][item] : 'Translate not found';
     },
 
+    multiCheck: function(tb_var) {
+        tb_var.on("change", ".chk-parent", function() {
+            console.log("hola");
+            
+            var e=$(this).closest("table").find("td:first-child .child-chk"), a=$(this).is(":checked");
+            $(e).each(function() {
+                a?($(this).prop("checked", !0), $(this).closest("tr").addClass("active")): ($(this).prop("checked", !1), $(this).closest("tr").removeClass("active"))
+            })
+        }),
+        tb_var.on("change", "tbody tr .new-control", function() {
+            $(this).parents("tr").toggleClass("active")
+        })
+    },    
+
     /**
      * ===== Render Table Settings ===== *
      * @param {*} table //tabla a renderizar
@@ -47,6 +61,27 @@ let components = {
         }
         // console.log(buttons);
 
+        if( action == "fixedheaderPaginationCheck" ){
+            // _settings.headerCallback = function(e, a, t, n, s) {
+            //     e.getElementsByTagName("th")[0].innerHTML=`
+            //         <div class="form-check form-check-primary">
+            //             <input class="form-check-input chk-parent new-control" type="checkbox" id="form-check-default">
+            //         </div>`;
+            // };
+            _settings.columnDefs = [{                 
+                width: "30px", 
+                className: "check_sandbox", 
+                orderable: false,
+                targets: 0,
+                // render:function(e, a, t, n) {
+                //     return `
+                //     <div class="form-check form-check-primary">
+                //         <input class="form-check-input child-chk new-control" type="checkbox" id="form-check-default">
+                //     </div>`
+                // }
+            }];
+        }
+
         _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-12 col-lg-8 d-flex flex-column flex-sm-row justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3 ms-lg-3'B>><'col-12 col-sm-12 col-lg-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
                         <'table-responsive'tr>
                         <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;                        
@@ -54,7 +89,7 @@ let components = {
         _settings.responsive = false; // La tabla sigue siendo responsive
         _settings.buttons =  _buttons;
         _settings.order = [];
-        if( action == "fixedheaderPagination" ){
+        if( action == "fixedheaderPagination" || action == "fixedheaderPaginationCheck" ){
             _settings.paging = true; // Aseguramos que la paginación esté activada
             _settings.pageLength = 100; // Muestra 100 elementos por página por defecto
             _settings.lengthChange = false; // Quita el selector de "mostrar X elementos por página"
@@ -63,7 +98,7 @@ let components = {
         }
         // _settings.stateSave = false;
 
-        if( action == "fixedheader" || action == "fixedheaderPagination" ){
+        if( action == "fixedheader" || action == "fixedheaderPagination" || action == "fixedheaderPaginationCheck" ){
             _settings.fixedHeader = true; // Deshabilita FixedHeader si estaba habilitado
             _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
         }
@@ -108,19 +143,18 @@ let components = {
             table.on('draw', function () {
                 __table_render.columns.adjust();
             });
-        }        
+        }    
     },
 
     actionTableChart: function(table, section = "general"){
         const _settings = {};
 
-        _settings.dom = `<'table-responsive'tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+        _settings.dom = `<'table-responsive'tr>`;
         _settings.deferRender = true;
         _settings.responsive = false;
         if (section == "driver") {
             _settings.order = [[3, 'desc']];
-            _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
+            // _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
         }else if(section == "commissions"){
             _settings.order = [[1, 'desc']];
         }else{
@@ -146,7 +180,7 @@ let components = {
         table.on('init', function () {
             __table.columns.adjust().draw();
         });        
-    },    
+    },  
 
     formReset: function(){
         const __closes = document.querySelectorAll('.__close');
@@ -243,7 +277,9 @@ let components = {
             dataType: "json", // Tipo de datos que se espera en la respuesta del servidor
             contentType: 'application/json; charset=utf-8',
             beforeSend: function(){
-                components.loadScreen();
+                if( !_params.hasOwnProperty('loading') ){
+                    components.loadScreen();
+                }                
             },
             success: function(response) {
                 // Manejar la respuesta exitosa del servidor
@@ -490,6 +526,11 @@ let components = {
         }
     },
 
+    /**
+     * 
+     * @param {*} __table 
+     * @param {*} __storageName 
+     */
     validateColumnVisibility: function(__table, __storageName){
         const __DataTable = $(__table).DataTable(); //DOM DataTable
         const localStorageKey = __storageName; //El nombre del localStorage        
@@ -554,7 +595,7 @@ window.addEventListener("DOMContentLoaded", function() {
             'X-CSRF-TOKEN': csrfToken
         },
         complete : function(xhr, status) {
-            console.log('complete', xhr, status);
+            // console.log('complete', xhr, status);
             components.removeLoadScreen();
         },
         error : function(xhr, status, error) {
@@ -573,6 +614,7 @@ window.addEventListener("DOMContentLoaded", function() {
     if (__table_render != null) {
         __table_render.columns.adjust();
         __table_render.columns.adjust().draw();
+        components.multiCheck(__table_render);
     }    
 });
 

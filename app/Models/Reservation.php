@@ -34,7 +34,8 @@ class Reservation extends Model
 
     public function sales()
     {
-        return $this->hasMany(Sale::class, 'reservation_id', 'id');
+        // return $this->hasMany(Sale::class, 'reservation_id', 'id');
+        return $this->hasMany(Sale::class, 'reservation_id', 'id')->whereNull('deleted_at');
     }
 
     public function callCenterAgent()

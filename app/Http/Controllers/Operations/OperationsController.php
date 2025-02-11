@@ -18,6 +18,7 @@ use App\Models\Destination;
 use App\Models\DestinationService;
 
 //TRAIT
+use App\Traits\ApiTrait;
 use App\Traits\CodeTrait;
 use App\Traits\RoleTrait;
 use App\Traits\FiltersTrait;
@@ -37,8 +38,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class OperationsController extends Controller
 {
-
-    use CodeTrait, RoleTrait, FiltersTrait, QueryTrait, FollowUpTrait;
+    use ApiTrait, CodeTrait, RoleTrait, FiltersTrait, QueryTrait, FollowUpTrait;
 
     public function index(Request $request){
         ini_set('memory_limit', '-1'); // Sin límite
@@ -108,51 +108,30 @@ class OperationsController extends Controller
         $items_private = $this->queryOperations($queryOnePR, $queryTwoPR, $queryHavingPR, $queryData);
         $items_shared = $this->queryOperations($queryOneSH, $queryTwoSH, $queryHavingSH, $queryData);
         
-        $not_preassigned_private = [];
-        $preassigned_private = [];
-        $not_preassigned_shared = [];
-        $preassigned_shared = [];
+        // $not_preassigned = [];
+        // $preassigned = [];        
+        // foreach ($items as $item) {
+        //     if( !OperationTrait::validatePreassignment($item) ){
+        //         $not_preassigned[] = $item;
+        //     }else{
+        //         $preassigned[] = $item;
+        //     }
+        // }
 
-        foreach ($items_private as $private) {
-            if( !OperationTrait::validatePreassignment($private) ){
-                $not_preassigned_private[] = $private;
-            }else{
-                $preassigned_private[] = $private;
-            }
-        }
+        // // Ordenamos los preasignados por hora en orden ascendente
+        // usort($preassigned, function ($a, $b) {
+        //     // Validamos la hora según el tipo
+        //     $timeA = ($a->op_type === "TYPE_ONE") ? $a->pickup_from : $a->pickup_to;
+        //     $timeB = ($b->op_type === "TYPE_ONE") ? $b->pickup_from : $b->pickup_to;
 
-        foreach ($items_shared as $shared) {
-            if( !OperationTrait::validatePreassignment($shared) ){
-                $not_preassigned_shared[] = $shared;
-            }else{
-                $preassigned_shared[] = $shared;
-            }
-        }        
+        //     // Comparación de tiempos
+        //     return strtotime($timeA) <=> strtotime($timeB);
+        // });
 
-        // Ordenamos los preasignados por hora en orden ascendente
-        usort($preassigned_private, function ($a, $b) {
-            // Validamos la hora según el tipo
-            $timeA = ($a->op_type === "TYPE_ONE") ? $a->pickup_from : $a->pickup_to;
-            $timeB = ($b->op_type === "TYPE_ONE") ? $b->pickup_from : $b->pickup_to;
-
-            // Comparación de tiempos
-            return strtotime($timeA) <=> strtotime($timeB);
-        });
-        usort($preassigned_shared, function ($a, $b) {
-            // Validamos la hora según el tipo
-            $timeA = ($a->op_type === "TYPE_ONE") ? $a->pickup_from : $a->pickup_to;
-            $timeB = ($b->op_type === "TYPE_ONE") ? $b->pickup_from : $b->pickup_to;
-
-            // Comparación de tiempos
-            return strtotime($timeA) <=> strtotime($timeB);
-        });        
-
-        $sorted_reservations_private = array_merge($not_preassigned_private, $preassigned_private);
-        $sorted_reservations_shared = array_merge($not_preassigned_shared, $preassigned_shared);
+        // $sorted_reservations = array_merge($not_preassigned, $preassigned);
 
         return view('operation.operations', [
-            'privates' => $sorted_reservations_private,
-            'shareds' => $sorted_reservations_shared,
+            'items' => $items,
             'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ),
             'nexDate' => date('Y-m-d', strtotime($request->date . ' +1 day')),
             'breadcrumbs' => [
@@ -166,6 +145,7 @@ class OperationsController extends Controller
             'reservation_status' => $this->reservationStatus(),
             'vehicles' => $this->Vehicles(),
             'zones' => $this->Zones(),
+            'types_cancellations' => ApiTrait::makeTypesCancellations(),
             'units' => $this->Units(), //LAS UNIDADES DADAS DE ALTA
             'units2' => $this->Units('active'), //LAS UNIDADES DADAS DE ALTA
             'drivers' => $this->Drivers(),
