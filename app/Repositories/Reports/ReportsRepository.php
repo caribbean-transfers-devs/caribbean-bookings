@@ -675,8 +675,8 @@ class ReportsRepository
         //     return $item->employee_status == 1;
         // });
 
-        // Reinicia los índices del arreglo si es necesario
-        $filteredCommissions = array_values($filteredCommissions);        
+        // // Reinicia los índices del arreglo si es necesario
+        // $filteredCommissions = array_values($filteredCommissions);
 
         return view('reports.commissions2', [
             'breadcrumbs' => [
