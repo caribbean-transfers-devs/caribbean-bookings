@@ -671,9 +671,9 @@ class ReportsRepository
         $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);        
 
         // Filtrar el arreglo para conservar solo los elementos con employee_status igual a 1
-        $filteredCommissions = array_filter($items, function($item) {
-            return $item->employee_status == 1;
-        });
+        // $filteredCommissions = array_filter($items, function($item) {
+        //     return $item->employee_status == 1;
+        // });
 
         // Reinicia los índices del arreglo si es necesario
         $filteredCommissions = array_values($filteredCommissions);        
@@ -874,7 +874,7 @@ class ReportsRepository
         // dd($query, $queryHaving, $queryData);
         $bookings = $this->queryBookings($query, $queryHaving, $queryData);
         
-        return view('reports.sales_new', [
+        return view('reports.sales', [
             'breadcrumbs' => [
                 [
                     "route" => "",
@@ -928,8 +928,8 @@ class ReportsRepository
             // "is_today" => ( isset($request->is_today) ? $request->is_today : NULL ),
         ];
 
-        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
-        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
         $havingConditions = []; $queryHaving = "";
         $queryData = [
             'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
@@ -1059,7 +1059,7 @@ class ReportsRepository
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
 
-        return view('reports.operations_new', [
+        return view('reports.operations', [
             'breadcrumbs' => [
                 [
                     "route" => "",
