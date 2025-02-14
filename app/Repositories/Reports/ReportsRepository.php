@@ -686,7 +686,7 @@ class ReportsRepository
                     "active" => true
                 ]
             ],       
-            'operations' => $filteredCommissions,
+            'operations' => $items,
             'users' => $this->Users(),
             'data' => $data,
             'request' => $request->input(),
