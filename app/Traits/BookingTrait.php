@@ -107,7 +107,7 @@ trait BookingTrait
     }
 
     public static function classStatusPayment($service){
-        return 'style="'.( $service->payment_status == "PAID" ? 'background-color:#00ab55;color:#fff;' : 'background-color:#e7515a;color:#fff;' ).'"';
+        return 'style="'.( $service->payment_status == "PAID" ? 'background-color:#00ab55;color:#fff;' : ( $service->payment_status == "PENDING" ? 'background-color:#e7515a;color:#fff;' : 'background-color:#2196f3;color:#fff;' ) ).'"';
     }
 
     public static function statusPayment($status = "PAID"){

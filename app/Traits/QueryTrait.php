@@ -63,6 +63,7 @@ trait QueryTrait
                                         ELSE 'UNKNOWN'
                                     END AS reservation_status,
                                     CASE
+                                        WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
                                         ELSE 'PENDING'
                                     END AS payment_status,

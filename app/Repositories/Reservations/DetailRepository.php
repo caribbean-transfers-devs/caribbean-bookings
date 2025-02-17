@@ -37,7 +37,7 @@ class DetailRepository
             'originSale'
         ])->find($id);
 
-        // dd($reservation->toArray());
+        // dump($reservation->toArray());
                 
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
         $sellers = User::whereIn('id', $users_ids)->get();        
@@ -77,6 +77,9 @@ class DetailRepository
         if($reservation->is_quotation == 1):
             $data['status'] = "QUOTATION";
         endif;
+        if( $reservation->site->is_cxc == 1 && round( $data['total_payments'], 2) == 0 ){
+            $data['status'] = "CREDIT";
+        }
         if($reservation->open_credit){
             $data['status'] = "OPENCREDIT";
         }
