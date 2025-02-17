@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const __payments = document.getElementById('dataMethodPayments');
         const __currencys = document.getElementById('dataCurrency');
         const __vehicles = document.getElementById('dataVehicles');
-        const __services_type = document.getElementById('dataServiceTypeOperation');
+        const __services_type = document.getElementById('dataServiceType');
+        const __services_type_operation = document.getElementById('dataServiceTypeOperation');
 
         const __sites = document.getElementById('dataSites');
         const __destinations = document.getElementById('dataDestinations');
@@ -32,6 +33,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const __chartSaleServiceType = document.getElementById('chartSaleServiceType');
         const __chartSaleServiceType2 = document.getElementById('chartSaleServiceType2');
 
+        const __chartSaleServiceTypeOperation = document.getElementById('chartSaleServiceTypeOperation');
+        const __chartSaleServiceTypeOperation2 = document.getElementById('chartSaleServiceTypeOperation2');
+
         const __chartSaleSites = document.getElementById('chartSaleSites');
         const __chartSaleDestination = document.getElementById('chartSaleDestination');
         const __chartSaleDrivers = document.getElementById('chartSaleDrivers');
@@ -44,6 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
         dataCurrency: __currencys?.value.trim() || "{}",
         dataVehicles: __vehicles?.value.trim() || "{}",
         dataServiceType: __services_type?.value.trim() || "{}",
+        dataServiceTypeOperation: __services_type_operation?.value.trim() || "{}",
 
         dataSites: __sites?.value.trim() || "{}",                
         dataDestinations: __destinations?.value.trim() || "{}",
@@ -65,6 +70,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 case 'serviceType':
                     _data = this.dataChartServiceType();
                     break
+                case 'serviceTypeOperation':
+                    _data = this.dataChartServiceTypeOperation();
+                    break                    
                 default:
                     _data = this.dataChartSaleStatus();
                     break;
@@ -358,7 +366,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
             return object;
         },
-        renderChartServiceType: function(){            
+        renderChartServiceType: function(){
             if( __chartSaleServiceType != null ){
                 new Chart(__chartSaleServiceType, {
                     type: 'pie',
@@ -408,6 +416,66 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             if( __chartSaleServiceType2 != null ){
                 new Chart(__chartSaleServiceType2, this.settingsChart('doughnut','serviceType'));
+            }
+        },        
+        dataChartServiceTypeOperation: function(){
+            let object = [];
+            const systems = Object.entries(JSON.parse(this.dataServiceTypeOperation));
+            systems.forEach( ([key, data]) => {
+                object.push(data);
+            });
+            return object;
+        },
+        renderChartServiceTypeOperation: function(){
+            if( __chartSaleServiceTypeOperation != null ){
+                new Chart(__chartSaleServiceTypeOperation, {
+                    type: 'pie',
+                    data: {
+                        labels: charts.dataChartServiceTypeOperation().map(row => row.name),
+                        datasets: [
+                            {
+                                data: charts.dataChartServiceTypeOperation().map(row => row.counter),
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true, // Hacer el gráfico responsivo
+                        maintainAspectRatio: true, // Permitir que el gráfico ajuste su altura además de su ancho
+                        plugins: {
+                            legend: {
+                                display: true,  // Mostrar las etiquetas
+                                position: 'right', // Colocar las etiquetas debajo del gráfico
+                                labels: {
+                                    padding: 5, // Ajustar el espacio entre la leyenda y el gráfico
+                                    boxWidth: 20, // Tamaño de los cuadros de color de la leyenda
+                                    font: {
+                                        size: 12, // Tamaño de la fuente de los labels
+                                        color: '#000' // Cambia el color de los labels a negro
+                                    },
+                                    color: '#000' // Asegura que el color de los labels sea negro
+                                }
+                            },
+                            datalabels: {
+                                display: true,
+                                formatter: (value, context) => {                                                                                
+                                    const total = context.chart._metasets[0].total;
+                                    const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                    return percentage; // Mostrar porcentaje en el gráfico
+                                },
+                                color: '#000',
+                                font: {
+                                    weight: 'bold'
+                                },
+                                anchor: 'end',
+                                align: 'start'
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels] // Asegúrate de incluir el plugin ChartDataLabels
+                });
+            }
+            if( __chartSaleServiceTypeOperation2 != null ){
+                new Chart(__chartSaleServiceTypeOperation2, this.settingsChart('doughnut','serviceTypeOperation'));
             }
         },
         dataChartSaleSites: function(){
@@ -769,6 +837,7 @@ document.addEventListener("DOMContentLoaded", function () {
     charts.renderChartSaleCurrency();
     charts.renderChartVehicle();
     charts.renderChartServiceType();
+    charts.renderChartServiceTypeOperation();
 
     charts.renderChartSaleSites();    
     charts.renderChartSaleDestinations();

@@ -30,7 +30,7 @@ class TpvCreateRequest extends FormRequest
             'phone' => 'required',
             'site_id' => 'required|integer',
             'call_center_agent' => 'required|integer',
-
+            'is_quotation' => 'required|integer',
         ];
     }
 
@@ -48,6 +48,7 @@ class TpvCreateRequest extends FormRequest
             'phone.required' => 'El teléfono es requerido',
             'site_id.required' => 'El sitio es requerido',
             'call_center_agent.required' => 'Debe seleccionar un agente',
+            'is_quotation.required' => 'Este parametro es requerido',
         ];
     }
 

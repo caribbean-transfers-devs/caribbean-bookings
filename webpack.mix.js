@@ -71,7 +71,9 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
         mix.sass('resources/scss/sections/zones.scss', data.assets + "css/sections/zones.min.css"); //ZONES
         mix.sass('resources/scss/sections/rates.scss', data.assets + "css/sections/rates.min.css"); //RATES
         mix.sass('resources/scss/sections/users.scss', data.assets + "css/sections/users.min.css"); //USERS
+
         mix.sass('resources/scss/sections/_settings_rates_enterprise.scss', data.assets + "css/sections/settings_rates_enterprise.min.css"); //RATES ENTERPRISE
+        mix.sass('resources/scss/sections/_settings_types_cancellations.scss', data.assets + "css/sections/settings_types_cancellations.min.css"); //TIPOS DE CANCELACIÓN
 
 
         mix.sass('resources/scss/sections/enterprise.scss', data.assets + "css/sections/enterprise.min.css");
@@ -125,6 +127,7 @@ mix.sass('resources/scss/dashboards/admin.scss', data.assets + "css/dashboards/a
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/settings/drivers.js'], data.assets + "js/sections/settings/drivers.min.js"); //DRIVERS
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/settings/exchanges.js'], data.assets + "js/sections/settings/exchanges.min.js"); //EXCHANGE
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/settings/rates_enterprise.js'], data.assets + "js/sections/settings/rates_enterprise.min.js"); //RATES ENTERPRISE
+        mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/settings/types_cancellations.js'], data.assets + "js/sections/settings/types_cancellations.min.js"); //TIPOS DE CANCELACIÓN
 
         mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/zones.js'], data.assets + "js/sections/zones.min.js"); //ZONES
         mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/rates.js'], data.assets + "js/sections/rates.min.js"); //RATES

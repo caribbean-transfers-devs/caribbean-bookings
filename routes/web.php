@@ -31,6 +31,7 @@ use App\Http\Controllers\Settings\EnterpriseController;
 use App\Http\Controllers\Settings\SitesController;
 use App\Http\Controllers\Settings\ExchangeReportsController;
 use App\Http\Controllers\Settings\RatesEnterpriseController;
+use App\Http\Controllers\Settings\TypesCancellationsController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -65,6 +66,13 @@ Route::group(['middleware' => ['auth']], function () {
         //STRIPE
         Route::get('/bot/conciliation/stripe', [ConciliationController::class, 'StripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
         Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
+
+    //TPV        
+        Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
+        Route::get('/tpv/edit/{code}', [TpvController::class, 'index'])->name('tpv.new');
+        Route::post('/tpv/quote', [TpvController::class, 'quote'])->name('tpv.quote');
+        Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
+        Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');        
 
     //FINANZAS    
         //PAGOS
@@ -168,12 +176,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('/payments',PaymentsController::class);
     Route::match(['post'], '/payments/conciliation', [PaymentsController::class, 'conciliation'])->name('payments.conciliation');
 
-    Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
-    Route::get('/tpv/edit/{code}', [TpvController::class, 'index'])->name('tpv.new');
-    Route::post('/tpv/quote', [TpvController::class, 'quote'])->name('tpv.quote');
-    Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
-    Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
-
         //EMPRESAS
         Route::resource('/enterprises', EnterpriseController::class);
         //SITIOS
@@ -189,10 +191,19 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/config/rates/enterprise', [RatesEnterpriseController::class, 'index'])->name('config.ratesEnterprise');
         Route::get('/config/rates/enterprise/destination/{id}/get', [RatesEnterpriseController::class, 'items'])->name('config.ratesEnterpriseZones');
         Route::post('/config/rates/enterprise/get', [RatesEnterpriseController::class, 'getRates'])->name('config.getRatesEnterprise');
-
         Route::post('/config/rates/enterprise/new', [RatesEnterpriseController::class, 'newRates'])->name('config.newRatesEnterprise');
         Route::delete('/config/rates/enterprise/delete', [RatesEnterpriseController::class, 'deleteRates'])->name('config.deleteRatesEnterprise');
         Route::put('/config/rates/enterprise/update', [RatesEnterpriseController::class, 'updateRates'])->name('config.updateRatesEnterprise');
+        //TIPO DE CANCELACIONES
+        Route::get('/config/types-cancellations', [TypesCancellationsController::class, 'index'])->name('config.types-cancellations.index');
+        Route::get('/config/types-cancellations/create', [TypesCancellationsController::class, 'create'])->name('config.types-cancellations.create');
+        Route::post('/config/types-cancellations', [TypesCancellationsController::class, 'store'])->name('config.types-cancellations.store');
+        Route::get('/config/types-cancellations/{cancellation}/edit', [TypesCancellationsController::class, 'edit'])->name('config.types-cancellations.edit');
+        Route::put('/config/types-cancellations/{cancellation}', [TypesCancellationsController::class, 'update'])->name('config.types-cancellations.update');
+        Route::delete('/config/types-cancellations/{cancellation}', [TypesCancellationsController::class, 'destroy'])->name('config.types-cancellations.destroy');
+        
+
+
 
 
     Route::resource('/vehicles', VehicleController::class);

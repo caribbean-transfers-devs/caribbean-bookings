@@ -51,7 +51,7 @@
             gap: 15px;
             > div.single_{
                 display: grid;
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr;
                 grid-column-gap: 15px;
                 grid-row-gap: 15px;
                 > button{
@@ -61,7 +61,7 @@
             }
             > div.multiple_{
                 display: grid;
-                grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
                 grid-column-gap: 15px;
             }
             p{

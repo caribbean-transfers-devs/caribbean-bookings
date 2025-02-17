@@ -53,9 +53,10 @@ trait QueryTrait
                                     COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                     SUM(p.is_conciliated) as is_conciliated,
                                     CASE
-                                        WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
-                                        WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                        WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
                                         WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                        WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                        WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                         WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
@@ -177,8 +178,9 @@ trait QueryTrait
 
                                 CASE
                                     WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
-                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                     WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                    WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                     ELSE 'UNKNOWN'
@@ -354,9 +356,10 @@ trait QueryTrait
                                 CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
 
                                 CASE
-                                    WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
-                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                    WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
                                     WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                    WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                     ELSE 'UNKNOWN'

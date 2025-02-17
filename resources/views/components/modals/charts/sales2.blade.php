@@ -1,7 +1,7 @@
 @php
     use App\Traits\BookingTrait;
 @endphp
-@props(['bookingsStatus','dataMethodPayments','dataCurrency','dataSites','dataOriginSale','dataVehicles','dataDestinations','dataUnit','dataDriver','dataServiceTypeOperation'])
+@props(['bookingsStatus','dataMethodPayments','dataCurrency','dataVehicles','dataServiceType','dataServiceTypeOperation','dataSites','dataDriver','dataDestinations','dataUnit','dataOriginSale'])
 <!-- Modal -->
 <div class="modal fade" id="chartsModal2" tabindex="-1" role="dialog" aria-labelledby="chartsModalLabel2" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -34,6 +34,9 @@
                 @if ( isset($dataVehicles) )
                     <input type="hidden" id="dataVehicles" value='@json(( isset($dataVehicles['data']) ? $dataVehicles['data'] : [] ))'>
                 @endif
+                @if ( isset($dataServiceType) )
+                    <input type="hidden" id="dataServiceType" value='@json(( isset($dataServiceType['data']) ? $dataServiceType['data'] : [] ))'>
+                @endif                
                 @if ( isset($dataServiceTypeOperation) )
                     <input type="hidden" id="dataServiceTypeOperation" value='@json(( isset($dataServiceTypeOperation['data']) ? $dataServiceTypeOperation['data'] : [] ))'>
                 @endif
@@ -231,14 +234,59 @@
                             </div>
                         </div>
                     @endif
-                    @if ( isset($dataServiceTypeOperation) )
-                        <div id="chartServiceType">                            
+                    @if ( isset($dataServiceType) )
+                        <div id="chartServiceType">
                             <div>
                                 <div class="chart-container">
                                     <canvas class="chartSale" id="chartSaleServiceType2" ></canvas>
                                 </div>
                                 <div>
                                     <h6>Por Tipo De Servicio</h6>                                
+                                    <div class="table-responsive">
+                                        <table class="table table-chart table-chart-general mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Tipo De Servicio</th>
+                                                    <th class="text-center">Cantidad</th>
+                                                    <th class="text-center">Pesos</th>
+                                                    <th class="text-center">Dolares</th>
+                                                    <th class="text-center">Gran Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($dataServiceType['data'] as $keyTypeOperation => $typeoperation )
+                                                    <tr>
+                                                        <th>{{ ucfirst(strtolower($typeoperation['name'])) }}</th>
+                                                        <td class="text-center">{{ $typeoperation['counter'] }}</td>
+                                                        <td class="text-center">{{ number_format($typeoperation['MXN']['total'],2) }}</td>
+                                                        <td class="text-center">{{ number_format($typeoperation['USD']['total'],2) }}</td>
+                                                        <td class="text-center">{{ number_format($typeoperation['gran_total'],2) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th>Total</th>
+                                                    <th class="text-center">{{ $dataServiceType['counter'] }}</th>
+                                                    <th class="text-center">{{ number_format($dataServiceType['MXN']['total'],2) }}</th>
+                                                    <th class="text-center">{{ number_format($dataServiceType['USD']['total'],2) }}</th>
+                                                    <th class="text-center">{{ number_format($dataServiceType['gran_total'],2) }}</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif                    
+                    @if ( isset($dataServiceTypeOperation) )
+                        <div id="chartServiceTypeOperation">
+                            <div>
+                                <div class="chart-container">
+                                    <canvas class="chartSale" id="chartSaleServiceTypeOperation2" ></canvas>
+                                </div>
+                                <div>
+                                    <h6>Por Tipo De Servicio De Operación</h6>                                
                                     <div class="table-responsive">
                                         <table class="table table-chart table-chart-general mb-0">
                                             <thead>
@@ -403,7 +451,7 @@
                     @endif
                     @if ( isset($dataUnit) )
                         <div id="chartUnits">
-                            <h6>Por Conductor</h6>
+                            <h6>Por Unidad</h6>
                             <div class="table-responsive">
                                 <table class="table table-chart table-chart-general mb-0">
                                     <thead>

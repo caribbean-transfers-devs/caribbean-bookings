@@ -53,8 +53,8 @@ class OperationsController extends Controller
             "driver" => ( isset($request->driver) ? $request->driver : 0 ),
         ];
 
-        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
-        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
         // $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two  ";
         // $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four  AND it.is_round_trip = 1 ";
         $havingConditions = []; $queryHaving = "";
@@ -142,8 +142,8 @@ class OperationsController extends Controller
     public function preassignments(Request $request){
         try {
             //DECLARAMOS VARIABLES
-            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
-            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
+            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
+            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
             $havingConditions = []; $queryHaving = "";
             $queryData = [
                 'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 00:00:00",
@@ -219,8 +219,8 @@ class OperationsController extends Controller
     public function closeOperation(Request $request){
         try {
             //DECLARAMOS VARIABLES
-            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
-            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
+            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
+            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
             $havingConditions = []; $queryHaving = "";
             $queryData = [
                 'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 00:00:00",

@@ -10,7 +10,54 @@
 @push('Css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
     <link href="{{ mix('/assets/css/sections/reservation_details.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/reservation_details.min.css') }}" rel="stylesheet" >    
+    <link href="{{ mix('/assets/css/sections/reservation_details.min.css') }}" rel="stylesheet" >
+    <style>
+
+        .countdown-container {
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 18px;
+            margin-bottom: 16px;            
+        }
+
+        .countdown {
+            display: flex;
+            gap: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .countdown div {
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+            min-width: 70px;
+            transition: all 0.3s ease;
+        }
+
+        .countdown div span {
+            display: block;
+            font-size: 16px;
+            font-weight: normal;
+            opacity: 0.8;
+        }
+
+        /* Animación sutil */
+        .countdown div:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .expired {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff5757;
+        }  
+    </style>
 @endpush
 
 @push('Js')
@@ -21,6 +68,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/relativeTime.min.js"></script>    
     <script src="{{ mix('assets/js/sections/reservations/details.min.js') }}"></script>
     <script>
         window.onload = () => {
@@ -34,6 +84,41 @@
             }
         };        
     </script>
+    @if ( $data['status'] == "QUOTATION" )        
+        <script>
+            dayjs.extend(dayjs_plugin_duration);
+            dayjs.extend(dayjs_plugin_relativeTime);
+
+            function iniciarContador(fechaObjetivo) {
+                function actualizarContador() {
+                    const ahora = dayjs();
+                    const vencimiento = dayjs(fechaObjetivo);
+                    const diferencia = vencimiento.diff(ahora);
+
+                    if (diferencia <= 0) {
+                        document.getElementById("countdown").innerHTML = '<span class="expired">¡Tiempo vencido!</span>';
+                        clearInterval(intervalo);
+                        return;
+                    }
+
+                    const duracion = dayjs.duration(diferencia);
+                    document.getElementById("countdown").innerHTML = `
+                        <div><span>DÍAS</span>${duracion.days()}</div>
+                        <div><span>HORAS</span>${duracion.hours()}</div>
+                        <div><span>MINUTOS</span>${duracion.minutes()}</div>
+                        <div><span>SEGUNDOS</span>${duracion.seconds()}</div>
+                    `;
+                }
+
+                actualizarContador();
+                const intervalo = setInterval(actualizarContador, 1000);
+            }
+
+            // Fecha de vencimiento (Cambia esto por la fecha que necesites)
+            const fechaVencimiento = `{{ $reservation->expires_at }}`;
+            iniciarContador(fechaVencimiento);
+        </script>
+    @endif
 @endpush
 
 @section('content')
@@ -61,6 +146,16 @@
                         <table class="table table-hover table-striped table-bordered table-details-booking mb-0">
                             <tbody>
                                 <tr>
+                                    <th>Estatus</th>
+                                    <td><span class="badge bg-{{ BookingTrait::classStatusBooking($data['status']) }}">{{ BookingTrait::statusBooking($data['status']) }}</span></td>
+                                </tr>
+                                @if ( $data['status'] == "QUOTATION" )
+                                    <tr>
+                                        <th>Fecha limite de pago</th>
+                                        <td>{{ $reservation->expires_at }}</td>
+                                    </tr>                                    
+                                @endif
+                                <tr>
                                     <th>Nombre</th>
                                     <td>{{ $reservation->client_first_name }} {{ $reservation->client_last_name }}</td>
                                 </tr>
@@ -75,48 +170,15 @@
                                 <tr>
                                     <th>Moneda</th>
                                     <td>{{ $reservation->currency }}</td>
-                                </tr>                                
-                                <tr>
-                                    <th>Estatus</th>
-                                    <td>
-                                        @if ($data['status'] == "PENDING")
-                                            <span class="badge bg-info">PENDING</span>
-                                        @endif
-                                        @if ($data['status'] == "CONFIRMED")
-                                            <span class="badge bg-success">CONFIRMED</span>
-                                        @endif
-                                        @if ($data['status'] == "CANCELLED")
-                                            <span class="badge bg-danger">CANCELLED</span>
-                                        @endif
-                                        @if ($data['status'] == "DUPLICATED")
-                                            <span class="badge bg-danger">DUPLICADO</span>
-                                        @endif                                                                             
-                                    </td>
                                 </tr>
                                 <tr>
-                                    <th>Unidad</th>
+                                    <th>Destino</th>
                                     <td>{{ $reservation->destination->name ?? '' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Creación</th>
-                                    <td>{{ $reservation->created_at }}</td>
                                 </tr>
                                 <tr>
                                     <th>Referencia</th>
                                     <td>{{ $reservation->reference }}</td>
                                 </tr>
-                                @if( isset( $reservation->originSale->code ) )
-                                    <tr>
-                                        <th>Origen de venta</th>
-                                        <td>{{ $reservation->originSale->code }}</td>
-                                    </tr>                                    
-                                @endif                                    
-                                @if( $reservation->open_credit == 1 )
-                                    <tr>
-                                        <th>Crédito Abierto</th>
-                                        <td><span class="badge bg-success">ACEPTADO</span></td>
-                                    </tr>
-                                @endif
                                 @if( isset( $reservation->originSale->code ) )
                                     <tr>
                                         <th>Origen de venta</th>
@@ -129,29 +191,23 @@
                                         <td>{{ $reservation->cancellationType->name_es }}</td>
                                     </tr>
                                 @endif
+                                @if ( $reservation->callCenterAgent != null )
+                                    <tr>
+                                        <th>Agente de Call Center</th>
+                                        <td>{{ $reservation->callCenterAgent->name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Estatus de comisión</th>
+                                        <td><span class="badge btn-{{ $reservation->is_commissionable == 1 ? "success ".( RoleTrait::hasPermission(95) ? '__remove_commission' : '' ) : "danger" }}" data-reservation="{{ $reservation->id }}" style="cursor: pointer;">{{ $reservation->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span></td>
+                                    </tr>
+                                @endif
                                 <tr>
-                                    <th>Estatus de comisión</th>
-                                    <td><span class="badge btn-{{ $reservation->is_commissionable == 1 ? "success ".( RoleTrait::hasPermission(95) ? '__remove_commission' : '' ) : "danger" }}" data-reservation="{{ $reservation->id }}" style="cursor: pointer;">{{ $reservation->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span></td>
-                                </tr>                                    
+                                    <th>Creación</th>
+                                    <td>{{ $reservation->created_at }}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-                    
-                    @if ( $reservation->callCenterAgent != null )
-                        <hr style="width:95%; margin-left: auto; margin-right: auto;">
-                        <div class="callcenter-x px-2">
-                            <div class="d-flex align-items-center mb-3 box zoom-in">
-                                <div class="flex-none w-10 h-10 overflow-hidden rounded-full image-fit">
-                                    <img alt="detalles" width="100%" src="{{ asset('/assets/img/profile-default.svg') }}">
-                                </div>
-                                <div class="ms-4 me-auto">
-                                    <div class="font-medium">{{ $reservation->callCenterAgent->name }}</div>
-                                    <div class="text-slate-500 text-xs mt-0.5">Agente de Call Center</div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
                     <hr style="width:95%; margin-left: auto; margin-right: auto;">
                     @if (RoleTrait::hasPermission(25))
                         <div class="followUps px-2 pb-2">
@@ -179,69 +235,103 @@
             <div class="controls">
                 @csrf
                 <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
-                @if (RoleTrait::hasPermission(20))
-                    <div class="btn-group btn-group-sm">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                {{-- NOS PERMITE REENVIO DE CORREO DE LA RESERVACIÓN AL CLIENTE, CUANDO TENEMOS EL PERMISO Y ES PENDIENTE, CONFIRMADA O A CREDITO --}}
+                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && RoleTrait::hasPermission(20) )
+                    <div class="btn-group" role="group">
+                        <button id="btndefault" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Re-envio de correo
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
-                        <div class="dropdown-menu">
+                        <div class="dropdown-menu" aria-labelledby="btndefault">
                             <a class="dropdown-item" href="#" onclick="sendMail('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','es')">Español</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" onclick="sendMail('{{ $reservation->items->first()->code }}','{{ $reservation->client_email }}','en')">Inglés</a>
                         </div>
                     </div>
                 @endif
-                @if (RoleTrait::hasPermission(21))
-                    <div class="btn-group btn-group-sm">
-                        <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Enviar Mensaje
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">SMS</a>
-                            <a class="dropdown-item" href="#">Whatsapp</a>
-                        </div>
-                    </div>
-                @endif
-                @if (RoleTrait::hasPermission(22))
-                    <div class="btn-group btn-group-sm">
-                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                {{-- NOS PERMITE ENVIAR UNA INVITACIÓN DE PAGO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACION --}}
+                @if ( ( $data['status'] == "PENDING" || $data['status'] == "QUOTATION") && RoleTrait::hasPermission(22))
+                    <div class="btn-group" role="group">
+                        <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Invitación de pago
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
-                        <div class="dropdown-menu" style="">
+                        <div class="dropdown-menu" aria-labelledby="btndefault">
                             <a class="dropdown-item" href="#" onclick="sendInvitation(event, '{{ $reservation->id }}','en')">Enviar en inglés</a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" onclick="sendInvitation(event, '{{ $reservation->id }}','es')">Enviar en español</a>
                         </div>
                     </div>
                 @endif
-                @if (RoleTrait::hasPermission(23))
+
+                    @if (RoleTrait::hasPermission(21) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Enviar Mensaje
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#">SMS</a>
+                                <a class="dropdown-item" href="#">Whatsapp</a>
+                            </div>
+                        </div>
+                    @endif
+
+                {{-- NOS PERMITE AGREGAR SEGUIMIENTOS DE LA RESERVA, SOLO CUANDO ESTA COMO PENDIENTE, CONFIRMADA O A CREDITO --}}
+                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && RoleTrait::hasPermission(23))
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
                 @endif
-                {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
-                @if (RoleTrait::hasPermission(94) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
-                    <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Activar servicio plus</button>
-                @endif
-                @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )                    
-                    <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
-                @endif
-                @if (RoleTrait::hasPermission(24) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                    <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Marcar como duplicado</button>
-                @endif
-                @if (RoleTrait::hasPermission(67) && ($reservation->is_cancelled == 1 || $reservation->is_duplicated == 1) )
+
+                    {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
+                    @if (RoleTrait::hasPermission(94) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
+                        <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Activar servicio plus</button>
+                    @endif
+                    @if (RoleTrait::hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                        {{-- <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button> --}}
+                    @endif
+                    @if (RoleTrait::hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                        <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Marcar como duplicado</button>
+                    @endif
+                    
+                {{-- NOS PERMITE PODER ACTIVAR LA RESERVA CUANDO ESTA COMO CREDITO ABIERTO --}}
+                @if ( $data['status'] == "OPENCREDIT" && RoleTrait::hasPermission(67) )
                     <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> Activar</button>
                 @endif
-                @if (RoleTrait::hasPermission(72) && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->open_credit == 0 )
+
+                {{-- NOS PERMITE PONER COMO CREDITO ABIERTO CUANDO LA RESERVA ESTA CONFIRMADA Y EL CLIENTE QUIERE CANCELAR --}}
+                @if ( $data['status'] == "CONFIRMED" && RoleTrait::hasPermission(72) )
                     <button class="btn btn-warning btn-sm" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Crédito Abierto</button>
+                @endif                        
+
+                {{-- NOS PERMITE COPIAR EL LINK DE PAGO PARA ENVIARSELO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACION --}}
+                @if ( $data['status'] == "PENDING" || $data['status'] == "QUOTATION" )
+                    <div class="btn-group" role="group">
+                        <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Copiar Link de pago
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="btndefault">
+                            <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'en')">Inglés</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'es')">Español</a>
+                        </div>
+                    </div>
                 @endif
-                <div class="btn-group btn-group-sm">
-                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Copiar Link de pago
-                    </button>
-                    <div class="dropdown-menu" style="">
-                        <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'en')">Inglés</a>
-                        <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'es')">Español</a>
+
+            </div>
+
+            @if ( $data['status'] == "QUOTATION" )
+                <div class="countdown-container">
+                    <h1>Tiempo restante para realizar el pago o la reserva se cancelara automaticamente</h1>
+                    <div id="countdown" class="countdown">
+                        <div><span>Días</span>00</div>
+                        <div><span>Horas</span>00</div>
+                        <div><span>Minutos</span>00</div>
+                        <div><span>Segundos</span>00</div>
                     </div>
                 </div>
-            </div>
+            @endif      
 
             <div class="tab">
                 <ul class="nav nav-pills mb-3" role="tablist">
@@ -301,39 +391,43 @@
                                             <p><strong># de Vuelo:</strong> {{ $item->flught_number ?? 'N/A' }}</p>
                                         </div>
                                         <div class="actions mb-3">
-                                            @if (RoleTrait::hasPermission(13))
+                                            @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(13))
                                                 <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" onclick="itemInfo({{ $item }})">Editar</button>
                                             @endif
-                                            <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
-                                                Confirmacion de llegada
-                                            </button>
-                                            <div class="btn-group btn-group-sm">
-                                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    Confirmacion de salida
+
+                                            {{-- NOS PERMITE REALIZAR ESTAS ACCIONES SOLO CUANDO LA RESERVA ESTA PENDIENTE CONFIRMADA O A CREDITO --}}
+                                            @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" )
+                                                <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
+                                                    Confirmacion de llegada
                                                 </button>
-                                                <div class="dropdown-menu" style="">
-                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'departure')">Enviar en inglés</a>
-                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'departure')">Enviar en español</a>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        Confirmacion de salida
+                                                    </button>
+                                                    <div class="dropdown-menu" style="">
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'departure')">Enviar en inglés</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'departure')">Enviar en español</a>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="btn-group btn-group-sm">
-                                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    Transfer recogida
-                                                </button>
-                                                <div class="dropdown-menu" style="">
-                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-pickup')">Enviar en inglés</a>
-                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-pickup')">Enviar en español</a>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        Transfer recogida
+                                                    </button>
+                                                    <div class="dropdown-menu" style="">
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-pickup')">Enviar en inglés</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-pickup')">Enviar en español</a>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="btn-group btn-group-sm">
-                                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    Transfer regreso
-                                                </button>
-                                                <div class="dropdown-menu" style="">
-                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-return')">Enviar en inglés</a>
-                                                    <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-return')">Enviar en español</a>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        Transfer regreso
+                                                    </button>
+                                                    <div class="dropdown-menu" style="">
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-return')">Enviar en inglés</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-return')">Enviar en español</a>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="item-data">
@@ -395,7 +489,11 @@
                                                                 }
                                                                 $tooltip = ( $item->op_one_operation_close == 1 ? 'data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones"' : '' );
                                                             @endphp
-                                                            @if ( RoleTrait::hasPermission(68) && $item->op_one_operation_close == 0 )
+                                                            {{-- PERMITIRA LA MODIFICACION DEL SERVICIO, DE ACUERDO A LAS SIGUIENTES REGLAS --}}
+                                                            {{-- SOLO CUANDO SE TENGA EL PERMISO --}}
+                                                            {{-- NO ESTE CERRADA LA OPERACION --}}
+                                                            {{-- CUANDO SEA CONFIRMED O CREDIT --}}
+                                                            @if ( RoleTrait::hasPermission(68) && $item->op_one_operation_close == 0 && ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) )
                                                                 <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ BookingTrait::statusBooking($item->op_one_status) }}</button>
                                                                 <div class="dropdown-menu" style="">
                                                                     <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
@@ -474,7 +572,11 @@
                                                                     }
                                                                     $tooltip = ( $item->op_two_operation_close == 1 ? 'data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el estatus final asignado por operaciones"' : '' );
                                                                 @endphp
-                                                                @if ( RoleTrait::hasPermission(68) && $item->op_two_operation_close == 0 )
+                                                                {{-- PERMITIRA LA MODIFICACION DEL SERVICIO, DE ACUERDO A LAS SIGUIENTES REGLAS --}}
+                                                                {{-- SOLO CUANDO SE TENGA EL PERMISO --}}
+                                                                {{-- NO ESTE CERRADA LA OPERACION --}}
+                                                                {{-- CUANDO SEA CONFIRMED O CREDIT --}}
+                                                                @if ( RoleTrait::hasPermission(68) && $item->op_two_operation_close == 0 && ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) )                                                                
                                                                     <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ BookingTrait::statusBooking($item->op_two_status) }}</button>
                                                                     <div class="dropdown-menu" style="">
                                                                         <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>

@@ -193,6 +193,10 @@ class TpvRepository
         if($request->payment_method == "CASH"):
             $data['pay_at_arrival'] = 1;
         endif;
+
+        if(!empty($request->is_quotation)):
+            $data['is_quotation'] = 1;
+        endif;
         
         $rez = $this->makeReservation($data, $request->uuid);
 

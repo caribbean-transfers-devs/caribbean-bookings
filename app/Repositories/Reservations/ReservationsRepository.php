@@ -94,8 +94,14 @@ class ReservationsRepository
             $reservation->items()->update([
                 'op_one_status' => 'CANCELLED',
                 'op_one_cancellation_type_id' => $request->type,
+                'op_one_time_operation' => NULL,
+                'op_one_preassignment' => NULL,
+                'op_one_operating_cost' => 0,
                 'op_two_status' => 'CANCELLED',
-                'op_two_cancellation_type_id' => $request->type
+                'op_two_cancellation_type_id' => $request->type,
+                'op_two_time_operation' => NULL,
+                'op_two_preassignment' => NULL,
+                'op_two_operating_cost' => 0,
             ]);
 
             $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", cancelo la reservación: ".$reservation->id, 'HISTORY', 'CANCELLATION_BOOKING');
@@ -103,14 +109,14 @@ class ReservationsRepository
             DB::commit();
             // Reservation cancelled successfully
             return response()->json([
-                'status' => 'success', 
+                'status' => 'success',
                 'message' => 'Reserva cancelada correctamente'
             ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
             // Error cancelling reservation
             return response()->json([
-                'status' => 'danger', 
+                'status' => 'danger',
                 'message' => 'Error al cancelar la reserva',
                 // 'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -122,12 +128,35 @@ class ReservationsRepository
             DB::beginTransaction();
             $reservation->is_duplicated = 1;
             $reservation->save();
+
+            // Actualizar los estados de los ítems y el ID por el tipo de cancelación
+            $reservation->items()->update([
+                'op_one_status' => 'DUPLICATE',
+                'op_one_cancellation_type_id' => NULL,
+                'op_one_time_operation' => NULL,
+                'op_one_preassignment' => NULL,
+                'op_one_operating_cost' => 0,
+                'op_two_status' => 'DUPLICATE',
+                'op_two_cancellation_type_id' => NULL,
+                'op_two_time_operation' => NULL,
+                'op_two_preassignment' => NULL,
+                'op_two_operating_cost' => 0,
+            ]);
+
             $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", marco marco como duplicada la reservación: ".$reservation->id, 'HISTORY', 'DUPLICADA');
+
             DB::commit();
-            return response()->json(['message' => 'Reservation duplicated successfully'], Response::HTTP_OK);
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Reseva duplicada correctamente'
+            ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error cancelling reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json([
+                'status' => 'danger',
+                'message' => 'Error cancelling reservation',
+                // 'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

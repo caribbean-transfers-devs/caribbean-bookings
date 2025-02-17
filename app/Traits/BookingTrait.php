@@ -20,6 +20,7 @@ trait BookingTrait
                 return 'danger';
                 break;
             case 'DUPLICATED':
+            case 'DUPLICATE':
             case 'OPERATION':
                 return 'secondary';
                 break;
@@ -29,6 +30,9 @@ trait BookingTrait
             case 'E':
                 return 'info';
                 break;
+            case 'QUOTATION':
+                return 'primary';
+                break;                
             default:
                 return 'success';
                 break;
@@ -50,6 +54,7 @@ trait BookingTrait
                 return 'CRÉDITO';
                 break;
             case 'DUPLICATED':
+            case 'DUPLICATE':
                 return 'DUPLICADO';
                 break;
             case 'NOSHOW':
@@ -79,6 +84,9 @@ trait BookingTrait
             case 'REFUND':
                 return 'REEMBOLSO';
                 break;
+            case 'QUOTATION':
+                return 'COTIZACIÓN';
+                break;                
             default:
                 return 'CONFIRMADO';
                 break;
@@ -106,8 +114,11 @@ trait BookingTrait
         switch ($status) {
             case 'PENDING':
                 return 'PENDIENTE';
-                break;            
-            default:
+                break;
+            case 'CREDIT':
+                return 'CREDITO';
+                break;
+            default:            
                 return 'PAGADO';
                 break;
         }

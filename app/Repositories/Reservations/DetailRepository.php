@@ -50,7 +50,7 @@ class DetailRepository
         
         //Sumamos las ventas y restamos pagos para saber si la reserva está confirmada o no..
         $data = [
-            "status" => "PENDING",
+            "status" => "PENDING", //NOS INDICA EL ESTATUS DEFAULT DE LA RESERVA
             "total_sales" => 0,
             "total_payments" => 0,
         ];
@@ -68,14 +68,21 @@ class DetailRepository
             endif;                      
         endforeach;
 
-        if( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ):
-            $data['status'] = "CONFIRMED";
-        endif;
         if($reservation->is_cancelled == 1):
             $data['status'] = "CANCELLED";
         endif;
         if($reservation->is_duplicated == 1):
             $data['status'] = "DUPLICATED";
+        endif;
+        if($reservation->is_quotation == 1):
+            $data['status'] = "QUOTATION";
+        endif;
+        if($reservation->open_credit){
+            $data['status'] = "OPENCREDIT";
+        }
+        
+        if( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ):
+            $data['status'] = "CONFIRMED";
         endif;
 
         return view('reservations.detail', [

@@ -74,11 +74,11 @@
                 <div>
                     <label class="form-label" for="formPaymentMethod">Método de pago</label>
                     <select class="form-control" id="formPaymentMethod" name="payment_method">
-                        <option value="CASH">Efectivo</option>
                         <option value="CARD">Tarjeta de crédito / Débito</option>
                         <option value="PAYPAL">PayPal</option>
                     </select>
                 </div>
+                <input type="hidden" id="formQuotation" name="is_quotation" value="1">         
             </div>
         </div>
         

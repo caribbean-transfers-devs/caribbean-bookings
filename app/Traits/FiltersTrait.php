@@ -79,6 +79,7 @@ trait FiltersTrait
             "OPENCREDIT" => "Credito abierto",
             "CANCELLED" => "Cancelado",
             "DUPLICATED" => "Duplicado",
+            "QUOTATION" => "Cotización",
         );
     }
 

@@ -146,5 +146,5 @@ class EnterpriseRepository
             return redirect()->route('enterprises.index')->with('success', 'Se elimimo correctamente la empresa.');
         } catch (Exception $e) {
         }
-    }    
+    }
 }
