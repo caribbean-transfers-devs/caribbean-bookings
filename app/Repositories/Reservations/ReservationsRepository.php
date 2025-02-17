@@ -93,15 +93,17 @@ class ReservationsRepository
             // Actualizar los estados de los ítems y el ID por el tipo de cancelación
             $reservation->items()->update([
                 'op_one_status' => 'CANCELLED',
-                'op_one_cancellation_type_id' => $request->type,
+                'op_one_status_operation' => 'PENDING',
                 'op_one_time_operation' => NULL,
                 'op_one_preassignment' => NULL,
                 'op_one_operating_cost' => 0,
+                'op_one_cancellation_type_id' => $request->type,
                 'op_two_status' => 'CANCELLED',
-                'op_two_cancellation_type_id' => $request->type,
+                'op_two_status_operation' => 'PENDING',
                 'op_two_time_operation' => NULL,
                 'op_two_preassignment' => NULL,
                 'op_two_operating_cost' => 0,
+                'op_two_cancellation_type_id' => $request->type,
             ]);
 
             $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", cancelo la reservación: ".$reservation->id, 'HISTORY', 'CANCELLATION_BOOKING');
@@ -132,15 +134,17 @@ class ReservationsRepository
             // Actualizar los estados de los ítems y el ID por el tipo de cancelación
             $reservation->items()->update([
                 'op_one_status' => 'DUPLICATE',
-                'op_one_cancellation_type_id' => NULL,
+                'op_one_status_operation' => 'PENDING',
                 'op_one_time_operation' => NULL,
                 'op_one_preassignment' => NULL,
                 'op_one_operating_cost' => 0,
+                'op_one_cancellation_type_id' => NULL,
                 'op_two_status' => 'DUPLICATE',
-                'op_two_cancellation_type_id' => NULL,
+                'op_two_status_operation' => 'PENDING',
                 'op_two_time_operation' => NULL,
                 'op_two_preassignment' => NULL,
                 'op_two_operating_cost' => 0,
+                'op_two_cancellation_type_id' => NULL,
             ]);
 
             $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", marco marco como duplicada la reservación: ".$reservation->id, 'HISTORY', 'DUPLICADA');

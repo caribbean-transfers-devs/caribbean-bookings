@@ -84,7 +84,7 @@
             }
         };        
     </script>
-    @if ( $data['status'] == "QUOTATION" )        
+    @if ( $data['status'] == "QUOTATION" )
         <script>
             dayjs.extend(dayjs_plugin_duration);
             dayjs.extend(dayjs_plugin_relativeTime);
@@ -396,7 +396,7 @@
                                             @endif
 
                                             {{-- NOS PERMITE REALIZAR ESTAS ACCIONES SOLO CUANDO LA RESERVA ESTA PENDIENTE CONFIRMADA O A CREDITO --}}
-                                            @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" )
+                                            @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" )
                                                 <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">
                                                     Confirmacion de llegada
                                                 </button>
