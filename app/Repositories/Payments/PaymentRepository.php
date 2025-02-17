@@ -49,6 +49,15 @@ class PaymentRepository
 
             $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency, 'HISTORY', 'CREATE_PAYMENT');
 
+            //ACTUALIZAMOS EL ESTATUS DE LA RESERVA, CUANDO SE AGREGA UN PAGO Y ESTA ES COTIZACIÓN
+            $booking = Reservation::find($request->reservation_id);
+            if( $booking && $booking->is_quotation == 1 ){
+                $booking->is_quotation = 0;
+                $booking->expires_at = NULL;
+                $booking->save();
+            }
+
+
             //AQUI REGISTRAMOS EL PAGO, PARA SABER SI UN AGENTE O SUPERVISOR DE CALLCENTER LE ESTA DANDO SEGUIMIENTO, LO HACEMOS MEDIANTE EL ROL
             // 3 Gerente - Call Center
             // 4 Agente - Call Center
