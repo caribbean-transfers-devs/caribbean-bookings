@@ -52,13 +52,13 @@
 
         //REPORTES
         if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71) || RoleTrait::hasPermission(97) || RoleTrait::hasPermission(98) || RoleTrait::hasPermission(99) || RoleTrait::hasPermission(101)):
-            // if(RoleTrait::hasPermission(43)):
-            //     $links_reports[] = [
-            //         'name' => 'Pagos',
-            //         'route' => route('reports.payment'),
-            //         'active' => request()->routeIs('reports.payment','reports.payment.action'),
-            //     ];
-            // endif;
+            if(RoleTrait::hasPermission(43)):
+                $links_reports[] = [
+                    'name' => 'Pagos',
+                    'route' => route('reports.payment'),
+                    'active' => request()->routeIs('reports.payment','reports.payment.action'),
+                ];
+            endif;
             if(RoleTrait::hasPermission(45)):
                 $links_reports[] = [
                     'name' => 'Comisiones',
@@ -66,13 +66,13 @@
                     'active' => request()->routeIs('reports.commissions','reports.commissions.action'),
                 ];
             endif;
-            // if(RoleTrait::hasPermission(50)):
-            //     $links_reports[] = [
-            //         'name' => 'Efectivo',
-            //         'route' => route('reports.cash'),
-            //         'active' => request()->routeIs('reports.cash','reports.cash.action'),
-            //     ];
-            // endif;
+            if(RoleTrait::hasPermission(50)):
+                $links_reports[] = [
+                    'name' => 'Efectivo',
+                    'route' => route('reports.cash'),
+                    'active' => request()->routeIs('reports.cash','reports.cash.action'),
+                ];
+            endif;
             if(RoleTrait::hasPermission(71)):
                 $links_reports[] = [
                     'name' => 'Cancelaciones',
@@ -94,20 +94,20 @@
                     'active' => request()->routeIs('reports.operations','reports.operations.action'),
                 ];
             endif;
-            if(RoleTrait::hasPermission(99)):
-                $links_reports[] = [
-                    'name' => 'Conciliacion',
-                    'route' => route('reports.conciliation'),
-                    'active' => request()->routeIs('reports.conciliation','reports.conciliation.action'),
-                ];
-            endif;
-            if(RoleTrait::hasPermission(101)):
-                $links_reports[] = [
-                    'name' => 'Cuentas por Cobrar',
-                    'route' => route('reports.receivable'),
-                    'active' => request()->routeIs('reports.receivable','reports.receivable.action'),
-                ];
-            endif;
+            // if(RoleTrait::hasPermission(99)):
+            //     $links_reports[] = [
+            //         'name' => 'Conciliacion',
+            //         'route' => route('reports.conciliation'),
+            //         'active' => request()->routeIs('reports.conciliation','reports.conciliation.action'),
+            //     ];
+            // endif;
+            // if(RoleTrait::hasPermission(101)):
+            //     $links_reports[] = [
+            //         'name' => 'Cuentas por Cobrar',
+            //         'route' => route('reports.receivable'),
+            //         'active' => request()->routeIs('reports.receivable','reports.receivable.action'),
+            //     ];
+            // endif;
             array_push($links,[
                 'type' => 'multiple',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>',

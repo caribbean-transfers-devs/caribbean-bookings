@@ -11,32 +11,32 @@
 
         <div class="item">
             @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
-                {{-- <a href="{{ $value->url }}" data-lightbox="galeria" data-title="{{ $value->path }}"> --}}
-                    <img src="{{ $value->url }}" alt="{{ $value->path }}">
-                {{-- </a> --}}
+                <img src="{{ $value->url }}" alt="{{ $value->path }}">
             @elseif(strtolower($extension) == 'pdf')
-                <embed src="https://docs.google.com/gview?embedded=true&url={{ $value->url }}" type="application/pdf" width="100%"> 
+                {{-- <a href="{{ $value->url }}" class="btn btn-primary btn-sm pdf-lightbox" href="{{ $value->url }}" data-title="{{ $value->path }}"> --}}
+                    <embed src="https://docs.google.com/gview?embedded=true&url={{ $value->url }}" type="application/pdf" width="100%">
+                {{-- </a> --}}
             @endif
-            <div class="container-degad">
-                <div class="content-top">
-                    <div class="btn_">
-                        @if (RoleTrait::hasPermission(65))
-                            @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
-                                <a href="{{ $value->url }}" class="btn btn-primary btn-sm" href="{{ $value->url }}" data-lightbox="galeria" data-title="{{ $value->path }}">Ver</a>
-                            @elseif(strtolower($extension) == 'pdf')
-                                <a href="{{ $value->url }}" class="btn btn-primary btn-sm pdf-lightbox" href="{{ $value->url }}" data-title="{{ $value->path }}">Ver</a>
-                            @endif
-                        @endif
-                        @if (RoleTrait::hasPermission(66))
-                            <button class="btn btn-danger btn-sm deleteMedia" data-id="{{ $value->id }}" data-name="{{ $value->path }}">Eliminar</button>
-                        @endif
-                        <?=BookingTrait::renderCategoryPicture($value->type_media)?>
-                    </div>                    
-                </div>
-                <div class="content-bottom">
-                    <p>{{ $value->path }}</p>
-                </div>
-            </div>            
+            
+            @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
+                <a class="container-degad" href="{{ $value->url }}" data-lightbox="galeria" data-title="{{ $value->path }}"></a>
+            @elseif(strtolower($extension) == 'pdf')
+                <a href="{{ $value->url }}" class="pdf-lightbox" href="{{ $value->url }}" data-title="{{ $value->path }}"></a>
+            @endif
+
+            <div class="content-top">
+                <div class="btn_">
+                    {{-- PERMITE ELIMINAR UNA IMAGEN --}}
+                    @if (RoleTrait::hasPermission(66))
+                        <button class="btn btn-danger btn-sm deleteMedia" data-id="{{ $value->id }}" data-name="{{ $value->path }}">Eliminar</button>
+                    @endif
+                    {{-- LA CATEGORIA DE LA IMAGEN --}}
+                    <?=BookingTrait::renderCategoryPicture($value->type_media)?>
+                </div>                    
+            </div>
+            <div class="content-bottom">
+                <p>{{ $value->path }}</p>
+            </div>
         </div>
 
         <!-- Contenedor del modal para PDF -->

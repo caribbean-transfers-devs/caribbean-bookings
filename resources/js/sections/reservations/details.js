@@ -1160,7 +1160,7 @@ function setStatus(event, type, status, item_id, rez_id){
                         // console.log(__params);
         
                         // Enviar la solicitud AJAX para actualizar estatus del servicio
-                        await components.request_exec_ajax( _LOCAL_URL + "/operation/managment/update-status", 'PUT', __params );
+                        await components.request_exec_ajax( _LOCAL_URL + "/action/updateServiceStatus", 'PUT', __params );
                     } else {
                         // Title, HTML, Icon
                         Swal.fire("Error en la subida", "Algunas imágenes no se pudieron subir. Intenta de nuevo.", "error");

@@ -33,6 +33,8 @@ use App\Http\Controllers\Settings\ExchangeReportsController;
 use App\Http\Controllers\Settings\RatesEnterpriseController;
 use App\Http\Controllers\Settings\TypesCancellationsController;
 
+use App\Http\Controllers\Actions\ActionsController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -226,4 +228,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/config/rates/new', [RatesController::class, 'newRates'])->name('config.newRates');
     Route::delete('/config/rates/delete', [RatesController::class, 'deleteRates'])->name('config.deleteRates');
     Route::put('/config/rates/update', [RatesController::class, 'updateRates'])->name('config.updateRates');
+
+
+    //ACCIONES GENERALES
+
+    Route::put('/action/updateServiceStatus', [ActionsController::class, 'updateServiceStatus'])->name('update.service.status');    
 });

@@ -377,7 +377,7 @@ const __btn_preassignment = document.getElementById('btn_preassignment') //* ===
 const __btn_close_operation = document.getElementById('btn_close_operation') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
 
 const __btn_update_status_operations = document.querySelectorAll('.btn_update_status_operation');
-const __btn_update_status_bookings = document.querySelectorAll('.btn_update_status_booking');
+const serviceStatusUpdates = document.querySelectorAll('.serviceStatusUpdate'); //* ===== BUTTON SERVICE STATUS UPDATE ===== */
 
 const __copy_whatsapp = document.querySelector('.copy_whatsapp'); //* ===== BUTTON TO COPY THE CONTENT THAT WILL BE SENT BY WHATSAPP ===== */
 const __copy_history = document.querySelector('.copy_history');
@@ -965,9 +965,9 @@ if (__btn_update_status_operations.length > 0) {
   });
 }
 
-if (__btn_update_status_bookings.length > 0) {
-  __btn_update_status_bookings.forEach(__btn_update_status_booking => {
-    __btn_update_status_booking.addEventListener('click', function(event) {
+if (serviceStatusUpdates.length > 0) {
+    serviceStatusUpdates.forEach(serviceStatusUpdate => {
+        serviceStatusUpdate.addEventListener('click', function(event) {
         event.preventDefault();
         (async () => {
             // Crear un contenedor para Dropzone y el select
@@ -990,7 +990,7 @@ if (__btn_update_status_bookings.length > 0) {
             dropzoneContainer.innerHTML = `
                 <p>${ status == "CANCELLED" || status == "NOSHOW" ? '¿Está seguro de cancelar la reservación? <br>  Esta acción no se puede revertir' : '¿Está seguro de actualizar el estatus? <br> Esta acción no se puede revertir' }</p>
                 ${HTML}
-            `;        
+            `;
 
             const { isConfirmed, value } = await swal.fire({
                 // title: "",
@@ -1087,9 +1087,6 @@ if (__btn_update_status_bookings.length > 0) {
                                     url: `/operation/status/booking`,
                                     type: 'PUT',
                                     data: { id: key, rez_id: booking, item_id: item, operation: operation, service: service, type: type, status: status },
-                                    // beforeSend: function() {
-                                    //     components.loadScreen();
-                                    // },
                                     success: function(resp) {
                                         Swal.fire({
                                             title: '¡Éxito!',

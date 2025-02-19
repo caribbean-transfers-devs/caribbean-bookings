@@ -47,7 +47,7 @@ trait BookingTrait
             case 'CANCELLED':
                 return 'CANCELADO';
                 break;
-            case 'CANCELLATION':
+            case 'CANCELLATION': //ES PARA LA GALERIA
                 return 'CANCELACIÓN';
                 break;
             case 'CREDIT':

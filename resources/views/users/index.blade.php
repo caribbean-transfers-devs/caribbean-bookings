@@ -67,7 +67,9 @@
                                         <th>Nombre</th>
                                         <th>Correo</th>
                                         <th>Restringido</th>
-                                        <th>Roles</th>
+                                        <th>Es Asesor de Call Center</th>
+                                        <th>Como comisiona</th>
+                                        <th>Roles</th>                                        
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -83,6 +85,16 @@
                                                     <span class="badge bg-danger">Si</span>
                                                 @endif
                                             </td>
+                                            <th>
+                                                @if ( $user->is_call_center_agent == 1 )
+                                                    <span class="badge bg-success">Sí</span>
+                                                @endif
+                                            </th>
+                                            <th>
+                                                @if ( $user->is_call_center_agent == 1 )
+                                                    <span class="badge bg-success">{{ $user->type_commission }}</span>
+                                                @endif
+                                            </th>                                            
                                             <td>
                                                 @foreach ($user->roles as $role)
                                                     <span class="badge bg-primary">{{ $role->role->role }}</span>
@@ -118,7 +130,9 @@
                                         <th>Nombre</th>
                                         <th>Correo</th>
                                         <th>Restringido</th>
-                                        <th>Roles</th>
+                                        <th>Es Asesor de Call Center</th>
+                                        <th>Como comisiona</th>
+                                        <th>Roles</th>                                        
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -134,6 +148,16 @@
                                                     <span class="badge bg-danger">Si</span>
                                                 @endif
                                             </td>
+                                            <th>
+                                                @if ( $user->is_call_center_agent == 1 )
+                                                    <span class="badge bg-success">Sí</span>
+                                                @endif
+                                            </th>
+                                            <th>
+                                                @if ( $user->is_call_center_agent == 1 )
+                                                    <span class="badge bg-success">{{ $user->type_commission }}</span>
+                                                @endif
+                                            </th>
                                             <td>
                                                 @foreach ($user->roles as $role)
                                                     <span class="badge bg-primary">{{ $role->role->role }}</span>

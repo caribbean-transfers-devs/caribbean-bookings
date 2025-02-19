@@ -71,6 +71,7 @@ class ReservationsRepository
         }
     }
 
+    //METODO QUE NOS AYUDA A CANCELAR LA RESERVACIÓN
     public function destroy($request, $reservation){
         try {
             // Verificar si existe algún ítem relacionado con status COMPLETED
@@ -92,12 +93,16 @@ class ReservationsRepository
 
             // Actualizar los estados de los ítems y el ID por el tipo de cancelación
             $reservation->items()->update([
+                'vehicle_id_one' => NULL,
+                'driver_id_one' => NULL,
                 'op_one_status' => 'CANCELLED',
                 'op_one_status_operation' => 'PENDING',
                 'op_one_time_operation' => NULL,
                 'op_one_preassignment' => NULL,
                 'op_one_operating_cost' => 0,
                 'op_one_cancellation_type_id' => $request->type,
+                'vehicle_id_two' => NULL,
+                'driver_id_two' => NULL,
                 'op_two_status' => 'CANCELLED',
                 'op_two_status_operation' => 'PENDING',
                 'op_two_time_operation' => NULL,
@@ -133,12 +138,16 @@ class ReservationsRepository
 
             // Actualizar los estados de los ítems y el ID por el tipo de cancelación
             $reservation->items()->update([
+                'vehicle_id_one' => NULL,
+                'driver_id_one' => NULL,
                 'op_one_status' => 'DUPLICATE',
                 'op_one_status_operation' => 'PENDING',
                 'op_one_time_operation' => NULL,
                 'op_one_preassignment' => NULL,
                 'op_one_operating_cost' => 0,
                 'op_one_cancellation_type_id' => NULL,
+                'vehicle_id_two' => NULL,
+                'driver_id_two' => NULL,
                 'op_two_status' => 'DUPLICATE',
                 'op_two_status_operation' => 'PENDING',
                 'op_two_time_operation' => NULL,

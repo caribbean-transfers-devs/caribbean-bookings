@@ -6,7 +6,6 @@ use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Models\ReservationsItem;
-use App\Models\ReservationFollowUp;
 
 //TRAIT
 use App\Traits\FiltersTrait;
@@ -16,7 +15,7 @@ use App\Traits\FollowUpTrait;
 
 class OperationRepository
 {
-    use FiltersTrait, QueryTrait, PaymentsTrait, FollowUpTrait;    
+    use FiltersTrait, QueryTrait, PaymentsTrait, FollowUpTrait;
 
     public function reservations($request)
     {

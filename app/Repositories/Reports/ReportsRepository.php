@@ -687,7 +687,7 @@ class ReportsRepository
                 ]
             ],       
             'operations' => $items,
-            'users' => $this->Users(),
+            'users' => $this->CallCenterAgent(),
             'data' => $data,
             'request' => $request->input(),
         ]);        

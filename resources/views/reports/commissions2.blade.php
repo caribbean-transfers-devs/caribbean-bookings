@@ -83,6 +83,7 @@
                         </ul>
                     </div>
                 @endif
+                
                 <table id="dataCommissions" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
@@ -91,12 +92,12 @@
                             <th class="text-center">VENDEDOR</th>
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
-                            <th class="text-center">FECHA DE RESERVACIÓN</th>
-                            <th class="text-center">HORA DE RESERVACIÓN</th>
+                            {{-- <th class="text-center">FECHA DE RESERVACIÓN</th>
+                            <th class="text-center">HORA DE RESERVACIÓN</th> --}}
                             <th class="text-center">SITIO</th>
-                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>
+                            {{-- <th class="text-center">ESTATUS DE RESERVACIÓN</th> --}}
                             <th class="text-center">TIPO DE SERVICIO EN OPERACIÓN</th>
-                            <th class="text-center">NOMBRE DEL CLIENTE</th>
+                            {{-- <th class="text-center">NOMBRE DEL CLIENTE</th> --}}
                             <th class="text-center">VEHÍCULO</th>
                             <th class="text-center">FECHA DE SERVICIO</th>
                             <th class="text-center">HORA DE SERVICIO</th>
@@ -104,9 +105,9 @@
                             <th class="text-center">ESTATUS DE OPERACIÓN</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">MONEDA</th>
-                            <th class="text-center">MÉTODO DE PAGO</th>
+                            {{-- <th class="text-center">MÉTODO DE PAGO</th>
                             <th class="text-center">PAGO AL LLEGAR</th>
-                            <th class="text-center">COMISIÓNABLE</th>
+                            <th class="text-center">COMISIÓNABLE</th> --}}
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
                     </thead>
@@ -152,12 +153,12 @@
                                             <p class="mb-1">{{ $operation->code }}</p>
                                         @endif
                                     </td>
-                                    <td class="text-center">{{ date("Y-m-d", strtotime($operation->created_at)) }}</td>
-                                    <td class="text-center">{{ date("H:i", strtotime($operation->created_at)) }}</td>
+                                    {{-- <td class="text-center">{{ date("Y-m-d", strtotime($operation->created_at)) }}</td>
+                                    <td class="text-center">{{ date("H:i", strtotime($operation->created_at)) }}</td> --}}
                                     <td class="text-center">{{ $operation->site_name }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($operation->reservation_status) }}">{{ BookingTrait::statusBooking($operation->reservation_status) }}</button></td>
+                                    {{-- <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($operation->reservation_status) }}">{{ BookingTrait::statusBooking($operation->reservation_status) }}</button></td> --}}
                                     <td class="text-center">{{ $operation->final_service_type }}</td>
-                                    <td class="text-center">{{ $operation->full_name }}</td>
+                                    {{-- <td class="text-center">{{ $operation->full_name }}</td> --}}
                                     <td class="text-center">{{ $operation->service_type_name }}</td>
                                     <td class="text-center">{{ OperationTrait::setDateTime($operation, "date") }}</td>
                                     <td class="text-center">{{ OperationTrait::setDateTime($operation, "time") }}</td>
@@ -165,19 +166,20 @@
                                     <td class="text-center"><?=OperationTrait::renderOperationStatus($operation)?></td>                                    
                                     <td class="text-center">{{ number_format(($operation->total_sales),2) }}</td>
                                     <td class="text-center">{{ $operation->currency }}</td>
-                                    <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                    {{-- <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
                                     <td class="text-center">
                                         <button class="btn btn-{{ $operation->pay_at_arrival == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->pay_at_arrival == 1 ? "SI" : "NO" }}</button>
                                     </td>
                                     <td class="text-center">
                                         <button class="btn btn-{{ $operation->is_commissionable == 1 ? "success" : "danger" }}" type="button">{{ $operation->is_commissionable == 1 ? "SI" : "NO" }}</button>
-                                    </td>
+                                    </td> --}}
                                     <td class="text-center">
                                         @if ( ($operation->reservation_status == "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") )
                                             @if ( !empty($operation->cancellation_reason) )
                                                 {{ $operation->cancellation_reason }}
                                             @else
-                                                {{ "NO SHOW" }}  
+                                                {{ $operation->cancellation_reason_one }} <br>
+                                                {{ $operation->cancellation_reason_two }}
                                             @endif
                                         @endif
                                     </td>
@@ -204,8 +206,6 @@
                 let object = [];
                 const systems = Object.entries(this.dataUsers);
                 systems.forEach( ([key, data]) => {
-                    // console.log(key);
-                    // console.log(data);
                     object.push(data);
                 });
                 return object;
@@ -222,24 +222,24 @@
                 return colors;
             },        
             renderChartSalesUsers: function(){
-                // Calcular el total de 'counter'
-                const totalCount = commissions.dataChartUsers().reduce((sum, system) => sum + system.QUANTITY, 0);
-                // Calcular el porcentaje de cada 'counter'
-                const percentages = commissions.dataChartUsers().map(site => ((site.QUANTITY / totalCount) * 100).toFixed(2) + '%');
-                // Generar colores únicos para los datos
-                const uniqueColors = commissions.generateUniqueColors(commissions.dataChartUsers().length);                
+                _data = this.dataChartUsers();
+                console.log(_data);
+                
 
                 if( document.getElementById('ChartSalesUsers') != null ){
                     new Chart(document.getElementById('ChartSalesUsers'), {
-                        type: 'pie',
+                        type: 'doughnut',
                         data: {
-                            labels: commissions.dataChartUsers().map(row => row.NAME),
+                            labels: _data.map(row => {
+                                const total = _data.reduce((sum, item) => sum + item.QUANTITY, 0);
+                                const percentage = ((row.QUANTITY / total) * 100).toFixed(2) + '%';
+                                return `${row.NAME} (${percentage})`; // Agrega el porcentaje en la leyenda
+                            }),
                             datasets: [
                                 {
-                                    data: commissions.dataChartUsers().map(row => row.QUANTITY),
-                                    backgroundColor: uniqueColors, // Aplicar colores únicos al dataset
-                                    borderColor: '#fff', // Opcional: añadir bordes blancos
-                                    borderWidth: 2 // Opcional: tamaño del borde
+                                    data: _data.map(row => row.QUANTITY),
+                                    borderWidth: 0, // Hace las líneas del gráfico más delgadas
+                                    cutout: '70%' // Reduce el grosor del doughnut
                                 }
                             ]
                         },
@@ -260,33 +260,8 @@
                                         color: '#000' // Asegura que el color de los labels sea negro
                                     }
                                 },
-                                tooltip: {
-                                    callbacks: {
-                                        title: function(tooltipItems) {
-                                            return tooltipItems[0].label;
-                                        },
-                                        label: function(tooltipItem) {
-                                            const index = tooltipItem.dataIndex;
-                                            const site = dataUsers.dataChartUsers()[index];
-                                            return [
-                                                `TOTAL DE VENTA: $ ${site.TOTAL.toLocaleString()}`,
-                                            ];
-                                        }
-                                    }
-                                },
                                 datalabels: {
-                                    display: true,
-                                    formatter: (value, context) => {                                                                                
-                                        const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
-                                        const percentage = ((value / total) * 100).toFixed(2) + '%';
-                                        return percentage; 
-                                    },
-                                    color: '#000',
-                                    font: {
-                                        weight: 'bold'
-                                    },
-                                    anchor: 'end',
-                                    align: 'start'
+                                    display: false // Oculta los datalabels en el gráfico
                                 }
                             }
                         },
@@ -297,6 +272,5 @@
         };
 
         commissions.renderChartSalesUsers();
-        console.log(commissions.dataChartUsers());        
     </script>
 @endpush

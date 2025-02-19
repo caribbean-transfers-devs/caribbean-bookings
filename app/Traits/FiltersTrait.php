@@ -37,6 +37,10 @@ trait FiltersTrait
         return User::where('status', 1)->get();
     }
 
+    public function CallCenterAgent(){
+        return User::where('is_call_center_agent', 1)->get();
+    }
+
     public function Enterprises(){
         return Enterprise::all();
     }

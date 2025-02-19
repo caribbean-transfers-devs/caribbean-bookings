@@ -231,6 +231,8 @@ trait QueryTrait
                                 it.driver_id_two,
                                 it.is_open,
                                 it.open_service_time,
+                                tc_one.name_es AS cancellation_reason_one,
+                                tc_two.name_es AS cancellation_reason_two,
 
                                 CASE 
                                     WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
@@ -286,6 +288,9 @@ trait QueryTrait
                                 LEFT OUTER JOIN destination_services as d_two ON d_two.id = vehicle_two.destination_service_id
                                 LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                 LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+
+                                LEFT OUTER JOIN types_cancellations as tc_one ON tc_one.id = it.op_one_cancellation_type_id
+                                LEFT OUTER JOIN types_cancellations as tc_two ON tc_two.id = it.op_two_cancellation_type_id
 
                                 LEFT OUTER JOIN (
                                     SELECT DISTINCT reservation_id
@@ -410,6 +415,8 @@ trait QueryTrait
                                 it.driver_id_two,
                                 it.is_open,
                                 it.open_service_time,
+                                tc_one.name_es AS cancellation_reason_one,
+                                tc_two.name_es AS cancellation_reason_two,
 
                                 CASE
                                     WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
@@ -465,6 +472,9 @@ trait QueryTrait
                                 LEFT OUTER JOIN destination_services as d_two ON d_two.id = vehicle_two.destination_service_id
                                 LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                 LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+
+                                LEFT OUTER JOIN types_cancellations as tc_one ON tc_one.id = it.op_one_cancellation_type_id
+                                LEFT OUTER JOIN types_cancellations as tc_two ON tc_two.id = it.op_two_cancellation_type_id                                
 
                                 LEFT OUTER JOIN (
                                     SELECT DISTINCT reservation_id

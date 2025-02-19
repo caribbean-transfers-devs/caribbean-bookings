@@ -40,7 +40,8 @@ class DetailRepository
         // dump($reservation->toArray());
                 
         $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
-        $sellers = User::whereIn('id', $users_ids)->get();        
+        $sellers = User::whereIn('id', $users_ids)->get();
+
         $sales_types = SalesType::all();
         $services_types = DestinationService::where('destination_id',$reservation->destination_id)->get();
         $zones = Zones::where('destination_id', 1)->get();
@@ -53,7 +54,7 @@ class DetailRepository
             "status" => "PENDING", //NOS INDICA EL ESTATUS DEFAULT DE LA RESERVA
             "total_sales" => 0,
             "total_payments" => 0,
-        ];
+        ];        
 
         foreach( $reservation->sales as $sale ):
             $data['total_sales'] += $sale->total;            
@@ -74,17 +75,16 @@ class DetailRepository
         if($reservation->is_duplicated == 1):
             $data['status'] = "DUPLICATED";
         endif;
+        if($reservation->open_credit == 1):
+            $data['status'] = "OPENCREDIT";
+        endif;
         if($reservation->is_quotation == 1):
             $data['status'] = "QUOTATION";
-        endif;
-        if( $reservation->site->is_cxc == 1 && round( $data['total_payments'], 2) == 0 ){
+        endif;        
+        if( $reservation->site->is_cxc == 1 && round( $data['total_payments'], 2) == 0 ):
             $data['status'] = "CREDIT";
-        }
-        if($reservation->open_credit){
-            $data['status'] = "OPENCREDIT";
-        }
-        
-        if( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ):
+        endif;            
+        if( round( $data['total_payments'], 2) != 0 && ( $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->open_credit == 0 ) && ( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ) ):
             $data['status'] = "CONFIRMED";
         endif;
 

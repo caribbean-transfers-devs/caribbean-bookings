@@ -576,6 +576,7 @@ class OperationsController extends Controller
     }
 
     public function updateStatusBooking(Request $request){
+
         try {
             DB::beginTransaction();
             $service = ReservationsItem::find($request->item_id);
@@ -607,7 +608,7 @@ class OperationsController extends Controller
             DB::commit();
             return response()->json([
                 'success' => true,
-                'message' => 'Estatus de reservación, actualizado con éxito',
+                'message' => 'El Estatus de servicio, se actualizado con éxito',
                 'data' => array(
                     "item"  => $request->id,
                     "value"  => $request->status,

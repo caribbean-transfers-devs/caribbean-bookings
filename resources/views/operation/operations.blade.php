@@ -264,10 +264,10 @@
                         <th class="text-center">AGENCIA</th>
                         <th class="text-center">UNIDAD</th>
                         <th class="text-center">CONDUCTOR</th>
-                        <th class="text-center">ESTATUS OPERACIÓN</th>
+                        <th class="text-center">ESTATUS DE OPERACIÓN</th>
                         <th class="text-center">HORA OPERACIÓN</th>
                         <th class="text-center">COSTO OPERATIVO</th>
-                        <th class="text-center">ESTATUS RESERVACIÓN</th>
+                        <th class="text-center">ESTATUS DE SERVICIO</th>
                         <th class="text-center">CÓDIGO</th>
                         <th class="text-center">VEHÍCULO</th>
                         <th class="text-center">PAGO</th>
