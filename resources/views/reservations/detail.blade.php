@@ -143,7 +143,7 @@
                     <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive table-details-booking">
+                    <div class="table-container table-details-booking">
                         <table class="table table-hover table-striped table-bordered mb-0">
                             <tbody>
                                 <tr>
@@ -411,8 +411,8 @@
                                                         CONFIRMACIÓN DE SALIDA
                                                     </button>
                                                     <div class="dropdown-menu" style="">
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'departure')">Enviar en inglés</a>
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'departure')">Enviar en español</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'en', 'departure')">Enviar en inglés</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'es', 'departure')">Enviar en español</a>
                                                     </div>
                                                 </div>
                                                 <div class="btn-group btn-group-sm">
@@ -420,8 +420,8 @@
                                                         TRANSFER RECOGIDA
                                                     </button>
                                                     <div class="dropdown-menu" style="">
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-pickup')">Enviar en inglés</a>
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-pickup')">Enviar en español</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'en', 'transfer-pickup')">Enviar en inglés</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'es', 'transfer-pickup')">Enviar en español</a>
                                                     </div>
                                                 </div>
                                                 <div class="btn-group btn-group-sm">
@@ -429,15 +429,15 @@
                                                         TRANSFER REGRESO
                                                     </button>
                                                     <div class="dropdown-menu" style="">
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'en', 'transfer-return')">Enviar en inglés</a>
-                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $item->destination_id }}, 'es', 'transfer-return')">Enviar en español</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'en', 'transfer-return')">Enviar en inglés</a>
+                                                        <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'es', 'transfer-return')">Enviar en español</a>
                                                     </div>
                                                 </div>
                                             @endif
                                         </div>
                                     </div>
                                     <div class="item-data">
-                                        <div class="table-responsive">                                            
+                                        <div class="table-container">                                            
                                             <table class="table">
                                                 <thead>
                                                     <tr>
@@ -635,7 +635,7 @@
                                 </button>
                             @endif
                         </div>
-                        <div class="table-responsive">
+                        <div class="table-container">
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -686,7 +686,7 @@
                                     </button>
                                 @endif
                             </div>
-                            <div class="table-responsive">
+                            <div class="table-container">
                                 <table class="table">
                                     <thead>
                                         <tr>
