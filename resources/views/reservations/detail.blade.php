@@ -405,7 +405,7 @@
 
                                             {{-- NOS PERMITE REALIZAR ESTAS ACCIONES SOLO CUANDO LA RESERVA ESTA PENDIENTE CONFIRMADA O A CREDITO --}}
                                             @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" )
-                                                <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $item->destination_id }})">CONFIRMACIÓN DE LLEGADA</button>
+                                                <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $reservation->destination_id }})">CONFIRMACIÓN DE LLEGADA</button>
                                                 <div class="btn-group btn-group-sm">
                                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                         CONFIRMACIÓN DE SALIDA
