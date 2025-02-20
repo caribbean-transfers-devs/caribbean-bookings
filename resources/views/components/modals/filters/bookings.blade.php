@@ -109,7 +109,7 @@
                             @if ( isset($websites) && !empty($websites) )
                                 <select class="form-control selectpicker" title="Sitio Web" data-live-search="true" data-selected-text-format="count > 1" name="site[]" id="site" data-value="{{ json_encode($data['site']) }}" multiple data-actions-box="true">                            
                                     @foreach ($websites as $key => $value)
-                                        <option value="{{ $value->id }}">{{ $value->site_name }}</option> 
+                                        <option value="{{ $value->id }}">{{ $value->name }}</option> 
                                     @endforeach
                                 </select>
                             @endif

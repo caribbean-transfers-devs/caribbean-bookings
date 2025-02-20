@@ -1,8 +1,21 @@
 @php
+    use App\Traits\FiltersTrait;
     use App\Traits\RoleTrait;
     use App\Traits\BookingTrait;
     use Illuminate\Support\Str;
     use Carbon\Carbon;
+
+    $services = FiltersTrait::Services();
+    $websites = FiltersTrait::Sites();
+    $origins = FiltersTrait::Origins();
+    $reservation_status = FiltersTrait::reservationStatus();
+    $vehicles = FiltersTrait::Vehicles();
+    $zones = FiltersTrait::Zones();
+    $payment_status = FiltersTrait::paymentStatus();
+    $currencies = FiltersTrait::Currencies();
+    $methods = FiltersTrait::Methods();
+    $cancellations = FiltersTrait::CancellationTypes();
+
     $bookingsStatus = [
         "total" => 0,
         "gran_total" => 0,
@@ -572,7 +585,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :istoday="1" :isbalance="1" :isduplicated="1" :isagency="1" :request="$request" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :istoday="1" :isbalance="1" :isduplicated="1" :isagency="1" />
     <x-modals.reports.columns />
     {{-- <x-modals.charts.sales :bookingsStatus="$bookingsStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataSites="$dataSites" :dataOriginSale="$dataOriginSale" :dataVehicles="$dataVehicles" :dataDestinations="$dataDestinations" /> --}}
     <x-modals.charts.sales2 :bookingsStatus="$bookingsStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataSites="$dataSites" :dataDestinations="$dataDestinations" :dataOriginSale="$dataOriginSale" />

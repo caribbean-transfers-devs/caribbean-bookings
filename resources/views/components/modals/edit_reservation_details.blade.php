@@ -1,4 +1,8 @@
-
+@php
+    use App\Traits\FiltersTrait;
+    $sites = FiltersTrait::Sites();
+    $origins = FiltersTrait::Origins();
+@endphp
 <div class="modal fade" id="serviceClientModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">

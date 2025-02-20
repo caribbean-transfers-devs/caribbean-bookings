@@ -17,14 +17,14 @@ class Reservation extends Model
     public function destination()
     {
         return $this->belongsTo(Destination::class, 'destination_id', 'id');
-    }
+    } 
 
     public function items()
     {
-        //return $this->hasMany(ReservationsItem::class, 'reservation_id', 'id');
-        return $this->hasMany(ReservationsItem::class, 'reservation_id', 'id')
-        ->join('zones', 'zones.id', '=', 'reservations_items.from_zone')
-        ->select('reservations_items.*', 'reservations_items.id as reservations_item_id', 'zones.*');
+        return $this->hasMany(ReservationsItem::class, 'reservation_id', 'id');
+        // return $this->hasMany(ReservationsItem::class, 'reservation_id', 'id')
+        // ->join('zones', 'zones.id', '=', 'reservations_items.from_zone')
+        // ->select('reservations_items.*', 'reservations_items.id as reservations_item_id', 'zones.*');
     }
 
     public function payments()

@@ -1,3 +1,7 @@
+@php
+    use App\Traits\FiltersTrait;
+    $zones = FiltersTrait::Zones($reservation->destination->id);
+@endphp
 <div class="modal fade" id="serviceEditModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -20,9 +24,11 @@
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="destinationTypeForm">Tipo</label>
                             <select class="form-control mb-2" id="destination_serv" name="destination_service_id">
-                                @foreach ($services as $service)
-                                    <option value="{{ $service->id }}">{{ $service->name }}</option>
-                                @endforeach                            
+                                @if ( !empty($reservation->destination->destination_services) )
+                                    @foreach ($reservation->destination->destination_services as $service)
+                                        <option value="{{ $service->id }}">{{ $service->name }}</option>
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
                         <div class="col-sm-12 col-md-6">

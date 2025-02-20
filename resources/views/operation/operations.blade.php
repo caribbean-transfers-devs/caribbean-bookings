@@ -1,4 +1,5 @@
 @php
+    use App\Traits\FiltersTrait;
     use App\Traits\RoleTrait;
     use App\Traits\BookingTrait;
     use App\Traits\OperationTrait;
@@ -7,6 +8,15 @@
     $arrivalTimeGroup = [];
     $departureTimeGroup = [];
     $generalTimeGroup = []; // Arreglo para agrupar los datos
+
+    $websites = FiltersTrait::Sites();
+    $reservation_status = FiltersTrait::reservationStatus();
+    $vehicles = FiltersTrait::Vehicles();
+    $zones = FiltersTrait::Zones();    
+    $units = FiltersTrait::Units(); //LAS UNIDADES DADAS DE ALTA
+    $units2 = FiltersTrait::Units('active'); //LAS UNIDADES DADAS DE ALTA
+    $drivers = FiltersTrait::Drivers();
+    $drivers2 = FiltersTrait::Drivers('active');
 @endphp
 @extends('layout.custom')
 @section('title') Gestion De Operación @endsection

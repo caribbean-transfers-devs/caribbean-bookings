@@ -34,7 +34,7 @@
                                     <label class="form-label" for="site_id">Agencia</label>
                                     <select class="form-control mb-2" id="site_id" name="site_id">
                                         @foreach($websites as $website)
-                                            <option value="{{ $website->id }}">{{ $website->site_name }}</option>
+                                            <option value="{{ $website->id }}">{{ $website->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

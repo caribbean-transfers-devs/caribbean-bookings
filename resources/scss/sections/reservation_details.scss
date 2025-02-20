@@ -1,5 +1,4 @@
 @import "../../plugins/flatpickr/flatpickr";
-@import "../../plugins/bootstrap-select/select";
 
 @import '../template/light/components/modal';
 @import '../template/dark/components/modal';
@@ -8,6 +7,11 @@
 
 @import '../components/gallery';
 @import '../components/cancelled';
+
+.main-content{
+    background-color: #ffffff;
+    font-family: "Poppins", serif;
+}
 
 .nav-link {
     display: flex;
@@ -25,10 +29,20 @@
 
 .tab {
     .tab-content{
-        background: #fff;
-        padding: 1.25rem;
-        box-shadow: 0 .1rem .2rem rgba(0, 0, 0, .05);
-        border-radius: 0 0 .2rem .2rem;
+        > .tab-pane{
+            &.services.active{
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            &:not(.services){
+                // background: #fff;
+                // padding: 1.25rem;
+                // box-shadow: 0 .1rem .2rem rgba(0, 0, 0, .05);
+                // border-radius: 0 0 .2rem .2rem;
+            }
+        }
     }
 }
 
@@ -179,7 +193,6 @@ div.controls{
 .services-container{
     padding: 15px;
     background-color: #dde9fa;
-    margin-top: 15px;
     border-radius: 8px;
     position: relative;
     >.check-bubble {
@@ -256,28 +269,44 @@ div#serviceMapModal{
     z-index: 9999;
 }
 
-
-.table-responsive {
+.table-responsive {    
   
-    table.table-details-booking {
+    table {
       width: 100%;
       border-collapse: collapse;
       overflow: hidden; // Asegura que el borde redondeado aplique a la tabla
   
+      thead, tfoot {
+        tr{
+          th {
+            background-color: rgba(251, 86, 7, 0.72) !important; // Fondo azul claro
+            padding: 0.5rem; /*8px*/
+            font-size: 0.75rem; /*12px*/
+            color: #16161D;
+            text-align: left;
+            border: 1px solid #CCD6EB;
+
+            &:first-child {
+              font-weight: 600;
+            }                      
+          }
+        }
+      }
+  
       tbody {
         tr {
           th, td {
-            padding: 0.5rem; /*8px*/
-            font-size: 0.75rem; /*12px*/
+            padding: 0.5rem;
+            font-size: 0.75rem;
             color: #425466;
             text-align: left;
-            border: 1px solid #CCD6EB !important; // Bordes sutiles
+            border: 1px solid #CCD6EB; // Bordes sutiles
 
             &:first-child {                
                 background-color: #f1f2f3 !important; // Fondo azul claro
                 color: #16161D;
                 font-weight: 500;
-            }                             
+            }                           
           }
         }
       }
@@ -285,7 +314,6 @@ div#serviceMapModal{
       tfoot {
         tr {                        
           th, td {
-            // background-color: rgba(204, 214, 235, 1) !important; // Fondo verde claro para el total
             background-color: rgba(218, 218, 218, 1) !important; // Fondo verde claro para el total
             &:first-child {
               font-weight: 400;
@@ -294,4 +322,12 @@ div#serviceMapModal{
         }
       }
     }
+
+    &:not(.table-details-booking){
+        border-radius: 8px;
+
+        table{
+            border-radius: 5px;
+        }
+    }    
   }

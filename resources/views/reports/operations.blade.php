@@ -1,9 +1,27 @@
 @php
+    use App\Traits\FiltersTrait;
     use App\Traits\RoleTrait;
     use App\Traits\BookingTrait;
     use App\Traits\OperationTrait;
     use Illuminate\Support\Str;
     use Carbon\Carbon;
+
+    $services = FiltersTrait::Services();
+    $websites = FiltersTrait::Sites();
+    $origins = FiltersTrait::Origins();
+    $reservation_status = FiltersTrait::reservationStatus();
+    $services_operation = FiltersTrait::servicesOperation();
+    $vehicles = FiltersTrait::Vehicles();
+    $zones = FiltersTrait::Zones();
+    $service_operation_status = FiltersTrait::statusOperationService();
+    $units = FiltersTrait::Units(); //LAS UNIDADES DADAS DE ALT;
+    $drivers = FiltersTrait::Drivers();
+    $operation_status = FiltersTrait::statusOperation();
+    $payment_status = FiltersTrait::paymentStatus();
+    $currencies = FiltersTrait::Currencies();
+    $methods = FiltersTrait::Methods();
+    $cancellations = FiltersTrait::CancellationTypes();
+
     $operationStatus = [
         "total" => 0,
         "gran_total" => 0,

@@ -1,10 +1,13 @@
 @php
+    use App\Traits\FiltersTrait;
     use App\Traits\RoleTrait;
     use App\Traits\BookingTrait;
     use App\Traits\OperationTrait;
     use Illuminate\Support\Str;
     $usersData = [];
     $exchange_rate = 16.50;
+
+    $users = FiltersTrait::CallCenterAgent();
 @endphp
 @extends('layout.app')
 @section('title') Comisiones @endsection

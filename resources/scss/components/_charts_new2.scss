@@ -1,5 +1,4 @@
 @import "../../plugins/bootstrap-select/select";
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 #chartsModal2, #commissionsModal{
   .modal-content{
@@ -8,11 +7,11 @@
 
       .modal-header{
           h5{
-              color: #425466;
-              font-size: 20px;
-              font-weight: 700;
-              line-height: 24.15px;
-              letter-spacing: 0;
+            color: #425466;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 24.15px;
+            letter-spacing: 0;
           }
 
           >.items_status{
@@ -44,11 +43,11 @@
             padding: 0.75rem; /*12*/
             display: flex;
             flex-direction: column;                
-            gap: 10px;
+            gap: 0.625rem; /*10*/
 
             h6{
               color: #425466;
-              font-size: 16px;
+              font-size: 1rem;  /*16*/
               font-weight: 700;
               letter-spacing: 0;
               margin: 0 ;
@@ -65,7 +64,7 @@
                 border-radius: 5px;
                 overflow: hidden; // Asegura que el borde redondeado aplique a la tabla
             
-                thead, tfoot {            
+                thead, tfoot {
                   tr{
                     th {
                       background-color: rgba(251, 86, 7, 0.72) !important; // Fondo azul claro
@@ -115,9 +114,10 @@
             >div:not(.table-responsive){ // Aplica solo si el segundo >div no tiene la clase table-responsive
               display: flex;
               flex-direction: column-reverse;
-              gap: 10px;
+              gap: 0.625rem; /*10*/
+
               h6{
-                margin-bottom: 10px;
+                margin-bottom: 0.625rem; /*10*/
               }
             }
             
@@ -129,7 +129,7 @@
 
         @media (min-width: 992px) {
             max-height: auto;
-            overflow: auto;                    
+            overflow: auto;
             display: grid;
             grid-template-columns: 1fr 430px;
 

@@ -16,10 +16,13 @@ use App\Models\Zones;
 use App\Models\DestinationService;
 use App\Models\CancellationTypes;
 use App\Models\ExchangeRateReport;
+use App\Models\SalesType;
 
 trait FiltersTrait
 {
-    public function Exchange($in, $end){
+
+    //NOS TRAE EL TIPO DE CAMBIO DEPENDIENDO DE LA FECHA
+    public static function Exchange($in, $end){
         $in = ( isset($in) ? $in : date('Y-m-d') );
         $end = ( isset($in) ? $in : date('Y-m-d') );
         $report = ExchangeRateReport::where('status', 1)->where('date_init', '<=', $in)
@@ -33,20 +36,21 @@ trait FiltersTrait
         }
     }
 
-    public function Users(){
+    public static function Users(){
         return User::where('status', 1)->get();
     }
 
-    public function CallCenterAgent(){
+    //NOS TRAE LOS AGENTES DE CALL CENTER
+    public static function CallCenterAgent(){
         return User::where('is_call_center_agent', 1)->get();
     }
 
-    public function Enterprises(){
+    public static function Enterprises(){
         return Enterprise::all();
     }
 
     //TIPO DE SERVICIO
-    public function Services(){
+    public static function Services(){
         return array(
             "0" => "One Way",
             "1" => "Round Trip",
@@ -54,11 +58,11 @@ trait FiltersTrait
     }
 
     //SITIOS O AGENCIAS
-    public function Sites(){
-        return DB::select("SELECT id, name as site_name FROM sites ORDER BY site_name ASC");
+    public static function Sites(){
+        return DB::select("SELECT id, name FROM sites ORDER BY name ASC");
     }
 
-    public function Origins(){
+    public static function Origins(){
         $origins[] = (object) array(
             "id" => 0,
             "code" => "PAGINA WEB"
@@ -75,7 +79,7 @@ trait FiltersTrait
     }
 
     //ESTATUS DE RESERVACIÓN
-    public function reservationStatus(){
+    public static function reservationStatus(){
         return array(
             "CONFIRMED" => "Confirmado",
             "PENDING" => "Pendiente",
@@ -88,7 +92,7 @@ trait FiltersTrait
     }
 
     //TIPO DE SERVICIO EN OPERACIÓN
-    public function servicesOperation(){
+    public static function servicesOperation(){
         return array(
             "ARRIVAL" => "Llegada",
             "DEPARTURE" => "Salida",
@@ -97,17 +101,21 @@ trait FiltersTrait
     }
 
     //TIPO DE VEHÍCULO
-    public function Vehicles(){
+    public static function Vehicles(){
         return DestinationService::all();
     }
 
     //ZONAS DE ORIGEN Y DESTINO
-    public function Zones(){
-        return Zones::all();;
+    public static function Zones($destination_id = NULL){
+        if( $destination_id ){
+            return Zones::where('destination_id', $destination_id)->get();
+        }else{
+            return Zones::all();
+        }        
     }
 
     //ESTATUS DE SERVICIO
-    public function statusOperationService(){
+    public static function statusOperationService(){
         return array(
             "PENDING" => "Pendiente",
             "COMPLETED" => "Completado",
@@ -116,8 +124,10 @@ trait FiltersTrait
         );
     }
 
-    //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADO COMO LOS VEHICULOS QUE TENEMOS
-    public function Units($action = "filters"){
+    //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADOS COMO LOS VEHICULOS QUE TENEMOS
+    // SI LE MANDAMOS EL PARAMERO ACTION COMO FILTERS, NOS TRAE TODAS LAS UNIDADES SI IMPORTAR QUE ESTEN INACTIVAS
+    // SI LE MANDAMOS EL PARAMERO ACTION COMO DIFERENTE DE FILTERS, NOS TRAE TODAS LAS UNIDADES QUE SOLO ESTEN ACTIVAS
+    public static function Units($action = "filters"){
         if( $action == "filters" ){
             return Vehicle::all();
         }else{
@@ -126,7 +136,7 @@ trait FiltersTrait
     }
 
     //CONDUCTOR
-    public function Drivers($action = "filters"){
+    public static function Drivers($action = "filters"){
         if( $action == "filters" ){
             return Driver::orderBy('names','ASC')->get();
         }else{
@@ -135,7 +145,7 @@ trait FiltersTrait
     }
 
     //ESTATUS DE OPERACIÓN
-    public function statusOperation(){
+    public static function statusOperation(){
         return array(
             "PENDING" => "Pendiente",
             "E" => "E",
@@ -145,7 +155,7 @@ trait FiltersTrait
     }    
     
     //ESTATUS DE PAGO DE RESERVACIÓN
-    public function paymentStatus(){
+    public static function paymentStatus(){
         return array(
             "PAID" => "Pagado",
             "PENDING" => "Pendiente",
@@ -153,7 +163,7 @@ trait FiltersTrait
     }
 
     //MONEDA DE RESERVACIÓN
-    public function Currencies(){
+    public static function Currencies(){
         return array(
             "USD" => "USD",
             "MXN" => "MXN",
@@ -161,7 +171,7 @@ trait FiltersTrait
     }
     
     //METODO DE PAGO DE RESERVACIÓN
-    public function Methods(){
+    public static function Methods(){
         return array(
             "CASH" => "CASH",
             "STRIPE" => "STRIPE",
@@ -171,11 +181,16 @@ trait FiltersTrait
     }
 
     //MOTIVOS DE CANCELACIÓN
-    public function CancellationTypes(){
+    public static function CancellationTypes(){
         return CancellationTypes::where('status',1)->get();
     }
 
-    public function parseArrayQuery($data, $marks = NULL){
+    public static function TypeSales()
+    {
+        return SalesType::all();
+    }    
+
+    public static function parseArrayQuery($data, $marks = NULL){
         if (is_array($data)) {
             $filteredData = array_filter($data, function($value) {
                 return $value !== NULL && $value !== 0;

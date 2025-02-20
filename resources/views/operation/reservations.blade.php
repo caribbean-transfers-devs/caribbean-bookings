@@ -1,8 +1,20 @@
-@php        
+@php
+    use App\Traits\FiltersTrait;
     use App\Traits\RoleTrait;
     use App\Traits\BookingTrait;
     use Illuminate\Support\Str;
     use Carbon\Carbon;
+
+    $services = FiltersTrait::Services();
+    $websites = FiltersTrait::Sites();
+    $origins = FiltersTrait::Origins();
+    $reservation_status = FiltersTrait::reservationStatus();
+    $vehicles = FiltersTrait::Vehicles();
+    $zones = FiltersTrait::Zones();
+    $payment_status = FiltersTrait::paymentStatus();
+    $currencies = FiltersTrait::Currencies();
+    $methods = FiltersTrait::Methods();
+    $cancellations = FiltersTrait::CancellationTypes();
 @endphp
 @extends('layout.app')
 @section('title') Reservaciones @endsection

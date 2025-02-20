@@ -37,6 +37,21 @@ trait OperationTrait
         return $status;
     }
 
+    //TIPO DE SERVICIO EN OPERACIONES
+    public static function typeService($status){
+        switch ($status) {
+            case 'DEPARTURE':
+                return 'SALIDA';
+                break;
+            case 'TRANSFER':
+                return 'TRASLADO';
+                break;                              
+            default:
+                return 'LLEGADA';
+                break;
+        }        
+    }
+
     public static function typePreassignment($service){
         if( $service->op_type == "TYPE_ONE" && $service->op_one_preassignment != "" ){
             return $service->op_one_preassignment;
@@ -46,11 +61,10 @@ trait OperationTrait
     }
 
     public static function renderServicePreassignment($service){
-        return '<button type="button" class="btn btn-'.( self::validatePreassignment($service) ? self::classServiceNumber($service->final_service_type) : 'danger' ).'">'.( self::validatePreassignment($service) ? self::typePreassignment($service) : 'ADD' ).'</button>';
+        return '<button type="button" class="btn btn-'.( self::validatePreassignment($service) ? self::classServiceNumber($service->final_service_type) : 'danger' ).' btn-sm">'.( self::validatePreassignment($service) ? self::typePreassignment($service) : 'ADD' ).'</button>';
     }
 
     // ESTATUS CONFIRMACION
-
     public static function serviceStatusConfirmation($service){
         return ( $service->operation_type == 'arrival' ? $service->op_one_confirmation : $service->op_two_confirmation );
     }

@@ -1,3 +1,7 @@
+@php
+    use App\Traits\FiltersTrait;
+    $typeSales = FiltersTrait::TypeSales();
+@endphp
 <div class="modal fade" id="serviceSalesModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -11,7 +15,7 @@
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="new_sale_type_id">Tipo</label>
                             <select class="form-select mb-2" id="new_sale_type_id" name="sale_type_id">
-                                @foreach($types as $type)
+                                @foreach($typeSales as $type)
                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                 @endforeach
                             </select>
@@ -28,14 +32,6 @@
                             <label class="form-label" for="new_sale_total">Total</label>
                             <input type="number" class="form-control mb-2" id="new_sale_total" name="total">
                         </div>
-                        {{-- <div class="col-sm-12 col-md-12">
-                            <label class="form-label" for="new_sale_agent_id">Agente</label>
-                            <select class="form-select mb-2" id="new_sale_agent_id" name="call_center_agent_id"> 
-                                @foreach($sellers as $agent)
-                                    <option value="{{ $agent->id }}">{{ $agent->name }}</option>
-                                @endforeach
-                            </select>
-                        </div> --}}
                     </div>
                     <input type="hidden" name="reservation_id" value="{{ $reservation_id }}">
                 </form>

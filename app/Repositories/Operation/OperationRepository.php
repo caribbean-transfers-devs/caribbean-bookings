@@ -197,16 +197,6 @@ class OperationRepository
                 ]
             ],
             'bookings' => $bookings,
-            'services' => $this->Services(),
-            'websites' => $this->Sites(),
-            'origins' => $this->Origins(),
-            'reservation_status' => $this->reservationStatus(),
-            'vehicles' => $this->Vehicles(),
-            'zones' => $this->Zones(),
-            'payment_status' => $this->paymentStatus(),
-            'currencies' => $this->Currencies(),
-            'methods' => $this->Methods(),
-            'cancellations' => $this->CancellationTypes(),
             'data' => $data,
         ]);
     }

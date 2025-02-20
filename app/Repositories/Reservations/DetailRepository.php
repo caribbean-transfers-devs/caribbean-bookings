@@ -2,13 +2,7 @@
 
 namespace App\Repositories\Reservations;
 
-use App\Models\DestinationService;
 use App\Models\Reservation;
-use App\Models\SalesType;
-use App\Models\User;
-use App\Models\UserRole;
-use App\Models\Site;
-use App\Models\Zones;
 
 use App\Traits\ApiTrait;
 use App\Traits\FiltersTrait;
@@ -25,9 +19,38 @@ class DetailRepository
     public function detail($request,$id)
     {
         $reservation = Reservation::with([
-            'destination',
-            'items.cancellationTypeOrigin',
-            'items.cancellationTypeDestino',
+            'destination.destination_services',
+            'items' => function ($query) {
+                $query->join('zones as zone_one', 'zone_one.id', '=', 'reservations_items.from_zone')
+                        ->join('zones as zone_two', 'zone_two.id', '=', 'reservations_items.to_zone')
+                        ->select(
+                            'reservations_items.*', 
+                            'reservations_items.id as reservations_item_id', 
+                            'zone_one.name as from_zone_name',
+                            'zone_one.is_primary as is_primary_from',
+                            'zone_two.name as to_zone_name',
+                            'zone_two.is_primary as is_primary_to',
+                            // Final Service Type para zone_one
+                            DB::raw("
+                                CASE 
+                                    WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 1 THEN 'DEPARTURE'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                END AS final_service_type_one
+                            "),
+                            
+                            // Final Service Type para zone_two
+                            DB::raw("
+                                CASE 
+                                    WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1 THEN 'DEPARTURE'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                    ELSE 'ARRIVAL'
+                                END AS final_service_type_two
+                            ")
+                        );
+            },
+            // 'items.cancellationTypeOrigin',
+            // 'items.cancellationTypeDestino',
             'sales.callCenterAgent',  // Mantienes la relación con ventas por si necesitas la información de ventas // Relación anidada
             'callCenterAgent',  // Relación directa con el agente del call center
             'payments',
@@ -36,25 +59,16 @@ class DetailRepository
             'cancellationType',
             'originSale'
         ])->find($id);
-
-        // dump($reservation->toArray());
-                
-        $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
-        $sellers = User::whereIn('id', $users_ids)->get();
-
-        $sales_types = SalesType::all();
-        $services_types = DestinationService::where('destination_id',$reservation->destination_id)->get();
-        $zones = Zones::where('destination_id', 1)->get();
-        $sites = Site::get();
+        // dd($reservation->toArray());
+;
         $types_cancellations = ApiTrait::makeTypesCancellations();
-        $media = ReservationsMedia::orderBy('id', 'desc')->get();
         
         //Sumamos las ventas y restamos pagos para saber si la reserva está confirmada o no..
         $data = [
             "status" => "PENDING", //NOS INDICA EL ESTATUS DEFAULT DE LA RESERVA
             "total_sales" => 0,
             "total_payments" => 0,
-        ];        
+        ];
 
         foreach( $reservation->sales as $sale ):
             $data['total_sales'] += $sale->total;            
@@ -97,17 +111,9 @@ class DetailRepository
                 ]
             ],
             'reservation' => $reservation,
-            'sellers' => $sellers,
-            'sales_types' => $sales_types,
-            'services_types' => $services_types,
             'data' => $data,
-            'sites' => $sites,
-            'zones' => $zones,
             'types_cancellations' => $types_cancellations,
-            'media' => $media,
-            'origins' => $this->Origins(),
             'request' => $request->input(),
-            'data_user' => auth()->user()
         ]);
     }
 

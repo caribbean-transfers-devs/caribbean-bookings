@@ -7,7 +7,6 @@ const __btnSendArrivalConfirmation = document.getElementById('btnSendArrivalConf
 const __titleModal = document.getElementById('titleModal');
 const __closeModalHeader = document.getElementById('closeModalHeader');
 const __closeModalFooter = document.getElementById('closeModalFooter');
-
 const __serviceType = document.getElementById('serviceTypeForm');
 
 //DECLARAMOS VARIABLES, PARA VENTAS Y PAGOS
@@ -15,6 +14,8 @@ const __type = document.getElementById('type_form');
 const __code = document.getElementById('sale_id');
 const __type_pay = document.getElementById('type_form_pay');
 const __code_pay = document.getElementById('payment_id');
+
+//DECLARAMOS VARIABLES PARA LAS ACCIONES DE LOS SERVICIOS
 
 if( document.querySelectorAll('.timeline-item').length > 0 ){
     document.querySelectorAll('.timeline-item').forEach(item => {

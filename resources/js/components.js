@@ -1,4 +1,4 @@
-const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 const language = document.documentElement.lang;
 const _LOCAL_URL = window.location.origin;
 const __loading = document.getElementById('content');

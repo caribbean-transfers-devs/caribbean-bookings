@@ -687,9 +687,7 @@ class ReportsRepository
                 ]
             ],       
             'operations' => $items,
-            'users' => $this->CallCenterAgent(),
             'data' => $data,
-            'request' => $request->input(),
         ]);        
     }
 
@@ -883,19 +881,8 @@ class ReportsRepository
                 ]
             ],
             'bookings' => $bookings,
-            'services' => $this->Services(),
-            'websites' => $this->Sites(),
-            'origins' => $this->Origins(),
-            'reservation_status' => $this->reservationStatus(),
-            'vehicles' => $this->Vehicles(),
-            'zones' => $this->Zones(),
-            'payment_status' => $this->paymentStatus(),
-            'currencies' => $this->Currencies(),
-            'methods' => $this->Methods(),
-            'cancellations' => $this->CancellationTypes(),
-            'exchange' => $this->Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
+            'exchange' => FiltersTrait::Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
             'data' => $data,
-            'request' => $request->input(),
         ]);
     }
 
@@ -1052,7 +1039,7 @@ class ReportsRepository
             $queryTwo .= " AND tc.id IN ($params) ";
         }        
 
-        if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || isset( $request->service_operation ) && !empty( $request->service_operation ) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) ){
+        if( (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || isset( $request->service_operation ) && !empty( $request->service_operation ) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) ){
             $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
         }
 
@@ -1068,22 +1055,7 @@ class ReportsRepository
                 ]
             ],
             'operations' => $operations,
-            'services' => $this->Services(),
-            'websites' => $this->Sites(),
-            'origins' => $this->Origins(),
-            'reservation_status' => $this->reservationStatus(),
-            'services_operation' => $this->servicesOperation(),
-            'vehicles' => $this->Vehicles(),
-            'zones' => $this->Zones(),
-            'service_operation_status' => $this->statusOperationService(),
-            'units' => $this->Units(), //LAS UNIDADES DADAS DE ALTA
-            'drivers' => $this->Drivers(),
-            'operation_status' => $this->statusOperation(),
-            'payment_status' => $this->paymentStatus(),
-            'currencies' => $this->Currencies(),
-            'methods' => $this->Methods(),
-            'cancellations' => $this->CancellationTypes(),
-            'exchange' => $this->Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
+            'exchange' => FiltersTrait::Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
             'data' => $data,
             'request' => $request->input(),
         ]);
@@ -1150,10 +1122,10 @@ class ReportsRepository
                 ]
             ],
             'conciliations' => $conciliations,
-            'payment_status' => $this->paymentStatus(),
-            'currencies' => $this->Currencies(),
-            'methods' => $this->Methods(),
-            'exchange' => $this->Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
+            'payment_status' => FiltersTrait::paymentStatus(),
+            'currencies' => FiltersTrait::Currencies(),
+            'methods' => FiltersTrait::Methods(),
+            'exchange' => FiltersTrait::Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
             'data' => $data,
             'request' => $request->input(),            
         ]);
@@ -1340,17 +1312,17 @@ class ReportsRepository
                 ]
             ],
             'bookings' => $bookings,
-            'services' => $this->Services(),
-            'websites' => $this->Sites(),
-            'origins' => $this->Origins(),
-            'reservation_status' => $this->reservationStatus(),
-            'vehicles' => $this->Vehicles(),
-            'zones' => $this->Zones(),
-            'payment_status' => $this->paymentStatus(),
-            'currencies' => $this->Currencies(),
-            'methods' => $this->Methods(),
-            'cancellations' => $this->CancellationTypes(),
-            'exchange' => $this->Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
+            'services' => FiltersTrait::Services(),
+            'websites' => FiltersTrait::Sites(),
+            'origins' => FiltersTrait::Origins(),
+            'reservation_status' => FiltersTrait::reservationStatus(),
+            'vehicles' => FiltersTrait::Vehicles(),
+            'zones' => FiltersTrait::Zones(),
+            'payment_status' => FiltersTrait::paymentStatus(),
+            'currencies' => FiltersTrait::Currencies(),
+            'methods' => FiltersTrait::Methods(),
+            'cancellations' => FiltersTrait::CancellationTypes(),
+            'exchange' => FiltersTrait::Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
             'data' => $data,
             'request' => $request->input(),
         ]);        
