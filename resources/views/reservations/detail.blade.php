@@ -635,7 +635,7 @@
                                 </button>
                             @endif
                         </div>
-                        <div class="table-container">
+                        <div class="table-responsive">
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -686,7 +686,7 @@
                                     </button>
                                 @endif
                             </div>
-                            <div class="table-container">
+                            <div class="table-responsive">
                                 <table class="table">
                                     <thead>
                                         <tr>

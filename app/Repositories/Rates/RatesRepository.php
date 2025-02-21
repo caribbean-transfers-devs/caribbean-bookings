@@ -73,7 +73,7 @@ class RatesRepository{
                                     LEFT JOIN destination_services as ds ON ds.id = rt.destination_service_id
                                     LEFT JOIN rates_groups as rg ON rg.id = rt.rate_group_id
                                     LEFT JOIN zones as zoneOne ON zoneOne.id = rt.zone_one
-                                    LEFT JOIN zones as zoneTwo ON zoneTwo.id = rt.zone_one
+                                    LEFT JOIN zones as zoneTwo ON zoneTwo.id = rt.zone_two
                                 WHERE rt.destination_id = :destination_id
                                 AND ( (rt.zone_one = :zone_one AND rt.zone_two = :zone_two) OR ( rt.zone_one = :zone_three AND rt.zone_two = :zone_four )  ) 
                                 AND rg.id = :rate_group
