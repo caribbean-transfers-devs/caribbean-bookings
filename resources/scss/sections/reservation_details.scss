@@ -31,9 +31,9 @@
     .tab-content{
         > .tab-pane{
             &.services.active{
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
+                // display: flex;
+                // flex-direction: column;
+                // gap: 16px;
             }
 
             &:not(.services){
@@ -269,12 +269,12 @@ div#serviceMapModal{
     z-index: 9999;
 }
 
-// .table-container {    
+.table-container, .table-responsive {
   
     table {
       width: 100%;
       border-collapse: collapse;
-      overflow: hidden; // Asegura que el borde redondeado aplique a la tabla
+    //   overflow: hidden; // Asegura que el borde redondeado aplique a la tabla
   
       thead, tfoot {
         tr{
@@ -323,11 +323,11 @@ div#serviceMapModal{
       }
     }
 
-    // &:not(.table-details-booking){
-    //     border-radius: 8px;
+    &:not(.table-details-booking){
+        border-radius: 8px;
 
-    //     table{
-    //         border-radius: 5px;
-    //     }
-    // }    
-// }
+        table{
+            border-radius: 5px;
+        }
+    }    
+}
