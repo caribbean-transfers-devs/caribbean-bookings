@@ -143,7 +143,7 @@
                     <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-container table-details-booking">
+                    {{-- <div class="table-container table-details-booking"> --}}
                         <table class="table table-hover table-striped table-bordered mb-0">
                             <tbody>
                                 <tr>
@@ -220,7 +220,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
+                    {{-- </div> --}}
                     <hr style="width:95%; margin-left: auto; margin-right: auto;">
                     @if (RoleTrait::hasPermission(25))
                         <div class="followUps px-2 pb-2">
@@ -437,7 +437,7 @@
                                         </div>
                                     </div>
                                     <div class="item-data">
-                                        <div class="table-container">                                            
+                                        {{-- <div class="table-container"> --}}
                                             <table class="table">
                                                 <thead>
                                                     <tr>
@@ -616,7 +616,7 @@
                                                     @endif
                                                 </tbody>
                                             </table>
-                                        </div>
+                                        {{-- </div> --}}
                                     </div>
                                 </div>                                
                             </div>                            
@@ -635,7 +635,7 @@
                                 </button>
                             @endif
                         </div>
-                        <div class="table-container">
+                        {{-- <div class="table-container"> --}}
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -673,7 +673,7 @@
                                     @endforeach                                   
                                 </tbody>
                             </table>
-                        </div>
+                        {{-- </div> --}}
                     </div>
                     {{-- CUANDO ES CREDITO NO DEJA QUE AGREGUEN PAGOS --}}
                     @if ( $data['status'] != "CREDIT" )
@@ -686,7 +686,7 @@
                                     </button>
                                 @endif
                             </div>
-                            <div class="table-container">
+                            {{-- <div class="table-container"> --}}
                                 <table class="table">
                                     <thead>
                                         <tr>
@@ -726,7 +726,7 @@
                                         @endforeach                                   
                                     </tbody>
                                 </table>
-                            </div>
+                            {{-- </div> --}}
                         </div>
                     @endif
                     @if (RoleTrait::hasPermission(65))
