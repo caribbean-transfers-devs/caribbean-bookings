@@ -90,9 +90,9 @@ class ReservationsController extends Controller
         }
     }
 
-    public function contactPoint(Request $request, ReservationsRepository $reservationRepository){
-        return $reservationRepository->getContactPoints($request);
-    }
+    // public function contactPoint(Request $request, ReservationsRepository $reservationRepository){
+    //     return $reservationRepository->getContactPoints($request);
+    // }
 
     public function arrivalConfirmation(ReservationConfirmationRequest $request, ReservationsRepository $reservationRepository){
         return $reservationRepository->sendArrivalConfirmation($request);

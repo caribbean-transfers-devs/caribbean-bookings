@@ -1,0 +1,111 @@
+@php
+    use App\Traits\RoleTrait;
+    use App\Traits\BookingTrait;
+    use App\Traits\OperationTrait;
+    $data = [
+        "total" => 0,
+        "total_conversion" => 0,
+        "MXN" => 0,
+        "USD" => 0
+    ];
+@endphp
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 mb-3">
+        <div class="col-xl-4">
+            <div class="card bg-success p-3">
+                <h5 class="card-title" style="font-size:11pt;">Total de reservas: {{ count($sales) }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12 col-lg-12 col-md-12">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="text-center" scope="col">Código</th>
+                        <th class="text-center" scope="col">Fecha de reservación</th>
+                        <th class="text-center" scope="col">Hora de reservación</th>
+                        <th class="text-center" scope="col">Sitio</th>
+                        <th class="text-center" scope="col">Estatus de reservación</th>
+                        <th class="text-center" scope="col">Estatus de pago</th>
+                        <th class="text-center" scope="col">Total de reservación</th>
+                        <th class="text-center" scope="col">Total</th>
+
+                        <th class="text-center" scope="col">USD</th>
+                        <th class="text-center" scope="col">MXN</th>
+                        
+                        <th class="text-center" scope="col">Moneda</th>
+                        <th class="text-center" scope="col">Nombre del cliente</th>
+                        <th class="text-center" scope="col">Desde</th>
+                        <th class="text-center" scope="col">Hacia</th>
+                        <th class="text-center" scope="col">Fecha de servicio</th>
+                        <th class="text-center" scope="col">Hora de servicio</th>
+                        <th class="text-center" scope="col">Estatus de servicio</th>
+                        <th class="text-center" scope="col">Estatus de operación</th>
+                    </tr>
+                </thead>
+                <tbody>            
+                    @foreach($sales as $key => $booking)
+                        @php
+                            $total = $booking->total_sales;
+                            $total_conversion = ( $booking->currency == "USD" ? $booking->total_sales * $exchange : $booking->total_sales );
+                            $data['total'] += $total;
+                            $data['total_conversion'] += $total_conversion;
+                            $data[$booking->currency] += $booking->total_sales;
+                        @endphp                    
+                        <tr>
+                            <td class="text-center">
+                                @if (RoleTrait::hasPermission(38))
+                                    <a href="/reservations/detail/{{ $booking->reservation_id }}"><?=$booking->code?></a>
+                                @else
+                                    <?=$codes_string?>
+                                @endif
+                            </td>
+                            <td class="text-center">{{ date("Y-m-d", strtotime($booking->created_at)) }}</td>
+                            <td class="text-center">{{ date("H:i", strtotime($booking->created_at)) }}</td>
+                            <td class="text-center">{{ $booking->site_name }}</td>
+                            <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($booking->reservation_status) }}">{{ BookingTrait::statusBooking($booking->reservation_status) }}</button></td>
+                            <td class="text-center" <?=BookingTrait::classStatusPayment($booking)?>>{{ BookingTrait::statusPayment($booking->payment_status) }}</td>
+                            <td class="text-center">$ {{ number_format(round($total, 2),2) }}</td>
+                            <td class="text-center">$ {{ number_format(round($total_conversion,2),2) }}</td>
+
+                            <td class="text-center">$ {{ number_format(round(( $booking->currency == "USD" ? $booking->total_sales : 0 ), 2),2) }}</td>
+                            <td class="text-center">$ {{ number_format(round(( $booking->currency == "MXN" ? $booking->total_sales : 0 ), 2),2) }}</td>
+                            
+                            <td class="text-center">{{ $booking->currency }}</td>                            
+                            <td class="text-center">{{ $booking->full_name }}</td>
+                            <td class="text-center">{{ OperationTrait::setFrom($booking, "name") }}</td>
+                            <td class="text-center">{{ OperationTrait::setTo($booking, "name") }}</td>
+                            <td class="text-center">{{ OperationTrait::setDateTime($booking, "date") }}</td>
+                            <td class="text-center">{{ OperationTrait::setDateTime($booking, "time") }}</td>
+                            <td class="text-center"><?=OperationTrait::renderServiceStatus($booking)?></td>
+                            <td class="text-center"><?=OperationTrait::renderOperationStatus($booking)?></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th class="text-center">Totales</th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center">{{ number_format(round($data['total'],2),2) }}</th>
+                        <th class="text-center">{{ number_format(round($data['total_conversion'],2),2) }}</th>
+                        <th class="text-center">{{ number_format(round($data['MXN'],2),2) }}</th>
+                        <th class="text-center">{{ number_format(round($data['USD'],2),2) }}</th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

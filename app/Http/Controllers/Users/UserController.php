@@ -3,83 +3,98 @@
 namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ChgPassRequest;
+use Illuminate\Http\Request;
+
+//REPOSITORY
+use App\Repositories\Users\UserRepository;
+
+//TRAITS
+use App\Traits\RoleTrait;
+
+//REQUEST
 use App\Http\Requests\UserRequest;
+use App\Http\Requests\ChgPassRequest;
 use App\Http\Requests\ValidIPRequest;
+
+//MODELS
 use App\Models\User;
 use App\Models\WhitelistIp;
-use App\Repositories\Users\UserRepository;
-use Illuminate\Http\Request;
-use App\Traits\RoleTrait;
 
 class UserController extends Controller
 {
-    public function index(Request $request, UserRepository $userRepository)
+    private $UserRepository;
+
+    public function __construct(UserRepository $UserRepository)
+    {
+        $this->UserRepository = $UserRepository;
+    }
+
+    public function index(Request $request)
     {
         if(RoleTrait::hasPermission(1)){
-            return $userRepository->indexUsers($request);
+            return $this->UserRepository->indexUsers($request);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
     }
 
-    public function create(Request $request, UserRepository $userRepository)
+    public function create(Request $request)
     {
         if(RoleTrait::hasPermission(2)){
-            return $userRepository->createUser($request);
+            return $this->UserRepository->createUser($request);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
     }
 
-    public function edit(Request $request, User $user, UserRepository $userRepository)
+    public function edit(Request $request, User $user)
     {
         if(RoleTrait::hasPermission(3)){
-            return $userRepository->editUser($request, $user);
+            return $this->UserRepository->editUser($request, $user);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
     }
 
-    public function store(UserRequest $request, UserRepository $userRepository)
+    public function store(UserRequest $request)
     {
         if(RoleTrait::hasPermission(2)){
-            return $userRepository->storeUser($request);
+            return $this->UserRepository->storeUser($request);
         }
     }
 
-    public function update(UserRequest $request, User $user, UserRepository $userRepository)
+    public function update(UserRequest $request, User $user)
     {
         if(RoleTrait::hasPermission(3)){
-            return $userRepository->updateUser($request, $user);
+            return $this->UserRepository->updateUser($request, $user);
         }
     }
 
-    public function change_pass(ChgPassRequest $request, User $user, UserRepository $userRepository)
+    public function change_pass(ChgPassRequest $request, User $user)
     {
         if(RoleTrait::hasPermission(3)){
-            return $userRepository->changePass($request, $user);
+            return $this->UserRepository->changePass($request, $user);
         }
     }
 
-    public function change_status(Request $request, User $user, UserRepository $userRepository)
+    public function change_status(Request $request, User $user)
     {
         if(RoleTrait::hasPermission(4)){
-            return $userRepository->changeStatus($request, $user);
+            return $this->UserRepository->changeStatus($request, $user);
         }       
     }
 
-    public function store_ips(ValidIPRequest $request, UserRepository $userRepository)
+    public function store_ips(ValidIPRequest $request)
     {
         if(RoleTrait::hasPermission(5)){
-            return $userRepository->storeIps($request);
+            return $this->UserRepository->storeIps($request);
         }        
     }
 
-    public function delete_ips(Request $request, WhitelistIp $ip, UserRepository $userRepository)
+    public function delete_ips(Request $request, WhitelistIp $ip)
     {
         if(RoleTrait::hasPermission(5)){
-            return $userRepository->deleteIps($request, $ip);
+            return $this->UserRepository->deleteIps($request, $ip);
         }
     }
 }

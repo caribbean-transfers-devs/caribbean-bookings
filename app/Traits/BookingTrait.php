@@ -98,7 +98,7 @@ trait BookingTrait
         $span = "";
         $items = explode(',',$data);
         foreach ($items as $key => $item) {
-            $span .= '<button type="button" class="btn btn-'.self::classStatusBooking($item).'">'.self::statusBooking($item).'</button>';
+            $span .= '<button type="button" class="btn btn-'.self::classStatusBooking($item).' mb-2">'.self::statusBooking($item).'</button>';
         }
         return $span;
     }

@@ -12,12 +12,7 @@ $("#chgPassBtn").on('click', () => {
     $("#chgPassBtn").prop('disabled', true);
     $("#chgPassBtn").html('<i class="fas fa-spinner fa-pulse"></i>');
     let frm_data = $("#frm_chg_pass").serialize();
-    let id = $("#pass_id").val();
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });       
+    let id = $("#pass_id").val(); 
     $.ajax({
         url: '/ChangePass/'+id,
         type: 'PUT',
@@ -70,12 +65,7 @@ function chgStatus(id,status){
         cancelButtonColor: '#6c757d',
         confirmButtonText: '¡Si, '+msg+'r!'
     }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-                }
-            });       
+        if (result.isConfirmed) { 
             $.ajax({
                 url: '/ChangeStatus/'+id,
                 type: 'PUT',

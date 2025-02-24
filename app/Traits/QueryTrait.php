@@ -28,6 +28,9 @@ trait QueryTrait
                                     rez.open_credit,
                                     rez.is_complete,
                                     rez.created_at,
+                                    us.status AS employee_status,
+                                    us.name AS employee,
+                                    site.id as site_code,
                                     site.type_site AS type_site,
                                     site.name AS site_name,
                                     origin.code AS origin_code,
@@ -78,6 +81,7 @@ trait QueryTrait
                                     GROUP_CONCAT(DISTINCT p.payment_details ORDER BY p.payment_details ASC SEPARATOR ', ') AS payment_details
                                 FROM reservations as rez
                                     INNER JOIN sites as site ON site.id = rez.site_id
+                                    LEFT OUTER JOIN users as us ON us.id = rez.call_center_agent_id
                                     LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
                                     LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
                                     LEFT JOIN (
@@ -137,7 +141,7 @@ trait QueryTrait
                                         GROUP BY it.reservation_id, it.is_round_trip
                                     ) as it ON it.reservation_id = rez.id
                                     WHERE 1=1 {$query}
-                                GROUP BY rez.id, site.type_site, site.name, site.is_cxc {$query2}",
+                                GROUP BY rez.id, site.id, site.type_site, site.name, site.is_cxc {$query2}",
                                     $queryData);
 
         if(sizeof( $bookings ) > 0):

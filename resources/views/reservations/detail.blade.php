@@ -251,9 +251,9 @@
 
                 {{-- NOS PERMITE REENVIO DE CORREO DE LA RESERVACIÓN AL CLIENTE, CUANDO TENEMOS EL PERMISO Y ES PENDIENTE, CONFIRMADA O A CREDITO --}}
                 @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(20) )
-                    <div class="btn-group" role="group">
+                    <div class="btn-group btn-group-sm" role="group">
                         <button id="btndefault" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Re-envio de correo
+                            RE-ENVIO DE CORREO
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btndefault">
@@ -266,9 +266,9 @@
 
                 {{-- NOS PERMITE ENVIAR UNA INVITACIÓN DE PAGO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACION --}}
                 @if ( ( $data['status'] == "PENDING" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(22))
-                    <div class="btn-group" role="group">
+                    <div class="btn-group btn-group-sm" role="group">
                         <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Invitación de pago
+                            INVITACIÓN DE PAGO
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btndefault">
@@ -282,7 +282,7 @@
                 @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && RoleTrait::hasPermission(21) )
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Enviar Mensaje
+                            ENVIAR MENSAJE
                         </button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="#">SMS</a>
@@ -293,35 +293,35 @@
 
                 {{-- NOS PERMITE AGREGAR SEGUIMIENTOS DE LA RESERVA, SOLO CUANDO ESTA COMO PENDIENTE, CONFIRMADA O A CREDITO --}}
                 @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && RoleTrait::hasPermission(23))
-                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> Seguimiento</button>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> SEGUIMIENTO</button>
                 @endif
 
                     {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
                     @if (RoleTrait::hasPermission(94) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
-                        <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Activar servicio plus</button>
+                        <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> ACTIVAR SERVICIO PLUS</button>
                     @endif
                     @if (RoleTrait::hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
                         {{-- <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button> --}}
                     @endif
                     @if (RoleTrait::hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                        <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Marcar como duplicado</button>
+                        <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> MARCAR COMO DUPLICADO</button>
                     @endif
                     
                 {{-- NOS PERMITE PODER ACTIVAR LA RESERVA CUANDO ESTA COMO CREDITO ABIERTO --}}
                 @if ( $data['status'] == "OPENCREDIT" && RoleTrait::hasPermission(67) )
-                    <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> Activar</button>
+                    <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> ACTIVAR RESERVA</button>
                 @endif
 
                 {{-- NOS PERMITE PONER COMO CREDITO ABIERTO CUANDO LA RESERVA ESTA CONFIRMADA Y EL CLIENTE QUIERE CANCELAR --}}
                 @if ( $data['status'] == "CONFIRMED" && RoleTrait::hasPermission(72) )
-                    <button class="btn btn-warning btn-sm" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Crédito Abierto</button>
+                    <button class="btn btn-warning btn-sm" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> CRÉDITO ABIERTO</button>
                 @endif                        
 
                 {{-- NOS PERMITE COPIAR EL LINK DE PAGO PARA ENVIARSELO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACION --}}
                 @if ( $data['status'] == "PENDING" || $data['status'] == "QUOTATION" )
-                    <div class="btn-group" role="group">
+                    <div class="btn-group btn-group-sm" role="group">
                         <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Copiar Link de pago
+                            COPIAR LINK DE PAGO
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btndefault">
@@ -396,7 +396,7 @@
                                             <p><strong>Tipo:</strong> {{ (( $item->is_round_trip == 1 )? 'Round Trip':'One Way') }}</p>
                                             <p><strong>Vehículo:</strong> {{ $item->destination_service->name }}</p>
                                             <p><strong>Pasajeros:</strong> {{ $item->passengers }}</p>
-                                            <p><strong># de Vuelo:</strong> {{ $item->flught_number ?? 'N/A' }}</p>
+                                            <p><strong># de Vuelo:</strong> {{ $item->flight_number ?? 'N/A' }}</p>
                                         </div>
                                         <div class="actions mb-3">
                                             @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(13))
@@ -404,32 +404,38 @@
                                             @endif
 
                                             {{-- NOS PERMITE REALIZAR ESTAS ACCIONES SOLO CUANDO LA RESERVA ESTA PENDIENTE CONFIRMADA O A CREDITO --}}
-                                            @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" )
-                                                <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal" onclick="getContactPoints({{ $item->reservations_item_id }}, {{ $reservation->destination_id }})">CONFIRMACIÓN DE LLEGADA</button>
-                                                <div class="btn-group btn-group-sm">
+                                            @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" )                                            
+                                                <button class="btn btn-secondary btn-sm arrivalConfirmation" type="button" data-id="{{ $item->reservations_item_id }}" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal">CONFIRMACIÓN DE LLEGADA</button>                            
+                                                <div class="btn-group btn-group-sm" role="group">
                                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                         CONFIRMACIÓN DE SALIDA
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                                     </button>
                                                     <div class="dropdown-menu" style="">
                                                         <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'en', 'departure')">Enviar en inglés</a>
+                                                        <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'es', 'departure')">Enviar en español</a>
                                                     </div>
                                                 </div>
                                                 <div class="btn-group btn-group-sm">
                                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                         TRANSFER RECOGIDA
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                                     </button>
                                                     <div class="dropdown-menu" style="">
                                                         <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'en', 'transfer-pickup')">Enviar en inglés</a>
+                                                        <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'es', 'transfer-pickup')">Enviar en español</a>
                                                     </div>
                                                 </div>
                                                 <div class="btn-group btn-group-sm">
                                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                         TRANSFER REGRESO
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                                     </button>
                                                     <div class="dropdown-menu" style="">
                                                         <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'en', 'transfer-return')">Enviar en inglés</a>
+                                                        <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item" href="#" onclick="sendDepartureConfirmation(event, {{ $item->reservations_item_id }}, {{ $reservation->destination_id }}, 'es', 'transfer-return')">Enviar en español</a>
                                                     </div>
                                                 </div>
@@ -629,9 +635,9 @@
                     <div class="tab-pane" id="icon-tab-2" role="tabpanel">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             @if (RoleTrait::hasPermission(14))
-                                <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#serviceSalesModal">
+                                <button class="btn btn-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceSalesModal">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                    Nueva venta
+                                    NUEVA VENTA
                                 </button>
                             @endif
                         </div>
@@ -680,9 +686,9 @@
                         <div class="tab-pane" id="icon-tab-3" role="tabpanel">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 @if (RoleTrait::hasPermission(14))
-                                    <button class="btn btn-success float-end" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
+                                    <button class="btn btn-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                        Nuevo pago
+                                        NUEVO PAGO
                                     </button>
                                 @endif
                             </div>

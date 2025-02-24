@@ -665,7 +665,7 @@ class ReportsRepository
             $params = $this->parseArrayQuery($request->user);
             $queryOne .= " AND us.id IN ($params) ";
             $queryTwo .= " AND us.id IN ($params) ";
-        }        
+        }
     
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
         $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);        
@@ -950,7 +950,7 @@ class ReportsRepository
 
         //ESTATUS DE RESERVACIÓN
         if(isset( $request->reservation_status ) && !empty( $request->reservation_status )){
-            $params = $this->parseArrayQuery($request->reservation_status,"single");
+            $params = $this->parseArrayQuery($request->reservation_status,"single");            
             $havingConditions[] = " reservation_status IN (".$params.") ";
         }
 

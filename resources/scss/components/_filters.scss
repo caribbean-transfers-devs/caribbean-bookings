@@ -2,22 +2,6 @@
 
 #filterModal{
     .modal-content{
-        background-color: #fafbfc;
-        font-family: Arial, sans-serif;
-
-        .modal-header{
-            h5{
-                color: #425466;
-                font-size: 18px;
-                font-weight: 700;
-                line-height: 24.15px;
-                letter-spacing: 0;
-            }
-        }
-
-        form{
-            background-color: #ffffff;
-        }
 
         .modal-body{
             padding: 0;
@@ -120,7 +104,7 @@
 
                         .input{
                             display: grid;
-                            grid-template-columns: 127px 1fr;
+                            grid-template-columns: 137px 1fr;
                             grid-gap: 5px;
                             align-items: center;
 
@@ -148,7 +132,7 @@
                         padding: 16px;                        
 
                         .input{
-                            grid-template-columns: 74px 1fr;
+                            grid-template-columns: 80px 1fr;
                             grid-gap: 10px;
 
                             .form-control{
@@ -197,12 +181,12 @@
             }
 
             .top{
-                padding: 1.313rem 1.313rem 2.125rem;
+                padding: 1rem 1rem 2.125rem;
                 border-bottom: 1px solid #CCD6EB;
             }
 
             .bottom{
-                padding: 2.125rem 1.313rem 1.313rem;
+                padding: 2.125rem 1rem 1rem;
                 display: grid;
                 grid-template-columns: 1fr;
                 grid-column-gap: 10px;

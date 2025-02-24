@@ -164,7 +164,14 @@ trait OperationTrait
 
     //MOSTRAMOS EL NOMBRE DEL VEHÍCULO, BASADO EN LA UNIDAD SELECCIONADA EN LA OPERACIÓN
     public static function setOperationVehicle($service){
-        return ( $service->op_type == "TYPE_ONE" ? $service->vehicle_name_one : $service->vehicle_name_two );
+        if( $service->op_type == "TYPE_ONE" && $service->vehicle_one_name != null ){
+            return $service->vehicle_name_one;
+        }else if( $service->op_type == "TYPE_TWO" && $service->vehicle_two_name != null ){
+            return $service->vehicle_name_two;
+        }else{
+            return "Unidad no seleccionada";
+        }        
+        //return ( $service->op_type == "TYPE_ONE" ? $service->vehicle_name_one : $service->vehicle_name_two );
     }
 
     public static function setOperationDriver($service){

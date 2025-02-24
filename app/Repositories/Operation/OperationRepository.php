@@ -223,41 +223,5 @@ class OperationRepository
             DB::rollBack();
             return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }    
-
-    /**
-     * NOS AYUDA A PODER CAMBIAR EL ESTATUS DEL SERVICIO, EN LOS DETALLES DE LA RESERVACIÓN
-     * @param request :la información recibida en la solicitud
-     */
-    public function statusUpdate($request)
-    {
-        try {
-            DB::beginTransaction();
-            $item = ReservationsItem::find($request->item_id);
-
-            $this->create_followUps($request->rez_id, "El usuario: ".auth()->user()->name.", actualizo es estatus del servicio de: (".$request->type.") de ".( $request->type == "arrival" ? $item->op_one_status : $item->op_two_status  ). " a ".$request->status, 'HISTORY', "ESTATUS DE RESERVACIÓN");
-
-            if($request->type == "arrival"):
-                $item->op_one_status = $request->status;
-                $item->op_one_cancellation_type_id = ( is_numeric($request->type_cancel) ? $request->type_cancel : NULL );
-            endif;
-            if($request->type == "departure"):
-                $item->op_two_status = $request->status;
-                $item->op_two_cancellation_type_id = ( is_numeric($request->type_cancel) ? $request->type_cancel : NULL );
-            endif;
-            $item->save();            
-    
-            DB::commit();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Estatus actualizado con éxito', 'success' => true
-            ], Response::HTTP_OK);
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Error al actualizar el estatus'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 }

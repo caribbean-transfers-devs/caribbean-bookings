@@ -46,6 +46,10 @@ class User extends Authenticatable
     /**
      * Relations
      */
+    public function target(){
+        return $this->belongsTo(Target::class, 'target_id', 'id');
+    }
+
     public function roles(){
         return $this->hasMany(UserRole::class, 'user_id', 'id');
     }

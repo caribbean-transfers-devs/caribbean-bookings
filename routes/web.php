@@ -1,10 +1,13 @@
 <?php
 
+
+use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Dashboard\CallCenterController;
+
 use App\Http\Controllers\Accounting\ConciliationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Configs\RatesController;
 use App\Http\Controllers\Configs\ZonesController;
-use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Driver\DriverController;
 use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
@@ -69,6 +72,13 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/bot/conciliation/stripe', [ConciliationController::class, 'StripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
         Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
 
+    //DASHBOARD
+        // AGENTES DE CALL CENTER
+        Route::match(['get', 'post'], '/callcenters', [CallCenterController::class, 'index'])->name('callcenters.index');
+        Route::match(['post'], '/callcenters/sales/get', [CallCenterController::class, 'getSales'])->name('callcenters.sales.get');
+        Route::match(['post'], '/callcenters/operations/get', [CallCenterController::class, 'getOperations'])->name('callcenters.operations.get');
+        Route::match(['post'], '/callcenters/stats/get', [CallCenterController::class, 'getStats'])->name('callcenters.stats.get');
+
     //TPV        
         Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
         Route::get('/tpv/edit/{code}', [TpvController::class, 'index'])->name('tpv.new');
@@ -125,12 +135,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::match(['post'], '/operation/spam/history/get', [SPAM::class, 'getHistory'])->name('operation.spam.get.history');
         Route::match(['post'], '/operation/spam/history/add', [SPAM::class, 'addHistory'])->name('operation.spam.add.history');
         Route::match(['post'], '/operation/pending/get', [PENDING::class, 'get'])->name('operation.pending.get');
-        
-        Route::put('/operation/confirmation/update-status', [OperationController::class, 'updateStatusConfirmation'])->name('operation.confirmation.update');
-        Route::get('/operation/spam/exportExcel', [OperationController::class, 'exportExcel'])->name('operation.spam.exportExcel');
-        Route::put('/operation/spam/update-status', [OperationController::class, 'spamUpdate'])->name('operation.spam.update');
-        Route::put('/operation/managment/update-status', [OperationController::class, 'statusUpdate'])->name('operation.managment.status');
+
+        Route::put('/operation/confirmation/update-status', [OperationController::class, 'updateStatusConfirmation'])->name('operation.confirmation.update');   
         Route::put('/operation/unlock/service', [OperationController::class, 'updateUnlock'])->name('operation.unlock.update');
+
         //RESERVACIONES
         Route::get('/operation/reservations', [OperationController::class, 'reservations'])->name('operation.reservations');
         Route::post('/operation/reservations', [OperationController::class, 'reservations'])->name('operation.reservations.search');
@@ -166,7 +174,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/GetExchange/{reservation}', [ReservationsController::class, 'get_exchange'])->name('reservations.get_exchange');
         Route::post('/reservationsfollowups', [ReservationsController::class, 'followups'])->name('reservations.followups');
         Route::put('/editreservitem/{item}', [ReservationsController::class, 'editreservitem'])->name('reservations.editreservitem');    
-        Route::post('/reservations/confirmation/contact-points', [ReservationsController::class, 'contactPoint'])->name('reservations.confirmation');
+        // Route::post('/reservations/confirmation/contact-points', [ReservationsController::class, 'contactPoint'])->name('reservations.confirmation');
         Route::post('/reservations/confirmation/arrival', [ReservationsController::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
         Route::post('/reservations/confirmation/departure', [ReservationsController::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');
         Route::post('/reservations/payment-request', [ReservationsController::class, 'paymentRequest'])->name('reservations.paymentRequest');

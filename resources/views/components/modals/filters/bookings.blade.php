@@ -1,10 +1,12 @@
 @props(['data','users','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','istoday','isbalance','isduplicated','isagency','request'])
 @php
     $date = "";
-    if( is_array($data) ){
-        $date = $data['init']." - ".$data['end'];
-    }else{
-        $date = $data;
+    if( isset($data) ){
+        if( is_array($data) ){
+            $date = $data['init']." - ".$data['end'];
+        }else{
+            $date = $data;
+        }
     }
 @endphp
 <!-- Modal -->

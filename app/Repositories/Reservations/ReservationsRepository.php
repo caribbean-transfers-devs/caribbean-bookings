@@ -283,10 +283,10 @@ class ReservationsRepository
         }
     }
 
-    public function getContactPoints($request){
-        $contact_points = ContactPoints::where('destination_id', $request['destination_id'] )->get();
-        return response()->json($contact_points, Response::HTTP_OK);
-    }
+    // public function getContactPoints($request){
+    //     $contact_points = ContactPoints::where('destination_id', $request['destination_id'] )->get();
+    //     return response()->json($contact_points, Response::HTTP_OK);
+    // }
 
     public function sendArrivalConfirmation($request){
         $lang = $request['lang'];

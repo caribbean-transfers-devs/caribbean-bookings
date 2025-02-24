@@ -24,6 +24,24 @@ if( document.querySelectorAll('.timeline-item').length > 0 ){
     });
 }
 
+
+//ENVIAR CONFIRMACIÓN DE LLEGADA
+document.addEventListener("click", function (event) {
+    if (event.target.classList.contains('arrivalConfirmation')) {
+        event.preventDefault();
+
+        // Definir parámetros de la petición
+        const target = event.target;
+        const id = target.dataset.id;
+
+        document.getElementById('arrival_confirmation_item_id').value = id;
+        __formConfirmation.classList.remove('d-none');
+        __btnSendArrivalConfirmation.classList.remove('d-none');
+        __titleModal.innerHTML = "Confirmación de llegada";
+        __closeModalFooter.innerHTML = "Cerrar";        
+    }
+});
+
 $(function() {
     $('#serviceSalesModal').on('hidden.bs.modal', function () {
         $("#frm_new_sale")[0].reset();
@@ -728,112 +746,57 @@ $(function() {
     initMap();
 });
 
-function getContactPoints(item_id, destination_id){
-    __formConfirmation.classList.remove('d-none');
-    __btnSendArrivalConfirmation.classList.remove('d-none');
-    __titleModal.innerHTML = "Confirmación de llegada";
-    __closeModalFooter.innerHTML = "Cerrar";
-    
-    $("#arrival_confirmation_item_id").val(item_id);
-    $("#terminal_id").empty().html('<option value="0">Cargando...</option>');
-    $.ajaxSetup({
+function sendArrivalConfirmation() {
+    const btn = document.getElementById("btnSendArrivalConfirmation");
+    const form = document.getElementById("formArrivalConfirmation");
+
+    btn.disabled = true;
+
+    const formData = new FormData(form);
+
+    Swal.fire({
+        title: "Procesando...",
+        text: "Por favor, espera mientras se envia la confirmación.", //Realiza la function de HTML en el Swal
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });    
+
+    fetch('/reservations/confirmation/arrival', {
         headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
-    $.ajax({
-        url: '/reservations/confirmation/contact-points',
-        type: 'POST',
-        data: { destination_id: destination_id },
-        success: function(resp) {
-            //console.log(resp);
-            let xHTML = '';
-            for (const key in resp) {
-                if (resp.hasOwnProperty(key)) {
-                    const data = resp[key];
-                    xHTML += `<option value="${data.id}">${data.name}</option>`;                    
-                }
+            'X-CSRF-TOKEN': csrfToken // Agregar el token en los headers
+        },
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json()) 
+    .then(resp => {
+        if (resp.status === 'success') {
+            Swal.fire({
+                title: '¡Éxito!',
+                icon: 'success',
+                html: 'La confirmación fue enviada.<b></b>',
+                timer: 2500
+            }).then(() => {
+                btn.disabled = false;
+            });
+
+            if (resp.hasOwnProperty('message')) {
+                contentMessageConfirmation(resp.message);
             }
-            $("#terminal_id").empty().html(xHTML);           
+        } else {
+            throw new Error(resp.message || 'Error desconocido');
         }
-    }).fail(function(xhr, status, error) {
-        Swal.fire(
-            '¡ERROR!',
-            xhr.responseJSON.message,
-            'error'
-        )        
-    });
-}
-
-function sendArrivalConfirmation(){
-    $("#btnSendArrivalConfirmation").prop('disabled', true);
-    let frm_data = $("#formArrivalConfirmation").serializeArray();
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
-    $.ajax({
-        url: '/reservations/confirmation/arrival',
-        type: 'POST',
-        data: frm_data,
-        success: function(resp) {
-            if (resp.status == 'success') {
-                Swal.fire({
-                    title: '¡Éxito!',
-                    icon: 'success',
-                    html: 'La confirmación fue enviada.<b></b>',
-                    timer: 2500
-                })
-
-                if( resp.hasOwnProperty('message') ){      
-                    contentMessageConfirmation(resp.message);              
-                }
-
-                $("#btnSendArrivalConfirmation").prop('disabled', false);
-
-                // window.onbeforeunload = null;
-                // let timerInterval
-                // Swal.fire({
-                //     title: '¡Éxito!',
-                //     icon: 'success',
-                //     html: 'Confirmación enviada. Será redirigido en <b></b>',
-                //     timer: 2500,
-                //     timerProgressBar: true,
-                //     didOpen: () => {
-                //         Swal.showLoading()
-                //         const b = Swal.getHtmlContainer().querySelector('b')
-                //         timerInterval = setInterval(() => {
-                //             b.textContent = (Swal.getTimerLeft() / 1000)
-                //                 .toFixed(0)
-                //         }, 100)
-                //     },
-                //     willClose: () => {
-                //         clearInterval(timerInterval)
-                //     }
-                // }).then((result) => {
-                //     location.reload();
-                // })
-            }
-        }
-    }).fail(function(xhr, status, error) {
-        Swal.fire(
-            '¡ERROR!',
-            xhr.responseJSON.message,
-            'error'
-        )
-        $("#btnSendArrivalConfirmation").prop('disabled', false);
+    })
+    .catch(error => {
+        Swal.fire('¡ERROR!', error.message, 'error');
+        btn.disabled = false;
     });
 }
 
 function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', type = 'departure'){
     event.preventDefault();
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
     $.ajax({
         url: '/reservations/confirmation/departure',
         type: 'POST',
@@ -854,29 +817,6 @@ function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', 
                 if( resp.hasOwnProperty('message') ){      
                     contentMessageConfirmation(resp.message);              
                 }
-
-                // window.onbeforeunload = null;
-                // let timerInterval
-                // Swal.fire({
-                //     title: '¡Éxito!',
-                //     icon: 'success',
-                //     html: 'Confirmación de regreso enviada. Será redirigido en <b></b>',
-                //     timer: 2500,
-                //     timerProgressBar: true,
-                //     didOpen: () => {
-                //         Swal.showLoading()
-                //         const b = Swal.getHtmlContainer().querySelector('b')
-                //         timerInterval = setInterval(() => {
-                //             b.textContent = (Swal.getTimerLeft() / 1000)
-                //                 .toFixed(0)
-                //         }, 100)
-                //     },
-                //     willClose: () => {
-                //         clearInterval(timerInterval)
-                //     }
-                // }).then((result) => {
-                //     location.reload();
-                // })
             }
         }
     }).fail(function(xhr, status, error) {
@@ -1179,7 +1119,7 @@ function setStatus(event, type, status, item_id, rez_id){
                 // console.log(__params);
             
                 // Enviar la solicitud AJAX para actualizar estatus del servicio
-                components.request_exec_ajax( _LOCAL_URL + "/operation/managment/update-status", 'PUT', __params );
+                components.request_exec_ajax( _LOCAL_URL + "/action/updateServiceStatus", 'PUT', __params );
             }            
         }
     })();    

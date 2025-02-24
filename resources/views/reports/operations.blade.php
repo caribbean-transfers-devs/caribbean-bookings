@@ -615,7 +615,8 @@
                                                     "total" => 0,
                                                     "counter" => 0,
                                                 ],
-                                                "counter" => 0,                                            
+                                                "counter" => 0,
+                                                "codes" => [],
                                             ];
                                         }
                                         $dataVehicles['total'] += $operation->service_cost;
@@ -628,6 +629,7 @@
                                         $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))][$operation->currency]['total'] += $operation->service_cost;
                                         $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))][$operation->currency]['counter']++;
                                         $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['counter']++;
+                                        $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['codes'][] = $operation->code;
                                         $dataVehicles['counter']++;
                                     }
                                 @endphp
@@ -696,6 +698,8 @@
             </div>
         </div>
     </div>
+
+    {{-- @dump($dataVehicles) --}}
 
     <x-modals.filters.bookings :data="$data" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :servicesoperation="$services_operation" :serviceoperationstatus="$service_operation_status" :units="$units" :drivers="$drivers" :operationstatus="$operation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :request="$request" />
     <x-modals.reports.columns />

@@ -98,7 +98,7 @@
                             {{-- <th class="text-center">FECHA DE RESERVACIÓN</th>
                             <th class="text-center">HORA DE RESERVACIÓN</th> --}}
                             <th class="text-center">SITIO</th>
-                            {{-- <th class="text-center">ESTATUS DE RESERVACIÓN</th> --}}
+                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>
                             <th class="text-center">TIPO DE SERVICIO EN OPERACIÓN</th>
                             {{-- <th class="text-center">NOMBRE DEL CLIENTE</th> --}}
                             <th class="text-center">VEHÍCULO</th>
@@ -159,7 +159,7 @@
                                     {{-- <td class="text-center">{{ date("Y-m-d", strtotime($operation->created_at)) }}</td>
                                     <td class="text-center">{{ date("H:i", strtotime($operation->created_at)) }}</td> --}}
                                     <td class="text-center">{{ $operation->site_name }}</td>
-                                    {{-- <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($operation->reservation_status) }}">{{ BookingTrait::statusBooking($operation->reservation_status) }}</button></td> --}}
+                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($operation->reservation_status) }}">{{ BookingTrait::statusBooking($operation->reservation_status) }}</button></td>
                                     <td class="text-center">{{ $operation->final_service_type }}</td>
                                     {{-- <td class="text-center">{{ $operation->full_name }}</td> --}}
                                     <td class="text-center">{{ $operation->service_type_name }}</td>

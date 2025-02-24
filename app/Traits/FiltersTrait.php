@@ -17,6 +17,7 @@ use App\Models\DestinationService;
 use App\Models\CancellationTypes;
 use App\Models\ExchangeRateReport;
 use App\Models\SalesType;
+use App\Models\ContactPoints;
 
 trait FiltersTrait
 {
@@ -188,7 +189,11 @@ trait FiltersTrait
     public static function TypeSales()
     {
         return SalesType::all();
-    }    
+    }
+
+    public static function ContactPoints($destination_id = NULL){
+        return ContactPoints::where('destination_id', $destination_id )->get();
+    }
 
     public static function parseArrayQuery($data, $marks = NULL){
         if (is_array($data)) {

@@ -2,51 +2,72 @@
 
 namespace App\Repositories\Users;
 
-use App\Models\Role;
-use App\Models\User;
-use App\Models\UserRole;
-use App\Models\WhitelistIp;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+
+//MODELS
+use App\Models\Role;
+use App\Models\User;
+use App\Models\UserRole;
+use App\Models\Target;
+use App\Models\WhitelistIp;
 
 class UserRepository
 {
     public function indexUsers($request)
     {
         try {
+            return view('users.index', [
+                'active_users' => User::where('status', 1)->whereDoesntHave('roles', function ($query) { $query->where('role_id', 4); })->get(),
+                'active_users_callcenter' => User::where('status', 1)->with('target')->whereHas('roles', function ($query) { $query->where('role_id', 4); })->whereDoesntHave('roles', function ($query) { $query->where('role_id', '!=', 4); })->get(),
+                'inactive_users' => User::where('status', 0)->get(),
+                'valid_ips' => WhitelistIp::all(), 
+                'breadcrumbs' => [
+                    [
+                        "route" => "",
+                        "name" => "Listado de usuarios",
+                        "active" => true                        
+                    ]
+                ]
+            ]);
             
-            $active_users = User::where('status', 1)->get();
-            $inactive_users = User::where('status', 0)->get();
-            $valid_ips = WhitelistIp::all();
-
-            $breadcrumbs = array(
-                array(
-                    "route" => "",
-                    "name" => "Listado de usuarios",
-                    "active" => true
-                ),
-            );
-
-            return view('users.index', compact('active_users', 'inactive_users', 'valid_ips', 'breadcrumbs'));
-            
-        } catch (\Throwable $e) {
-
+        } catch (Exception $e) {
             $active_users = [];
             $inactive_users = [];
             $valid_ips = WhitelistIp::all();
-
-            return view('users.index', compact('active_users', 'inactive_users', 'valid_ips'));
+            return view('users.index', [
+                'active_users' => [], 
+                'inactive_users' => [],
+                'active_users_callcenter' => [], 
+                'valid_ips' => []
+            ]);
         }
     }
     
 
     public function createUser($request){
-        return view('users.create_edit', [
-            'roles' => Role::all(),
-            'v_type' => 1,
-            'user' => new User()
-        ]);
+        try {
+            return view('users.create_edit',[
+                'breadcrumbs' => [
+                    [
+                        "route" => route('users.index'),
+                        "name" => "Listado de usuarios",
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Nuevo usuario ".( $request->type === 'callcenter' ? 'de Call Center' : '' ),
+                        "active" => true
+                    ]
+                ],
+                'roles' => ( $request->type === 'callcenter' ? Role::where('id', 4)->get() : Role::where('id', '!=', 4)->get() ),
+                'v_type' => 1,
+                'user' => new User()                
+            ]);
+        } catch (Exception $e) {
+            return back()->withErrors(['danger' => 'Ocurrió un error al cargar la página.']);
+        }
     }
 
     public function editUser($request,$user){
@@ -66,7 +87,41 @@ class UserRepository
             $user->email = strtolower($request->email);
             $user->password = bcrypt($request->password);
             $user->restricted = $request->restricted;
+
+            ( isset($request->type_commission) && ($request->type_commission == "target" || $request->type_commission == "percentage") ? $user->is_call_center_agent = 1 : 0 );
+            ( isset($request->type_commission) ? $user->type_commission = $request->type_commission : "target" );
+            ( isset($request->type_commission) && $request->type_commission == "target" ? $user->target_id = 1 : NULL );
+            ( isset($request->percentage) ? $user->percentage = $request->percentage : 0 );
+            ( isset($request->daily_goal) ? $user->daily_goal = $request->daily_goal : 0 );
+
             $user->save();
+
+            // $tar = [
+            //     [
+            //         "amount" => 85000,
+            //         "percentage" => 4
+            //     ],
+            //     [
+            //         "amount" => 110000,
+            //         "percentage" => 5
+            //     ],
+            //     [
+            //         "amount" => 135000,
+            //         "percentage" => 6
+            //     ],
+            //     [
+            //         "amount" => 155000,
+            //         "percentage" => 7
+            //     ],
+            //     [
+            //         "amount" => 175000,
+            //         "percentage" => 8
+            //     ],
+            // ];
+
+            // $target = new Target();
+            // $target->object = $tar;
+            // $target->save();
 
             foreach ($request->roles as $role) {
                 $user_role = new UserRole();
@@ -101,6 +156,12 @@ class UserRepository
             $user->name = $request->name;
             $user->email = strtolower($request->email);
             $user->restricted = $request->restricted;
+
+            ( isset($request->type_commission) && ($request->type_commission == "target" || $request->type_commission == "percentage") ? $user->is_call_center_agent = 1 : 0 );
+            ( isset($request->type_commission) ? $user->type_commission = $request->type_commission : "target" );
+            ( isset($request->percentage) ? $user->percentage = $request->percentage : 0 );
+            ( isset($request->daily_goal) ? $user->daily_goal = $request->daily_goal : 0 );
+
             $user->save();
 
             $user->roles()->delete();
@@ -182,7 +243,7 @@ class UserRepository
         }
     }
 
-    public function storeIps($request){       
+    public function storeIps($request){
         try {
             DB::beginTransaction();
 

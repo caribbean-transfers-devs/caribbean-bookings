@@ -120,14 +120,24 @@
         endif;
 
         //GESTION
-        if(RoleTrait::hasPermission(39) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(10) || RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) ):
+        if(RoleTrait::hasPermission(39) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(10) || RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || RoleTrait::hasPermission(112) ):
+            // CONFIRMACIONES
             if(RoleTrait::hasPermission(39)):
                 $links_operations[] = [
                     'name' => 'Confirmaciones',
                     'route' => route('operation.confirmation'),
                     'active' => request()->routeIs('operation.confirmation','operation.confirmation.search'),
                 ];
+            endif;
+            // DASHBOARD AGENTE DE CALL CENTER
+            if(RoleTrait::hasPermission(112)):
+                $links_operations[] = [
+                    'name' => 'Dashboard Agente Call Center',
+                    'route' => route('callcenters.index'),
+                    'active' => request()->routeIs('callcenters.index'),
+                ];
             endif;            
+            // POST VENTA
             if(RoleTrait::hasPermission(47)):
                 $links_operations[] = [
                     'name' => 'Post venta',
@@ -135,13 +145,15 @@
                     'active' => request()->routeIs('operation.after.sales'),
                 ];
             endif;
+            // RESERVACIONES
             if(RoleTrait::hasPermission(10)):
                 $links_operations[] = [
                     'name' => 'Reservaciones',
                     'route' => route('operation.reservations'),
                     'active' => request()->routeIs('operation.reservations','operation.reservations.search'),
                 ];
-            endif;            
+            endif;
+            // OPERACIONES
             if(RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79)):
                 $links_operations[] = [
                     'name' => 'Operaciones',
@@ -155,7 +167,7 @@
                 'code' => 'operations',
                 'name' => 'Gestion',
                 'route' => null,
-                'active' => request()->routeIs('operation.*'),
+                'active' => request()->routeIs('operation.*','callcenters.index'),
                 'urls' => $links_operations
             ]);
         endif;        

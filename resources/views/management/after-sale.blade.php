@@ -57,7 +57,6 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Pendientes de pago</h5>
-                    
                     <div class="row" id="pending-general-container">
                         <div class="loaderItem"></div>
                     </div>

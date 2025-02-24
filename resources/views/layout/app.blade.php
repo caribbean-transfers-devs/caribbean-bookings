@@ -17,8 +17,8 @@
     <link href="{{ mix('/assets/css/core/core.min.css') }}" rel="stylesheet" >
     <link href="{{ mix('/assets/css/panel/panel2.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/panel/panel2.min.css') }}" rel="stylesheet" >
-    <link href="{{ mix('/assets/css/panel/panel.min.css') }}"rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/panel/panel.min.css') }}"rel="stylesheet" >
+    {{-- <link href="{{ mix('/assets/css/panel/panel.min.css') }}"rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/panel/panel.min.css') }}"rel="stylesheet" > --}}
 
     @stack('Css')
 </head> 

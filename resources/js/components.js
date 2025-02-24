@@ -442,6 +442,40 @@ let components = {
         }
     },
 
+    titleModal: function(){
+        const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
+        const __title_modal = document.getElementById('filterModalLabel');
+
+        if( __create != null ){
+            __create.addEventListener('click', function () {
+                __title_modal.innerHTML = this.dataset.title;
+            });
+        }        
+    },
+
+    calendarFilter: function(){
+        if ( document.getElementById('lookup_date') ) {
+            const picker = new easepick.create({
+                element: "#lookup_date",
+                css: [
+                    'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+                    'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+                    'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
+                ],
+                zIndex: 10,
+                plugins: ['RangePlugin'],
+            });
+
+            // Obtener el input y verificar si tiene valor
+            const input = document.getElementById('lookup_date');
+            if (!input.value) {
+                const today = new Date().toISOString().split('T')[0]; // Fecha en formato YYYY-MM-DD
+                picker.setDate(today); // Asigna la fecha al picker
+                input.value = today + ' - ' + today; // Asigna la fecha al input
+            }
+        }       
+    },
+
     actionButtonColumns: function(){
         const __btn_columns = document.querySelectorAll('.__btn_columns');
         __btn_columns.forEach(__btn_column => {

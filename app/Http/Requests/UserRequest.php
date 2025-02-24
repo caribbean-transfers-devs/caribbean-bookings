@@ -19,15 +19,28 @@ class UserRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules(): array    
     {
-        return [
+        $rules =[
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'password' => 'nullable|string|min:6|confirmed',
             'roles' => 'required|array',
             'restricted' => 'nullable|integer'
         ];
+
+        // Si el request incluye `type` con valor "callcenter", agregamos más reglas
+        if ($this->input('type') === 'callcenter') {
+            $rules['type_commission'] = 'required|string|in:target,percentage';
+            $rules['daily_goal'] = 'required|numeric|digits_between:10,2';
+            $rules['is_external'] = 'required|integer|in:0,1';
+        }
+
+        if ($this->input('type_commission') === 'percentage') {
+            $rules['percentage'] = 'required|numeric|digits_between:10,2';
+        }
+
+        return $rules;
     }
 
     public function messages()
