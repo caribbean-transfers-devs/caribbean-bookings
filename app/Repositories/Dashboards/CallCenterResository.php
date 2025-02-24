@@ -221,8 +221,8 @@ class CallCenterResository
             $data['daily_goal'] = round($dataUser->daily_goal, 2);
             $data['total_day'] = round($data['total_day'], 2);
             $data['total_month'] = round($data['total_month'], 2);
-            // $data['total_services_operated'] = round($data['total_services_operated'], 2);
-            $data['total_services_operated'] = 85000;
+            $data['total_services_operated'] = round($data['total_services_operated'], 2);
+            // $data['total_services_operated'] = 85000;
             $data['total_pending_services'] = round($data['total_pending_services'], 2);
 
             $percentage_commission = ($dataUser->type_commission === 'target')
