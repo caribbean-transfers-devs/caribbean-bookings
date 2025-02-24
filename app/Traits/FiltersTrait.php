@@ -174,7 +174,8 @@ trait FiltersTrait
     //METODO DE PAGO DE RESERVACIÓN
     public static function Methods(){
         return array(
-            "CASH" => "CASH",
+            "CREDIT" => "CREDITO",
+            "CASH" => "EFECTIVO",
             "STRIPE" => "STRIPE",
             "PAYPAL" => "PAYPAL",
             "MIFEL" => "MIFEL",

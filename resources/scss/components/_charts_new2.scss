@@ -146,7 +146,7 @@
               margin: 0 ;
             }
 
-            >div{ // Aplica solo si el segundo >div no tiene la clase table-responsive
+            >div:not(.table-responsive){ // Aplica solo si el segundo >div no tiene la clase table-responsive
               display: flex;
               flex-direction: column-reverse;
               gap: 0.625rem; /*10*/
@@ -208,7 +208,7 @@
         @media (min-width: 1200px) {
           .container_left, .container_right{
             >div{
-              >div{ // Aplica solo si el segundo >div no tiene la clase table-responsive
+              >div:not(.table-responsive){ // Aplica solo si el segundo >div no tiene la clase table-responsive
                 display: grid;
                 grid-template-columns: 300px 1fr;
               }
