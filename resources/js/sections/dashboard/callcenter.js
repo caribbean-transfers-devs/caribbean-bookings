@@ -62,8 +62,8 @@ let callcenter = {
             return await http.json();
         } catch (error) {
             console.error("Error en getStats:", error);
-            return { data: { total_day: "N/A", percentage_daily_goal: "N/A", total_month: "N/A", total_services_operated: "N/A", total_pending_services: "N/A" } }; // Devolver valores por defecto            
-        }        
+            return { data: { daily_goal: "N/A", total_day: "N/A", percentage_daily_goal: "N/A", total_month: "N/A", total_services_operated: "N/A", total_pending_services: "N/A" } }; // Devolver valores por defecto            
+        }
     },
 
     getLoader: function() {
@@ -133,11 +133,11 @@ let callcenter = {
             }
             elements.listTargets.innerHTML = targets;
     
-            document.querySelector(".btn-close").click(); // Simula el clic en el botón
+            document.querySelector(".close-filters").click(); // Simula el clic en el botón
         } catch (error) {
             console.error("Error al obtener estadísticas:", error);
             Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar.</p>');
-            document.querySelector(".btn-close").click(); // Simula el clic en el botón
+            document.querySelector(".close-filters").click(); // Simula el clic en el botón
         }
     },
 }

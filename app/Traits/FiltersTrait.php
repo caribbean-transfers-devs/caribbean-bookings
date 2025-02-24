@@ -60,7 +60,7 @@ trait FiltersTrait
 
     //SITIOS O AGENCIAS
     public static function Sites(){
-        return DB::select("SELECT id, name FROM sites ORDER BY name ASC");
+        return DB::select("SELECT id, name, type_site FROM sites ORDER BY name ASC");
     }
 
     public static function Origins(){

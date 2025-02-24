@@ -34,7 +34,7 @@
                             <label class="form-label" for="serviceSiteReference">Sitio</label>
                             <select class="form-select mb-2" id="serviceSiteReference" name="site_id" readonly>
                                 @foreach($sites as $key => $value)
-                                    <option value="{{ $value->id }}" {{ $reservation->site_id == $value->id ? 'selected' : '' }}>{{ $value->name }}</option>
+                                    <option data-type="{{ $value->type_site }}" value="{{ $value->id }}" {{ $reservation->site_id == $value->id ? 'selected' : '' }}>{{ $value->name }}</option>
                                 @endforeach
                             </select>
                         </div>

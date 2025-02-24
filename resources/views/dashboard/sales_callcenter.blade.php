@@ -30,8 +30,8 @@
                         <th class="text-center" scope="col">Total de reservación</th>
                         <th class="text-center" scope="col">Total</th>
 
-                        <th class="text-center" scope="col">USD</th>
-                        <th class="text-center" scope="col">MXN</th>
+                        {{-- <th class="text-center" scope="col">USD</th>
+                        <th class="text-center" scope="col">MXN</th> --}}
 
                         <th class="text-center" scope="col">Moneda</th>
                         <th class="text-center" scope="col">Nombre del cliente</th>
@@ -45,7 +45,7 @@
                 <tbody>
                     @foreach($sales as $key => $booking)
                         @php
-                            $total = $booking->total_sales;
+                            $total = ( $booking->currency == "USD" ? $booking->total_sales * $exchange : $booking->total_sales );
                             $total_conversion = ( $booking->currency == "USD" ? $booking->total_sales * $exchange : $booking->total_sales );
                             $data['total'] += $total;
                             $data['total_conversion'] += $total_conversion;
@@ -74,8 +74,8 @@
                             <td class="text-center">$ {{ number_format(round($total, 2),2) }}</td>
                             <td class="text-center">$ {{ number_format(round($total_conversion,2),2) }}</td>
 
-                            <td class="text-center">$ {{ number_format(round(( $booking->currency == "USD" ? $booking->total_sales : 0 ), 2),2) }}</td>
-                            <td class="text-center">$ {{ number_format(round(( $booking->currency == "MXN" ? $booking->total_sales : 0 ), 2),2) }}</td>
+                            {{-- <td class="text-center">$ {{ number_format(round(( $booking->currency == "USD" ? $booking->total_sales : 0 ), 2),2) }}</td>
+                            <td class="text-center">$ {{ number_format(round(( $booking->currency == "MXN" ? $booking->total_sales : 0 ), 2),2) }}</td> --}}
                             
                             <td class="text-center">{{ $booking->currency }}</td>
                             <td class="text-center">{{ $booking->full_name }}</td>
@@ -116,8 +116,10 @@
                         <th class="text-center"></th>
                         <th class="text-center">{{ number_format(round($data['total'],2),2) }}</th>
                         <th class="text-center">{{ number_format(round($data['total_conversion'],2),2) }}</th>
-                        <th class="text-center">{{ number_format(round($data['MXN'],2),2) }}</th>
-                        <th class="text-center">{{ number_format(round($data['USD'],2),2) }}</th>
+
+                        {{-- <th class="text-center">{{ number_format(round($data['USD'],2),2) }}</th>
+                        <th class="text-center">{{ number_format(round($data['MXN'],2),2) }}</th> --}}
+                        
                         <th class="text-center"></th>
                         <th class="text-center"></th>
                         <th class="text-center"></th>

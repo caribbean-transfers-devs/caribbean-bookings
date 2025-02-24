@@ -47,12 +47,12 @@
                 <tbody>            
                     @foreach($sales as $key => $booking)
                         @php
-                            $total = $booking->total_sales;
-                            $total_conversion = ( $booking->currency == "USD" ? $booking->total_sales * $exchange : $booking->total_sales );
+                            $total = ( $booking->currency == "USD" ? $booking->cost * $exchange : $booking->cost );
+                            $total_conversion = ( $booking->currency == "USD" ? $booking->cost * $exchange : $booking->cost );
                             $data['total'] += $total;
                             $data['total_conversion'] += $total_conversion;
-                            $data[$booking->currency] += $booking->total_sales;
-                        @endphp                    
+                            $data[$booking->currency] += $booking->cost;
+                        @endphp
                         <tr>
                             <td class="text-center">
                                 @if (RoleTrait::hasPermission(38))
@@ -93,8 +93,8 @@
                         <th class="text-center"></th>
                         <th class="text-center">{{ number_format(round($data['total'],2),2) }}</th>
                         <th class="text-center">{{ number_format(round($data['total_conversion'],2),2) }}</th>
-                        <th class="text-center">{{ number_format(round($data['MXN'],2),2) }}</th>
                         <th class="text-center">{{ number_format(round($data['USD'],2),2) }}</th>
+                        <th class="text-center">{{ number_format(round($data['MXN'],2),2) }}</th>
                         <th class="text-center"></th>
                         <th class="text-center"></th>
                         <th class="text-center"></th>

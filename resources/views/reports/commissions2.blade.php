@@ -107,6 +107,7 @@
                             <th class="text-center">ESTATUS DE SERVICIO</th>
                             <th class="text-center">ESTATUS DE OPERACIÓN</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
+                            <th class="text-center">TOTAL POR SERVICIO</th>
                             <th class="text-center">MONEDA</th>
                             {{-- <th class="text-center">MÉTODO DE PAGO</th>
                             <th class="text-center">PAGO AL LLEGAR</th>
@@ -128,20 +129,31 @@
                                             'TOTAL_PENDING' => 0,
                                             'QUANTITY' => 0,
                                             'BOOKINGS' => [],
-                                        ];
+                                        ];                                        
                                     endif;
-                                    $usersData[Str::slug($operation->employee)]['TOTAL'] += ( $operation->currency == "USD" ? ($operation->total_sales * $exchange_rate) : $operation->total_sales );
-                                    $usersData[Str::slug($operation->employee)][$operation->currency] += $operation->total_sales;
 
-                                    if( $operation->reservation_status == "CONFIRMED" && OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" && ( OperationTrait::operationStatus($operation) == "OK" || OperationTrait::operationStatus($operation) == "PENDING" ) ){
+                                    if( in_array( $operation->reservation_status, ['CONFIRMED', 'CREDIT', 'OPENCREDIT'] ) ){
+                                        $usersData[Str::slug($operation->employee)]['TOTAL'] += ( $operation->currency == "USD" ? ($operation->cost * $exchange_rate) : $operation->cost );
+                                    }
+
+                                    // APLICA COMO VENDIDO TODAS AQUELLAS RESERVAS QUE CUMPLAN CON LOS SIGUIENTES ESTATUS, CONFIRMADO, CREDITO O CREDITO ABIERTO
+                                    if( in_array( $operation->reservation_status, ['CONFIRMED', 'CREDIT', 'OPENCREDIT'] ) ){
+                                        $usersData[Str::slug($operation->employee)][$operation->currency] += $operation->cost;
+                                    }                                    
+
+                                    // APLICA COMO SERVICIOS OPERADOS TODOS AQUELLOS SERVICIOS QUE ESTEN COMPELTADOS Y EL ESTATUS DE RESERVA SEAN, CONFIRMADO, CREDITO O CREDITO ABIERTO
+                                    if( in_array( $operation->reservation_status, ['CONFIRMED', 'CREDIT', 'OPENCREDIT'] ) && OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" ){
                                         $usersData[Str::slug($operation->employee)]['TOTAL_CONFIRMED'] += ( $operation->currency == "USD" ? ($operation->cost * $exchange_rate) : $operation->cost );
                                         $usersData[Str::slug($operation->employee)]['QUANTITY']++;
                                     }
-                                    if( ( $operation->reservation_status == "PENDING" || $operation->reservation_status == "CONFIRMED" ) && OperationTrait::serviceStatus($operation, "no_translate") == "PENDING"  ){
+
+                                    // APLICA COMO SERVICIOS PENDIENTES DE OPERAR TODOS AQUELLOS SERVICIOS QUE ESTEN PENDIENTES Y EL ESTATUS DE RESERVA SEAN, CONFIRMADO, CREDITO O CREDITO ABIERTO
+                                    if( in_array( $operation->reservation_status, ['CONFIRMED', 'CREDIT', 'OPENCREDIT'] ) && OperationTrait::serviceStatus($operation, "no_translate") == "PENDING"  ){
                                         $usersData[Str::slug($operation->employee)]['TOTAL_PENDING'] += ( $operation->currency == "USD" ? ($operation->cost * $exchange_rate) : $operation->cost );
                                     }
+
                                     if( !in_array($operation->reservation_id, $usersData[Str::slug($operation->employee)]['BOOKINGS']) ){                                     
-                                        array_push($usersData[Str::slug($operation->employee)]['BOOKINGS'], $operation->reservation_id);                                        
+                                        array_push($usersData[Str::slug($operation->employee)]['BOOKINGS'], $operation->reservation_id);
                                     }                                    
                                 @endphp
                                 <tr class="" data-nomenclatura="{{ $operation->final_service_type }}{{ $operation->op_type }}" data-reservation="{{ $operation->reservation_id }}" data-item="{{ $operation->id }}" data-operation="{{ $operation->final_service_type }}" data-service="{{ $operation->operation_type }}" data-type="{{ $operation->op_type }}" data-close_operation="">
@@ -166,8 +178,9 @@
                                     <td class="text-center">{{ OperationTrait::setDateTime($operation, "date") }}</td>
                                     <td class="text-center">{{ OperationTrait::setDateTime($operation, "time") }}</td>
                                     <td class="text-center"><?=OperationTrait::renderServiceStatus($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::renderOperationStatus($operation)?></td>                                    
+                                    <td class="text-center"><?=OperationTrait::renderOperationStatus($operation)?></td>
                                     <td class="text-center">{{ number_format(($operation->total_sales),2) }}</td>
+                                    <td class="text-center">{{ number_format((( $operation->currency == "USD" ? ($operation->cost * $exchange_rate) : $operation->cost )),2) }}</td>
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     {{-- <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
                                     <td class="text-center">

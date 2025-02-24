@@ -1408,7 +1408,7 @@ function enablePlusService(id){
 }
 
 const __site = document.getElementById('serviceSiteReference');
-if( __site != null ){
+if( __site ){
   actionSite(__site);
   __site.addEventListener('change', function(event){
     event.preventDefault();
@@ -1418,7 +1418,9 @@ if( __site != null ){
 
 function actionSite(__site){
   const __reference = document.getElementById('serviceClientReference');
-  if( __site.value == "9" || __site.value == "14" || __site.value == "16" ){
+  const selectedOption = __site.options[__site.selectedIndex];
+
+  if( selectedOption.getAttribute('data-type') == "AGENCY" ){
     __reference.removeAttribute('readonly');
   }else{
     __reference.setAttribute('readonly', true);

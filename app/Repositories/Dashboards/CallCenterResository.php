@@ -128,6 +128,8 @@ class CallCenterResository
                 "subtotal_commission_pending" => 0,
                 "total_commission_pending" => 0,
                 "percentage_commission" => 0,
+                "operation_completed" => [],
+                "operation_pending" => []
             ];
 
             // Manejo de Fechas
@@ -204,8 +206,8 @@ class CallCenterResository
             if( $operations ){
                 foreach ($operations as $operation) {
                     $total_sales = $operation->currency == "USD"
-                    ? ($operation->total_sales * $exchange_commission)
-                    : $operation->total_sales;
+                    ? ($operation->cost * $exchange_commission)
+                    : $operation->cost;
 
                     if( ( $operation->is_round_trip == 0 && ( $operation->one_service_status == "COMPLETED" ) ) || ( $operation->is_round_trip == 1 && ( $operation->one_service_status == "COMPLETED" || $operation->two_service_status == "COMPLETED" ) ) ){
                         $data['total_services_operated'] += $total_sales;

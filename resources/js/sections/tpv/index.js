@@ -329,9 +329,7 @@ $(document).on("change", "#formSite", function() {
 function actionSite(__site){
   const __reference = document.getElementById('formReference');
   const selectedOption = __site.options[__site.selectedIndex];
-  // console.log(__site, selectedOption.getAttribute('data-type'));
-  
-  // if( __site.value == "9" || __site.value == "14" || __site.value == "16" ){
+
   if( selectedOption.getAttribute('data-type') == "AGENCY" ){
     __reference.removeAttribute('readonly');
   }else{
