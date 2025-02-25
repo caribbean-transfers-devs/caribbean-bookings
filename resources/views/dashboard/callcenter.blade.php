@@ -10,13 +10,13 @@
         $dates[] = $today->format('Y-m-d');
         $today->modify('-1 day');
     }
-
 @endphp
 @extends('layout.app')
 @section('title') Dashboard Callcenter @endsection
 
 @push('Css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://designreset.com/cork/html/src/plugins/src/apex/apexcharts.css">
     <link href="{{ mix('/assets/css/sections/dashboard_callcenter.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/dashboard_callcenter.min.css') }}" rel="stylesheet" >
 @endpush
@@ -27,6 +27,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
+    <script src="https://designreset.com/cork/html/src/plugins/src/apex/apexcharts.min.js"></script>
     <script src="{{ mix('/assets/js/sections/dashboard/callcenter.min.js') }}"></script>
 @endpush
 
@@ -180,7 +181,25 @@
         </div>
 
         <div class="col-xl-9 col-lg-9 col-md-9 col-sm-12 col-12 layout-spacing">
-
+            <div class="widget widget-chart-one">
+                <div class="widget-heading">
+                    <h5 class="">Total</h5>
+                    <div class="task-action">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" href="#" role="button" id="renvenue" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                            </a>
+                            <div class="dropdown-menu left" aria-labelledby="renvenue" style="will-change: transform;">
+                                <a class="dropdown-item" data-type="sales" href="javascript:void(0);" onclick="callcenter.reloadChartsSales()">Ventas</a>
+                                <a class="dropdown-item" data-type="operation" href="javascript:void(0);" onclick="callcenter.reloadChartsOperations()">Operación</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="widget-content">
+                    <div class="text-center" id="revenueMonthly"></div>
+                </div>
+            </div>
         </div>
 
         <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 col-12 layout-spacing">    
@@ -189,7 +208,7 @@
                     <p class="wallet-title mb-3">Total de comisión</p>
                     
                     <p class="total-amount mb-3" id="totalCommissionOperated"></p>
-                    {{-- <a href="#" class="wallet-text"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up me-2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> Get 6% interest</a> --}}
+                    <a href="javascript:void(0);" class="wallet-text"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up me-2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> Ver más detalles de comisión</a>
                 </div>
                 <div class="wallet-action text-center d-flex justify-content-around">
                     <button class="btn btn-success btn-sm bs-tooltip" title="Total de comisión generada por los servicios operados">
@@ -198,6 +217,10 @@
                     <button class="btn btn-warning btn-sm bs-tooltip" title="Total de comisión pendiente de generar por los servicios pendientes de operar">
                         <span class="btn-text-inner" id="totalCommissionPending"></span>
                     </button>
+                </div>
+                <div class="w-100 d-none" id="containerBreakdownCommissions">
+                    <hr>                
+                    <ul class="list-group list-group-media" id="listBreakdownCommissions"></ul>    
                 </div>
                 <hr>                
                 <ul class="list-group list-group-media" id="listTargets"></ul>

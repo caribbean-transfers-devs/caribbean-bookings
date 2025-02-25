@@ -77,7 +77,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::match(['get', 'post'], '/callcenters', [CallCenterController::class, 'index'])->name('callcenters.index');
         Route::match(['post'], '/callcenters/sales/get', [CallCenterController::class, 'getSales'])->name('callcenters.sales.get');
         Route::match(['post'], '/callcenters/operations/get', [CallCenterController::class, 'getOperations'])->name('callcenters.operations.get');
-        Route::match(['post'], '/callcenters/stats/get', [CallCenterController::class, 'getStats'])->name('callcenters.stats.get');
+        Route::match(['post','get'], '/callcenters/stats/get', [CallCenterController::class, 'getStats'])->name('callcenters.stats.get');
+        Route::match(['post','get'], '/callcenters/stats/charts/sales', [CallCenterController::class, 'chartsSales'])->name('callcenters.charts.sales.get');
+        Route::match(['post','get'], '/callcenters/stats/charts/opertions', [CallCenterController::class, 'chartsOperations'])->name('callcenters.charts.operations.get');
 
     //TPV        
         Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');

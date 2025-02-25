@@ -107,9 +107,9 @@ trait OperationTrait
         }        
     }
 
-    //DATE TIME
-
-    public static function setDateTime($service, $type = "date"){
+    //SETEA LA FECHA O HORA, DEPENDIENDO DEL TIPE, DATE TIME
+    public static function setDateTime($service, $type = "")
+    {
         if ($type == "date") {
             return date("Y-m-d", strtotime(( $service->operation_type == 'arrival' ? $service->pickup_from : $service->pickup_to )));
         }else if ($type == "time"){
@@ -119,6 +119,7 @@ trait OperationTrait
         }
     }
 
+    //
     public static function serviceStatus($service, $action = "translate"){
         if( $action == "translate" ){
             return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ));
@@ -203,7 +204,6 @@ trait OperationTrait
             return 0;
         }
     }
-
     
     public static function operationStatus($service, $action = "translate"){
         if( $action == "translate" ){

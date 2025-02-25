@@ -1,16 +1,87 @@
 
 let cache = new Map();
 let callcenter = {
+    optionsSettings: {
+        chart: {
+          fontFamily: 'Poppins, serif',
+          height: 365,
+          type: 'area',
+          zoom: {
+            enabled: false
+          },
+          dropShadow: {
+            enabled: true,
+            opacity: 0.2,
+            blur: 10,
+            left: -7,
+            top: 22
+          },
+          toolbar: {
+            show: false
+          },
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+            show: true,
+            curve: 'smooth',
+            width: 2,
+            lineCap: 'square'
+        },
+        xaxis: {
+          axisBorder: {
+            show: false
+          },
+          axisTicks: {
+            show: false
+          },
+          crosshairs: {
+            show: true
+          },
+          labels: {
+            offsetX: 0,
+            offsetY: 2,
+            style: {
+                fontSize: '11px',
+                fontFamily: 'Poppins, serif',
+                cssClass: 'apexcharts-xaxis-title',
+            },
+          }
+        },
+        yaxis: {
+          labels: {
+            formatter: function(value, index) {
+              return (value / 1000) + 'K'
+            },
+            offsetX: -15,
+            offsetY: 0,
+            style: {
+                fontSize: '11px',
+                fontFamily: 'Poppins, serif',
+                cssClass: 'apexcharts-yaxis-title',
+            },
+          }
+        },
+        responsive: [{
+          breakpoint: 575,
+          options: {
+            legend: {
+                offsetY: -50,
+            },
+          },
+        }]
+    },
     fetchData: async function(url, containerId, params) {
-        const cacheKey = JSON.stringify({ url, params });
+        // const cacheKey = JSON.stringify({ url, params });
 
         const container = document.getElementById(containerId);
         if (!container) return;        
         
-        if (cache.has(cacheKey)) {
-            container.innerHTML = cache.get(cacheKey);
-            return;
-        }
+        // if (cache.has(cacheKey)) {
+        //     container.innerHTML = cache.get(cacheKey);
+        //     return;
+        // }
     
         try {
             const response = await fetch(url, {
@@ -27,7 +98,7 @@ let callcenter = {
             }
     
             const data = await response.text();
-            cache.set(cacheKey, data); // Guardar en cache
+            // cache.set(cacheKey, data); // Guardar en cache
             container.innerHTML = data.trim();
         } catch (error) {
             console.error("Error en la petición:", error);
@@ -42,7 +113,7 @@ let callcenter = {
     
     getOperation: function(_params) {
         this.fetchData('/callcenters/operations/get', "data", _params);
-    },    
+    },
 
     getStats: async function() {
         try {
@@ -66,6 +137,27 @@ let callcenter = {
         }
     },
 
+    fetchDataCharts: async function(url) {
+        try {
+            const http = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+            });
+    
+            if (!http.ok) {
+                throw new Error(`Error ${http.status}: ${http.statusText}`);
+            }
+    
+            return await http.json();
+        } catch (error) {
+            console.error("Error en fetchDataCharts:", error);
+            return { data: { daily_goal: "N/A", total_day: "N/A", percentage_daily_goal: "N/A", total_month: "N/A", total_services_operated: "N/A", total_pending_services: "N/A" } }; // Devolver valores por defecto            
+        }
+    },
+
     getLoader: function() {
         return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
     },    
@@ -79,6 +171,80 @@ let callcenter = {
         return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(this.cleanNumber(value));
     },
 
+    formatDate: function(date){
+        const _date = new Date(date);
+        
+        // Obtener el día y el mes en formato corto (Ej: 1 Ene)
+        const day = _date.getDate();
+        const month = new Intl.DateTimeFormat('es', { month: 'short' }).format(_date);        
+        const newDate = `${day} ${month.charAt(0).toUpperCase() + month.slice(1)}`; // Capitaliza el mes
+        return newDate;
+    },
+
+    seriesSales: function(data) {
+      let object = { series:[ { name: 'VENTAS', data: [] } ], labels: [] };
+      const sales = Object.entries(data.data);
+      sales.forEach( ([date, dataDay]) => {
+          let sales = object.series.find(serie => serie.name === 'VENTAS');
+          // Formatear el total como moneda con 2 decimales
+          let Total = new Intl.NumberFormat('es-ES', {
+            style: 'currency',
+            currency: 'USD', // Cambia 'USD' por la moneda que necesites
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }).format(dataDay.TOTAL);          
+          sales.data.push(Total); // Agregar un valor
+          object.labels.push((dataDay.DATE));
+      });
+      return object;
+    },
+    chartSales: function(response){
+      let data = this.seriesSales(response);
+      let options = {
+        colors: ['#00ab55'],
+        series: data.series,
+        labels: data.labels
+      };
+      const object = Object.assign({}, options, this.optionsSettings);
+      var chart1 = new ApexCharts(document.getElementById("revenueMonthly"),object).render();
+    },
+
+    seriesOperations: function(data) {
+        let object = { series:[ { name: 'COMPLETADAS', data: [] }, { name: 'PENDIENTES', data: [] } ], labels: [] };
+        const operations = Object.entries(data.data);
+        operations.forEach( ([date, dataDay]) => {
+            let completed = object.series.find(serie => serie.name === 'COMPLETADAS');
+            let pending = object.series.find(serie => serie.name === 'PENDIENTES');
+            // Formatear el total como moneda con 2 decimales
+            let TotalCompleted = new Intl.NumberFormat('es-ES', {
+              style: 'currency',
+              currency: 'USD', // Cambia 'USD' por la moneda que necesites
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(dataDay.COMPLETED.TOTAL);
+            let TotalPending = new Intl.NumberFormat('es-ES', {
+              style: 'currency',
+              currency: 'USD', // Cambia 'USD' por la moneda que necesites
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(dataDay.PENDING.TOTAL);            
+            completed.data.push(TotalCompleted); // Agregar un valor
+            pending.data.push(TotalPending); // Agregar un valor
+            object.labels.push((dataDay.DATE));
+        });
+        return object;
+    },
+    chartSalesOperations: function(response){
+        let data = this.seriesOperations(response);
+        let options = {
+          colors: ['#00ab55', '#e2a03f'],
+          series: data.series,
+          labels: data.labels
+        };
+        const object = Object.assign({}, options, this.optionsSettings);
+        var chart1 = new ApexCharts(document.getElementById("revenueMonthly"),object).render();
+    },
+
     // Ejecutar las actualizaciones de forma paralela con Promise.all:
     reloadAll: async function(){
         const elements = {
@@ -90,7 +256,8 @@ let callcenter = {
             totalCommissionOperated: document.getElementById("totalCommissionOperated"),
             totalCommissionOperated2: document.getElementById("totalCommissionOperated2"),
             totalCommissionPending: document.getElementById("totalCommissionPending"),
-            listTargets: document.getElementById("listTargets"),
+            listBreakdownCommissions: document.getElementById("listBreakdownCommissions"),
+            listTargets: document.getElementById("listTargets"),            
         };
     
         Object.values(elements).forEach(el => el.innerHTML = this.getLoader());
@@ -117,6 +284,35 @@ let callcenter = {
                 style="width: ${stats.data.percentage_daily_goal}%"></div>
             </div><div><p>${stats.data.percentage_daily_goal}%</p></div>`;
 
+            listBreakdownCommissions.innerHTML = `
+                                                    <li class="list-group-item ">
+                                                        <div class="media-body">
+                                                            <h6 class="tx-inverse text-uppercase">Total operado</h6>
+                                                            <p class="amount">${this.formatCurrency(stats.data.total_services_operated)}</p>
+                                                        </div>
+                                                    </li>
+                                                    <li class="list-group-item ">
+                                                        <div class="media-body">
+                                                            <h6 class="tx-inverse text-uppercase">Descuento por inversion</h6>
+                                                            <p class="mg-b-0">Porcentage de descuento: <strong>${stats.data.percentage_commission_investment}%</strong></p>
+                                                            <p class="amount">${this.formatCurrency(stats.data.total_investment_discount_operated)}</p>
+                                                        </div>
+                                                    </li>
+                                                    <li class="list-group-item ">
+                                                        <div class="media-body">
+                                                            <h6 class="tx-inverse text-uppercase">Total menos decuento</h6>                                                            
+                                                            <p class="amount">${this.formatCurrency(stats.data.total_sercices_operated_investment_discount)}</p>
+                                                        </div>
+                                                    </li>
+                                                    <li class="list-group-item ">
+                                                        <div class="media-body">
+                                                            <h6 class="tx-inverse text-uppercase">Total de comisión</h6>
+                                                            <p class="mg-b-0">Porcentage de comisión: <strong>${stats.data.percentage_commission}%</strong></p>
+                                                            <p class="amount">${this.formatCurrency(stats.data.total_commission_operated)}</p>
+                                                        </div>
+                                                    </li>
+                                                 `;
+
             let targets = '';
             if (stats.data.targets) {
                 stats.data.targets.forEach(target => {
@@ -132,7 +328,7 @@ let callcenter = {
                 });
             }
             elements.listTargets.innerHTML = targets;
-    
+
             document.querySelector(".close-filters").click(); // Simula el clic en el botón
         } catch (error) {
             console.error("Error al obtener estadísticas:", error);
@@ -140,10 +336,39 @@ let callcenter = {
             document.querySelector(".close-filters").click(); // Simula el clic en el botón
         }
     },
+
+    reloadChartsSales: async function(){
+        const revenueMonthly =  document.getElementById("revenueMonthly");
+        revenueMonthly.innerHTML = this.getLoader();
+
+        try {
+            const chartsOperations = await this.fetchDataCharts('/callcenters/stats/charts/sales');
+            revenueMonthly.innerHTML = "";
+            this.chartSales(chartsOperations);
+        } catch (error) {
+            console.error("Error al obtener data:", error);
+            revenueMonthly.innerHTML = '<p style="color:red;">Error al cargar.</p>';
+        }        
+    },
+
+    reloadChartsOperations: async function(){
+        const revenueMonthly =  document.getElementById("revenueMonthly");
+        revenueMonthly.innerHTML = this.getLoader();
+
+        try {
+            const chartsOperations = await this.fetchDataCharts('/callcenters/stats/charts/opertions');
+            revenueMonthly.innerHTML = "";
+            this.chartSalesOperations(chartsOperations);
+        } catch (error) {
+            console.error("Error al obtener data:", error);
+            revenueMonthly.innerHTML = '<p style="color:red;">Error al cargar.</p>';
+        }        
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    callcenter.reloadAll(); // Inicializar cargando todo
+    callcenter.reloadAll(); // Inicializar cargando las estadisticas
+    callcenter.reloadChartsSales();
 
     // Configuraciones necesarias
     components.titleModal();
@@ -154,6 +379,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('formSearch').addEventListener('submit', function(event) {
             event.preventDefault(); // Evita que el formulario se recargue
             callcenter.reloadAll();
+            callcenter.reloadChartsSales();
         });
     }
 
@@ -173,22 +399,38 @@ document.addEventListener("DOMContentLoaded", function() {
             event.preventDefault();
 
             // Elementos HTML
-            const data    = document.getElementById("data");
+            const data       = document.getElementById("data");
 
             // Actualizar resumen general, al mostrar el loader ANTES de la solicitud
             data.innerHTML   = callcenter.getLoader().trim();
 
             // Definir parámetros de la petición
-            const target = event.target;
-            const _params = {
+            const target     = event.target;
+            const _params    = {
                 type: target.dataset.type || "",
                 date: document.getElementById('lookup_date').value || ""
             };
             
             $("#callcenterModal").modal('show');
             
-            if (_params.type == "sales") callcenter.getSales(_params);
-            if (_params.type == "completed" || _params.type == "pending") callcenter.getOperation(_params);
+            const titleDashboard = document.getElementById('callcenterModalLabel');
+            if (_params.type == "sales"){
+                titleDashboard.innerText = "Listado de reservas vendidas";
+                callcenter.getSales(_params);
+            }
+            if (_params.type == "completed" || _params.type == "pending"){
+                titleDashboard.innerText = ( _params.type == "completed" ? "Listado de servicios operados" : "Listado de servicios pendientes de operar" );
+                callcenter.getOperation(_params);
+            } 
         }
-    }, 300)); // 300ms de espera antes de ejecutar de nuevo
+
+        if (event.target.classList.contains('wallet-text')) {
+            event.preventDefault();
+            console.log(event.target);
+            
+            const containerBreakdown = document.getElementById('containerBreakdownCommissions');
+            containerBreakdown.classList.toggle('d-none');
+
+        }
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo    
 });

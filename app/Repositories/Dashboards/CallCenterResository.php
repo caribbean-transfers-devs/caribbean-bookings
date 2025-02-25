@@ -11,10 +11,11 @@ use Carbon\Carbon;
 //TRAIT
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
+use App\Traits\OperationTrait;
 
 class CallCenterResository
 {
-    use FiltersTrait, QueryTrait;
+    use FiltersTrait, QueryTrait, OperationTrait;
 
     public function index($request)
     {
@@ -40,7 +41,14 @@ class CallCenterResository
 
         $dataUser = auth()->user();
         $userId = $dataUser->id; // Obtener ID del usuario autenticado
-        $exchange_commission = 16.50;        
+        $exchange_commission = 16.50;
+
+        // Condiciones de Reservas
+        // Status de reservación
+
+        //Para las ventas velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
+        $paramBookingStatus = $this->parseArrayQuery(['CONFIRMED', 'CREDIT', 'OPENCREDIT'], "single");
+        $queryHavingBooking = " HAVING reservation_status IN ($paramBookingStatus) ";          
 
         $query = " AND rez.site_id != 21 AND rez.site_id != 11 
                    AND rez.created_at BETWEEN :init AND :end 
@@ -53,8 +61,7 @@ class CallCenterResository
             'user' => $userId,
         ];
         
-        // $bookings = $this->queryBookings($query, '', $queryData)->paginate(50);
-        $bookings = $this->queryBookings($query, '', $queryData);
+        $bookings = $this->queryBookings($query, $queryHavingBooking, $queryData);
 
         return view('dashboard.sales_callcenter', [ 'sales' => $bookings, 'exchange' => $exchange_commission ]);
     }
@@ -122,20 +129,20 @@ class CallCenterResository
                 "total_month" => 0,                
                 "percentage_daily_goal" => 0,
                 "total_services_operated" => 0,
-                "subtotal_commission_operated" => 0,
-                "total_commission_operated" => 0,
+                "total_investment_discount_operated" => 0,
+                "total_sercices_operated_investment_discount" => 0,
+                "total_commission_operated" => 0,            
                 "total_pending_services" => 0,
-                "subtotal_commission_pending" => 0,
+                "total_investment_discount_pending" => 0,
+                "total_sercices_pending_investment_discount" => 0,
                 "total_commission_pending" => 0,
                 "percentage_commission" => 0,
-                "operation_completed" => [],
-                "operation_pending" => []
             ];
 
             // Manejo de Fechas
             $dates = isset($request->date) && !empty($request->date) 
             ? explode(" - ", $request->date)
-            : [date('Y-m-d'), date('Y-m-d')];
+            : [date('Y-m-d'), date('Y-m-d')];           
 
             $dataUser = auth()->user();
             $userId = $dataUser->id; // Obtener ID del usuario autenticado
@@ -151,7 +158,7 @@ class CallCenterResository
 
             //Para la operación velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
             $paramsOperation = $this->parseArrayQuery(['CONFIRMED', 'CREDIT', 'OPENCREDIT'],"single");
-            $queryHavingOperation = " HAVING reservation_status IN (".$paramsOperation.") ";
+            $queryHavingOperation = " HAVING reservation_status IN (".$paramsOperation.") ";            
                 
             $query = " AND rez.site_id != 21 AND rez.site_id != 11 
                        AND rez.created_at BETWEEN :init AND :end 
@@ -174,7 +181,7 @@ class CallCenterResository
 
             $params = $this->parseArrayQuery(['PENDING', 'COMPLETED'], "single");
             $queryOne .= " AND us.id = $userId AND it.op_one_status IN ($params) ";
-            $queryTwo .= " AND us.id = $userId AND it.op_two_status IN ($params) ";
+            $queryTwo .= " AND us.id = $userId AND it.op_two_status IN ($params) ";            
 
             $queryData = [
                 'init' => "{$dates[0]} 00:00:00",
@@ -191,13 +198,12 @@ class CallCenterResository
             // Recorremos para poder obtener el total de venta diaria y mensual
             if( $bookings ){
                 foreach ($bookings as $booking) {
+                    $date_ = date("Y-m-d", strtotime( $booking->created_at ));
                     $total_sales = $booking->currency == "USD"
                     ? ($booking->total_sales * $exchange_commission)
                     : $booking->total_sales;
 
-                    if (Carbon::parse($booking->created_at)->isToday()) {
-                        $data['total_day'] += $total_sales;
-                    }
+                    if (Carbon::parse($booking->created_at)->isToday()) { $data['total_day'] += $total_sales; }
                     $data['total_month'] += $total_sales;
                 }
             }
@@ -205,15 +211,16 @@ class CallCenterResository
             // Recorremos para poder obtener el total de servicios pendientes y completados
             if( $operations ){
                 foreach ($operations as $operation) {
+                    $date_ = OperationTrait::setDateTime($operation, "date");
                     $total_sales = $operation->currency == "USD"
                     ? ($operation->cost * $exchange_commission)
                     : $operation->cost;
 
-                    if( ( $operation->is_round_trip == 0 && ( $operation->one_service_status == "COMPLETED" ) ) || ( $operation->is_round_trip == 1 && ( $operation->one_service_status == "COMPLETED" || $operation->two_service_status == "COMPLETED" ) ) ){
+                    if( OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" ){
                         $data['total_services_operated'] += $total_sales;
                     }
 
-                    if( ( $operation->is_round_trip == 0 && ( $operation->one_service_status == "PENDING" ) ) || ( $operation->is_round_trip == 1 && ( $operation->one_service_status == "PENDING" || $operation->two_service_status == "PENDING" ) ) ){
+                    if( OperationTrait::serviceStatus($operation, "no_translate") == "PENDING" ){
                         $data['total_pending_services'] += $total_sales;
                     }
                 }
@@ -227,11 +234,13 @@ class CallCenterResository
             // $data['total_services_operated'] = 85000;
             $data['total_pending_services'] = round($data['total_pending_services'], 2);
 
+            //Recorremos la reglas para ver cual coincide en caso de no coindir coloca el 4% de comisión defaul
             $percentage_commission = ($dataUser->type_commission === 'target')
             ? array_reduce($data['targets'], function ($carry, $target) use ($data) {
                 return ($data['total_services_operated'] >= $target['amount']) ? $target['percentage'] : $carry;
-            }, 0)
-            : $dataUser->percentage;
+            }, 4)
+            : $dataUser->percentage;            
+            $data['percentage_commission_investment'] = $percentage_commission_investment;
             $data['percentage_commission'] = $percentage_commission;
 
             // Calcular porcentaje que lleva para alcanzar la meta diaria
@@ -239,11 +248,165 @@ class CallCenterResository
                 ? round(($data['total_day'] / $dataUser->daily_goal) * 100, 2)
                 : 0;
 
-            $data['subtotal_commission_operated'] = round($this->calculateTotalDiscount($data['total_services_operated'], $percentage_commission_investment), 2);            
-            $data['total_commission_operated'] = round(($data['subtotal_commission_operated'] * $percentage_commission) / 100, 2);
+            //Desglose de las comisiones de servicios operados
+            $data['total_investment_discount_operated'] = round( ($data['total_services_operated'] * ($percentage_commission_investment / 100) ), 2);
+            $data['total_sercices_operated_investment_discount'] = round($this->calculateTotalDiscount($data['total_services_operated'], $percentage_commission_investment), 2);
+            $data['total_commission_operated'] = round(($data['total_sercices_operated_investment_discount'] * ( $percentage_commission) / 100 ), 2);
 
-            $data['subtotal_commission_pending'] = round($this->calculateTotalDiscount($data['total_pending_services'], $percentage_commission_investment), 2);            
-            $data['total_commission_pending'] = round(($data['subtotal_commission_pending'] * $percentage_commission) / 100, 2);
+            //Desglose de las comisiones de servicios pendientes de operar
+            $data['total_investment_discount_pending'] = round( ($data['total_pending_services'] * ($percentage_commission_investment / 100) ), 2);
+            $data['total_sercices_pending_investment_discount'] = round($this->calculateTotalDiscount($data['total_pending_services'], $percentage_commission_investment), 2);            
+            $data['total_commission_pending'] = round(($data['total_sercices_pending_investment_discount'] * $percentage_commission) / 100, 2);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'se encontraron datos',
+                'data' => $data,
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);            
+        }
+    }
+
+    public function chartsSales($request)
+    {
+        try {
+            // ini_set('memory_limit', '-1'); // Sin límite
+            set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
+
+            // Manejo de Fechas
+            $now = Carbon::today(); // Asegura que obtenemos la fecha del día actual sin afectar la hora
+            $start = $now->copy()->startOfMonth();
+            $end = $now->copy()->endOfMonth();
+            $queryData = [
+                'init' => $start->toDateTimeString(), // YYYY-MM-DD HH:MM:SS
+                'end' => $end->toDateTimeString(),                
+            ];            
+            $data = $this->dataSales($start, $end);
+
+            $dataUser = auth()->user();
+            $userId = $dataUser->id; // Obtener ID del usuario autenticado
+            $exchange_commission = 16.50;
+
+            // Condiciones de Reservas
+            // Status de reservación
+
+            //Para las ventas velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
+            $paramBookingStatus = $this->parseArrayQuery(['CONFIRMED', 'CREDIT', 'OPENCREDIT'], "single");
+            $queryHavingBooking = " HAVING reservation_status IN ($paramBookingStatus) ";
+
+            $query = " AND rez.site_id != 21 AND rez.site_id != 11 
+                       AND rez.created_at BETWEEN :init AND :end 
+                       AND us.id = :userId";
+
+            $queryData['userId'] = $userId;
+
+            // Obtener datos de reservas y operaciones
+            $bookings = $this->queryBookings($query, $queryHavingBooking, $queryData);
+
+            // Recorremos para poder obtener el total de venta diaria y mensual
+            if( $bookings ){
+                foreach ($bookings as $booking) {
+                    $date_ = date("Y-m-d", strtotime( $booking->created_at ));
+                    $total_sales = $booking->currency == "USD"
+                    ? ($booking->total_sales * $exchange_commission)
+                    : $booking->total_sales;
+
+                    if( isset($data[$date_]) ){
+                        $data[$date_]['TOTAL'] += round($total_sales,2);
+                        $data[$date_][$booking->currency] += round($booking->total_sales,2);
+                        $data[$date_]['QUANTITY'] ++;
+                        $data[$date_]['BOOKINGS'][] = $booking;
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'se encontraron datos',
+                'data' => $data,
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //NOS TRAE LA DATA PARA LA GRAFICA DE VENTAS DEL MES CORRIENTE
+    public function chartsOperations($request)
+    {
+        try {
+            // ini_set('memory_limit', '-1'); // Sin límite
+            set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
+
+            // Manejo de Fechas
+            $now = Carbon::today(); // Asegura que obtenemos la fecha del día actual sin afectar la hora
+            $start = $now->copy()->startOfMonth();
+            $end = $now->copy()->endOfMonth();
+            $queryData = [
+                'init' => $start->toDateTimeString(), // YYYY-MM-DD HH:MM:SS
+                'end' => $end->toDateTimeString()
+            ];
+            $data = $this->dataSalesOperation($start, $end);
+
+            $dataUser = auth()->user();
+            $userId = $dataUser->id; // Obtener ID del usuario autenticado
+            $exchange_commission = 16.50;
+
+            // Condiciones de Reservas
+            // Status de reservación
+
+            //Para la operación velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
+            $paramsOperation = $this->parseArrayQuery(['CONFIRMED', 'CREDIT', 'OPENCREDIT'],"single");
+            $queryHavingOperation = " HAVING reservation_status IN (".$paramsOperation.") ";
+
+            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two 
+                          AND rez.is_commissionable = 1 
+                          AND rez.is_cancelled = 0 
+                          AND rez.is_duplicated = 0 
+                        --   AND rez.open_credit = 0 
+                          AND rez.is_quotation = 0 ";
+
+            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four 
+                          AND rez.is_commissionable = 1 
+                          AND rez.is_cancelled = 0 
+                          AND rez.is_duplicated = 0 
+                        --   AND rez.open_credit = 0 
+                          AND rez.is_quotation = 0 
+                          AND it.is_round_trip = 1 ";
+
+            $params = $this->parseArrayQuery(['PENDING', 'COMPLETED'], "single");
+            $queryOne .= " AND us.id = $userId AND it.op_one_status IN ($params) ";
+            $queryTwo .= " AND us.id = $userId AND it.op_two_status IN ($params) ";
+
+            // Obtener datos de reservas y operaciones
+            $operations = $this->queryOperations($queryOne, $queryTwo, $queryHavingOperation, $queryData);
+
+            // Recorremos para poder obtener el total de servicios pendientes y completados
+            if( $operations ){
+                foreach ($operations as $operation) {
+                    $date_ = OperationTrait::setDateTime($operation, "date");
+                    $total_sales = $operation->currency == "USD"
+                    ? ($operation->cost * $exchange_commission)
+                    : $operation->cost;
+
+                    if( isset($data[$date_]) ){
+                        $data[$date_]['TOTAL'] += round($total_sales,2);
+                        $data[$date_][$operation->currency] += round($operation->cost,2);
+                        $data[$date_]['QUANTITY'] ++;
+
+                        $data[$date_][OperationTrait::serviceStatus($operation, "no_translate")]['TOTAL'] += round($total_sales,2);
+                        $data[$date_][OperationTrait::serviceStatus($operation, "no_translate")][$operation->currency] += round($operation->cost,2);
+                        $data[$date_][OperationTrait::serviceStatus($operation, "no_translate")]['QUANTITY'] ++;
+                        $data[$date_][OperationTrait::serviceStatus($operation, "no_translate")]['BOOKINGS'][] = $operation;
+                    }
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -262,4 +425,57 @@ class CallCenterResository
     {
         return $amount - ($amount * ($percentage / 100));
     }
+
+    //calcular monto a descontar
+    public function dataSales($start_d, $end_d)
+    {
+        // $start = Carbon::now()->startOfMonth();
+        // $end = Carbon::now()->endOfMonth();
+        $bookings_month = [];
+        for ($date = $start_d; $date->lte($end_d); $date->addDay()) {
+            $bookings_month[$date->toDateString()] = [
+                "DATE" => $date->format('j M'),
+                "TOTAL" => 0,
+                "USD" => 0,
+                "MXN" => 0,
+                "QUANTITY" => 0,
+                "BOOKINGS" => [],
+            ];
+        }
+
+        return $bookings_month;
+    }
+
+    //calcular monto a descontar
+    public function dataSalesOperation($start_d, $end_d)
+    {
+        // $start = Carbon::now()->startOfMonth();
+        // $end = Carbon::now()->endOfMonth();
+        $bookings_month = [];
+        for ($date = $start_d; $date->lte($end_d); $date->addDay()) {
+            $bookings_month[$date->toDateString()] = [
+                "DATE" => $date->format('j M'),
+                "TOTAL" => 0,
+                "USD" => 0,
+                "MXN" => 0,
+                "QUANTITY" => 0,
+                "COMPLETED" => [
+                    "TOTAL" => 0,
+                    "USD" => 0,
+                    "MXN" => 0,
+                    "QUANTITY" => 0,
+                    "BOOKINGS" => [],
+                ],
+                "PENDING" => [
+                    "TOTAL" => 0,
+                    "USD" => 0,
+                    "MXN" => 0,
+                    "QUANTITY" => 0,
+                    "BOOKINGS" => [],
+                ],
+            ];
+        }
+
+        return $bookings_month;
+    }    
 }

@@ -91,6 +91,7 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard2.js'], data.assets + "js/sections/dashboard2.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/dashboard/callcenter.js'], data.assets + "js/sections/dashboard/callcenter.min.js");
 
+
         //TPV
         mix.combine(['resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/tpv/index.js'], data.assets + "js/sections/tpv/index.min.js");
 

@@ -3,24 +3,29 @@
     use App\Traits\BookingTrait;
     $data = [
         "total" => 0,
-        "total_conversion" => 0,
-        "MXN" => 0,
-        "USD" => 0
     ];
 @endphp
 <div class="row">
-    <div class="col-xl-12 col-lg-12 col-md-12 mb-3">
-        <div class="col-xl-4">
-            <div class="card bg-success p-3">
-                <h5 class="card-title" style="font-size:11pt;">Total de reservas: {{ count($sales) }}</h5>
+    {{-- <div class="col-xl-12 col-lg-12 col-md-12 mb-3">
+        <div class="row">
+            <div class="col-xl-3">
+                <div class="card bg-info p-3">
+                    <h5 class="card-title" style="font-size:11pt;">Total de reservas: {{ count($sales) }}</h5>
+                </div>
+            </div>
+            <div class="col-xl-3">
+                <div class="card bg-success p-3">
+                    <h5 class="card-title" style="font-size:11pt;">Total de vendido: {{ $data['total'] }}</h5>
+                </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="col-xl-12 col-lg-12 col-md-12">
         <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
+                        <th class="text-center" scope="col">Tipo de servicio</th>
                         <th class="text-center" scope="col">Código</th>
                         <th class="text-center" scope="col">Fecha de reservación</th>
                         <th class="text-center" scope="col">Hora de reservación</th>
@@ -28,11 +33,7 @@
                         <th class="text-center" scope="col">Estatus de reservación</th>
                         <th class="text-center" scope="col">Estatus de pago</th>
                         <th class="text-center" scope="col">Total de reservación</th>
-                        <th class="text-center" scope="col">Total</th>
-
-                        {{-- <th class="text-center" scope="col">USD</th>
-                        <th class="text-center" scope="col">MXN</th> --}}
-
+                        <th class="text-center" scope="col">Total de reservación MXN</th>
                         <th class="text-center" scope="col">Moneda</th>
                         <th class="text-center" scope="col">Nombre del cliente</th>
                         <th class="text-center" scope="col">Desde</th>
@@ -46,12 +47,10 @@
                     @foreach($sales as $key => $booking)
                         @php
                             $total = ( $booking->currency == "USD" ? $booking->total_sales * $exchange : $booking->total_sales );
-                            $total_conversion = ( $booking->currency == "USD" ? $booking->total_sales * $exchange : $booking->total_sales );
                             $data['total'] += $total;
-                            $data['total_conversion'] += $total_conversion;
-                            $data[$booking->currency] += $booking->total_sales;
                         @endphp
                         <tr>
+                            <td class="text-center"><span class="badge badge-{{ $booking->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $booking->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                             <td class="text-center">
                                 @php
                                     $codes_string = "";
@@ -71,12 +70,8 @@
                             <td class="text-center">{{ $booking->site_name }}</td>
                             <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($booking->reservation_status) }}">{{ BookingTrait::statusBooking($booking->reservation_status) }}</button></td>
                             <td class="text-center" <?=BookingTrait::classStatusPayment($booking)?>>{{ BookingTrait::statusPayment($booking->payment_status) }}</td>
+                            <td class="text-center">$ {{ number_format(round($booking->total_sales, 2),2) }}</td>
                             <td class="text-center">$ {{ number_format(round($total, 2),2) }}</td>
-                            <td class="text-center">$ {{ number_format(round($total_conversion,2),2) }}</td>
-
-                            {{-- <td class="text-center">$ {{ number_format(round(( $booking->currency == "USD" ? $booking->total_sales : 0 ), 2),2) }}</td>
-                            <td class="text-center">$ {{ number_format(round(( $booking->currency == "MXN" ? $booking->total_sales : 0 ), 2),2) }}</td> --}}
-                            
                             <td class="text-center">{{ $booking->currency }}</td>
                             <td class="text-center">{{ $booking->full_name }}</td>
                             <td class="text-center">{{ $booking->from_name }}</td>
@@ -114,12 +109,9 @@
                         <th class="text-center"></th>
                         <th class="text-center"></th>
                         <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
                         <th class="text-center">{{ number_format(round($data['total'],2),2) }}</th>
-                        <th class="text-center">{{ number_format(round($data['total_conversion'],2),2) }}</th>
-
-                        {{-- <th class="text-center">{{ number_format(round($data['USD'],2),2) }}</th>
-                        <th class="text-center">{{ number_format(round($data['MXN'],2),2) }}</th> --}}
-                        
                         <th class="text-center"></th>
                         <th class="text-center"></th>
                         <th class="text-center"></th>

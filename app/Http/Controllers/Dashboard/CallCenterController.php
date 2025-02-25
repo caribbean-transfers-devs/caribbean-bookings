@@ -42,4 +42,14 @@ class CallCenterController extends Controller
     {
         return $this->CallCenterResository->getStats($request);
     }
+
+    public function chartsSales(Request $request)
+    {
+        return $this->CallCenterResository->chartsSales($request);
+    }
+
+    public function chartsOperations(Request $request)
+    {
+        return $this->CallCenterResository->chartsOperations($request);
+    }
 }

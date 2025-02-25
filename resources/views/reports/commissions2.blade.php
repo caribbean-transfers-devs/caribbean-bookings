@@ -107,7 +107,8 @@
                             <th class="text-center">ESTATUS DE SERVICIO</th>
                             <th class="text-center">ESTATUS DE OPERACIÓN</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
-                            <th class="text-center">TOTAL POR SERVICIO</th>
+                            <th class="text-center">TOTAL DE RESERVACIÓN MXN</th>
+                            <th class="text-center">TOTAL OPERADO POR COSTO DE SERVICIO</th>
                             <th class="text-center">MONEDA</th>
                             {{-- <th class="text-center">MÉTODO DE PAGO</th>
                             <th class="text-center">PAGO AL LLEGAR</th>
@@ -132,6 +133,7 @@
                                         ];                                        
                                     endif;
 
+                                    //TOTAL DE VENTA
                                     if( in_array( $operation->reservation_status, ['CONFIRMED', 'CREDIT', 'OPENCREDIT'] ) ){
                                         $usersData[Str::slug($operation->employee)]['TOTAL'] += ( $operation->currency == "USD" ? ($operation->cost * $exchange_rate) : $operation->cost );
                                     }
@@ -180,6 +182,7 @@
                                     <td class="text-center"><?=OperationTrait::renderServiceStatus($operation)?></td>
                                     <td class="text-center"><?=OperationTrait::renderOperationStatus($operation)?></td>
                                     <td class="text-center">{{ number_format(($operation->total_sales),2) }}</td>
+                                    <td class="text-center">{{ number_format(( $operation->currency == "USD" ? ($operation->total_sales * $exchange_rate) : $operation->total_sales ),2) }}</td>
                                     <td class="text-center">{{ number_format((( $operation->currency == "USD" ? ($operation->cost * $exchange_rate) : $operation->cost )),2) }}</td>
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     {{-- <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>

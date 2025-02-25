@@ -1,4 +1,5 @@
 @import "../../plugins/table/datatable/datatables5";
+// @import "../../plugins/apex/apexcharts.scss";
 @import "../template/plugins/light/table/datatable/custom_dt";
 
 @import '../template/light/widgets/_widgets/reset-analytics';
@@ -7,6 +8,7 @@
 
 @import '../template/light/widgets/_widgets/reset-sales';
 @import '../template/light/widgets/_widgets/widget-wallet-one';
+@import '../template/light/widgets/_widgets/widget-chart-one';
 
 @import '../template/light/components/modal';
 @import '../components/filters';
@@ -15,6 +17,10 @@
 .container-loader{
   text-align: center;
   color: #000;
+}
+
+#revenueMonthly{
+  font-size: 40px;
 }
 
 .callcenter-container{  

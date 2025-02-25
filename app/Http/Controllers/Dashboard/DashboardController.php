@@ -31,11 +31,11 @@ class DashboardController extends Controller
         $dataUser = auth()->user();
         
         if( in_array(3, $roles['roles']) || in_array(4, $roles['roles']) ){
-            if( $dataUser->is_external == 1 ){
+            // if( $dataUser->is_external == 1 ){
                 return $this->CallCenterResository->index($request);
-            }else{
-                return $this->ManagementRepository->afterSales($request);
-            }
+            // }else{
+            //     return $this->ManagementRepository->afterSales($request);
+            // }
         }else{
             return $this->DashboardRepository->index($request);
         }
