@@ -264,6 +264,11 @@
                     </div>
                 @endif
 
+                {{-- NOS PERMITE AGREGAR SEGUIMIENTOS DE LA RESERVA, SOLO CUANDO ESTA COMO PENDIENTE, CONFIRMADA O A CREDITO --}}
+                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(23))
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> SEGUIMIENTO</button>
+                @endif                
+
                 {{-- NOS PERMITE ENVIAR UNA INVITACIÓN DE PAGO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACION --}}
                 @if ( ( $data['status'] == "PENDING" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(22))
                     <div class="btn-group btn-group-sm" role="group">
@@ -289,11 +294,6 @@
                             <a class="dropdown-item" href="#">Whatsapp</a>
                         </div>
                     </div>
-                @endif
-
-                {{-- NOS PERMITE AGREGAR SEGUIMIENTOS DE LA RESERVA, SOLO CUANDO ESTA COMO PENDIENTE, CONFIRMADA O A CREDITO --}}
-                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && RoleTrait::hasPermission(23))
-                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> SEGUIMIENTO</button>
                 @endif
 
                     {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
@@ -702,6 +702,7 @@
                                             <th class="text-center">Moneda</th>
                                             <th class="text-center">TC</th>
                                             <th class="text-start">Ref.</th>
+                                            <th class="text-start">Categoria.</th>
                                             <th class="text-center">Fecha de pago</th>
                                             <th class="text-center"></th>
                                         </tr>
@@ -715,6 +716,7 @@
                                                 <td class="text-center">{{ $payment->currency }}</td>
                                                 <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
                                                 <td class="text-start">{{ $payment->reference }}</td>
+                                                <td class="text-start">{{ $payment->categories }}</td>
                                                 <td class="text-center">{{ $payment->created_at }}</td>
                                                 <td class="text-center">
                                                     @if (RoleTrait::hasPermission(15))
