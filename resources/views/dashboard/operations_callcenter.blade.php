@@ -17,7 +17,7 @@
     </div> --}}
     <div class="col-xl-12 col-lg-12 col-md-12">
         <div class="table-responsive">
-            <table class="table">
+            <table class="table custom-table">
                 <thead>
                     <tr>
                         <th class="text-center" scope="col">Tipo de servicio</th>

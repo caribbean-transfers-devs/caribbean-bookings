@@ -1,12 +1,11 @@
-$(document).ready(function () {    
-         
+$(document).ready(function () {
     const selectElement = $('#spam-selec-date');
           selectElement.find('option:eq(1)').prop('selected', true);
 
         getSpamByDate({ target: selectElement[0] });        
 });
 
-function getSpamByDate(event) {    
+function getSpamByDate(event) {
     getSpamRequest(event.target.value, 'PENDING');
 }
 
@@ -39,8 +38,6 @@ window.getSpamByStatus = function(status, date){
     getSpamRequest(date, status, 1);
 }
 
-
-
 window.spamOnenModal = function(event, ritID, rezID, status = 'PENDING'){
     $("#viewSpamDetailModal").modal("show");
     getSpamClientDetails(ritID);
@@ -56,11 +53,6 @@ window.spamOnenModal = function(event, ritID, rezID, status = 'PENDING'){
 }
 
 function getSpamClientDetails(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
     $.ajax({
         url: '/operation/spam/get/basic-information',
         type: 'POST',
@@ -78,11 +70,6 @@ function getSpamClientDetails(id){
 }
 
 function getSpamHistory(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
     $.ajax({
         url: '/operation/spam/history/get',
         type: 'POST',
@@ -101,15 +88,7 @@ function getSpamHistory(id){
 
 window.saveSpamComment = function(event){
     event.preventDefault();
-
-    let frm_data = $("#formSpamAddComment").serializeArray();    
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
+    let frm_data = $("#formSpamAddComment").serializeArray();
     $.ajax({
         url: '/operation/spam/history/add',
         type: 'POST',
@@ -130,9 +109,7 @@ window.saveSpamComment = function(event){
                 const selectElement = $('#spam-selec-date');
                     selectElement.find('option:eq(1)').prop('selected', true);
                     getSpamByDate({ target: selectElement[0] });                
-            });
-
-                  
+            });                  
         }
     }).fail(function(xhr, status, error) {
         $("#btnSaveSpamComment").prop('disabled', false).text("Guardar");
@@ -148,7 +125,7 @@ window.saveSpamComment = function(event){
     });
 }
 
-function resetSpamForm() {    
+function resetSpamForm() {
     $('#formSpamAddComment')[0].reset();
     $('#btnSaveSpamComment').prop('disabled', false);
 }
@@ -168,3 +145,44 @@ $('#spamRememberCheck').on('change', function () {
         $("#spamRememberDisplay").addClass("follow_up_hide");
     }
 });
+
+$(document).ready(function () {
+    getPendingRequest();
+    if( document.getElementById('quotation-general-container') ){
+        getQuotationRequest();
+    }    
+});
+
+function getPendingRequest(){
+    $.ajax({
+        url: '/operation/pending/get',
+        type: 'POST',
+        data: {},
+        dataType: 'text',
+        beforeSend: function() {
+            $("#pending-general-container").empty().append('<div class="loaderItem"></div>');
+        },
+        success: function (data) {
+            $("#pending-general-container").empty().append(data);
+        }
+    }).fail(function(xhr, status, error) {
+        console.log(xhr);
+    });
+}
+
+function getQuotationRequest(){
+    $.ajax({
+        url: '/operation/quotation/get',
+        type: 'POST',
+        data: { date: document.getElementById('lookup_date').value },
+        dataType: 'text',
+        beforeSend: function() {
+            $("#quotation-general-container").empty().append('<div class="loaderItem"></div>');
+        },
+        success: function (data) {
+            $("#quotation-general-container").empty().append(data);
+        }
+    }).fail(function(xhr, status, error) {
+        console.log(xhr);
+    });
+}

@@ -52,4 +52,8 @@ class CallCenterController extends Controller
     {
         return $this->CallCenterResository->chartsOperations($request);
     }
+
+    public function destinationsList(Request $request){
+        return $this->CallCenterResository->destinationsList($request);
+    }
 }

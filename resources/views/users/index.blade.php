@@ -29,7 +29,6 @@
                 'className' => 'btn btn-primary',
             ),            
         );
-        // dump($buttons);
     @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
@@ -166,7 +165,7 @@
                                                     </button>
                                                     <ul class="dropdown-menu" aria-labelledby="actions">
                                                         @if(RoleTrait::hasPermission(3)) 
-                                                            <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
+                                                            <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}?type=callcenter">Editar</a></li>
                                                             <li><a class="dropdown-item" href="#" onclick="ChangePass({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#chgPassModal">Contraseña</a></li>
                                                             <li><hr class="dropdown-divider"></li>
                                                         @endif

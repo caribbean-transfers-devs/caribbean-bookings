@@ -120,7 +120,8 @@
         endif;
 
         //GESTION
-        if(RoleTrait::hasPermission(39) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(10) || RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || RoleTrait::hasPermission(112) ):
+        // || RoleTrait::hasPermission(112)
+        if(RoleTrait::hasPermission(39) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(10) || RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) ):
             // CONFIRMACIONES
             if(RoleTrait::hasPermission(39)):
                 $links_operations[] = [
@@ -130,13 +131,13 @@
                 ];
             endif;
             // DASHBOARD AGENTE DE CALL CENTER
-            if(RoleTrait::hasPermission(112)):
-                $links_operations[] = [
-                    'name' => 'Dashboard Agente Call Center',
-                    'route' => route('callcenters.index'),
-                    'active' => request()->routeIs('callcenters.index'),
-                ];
-            endif;            
+            // if(RoleTrait::hasPermission(112)):
+            //     $links_operations[] = [
+            //         'name' => 'Dashboard Agente Call Center',
+            //         'route' => route('callcenters.index'),
+            //         'active' => request()->routeIs('callcenters.index'),
+            //     ];
+            // endif;
             // POST VENTA
             if(RoleTrait::hasPermission(47)):
                 $links_operations[] = [
@@ -167,7 +168,7 @@
                 'code' => 'operations',
                 'name' => 'Gestion',
                 'route' => null,
-                'active' => request()->routeIs('operation.*','callcenters.index'),
+                'active' => request()->routeIs('operation.*','callcenters.index','operation.after.sales'),
                 'urls' => $links_operations
             ]);
         endif;        

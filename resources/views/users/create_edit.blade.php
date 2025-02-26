@@ -147,8 +147,8 @@
                                             <label for="type_commission" class="form-label">Tipo de comisión</label>
                                             <select class="form-select" id="type_commission" name="type_commission">
                                                 <option value="">Selecciona una opción</option>
-                                                <option value="target" @if ($user->restricted == "target") selected @endif>Por metas</option>
-                                                <option value="percentage" @if ($user->restricted == "percentage") selected @endif>Porcentaje</option>
+                                                <option value="target" @if ($user->type_commission == "target") selected @endif>Por metas</option>
+                                                <option value="percentage" @if ($user->type_commission == "percentage") selected @endif>Porcentaje</option>
                                             </select>
                                         </div>
                                     @endif
@@ -174,7 +174,7 @@
                                         <label for="email" class="form-label">Roles</label>
                                         <select class="form-select" id="roles" name="roles[]" multiple>
                                             @foreach ($roles as $role)
-                                                <option value="{{ $role->id }}" @if ( isset($_REQUEST['type']) && $_REQUEST['type'] === 'callcenter') selected @endif  @if (in_array($role->id, $active_roles)) selected @endif>{{ $role->role }}</option>
+                                                <option value="{{ $role->id }}" @if ( isset($_REQUEST['type']) && $_REQUEST['type'] === 'callcenter' && empty($active_roles) ) selected @endif  @if (in_array($role->id, $active_roles)) selected @endif>{{ $role->role }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -189,13 +189,13 @@
                                         <div class="col-4">
                                             <label for="daily_goal" class="form-label">Indica la meta de venta diaria en pesos</label>
                                             <input type="number" step=".01" class="form-control" id="daily_goal" name="daily_goal"
-                                                    value="{{ $user->percentage }}" required>
+                                                    value="{{ $user->daily_goal }}" required>
                                         </div>
                                         <div class="col-4">
                                             <label for="is_external" class="form-label">Es externo</label>
                                             <select class="form-select" id="is_external" name="is_external">
-                                                <option value="0" @if ($user->restricted == 0) selected @endif>No</option>
-                                                <option value="1" @if ($user->restricted == 1) selected @endif>Sí</option>
+                                                <option value="0" @if ($user->is_external == 0) selected @endif>No</option>
+                                                <option value="1" @if ($user->is_external == 1) selected @endif>Sí</option>
                                             </select>
                                         </div>                                        
                                     </div>

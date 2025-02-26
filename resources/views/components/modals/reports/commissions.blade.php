@@ -23,7 +23,7 @@
             </div>
             <div class="modal-body charts-double">
                 <div class="container_left">
-                    <table class="table table-chart table-chart-general">
+                    <table class="table custom-table table-chart table-chart-general">
                         <thead>
                             <tr>                                                        
                                 <th class="text-center">NOMBRE</th>

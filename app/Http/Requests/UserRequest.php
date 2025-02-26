@@ -32,12 +32,12 @@ class UserRequest extends FormRequest
         // Si el request incluye `type` con valor "callcenter", agregamos más reglas
         if ($this->input('type') === 'callcenter') {
             $rules['type_commission'] = 'required|string|in:target,percentage';
-            $rules['daily_goal'] = 'required|numeric|digits_between:10,2';
+            $rules['daily_goal'] = 'required|numeric';
             $rules['is_external'] = 'required|integer|in:0,1';
         }
 
         if ($this->input('type_commission') === 'percentage') {
-            $rules['percentage'] = 'required|numeric|digits_between:10,2';
+            $rules['percentage'] = 'required|numeric';
         }
 
         return $rules;

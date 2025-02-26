@@ -19,11 +19,11 @@ class CallCenterResository
 
     public function index($request)
     {
-        return view('dashboard.callcenter', [
+        return view('dashboard.callcenteragent', [
             'breadcrumbs' => [
                 [
                     "route" => "",
-                    "name" => "Dashboard",
+                    "name" => "Dashboard de agente de Call Center: ".auth()->user()->name,
                     "active" => true
                 ]
             ],
@@ -41,7 +41,6 @@ class CallCenterResository
 
         $dataUser = auth()->user();
         $userId = $dataUser->id; // Obtener ID del usuario autenticado
-        $exchange_commission = 16.50;
 
         // Condiciones de Reservas
         // Status de reservación
@@ -63,7 +62,7 @@ class CallCenterResository
         
         $bookings = $this->queryBookings($query, $queryHavingBooking, $queryData);
 
-        return view('dashboard.sales_callcenter', [ 'sales' => $bookings, 'exchange' => $exchange_commission ]);
+        return view('dashboard.sales_callcenter', [ 'sales' => $bookings, 'exchange' => FiltersTrait::exchangeCommission($dates[0], $dates[1]) ]);
     }
 
     public function getOperations($request)
@@ -77,7 +76,6 @@ class CallCenterResository
 
         $dataUser = auth()->user();
         $userId = $dataUser->id; // Obtener ID del usuario autenticado
-        $exchange_commission = 16.50;
 
         // Condiciones de Reservas
         // Status de reservación
@@ -113,7 +111,7 @@ class CallCenterResository
 
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHavingOperation, $queryData);
 
-        return view('dashboard.operations_callcenter', [ 'sales' => $operations, 'exchange' => $exchange_commission ]);
+        return view('dashboard.operations_callcenter', [ 'sales' => $operations, 'exchange' => FiltersTrait::exchangeCommission($dates[0], $dates[1]) ]);
     }
 
     public function getStats($request)
@@ -123,6 +121,7 @@ class CallCenterResository
             set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
 
             $data = [
+                "exchange" => 16.5,
                 "targets" => auth()->user()->target->object ?? [],
                 "daily_goal" => 0,
                 "total_day" => 0,
@@ -147,7 +146,7 @@ class CallCenterResository
             $dataUser = auth()->user();
             $userId = $dataUser->id; // Obtener ID del usuario autenticado
             $percentage_commission_investment = 20;
-            $exchange_commission = 16.50;
+            $data['exchange'] = FiltersTrait::exchangeCommission($dates[0], $dates[1]);
 
             // Condiciones de Reservas
             // Status de reservación
@@ -200,7 +199,7 @@ class CallCenterResository
                 foreach ($bookings as $booking) {
                     $date_ = date("Y-m-d", strtotime( $booking->created_at ));
                     $total_sales = $booking->currency == "USD"
-                    ? ($booking->total_sales * $exchange_commission)
+                    ? ($booking->total_sales * $data['exchange'])
                     : $booking->total_sales;
 
                     if (Carbon::parse($booking->created_at)->isToday()) { $data['total_day'] += $total_sales; }
@@ -213,7 +212,7 @@ class CallCenterResository
                 foreach ($operations as $operation) {
                     $date_ = OperationTrait::setDateTime($operation, "date");
                     $total_sales = $operation->currency == "USD"
-                    ? ($operation->cost * $exchange_commission)
+                    ? ($operation->cost * $data['exchange'])
                     : $operation->cost;
 
                     if( OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" ){
@@ -238,7 +237,7 @@ class CallCenterResository
             $percentage_commission = ($dataUser->type_commission === 'target')
             ? array_reduce($data['targets'], function ($carry, $target) use ($data) {
                 return ($data['total_services_operated'] >= $target['amount']) ? $target['percentage'] : $carry;
-            }, 4)
+            }, 0)
             : $dataUser->percentage;            
             $data['percentage_commission_investment'] = $percentage_commission_investment;
             $data['percentage_commission'] = $percentage_commission;
@@ -284,12 +283,12 @@ class CallCenterResository
             $queryData = [
                 'init' => $start->toDateTimeString(), // YYYY-MM-DD HH:MM:SS
                 'end' => $end->toDateTimeString(),                
-            ];            
+            ];
+            $exchange_commission = FiltersTrait::exchangeCommission($start->toDateString(), $end->toDateString());
             $data = $this->dataSales($start, $end);
 
             $dataUser = auth()->user();
             $userId = $dataUser->id; // Obtener ID del usuario autenticado
-            $exchange_commission = 16.50;
 
             // Condiciones de Reservas
             // Status de reservación
@@ -327,6 +326,7 @@ class CallCenterResository
             return response()->json([
                 'success' => true,
                 'message' => 'se encontraron datos',
+                'date' => $start->toDateString().' - '.$end->toDateString(),
                 'data' => $data,
             ], Response::HTTP_OK);
         } catch (Exception $e) {
@@ -352,11 +352,11 @@ class CallCenterResository
                 'init' => $start->toDateTimeString(), // YYYY-MM-DD HH:MM:SS
                 'end' => $end->toDateTimeString()
             ];
+            $exchange_commission = FiltersTrait::exchangeCommission($start->toDateString(), $end->toDateString());
             $data = $this->dataSalesOperation($start, $end);
 
             $dataUser = auth()->user();
             $userId = $dataUser->id; // Obtener ID del usuario autenticado
-            $exchange_commission = 16.50;
 
             // Condiciones de Reservas
             // Status de reservación
@@ -411,6 +411,7 @@ class CallCenterResository
             return response()->json([
                 'success' => true,
                 'message' => 'se encontraron datos',
+                'date' => $start->toDateString().' - '.$end->toDateString(),
                 'data' => $data,
             ], Response::HTTP_OK);
         } catch (Exception $e) {
@@ -477,5 +478,79 @@ class CallCenterResository
         }
 
         return $bookings_month;
-    }    
+    }
+
+    public function destinationsList($request){
+        try{
+            //Para las ventas velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
+            $paramBookingStatus = $this->parseArrayQuery(['CONFIRMED', 'CREDIT', 'OPENCREDIT'], "single");
+            $queryHavingBooking = " HAVING reservation_status IN ($paramBookingStatus) ";
+            
+            $query = " AND rez.site_id != 21 AND rez.site_id != 11 
+                        AND rez.created_at BETWEEN :init AND :end 
+                        AND rez.is_duplicated = 0 ";
+
+            $dates = isset($request->date) && !empty($request->date) 
+            ? explode(" - ", $request->date) 
+            : ['2024-12-01', '2025-02-28'];                    
+
+            $queryData = [
+                'init' => "{$dates[0]} 00:00:00",
+                'end' => "{$dates[1]} 23:59:59",
+            ];
+
+            $data = [];
+
+            $bookings = $this->queryBookings($query, $queryHavingBooking, $queryData);
+
+            if( $bookings ){
+                foreach ($bookings as $booking) {
+                    if( !isset($data[Str::slug($booking->from_name)]) ){
+                        $data[Str::slug($booking->from_name)] = [
+                            "NAME" => $booking->from_name,
+                            "QUANTITY" => 0,
+                            "TYPO_SERVICE" => [
+                                "ONEWEY" => 0,
+                                "ROUDTRIP" => 0
+                            ]
+                        ];
+                    }
+                    if( !isset($data[Str::slug($booking->to_name)]) ){
+                        $data[Str::slug($booking->to_name)] = [
+                            "NAME" => $booking->to_name,
+                            "QUANTITY" => 0,
+                            "TYPO_SERVICE" => [
+                                "ONEWEY" => 0,
+                                "ROUDTRIP" => 0
+                            ]
+                        ];
+                    }
+                    
+
+                    $data[Str::slug($booking->from_name)]['QUANTITY'] ++;
+                    $data[Str::slug($booking->to_name)]['QUANTITY'] ++;
+
+                    if( $booking->is_round_trip == 0 ){
+                        $data[Str::slug($booking->from_name)]['TYPO_SERVICE']['ONEWEY'] ++;
+                        $data[Str::slug($booking->from_name)]['TYPO_SERVICE']['ONEWEY'] ++;
+                    }
+                    if( $booking->is_round_trip > 0 ){
+                        $data[Str::slug($booking->to_name)]['TYPO_SERVICE']['ROUDTRIP'] ++;
+                        $data[Str::slug($booking->to_name)]['TYPO_SERVICE']['ROUDTRIP'] ++;
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'se encontraron datos',
+                'data' => $data,
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

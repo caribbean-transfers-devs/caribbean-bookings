@@ -24,15 +24,16 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resources/plugins/font-icons/fontawesome/css/fontawesome.css'], data.assets + '/css/panel/panel.min.css');//panel styles        
         mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
         mix.sass('resources/scss/error.scss', data.assets + "css/panel/error.min.css");//error styles
-
-
-        mix.sass('resources/scss/sections/tpv.scss', data.assets + "css/sections/tpv.min.css"); //TPV
-        mix.sass('resources/scss/sections/reservation_details.scss', data.assets + "css/sections/reservation_details.min.css"); //RESERVATION DETAILS
-        mix.sass('resources/scss/sections/dashboard.scss', data.assets + "css/sections/dashboard.min.css"); //DASHBOARD
-        mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //REPORTS 
+        
+        mix.sass('resources/scss/sections/reservation_details.scss', data.assets + "css/sections/reservation_details.min.css"); //RESERVATION DETAILS    
+        mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //LO UTILIZA LA VISTA DE COMISIONES 
 
         //DASHBOARD
-        mix.sass('resources/scss/sections/_dashboard_callcenter.scss', data.assets + "css/sections/dashboard_callcenter.min.css"); //MANAGEMENT POST VENTA
+        mix.sass('resources/scss/sections/dashboard/_management.scss', data.assets + "css/sections/dashboard/management.min.css"); //DASHBOARD DE GERENCIA
+        mix.sass('resources/scss/sections/dashboard/_callcenteragent.scss', data.assets + "css/sections/dashboard/callcenteragent.min.css"); //DASHBOAR DE AGENTE DE CALL CENTER
+
+        // TPV
+        mix.sass('resources/scss/sections/tpv.scss', data.assets + "css/sections/tpv.min.css"); //TPV
 
         //STYLES REPORTS
         mix.sass('resources/scss/sections/_report_payments.scss', data.assets + "css/sections/report_payments.min.css"); //PAYMENTS
@@ -49,10 +50,8 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         mix.sass('resources/scss/sections/_management_confirmation.scss', data.assets + "css/sections/management_confirmation.min.css"); //MANAGEMENT CONFIRMATION
         mix.sass('resources/scss/sections/_management_aftersales.scss', data.assets + "css/sections/management_aftersales.min.css"); //MANAGEMENT POST VENTA
 
-        mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/plugins/table/datatable/dataTables_fixedHeader.min.js', 'resources/js/sections/operations/spam-v2.js'], data.assets + "js/sections/operations/spam-v2.min.js");
-        mix.sass('resources/scss/sections/_new_spam.scss', data.assets + "css/sections/new_spam.min.css"); //MANAGEMENT POST VENTA
-
-        mix.combine(['resources/js/sections/operations/pending.js'], data.assets + "js/sections/operations/pending.min.js");
+        mix.combine(['resources/js/sections/operations/spam-v2.js'], data.assets + "js/sections/operations/spam-v2.min.js");    
+        mix.sass('resources/scss/sections/_new_spam.scss', data.assets + "css/sections/new_spam.min.css"); //MANAGEMENT POST VENTA        
 
         mix.sass('resources/scss/sections/_management_spam.scss', data.assets + "css/sections/management_spam.min.css"); //MANAGEMENT SPAM
         mix.sass('resources/scss/sections/_management_reservations.scss', data.assets + "css/sections/management_reservations.min.css"); //MANAGEMENT RESERVATIONS
@@ -87,10 +86,8 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         mix.combine(['resources/plugins/perfect-scrollbar/perfect-scrollbar.min.js','resources/plugins/mousetrap/mousetrap.min.js','resources/plugins/waves/waves.min.js','resources/plugins/notification/snackbar/snackbar.min.js', 'resources/plugins/waitMe/waitme.js','resources/js/components.js'], data.assets + '/js/panel/panel_custom.min.js');//panel scripts
 
         //DASHBOARD
-        mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard.js'], data.assets + "js/sections/dashboard.min.js");
-        mix.combine(['resources/plugins/apex/apexcharts.min.js','resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js','resources/js/sections/dashboard2.js'], data.assets + "js/sections/dashboard2.min.js");
-        mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/dashboard/callcenter.js'], data.assets + "js/sections/dashboard/callcenter.min.js");
-
+        mix.combine(['resources/plugins/apex/apexcharts.min.js', 'resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/dashboard/management.js'], data.assets + "js/sections/dashboard/management.min.js");
+        mix.combine(['resources/plugins/apex/apexcharts.min.js', 'resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/dashboard/callcenteragent.js', 'resources/js/sections/operations/spam-v2.js'], data.assets + "js/sections/dashboard/callcenteragent.min.js");
 
         //TPV
         mix.combine(['resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/tpv/index.js'], data.assets + "js/sections/tpv/index.min.js");

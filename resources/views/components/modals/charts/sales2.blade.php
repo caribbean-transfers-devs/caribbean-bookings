@@ -66,7 +66,7 @@
                                 <div>
                                     <h6>Por Estatus</h6>
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Estatus</th>                                                    
@@ -111,7 +111,7 @@
                                 <div>
                                     <h6>Por Metodo De Pago</h6>                                
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Metodo De Pago</th>                                                    
@@ -156,7 +156,7 @@
                                 <div>
                                     <h6>Por Moneda</h6>                                
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Moneda</th>                                                    
@@ -198,7 +198,7 @@
                                 <div>
                                     <h6>Por Vehículo</h6>                                
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Vehículo</th>
@@ -243,7 +243,7 @@
                                 <div>
                                     <h6>Por Tipo De Servicio</h6>                                
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Tipo De Servicio</th>
@@ -288,7 +288,7 @@
                                 <div>
                                     <h6>Por Tipo De Servicio De Operación</h6>                                
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Tipo De Servicio</th>
@@ -330,7 +330,7 @@
                         <div id="chartSites">
                             <h6>Por Sitio</h6>
                             <div class="table-responsive">
-                                <table class="table table-chart table-chart-general mb-0">
+                                <table class="table custom-table table-chart table-chart-general mb-0">
                                     <thead>
                                         <tr>
                                             <th>Sitio</th>
@@ -368,7 +368,7 @@
                         <div id="chartDestination">
                             <h6>Por Destino</h6>
                             <div class="table-responsive">
-                                <table class="table table-chart table-chart-general mb-0">
+                                <table class="table custom-table table-chart table-chart-general mb-0">
                                     <thead>
                                         <tr>
                                             <th>Destino</th>
@@ -406,7 +406,7 @@
                         <div id="chartDrivers">
                             <h6>Por Conductor</h6>
                             <div class="table-responsive">
-                                <table class="table table-chart table-chart-driver mb-0">
+                                <table class="table custom-table table-chart table-chart-driver mb-0">
                                     <thead>
                                         <tr>
                                             <th>Conductor</th>
@@ -453,7 +453,7 @@
                         <div id="chartUnits">
                             <h6>Por Unidad</h6>
                             <div class="table-responsive">
-                                <table class="table table-chart table-chart-general mb-0">
+                                <table class="table custom-table table-chart table-chart-general mb-0">
                                     <thead>
                                         <tr>
                                             <th>Unidad</th>
@@ -494,7 +494,7 @@
                         <div id="chartOriginSale">
                             <h6>Por Origen De Venta</h6>
                             <div class="table-responsive">
-                                <table class="table table-chart table-chart-general mb-0">
+                                <table class="table custom-table table-chart table-chart-general mb-0">
                                     <thead>
                                         <tr>
                                             <th>Origen</th>

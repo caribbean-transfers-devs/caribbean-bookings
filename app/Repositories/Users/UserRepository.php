@@ -159,6 +159,7 @@ class UserRepository
 
             ( isset($request->type_commission) && ($request->type_commission == "target" || $request->type_commission == "percentage") ? $user->is_call_center_agent = 1 : 0 );
             ( isset($request->type_commission) ? $user->type_commission = $request->type_commission : "target" );
+            ( isset($request->type_commission) && $request->type_commission == "target" ? $user->target_id = 1 : NULL );
             ( isset($request->percentage) ? $user->percentage = $request->percentage : 0 );
             ( isset($request->daily_goal) ? $user->daily_goal = $request->daily_goal : 0 );
 

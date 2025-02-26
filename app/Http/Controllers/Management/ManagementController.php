@@ -15,7 +15,7 @@ class ManagementController extends Controller
 {
     use RoleTrait;
 
-    private $ManagementRepository;    
+    private $ManagementRepository;
 
     public function __construct(ManagementRepository $ManagementRepository)
     {

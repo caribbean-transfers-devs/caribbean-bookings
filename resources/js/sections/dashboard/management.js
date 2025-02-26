@@ -1,0 +1,1014 @@
+if ( document.getElementById('lookup_date') != null ) {
+    const picker = new easepick.create({
+        element: "#lookup_date",
+        css: [
+            'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+            'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+            'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
+        ],
+        zIndex: 10,
+        plugins: ['RangePlugin'],
+    });   
+}
+
+window.addEventListener("load", function(){
+    try {
+
+        // const bookings_day = new PerfectScrollbar(document.querySelector('.bookings_day'));
+        dashboard.actionTable($('.table-rendering'));
+
+        var Theme = 'dark';
+
+        Apex.tooltip = {
+            theme: Theme
+        }
+
+        /**
+            ==============================
+            |    @Options Charts Script   |
+            ==============================
+        */
+
+        /*
+            =================================
+                Bookings By Status Day | Options
+            =================================
+        */
+        // var optionsStatusDay = {
+        //     chart: {
+        //         type: 'donut',
+        //         width: 370,
+        //         height: 430
+        //     },
+        //     colors: dashboard.seriesStatusDay().colors,
+        //     dataLabels: {
+        //         enabled: true
+        //     },
+        //     legend: {
+        //         position: 'bottom',
+        //         horizontalAlign: 'center',
+        //         fontSize: '14px',
+        //         markers: {
+        //             width: 10,
+        //             height: 10,
+        //             offsetX: -5,
+        //             offsetY: 0
+        //         },
+        //         itemMargin: {
+        //             horizontal: 10,
+        //             vertical: 30
+        //         }
+        //     },
+        //     plotOptions: {
+        //         pie: {
+        //             donut: {
+        //             size: '75%',
+        //             background: 'transparent',
+        //             labels: {
+        //                 show: true,
+        //                 name: {
+        //                     show: true,
+        //                     fontSize: '29px',
+        //                     fontFamily: 'Nunito, sans-serif',
+        //                     color: undefined,
+        //                     offsetY: -10
+        //                 },
+        //                 value: {
+        //                     show: true,
+        //                     fontSize: '26px',
+        //                     fontFamily: 'Nunito, sans-serif',
+        //                     color: '#0e1726',
+        //                     offsetY: 16,
+        //                     formatter: function (val) {
+        //                         return val
+        //                     }
+        //                 },
+        //                 total: {
+        //                     show: true,
+        //                     showAlways: true,
+        //                     label: 'Total',
+        //                     color: '#888ea8',
+        //                     fontSize: '30px',
+        //                     formatter: function (w) {
+        //                         return w.globals.seriesTotals.reduce( function(a, b) {
+        //                         return a + b
+        //                         }, 0)
+        //                     }
+        //                 }
+        //             }
+        //             }
+        //         }
+        //     },
+        //     stroke: {
+        //         show: true,
+        //         width: 15,
+        //         colors: '#ffffff'
+        //     },
+        //     series: dashboard.seriesStatusDay().series,
+        //     labels: dashboard.seriesStatusDay().labels,
+        //     responsive: [
+        //         {
+        //             breakpoint: 1440, options: {
+        //                 chart: {
+        //                     width: 325
+        //                 },
+        //             }
+        //         },
+        //         {
+        //             breakpoint: 1199, options: {
+        //                 chart: {
+        //                     width: 380
+        //                 },
+        //             }
+        //         },
+        //         {
+        //             breakpoint: 575, options: {
+        //                 chart: {
+        //                     width: 320
+        //                 },
+        //             }
+        //         },
+        //     ],
+        // }
+
+        /*
+            =================================
+                Bookings By Status Day | Options
+            =================================
+        */
+        var optionsStatusMonth = {
+            chart: {
+                type: 'donut',
+                width: 370,
+                height: 430
+            },
+            colors: dashboard.seriesStatusMonth().colors,
+            dataLabels: {
+                enabled: true
+            },
+            legend: {
+                position: 'bottom',
+                horizontalAlign: 'center',
+                fontSize: '14px',
+                markers: {
+                    width: 10,
+                    height: 10,
+                    offsetX: -5,
+                    offsetY: 0
+                },
+                itemMargin: {
+                    horizontal: 10,
+                    vertical: 30
+                }
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                    size: '75%',
+                    background: 'transparent',
+                    labels: {
+                        show: true,
+                        name: {
+                            show: true,
+                            fontSize: '29px',
+                            fontFamily: 'Nunito, sans-serif',
+                            color: undefined,
+                            offsetY: -10
+                        },
+                        value: {
+                            show: true,
+                            fontSize: '26px',
+                            fontFamily: 'Nunito, sans-serif',
+                            color: '#0e1726',
+                            offsetY: 16,
+                            formatter: function (val) {
+                                return val
+                            }
+                        },
+                        total: {
+                            show: true,
+                            showAlways: true,
+                            label: 'Total',
+                            color: '#888ea8',
+                            fontSize: '30px',
+                            formatter: function (w) {
+                                return w.globals.seriesTotals.reduce( function(a, b) {
+                                return a + b
+                                }, 0)
+                            }
+                        }
+                    }
+                    }
+                }
+            },
+            stroke: {
+                show: true,
+                width: 15,
+                colors: '#ffffff'
+            },
+            series: dashboard.seriesStatusMonth().series,
+            labels: dashboard.seriesStatusMonth().labels,
+            responsive: [
+                {
+                    breakpoint: 1440, options: {
+                        chart: {
+                            width: 325
+                        },
+                    }
+                },
+                {
+                    breakpoint: 1199, options: {
+                        chart: {
+                            width: 380
+                        },
+                    }
+                },
+                {
+                    breakpoint: 575, options: {
+                        chart: {
+                            width: 320
+                        },
+                    }
+                },
+            ],
+        }
+
+        /*
+            =================================
+                Bookings Analytics Month | Options
+            =================================
+        */
+        var optionsBookingsMonth = {
+            chart: {
+                fontFamily: 'Nunito, sans-serif',
+                height: 380,
+                type: 'area',
+                zoom: {
+                    enabled: false
+                },
+                dropShadow: {
+                    enabled: true,
+                    opacity: 0.2,
+                    blur: 10,
+                    left: -7,
+                    top: 22
+                },
+                toolbar: {
+                    show: false
+                },
+            },
+            // colors: ['#1b55e2', '#e7515a'],
+            colors: ['#D01317'],
+            dataLabels: {
+                enabled: true
+            },
+            // markers: {
+            //     discrete: [
+            //         {
+            //             seriesIndex: 0,
+            //             dataPointIndex: 7,
+            //             fillColor: '#000',
+            //             strokeColor: '#000',
+            //             size: 5
+            //         },
+            //         {
+            //             seriesIndex: 2,
+            //             dataPointIndex: 11,
+            //             fillColor: '#000',
+            //             strokeColor: '#000',
+            //             size: 4
+            //         }
+            //     ]
+            // },
+            subtitle: {
+                text: 'MXN:' + ' $ ' + dashboard.number_format(dashboard.seriesBookingsMonth().MXN,2,'.',','),
+                align: 'left',
+                margin: 0,
+                // offsetX: 100,
+                // offsetY: 20,
+                floating: false,
+                style: {
+                    fontSize: '18px',
+                    color: '#0e1726'
+                }
+            },
+            title: {
+                text: 'USD:' + ' $ ' + dashboard.number_format(dashboard.seriesBookingsMonth().USD,2,'.',','),
+                align: 'left',
+                margin: 0,
+                // offsetX: -10,
+                // offsetY: 20,
+                floating: false,
+                style: {
+                    fontSize: '18px',
+                    color: '#0e1726'
+                },
+            },
+            stroke: {
+                show: true,
+                curve: 'smooth',
+                width: 2,
+                lineCap: 'square'
+            },
+            series: dashboard.seriesBookingsMonth().series,
+            //labels: dashboard.seriesBookingsMonth().labels,
+            xaxis: {
+                type: 'datetime',
+                categories: dashboard.seriesBookingsMonth().labels,
+                axisBorder: {
+                    show: false
+                },
+                axisTicks: {
+                    show: false
+                },
+                crosshairs: {
+                    show: true
+                },
+                labels: {
+                    // offsetX: 0,
+                    // offsetY: 5,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Nunito, sans-serif',
+                        cssClass: 'apexcharts-xaxis-title',
+                    },
+                }
+            },
+            yaxis: {
+                labels: {
+                    // formatter: function(value, index) {
+                    //     return (value / 1000) + 'K'
+                    // },
+                    offsetX: -15,
+                    offsetY: 0,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Nunito, sans-serif',
+                        cssClass: 'apexcharts-yaxis-title',
+                    },
+                }
+            },
+            grid: {
+                borderColor: '#e0e6ed',
+                strokeDashArray: 5,
+                xaxis: {
+                    lines: {
+                        show: true
+                    }
+                },
+                yaxis: {
+                    lines: {
+                        show: false,
+                    }
+                },
+                padding: {
+                    // top: -50,
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 5
+                },
+            },
+            // legend: {
+            //     position: 'top',
+            //     horizontalAlign: 'right',
+            //     offsetY: -50,
+            //     fontSize: '16px',
+            //     fontFamily: 'Quicksand, sans-serif',
+            //     markers: {
+            //         width: 10,
+            //         height: 10,
+            //         strokeWidth: 0,
+            //         strokeColor: '#fff',
+            //         fillColors: undefined,
+            //         radius: 12,
+            //         onClick: undefined,
+            //         offsetX: -5,
+            //         offsetY: 0
+            //     },
+            //     itemMargin: {
+            //         horizontal: 10,
+            //         vertical: 20
+            //     }
+            // },
+            tooltip: {
+                theme: Theme,
+                marker: {
+                    show: true,
+                },
+                x: {
+                    show: true,
+                    format: 'dd/MM/yy'
+                },
+                custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                    console.log( series, seriesIndex, dataPointIndex, w );
+                    const details = dashboard.seriesBookingsMonth().series[seriesIndex].data[dataPointIndex].details;
+                    return `<div class="custom-tooltip">
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total de ventas:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
+                                </div>                                
+                            </div>`;
+                }
+            },
+            fill: {
+                type:"gradient",
+                gradient: {
+                    type: "vertical",
+                    shadeIntensity: 1,
+                    inverseColors: !1,
+                    opacityFrom: .19,
+                    opacityTo: .05,
+                    stops: [100, 100]
+                }
+            },
+            responsive: [
+                {
+                    breakpoint: 575,
+                    options: {
+                        legend: {
+                            offsetY: -50,
+                        },
+                    },
+                }
+            ]
+        }
+
+        /*
+            =================================
+                Bookings Analytics Currency Month | Options
+            =================================
+        */
+        var optionsBookingsCurrencyMonth = {
+            chart: {
+                fontFamily: 'Nunito, sans-serif',
+                height: 365,
+                type: 'area',
+                zoom: {
+                    enabled: false
+                },
+                dropShadow: {
+                    enabled: true,
+                    opacity: 0.2,
+                    blur: 10,
+                    left: -7,
+                    top: 22
+                },
+                toolbar: {
+                    show: false
+                },
+            },
+            colors: ['#D01317', '#16161D'],
+            dataLabels: {
+                enabled: true,
+                formatter: function (value, { seriesIndex, dataPointIndex, w }) {
+                    return dashboard.number_format(value,2,'.',',')
+                },
+            },
+            markers: {
+                discrete: [
+                    {
+                        seriesIndex: 0,
+                        dataPointIndex: 7,
+                        fillColor: '#000',
+                        strokeColor: '#000',
+                        size: 5
+                    },
+                    {
+                        seriesIndex: 2,
+                        dataPointIndex: 11,
+                        fillColor: '#000',
+                        strokeColor: '#000',
+                        size: 4
+                    }
+                ]
+            },        
+            stroke: {
+                show: true,
+                curve: 'smooth',
+                width: 2,
+                lineCap: 'square'
+            },
+            series: dashboard.seriesBookingsCurrencyMonth().series,
+            labels: dashboard.seriesBookingsCurrencyMonth().labels,
+            xaxis: {
+                type: 'datetime',
+                axisBorder: {
+                    show: false
+                },
+                axisTicks: {
+                    show: false
+                },
+                crosshairs: {
+                    show: true
+                },
+                labels: {
+                    // offsetX: 0,
+                    // offsetY: 5,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Nunito, sans-serif',
+                        cssClass: 'apexcharts-xaxis-title',
+                    },
+                }
+            },
+            yaxis: {
+                labels: {
+                    formatter: function(value, index) {
+                        return (value / 1000) + 'K'
+                    },
+                    offsetX: -15,
+                    offsetY: 0,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Nunito, sans-serif',
+                        cssClass: 'apexcharts-yaxis-title',
+                    },
+                }
+            },
+            grid: {
+                borderColor: '#e0e6ed',
+                strokeDashArray: 5,
+                xaxis: {
+                    lines: {
+                        show: true
+                    }
+                },
+                yaxis: {
+                    lines: {
+                        show: false,
+                    }
+                },
+                padding: {
+                    // top: -50,
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 5
+                },
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+                // offsetY: -50,
+                fontSize: '16px',
+                fontFamily: 'Quicksand, sans-serif',
+                markers: {
+                    width: 10,
+                    height: 10,
+                    strokeWidth: 0,
+                    strokeColor: '#fff',
+                    fillColors: undefined,
+                    radius: 12,
+                    onClick: undefined,
+                    offsetX: -5,
+                    offsetY: 0
+                },
+                itemMargin: {
+                    horizontal: 10,
+                    vertical: 20
+                }
+            },
+            tooltip: {
+                theme: Theme,
+                marker: {
+                    show: true,
+                },
+                x: {
+                    show: false,
+                },
+                custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                    // console.log( series, seriesIndex, dataPointIndex, w );
+                    // // console.log( series[seriesIndex][dataPointIndex] );
+                    // console.log(w.config.series[0].name + ":  " + w.config.series[0].data[dataPointIndex]);
+                    // console.log(w.config.series[1].name + ":  " + w.config.series[0].data[dataPointIndex]);
+                    return `<div class="custom-tooltip">
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(series[0][dataPointIndex],2,'.',',') }</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(series[1][dataPointIndex],2,'.',',') }</span>
+                                </div>
+                            </div>`;
+                }                
+            },
+            fill: {
+                type:"gradient",
+                gradient: {
+                    type: "vertical",
+                    shadeIntensity: 1,
+                    inverseColors: !1,
+                    opacityFrom: .19,
+                    opacityTo: .05,
+                    stops: [100, 100]
+                }
+            },
+            responsive: [
+                {
+                    breakpoint: 575,
+                    options: {
+                        legend: {
+                            offsetY: -50,
+                        },
+                    },
+                }
+            ]
+        }
+
+        /*
+            =================================
+                Bookings Analytics Sites Month | Options
+            =================================
+        */
+        var optionsBookingsSitesMonth = {
+            chart: {
+                fontFamily: 'Nunito, sans-serif',
+                height: 370,
+                type: 'bar',
+                zoom: {
+                    enabled: false
+                },
+                toolbar: {
+                    show: false
+                }                
+            },
+            colors: ['#D01317'],
+            dataLabels: {
+                enabled: true
+            },            
+            series: dashboard.seriesSitesMonth().series,
+            xaxis: {
+                type: 'category',
+                labels: {
+                    offsetX: 0,
+                    offsetY: 5,
+                    rotate: -45,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Nunito, sans-serif',
+                        cssClass: 'apexcharts-xaxis-title',
+                    },
+                },                
+                categories: dashboard.seriesSitesMonth().labels
+            },
+            yaxis: {
+                labels: {
+                    offsetX: -15,
+                    offsetY: 0,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Nunito, sans-serif',
+                        cssClass: 'apexcharts-yaxis-title',
+                    },
+                },                
+            },            
+            tooltip: {
+                theme: Theme,
+                custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                    const details = dashboard.seriesSitesMonth().series[seriesIndex].data[dataPointIndex].details;
+                    return `<div class="custom-tooltip">
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total de ventas:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
+                                </div>
+                            </div>`;
+                }                
+            },            
+            responsive: [{
+                breakpoint: 575,
+            }],
+        }
+
+        /*
+            =================================
+                Bookings Analytics Sites Day | Options
+            =================================
+        */
+        // var optionsBookingsSitesDay = {
+        //     chart: {
+        //         fontFamily: 'Nunito, sans-serif',
+        //         height: 370,
+        //         type: 'bar',
+        //         zoom: {
+        //             enabled: false
+        //         },
+        //         toolbar: {
+        //             show: false
+        //         }                
+        //     },
+        //     colors: ['#D01317'],
+        //     dataLabels: {
+        //         enabled: true
+        //     },            
+        //     series: dashboard.seriesSitesDay().series,
+        //     xaxis: {
+        //         type: 'category',
+        //         labels: {
+        //             offsetX: 0,
+        //             offsetY: 5,
+        //             rotate: -45,
+        //             style: {
+        //                 fontSize: '12px',
+        //                 fontFamily: 'Nunito, sans-serif',
+        //                 cssClass: 'apexcharts-xaxis-title',
+        //             },
+        //         },                
+        //         categories: dashboard.seriesSitesDay().labels
+        //     },
+        //     yaxis: {
+        //         labels: {
+        //             offsetX: -15,
+        //             offsetY: 0,
+        //             style: {
+        //                 fontSize: '12px',
+        //                 fontFamily: 'Nunito, sans-serif',
+        //                 cssClass: 'apexcharts-yaxis-title',
+        //             },
+        //         },                
+        //     },            
+        //     tooltip: {
+        //         theme: Theme,
+        //         custom: function({ series, seriesIndex, dataPointIndex, w }) {
+        //             const details = dashboard.seriesSitesDay().series[seriesIndex].data[dataPointIndex].details;
+        //             return `<div class="custom-tooltip">
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total de ventas:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
+        //                         </div>
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+        //                         </div>                                
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
+        //                         </div>
+        //                     </div>`;
+        //         }
+        //     },            
+        //     responsive: [{
+        //         breakpoint: 575,
+        //     }],
+        // }
+
+        /*
+            =================================
+                Bookings Analytics Destinations Day | Options
+            =================================
+        */        
+        // var optionsBookingsDestinationsDay = {
+        //     chart: {
+        //         fontFamily: 'Nunito, sans-serif',
+        //         height: 370,
+        //         type: 'bar',
+        //         zoom: {
+        //             enabled: false
+        //         },
+        //         toolbar: {
+        //             show: false
+        //         }
+        //     },
+        //     // colors: dashboard.seriesDestinationMonth().colors,
+        //     colors: ['#16161D'],
+        //     dataLabels: {
+        //         enabled: true,
+        //     },
+        //     series: dashboard.seriesDestinationDay().series,
+        //     xaxis: {
+        //         type: 'category',
+        //         labels: {
+        //             offsetX: 0,
+        //             offsetY: 5,
+        //             rotate: -45,
+        //             style: {
+        //                 fontSize: '12px',
+        //                 fontFamily: 'Nunito, sans-serif',
+        //                 cssClass: 'apexcharts-xaxis-title',
+        //             },
+        //         },
+        //         categories: dashboard.seriesDestinationDay().labels,
+        //     },
+        //     yaxis: {
+        //         labels: {
+        //             offsetX: -15,
+        //             offsetY: 0,
+        //             style: {
+        //                 fontSize: '12px',
+        //                 fontFamily: 'Nunito, sans-serif',
+        //                 cssClass: 'apexcharts-yaxis-title',
+        //             },
+        //         },                
+        //     },
+        //     tooltip: {
+        //         theme: Theme,
+        //         custom: function({ series, seriesIndex, dataPointIndex, w }) {
+        //             const details = dashboard.seriesDestinationDay().series[seriesIndex].data[dataPointIndex].details;
+        //             return `<div class="custom-tooltip">
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total de ventas:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
+        //                         </div>
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+        //                         </div>
+        //                         <div class="apexcharts-tooltip-y-group">
+        //                             <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+        //                             <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
+        //                         </div>
+        //                     </div>`;
+        //         }                
+        //     },
+        //     responsive: [{
+        //         breakpoint: 575,
+        //     }]
+        // }
+
+        /*
+            =================================
+                Bookings Analytics Destinations Month | Options
+            =================================
+        */        
+        var optionsBookingsDestinationsMonth = {
+            chart: {
+                fontFamily: 'Nunito, sans-serif',
+                height: 370,
+                type: 'bar',
+                zoom: {
+                    enabled: false
+                },
+                toolbar: {
+                    show: false
+                }
+            },
+            // colors: dashboard.seriesDestinationMonth().colors,
+            colors: ['#16161D'],
+            dataLabels: {
+                enabled: true,
+            },
+            series: dashboard.seriesDestinationMonth().series,
+            xaxis: {
+                type: 'category',
+                labels: {
+                    offsetX: 0,
+                    offsetY: 5,
+                    rotate: -45,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Nunito, sans-serif',
+                        cssClass: 'apexcharts-xaxis-title',
+                    },
+                },
+                categories: dashboard.seriesDestinationMonth().labels,
+            },
+            yaxis: {
+                labels: {
+                    offsetX: -15,
+                    offsetY: 0,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Nunito, sans-serif',
+                        cssClass: 'apexcharts-yaxis-title',
+                    },
+                },                
+            },
+            tooltip: {
+                theme: Theme,
+                custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                    const details = dashboard.seriesDestinationMonth().series[seriesIndex].data[dataPointIndex].details;
+                    return `<div class="custom-tooltip">
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total de ventas:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${details.counter}</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total USD:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.USD,2,'.',',') }</span>
+                                </div>
+                                <div class="apexcharts-tooltip-y-group">
+                                    <span class="apexcharts-tooltip-text-y-label">Total MXN:</span>
+                                    <span class="apexcharts-tooltip-text-y-value">${ dashboard.number_format(details.MXN,2,'.',',') }</span>
+                                </div>
+                            </div>`;
+                }                
+            },
+            responsive: [{
+                breakpoint: 575,
+            }]
+        }
+
+        /**
+             ==============================
+            |    @Render Charts Script    |
+            ==============================
+        */
+
+        /*
+            =================================
+                Bookings By Status Day | Render
+            =================================
+        */
+        // var bookingsStatusDay = new ApexCharts(
+        //     document.querySelector("#bookingsStatusDay"),
+        //     optionsStatusDay
+        // );
+        // bookingsStatusDay.render();
+
+        /*
+            =================================
+                Bookings By Status Month | Render
+            =================================
+        */
+        // var bookingsStatusMonth = new ApexCharts(
+        //     document.querySelector("#bookingsStatusMonth"),
+        //     optionsStatusMonth
+        // );
+        // bookingsStatusMonth.render();
+
+        /*
+            ================================
+                Bookings Analytics Month | Render
+            ================================
+        */
+        var bookingsAnalyticsMonth = new ApexCharts(
+            document.querySelector("#bookingsAnalyticsMonth"),
+            optionsBookingsMonth
+        );
+        bookingsAnalyticsMonth.render();
+
+        /*
+            ================================
+                Bookings Analytics Currency Month | Render
+            ================================
+        */
+        var bookingsAnalyticsCurrencyMonth = new ApexCharts(
+            document.querySelector("#bookingsAnalyticsCurrencyMonth"),
+            optionsBookingsCurrencyMonth
+        );
+        bookingsAnalyticsCurrencyMonth.render();
+
+        /*
+            ================================
+                Bookings Analytics Sites Day | Render
+            ================================
+        */
+        // var bookingsAnalyticsSitesDay = new ApexCharts(
+        //     document.querySelector("#bookingsAnalyticsSitesDay"),
+        //     optionsBookingsSitesDay
+        // );
+        // bookingsAnalyticsSitesDay.render();
+
+        /*
+            ================================
+                Bookings Analytics Sites Month | Render
+            ================================
+        */
+        var bookingsAnalyticsSitesMonth = new ApexCharts(
+            document.querySelector("#bookingsAnalyticsSitesMonth"),
+            optionsBookingsSitesMonth
+        );
+        bookingsAnalyticsSitesMonth.render();
+
+        /*
+            ================================
+                Bookings Analytics Destinations Day | Render
+            ================================
+        */
+        // var bookingsAnalyticsDestinationsDay = new ApexCharts(
+        //     document.querySelector("#bookingsAnalyticsDestinationsDay"),
+        //     optionsBookingsDestinationsDay
+        // );
+        // bookingsAnalyticsDestinationsDay.render();
+
+        /*
+            ================================
+                Bookings Analytics Destinations Month | Render
+            ================================
+        */
+        var bookingsAnalyticsDestinationsMonth = new ApexCharts(
+            document.querySelector("#bookingsAnalyticsDestinationsMonth"),
+            optionsBookingsDestinationsMonth
+        );
+        bookingsAnalyticsDestinationsMonth.render();
+    } catch(e) {
+        console.log(e);
+    }
+})

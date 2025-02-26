@@ -16,13 +16,14 @@ use App\Models\Zones;
 use App\Models\DestinationService;
 use App\Models\CancellationTypes;
 use App\Models\ExchangeRateReport;
+use App\Models\ExchangeRateCommission;
 use App\Models\SalesType;
 use App\Models\ContactPoints;
 
 trait FiltersTrait
 {
 
-    //NOS TRAE EL TIPO DE CAMBIO DEPENDIENDO DE LA FECHA
+    //NOS TRAE EL TIPO DE CAMBIO DEPENDIENDO DE LA FECHA, PARA LOS REPORTES
     public static function Exchange($in, $end){
         $in = ( isset($in) ? $in : date('Y-m-d') );
         $end = ( isset($in) ? $in : date('Y-m-d') );
@@ -34,6 +35,20 @@ trait FiltersTrait
             return $report->exchange; // Ejemplo: 25.50
         } else {
             return 18;
+        }
+    }
+
+    public static function exchangeCommission($in, $end){
+        $in = ( isset($in) ? $in : date('Y-m-d') );
+        $end = ( isset($in) ? $in : date('Y-m-d') );
+        $report = ExchangeRateCommission::where('status', 1)->where('date_init', '<=', $in)
+                                ->where('date_end', '>=', $end)
+                                ->first();
+
+        if ($report) {
+            return $report->exchange; // Ejemplo: 25.50
+        } else {
+            return 16.5;
         }
     }
 

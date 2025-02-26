@@ -1,29 +1,27 @@
-@import "../../plugins/table/datatable/datatables5";
-@import "../template/plugins/light/table/datatable/custom_dt";
-// @import "../template/plugins/light/table/datatable/dt-global_style";
-// @import "../template/plugins/dark/table/datatable/dt-global_style";
-
-@import '../template/light/components/tabs';
-@import '../template/dark/components/tabs';
-@import '../template/light/components/modal';
-@import '../template/dark/components/modal';
-
 @import '../template/light/users/account-setting';
 @import '../template/dark/users/account-setting';
 
-@import '../components/fixedheader';
+@import '../template/light/components/modal';
+
 @import '../components/filters';
-@import '../components/charts';
+@import '../components/table';
+@import '../components/loaders';
+
+.card-data{
+    max-height: 700px;
+    overflow-y: scroll;
+}
+
+.callcenter-container{ font-family: "Poppins", serif; }
 
 div.spam-date-container{
     display: grid;
     grid-template-columns: 2fr 1fr;
     grid-column-gap: 15px;
     grid-row-gap: 15px;
-    margin-bottom: 15px;
     align-items: baseline;
     > select{
-        padding: 0px 15px;
+        padding: 5px 15px;
         align-self: baseline;
     }
 }
@@ -93,46 +91,6 @@ div.spam-date-container{
     }
 }
 
-/*
-@media (max-width:300px){
-	.timeline{
-		width:100%;
-		padding:30px 5px 30px 10px;
-	}
-	.timeline ul li .content h3{
-		color:#34ace0;
-		font-size:15px;
-	}
-}*/
-
-
-.loaderItem {
-    margin: 0 auto;
-    width: 60px;
-    aspect-ratio: 2;
-    --_g: no-repeat radial-gradient(circle closest-side,#000 90%,#0000);
-    background: 
-      var(--_g) 0%   50%,
-      var(--_g) 50%  50%,
-      var(--_g) 100% 50%;
-    background-size: calc(100%/3) 50%;
-    animation: l3 1s infinite linear;
-}
-@keyframes l3 {
-    20%{background-position:0%   0%, 50%  50%,100%  50%}
-    40%{background-position:0% 100%, 50%   0%,100%  50%}
-    60%{background-position:0%  50%, 50% 100%,100%   0%}
-    80%{background-position:0%  50%, 50%  50%,100% 100%}
-}
-
 .follow_up_hide{
     display: none;
 }
-
-// .callcenter{
-//     background-color: #00ab55 !important;
-    
-//     td{
-//         color: #fff !important;
-//     }
-// }

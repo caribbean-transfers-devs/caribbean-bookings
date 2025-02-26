@@ -12,6 +12,7 @@ trait QueryTrait
     public function queryBookings($query, $query2, $queryData){
         $bookings = DB::select("SELECT 
                                     rez.id AS reservation_id, 
+                                    rez.categories,
                                     CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name,
                                     rez.client_email,
                                     rez.client_phone,
@@ -154,6 +155,7 @@ trait QueryTrait
     public function queryOperations($queryOne, $queryTwo, $queryHaving, $queryData){
         return  DB::select("SELECT 
                                 rez.id as reservation_id,
+                                rez.categories,
                                 CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
                                 rez.client_email,
                                 rez.client_phone,
@@ -340,6 +342,7 @@ trait QueryTrait
 
                             SELECT 
                                 rez.id as reservation_id,
+                                rez.categories,
                                 CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
                                 rez.client_email,
                                 rez.client_phone,

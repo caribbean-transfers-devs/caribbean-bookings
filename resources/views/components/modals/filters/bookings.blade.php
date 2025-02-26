@@ -22,10 +22,6 @@
             <form class="form" action="" method="POST" id="formSearch">
                 <div class="modal-body">
                     @csrf
-                    @php
-                        // dump($users);
-                        // dump($request);
-                    @endphp
                     <div class="top">
                         <div class="item">
                             <div class="box_input transparent">
@@ -277,7 +273,7 @@
                     @endif                    
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn btn-light-dark" data-bs-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
+                    <button type="button" class="btn btn-light-dark" data-bs-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>
                     <button type="submit" class="btn btn-primary">Buscar</button>
                 </div>
             </form>
