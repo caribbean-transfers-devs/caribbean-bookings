@@ -60,8 +60,6 @@ Route::middleware(['guest'])->group(function () {
 //Meter al middleware para protejer estas rutas...
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::post('/', [DashboardController::class, 'index'])->name('dashboard.search');
 
     //BOTS 
         //PAYPAL
@@ -74,6 +72,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
 
     //DASHBOARD
+        Route::match(['get', 'post'], '/', [DashboardController::class, 'index'])->name('dashboard');
         // AGENTES DE CALL CENTER
         Route::match(['get', 'post'], '/callcenters', [CallCenterController::class, 'index'])->name('callcenters.index');
         Route::match(['post'], '/callcenters/sales/get', [CallCenterController::class, 'getSales'])->name('callcenters.sales.get');
@@ -241,6 +240,6 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     //ACCIONES GENERALES
-
+    Route::post('/action/enablePayArrival', [ActionsController::class, 'enablePayArrival'])->name('update.booking.pay.arrival');    
     Route::put('/action/updateServiceStatus', [ActionsController::class, 'updateServiceStatus'])->name('update.service.status');    
 });

@@ -22,7 +22,12 @@ class ActionsController extends Controller
         $this->ActionsRepository = $ActionsRepository;
     }
 
+    public function enablePayArrival(Request $request)
+    {
+        return $this->ActionsRepository->enablePayArrival($request);
+    }
+
     public function updateServiceStatus(Request $request){
-        return $this->ActionsRepository->updateServiceStatus($request);        
-    }    
+        return $this->ActionsRepository->updateServiceStatus($request);
+    }
 }

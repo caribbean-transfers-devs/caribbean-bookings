@@ -9,6 +9,17 @@
 @push('Js')    
     <script src="{{ mix('assets/js/sections/user_edit.min.js') }}"></script>
     <script>
+        function isCommissionF(__this){
+            const box = document.querySelector('.callcenteagent');
+            const box2 = document.querySelector('.callcenteagent2');
+            if( __this.value == 1 ){
+                box.classList.remove('d-none');
+                box2.classList.remove('d-none');
+            }else{
+                box.classList.add('d-none');
+                box2.classList.add('d-none');
+            }
+        }
         function typeCommission(__this){
             const percentage = document.querySelector('.percentage');
             if( __this.value == "percentage" ){
@@ -17,6 +28,7 @@
                 percentage.classList.add('d-none')
             }
         }
+        const isCommission = document.getElementById("is_commission");
         const type_commission = document.getElementById('type_commission');
 
         const choices = new Choices(document.getElementById('roles'),{
@@ -27,6 +39,12 @@
             itemSelectText: 'Clic para elegir',
         });
 
+        if( isCommission ){
+            isCommissionF(isCommission);
+            isCommission.addEventListener('change', function(){
+                isCommissionF(this);
+            });
+        }
         if (type_commission) {
             typeCommission(type_commission);
             type_commission.addEventListener('change', function(){
@@ -81,7 +99,6 @@
                     'error'
                 )
             });
-
         })
     </script>
 @endpush
@@ -141,17 +158,6 @@
                                     </div>
                                 @endif                                  
                                 <div class="row mb-3">
-                                    @if ( isset($_REQUEST['type']) && $_REQUEST['type'] === 'callcenter' )
-                                        <input type="hidden" name="type" value="callcenter" required>
-                                        <div class="col-6">
-                                            <label for="type_commission" class="form-label">Tipo de comisión</label>
-                                            <select class="form-select" id="type_commission" name="type_commission">
-                                                <option value="">Selecciona una opción</option>
-                                                <option value="target" @if ($user->type_commission == "target") selected @endif>Por metas</option>
-                                                <option value="percentage" @if ($user->type_commission == "percentage") selected @endif>Porcentaje</option>
-                                            </select>
-                                        </div>
-                                    @endif
                                     <div class="col-6">
                                         <label for="restricted" class="form-label">Restringido</label>
                                         <select class="form-select" id="restricted" name="restricted">
@@ -159,7 +165,45 @@
                                             <option value="1" @if ($user->restricted == 1) selected @endif>Si</option>
                                         </select>
                                     </div>
-                                    <div class="col-6 {{ isset($_REQUEST['type']) && $_REQUEST['type'] === 'callcenter' ? 'd-none' : '' }}">
+                                    <div class="col-6">
+                                        <label for="is_commission" class="form-label">Comisiona</label>
+                                        <select class="form-select" id="is_commission" name="is_commission">
+                                            <option value="0" @if ($user->is_commission == 0) selected @endif>No</option>
+                                            <option value="1" @if ($user->is_commission == 1) selected @endif>Si</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3 d-none callcenteagent">
+                                    <div class="col-6">
+                                        <label for="type_commission" class="form-label">Tipo de comisión</label>
+                                        <select class="form-select" id="type_commission" name="type_commission">
+                                            <option value="">Selecciona una opción</option>
+                                            <option value="target" @if ($user->type_commission == "target") selected @endif>Por metas</option>
+                                            <option value="percentage" @if ($user->type_commission == "percentage") selected @endif>Porcentaje</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 d-none percentage">
+                                        <label for="percentage" class="form-label">Porcentage</label>
+                                        <input type="number" step=".01" class="form-control" id="percentage" name="percentage"
+                                                value="{{ $user->percentage }}" required>
+                                    </div>                                    
+                                </div>
+                                <div class="row mb-3 d-none callcenteagent2">
+                                    <div class="col-6">
+                                        <label for="daily_goal" class="form-label">Indica la meta de venta diaria en pesos</label>
+                                        <input type="number" step=".01" class="form-control" id="daily_goal" name="daily_goal"
+                                                value="{{ $user->daily_goal }}" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="is_external" class="form-label">Es externo</label>
+                                        <select class="form-select" id="is_external" name="is_external">
+                                            <option value="0" @if ($user->is_external == 0) selected @endif>No</option>
+                                            <option value="1" @if ($user->is_external == 1) selected @endif>Sí</option>
+                                        </select>
+                                    </div>                                        
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-12">
                                         @php
                                             $active_roles = [];
                                             if($user->roles){
@@ -167,39 +211,15 @@
                                                     $active_roles[] = $role->role_id;
                                                 }
                                             }
-                                            // dump($active_roles);
-                                            // dump($user->roles->toArray());
-                                            // dump($roles->toArray());
                                         @endphp
                                         <label for="email" class="form-label">Roles</label>
                                         <select class="form-select" id="roles" name="roles[]" multiple>
                                             @foreach ($roles as $role)
-                                                <option value="{{ $role->id }}" @if ( isset($_REQUEST['type']) && $_REQUEST['type'] === 'callcenter' && empty($active_roles) ) selected @endif  @if (in_array($role->id, $active_roles)) selected @endif>{{ $role->role }}</option>
+                                                <option value="{{ $role->id }}" @if (in_array($role->id, $active_roles)) selected @endif>{{ $role->role }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
-                                @if ( isset($_REQUEST['type']) && $_REQUEST['type'] === 'callcenter' )
-                                    <div class="row mb-3">
-                                        <div class="col-4 d-none percentage">
-                                            <label for="percentage" class="form-label">Porcentage</label>
-                                            <input type="number" step=".01" class="form-control" id="percentage" name="percentage"
-                                                    value="{{ $user->percentage }}" required>
-                                        </div>
-                                        <div class="col-4">
-                                            <label for="daily_goal" class="form-label">Indica la meta de venta diaria en pesos</label>
-                                            <input type="number" step=".01" class="form-control" id="daily_goal" name="daily_goal"
-                                                    value="{{ $user->daily_goal }}" required>
-                                        </div>
-                                        <div class="col-4">
-                                            <label for="is_external" class="form-label">Es externo</label>
-                                            <select class="form-select" id="is_external" name="is_external">
-                                                <option value="0" @if ($user->is_external == 0) selected @endif>No</option>
-                                                <option value="1" @if ($user->is_external == 1) selected @endif>Sí</option>
-                                            </select>
-                                        </div>                                        
-                                    </div>
-                                @endif
                             </form>                            
                             <button class="btn btn-success" id="save">@if ($v_type == 1)
                                 Crear

@@ -19,8 +19,9 @@ class UserRepository
     {
         try {
             return view('users.index', [
-                'active_users' => User::where('status', 1)->whereDoesntHave('roles', function ($query) { $query->where('role_id', 4); })->get(),
-                'active_users_callcenter' => User::where('status', 1)->with('target')->whereHas('roles', function ($query) { $query->where('role_id', 4); })->whereDoesntHave('roles', function ($query) { $query->where('role_id', '!=', 4); })->get(),
+                // 'active_users' => User::where('status', 1)->whereDoesntHave('roles', function ($query) { $query->where('role_id', 4); })->get(),
+                // 'active_users_callcenter' => User::where('status', 1)->with('target')->whereHas('roles', function ($query) { $query->where('role_id', 4); })->whereDoesntHave('roles', function ($query) { $query->where('role_id', '!=', 4); })->get(),
+                'active_users' => User::where('status', 1)->get(),                
                 'inactive_users' => User::where('status', 0)->get(),
                 'valid_ips' => WhitelistIp::all(), 
                 'breadcrumbs' => [
@@ -44,7 +45,6 @@ class UserRepository
             ]);
         }
     }
-    
 
     public function createUser($request){
         try {
@@ -57,11 +57,12 @@ class UserRepository
                     ],
                     [
                         "route" => "",
-                        "name" => "Nuevo usuario ".( $request->type === 'callcenter' ? 'de Call Center' : '' ),
+                        "name" => "Nuevo usuario",
                         "active" => true
                     ]
                 ],
-                'roles' => ( $request->type === 'callcenter' ? Role::where('id', 4)->get() : Role::where('id', '!=', 4)->get() ),
+                // 'roles' => ( $request->type === 'callcenter' ? Role::where('id', 4)->get() : Role::where('id', '!=', 4)->get() ),
+                'roles' => Role::all(),
                 'v_type' => 1,
                 'user' => new User()                
             ]);
@@ -87,41 +88,16 @@ class UserRepository
             $user->email = strtolower($request->email);
             $user->password = bcrypt($request->password);
             $user->restricted = $request->restricted;
-
-            ( isset($request->type_commission) && ($request->type_commission == "target" || $request->type_commission == "percentage") ? $user->is_call_center_agent = 1 : 0 );
+            $user->is_commission = $request->is_commission;
+        
             ( isset($request->type_commission) ? $user->type_commission = $request->type_commission : "target" );
             ( isset($request->type_commission) && $request->type_commission == "target" ? $user->target_id = 1 : NULL );
             ( isset($request->percentage) ? $user->percentage = $request->percentage : 0 );
             ( isset($request->daily_goal) ? $user->daily_goal = $request->daily_goal : 0 );
 
+            $user->is_external = $request->is_external;
+
             $user->save();
-
-            // $tar = [
-            //     [
-            //         "amount" => 85000,
-            //         "percentage" => 4
-            //     ],
-            //     [
-            //         "amount" => 110000,
-            //         "percentage" => 5
-            //     ],
-            //     [
-            //         "amount" => 135000,
-            //         "percentage" => 6
-            //     ],
-            //     [
-            //         "amount" => 155000,
-            //         "percentage" => 7
-            //     ],
-            //     [
-            //         "amount" => 175000,
-            //         "percentage" => 8
-            //     ],
-            // ];
-
-            // $target = new Target();
-            // $target->object = $tar;
-            // $target->save();
 
             foreach ($request->roles as $role) {
                 $user_role = new UserRole();
@@ -143,7 +119,7 @@ class UserRepository
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear el usuario',
+                'message' => $e->getMessage(),
                 'status' => Response::HTTP_INTERNAL_SERVER_ERROR
             ]);
         }
@@ -156,12 +132,14 @@ class UserRepository
             $user->name = $request->name;
             $user->email = strtolower($request->email);
             $user->restricted = $request->restricted;
+            $user->is_commission = $request->is_commission;
 
-            ( isset($request->type_commission) && ($request->type_commission == "target" || $request->type_commission == "percentage") ? $user->is_call_center_agent = 1 : 0 );
             ( isset($request->type_commission) ? $user->type_commission = $request->type_commission : "target" );
             ( isset($request->type_commission) && $request->type_commission == "target" ? $user->target_id = 1 : NULL );
             ( isset($request->percentage) ? $user->percentage = $request->percentage : 0 );
             ( isset($request->daily_goal) ? $user->daily_goal = $request->daily_goal : 0 );
+
+            $user->is_external = $request->is_external;
 
             $user->save();
 
@@ -186,7 +164,7 @@ class UserRepository
 
             return response()->json([
                 'success' => false, 
-                'message' => 'Error al actualizar el usuario',
+                'message' => $e->getMessage(),
                 'status' => Response::HTTP_INTERNAL_SERVER_ERROR
             ]);
         }

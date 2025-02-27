@@ -38,6 +38,7 @@ class PaymentRepository
             $payment->reservation_id = $request->reservation_id;
             $payment->reference = $request->reference;
             $payment->user_id = auth()->user()->id;
+
             if( isset($request->is_conciliated) && $request->is_conciliated == 1 ){
                 if( $request->payment_method != "PAYPAL" && $request->payment_method != "STRIPE" && $request->payment_method != "CARD" ){
                     $payment->is_conciliated = $request->is_conciliated;
@@ -48,9 +49,9 @@ class PaymentRepository
             $payment->save();
 
             $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency, 'HISTORY', 'CREATE_PAYMENT');
-
-            //ACTUALIZAMOS EL ESTATUS DE LA RESERVA, CUANDO SE AGREGA UN PAGO Y ESTA ES COTIZACIÓN
             $booking = Reservation::find($request->reservation_id);
+
+            //ACTUALIZAMOS EL ESTATUS DE LA RESERVA, CUANDO SE AGREGA UN PAGO Y ESTA ES COTIZACIÓN        
             if( $booking && $booking->is_quotation == 1 ){
                 $booking->is_quotation = 0;
                 $booking->expires_at = NULL;
@@ -63,14 +64,13 @@ class PaymentRepository
             // 4 Agente - Call Center
             $roles = session()->get('roles');
             if( isset($request->type_site) && !empty($request->type_site) && ( in_array(3, $roles['roles']) || in_array(4, $roles['roles']) ) ){
-                $reservation = Reservation::find($request->reservation_id);
-                if( $request->type_site == "CALLCENTER" ){
-                    $reservation->agent_id_after_sales = auth()->user()->id;
+                if( $booking->type_site == "CALLCENTER" ){
+                    $booking->agent_id_after_sales = auth()->user()->id;
                 }else{
-                    $reservation->agent_id_pull_sales = auth()->user()->id;
+                    $booking->agent_id_pull_sales = auth()->user()->id;
                 }
-                $reservation->type_after_sales = ( $request->platform == "Bookign" ? "PENDING" : "SPAM" );
-                $reservation->save();
+                $booking->type_after_sales = ( $request->platform == "Bookign" ? "PENDING" : "SPAM" );
+                $booking->save();
             }
 
             DB::commit();

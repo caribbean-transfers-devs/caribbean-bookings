@@ -72,28 +72,28 @@ var App = function() {
         onToggleSidebarSubmenu: function() {
             ['mouseenter', 'mouseleave'].forEach(function(e){
                 document.querySelector('.sidebar-wrapper').addEventListener(e, function() {
-                    // if (document.querySelector('body').classList.contains('alt-menu')) {
-                    //     if (document.querySelector('.main-container').classList.contains('sidebar-closed')) {
-                    //         if (e === 'mouseenter') {
-                    //             document.querySelector('li.menu .submenu').classList.remove('show');
-                    //             document.querySelector('li.menu.active .submenu').classList.add('recent-submenu');
-                    //             document.querySelector('li.menu.active').querySelector('.collapse.submenu.recent-submenu').classList.add('show');
-                    //             document.querySelector('.collapse.submenu.recent-submenu').parentNode.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'true');
-                    //         } else if (e === 'mouseleave') {
-                    //             getMenuList = document.querySelectorAll('li.menu');
-                    //             getMenuList.forEach(element => {
-                    //                 var submenuShowEle = element.querySelector('.collapse.submenu.show');
-                    //                 if (submenuShowEle) {
-                    //                     submenuShowEle.classList.remove('show');
-                    //                 }
-                    //                 var submenuExpandedToggleEle = element.querySelector('.dropdown-toggle[aria-expanded="true"]');
-                    //                 if (submenuExpandedToggleEle) {
-                    //                     submenuExpandedToggleEle.setAttribute('aria-expanded', 'false');
-                    //                 }
-                    //             });
-                    //         }
-                    //     }
-                    // } else {
+                    if (document.querySelector('body').classList.contains('alt-menu')) {
+                        if (document.querySelector('.main-container').classList.contains('sidebar-closed')) {
+                            if (e === 'mouseenter') {
+                                document.querySelector('li.menu .submenu').classList.remove('show');
+                                document.querySelector('li.menu.active .submenu').classList.add('recent-submenu');
+                                document.querySelector('li.menu.active').querySelector('.collapse.submenu.recent-submenu').classList.add('show');
+                                document.querySelector('.collapse.submenu.recent-submenu').parentNode.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'true');
+                            } else if (e === 'mouseleave') {
+                                getMenuList = document.querySelectorAll('li.menu');
+                                getMenuList.forEach(element => {
+                                    var submenuShowEle = element.querySelector('.collapse.submenu.show');
+                                    if (submenuShowEle) {
+                                        submenuShowEle.classList.remove('show');
+                                    }
+                                    var submenuExpandedToggleEle = element.querySelector('.dropdown-toggle[aria-expanded="true"]');
+                                    if (submenuExpandedToggleEle) {
+                                        submenuExpandedToggleEle.setAttribute('aria-expanded', 'false');
+                                    }
+                                });
+                            }
+                        }
+                    } else {
                         if (document.querySelector('.main-container').classList.contains('sidebar-closed')) {
                             if (e === 'mouseenter') {
                                 document.querySelector('li.menu .submenu').classList.remove('show');
@@ -124,13 +124,13 @@ var App = function() {
                                 });
                             }
                         }
-                    // }                    
+                    }                    
                 });
             });
 
         },
         offToggleSidebarSubmenu: function () {
-            // $('.sidebar-wrapper').off('mouseenter mouseleave');
+            $('.sidebar-wrapper').off('mouseenter mouseleave');
         },
         overlay: function() {
             document.querySelector('#dismiss, .overlay').addEventListener('click', function () {
@@ -359,7 +359,6 @@ var App = function() {
             inBuiltfunctionality.EnableNavBarPopper();
         }
     }
-
 }();
 
 window.addEventListener('load', function() {

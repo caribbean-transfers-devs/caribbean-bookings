@@ -267,10 +267,15 @@
                 {{-- NOS PERMITE AGREGAR SEGUIMIENTOS DE LA RESERVA, SOLO CUANDO ESTA COMO PENDIENTE, CONFIRMADA O A CREDITO --}}
                 @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(23))
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> AGREGAR SEGUIMIENTO</button>
-                @endif                
+                @endif
 
-                {{-- NOS PERMITE ENVIAR UNA INVITACIÓN DE PAGO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACION --}}
-                @if ( ( $data['status'] == "PENDING" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(22))
+                {{-- NOS PERMITE INDICAR QUE CLIENTE PAGARA A LA LLEGADA, SOLO SE MOSTRARA CUANDO SEA COTIZACIÓN --}}
+                @if ( $data['status'] == "QUOTATION" )
+                    <button class="btn btn-warning btn-sm enablePayArrival" id="enablePayArrival" data-code="{{ $reservation->id }}"><i class="align-middle" data-feather="plus"></i> AGREGAR SEGUIMIENTO</button>
+                @endif
+
+                {{-- NOS PERMITE ENVIAR UNA INVITACIÓN DE PAGO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACIÓN --}}
+                @if ( ( $data['status'] != "CANCELLED") && RoleTrait::hasPermission(22))
                     <div class="btn-group btn-group-sm" role="group">
                         <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             INVITACIÓN DE PAGO
@@ -284,6 +289,21 @@
                     </div>
                 @endif
 
+                {{-- NOS PERMITE COPIAR EL LINK DE PAGO PARA ENVIARSELO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACIÓN --}}
+                @if ( $data['status'] != "CANCELLED" )
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            COPIAR LINK DE PAGO
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="btndefault">
+                            <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'en')">Inglés</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'es')">Español</a>
+                        </div>
+                    </div>
+                @endif                
+
                 @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && RoleTrait::hasPermission(21) )
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -296,16 +316,16 @@
                     </div>
                 @endif
 
-                    {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
-                    @if (RoleTrait::hasPermission(94) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
-                        <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> ACTIVAR SERVICIO PLUS</button>
-                    @endif
-                    @if (RoleTrait::hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                        {{-- <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button> --}}
-                    @endif
-                    @if (RoleTrait::hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                        <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> MARCAR COMO DUPLICADO</button>
-                    @endif
+                {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
+                @if (RoleTrait::hasPermission(94) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
+                    <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> ACTIVAR SERVICIO PLUS</button>
+                @endif
+                @if (RoleTrait::hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                    {{-- <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button> --}}
+                @endif
+                @if (RoleTrait::hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                    <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> MARCAR COMO DUPLICADO</button>
+                @endif
                     
                 {{-- NOS PERMITE PODER ACTIVAR LA RESERVA CUANDO ESTA COMO CREDITO ABIERTO --}}
                 @if ( $data['status'] == "OPENCREDIT" && RoleTrait::hasPermission(67) )
@@ -315,23 +335,7 @@
                 {{-- NOS PERMITE PONER COMO CREDITO ABIERTO CUANDO LA RESERVA ESTA CONFIRMADA Y EL CLIENTE QUIERE CANCELAR --}}
                 @if ( $data['status'] == "CONFIRMED" && RoleTrait::hasPermission(72) )
                     <button class="btn btn-warning btn-sm" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> CRÉDITO ABIERTO</button>
-                @endif                        
-
-                {{-- NOS PERMITE COPIAR EL LINK DE PAGO PARA ENVIARSELO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACION --}}
-                @if ( $data['status'] == "PENDING" || $data['status'] == "QUOTATION" )
-                    <div class="btn-group btn-group-sm" role="group">
-                        <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            COPIAR LINK DE PAGO
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="btndefault">
-                            <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'en')">Inglés</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'es')">Español</a>
-                        </div>
-                    </div>
                 @endif
-
             </div>
 
             @if ( $data['status'] == "QUOTATION" )

@@ -95,10 +95,10 @@ class DetailRepository
         if($reservation->is_quotation == 1):
             $data['status'] = "QUOTATION";
         endif;        
-        if( $reservation->site->is_cxc == 1 && round( $data['total_payments'], 2) == 0 ):
+        if( $reservation->site->is_cxc == 1 && ( round( $data['total_payments'], 2) == 0 || ( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ) ) ):
             $data['status'] = "CREDIT";
         endif;            
-        if( round( $data['total_payments'], 2) != 0 && ( $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->open_credit == 0 ) && ( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ) ):
+        if( $reservation->site->is_cxc == 0 && round( $data['total_payments'], 2) != 0 && ( $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->open_credit == 0 ) && ( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ) ):
             $data['status'] = "CONFIRMED";
         endif;
 

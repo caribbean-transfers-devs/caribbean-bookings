@@ -19,9 +19,41 @@ class ActionsRepository
     use FollowUpTrait;
 
     /**
+     * NOS AYUDA A MARCAR LA RESERVACIÓN COMO PAGO A LA LLEGADA
+     * @param request :la información recibida en la solicitud
+    */
+    public function enablePayArrival($request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $booking = Reservation::find($request->reservation_id);
+            $booking->pay_at_arrival = 1;
+            $booking->is_quotation = 0;
+            $booking->expires_at = NULL;
+            $booking->save();
+
+            // ESTATUS DE RESERVACIÓN
+            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el estatus de la reservacion de (QUOTATION) a (PENDING), porque cliente pagara a la llegada", 'HISTORY', "UPDATE_BOOKING_PAY_ARRIVAL");
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se marco correctamente la reservación como pago a la llegada',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * NOS AYUDA A PODER CAMBIAR EL ESTATUS DEL SERVICIO, EN LOS DETALLES DE LA RESERVACIÓN
      * @param request :la información recibida en la solicitud
-     */
+    */
     public function updateServiceStatus($request)
     {
         try {
@@ -39,7 +71,7 @@ class ActionsRepository
             }            
 
             // ESTATUS DE RESERVACIÓN
-            $this->create_followUps($request->rez_id, "El usuario: ".auth()->user()->name.", actualizo el estatus del servicio de: (".strtoupper($request->type).") de ".( $request->type == "arrival" ? $item->op_one_status : $item->op_two_status  ). " a ".$request->status, 'HISTORY', "UPDATE_STATUS_SERVICE");
+            $this->create_followUps($request->rez_id, "El usuario: ".auth()->user()->name.", actualizo el estatus del servicio de (".strtoupper($request->type).") de: ".( $request->type == "arrival" ? $item->op_one_status : $item->op_two_status  ). " a ".$request->status, 'HISTORY', "UPDATE_STATUS_SERVICE");
 
             if($request->type == "arrival"):
                 $item->op_one_status = $request->status;
@@ -107,11 +139,9 @@ class ActionsRepository
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-                // 'message' => 'Error al actualizar el estatus'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 
     public function sendEmail($baseUrl = '', $request = []){
         $data = [

@@ -29,13 +29,9 @@ class DashboardController extends Controller
     public function index(Request $request){
         $roles = session()->get('roles');
         $dataUser = auth()->user();
-        
-        if( in_array(3, $roles['roles']) || in_array(4, $roles['roles']) ){
-            // if( $dataUser->is_external == 1 ){
-                return $this->CallCenterResository->index($request);
-            // }else{
-            //     return $this->ManagementRepository->afterSales($request);
-            // }
+        // in_array(3, $roles['roles']) || in_array(4, $roles['roles']);
+        if( RoleTrait::hasPermission(113) && $dataUser->is_commission == 1 ){
+            return $this->CallCenterResository->index($request);
         }else{
             return $this->DashboardRepository->index($request);
         }

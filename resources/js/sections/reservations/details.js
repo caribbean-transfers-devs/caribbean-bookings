@@ -15,7 +15,58 @@ const __code = document.getElementById('sale_id');
 const __type_pay = document.getElementById('type_form_pay');
 const __code_pay = document.getElementById('payment_id');
 
-//DECLARAMOS VARIABLES PARA LAS ACCIONES DE LOS SERVICIOS
+//DECLARAMOS VARIABLES PARA ACCIONES DE RESERVAS
+const enablePayArrival = document.getElementById('enablePayArrival');
+
+
+if( enablePayArrival ){
+    enablePayArrival.addEventListener('click', function(event){
+        event.preventDefault();
+        const { code } = this.dataset;
+        
+        Swal.fire({
+            title: "Procesando solicitud...",
+            text: "Por favor, espera mientras se marca como pago a la llegada el servicio.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('/action/enablePayArrival', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },            
+            body: JSON.stringify({ reservation_id: code })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
+        .then(data => {
+            Swal.fire({
+                icon: data.status,
+                html: data.message,
+                allowOutsideClick: false,
+            }).then(() => {
+                location.reload();
+            });
+        })
+        .catch(error => {
+            Swal.fire(
+                '¡ERROR!',
+                error.message || 'Ocurrió un error',
+                'error'
+            );
+        });        
+    })
+}
+
+
 
 if( document.querySelectorAll('.timeline-item').length > 0 ){
     document.querySelectorAll('.timeline-item').forEach(item => {
@@ -23,7 +74,6 @@ if( document.querySelectorAll('.timeline-item').length > 0 ){
         item.style.setProperty('--timeline-height', `${height}px`);
     });
 }
-
 
 //ENVIAR CONFIRMACIÓN DE LLEGADA
 document.addEventListener("click", function (event) {

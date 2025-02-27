@@ -32,14 +32,12 @@ class SaleRepository
             $sale->created_at = date('Y-m-d H:m:s');
             $sale->updated_at = date('Y-m-d H:m:s');
 
-            // $sale->call_center_agent_id = $request->call_center_agent_id;
             $sale->save();
 
             $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego una venta tipo: '.$request->sale_type_id.', por un monto de: '.$request->total, 'HISTORY', 'CREATE_SALE');
 
             DB::commit();
 
-            // Sale created successfully
             return response()->json([
                 'status' => 'success',
                 'message' => 'La venta se creo correctamente',                

@@ -21,7 +21,7 @@ class CallCenterController extends Controller
     }    
 
     public function index(Request $request){
-        if(RoleTrait::hasPermission(112)){
+        if(RoleTrait::hasPermission(113)){
             return $this->CallCenterResository->index($request);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');

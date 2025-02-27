@@ -63,9 +63,7 @@ if( _destination != null ){
 
 if( _btnQuoteRate != null ){
     _btnQuoteRate.addEventListener('click', function(event){
-        event.preventDefault();
-        console.log(_enterprise.value, _destination.value, _zoneOne.value, _zoneTwo.value, _service.value);
-        
+        event.preventDefault();        
         if( _destination.value == 0 || _zoneOne.value == 0 || _zoneTwo.value == 0 ){
             Swal.fire({
                 icon: "error",
@@ -85,13 +83,13 @@ if( _btnQuoteRate != null ){
         }
 
         let swalLoading = Swal.fire({
-                                    title: "Procesando solicitud...",
-                                    text: "Por favor, espera mientras se cargan las tarifas.",
-                                    allowOutsideClick: false,
-                                    didOpen: () => {
-                                        Swal.showLoading();
-                                    }
-                            });
+            title: "Procesando solicitud...",
+            text: "Por favor, espera mientras se cargan las tarifas.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         $.ajax({
             url: `/config/rates/enterprise/get`,

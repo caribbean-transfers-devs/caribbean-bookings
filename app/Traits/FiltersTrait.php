@@ -58,7 +58,7 @@ trait FiltersTrait
 
     //NOS TRAE LOS AGENTES DE CALL CENTER
     public static function CallCenterAgent(){
-        return User::where('is_call_center_agent', 1)->get();
+        return User::where('is_commission', 1)->get();
     }
 
     public static function Enterprises(){
