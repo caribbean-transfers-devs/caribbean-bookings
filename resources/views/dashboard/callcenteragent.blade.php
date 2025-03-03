@@ -18,6 +18,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <link href="{{ mix('/assets/css/sections/dashboard/callcenteragent.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/dashboard/callcenteragent.min.css') }}" rel="stylesheet" >
+    <style>
+        img.qr{
+            width: 100%;
+            max-width: 300px;
+        }        
+    </style>
 @endpush
 
 @push('Js')
@@ -61,6 +67,7 @@
                 <button class="btn btn-primary btn-sm __btn_create" data-title="Filtros de callcenter" data-bs-toggle="modal" data-bs-target="#filterModal"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros</button>
                 <button class="btn btn-success btn-sm">Fecha: <strong id="dateInfo"></strong></button>
                 <button class="btn btn-warning btn-sm">Tipo de cambio comisiones: <strong id="exchangeInfo"></strong></button>
+                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#callcenterQRModal">Ver QR</button>
             </div>
         </div>
 
@@ -275,5 +282,6 @@
 
     <x-modals.filters.bookings />
     <x-modals.dashboard.callcenteragent />
+    <x-modals.dashboard.QR />
     <x-modals.management.aftersales />
 @endsection

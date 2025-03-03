@@ -5,6 +5,8 @@
     "/assets/css/panel/panel2.min.css": "/assets/css/panel/panel2.min.css?id=e219bd2724e80b4173e2be35b89e9604",
     "/assets/css/core/core.min.css": "/assets/css/core/core.min.css?id=f71b342b469e58c5f4d65389a4a1e6a8",
     "/assets/css/base/fonts.min.css": "/assets/css/base/fonts.min.css?id=faed934797e40bbaddcfc2b1176db9fb",
+    "/assets/css/sections/booking/details.min.css": "/assets/css/sections/booking/details.min.css?id=003e73842ce0d9241679bac3904857c1",
+    "/assets/css/sections/tpv2.min.css": "/assets/css/sections/tpv2.min.css?id=67dd5890a3b40e1df0c8739078a37dad",
     "/assets/css/sections/driver_forms.min.css": "/assets/css/sections/driver_forms.min.css?id=772806ea1c048ca6db4be13a9c2086e4",
     "/assets/css/sections/driver.min.css": "/assets/css/sections/driver.min.css?id=2451e0232656082324bd809b32e7964a",
     "/assets/css/sections/vehicle_forms.min.css": "/assets/css/sections/vehicle_forms.min.css?id=772806ea1c048ca6db4be13a9c2086e4",
@@ -69,5 +71,6 @@
     "/assets/js/sections/rates.min.js": "/assets/js/sections/rates.min.js?id=0c8f5946342e8344d036a143ab436eee",
     "/assets/js/sections/users.min.js": "/assets/js/sections/users.min.js?id=55f6d9399d950f4a8ecf6ed7f0189430",
     "/assets/js/sections/user_edit.min.js": "/assets/js/sections/user_edit.min.js?id=4d1a1f2feb3ac053df5fb6cdcc76d02e",
-    "/assets/js/sections/roles.min.js": "/assets/js/sections/roles.min.js?id=348fb17a0b18f863d38ad6dffad8adb2"
+    "/assets/js/sections/roles.min.js": "/assets/js/sections/roles.min.js?id=348fb17a0b18f863d38ad6dffad8adb2",
+    "/assets/js/views/tpv/index2.min.js": "/assets/js/views/tpv/index2.min.js?id=b336c0139de0a0f1a3cacd0bbe01709c"
 }

@@ -29,6 +29,8 @@ trait QueryTrait
                                     rez.open_credit,
                                     rez.is_complete,
                                     rez.created_at,
+                                    rez.is_quotation,
+                                    rez.was_is_quotation,
                                     us.status AS employee_status,
                                     us.name AS employee,
                                     site.id as site_code,

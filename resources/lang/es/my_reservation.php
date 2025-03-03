@@ -1,0 +1,23 @@
+<?php
+return [
+    'title' => '¡Mi reservación!',
+    'hi' => 'Hola',
+    'phone' => 'Teléfono',
+    'travel_information' => 'Información de viaje',
+    'reservation_code' => 'Código de reservación',
+    'type_of_service' => 'Tipo de servicio',
+    'one_way' => 'Sencillo',
+    'round_trip' => 'Redondo',
+    'passengers' => 'Pasajeros',
+    'time' => 'Hora',
+    'leaving_from' => 'Saliendo de',
+    'going_to' => 'Ir a',
+    'flight_number' => 'Número de vuelo de llegada',
+    'pickup' => 'Recogida',
+    'departure' => 'Regreso',
+    'logout' => 'Cerrar de sesión',
+    'print' => 'Imprimir',
+    'card' => 'Tarjeta de Crédito / Débito',
+    'link' => "compartir lik de pago",
+    'payment_method' => "Selecciona metodo de pago",
+];

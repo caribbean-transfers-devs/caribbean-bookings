@@ -21,7 +21,8 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         ************************************************************/
 
         mix.sass('resources/scss/core.scss', data.assets + '/css/core/core.min.css');//core styles
-        mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resources/plugins/font-icons/fontawesome/css/fontawesome.css'], data.assets + '/css/panel/panel.min.css');//panel styles        
+        mix.styles(['resources/plugins/font-icons/fontawesome/css/regular.css','resources/plugins/font-icons/fontawesome/css/fontawesome.css'], data.assets + '/css/panel/panel.min.css');//panel styles
+        
         mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
         mix.sass('resources/scss/error.scss', data.assets + "css/panel/error.min.css");//error styles
         
@@ -127,3 +128,14 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/users.js'], data.assets + "js/sections/users.min.js");
         mix.combine(['resources/plugins/choices/choices.js'], data.assets + "js/sections/user_edit.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/roles.js'], data.assets + "js/sections/roles.min.js");
+
+
+//tpv styles
+mix.sass('resources/scss/tpv/one.scss', data.assets + "css/sections/tpv2.min.css");
+//tpv scripts
+mix.combine(['resources/js/libs/validator.js', 'resources/js/libs/intlTelInput.min.js', 'resources/js/sections/tpv/index2.js'], data.assets + "js/views/tpv/index2.min.js");
+
+//booking details styles
+mix.sass('resources/scss/sections/booking_details.scss', data.assets + "css/sections/booking/details.min.css");
+// mix.sass('resources/scss/process/cancel.scss', data.assets + "/css/sections/booking/cancel.min.css");
+// mix.sass('resources/scss/process/success.scss', data.assets + "/css/sections/booking/success.min.css");

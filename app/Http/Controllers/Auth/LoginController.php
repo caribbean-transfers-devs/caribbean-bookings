@@ -19,6 +19,11 @@ class LoginController extends Controller
             $request->authenticate();
             $request->session()->regenerate();
             session(['roles' => RoleTrait::getRolesAndSubmodules()]);
+
+            $dataUser = auth()->user();
+            if( $dataUser->is_commission == 1 ){
+                return redirect()->route('callcenters.index');    
+            }
             return redirect()->route('dashboard');
         }
     }

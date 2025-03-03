@@ -268,7 +268,8 @@
                             <th class="text-center">MÉTODO DE PAGO</th> 
                             <th class="text-center">INFORMACIÓN DE MÉTODO DE PAGO</th>
                             <th class="text-center">PAGO AL LLEGAR</th>
-                            <th class="text-center">COMISIÓNABLE</th> 
+                            <th class="text-center">FUE COTIZACIÓN</th>                            
+                            <th class="text-center">COMISIÓNABLE</th>
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
                     </thead>
@@ -563,6 +564,11 @@
                                     </td>
                                     <td class="text-center">
                                         <button class="btn btn-{{ $item->pay_at_arrival == 1 ? 'success' : 'danger' }}" type="button">{{ $item->pay_at_arrival == 1 ? "SI" : "NO" }}</button>
+                                    </td>
+                                    <td class="text-center">
+                                        @if ( $item->is_quotation == 0 && $item->was_is_quotation == 1 )
+                                            <button class="btn btn-success" type="button">Sí</button>
+                                        @endif
                                     </td>
                                     <td class="text-center">
                                         <button class="btn btn-{{ $item->is_commissionable == 1 ? 'success' : 'danger' }}" type="button">{{ $item->is_commissionable == 1 ? "SI" : "NO" }}</button>

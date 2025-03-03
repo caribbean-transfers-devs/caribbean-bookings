@@ -26,9 +26,15 @@ use App\Http\Controllers\Reservations\ReservationsController;
 use App\Http\Controllers\RoleController;
 
 use App\Http\Controllers\Sales\SalesController;
-use App\Http\Controllers\Tpv\TpvController;
 use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Vehicle\VehicleController;
+
+//Tpv
+use App\Http\Controllers\Tpv\TpvController;
+use App\Http\Controllers\Tpv\TpvController2;
+use App\Http\Controllers\Tpv\Api\AutocompleteController as APIAutocomplete;
+use App\Http\Controllers\Tpv\Api\QuoteController as APIQuote;
+use App\Http\Controllers\Bookings\BookingsController;
 
 //Settings
 use App\Http\Controllers\Settings\EnterpriseController;
@@ -51,6 +57,30 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+    Route::get('/qr/create/{type}/{id}/{language}', [TpvController2::class, 'createQr'])->name('qr.createQr');
+    Route::post('/tpv2/autocomplete', [APIAutocomplete::class,'index']);
+    Route::post('/tpv2/quote', [APIQuote::class,'index']);
+    Route::post('/tpv2/re-quote', [APIQuote::class,'checkout']);
+
+    //TPV AND BOOKING DETAILS
+    Route::middleware(['locale','ApiChecker'])->group(function () {
+        Route::get('/tpv2/book/{id}', [TpvController2::class, 'book'])->name('tpv.book');
+        Route::post('/tpv2/book/{id}/make', [TpvController2::class, 'create'])->name('tpv.create.en');
+
+        Route::get('/thank-you', [TpvController2::class, 'success'])->name('process.success');
+        Route::get('/cancel', [TpvController2::class, 'cancel'])->name('process.cancel');
+        Route::get('/my-reservation-detail', [BookingsController::class, 'ReservationDetail'])->name('reservation.detail');
+
+        Route::prefix('{locale}')->where(['locale' => '[a-zA-Z]{2}', 'ApiChecker'])->group(function () {
+            Route::get('/tpv2/book/{id}', [TpvController2::class, 'book'])->name('tpv.book.es');
+            Route::post('/tpv2/book/{id}/make', [TpvController2::class, 'create'])->name('tpv.create.es');
+
+            Route::get('/thank-you', [TpvController::class, 'success'])->name('process.success.es');
+            Route::get('/cancel', [TpvController::class, 'cancel'])->name('process.cancel.es');
+            Route::get('/my-reservation-detail', [BookingsController::class, 'ReservationDetail'])->name('reservation.detail.es');
+        });
+    });
 
 Route::middleware(['guest'])->group(function () {
     Route::get('login', [LoginController::class, 'index']);
@@ -87,7 +117,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/tpv/edit/{code}', [TpvController::class, 'index'])->name('tpv.new');
         Route::post('/tpv/quote', [TpvController::class, 'quote'])->name('tpv.quote');
         Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
-        Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');        
+        Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
 
     //FINANZAS    
         //PAGOS

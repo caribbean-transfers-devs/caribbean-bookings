@@ -8,6 +8,7 @@
         "php": "^8.1",
         "aws/aws-sdk-php": "^3.307",
         "codedge/laravel-fpdf": "^1.12",
+        "endroid/qr-code": "^5.1",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
