@@ -365,14 +365,14 @@
                         </a>
                     </li>
                     {{-- CUANDO ES CREDITO NO DEJA QUE AGREGUEN PAGOS --}}
-                    @if ( $data['status'] != "CREDIT" )
+
                         <li class="nav-item">
                             <a class="nav-link" href="#icon-tab-3" data-bs-toggle="tab" role="tab">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card align-middle"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                                 Pagos
                             </a>
                         </li>
-                    @endif
+
                     @if (RoleTrait::hasPermission(65))
                         <li class="nav-item">
                             <a class="nav-link" href="#icon-tab-4" data-bs-toggle="tab" role="tab">
@@ -686,14 +686,16 @@
                         </div>
                     </div>
                     {{-- CUANDO ES CREDITO NO DEJA QUE AGREGUEN PAGOS --}}
-                    @if ( $data['status'] != "CREDIT" )
+                    
                         <div class="tab-pane" id="icon-tab-3" role="tabpanel">
                             <div class="d-flex align-items-center justify-content-between mb-2">
-                                @if (RoleTrait::hasPermission(14))
-                                    <button class="btn btn-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                        NUEVO PAGO
-                                    </button>
+                                @if ( $data['status'] != "CREDIT" )
+                                    @if (RoleTrait::hasPermission(14) )
+                                        <button class="btn btn-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                            NUEVO PAGO
+                                        </button>
+                                    @endif
                                 @endif
                             </div>
                             <div class="table-responsive">
@@ -740,7 +742,7 @@
                                 </table>
                             </div>
                         </div>
-                    @endif
+                    
                     @if (RoleTrait::hasPermission(65))
                         <div class="tab-pane" id="icon-tab-4" role="tabpanel">
                             @if (RoleTrait::hasPermission(64))

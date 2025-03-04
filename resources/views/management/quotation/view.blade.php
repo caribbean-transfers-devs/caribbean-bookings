@@ -24,7 +24,7 @@
                         <td class="text-center">{{ $value->passengers }}</td>
                         <td>{{ $value->from_name }}</td>
                         <td>{{ $value->to_name }}</td>
-                        <td class="text-end">{{ $value->total_balance }} {{ $value->currency }}</td>
+                        <td class="text-end">{{ $value->total_sales }} {{ $value->currency }}</td>
                     </tr>
                 @endforeach
             @endif

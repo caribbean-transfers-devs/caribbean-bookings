@@ -650,10 +650,32 @@ class ReportsRepository
             "user" => ( isset($request->user) ? $request->user : 0 ),
         ];
         
-        // $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND rez.call_center_agent_id = 27 ";
-        // $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 AND rez.call_center_agent_id = 27 ";
-        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
-        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_commissionable = 1 AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
+        // $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two 
+        //               AND rez.is_commissionable = 1 
+        //               AND rez.is_cancelled = 0 
+        //               AND rez.is_duplicated = 0 ";
+
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two 
+                      AND rez.is_commissionable = 1 
+                      AND rez.is_cancelled = 0 
+                      AND rez.is_duplicated = 0
+                    --   AND rez.open_credit = 0 
+                      AND rez.is_quotation = 0 ";
+
+        // $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four 
+        //               AND rez.is_commissionable = 1 
+        //               AND rez.is_cancelled = 0 
+        //               AND rez.is_duplicated = 0 
+        //               AND it.is_round_trip = 1 ";
+
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four 
+                      AND rez.is_commissionable = 1 
+                      AND rez.is_cancelled = 0 
+                      AND rez.is_duplicated = 0 
+                    --   AND rez.open_credit = 0 
+                      AND rez.is_quotation = 0 
+                      AND it.is_round_trip = 1 ";                      
+
         $havingConditions = []; $queryHaving = "";
         $queryData = [
             'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
@@ -687,6 +709,7 @@ class ReportsRepository
                 ]
             ],       
             'operations' => $items,
+            'exchange' => FiltersTrait::ExchangeCommission(date("Y-m-d", strtotime($data['init'])), date("Y-m-d", strtotime($data['end']))),
             'data' => $data,
         ]);        
     }
@@ -881,7 +904,7 @@ class ReportsRepository
                 ]
             ],
             'bookings' => $bookings,
-            'exchange' => FiltersTrait::Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
+            'exchange' => FiltersTrait::Exchange(date("Y-m-d", strtotime($data['init'])), date("Y-m-d", strtotime($data['end']))),
             'data' => $data,
         ]);
     }
@@ -1055,7 +1078,7 @@ class ReportsRepository
                 ]
             ],
             'operations' => $operations,
-            'exchange' => FiltersTrait::Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
+            'exchange' => FiltersTrait::Exchange(date("Y-m-d", strtotime($data['init'])), date("Y-m-d", strtotime($data['end']))),
             'data' => $data,
             'request' => $request->input(),
         ]);

@@ -38,7 +38,7 @@ trait FiltersTrait
         }
     }
 
-    public static function exchangeCommission($in, $end){
+    public static function ExchangeCommission($in, $end){
         $in = ( isset($in) ? $in : date('Y-m-d') );
         $end = ( isset($in) ? $in : date('Y-m-d') );
         $report = ExchangeRateCommission::where('status', 1)->where('date_init', '<=', $in)
@@ -52,13 +52,17 @@ trait FiltersTrait
         }
     }
 
+    public static function PercentageCommissionInvestment(){
+        return 20; // Ejemplo: 20.00
+    }
+
     public static function Users(){
         return User::where('status', 1)->get();
     }
 
     //NOS TRAE LOS AGENTES DE CALL CENTER
     public static function CallCenterAgent(){
-        return User::where('is_commission', 1)->get();
+        return User::where('is_commission', 1)->with('target')->get();
     }
 
     public static function Enterprises(){

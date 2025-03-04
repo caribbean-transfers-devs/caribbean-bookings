@@ -51,6 +51,7 @@ class CallCenterResository
 
         $query = " AND rez.site_id != 21 AND rez.site_id != 11 
                    AND rez.created_at BETWEEN :init AND :end 
+                   AND rez.is_commissionable = 1 
                    AND rez.is_duplicated = 0 
                    AND us.id = :user ";
         
@@ -62,7 +63,7 @@ class CallCenterResository
         
         $bookings = $this->queryBookings($query, $queryHavingBooking, $queryData);
 
-        return view('dashboard.sales_callcenter', [ 'sales' => $bookings, 'exchange' => FiltersTrait::exchangeCommission($dates[0], $dates[1]) ]);
+        return view('dashboard.sales_callcenter', [ 'sales' => $bookings, 'exchange' => FiltersTrait::ExchangeCommission($dates[0], $dates[1]) ]);
     }
 
     public function getOperations($request)
@@ -87,15 +88,15 @@ class CallCenterResository
         $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two 
                       AND rez.is_commissionable = 1 
                       AND rez.is_cancelled = 0 
-                      AND rez.is_duplicated = 0 
-                      AND rez.open_credit = 0 
+                      AND rez.is_duplicated = 0
+                    --   AND rez.open_credit = 0 
                       AND rez.is_quotation = 0 ";
 
         $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four 
                       AND rez.is_commissionable = 1 
                       AND rez.is_cancelled = 0 
                       AND rez.is_duplicated = 0 
-                      AND rez.open_credit = 0 
+                    --   AND rez.open_credit = 0 
                       AND rez.is_quotation = 0 
                       AND it.is_round_trip = 1 ";
 
@@ -107,11 +108,11 @@ class CallCenterResository
         $queryData = [
             'init' => "{$dates[0]} 00:00:00",
             'end' => "{$dates[1]} 23:59:59",
-        ];        
+        ];
 
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHavingOperation, $queryData);
 
-        return view('dashboard.operations_callcenter', [ 'sales' => $operations, 'exchange' => FiltersTrait::exchangeCommission($dates[0], $dates[1]) ]);
+        return view('dashboard.operations_callcenter', [ 'sales' => $operations, 'exchange' => FiltersTrait::ExchangeCommission($dates[0], $dates[1]) ]);
     }
 
     public function getStats($request)
@@ -146,7 +147,7 @@ class CallCenterResository
             $dataUser = auth()->user();
             $userId = $dataUser->id; // Obtener ID del usuario autenticado
             $percentage_commission_investment = 20;
-            $data['exchange'] = FiltersTrait::exchangeCommission($dates[0], $dates[1]);
+            $data['exchange'] = FiltersTrait::ExchangeCommission($dates[0], $dates[1]);
 
             // Condiciones de Reservas
             // Status de reservación
@@ -161,6 +162,8 @@ class CallCenterResository
                 
             $query = " AND rez.site_id != 21 AND rez.site_id != 11 
                        AND rez.created_at BETWEEN :init AND :end 
+                       AND rez.is_commissionable = 1 
+                       AND rez.is_duplicated = 0 
                        AND us.id = :userId";
 
             $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two 
@@ -238,7 +241,7 @@ class CallCenterResository
             ? array_reduce($data['targets'], function ($carry, $target) use ($data) {
                 return ($data['total_services_operated'] >= $target['amount']) ? $target['percentage'] : $carry;
             }, 0)
-            : $dataUser->percentage;            
+            : $dataUser->percentage;
             $data['percentage_commission_investment'] = $percentage_commission_investment;
             $data['percentage_commission'] = $percentage_commission;
 
@@ -284,7 +287,7 @@ class CallCenterResository
                 'init' => $start->toDateTimeString(), // YYYY-MM-DD HH:MM:SS
                 'end' => $end->toDateTimeString(),                
             ];
-            $exchange_commission = FiltersTrait::exchangeCommission($start->toDateString(), $end->toDateString());
+            $exchange_commission = FiltersTrait::ExchangeCommission($start->toDateString(), $end->toDateString());
             $data = $this->dataSales($start, $end);
 
             $dataUser = auth()->user();
@@ -299,6 +302,8 @@ class CallCenterResository
 
             $query = " AND rez.site_id != 21 AND rez.site_id != 11 
                        AND rez.created_at BETWEEN :init AND :end 
+                       AND rez.is_commissionable = 1 
+                       AND rez.is_duplicated = 0 
                        AND us.id = :userId";
 
             $queryData['userId'] = $userId;
@@ -352,7 +357,7 @@ class CallCenterResository
                 'init' => $start->toDateTimeString(), // YYYY-MM-DD HH:MM:SS
                 'end' => $end->toDateTimeString()
             ];
-            $exchange_commission = FiltersTrait::exchangeCommission($start->toDateString(), $end->toDateString());
+            $exchange_commission = FiltersTrait::ExchangeCommission($start->toDateString(), $end->toDateString());
             $data = $this->dataSalesOperation($start, $end);
 
             $dataUser = auth()->user();

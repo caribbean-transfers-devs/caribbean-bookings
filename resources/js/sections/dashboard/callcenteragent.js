@@ -200,6 +200,7 @@ let callcenter = {
     },
     chartSales: function(response){
       let data = this.seriesSales(response);
+      console.log(data);      
       let options = {
         colors: ['#00ab55'],
         series: data.series,

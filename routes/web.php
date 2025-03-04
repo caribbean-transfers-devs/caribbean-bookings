@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Bots\MasterToursController;
 
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\CallCenterController;
@@ -91,7 +92,9 @@ Route::middleware(['guest'])->group(function () {
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    //BOTS 
+    //BOTS
+        //SET RATE MASTER TOUR
+        Route::get('/set/rate/master', [MasterToursController::class, 'ListServicesMasterTour'])->name('list.services.master.tours')->withoutMiddleware(['auth']);
         //PAYPAL
         Route::get('/bot/conciliation/paypal', [ConciliationController::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
         Route::get('/conciliation/paypalOrders', [ConciliationController::class, 'PayPalPaymenOrders'])->name('bot.paypal.orders')->withoutMiddleware(['auth']);
