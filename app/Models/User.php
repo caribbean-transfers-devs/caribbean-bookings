@@ -50,6 +50,10 @@ class User extends Authenticatable
         return $this->belongsTo(Target::class, 'target_id', 'id');
     }
 
+    public function sessions(){
+        return $this->hasMany(UserSession::class, 'user_id', 'id');
+    }
+
     public function roles(){
         return $this->hasMany(UserRole::class, 'user_id', 'id');
     }

@@ -91,6 +91,9 @@ Route::middleware(['guest'])->group(function () {
 //Meter al middleware para protejer estas rutas...
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::post('/logout/other/{sessionId}', [UserSessionController::class, 'logoutOtherSession'])->name('logout.other');    
+    Route::post('/logout/all', [UserSessionController::class, 'logoutAllSessions'])->name('logout.all');
+    
 
     //BOTS
         //SET RATE MASTER TOUR

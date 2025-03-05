@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 //MODELS
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserSession;
 use App\Models\UserRole;
 use App\Models\Target;
 use App\Models\WhitelistIp;
@@ -72,10 +73,16 @@ class UserRepository
     }
 
     public function editUser($request,$user){
+        // Comparar el dispositivo actual con las sesiones guardadas
+        $currentSession = UserSession::where('user_id', $user->id)
+            ->where('ip_address', $request->ip())
+            ->where('user_agent', $request->userAgent())
+            ->first();        
         return view('users.create_edit', [
             'roles' => Role::all(),
             'v_type' => 2,
-            'user' => $user
+            'user' => $user,
+            'currentSession' => $currentSession
         ]);
     }
 

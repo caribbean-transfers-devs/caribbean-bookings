@@ -52,7 +52,7 @@ let callcenter = {
         yaxis: {
           labels: {
             formatter: function(value, index) {
-              return (value / 1000) + 'K'
+              return (value / 1000) + ' K'
             },
             offsetX: -15,
             offsetY: 0,
@@ -104,7 +104,48 @@ let callcenter = {
             console.error("Error en la petición:", error);
             container.innerHTML = '<p style="color:red;">Error al cargar datos.</p>'.trim();
         }
-    },    
+    },
+
+    fetchDataCharts: async function(url) {
+        try {
+            const _params    = {
+                date: document.getElementById('lookup_date').value || ""
+            };
+
+            const http = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(_params),
+            });
+    
+            if (!http.ok) {
+                throw new Error(`Error ${http.status}: ${http.statusText}`);
+            }
+    
+            return await http.json();
+        } catch (error) {
+            console.error("Error en fetchDataCharts:", error);
+            return { data: { daily_goal: "N/A", total_day: "N/A", percentage_daily_goal: "N/A", total_month: "N/A", total_services_operated: "N/A", total_pending_services: "N/A" } }; // Devolver valores por defecto            
+        }
+    },
+
+    cleanNumber: function(value) {
+        if (!value) return 0;
+        return Number(value.toString().replace(/[^0-9.-]+/g, ""));
+    },
+
+    formatCurrency: function(value, asNumber = false) {
+        let cleanedValue = this.cleanNumber(value);
+        return asNumber ? cleanedValue.toFixed(2) : 
+            new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(cleanedValue);
+    },
+
+    getLoader: function() {
+        return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
+    },
 
     getSales: function(_params) {
         console.log(_params);
@@ -137,62 +178,13 @@ let callcenter = {
         }
     },
 
-    fetchDataCharts: async function(url) {
-        try {
-            const http = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-            });
-    
-            if (!http.ok) {
-                throw new Error(`Error ${http.status}: ${http.statusText}`);
-            }
-    
-            return await http.json();
-        } catch (error) {
-            console.error("Error en fetchDataCharts:", error);
-            return { data: { daily_goal: "N/A", total_day: "N/A", percentage_daily_goal: "N/A", total_month: "N/A", total_services_operated: "N/A", total_pending_services: "N/A" } }; // Devolver valores por defecto            
-        }
-    },
-
-    getLoader: function() {
-        return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
-    },    
-
-    cleanNumber: function(value) {
-        if (!value) return 0;
-        return Number(value.toString().replace(/[^0-9.-]+/g, ""));
-    },
-
-    formatCurrency: function(value) {
-        return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(this.cleanNumber(value));
-    },
-
-    formatDate: function(date){
-        const _date = new Date(date);
-        
-        // Obtener el día y el mes en formato corto (Ej: 1 Ene)
-        const day = _date.getDate();
-        const month = new Intl.DateTimeFormat('es', { month: 'short' }).format(_date);        
-        const newDate = `${day} ${month.charAt(0).toUpperCase() + month.slice(1)}`; // Capitaliza el mes
-        return newDate;
-    },
-
     seriesSales: function(data) {
       let object = { series:[ { name: 'VENTAS', data: [] } ], labels: [] };
       const sales = Object.entries(data.data);
       sales.forEach( ([date, dataDay]) => {
           let sales = object.series.find(serie => serie.name === 'VENTAS');
           // Formatear el total como moneda con 2 decimales
-          let Total = new Intl.NumberFormat('es-ES', {
-            style: 'currency',
-            currency: 'USD', // Cambia 'USD' por la moneda que necesites
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          }).format(dataDay.TOTAL);          
+          let Total = this.formatCurrency(dataDay.TOTAL, true);
           sales.data.push(Total); // Agregar un valor
           object.labels.push((dataDay.DATE));
       });
@@ -200,7 +192,6 @@ let callcenter = {
     },
     chartSales: function(response){
       let data = this.seriesSales(response);
-      console.log(data);      
       let options = {
         colors: ['#00ab55'],
         series: data.series,
@@ -215,27 +206,17 @@ let callcenter = {
         const operations = Object.entries(data.data);
         operations.forEach( ([date, dataDay]) => {
             let completed = object.series.find(serie => serie.name === 'COMPLETADAS');
-            let pending = object.series.find(serie => serie.name === 'PENDIENTES');
+            let pending = object.series.find(serie => serie.name === 'PENDIENTES');            
             // Formatear el total como moneda con 2 decimales
-            let TotalCompleted = new Intl.NumberFormat('es-ES', {
-              style: 'currency',
-              currency: 'USD', // Cambia 'USD' por la moneda que necesites
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            }).format(dataDay.COMPLETED.TOTAL);
-            let TotalPending = new Intl.NumberFormat('es-ES', {
-              style: 'currency',
-              currency: 'USD', // Cambia 'USD' por la moneda que necesites
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            }).format(dataDay.PENDING.TOTAL);            
+            let TotalCompleted = this.formatCurrency(dataDay.COMPLETED.TOTAL, true);
+            let TotalPending = this.formatCurrency(dataDay.PENDING.TOTAL, true);    
             completed.data.push(TotalCompleted); // Agregar un valor
             pending.data.push(TotalPending); // Agregar un valor
             object.labels.push((dataDay.DATE));
         });
         return object;
     },
-    chartSalesOperations: function(response){
+    chartOperations: function(response){
         let data = this.seriesOperations(response);
         let options = {
           colors: ['#00ab55', '#e2a03f'],
@@ -258,8 +239,8 @@ let callcenter = {
             totalServicesOperated: document.getElementById("totalServicesOperated"),
             totalPendingServices: document.getElementById("totalPendingServices"),
             totalCommissionOperated: document.getElementById("totalCommissionOperated"),
-            totalCommissionOperated2: document.getElementById("totalCommissionOperated2"),
-            totalCommissionPending: document.getElementById("totalCommissionPending"),
+            // totalCommissionOperated2: document.getElementById("totalCommissionOperated2"),
+            // totalCommissionPending: document.getElementById("totalCommissionPending"),
             listBreakdownCommissions: document.getElementById("listBreakdownCommissions"),
             listTargets: document.getElementById("listTargets"),            
         };
@@ -278,8 +259,8 @@ let callcenter = {
                 elements.totalServicesOperated.innerText = this.formatCurrency(stats.data.total_services_operated),
                 elements.totalPendingServices.innerText = this.formatCurrency(stats.data.total_pending_services),
                 elements.totalCommissionOperated.innerText = this.formatCurrency(stats.data.total_commission_operated),
-                elements.totalCommissionOperated2.innerText = this.formatCurrency(stats.data.total_commission_operated),
-                elements.totalCommissionPending.innerText = this.formatCurrency(stats.data.total_commission_pending),
+                // elements.totalCommissionOperated2.innerText = this.formatCurrency(stats.data.total_commission_operated),
+                // elements.totalCommissionPending.innerText = this.formatCurrency(stats.data.total_commission_pending),
             ]);
     
             let percentage = (stats.data.percentage_daily_goal <= 50 ? 'danger' : 
@@ -291,10 +272,10 @@ let callcenter = {
             </div><div><p>${stats.data.percentage_daily_goal}%</p></div>`;
 
             listBreakdownCommissions.innerHTML = `
-                                                    <li class="list-group-item ">
+                                                    <li class="list-group-item">
                                                         <div class="media-body">
                                                             <h6 class="tx-inverse text-uppercase">Total operado</h6>
-                                                            <p class="amount">${this.formatCurrency(stats.data.total_services_operated)}</p>
+                                                            <p class="amount">${this.formatCurrency(stats.data.total_services_operated_month)}</p>
                                                         </div>
                                                     </li>
                                                     <li class="list-group-item ">
@@ -307,7 +288,7 @@ let callcenter = {
                                                     <li class="list-group-item ">
                                                         <div class="media-body">
                                                             <h6 class="tx-inverse text-uppercase">Total menos decuento</h6>                                                            
-                                                            <p class="amount">${this.formatCurrency(stats.data.total_sercices_operated_investment_discount)}</p>
+                                                            <p class="amount">${this.formatCurrency(stats.data.total_services_operated_investment_discount)}</p>
                                                         </div>
                                                     </li>
                                                     <li class="list-group-item ">
@@ -321,9 +302,10 @@ let callcenter = {
 
             let targets = '';
             if (stats.data.targets) {
+                console.log(stats.data.targets);                
                 stats.data.targets.forEach(target => {
                     targets += `
-                        <li class="list-group-item ">
+                        <li class="list-group-item ${ target.status ? 'active' : '' }">
                             <div class="media-body">
                                 <h6 class="tx-inverse text-uppercase">${target.name}</h6>
                                 <p class="mg-b-0">Porcentage de comisión: <strong>${target.percentage}%</strong></p>
@@ -352,10 +334,10 @@ let callcenter = {
         Object.values(elements).forEach(el => el.innerHTML = this.getLoader());
 
         try {
-            const chartsOperations = await this.fetchDataCharts('/callcenters/stats/charts/sales');
+            const chartsOperations = await this.fetchDataCharts('/callcenters/stats/charts/sales');            
 
             await Promise.all([
-                elements.titleCharts.innerText = "Estadisticas de ventas del: " + chartsOperations.date,
+                elements.titleCharts.innerText = "Estadistica de ventas periodo del: " + chartsOperations.date,
             ]);
 
             revenueMonthly.innerHTML = "";
@@ -378,11 +360,11 @@ let callcenter = {
             const chartsOperations = await this.fetchDataCharts('/callcenters/stats/charts/opertions');
 
             await Promise.all([
-                elements.titleCharts.innerText = "Estadisticas de servicios operados y pendientes de operar del: " + chartsOperations.date,
+                elements.titleCharts.innerText = "Estadistica de servicios operados y pendientes de operar periodo del: " + chartsOperations.date,
             ]);
 
             revenueMonthly.innerHTML = "";
-            this.chartSalesOperations(chartsOperations);
+            this.chartOperations(chartsOperations);
         } catch (error) {
             console.error("Error al obtener estadísticas:", error);
             Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar.</p>');
