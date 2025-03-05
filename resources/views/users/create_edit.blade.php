@@ -40,7 +40,8 @@
         }
         .manage-access-container .device-list {
             margin: 0;
-            padding: 0;    
+            padding: 0;
+            display: flex;
         }
         .manage-access-container .device-list-item {
             background-color: #ffffff;

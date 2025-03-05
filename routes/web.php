@@ -91,8 +91,8 @@ Route::middleware(['guest'])->group(function () {
 //Meter al middleware para protejer estas rutas...
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::post('/logout/other/{sessionId}', [UserSessionController::class, 'logoutOtherSession'])->name('logout.other');    
-    Route::post('/logout/all', [UserSessionController::class, 'logoutAllSessions'])->name('logout.all');
+    Route::post('/logout/other/{sessionId}', [LoginController::class, 'logoutOtherSession'])->name('logout.other');    
+    Route::post('/logout/all', [LoginController::class, 'logoutAllSessions'])->name('logout.all');
     
 
     //BOTS

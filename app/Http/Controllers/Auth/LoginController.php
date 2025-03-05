@@ -60,21 +60,56 @@ class LoginController extends Controller
         return $agent->device() . ' - ' . $agent->browser();
     }
 
+    /**
+     * Cierra sesión en un dispositivo específico.
+     */    
     public function logoutOtherSession($sessionId)
     {
-        $session = UserSession::find($sessionId);    
-        if ($session && $session->user_id == Auth::id()) {
-            // Aquí puedes usar un sistema de cookies o una acción de logout
+        // $session = UserSession::find($sessionId);    
+        // if ($session && $session->user_id == Auth::id()) {
+        //     // Aquí puedes usar un sistema de cookies o una acción de logout
+        //     $session->delete();
+        //     // Puedes hacer algo aquí para invalidar la sesión en ese dispositivo
+        // }
+        // return back();
+        $user = Auth::user();
+
+        // Buscar la sesión y eliminarla solo si pertenece al usuario autenticado
+        $session = UserSession::where('user_id', $user->id)->where('id', $sessionId)->first();
+
+        if ($session) {
             $session->delete();
-            // Puedes hacer algo aquí para invalidar la sesión en ese dispositivo
+            return redirect()->back()->with('success', 'Sesión cerrada exitosamente.');
         }
-        return back();
+
+        return redirect()->back()->with('error', 'No se pudo cerrar la sesión.');        
     }
 
-    public function logoutAllSessions()
+    /**
+     * Cierra todas las sesiones excepto la actual.
+     */    
+    public function logoutAllSessions(Request $request)
     {
-        UserSession::where('user_id', Auth::id())->delete();
-        Auth::logout();
-        return redirect('/login');
+        // UserSession::where('user_id', Auth::id())->delete();
+        // Auth::logout();
+        // return redirect('/login');
+        $user = Auth::user();
+
+        // Obtener la sesión actual
+        // $currentSession = UserSession::where('user_id', $user->id)
+        //     ->where('ip_address', $request->ip())
+        //     ->where('user_agent', $request->userAgent())
+        //     ->first();
+        $currentSession = UserSession::where('user_id', $user->id)
+            ->where('ip_address', Device::ip())
+            ->where('user_agent', Device::userAgent())
+            ->first();        
+
+        // Eliminar todas las demás sesiones del usuario
+        UserSession::where('user_id', $user->id)
+            ->where('id', '!=', optional($currentSession)->id)
+            ->delete();
+
+        return redirect()->back()->with('success', 'Todas las demás sesiones han sido cerradas.');        
     }
 }

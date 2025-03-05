@@ -21,8 +21,26 @@
 @import '../../sections/new_spam';
 
 .items-button{
-  display: flex;
-  gap: 16px;  
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+  row-gap: 16px;
+
+  > button{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    font-size: 0.875rem;
+    @media (min-width: 992px) {
+      flex-direction: column;
+    }
+    @media (min-width: 1200px) {
+      flex-direction: row;
+    }
+  }
+  @media (min-width: 992px) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
 }
 .card .card-title{
   font-size: 18px;
