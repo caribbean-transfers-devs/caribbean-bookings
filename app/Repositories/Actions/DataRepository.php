@@ -14,7 +14,7 @@ use App\Models\SalesType;
 
 //TRAITS
 
-class ActionsRepository
+class DataRepository
 {
     public function getZones($request)
     {

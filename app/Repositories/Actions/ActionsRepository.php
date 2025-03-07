@@ -51,6 +51,38 @@ class ActionsRepository
     }
 
     /**
+     * NOS AYUDA A MARCAR LA RESERVACIÓN COMO SOLICITUD DE REEMBOLSO
+     * @param request :la información recibida en la solicitud
+    */
+    public function refundRequest($request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $booking = Reservation::find($request->reservation_id);
+            $booking->status_refund = 'REFUND_REQUESTED';
+            $booking->request_date_refund = date('Y-m-d H:m:s');
+            $booking->message_refund = $request->message;
+            $booking->save();
+
+            // ESTATUS DE RESERVACIÓN
+            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", indica que la cliente solicita reeembolso de la reservación", 'HISTORY', "UPDATE_BOOKING_REFUND_REQUESTED");
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se marco correctamente la reservación como solicitud de reeembolso',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
+
+    /**
      * NOS AYUDA A PODER CAMBIAR EL ESTATUS DEL SERVICIO, EN LOS DETALLES DE LA RESERVACIÓN
      * @param request :la información recibida en la solicitud
     */

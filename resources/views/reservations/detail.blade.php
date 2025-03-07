@@ -336,6 +336,11 @@
                 @if ( $data['status'] == "CONFIRMED" && RoleTrait::hasPermission(72) )
                     <button class="btn btn-warning btn-sm" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> CRÉDITO ABIERTO</button>
                 @endif
+
+                {{-- NOS PERMITE INDICAR QUE CLIENTE ESTA SOLICITANDO UN REEMBOLSO --}}
+                @if ( $data['status'] == "CONFIRMED" && $reservation->status_refund == NULL )
+                    <button class="btn btn-warning btn-sm refundRequest" id="refundRequest" data-code="{{ $reservation->id }}"><i class="align-middle" data-feather="delete"></i> SOLICITUD DE REEMBOLSO A CONTABILIDAD</button>
+                @endif
             </div>
 
             @if ( $data['status'] == "QUOTATION" )

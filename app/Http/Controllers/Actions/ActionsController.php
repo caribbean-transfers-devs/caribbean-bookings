@@ -27,6 +27,11 @@ class ActionsController extends Controller
         return $this->ActionsRepository->enablePayArrival($request);
     }
 
+    public function refundRequest(Request $request)
+    {
+        return $this->ActionsRepository->refundRequest($request);
+    }
+
     public function updateServiceStatus(Request $request){
         return $this->ActionsRepository->updateServiceStatus($request);
     }

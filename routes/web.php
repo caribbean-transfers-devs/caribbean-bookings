@@ -276,6 +276,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     //ACCIONES GENERALES
-    Route::post('/action/enablePayArrival', [ActionsController::class, 'enablePayArrival'])->name('update.booking.pay.arrival');    
+    Route::post('/action/enablePayArrival', [ActionsController::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
+    Route::post('/action/refundRequest', [ActionsController::class, 'refundRequest'])->name('update.booking.refund.request');
     Route::put('/action/updateServiceStatus', [ActionsController::class, 'updateServiceStatus'])->name('update.service.status');    
 });

@@ -17,52 +17,136 @@ const __code_pay = document.getElementById('payment_id');
 
 //DECLARAMOS VARIABLES PARA ACCIONES DE RESERVAS
 const enablePayArrival = document.getElementById('enablePayArrival');
+const refundRequest = document.getElementById('refundRequest');
 
-
+//HABILIDATAMOS PAGO A LA LLEGADA
 if( enablePayArrival ){
     enablePayArrival.addEventListener('click', function(event){
         event.preventDefault();
         const { code } = this.dataset;
-        
-        Swal.fire({
-            title: "Procesando solicitud...",
-            text: "Por favor, espera mientras se marca como pago a la llegada el servicio.",
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
 
-        fetch('/action/enablePayArrival', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },            
-            body: JSON.stringify({ reservation_id: code })
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw err; });
+        Swal.fire({
+            html: '¿Está seguro de marcar la reservación como pago a la llegada?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {                        
+                Swal.fire({
+                    title: "Procesando solicitud...",
+                    text: "Por favor, espera mientras se marca como pago a la llegada la reserva.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/action/enablePayArrival', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },            
+                    body: JSON.stringify({ reservation_id: code })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        icon: data.status,
+                        html: data.message,
+                        allowOutsideClick: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire(
+                        '¡ERROR!',
+                        error.message || 'Ocurrió un error',
+                        'error'
+                    );
+                });
             }
-            return response.json();
-        })
-        .then(data => {
-            Swal.fire({
-                icon: data.status,
-                html: data.message,
-                allowOutsideClick: false,
-            }).then(() => {
-                location.reload();
-            });
-        })
-        .catch(error => {
-            Swal.fire(
-                '¡ERROR!',
-                error.message || 'Ocurrió un error',
-                'error'
-            );
-        });        
+        });       
+    })
+}
+
+//SOLITAMOS REEMBOLSO
+if( refundRequest ){
+    refundRequest.addEventListener('click', function(event){
+        event.preventDefault();
+        const { code } = this.dataset;
+
+        Swal.fire({
+            html: '¿Está seguro de la solicitud del reembolso de la reservación?',
+            icon: 'warning',
+            input: 'textarea',
+            inputLabel: "Ingresa un comentario indicando los detalles del reembolso",
+            inputPlaceholder: 'Ingresa un comentario indicando si el reembolso es total, o si es parcial de cuanto porcentaje, en caso de ser un "round trip" indicar si aplica el reembolso solo para llegada o salida o ambos...',
+            inputAttributes: {
+                required: true
+            },            
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: (comment) => {
+                if (!comment.trim()) {
+                    Swal.showValidationMessage('Debe ingresar un comentario.');
+                    return false;
+                }
+                return comment.trim();
+            }            
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let message = result.value;
+                
+                Swal.fire({
+                    title: "Procesando solicitud...",
+                    text: "Por favor, espera mientras se envia la solicud de reembolso de la reserva.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/action/refundRequest', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },            
+                    body: JSON.stringify({ reservation_id: code, message: message })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        icon: data.status,
+                        html: data.message,
+                        allowOutsideClick: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire(
+                        '¡ERROR!',
+                        error.message || 'Ocurrió un error',
+                        'error'
+                    );
+                });
+            }
+        });       
     })
 }
 
