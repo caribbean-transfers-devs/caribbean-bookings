@@ -151,4 +151,57 @@ trait ApiTrait
 
         return json_decode($response, true);
     }
+
+
+    public static function makeSetting($end_point, $method){
+        $params = [
+            "api_key" => "sk_eUZERlFKVW4zMmM0TUt2V0R6cGlsRWRJTWJSUGZNc3pTdWhPUVBBckN6TitWUWVmZlZTbnd4NGR2cFF6U1JUV3pUQ1A5dmdRdEhRMW1GNWg1NFdMUlE9PQ==",
+            "domain" => $_SERVER["HTTP_HOST"],
+            "view" => "frontend",
+            "language" => "es",
+            "currency" => "MXN"
+        ];
+        return self::makeRequestHttp($end_point, $method, $params, 'v2/');
+    }
+
+    public static function makeRequestHttp($end_point, $method = "GET", $data = null, $version = "v1/", $type = "json"){
+        return self::sendRequestTest($version.$end_point, $method, $data, [], $type);
+    }    
+
+    public static function sendRequestTest($end_point, $method = 'GET', $data = null, $headers_merge = [], $type = "json") {
+        $url = 'https://api.kreatravel.com/api/'.$end_point;
+        $ch = curl_init($url);
+
+        if ($method == 'POST') {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            if ($data) {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            }
+        }
+
+        if ($method == 'GET') {
+            if ($data) {
+                $url .= '?' . http_build_query($data);
+            }
+        }
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        $headers = array(
+            'Content-Type: application/json',
+        );
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            echo 'Error: ' . curl_error($ch);
+        }
+
+        curl_close($ch);
+
+        return json_decode($response, true);
+    }
 }

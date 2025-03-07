@@ -14,12 +14,13 @@ use App\Models\Sale;
 use App\Models\Payment;
 
 //TRAITS
+use App\Traits\ApiTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
 
 class MasterToursRepository
 {
-    use FiltersTrait, QueryTrait;
+    use ApiTrait, FiltersTrait, QueryTrait;
 
     public function __construct()
     {
@@ -207,5 +208,10 @@ class MasterToursRepository
         }
 
         return $data;
-    }    
+    }
+    
+    public function TestApi($request)
+    {
+        return ApiTrait::makeSetting('business', 'POST');
+    }
 }
