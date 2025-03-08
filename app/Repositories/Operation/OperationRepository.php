@@ -143,6 +143,12 @@ class OperationRepository
         if(isset( $request->is_commissionable )){
             $params = $request->is_commissionable;
             $query .= " AND rez.is_commissionable = $params ";
+        }
+
+        //PAGO A LA LLEGADA
+        if( $request->is_pay_at_arrival !=  NULL ){
+            $params = $request->is_pay_at_arrival;
+            $query .= " AND rez.pay_at_arrival = $params ";
         }        
 
         //MOTIVOS DE CANCELACIÓN

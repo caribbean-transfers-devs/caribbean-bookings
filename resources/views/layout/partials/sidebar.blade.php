@@ -4,9 +4,8 @@
     @php
         $links = []; //LINKS GENERALES
         $links_dashboard = [];
-        $links_finance = [];
+        $links_finances = [];
         $links_reports = [];
-        $links_selling_point = [];
         $links_operations = [];
         $links_settings = [];
 
@@ -37,7 +36,7 @@
                 'route' => ( empty($links_dashboard) || count($links_dashboard) == 1 ? ( auth()->user()->is_commission == 1 ? route('callcenters.index') : route('dashboard') ) : route('dashboard') ),
                 'active' => request()->routeIs('dashboard', 'callcenters.index'),
                 'urls' => $links_dashboard
-            ]);        
+            ]);
 
         //TPV
         if(RoleTrait::hasPermission(26)):
@@ -51,21 +50,25 @@
             ]);
         endif;
 
-        //FINANZAS
-        // $links_finance[] = [
-        //     'name' => 'Finanzas',
-        //     'route' => route('finance.sales'),
-        //     'active' => request()->routeIs('finance.sales','finance.sales.action'),
-        // ];
-        // array_push($links,[
-        //     'type' => 'multiple',
-        //     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>',
-        //     'code' => 'finances',
-        //     'name' => 'Finanzas',
-        //     'route' => null,
-        //     'active' => request()->routeIs('finance.*'),
-        //     'urls' => $links_finance
-        // ]);
+        // // FINANZAS
+        // if(RoleTrait::hasPermission(43)):
+        //     if(RoleTrait::hasPermission(43)):
+        //         $links_finances[] = [
+        //             'name' => 'Finanzas',
+        //             'route' => route('finance.sales'),
+        //             'active' => request()->routeIs('finance.sales','finance.sales.action'),
+        //         ];
+        //     endif;
+        //     array_push($links,[
+        //         'type' => 'multiple',
+        //         'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>',
+        //         'code' => 'finances',
+        //         'name' => 'Finanzas',
+        //         'route' => null,
+        //         'active' => request()->routeIs('finance.*'),
+        //         'urls' => $links_finances
+        //     ]);
+        // endif;
 
         //REPORTES
         if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71) || RoleTrait::hasPermission(97) || RoleTrait::hasPermission(98) || RoleTrait::hasPermission(99) || RoleTrait::hasPermission(101)):

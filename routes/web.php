@@ -14,7 +14,7 @@ use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
 use App\Http\Controllers\Payments\PaymentsController;
 
-use App\Http\Controllers\Finance\SalesController as SaleFinance;
+use App\Http\Controllers\Finances\SalesController as SaleFinance;
 
 use App\Http\Controllers\Reports\ReportsController;
 use App\Http\Controllers\Management\ManagementController;
@@ -97,7 +97,7 @@ Route::group(['middleware' => ['auth']], function () {
     //BOTS
         //SET RATE MASTER TOUR
         Route::get('/set/rate/master', [MasterToursController::class, 'ListServicesMasterTour'])->name('list.services.master.tours')->withoutMiddleware(['auth']);
-        Route::get('/set/test/api', [MasterToursController::class, 'TestApi'])->name('test.api')->withoutMiddleware(['auth']);
+
         //PAYPAL
         Route::get('/bot/conciliation/paypal', [ConciliationController::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
         Route::get('/conciliation/paypalOrders', [ConciliationController::class, 'PayPalPaymenOrders'])->name('bot.paypal.orders')->withoutMiddleware(['auth']);
@@ -108,6 +108,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
 
     //DASHBOARD
+        // GERENCIA
         Route::match(['get', 'post'], '/', [DashboardController::class, 'index'])->name('dashboard');
         // AGENTES DE CALL CENTER
         Route::match(['get', 'post'], '/callcenters', [CallCenterController::class, 'index'])->name('callcenters.index');

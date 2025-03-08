@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Finance;
+namespace App\Http\Controllers\Finances;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 //REPOSITORY
-use App\Repositories\Finance\SalesRepository;
+use App\Repositories\Finances\RefundsRepository;
 
 //TRAITS
 use App\Traits\RoleTrait;
 
-class SalesController extends Controller
+class RefundsController extends Controller
 {
     use RoleTrait;    
 
@@ -25,5 +25,5 @@ class SalesController extends Controller
     public function index(Request $request)
     {
         return $this->SalesRepository->index($request);
-    }    
+    }
 }

@@ -45,6 +45,18 @@
                     'data-bs-target' => '#filterModal',
                 )
             ),
+            array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
+                'titleAttr' => 'Administrar columnas',
+                'className' => 'btn btn-primary __btn_columns',
+                'attr' => array(
+                    'data-title' =>  "Administrar columnas",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#columnsModal',
+                    'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
+                    'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
+                )                
+            ),            
         );
     @endphp
     <div class="row layout-top-spacing">
@@ -60,6 +72,7 @@
                         </ul>
                     </div>
                 @endif
+
                 <table id="dataBookings" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
@@ -80,7 +93,10 @@
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">BALANCE</th>
                             <th class="text-center">MONEDA</th>
-                            <th class="text-center">MÉTODO DE PAGO</th> 
+                            <th class="text-center">MÉTODO DE PAGO</th>
+                            <th class="text-center">PAGO AL LLEGAR</th>
+                            <th class="text-center">COMISIÓNABLE</th>
+                            <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -118,6 +134,21 @@
                                     <td class="text-center" {{ (($item->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>                                
                                     <td class="text-center">{{ $item->currency }}</td>
                                     <td class="text-center">{{ $item->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $item->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-{{ $item->pay_at_arrival == 1 ? 'success' : 'danger' }}" type="button">{{ $item->pay_at_arrival == 1 ? "SI" : "NO" }}</button>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-{{ $item->is_commissionable == 1 ? 'success' : 'danger' }}" type="button">{{ $item->is_commissionable == 1 ? "SI" : "NO" }}</button>
+                                    </td>
+                                    <td class="text-center">
+                                        @if ( $item->reservation_status == "CANCELLED" )
+                                            @if ( !empty($item->cancellation_reason) )
+                                                {{ $item->cancellation_reason }}
+                                            @else
+                                                {{ "NO SHOW" }}
+                                            @endif
+                                        @endif
+                                    </td>                                    
                                 </tr>
                             @endforeach
                         @endif
@@ -127,7 +158,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :isSearch="1" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :websites="$websites" :origins="$origins" :istoday="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :websites="$websites" :origins="$origins" :ispayarrival="1" :istoday="1" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />
 @endsection

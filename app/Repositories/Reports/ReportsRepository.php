@@ -844,7 +844,13 @@ class ReportsRepository
         if(isset( $request->is_commissionable )){
             $params = $request->is_commissionable;
             $query .= " AND rez.is_commissionable = $params ";
-        }        
+        }
+
+        //PAGO A LA LLEGADA
+        if( $request->is_pay_at_arrival !=  NULL ){
+            $params = $request->is_pay_at_arrival;
+            $query .= " AND rez.pay_at_arrival = $params ";
+        }
 
         //MOTIVOS DE CANCELACIÓN
         if(isset( $request->cancellation_status ) && !empty( $request->cancellation_status )){
@@ -893,7 +899,7 @@ class ReportsRepository
         }
 
         // dd($query, $queryHaving, $queryData);
-        $bookings = $this->queryBookings($query, $queryHaving, $queryData);
+        $bookings = $this->queryBookings($query, $queryHaving, $queryData);        
         
         return view('reports.sales', [
             'breadcrumbs' => [

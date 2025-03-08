@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Finance;
+namespace App\Repositories\Finances;
 
 use Exception;
 use Illuminate\Http\Response;
@@ -461,7 +461,7 @@ class SalesRepository
 
                         // dd($payment_paypal2);
 
-        return view('finance.sales', [
+        return view('finances.sales', [
             'breadcrumbs' => [
                 [
                     "route" => "",

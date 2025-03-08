@@ -235,7 +235,7 @@
                     </div>
                 @endif
                 
-                <table id="dataBookings" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataSales" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
                             <th class="text-center">ID</th>
@@ -268,7 +268,7 @@
                             <th class="text-center">MÉTODO DE PAGO</th> 
                             <th class="text-center">INFORMACIÓN DE MÉTODO DE PAGO</th>
                             <th class="text-center">PAGO AL LLEGAR</th>
-                            <th class="text-center">FUE COTIZACIÓN</th>                            
+                            <th class="text-center">FUE COTIZACIÓN</th>
                             <th class="text-center">COMISIÓNABLE</th>
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>

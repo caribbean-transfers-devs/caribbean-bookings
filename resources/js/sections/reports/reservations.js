@@ -93,5 +93,5 @@ if( __payment_infos.length > 0 ){
     });
 }
 
-components.renderCheckboxColumns('dataBookings', 'columns');
+components.renderCheckboxColumns('dataSales', 'columns');
 components.setValueSelectpicker();

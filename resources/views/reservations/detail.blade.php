@@ -123,7 +123,7 @@
 @endpush
 
 @section('content')
-    {{-- @dump($reservation); --}}
+    {{-- @dump($reservation->toArray()); --}}
     <div class="row layout-top-spacing">
         <div class="col-xxl-3 col-xl-4 col-12">
             <div class="card">
@@ -156,6 +156,10 @@
                                         <td>{{ $reservation->expires_at }}</td>
                                     </tr>                                    
                                 @endif
+                                <tr>
+                                    <th>Pago al llegar</th>
+                                    <td><span class="badge bg-{{ $reservation->pay_at_arrival == 1 ? 'success' : 'danger' }}">{{ $reservation->pay_at_arrival == 1 ? 'Sí' : 'No' }}</span></td>
+                                </tr>                                
                                 <tr>
                                     <th>Nombre</th>
                                     <td>{{ $reservation->client_first_name }} {{ $reservation->client_last_name }}</td>

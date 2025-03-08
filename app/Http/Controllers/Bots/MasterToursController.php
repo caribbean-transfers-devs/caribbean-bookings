@@ -26,9 +26,4 @@ class MasterToursController extends Controller
     {
         return $this->MasterToursRepository->ListServicesMasterTour($request);
     }
-
-    public function TestApi(Request $request)
-    {
-        return $this->MasterToursRepository->TestApi($request);
-    }
 }

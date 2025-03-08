@@ -209,9 +209,4 @@ class MasterToursRepository
 
         return $data;
     }
-    
-    public function TestApi($request)
-    {
-        return ApiTrait::makeSetting('business', 'POST');
-    }
 }
