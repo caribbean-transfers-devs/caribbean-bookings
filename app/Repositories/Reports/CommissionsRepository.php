@@ -118,21 +118,24 @@ class CommissionsRepository
                     : $operation->cost;
 
                     $data['total_operations'] += $total_sales;
+
                     $user = $dataUser->where('id', $operation->employee_code)->first();
-                    if ( $user || !isset($data["DATA"][$operation->employee_code]) ) {
+                    if ( !isset($data["DATA"][$operation->employee_code]) && !empty($user) ) {
                         $data["DATA"][$operation->employee_code] = [
                             "NAME" => $operation->employee,
                             "TOTAL" => 0,
                             "USD" => 0,
                             "MXN" => 0,
                             "QUANTITY" => 0,
-                            "SETTINGS" => []
+                            "SETTINGS" => $user
                         ];
                     }
-
-                    $data["DATA"][$operation->employee_code]['TOTAL'] += round($total_sales, 2);
-                    $data["DATA"][$operation->employee_code][$booking->currency] += round($operation->cost, 2);
-                    $data["DATA"][$operation->employee_code]['QUANTITY'] ++;
+                    
+                    if( isset($data["DATA"][$operation->employee_code]) && !empty($user) ){
+                        $data["DATA"][$operation->employee_code]['TOTAL'] += round($total_sales, 2);
+                        $data["DATA"][$operation->employee_code][$booking->currency] += round($operation->cost, 2);
+                        $data["DATA"][$operation->employee_code]['QUANTITY'] ++;
+                    }
                 }
             }
 

@@ -167,7 +167,7 @@ class TpvRepository
         // $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
         // $agents = User::whereIn('id', $users_ids)->get();
 
-        return view('tpv.form', compact('quotation','sites'));
+        return view('tpv.form', compact('quotation','sites','origin_sales'));
     }
 
     public function create($request){    

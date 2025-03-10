@@ -1,9 +1,9 @@
 @php
     use App\Traits\FiltersTrait;
-    $users = FiltersTrait::CallCenterAgent();    
+    $users = FiltersTrait::CallCenterAgent();
 @endphp
 @extends('layout.app')
-@section('title') Dashboard Agente de Call Center @endsection
+@section('title') Reporte de comisiones @endsection
 
 @push('Css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
