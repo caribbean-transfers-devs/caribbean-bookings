@@ -14,9 +14,14 @@ use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
 use App\Http\Controllers\Payments\PaymentsController;
 
+//FINANZAS
+use App\Http\Controllers\Finances\RefundsController as RefundsFinances;
 use App\Http\Controllers\Finances\SalesController as SaleFinance;
 
+//REPORTES
 use App\Http\Controllers\Reports\ReportsController;
+use App\Http\Controllers\Reports\CommissionsController as CommissionsReports;
+
 use App\Http\Controllers\Management\ManagementController;
 use App\Http\Controllers\Operation\SpamController as SPAM;
 use App\Http\Controllers\Operation\PendingController as PENDING;
@@ -126,8 +131,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
         Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
 
-    //FINANZAS    
-        //PAGOS
+    //FINANZAS 
+        //REEMBOLSOS
+        Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds');   
+        //PAGOS        
         Route::get('/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales');
         Route::post('/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales.action');
 
@@ -145,9 +152,12 @@ Route::group(['middleware' => ['auth']], function () {
         //COMISIONES
         Route::get('/reports/commissions', [ReportsController::class, 'commissions2'])->name('reports.commissions');
         Route::post('/reports/commissions', [ReportsController::class, 'commissions2'])->name('reports.commissions.action');
-        //COMISIONES VERSION 2
-        Route::get('/reports/commissions2', [ReportsController::class, 'commissions'])->name('reports.commissions2');
-        Route::post('/reports/commissions2', [ReportsController::class, 'commissions'])->name('reports.commissions2.action');
+
+        Route::match(['get', 'post'], '/reports/commissions2', [CommissionsReports::class, 'index'])->name('reports.commissions2');
+        Route::match(['post','get'], '/reports/stats/commissions/get', [CommissionsReports::class, 'getStats'])->name('reports.stats.get');
+        Route::match(['post','get'], '/reports/sales/stats/charts/commissions', [CommissionsReports::class, 'chartsSales'])->name('reports.sales.stats.charts.comissions.get');
+        Route::match(['post','get'], '/reports/operations/stats/charts/commissions', [CommissionsReports::class, 'chartsOperations'])->name('reports.operations.stats.charts.comissions.get');
+
         //VENTAS
         Route::get('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales');
         Route::post('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales.action');

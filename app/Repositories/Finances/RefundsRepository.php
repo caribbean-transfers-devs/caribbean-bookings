@@ -18,7 +18,7 @@ use App\Traits\StripeTrait;
 
 class RefundsRepository
 {
-    use MethodsTrait, FiltersTrait;
+    use MethodsTrait, QueryTrait, FiltersTrait;
 
     public function index($request)
     {
@@ -26,7 +26,7 @@ class RefundsRepository
         set_time_limit(120); // Aumenta el tiempo de ejecución a 120 segundos
     
         // Función auxiliar para obtener fechas seguras
-        $dates = MethodsTrait::parseDateRange($request->date ?? date("Y-m-d"));
+        $dates = MethodsTrait::parseDateRange($request->date ?? '');
         
         // Parámetros iniciales
         $data = [
@@ -52,7 +52,7 @@ class RefundsRepository
             "is_agency" => $request->is_agency ?? 0,
         ];
 
-        $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end ';
+        $query = ' AND rez.site_id NOT IN(21,11) AND request_date_refund IS NOT NULL AND rez.request_date_refund BETWEEN :init AND :end ';
         $havingConditions = [];
         $queryHaving = '';
         $queryData = [
@@ -67,17 +67,17 @@ class RefundsRepository
 
         // SITIO
         if (!empty($request->site)) {
-            $query .= " AND site.id IN (" . MethodsTrait::parseArrayQuery($request->site) . ") ";
+            $query .= " AND site.id IN (" . MethodsTrait::parseArrayQuery2($request->site) . ") ";
         }
 
         // ORIGEN DE VENTA
         if (!empty($request->origin)) {
-            $query .= " AND (origin.id IN (" . MethodsTrait::parseArrayQuery($request->origin) . ") OR origin.id IS NULL) ";
+            $query .= " AND (origin.id IN (" . MethodsTrait::parseArrayQuery2($request->origin) . ") OR origin.id IS NULL) ";
         }
 
         // ESTATUS DE RESERVACIÓN
         if (!empty($request->reservation_status)) {
-            $havingConditions[] = " reservation_status IN (" . MethodsTrait::parseArrayQuery($request->reservation_status, "single") . ") ";
+            $havingConditions[] = " reservation_status IN (" . MethodsTrait::parseArrayQuery2($request->reservation_status, "single") . ") ";
         }
 
         // TIPO DE VEHÍCULO
@@ -94,12 +94,12 @@ class RefundsRepository
 
         // ESTATUS DE PAGO
         if (!empty($request->payment_status)) {
-            $havingConditions[] = " payment_status IN (" . MethodsTrait::parseArrayQuery($request->payment_status, "single") . ") ";
+            $havingConditions[] = " payment_status IN (" . MethodsTrait::parseArrayQuery2($request->payment_status, "single") . ") ";
         }
 
         // MONEDA DE LA RESERVA
         if (!empty($request->currency)) {
-            $query .= " AND rez.currency IN (" . MethodsTrait::parseArrayQuery($request->currency, "single") . ") ";
+            $query .= " AND rez.currency IN (" . MethodsTrait::parseArrayQuery2($request->currency, "single") . ") ";
         }
 
         // MÉTODO DE PAGO
@@ -115,7 +115,7 @@ class RefundsRepository
 
         // MOTIVOS DE CANCELACIÓN
         if (!empty($request->cancellation_status)) {
-            $query .= " AND tc.id IN (" . MethodsTrait::parseArrayQuery($request->cancellation_status) . ") ";
+            $query .= " AND tc.id IN (" . MethodsTrait::parseArrayQuery2($request->cancellation_status) . ") ";
         }
 
         // RESERVAS CON UN BALANCE
@@ -145,21 +145,18 @@ class RefundsRepository
             $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
         }
 
-        $bookings = $this->queryBookings($query, $queryHaving, $queryData);        
+        $bookings = $this->queryBookings($query, $queryHaving, $queryData);
 
         return view('finances.refunds.index', [
             'breadcrumbs' => [
                 [
                     "route" => "",
-                    "name" => "Ventas del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
+                    "name" => "Reembolsos del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
                     "active" => true
                 ]
             ],
-            "paypal" => $payment_paypal,
-            "stripe" => $payment_stripe,
-            "paypal2" => $payment_paypal,
-            "payments" => $payments,
-            'exchange' => $this->Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
+            'bookings' => $bookings,
+            'exchange' => $this->Exchange(( date("Y-m-d", strtotime($data['init'])) ), ( date("Y-m-d", strtotime($data['end'])) )),
             'data' => $data,
         ]);
     }    

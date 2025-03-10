@@ -23,6 +23,12 @@ let callcenter = {
         dataLabels: {
           enabled: false
         },
+        markers: {
+            size: 5,
+            hover: {
+                size: 7
+            }
+        },
         stroke: {
             show: true,
             curve: 'smooth',
@@ -202,7 +208,15 @@ let callcenter = {
     },
 
     seriesOperations: function(data) {
-        let object = { series:[ { name: 'COMPLETADAS', data: [] }, { name: 'PENDIENTES', data: [] } ], labels: [] };
+        let object = 
+        { 
+            series:
+            [ 
+                { name: 'COMPLETADAS', data: [] }, 
+                { name: 'PENDIENTES', data: [] } 
+            ], 
+            labels: [] 
+        };
         const operations = Object.entries(data.data);
         operations.forEach( ([date, dataDay]) => {
             let completed = object.series.find(serie => serie.name === 'COMPLETADAS');
@@ -373,12 +387,12 @@ let callcenter = {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    callcenter.reloadAll(); // Inicializar cargando las estadisticas
-    callcenter.reloadChartsSales();
-
     // Configuraciones necesarias
     components.titleModal();
     components.calendarFilter();
+        
+    callcenter.reloadAll(); // Inicializar cargando las estadisticas
+    callcenter.reloadChartsSales();
 
     // Solictudes de filtros mediante el formulario
     if( document.getElementById('formSearch') ){

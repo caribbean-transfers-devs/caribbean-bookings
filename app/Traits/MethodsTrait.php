@@ -2,20 +2,80 @@
 
 namespace App\Traits;
 use Illuminate\Http\Response;
+
+//PACKAGES
+use Carbon\Carbon;
+
+//MODELS
+use App\Models\User;
 trait MethodsTrait
 {
 
+    public static function parseArray($user)
+    {
+        if (is_array($user)) {
+            return array_filter($user); // Devuelve el array sin modificaciones si ya es un array
+        }
+    
+        if (!is_string($user)) {
+            return []; // Si no es string ni array, devuelve un array vacío
+        }
+    
+        preg_match_all('/["\']([^"\']+)["\']/', $user, $matches);
+        return $matches[1] ?? []; // Devuelve un array vacío si no hay coincidencias
+    }
+
+    /**
+     * Función para obtener la información de usuario o usuarios
+     */
+    public static function DataUser(array $users = [])
+    {
+        // Filtrar solo valores numéricos para evitar errores en la consulta
+        // Filtrar solo valores numéricos enteros
+        // $users = array_filter($users, fn($id) => ctype_digit((string) $id)); // Solo números enteros
+        $users = array_filter($users, fn($id) => is_numeric($id) && ctype_digit((string) $id));
+
+        // Base de la consulta
+        $query = User::where('is_commission', 1)->where('status', 1)->with('target');
+
+        // Si hay usuarios filtrados, aplicar whereIn
+        if (!empty($users)) {
+            $query->whereIn('id', $users);
+        }
+
+        return $query->get();
+    }
+
     /**
      * Función para dividir el rango de fechas en 'init' y 'end'.
+     * @param date: es la fecha en el siguiente formato ejemplo: 2025-01-01 - 2025-01-31
      */
     public static function parseDateRange($date)
     {
-        $dates = explode(" - ", $date);
+        $dates = isset($date) && !empty($date) ? explode(" - ", $date) : [date('Y-m-d'), date('Y-m-d')];
         return [
-            'init' => $dates[0] ?? date("Y-m-d"),
-            'end' => $dates[1] ?? date("Y-m-d"),
+            'init' => $dates[0],
+            'end' => $dates[1],
         ];
     }
+
+    /**
+     * Función para dividir el rango de fechas en 'init' y 'end', de un mes.
+     */
+    public static function parseDateRangeMonth($date)
+    {
+        $startDate = Carbon::parse($date); // Tomar la primera fecha
+        $start = $startDate->copy()->startOfMonth();
+        $end = $startDate->copy()->endOfMonth();
+        return [
+            'init' => $start->toDateString(),
+            'end' => $end->toDateString(),
+            'initTime' => $start->toDateTimeString(),
+            'endTime' => $end->toDateTimeString(),
+            'initCarbon' => $start,
+            'endCarbon' => $end,
+        ];
+    }    
 
     /**
      * Función para generar condiciones con FIND_IN_SET
@@ -33,20 +93,56 @@ trait MethodsTrait
     /**
      * Función para formatear arreglos en consultas SQL.
      */
-    public static function parseArrayQuery($data, $marks = null)
+    public static function parseArrayQuery2($data, $marks = null)
     {
         if (is_array($data)) {
-            $filteredData = array_filter($data, fn($value) => $value !== null && $value !== 0);
-            
-            return implode(',', array_map(function($value) use ($marks) {
-                return match ($marks) {
-                    'single' => "'" . addslashes($value) . "'",
-                    'double' => '"' . addslashes($value) . '"',
-                    default => $value,
-                };
-            }, $filteredData));
+            // $filteredData = array_filter($data, fn($value) => $value !== null && $value !== 0);
+            $filteredData = array_filter($data, fn($value) => $value !== null); // Mantiene valores 0
+            return implode(',', array_map(fn($value) => match ($marks) {
+                'single' => "'" . addslashes($value) . "'",
+                'double' => '"' . addslashes($value) . '"',
+                default => $value,
+            }, $filteredData));            
         }
-        return "'" . addslashes($data) . "'";
-    }    
 
+        return isset($data) ? "'" . addslashes($data) . "'" : "NULL";
+    }
+
+    //GENERA EL ARREGLO PARA PODER GUARDAR LA VENTAS REALIZADAS POR UNO O VARIOS AGENTES DE CALL CENTER
+    public static function dataSales($start_d, $end_d, string $action = NULL, array $data = [])
+    {
+        $bookings_month = [];
+        $date = clone $start_d; // Clonar la fecha antes de modificarla
+    
+        while ($date->lte($end_d)) {
+            $bookings_month[$date->toDateString()] = [
+                "DATE" => $date->format('j M'),
+                "TOTAL" => 0,
+                "USD" => 0,
+                "MXN" => 0,
+                "QUANTITY" => 0,
+                "BOOKINGS" => [],
+            ];
+            if( $action != NULL ){
+                $bookings_month[$date->toDateString()]["DATA"] = [];
+                if( $data ){
+                    foreach ($data as $value) {
+                        if (!isset($bookings_month[$date->toDateString()]["DATA"][$value['id']])) {
+                            $bookings_month[$date->toDateString()]["DATA"][$value['id']] = [
+                                "NAME" => $value['name'],
+                                "TOTAL" => 0,
+                                "USD" => 0,
+                                "MXN" => 0,
+                                "QUANTITY" => 0,
+                                "BOOKINGS" => []
+                            ];
+                        }                        
+                    }
+                }
+            }            
+            $date->addDay(); // Modificamos solo la copia, no la original
+        }
+
+        return $bookings_month;
+    }
 }

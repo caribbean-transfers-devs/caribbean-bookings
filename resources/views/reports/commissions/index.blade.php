@@ -13,7 +13,7 @@
     $users = FiltersTrait::CallCenterAgent();
 @endphp
 @extends('layout.app')
-@section('title') Comisiones @endsection
+@section('title') Reporte de comisiones @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/report_commissions.min.css') }}" rel="preload" as="style" >
@@ -29,6 +29,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>    
     <script src="{{ mix('/assets/js/sections/reports/commissions.min.js') }}"></script>
+    <script>
+        document.getElementById('user').addEventListener('change', function() {
+            let selectedValues = Array.from(this.selectedOptions).map(option => option.value);
+            console.log(selectedValues);
+        });
+    </script>
 @endpush
 
 @section('content')
@@ -80,7 +86,7 @@
                 'className' => 'btn btn-warning',
             ),            
         );
-    @endphp
+    @endphp    
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
             <div class="widget-content widget-content-area br-8">

@@ -1,4 +1,7 @@
-
+@php
+    use App\Traits\FiltersTrait;
+    $users = FiltersTrait::CallCenterAgent([1]);    
+@endphp
 <form class="col-xl-12 quote_container" id="formReservation">
     <div class="left_">
         @if (isset( $quotation['items'] ))
@@ -113,8 +116,8 @@
                 <div>
                     <label class="form-label" for="formAgent">Agente</label>
                     <select class="form-control" id="formAgent" name="call_center_agent">
-                        @if (isset( $agents ) && sizeof($agents) >= 1)
-                            @foreach ($agents as $item)
+                        @if (isset( $users ) && $users)
+                            @foreach ($users as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                             @endforeach
                         @endif

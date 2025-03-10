@@ -123,7 +123,7 @@ class CallCenterResository
     public function getStats($request)
     {
         try {
-            // ini_set('memory_limit', '-1'); // Sin límite
+            ini_set('memory_limit', '-1'); // Sin límite
             set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
 
             $dataUser = auth()->user();
@@ -149,16 +149,12 @@ class CallCenterResository
                 "total_services_operated_month" => 0,
                 "total_investment_discount_operated" => 0,
                 "total_services_operated_investment_discount" => 0,
-                "total_commission_operated" => 0,            
+                "total_commission_operated" => 0,
                 "total_pending_services" => 0,
-                // "total_investment_discount_pending" => 0,
-                // "total_services_pending_investment_discount" => 0,
-                // "total_commission_pending" => 0,
                 "percentage_commission" => 0,
             ];
 
             // Condiciones de Reservas
-            // Status de reservación
 
             //Para las ventas velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
             $paramBookingStatus = $this->parseArrayQuery(['CONFIRMED', 'CREDIT', 'OPENCREDIT'], "single");
@@ -218,7 +214,6 @@ class CallCenterResository
             // Recorremos para poder obtener el total de venta diaria y mensual
             if( $bookings ){
                 foreach ($bookings as $booking) {
-                    $date_ = date("Y-m-d", strtotime( $booking->created_at ));
                     $total_sales = $booking->currency == "USD"
                     ? ($booking->total_sales * $data['exchange_commission'])
                     : $booking->total_sales;

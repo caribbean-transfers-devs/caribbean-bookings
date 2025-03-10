@@ -61,8 +61,18 @@ trait FiltersTrait
     }
 
     //NOS TRAE LOS AGENTES DE CALL CENTER
-    public static function CallCenterAgent(){
-        return User::where('is_commission', 1)->with('target')->get();
+    public static function CallCenterAgent(array $status = []){
+        $status = array_filter($status, fn($id) => is_numeric($id) && ctype_digit((string) $id));
+
+        // Base de la consulta
+        $query = User::where('is_commission', 1)->with('target');
+
+        // Si hay usuarios filtrados, aplicar whereIn
+        if (!empty($status)) {
+            $query->whereIn('status', $status);
+        }
+
+        return $query->get();        
     }
 
     public static function Enterprises(){

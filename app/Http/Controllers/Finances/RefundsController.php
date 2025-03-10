@@ -15,15 +15,15 @@ class RefundsController extends Controller
 {
     use RoleTrait;    
 
-    private $SalesRepository;    
+    private $RefundsRepository;    
 
-    public function __construct(SalesRepository $SalesRepository)
+    public function __construct(RefundsRepository $RefundsRepository)
     {
-        $this->SalesRepository = $SalesRepository;
+        $this->RefundsRepository = $RefundsRepository;
     }
 
     public function index(Request $request)
     {
-        return $this->SalesRepository->index($request);
+        return $this->RefundsRepository->index($request);
     }
 }
