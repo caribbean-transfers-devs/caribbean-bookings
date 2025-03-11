@@ -35,6 +35,8 @@ trait QueryTrait
                                     rez.request_date_refund,
                                     rez.end_date_refund,
                                     rez.message_refund,
+                                    rez.campaign,
+                                    
                                     us.id AS employee_code,
                                     us.status AS employee_status,
                                     us.name AS employee,
@@ -180,6 +182,8 @@ trait QueryTrait
                                 rez.open_credit,
                                 rez.is_complete,
                                 rez.created_at,
+                                rez.campaign,
+
                                 us.id AS employee_code,
                                 us.status AS employee_status,
                                 us.name AS employee,
@@ -368,6 +372,8 @@ trait QueryTrait
                                 rez.open_credit,
                                 rez.is_complete,
                                 rez.created_at,
+                                rez.campaign,
+
                                 us.id AS employee_code,
                                 us.status AS employee_status,
                                 us.name AS employee,

@@ -18,26 +18,51 @@
 @import '../../components/table';
 @import '../../components/loaders';
 
-.items-button{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 16px;
-  row-gap: 16px;
+#filterModal{
+  background-color: #ebedf2;
+  border-radius: 8px;
+  border: 1px solid #e0e6ed;
+  
+  .top{
+    border: 0;
+    .bootstrap-select{
+      &.btn-group{
+          > .dropdown-toggle{
+            padding: 18px;
+          }
+      }
+    }    
+  }
 
-  > button{
+  .box_button{
     display: flex;
-    flex-direction: row;
-    gap: 10px;
-    font-size: 0.875rem;
-    @media (min-width: 992px) {
-      flex-direction: column;
-    }
-    @media (min-width: 1200px) {
-      flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px;    
+    border: 1px solid #CCD6EB;
+    padding: 16px;
+    background-color: #fff;
+    font-size: 14px;
+
+    label{
+      letter-spacing: initial;
+      color: #425466;
+      font-size: 14px;
+      line-height: 19.55px;
+      outline: none;
+      margin: 0;            
+      border: 0;
+      padding: 0;      
     }
   }
-  @media (min-width: 992px) {
-    grid-template-columns: 1fr 1fr 1fr;
+
+  .item-input{
+    display: grid;                        
+    grid-gap: 10px;
+
+    @media (min-width: 992px) {
+        grid-template-columns: 1fr 400px 400px;
+    }
   }
 }
 

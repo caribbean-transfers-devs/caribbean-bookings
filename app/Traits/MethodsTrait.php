@@ -52,10 +52,22 @@ trait MethodsTrait
      */
     public static function parseDateRange($date)
     {
-        $dates = isset($date) && !empty($date) ? explode(" - ", $date) : [date('Y-m-d'), date('Y-m-d')];
+        $dates = isset($date) && !empty($date)
+        ? (strpos($date, ' - ') !== false 
+            ? explode(" - ", $date) 
+            : (strpos($date, ' a ') !== false 
+                ? explode(" a ", $date) 
+                : [$date, $date])) 
+        : [date('Y-m-d'), date('Y-m-d')];
+
+        // Si solo hay una fecha, duplicarla para evitar errores
+        if (count($dates) === 1) {
+            $dates[1] = $dates[0];
+        }
+
         return [
-            'init' => $dates[0],
-            'end' => $dates[1],
+            'init' => trim($dates[0]), // Eliminamos espacios en blanco extra
+            'end' => trim($dates[1]),
         ];
     }
 
@@ -109,7 +121,7 @@ trait MethodsTrait
     }
 
     //GENERA EL ARREGLO PARA PODER GUARDAR LA VENTAS REALIZADAS POR UNO O VARIOS AGENTES DE CALL CENTER
-    public static function dataSales($start_d, $end_d, string $action = NULL, array $data = [])
+    public static function SalesArrayStructure($start_d, $end_d, string $action = NULL, array $data = []):array
     {
         $bookings_month = [];
         $date = clone $start_d; // Clonar la fecha antes de modificarla
@@ -145,4 +157,29 @@ trait MethodsTrait
 
         return $bookings_month;
     }
+
+    public static function UserArrayStructure(array $data = []):array
+    {
+        $dataUser = [];
+
+        if( $data ){
+            foreach ($data as $value) {
+                if (!isset($dataUser[$value['id']])) {
+                    $dataUser[$date->toDateString()]["DATA"][$value['id']] = [
+                        "NAME" => $value['name'],
+                        "TOTAL" => 0,
+                        "USD" => 0,
+                        "MXN" => 0,
+                        "QUANTITY" => 0,
+                        "BOOKINGS" => []
+                    ];
+                }                        
+            }
+        }        
+    }
+
+    public static function calculateTotalDiscount(float $amount = 0, float $percentage = 0):float
+    {
+        return $amount - ($amount * ($percentage / 100));
+    }    
 }

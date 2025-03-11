@@ -81,8 +81,9 @@
                             <th class="text-center">REFERENCIA</th>
                             <th class="text-center">FECHA</th>
                             <th class="text-center">HORA</th>
-                            <th class="text-center">SITIO</th>
+                            <th class="text-center">SITIO</th>                            
                             <th class="text-center">ORIGEN DE VENTA</th>
+                            <th class="text-center">CAMPAÑA</th>
                             <th class="text-center">ESTATUS</th>
                             <th class="text-center">CLIENTE</th>
                             <th class="text-center">VEHÍCULO</th>
@@ -123,6 +124,7 @@
                                     <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ $item->site_name }}</td>
                                     <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' }}</td>
+                                    <td class="text-center">{{ $item->campaign }}</td>
                                     <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }}">{{ BookingTrait::statusBooking($item->reservation_status) }}</button></td>
                                     <td class="text-center">{{ $item->full_name }}</td>
                                     <td class="text-center">{{ $item->service_type_name }}</td>

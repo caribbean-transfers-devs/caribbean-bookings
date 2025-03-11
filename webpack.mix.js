@@ -102,8 +102,18 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/cash.js'], data.assets + "js/sections/reports/cash.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/cancellations.js'], data.assets + "js/sections/reports/cancellations.min.js");
 
+        //COMISIONES
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/commissions.js'], data.assets + "js/sections/reports/commissions.min.js");
-        mix.combine(['resources/plugins/apex/apexcharts.min.js', 'resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/commissions_new.js'], data.assets + "js/sections/reports/commissions_new.min.js");
+        mix.combine([
+            'resources/plugins/apex/apexcharts.min.js', 
+            'resources/plugins/table/datatable/datatables5.js',
+            'resources/plugins/flatpickr/flatpickr.js',
+            'resources/plugins/flatpickr/es.min.js',
+            'resources/plugins/flatpickr/monthSelect.js',
+            'resources/plugins/bootstrap-select/select.js',
+            'resources/js/sections/components/filters.js',
+            'resources/js/sections/reports/commissions_new.js'
+        ], data.assets + "js/sections/reports/commissions_new.min.js");
 
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/components/charts.js', 'resources/js/sections/reports/reservations.js'], data.assets + "js/sections/reports/reservations.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/components/charts.js', 'resources/js/sections/reports/operations.js'], data.assets + "js/sections/reports/operations.min.js");

@@ -236,13 +236,14 @@
                             <th class="text-center">HORA DE RESERVACIÓN</th>
                             <th class="text-center">SITIO</th>
                             <th class="text-center">ORIGEN DE VENTA</th>
+                            <th class="text-center">CAMPAÑA</th>
                             <th class="text-center">ESTATUS DE RESERVACIÓN</th>
                             <th class="text-center">NOMBRE DEL CLIENTE</th>
                             <th class="text-center">TELÉFONO DEL CLIENTE</th>
                             <th class="text-center">CORREO DEL CLIENTE</th>
                             <th class="text-center">VEHÍCULO</th>
                             <th class="text-center">PAX</th>
-                            <th class="text-center">ORIGEN</th>
+                            <th class="text-center">ORIGEN</th>                            
                             <th class="text-center">DESDE</th>
                             <th class="text-center">DESTINO</th>
                             <th class="text-center">HACIA</th>
@@ -508,6 +509,7 @@
                                     <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ $item->site_name }}</td>
                                     <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' }}</td>
+                                    <td class="text-center">{{ $item->campaign }}</td>
                                     <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }}">{{ BookingTrait::statusBooking($item->reservation_status) }}</button></td>
                                     <td class="text-center">{{ $item->full_name }}</td>
                                     <td class="text-center">{{ $item->client_phone }}</td>

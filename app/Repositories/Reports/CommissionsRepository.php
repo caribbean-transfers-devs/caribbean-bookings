@@ -40,16 +40,17 @@ class CommissionsRepository
             ini_set('memory_limit', '-1'); // Sin límite
             set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
 
-            $userArray = MethodsTrait::parseArray($request->user ?? '');
+            $userArray = MethodsTrait::parseArray($request->user ?? '');            
             $dataUser = MethodsTrait::DataUser($userArray);
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             
             $data = [
-                "exchange_commission" => FiltersTrait::ExchangeCommission($dates['init'], $dates['end']),
-                "total_sales" => 0,
-                "total_operations" => 0,
-                "total_commissions" => 0,
+                "EXCHANGE_COMMISSION" => FiltersTrait::ExchangeCommission($dates['init'], $dates['end']),
+                "PERCENTAGE_COMMISSION_INVESTMENT" => FiltersTrait::PercentageCommissionInvestment(),
+                "TOTAL_SALES" => 0,
+                "TOTAL_OPERATIONS" => 0,
+                "TOTAL_COMMISSIONS" => 0,
                 "DATA" => []
             ];
 
@@ -103,10 +104,10 @@ class CommissionsRepository
             if( $bookings ){
                 foreach ($bookings as $booking) {
                     $total_sales = $booking->currency == "USD"
-                    ? ($booking->total_sales * $data['exchange_commission'])
+                    ? ($booking->total_sales * $data['EXCHANGE_COMMISSION'])
                     : $booking->total_sales;
 
-                    $data['total_sales'] += $total_sales;
+                    $data['TOTAL_SALES'] += $total_sales;
                 }
             }
 
@@ -114,10 +115,10 @@ class CommissionsRepository
             if( $operations ){
                 foreach ($operations as $operation) {
                     $total_sales = $operation->currency == "USD"
-                    ? ($operation->cost * $data['exchange_commission'])
+                    ? ($operation->cost * $data['EXCHANGE_COMMISSION'])
                     : $operation->cost;
 
-                    $data['total_operations'] += $total_sales;
+                    $data['TOTAL_OPERATIONS'] += $total_sales;
 
                     $user = $dataUser->where('id', $operation->employee_code)->first();
                     if ( !isset($data["DATA"][$operation->employee_code]) && !empty($user) ) {
@@ -127,7 +128,12 @@ class CommissionsRepository
                             "USD" => 0,
                             "MXN" => 0,
                             "QUANTITY" => 0,
-                            "SETTINGS" => $user
+                            "SETTINGS" => [
+                                'daily_goal' => $user->daily_goal ?? 0,
+                                'type_commission' => $user->type_commission ?? "target",
+                                'percentage' => $user->percentage ?? 0,
+                                'targets' => $user->target->object ?? [],
+                            ]
                         ];
                     }
                     
@@ -139,31 +145,28 @@ class CommissionsRepository
                 }
             }
 
-            // // Redondear valores finales
-            // $data['total_day'] = round($data['total_day'], 2);
-            // $data['total_month'] = round($data['total_month'], 2);
-            // $data['total_services_operated'] = round($data['total_services_operated'], 2);
-            // $data['total_services_operated_month'] = round($data['total_services_operated_month'], 2);
-            // $data['total_pending_services'] = round($data['total_pending_services'], 2);            
+            foreach ($data['DATA'] as $item) {
+                $percentage_commission = $item['SETTINGS']['type_commission'] === 'target' ? 0 : $item['SETTINGS']['percentage'];
+                $targets = is_string($item['SETTINGS']['targets']) ? json_decode($item['SETTINGS']['targets'], true) : $item['SETTINGS']['targets'];
+                foreach ( $targets as &$target ) {
+                    if ($item['TOTAL'] >= $target['amount']) {
+                        $percentage_commission = $target['percentage'];
+                        $target['status'] = true; // Modificar status a true donde se obtiene el percentage
+                    }
+                }
+                unset($targets); // Romper la referencia para evitar efectos secundarios
 
-            // $data['percentage_commission'] = $dataUser->type_commission === 'target' ? 0 : $dataUser->percentage;
-            // foreach ($data['targets'] as &$target) {
-            //     if ($data['total_services_operated_month'] >= $target['amount']) {
-            //         $data['percentage_commission'] = $target['percentage'];
-            //         $target['status'] = true; // Modificar status a true donde se obtiene el percentage
-            //     }
-            // }
-            // unset($target); // Romper la referencia para evitar efectos secundarios
+                //Desglose de las comisiones de servicios operados
+                $total_investment_discount_operated = round( ($item['TOTAL'] * ( $data['PERCENTAGE_COMMISSION_INVESTMENT'] / 100) ), 2);
+                $total_services_operated_investment_discount = round(MethodsTrait::calculateTotalDiscount($item['TOTAL'], $data['PERCENTAGE_COMMISSION_INVESTMENT']), 2);
+                $total_commission_operated = round(( $total_services_operated_investment_discount * $percentage_commission ) / 100, 2);
+                $data['TOTAL_COMMISSIONS'] += $total_commission_operated;
+            }
 
-            // // Calcular porcentaje que lleva para alcanzar la meta diaria
-            // $data['percentage_daily_goal'] = $dataUser->daily_goal > 0
-            //     ? round(($data['total_day'] / $dataUser->daily_goal) * 100, 2)
-            //     : 0;
-
-            // //Desglose de las comisiones de servicios operados
-            // $data['total_investment_discount_operated'] = round( ($data['total_services_operated_month'] * ( $data['percentage_commission_investment'] / 100) ), 2);
-            // $data['total_services_operated_investment_discount'] = round($this->calculateTotalDiscount($data['total_services_operated_month'], $data['percentage_commission_investment']), 2);
-            // $data['total_commission_operated'] = round(( $data['total_services_operated_investment_discount'] * $data['percentage_commission'] ) / 100, 2);
+            // Redondear valores finales
+            $data['TOTAL_SALES'] = round($data['TOTAL_SALES'], 2);
+            $data['TOTAL_OPERATIONS'] = round($data['TOTAL_OPERATIONS'], 2);
+            $data['TOTAL_COMMISSIONS'] = round($data['TOTAL_COMMISSIONS'], 2);
 
             return response()->json([
                 'success' => true,
@@ -190,7 +193,7 @@ class CommissionsRepository
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
             $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);            
-            $data = MethodsTrait::dataSales($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
+            $data = MethodsTrait::SalesArrayStructure($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
             
             //Para las ventas velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
             $paramBookingStatus = MethodsTrait::parseArrayQuery2(['CONFIRMED', 'CREDIT', 'OPENCREDIT'], "single");
@@ -227,17 +230,6 @@ class CommissionsRepository
                         $data[$date_]['QUANTITY']++;
                         $data[$date_]['BOOKINGS'][] = $booking;
     
-                        // if (!isset($data[$date_]['DATA'][$booking->employee_code])) {
-                        //     $data[$date_]['DATA'][$booking->employee_code] = [
-                        //         "NAME" => $booking->employee,
-                        //         "TOTAL" => 0,
-                        //         "USD" => 0,
-                        //         "MXN" => 0,
-                        //         "QUANTITY" => 0,
-                        //         "BOOKINGS" => []
-                        //     ];
-                        // }
-    
                         if (isset($data[$date_]['DATA'][$booking->employee_code])) {
                             $data[$date_]['DATA'][$booking->employee_code]['TOTAL'] += round($total_sales, 2);
                             $data[$date_]['DATA'][$booking->employee_code][$booking->currency] += round($booking->total_sales, 2);
@@ -273,8 +265,8 @@ class CommissionsRepository
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
-            $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);            
-            $data = MethodsTrait::dataSales($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
+            $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
+            $data = MethodsTrait::SalesArrayStructure($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
 
             //Para la operación velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
             $paramsOperation = $this->parseArrayQuery(['CONFIRMED', 'CREDIT', 'OPENCREDIT'],"single");
@@ -326,18 +318,7 @@ class CommissionsRepository
                         $data[$date_]['QUANTITY'] ++;
                         $data[$date_]['BOOKINGS'][] = $operation;
 
-                        // if (!isset($data[$date_]['DATA'][$operation->employee_code])) {
-                        //     $data[$date_]['DATA'][$operation->employee_code] = [
-                        //         "NAME" => $operation->employee,
-                        //         "TOTAL" => 0,
-                        //         "USD" => 0,
-                        //         "MXN" => 0,
-                        //         "QUANTITY" => 0,
-                        //         "BOOKINGS" => []
-                        //     ];
-                        // }
-
-                        if (isset($data[$date_]['DATA'][$operation->employee_code])) {
+                        if ( isset($data[$date_]['DATA'][$operation->employee_code]) ) {
                             $data[$date_]['DATA'][$operation->employee_code]['TOTAL'] += round($total_sales, 2);
                             $data[$date_]['DATA'][$operation->employee_code][$operation->currency] += round($operation->cost, 2);
                             $data[$date_]['DATA'][$operation->employee_code]['QUANTITY']++;

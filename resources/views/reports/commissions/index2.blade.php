@@ -12,21 +12,36 @@
 @endpush
 
 @push('Js')
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="{{ mix('/assets/js/sections/reports/commissions_new.min.js') }}"></script>
 @endpush
 
 @section('content')
     <div class="row layout-top-spacing callcenter-container">
         <div class="col-12 layout-spacing">
-            <div class="items-button">
-                <button class="btn btn-primary btn-sm __btn_create" data-title="Filtros de callcenter" data-bs-toggle="modal" data-bs-target="#filterModal"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros</button>
-                <button class="btn btn-success btn-sm">Fecha: <strong id="dateInfo"></strong></button>
-                <button class="btn btn-warning btn-sm">Tipo de cambio comisiones: <strong id="exchangeInfo"></strong></button>
+            <div class="items-button" id="filterModal">
+                <div class="top">
+                    <div class="item-input">
+                        <div class="box_input transparent_border">
+                            <svg width="24" height="24"><use xlink:href="{{ asset('/assets/img/icons/icons.svg#calendar') }}"></use></svg>
+                            <div class="input">
+                                <label for="filter_date">Fecha:</label>
+                                <input type="text" name="date" id="filter_date" class="form-control" value="{{ date('Y-m-d') }}">
+                            </div>
+                        </div>
+                        @if ( isset($users) && !empty($users) )
+                            <select class="form-control selectpicker" title="Vendedor" data-live-search="true" data-selected-text-format="count > 1" name="user[]" id="user" data-value="{{ json_encode(( isset($data['user']) ? $data['user'] : [] )) }}" multiple data-actions-box="true">                            
+                                @foreach ($users as $key => $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option> 
+                                @endforeach
+                            </select>
+                        @endif
+                        <div class="box_button">
+                            <label for="">Tipo de cambio comisiones:</label>
+                            <strong id="exchangeInfo"></strong>
+                        </div>
+                    </div>
+                </div>                
+                {{-- <button class="btn btn-warning btn-sm">Tipo de cambio comisiones: </button> --}}
             </div>
         </div>
 
@@ -125,5 +140,5 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :users="$users" />
+    {{-- <x-modals.filters.bookings :users="$users" /> --}}
 @endsection

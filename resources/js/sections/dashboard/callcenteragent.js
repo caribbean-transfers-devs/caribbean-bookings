@@ -388,7 +388,7 @@ let callcenter = {
 
 document.addEventListener("DOMContentLoaded", function() {
     // Configuraciones necesarias
-    components.titleModal();
+    components.titleModalFilter();
     components.calendarFilter();
         
     callcenter.reloadAll(); // Inicializar cargando las estadisticas

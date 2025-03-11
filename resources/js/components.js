@@ -442,7 +442,7 @@ let components = {
         }
     },
 
-    titleModal: function(){
+    titleModalFilter: function(){
         const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
         const __title_modal = document.getElementById('filterModalLabel');
 
@@ -450,7 +450,7 @@ let components = {
             __create.addEventListener('click', function () {
                 __title_modal.innerHTML = this.dataset.title;
             });
-        }        
+        }
     },
 
     calendarFilter: function(){

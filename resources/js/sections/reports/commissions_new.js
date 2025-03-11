@@ -1,6 +1,26 @@
 let commissions = {
     selectedValues: [],
-    optionsSettings: {        
+    GetDate: function(ParamDate = null){
+        let _filter_date = ParamDate || document.getElementById('filter_date').value || "";
+    
+        if (!_filter_date) {
+            return ""; // Si no hay fecha, retorna una cadena vacía
+        }
+        console.log("Fecha recibida:", _filter_date);
+
+        // Aseguramos que el formato sea YYYY-MM-DD y extraemos el año y el mes
+        let [year, month] = _filter_date.split("-").map(Number);
+
+        // Calcular primer y último día del mes seleccionado
+        let start = new Date(Date.UTC(year, month - 1, 1)); // Mes en base 0
+        let end = new Date(Date.UTC(year, month, 0)); // Último día del mes
+
+        let startFormatted = start.toISOString().split("T")[0]; // YYYY-MM-DD
+        let endFormatted = end.toISOString().split("T")[0]; // YYYY-MM-DD
+    
+        return `${startFormatted} a ${endFormatted}`;
+    },
+    optionsSettings: {
         chart: {
           fontFamily: 'Poppins, serif',
           height: 410,
@@ -91,7 +111,7 @@ let commissions = {
     getStats: async function() {
         try {
             const _params    = {
-                date: document.getElementById('lookup_date').value || "",
+                date: this.GetDate(),
                 user: this.selectedValues
             };
 
@@ -117,9 +137,10 @@ let commissions = {
     fetchDataCharts: async function(url) {
         try {
             const _params    = {
-                date: document.getElementById('lookup_date').value || "",
+                date: this.GetDate(),
                 user: this.selectedValues
             };
+            console.log(_params);
 
             const http = await fetch(url, {
                 method: 'POST',
@@ -156,7 +177,6 @@ let commissions = {
     // Ejecutar las actualizaciones de forma paralela con Promise.all:
     reloadAll: async function(){
         const elements = {
-            dateInfo: document.getElementById("dateInfo"),               
             exchangeInfo: document.getElementById("exchangeInfo"),
             totalSales: document.getElementById("totalSales"),
             totalOperationSales: document.getElementById("totalOperationSales"),
@@ -169,17 +189,14 @@ let commissions = {
             const stats = await this.getStats();
     
             await Promise.all([
-                elements.dateInfo.innerText = document.getElementById('lookup_date').value,
-                elements.exchangeInfo.innerText = this.formatCurrency(stats.data.exchange_commission),
-                elements.totalSales.innerText = this.formatCurrency(stats.data.total_sales),
-                elements.totalOperationSales.innerText = this.formatCurrency(stats.data.total_operations),
+                elements.exchangeInfo.innerText = this.formatCurrency(stats.data.EXCHANGE_COMMISSION),
+                elements.totalSales.innerText = this.formatCurrency(stats.data.TOTAL_SALES),
+                elements.totalOperationSales.innerText = this.formatCurrency(stats.data.TOTAL_OPERATIONS),
+                elements.totalCommissions.innerText = this.formatCurrency(stats.data.TOTAL_COMMISSIONS),
             ]);
-
-            document.querySelector(".close-filters").click(); // Simula el clic en el botón
         } catch (error) {
             console.error("Error al obtener estadísticas:", error);
             Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar.</p>');
-            document.querySelector(".close-filters").click(); // Simula el clic en el botón
         }
     },    
 
@@ -349,7 +366,6 @@ let commissions = {
 
             revenueMonthly.innerHTML = "";
             this.chartSales(chartsOperations, 'two');
-            document.querySelector(".close-filters").click(); // Simula el clic en el botón
         } catch (error) {
             console.error("Error al obtener estadísticas:", error);
             Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar.</p>');
@@ -456,25 +472,38 @@ let commissions = {
     },    
 };
 
-document.addEventListener("DOMContentLoaded", function() {
+const __filter_date = document.getElementById('filter_date');
+document.addEventListener("DOMContentLoaded", function() {    
     // Configuraciones necesarias
-    components.titleModal();
-    components.calendarFilter();
-
     commissions.reloadAll(); // Inicializar cargando las estadisticas
     commissions.reloadSalesCharts();
+
+    if( __filter_date ){
+        let calendarInstance = filters.calendarFilter(__filter_date, {
+            mode: "single",
+            minDate: null,
+            plugins: [
+                new monthSelectPlugin({
+                  shorthand: true, //defaults to false
+                //   dateFormat: "m.y", //defaults to "F Y"
+                  dateFormat: "Y-m-d", //defaults to "F Y"
+                  altFormat: "F Y", //defaults to "F Y"
+                })
+            ],
+        });
+
+        // También puedes usarlo externamente
+        calendarInstance.set("onChange", function(selectedDates, dateStr, instance) {
+            commissions.GetDate(dateStr);
+            commissions.reloadAll();
+            commissions.reloadSalesCharts();
+        });
+    }
 
     if( document.getElementById('user') ){
         document.getElementById('user').addEventListener('change', function() {
             commissions.selectedValues = Array.from(this.selectedOptions).map(option => option.value);
-        });
-    }
-
-    // Solictudes de filtros mediante el formulario
-    if( document.getElementById('formSearch') ){
-        document.getElementById('formSearch').addEventListener('submit', function(event) {
-            event.preventDefault(); // Evita que el formulario se recargue
-            commissions.reloadAll();
+            commissions.reloadAll(); // Inicializar cargando las estadisticas
             commissions.reloadSalesCharts();
         });
     }
