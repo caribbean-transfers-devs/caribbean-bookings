@@ -11,7 +11,7 @@ use App\Models\User;
 trait MethodsTrait
 {
 
-    public static function parseArray($user)
+    public static function parseArray($user):array
     {
         if (is_array($user)) {
             return array_filter($user); // Devuelve el array sin modificaciones si ya es un array
@@ -28,24 +28,21 @@ trait MethodsTrait
     /**
      * Función para obtener la información de usuario o usuarios
      */
-    public static function DataUser(array $users = [], array $status = [])
+    public static function DataUser(array $users = [], array $status = []):object
     {
         // Filtrar solo valores numéricos para evitar errores en la consulta
-        // Filtrar solo valores numéricos enteros
-        // $users = array_filter($users, fn($id) => ctype_digit((string) $id)); // Solo números enteros
         $users = array_filter($users, fn($id) => is_numeric($id) && ctype_digit((string) $id));
+        $status = array_filter($status, fn($id) => is_numeric($status) && ctype_digit((string) $id));
 
-        // Base de la consulta
-        $query = User::where('is_commission', 1)->where('status', 1)->with('target');
+        // Construcción de la consulta base
+        $query = User::where('is_commission', 1)->with('target');
 
         // Si hay usuarios filtrados, aplicar whereIn
         if (!empty($users)) {
             $query->whereIn('id', $users);
         }
 
-        if (!empty($status)) {
-            $query->whereIn('status', $status);
-        }
+        $query->whereIn('status', $status ?: [1]);
 
         return $query->get();
     }
@@ -169,7 +166,7 @@ trait MethodsTrait
         if( $data ){
             foreach ($data as $value) {
                 if (!isset($dataUser[$value['id']])) {
-                    $dataUser["DATA"][$value['id']] = [
+                    $dataUser[$value['id']] = [
                         "NAME" => $value['name'],
                         "TOTAL" => 0,
                         "USD" => 0,
@@ -185,7 +182,9 @@ trait MethodsTrait
                     ];
                 }                        
             }
-        }        
+        }
+        
+        return $dataUser;
     }
 
     public static function calculateTotalDiscount(float $amount = 0, float $percentage = 0):float

@@ -288,7 +288,8 @@
                 </thead>
                 <tbody>
                     @if(sizeof($items)>=1)
-                        @foreach($items as $key => $value)                        
+                        @foreach($items as $key => $value)      
+                            {{-- @dump($value) --}}
                             @php
                                 // dump($value);
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
@@ -467,7 +468,7 @@
                                 </td>
                                 <td class="text-center" style="{{ ( $value->service_type_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_type_name }}</td>
                                 <td class="text-center" <?=BookingTrait::classStatusPayment($value)?>>{{ BookingTrait::statusPayment($value->payment_status) }}</td>
-                                <td class="text-center" <?=BookingTrait::classStatusPayment($value)?>>{{ number_format(( $operation->pay_at_arrival == 1 ? $value->total_sales : 0 ),2) }}</td>
+                                <td class="text-center" >{{ number_format(( $value->pay_at_arrival == 1 ? $value->total_sales : 0 ),2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">

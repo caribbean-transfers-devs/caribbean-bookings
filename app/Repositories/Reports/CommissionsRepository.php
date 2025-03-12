@@ -40,8 +40,10 @@ class CommissionsRepository
             ini_set('memory_limit', '-1'); // Sin límite
             set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
 
-            $userArray = MethodsTrait::parseArray($request->user ?? '', $request->status ?? '');
-            $dataUser = MethodsTrait::DataUser($userArray);
+            $userArray = MethodsTrait::parseArray($request->user ?? '');
+            $statusArray = MethodsTrait::parseArray($request->status ?? '');
+            $dataUser = MethodsTrait::DataUser($userArray, $statusArray);
+            // dd($statusArray, $dataUser);
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
@@ -108,7 +110,11 @@ class CommissionsRepository
                     ? ($booking->total_sales * $data['EXCHANGE_COMMISSION'])
                     : $booking->total_sales;
 
-                    $data['TOTAL_SALES'] += $total_sales;
+                    if( isset($data["DATA"][$booking->employee_code]) ){
+
+                        $data['TOTAL_SALES'] += $total_sales;
+
+                    }
                 }
             }
 
@@ -118,15 +124,16 @@ class CommissionsRepository
                     $total_sales = $operation->currency == "USD"
                     ? ($operation->cost * $data['EXCHANGE_COMMISSION'])
                     : $operation->cost;
+            
+                    // $user = $dataUser->where('id', $operation->employee_code)->first();                
+                    if( isset($data["DATA"][$operation->employee_code]) ){
 
-                    $data['TOTAL_OPERATIONS'] += $total_sales;
+                        $data['TOTAL_OPERATIONS'] += $total_sales;
 
-                    // $user = $dataUser->where('id', $operation->employee_code)->first();
-                    
-                    if( isset($data["DATA"][$operation->employee_code]) && !empty($user) ){
                         $data["DATA"][$operation->employee_code]['TOTAL'] += round($total_sales, 2);
                         $data["DATA"][$operation->employee_code][$booking->currency] += round($operation->cost, 2);
                         $data["DATA"][$operation->employee_code]['QUANTITY'] ++;
+
                     }
                 }
             }
@@ -173,8 +180,9 @@ class CommissionsRepository
             ini_set('memory_limit', '-1'); // Sin límite
             set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
             
-            $userArray = MethodsTrait::parseArray($request->user ?? '', $request->status ?? '');
-            $dataUser = MethodsTrait::DataUser($userArray);
+            $userArray = MethodsTrait::parseArray($request->user ?? '');
+            $statusArray = MethodsTrait::parseArray($request->status ?? '');
+            $dataUser = MethodsTrait::DataUser($userArray, $statusArray);
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
@@ -210,18 +218,18 @@ class CommissionsRepository
                         ? ($booking->total_sales * $exchange_commission) 
                         : $booking->total_sales;
     
-                    if (isset($data[$date_])) {
+                    if ( isset($data[$date_]) && isset($data[$date_]['DATA'][$booking->employee_code]) ) {
                         $data[$date_]['TOTAL'] += round($total_sales, 2);
                         $data[$date_][$booking->currency] += round($booking->total_sales, 2);
                         $data[$date_]['QUANTITY']++;
                         $data[$date_]['BOOKINGS'][] = $booking;
     
-                        if (isset($data[$date_]['DATA'][$booking->employee_code])) {
+                        // if ( isset($data[$date_]['DATA'][$booking->employee_code]) ) {
                             $data[$date_]['DATA'][$booking->employee_code]['TOTAL'] += round($total_sales, 2);
                             $data[$date_]['DATA'][$booking->employee_code][$booking->currency] += round($booking->total_sales, 2);
                             $data[$date_]['DATA'][$booking->employee_code]['QUANTITY']++;
                             $data[$date_]['DATA'][$booking->employee_code]['BOOKINGS'][] = $booking;
-                        }
+                        // }
                     }
                 }
             }
@@ -246,8 +254,9 @@ class CommissionsRepository
             ini_set('memory_limit', '-1'); // Sin límite
             set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
 
-            $userArray = MethodsTrait::parseArray($request->user ?? '', $request->status ?? '');
-            $dataUser = MethodsTrait::DataUser($userArray);
+            $userArray = MethodsTrait::parseArray($request->user ?? '');
+            $statusArray = MethodsTrait::parseArray($request->status ?? '');
+            $dataUser = MethodsTrait::DataUser($userArray, $statusArray);
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
@@ -298,18 +307,18 @@ class CommissionsRepository
                     ? ($operation->cost * $exchange_commission)
                     : $operation->cost;
 
-                    if( isset($data[$date_]) ){
+                    if( isset($data[$date_]) && isset($data[$date_]['DATA'][$operation->employee_code]) ){
                         $data[$date_]['TOTAL'] += round($total_sales,2);
                         $data[$date_][$operation->currency] += round($operation->cost,2);
                         $data[$date_]['QUANTITY'] ++;
                         $data[$date_]['BOOKINGS'][] = $operation;
 
-                        if ( isset($data[$date_]['DATA'][$operation->employee_code]) ) {
+                        // if ( isset($data[$date_]['DATA'][$operation->employee_code]) ) {
                             $data[$date_]['DATA'][$operation->employee_code]['TOTAL'] += round($total_sales, 2);
                             $data[$date_]['DATA'][$operation->employee_code][$operation->currency] += round($operation->cost, 2);
                             $data[$date_]['DATA'][$operation->employee_code]['QUANTITY']++;
                             $data[$date_]['DATA'][$operation->employee_code]['BOOKINGS'][] = $operation;
-                        }
+                        // }
                     }
                 }
             }

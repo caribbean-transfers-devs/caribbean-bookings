@@ -1,12 +1,19 @@
 let commissions = {
-    selectedValues: [],
+    selectedUsers: function(){
+        let usersElement = document.getElementById('user');
+        return usersElement ? this.selectedOptions(usersElement) : [];         
+    },
+    selectedStatus: function(){
+        let statusElement = document.getElementById('status');
+        return statusElement ? this.selectedOptions(statusElement) : [];       
+    },
     GetDate: function(ParamDate = null){
         let _filter_date = ParamDate || document.getElementById('filter_date').value || "";
     
         if (!_filter_date) {
             return ""; // Si no hay fecha, retorna una cadena vacía
         }
-        console.log("Fecha recibida:", _filter_date);
+        // console.log("Fecha recibida:", _filter_date);
 
         // Aseguramos que el formato sea YYYY-MM-DD y extraemos el año y el mes
         let [year, month] = _filter_date.split("-").map(Number);
@@ -19,6 +26,9 @@ let commissions = {
         let endFormatted = end.toISOString().split("T")[0]; // YYYY-MM-DD
     
         return `${startFormatted} a ${endFormatted}`;
+    },
+    selectedOptions: function(_this){
+        return Array.from(_this.selectedOptions).map(option => option.value);
     },
     optionsSettings: {
         chart: {
@@ -112,8 +122,11 @@ let commissions = {
         try {
             const _params    = {
                 date: this.GetDate(),
-                user: this.selectedValues
+                user: this.selectedUsers(),
+                status: this.selectedStatus()
             };
+            console.log(_params);
+            
 
             const http = await fetch('/reports/stats/commissions/get', {
                 method: 'POST',
@@ -138,9 +151,9 @@ let commissions = {
         try {
             const _params    = {
                 date: this.GetDate(),
-                user: this.selectedValues
+                user: this.selectedUsers(),
+                status: this.selectedStatus()
             };
-            console.log(_params);
 
             const http = await fetch(url, {
                 method: 'POST',
@@ -502,9 +515,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if( document.getElementById('user') ){
         document.getElementById('user').addEventListener('change', function() {
-            commissions.selectedValues = Array.from(this.selectedOptions).map(option => option.value);
+            let selectedValues = commissions.selectedStatus(); // Obtener valores seleccionados
             commissions.reloadAll(); // Inicializar cargando las estadisticas
             commissions.reloadSalesCharts();
         });
     }
+
+    if( document.getElementById('status') ){        
+        document.getElementById('status').addEventListener('change', function() {
+            let selectedValues = commissions.selectedStatus(); // Obtener valores seleccionados
+            commissions.reloadAll(); // Inicializar cargando las estadisticas
+            commissions.reloadSalesCharts();
+        });
+    }    
 });
