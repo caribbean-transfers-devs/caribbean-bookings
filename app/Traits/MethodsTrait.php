@@ -28,7 +28,7 @@ trait MethodsTrait
     /**
      * Función para obtener la información de usuario o usuarios
      */
-    public static function DataUser(array $users = [])
+    public static function DataUser(array $users = [], array $status = [])
     {
         // Filtrar solo valores numéricos para evitar errores en la consulta
         // Filtrar solo valores numéricos enteros
@@ -41,6 +41,10 @@ trait MethodsTrait
         // Si hay usuarios filtrados, aplicar whereIn
         if (!empty($users)) {
             $query->whereIn('id', $users);
+        }
+
+        if (!empty($status)) {
+            $query->whereIn('status', $status);
         }
 
         return $query->get();
@@ -165,13 +169,19 @@ trait MethodsTrait
         if( $data ){
             foreach ($data as $value) {
                 if (!isset($dataUser[$value['id']])) {
-                    $dataUser[$date->toDateString()]["DATA"][$value['id']] = [
+                    $dataUser["DATA"][$value['id']] = [
                         "NAME" => $value['name'],
                         "TOTAL" => 0,
                         "USD" => 0,
                         "MXN" => 0,
                         "QUANTITY" => 0,
-                        "BOOKINGS" => []
+                        "BOOKINGS" => [],
+                        "SETTINGS" => [
+                            'daily_goal' => $value['daily_goal'] ?? 0,
+                            'type_commission' => $value['type_commission'] ?? "target",
+                            'percentage' => $value['percentage'] ?? 0,
+                            'targets' => $value['target']['object'] ?? [],                            
+                        ]
                     ];
                 }                        
             }

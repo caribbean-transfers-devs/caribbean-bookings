@@ -649,7 +649,7 @@
                                     <td class="text-center">{{ date("H:i", strtotime($operation->created_at)) }}</td>
                                     <td class="text-center">{{ $operation->site_name }}</td>
                                     <td class="text-center">{{ !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' }}</td>
-                                    <td class="text-center">{{ $item->campaign }}</td>
+                                    <td class="text-center">{{ $operation->campaign }}</td>
                                     <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($operation->reservation_status) }}">{{ BookingTrait::statusBooking($operation->reservation_status) }}</button></td>
                                     <td class="text-center"><?=OperationTrait::renderServicePreassignment($operation)?></td>
                                     <td class="text-center">{{ $operation->final_service_type }}</td>

@@ -40,18 +40,19 @@ class CommissionsRepository
             ini_set('memory_limit', '-1'); // Sin límite
             set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
 
-            $userArray = MethodsTrait::parseArray($request->user ?? '');            
+            $userArray = MethodsTrait::parseArray($request->user ?? '', $request->status ?? '');
             $dataUser = MethodsTrait::DataUser($userArray);
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
-            
+            $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
+            $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
             $data = [
                 "EXCHANGE_COMMISSION" => FiltersTrait::ExchangeCommission($dates['init'], $dates['end']),
                 "PERCENTAGE_COMMISSION_INVESTMENT" => FiltersTrait::PercentageCommissionInvestment(),
                 "TOTAL_SALES" => 0,
                 "TOTAL_OPERATIONS" => 0,
                 "TOTAL_COMMISSIONS" => 0,
-                "DATA" => []
+                "DATA" => MethodsTrait::UserArrayStructure($dataUser->toArray())
             ];
 
             //Para las ventas velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
@@ -120,22 +121,7 @@ class CommissionsRepository
 
                     $data['TOTAL_OPERATIONS'] += $total_sales;
 
-                    $user = $dataUser->where('id', $operation->employee_code)->first();
-                    if ( !isset($data["DATA"][$operation->employee_code]) && !empty($user) ) {
-                        $data["DATA"][$operation->employee_code] = [
-                            "NAME" => $operation->employee,
-                            "TOTAL" => 0,
-                            "USD" => 0,
-                            "MXN" => 0,
-                            "QUANTITY" => 0,
-                            "SETTINGS" => [
-                                'daily_goal' => $user->daily_goal ?? 0,
-                                'type_commission' => $user->type_commission ?? "target",
-                                'percentage' => $user->percentage ?? 0,
-                                'targets' => $user->target->object ?? [],
-                            ]
-                        ];
-                    }
+                    // $user = $dataUser->where('id', $operation->employee_code)->first();
                     
                     if( isset($data["DATA"][$operation->employee_code]) && !empty($user) ){
                         $data["DATA"][$operation->employee_code]['TOTAL'] += round($total_sales, 2);
@@ -187,12 +173,12 @@ class CommissionsRepository
             ini_set('memory_limit', '-1'); // Sin límite
             set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
             
-            $userArray = MethodsTrait::parseArray($request->user ?? '');
+            $userArray = MethodsTrait::parseArray($request->user ?? '', $request->status ?? '');
             $dataUser = MethodsTrait::DataUser($userArray);
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
-            $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);            
+            $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
             $data = MethodsTrait::SalesArrayStructure($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
             
             //Para las ventas velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
@@ -260,7 +246,7 @@ class CommissionsRepository
             ini_set('memory_limit', '-1'); // Sin límite
             set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
 
-            $userArray = MethodsTrait::parseArray($request->user ?? '');
+            $userArray = MethodsTrait::parseArray($request->user ?? '', $request->status ?? '');
             $dataUser = MethodsTrait::DataUser($userArray);
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');

@@ -35,6 +35,10 @@
                                 @endforeach
                             </select>
                         @endif
+                        <select class="form-control selectpicker" title="Estatus" data-live-search="true" data-selected-text-format="count > 3" name="status[]" id="status" data-value="{{ json_encode(( isset($data['status']) ? $data['status'] : [] )) }}" multiple data-actions-box="true">                            
+                            <option value="1">Activos</option>
+                            <option value="0">Inactivos</option>
+                        </select>
                         <div class="box_button">
                             <label for="">Tipo de cambio comisiones:</label>
                             <strong id="exchangeInfo"></strong>
