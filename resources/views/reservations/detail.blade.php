@@ -1,5 +1,6 @@
 @php
     use App\Traits\RoleTrait;
+    use App\Traits\FinanceTrait;
     use App\Traits\BookingTrait;
     use App\Traits\OperationTrait;
     use Carbon\Carbon;
@@ -342,7 +343,7 @@
                 @endif
 
                 {{-- NOS PERMITE INDICAR QUE CLIENTE ESTA SOLICITANDO UN REEMBOLSO --}}
-                @if ( $data['status'] == "CONFIRMED" && $reservation->status_refund == NULL )
+                @if ( $data['status'] == "CONFIRMED" || $data['status'] == "CANCELLED" )
                     <button class="btn btn-warning btn-sm refundRequest" id="refundRequest" data-code="{{ $reservation->id }}"><i class="align-middle" data-feather="delete"></i> SOLICITUD DE REEMBOLSO A CONTABILIDAD</button>
                 @endif
             </div>
@@ -381,10 +382,16 @@
                                 Pagos
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#icon-tab-4" data-bs-toggle="tab" role="tab">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card align-middle"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                Reembolsos
+                            </a>
+                        </li>                        
 
                     @if (RoleTrait::hasPermission(65))
                         <li class="nav-item">
-                            <a class="nav-link" href="#icon-tab-4" data-bs-toggle="tab" role="tab">
+                            <a class="nav-link" href="#icon-tab-5" data-bs-toggle="tab" role="tab">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera align-middle"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                                 Imagenes
                             </a>
@@ -724,14 +731,14 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($reservation->payments as $payment)
-                                            <tr>
+                                            <tr style="{{ $payment->category == "REFUND" ? 'background-color: #fbeced;' : '' }}">
                                                 <td>{{ $payment->payment_method }}</td>
                                                 <td>{{ $payment->description }}</td>
                                                 <td class="text-end">{{ number_format($payment->total) }}</td>
                                                 <td class="text-center">{{ $payment->currency }}</td>
                                                 <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
                                                 <td class="text-start">{{ $payment->reference }}</td>
-                                                <td class="text-start">{{ $payment->categories }}</td>
+                                                <td class="text-start">{{ $payment->category }}</td>
                                                 <td class="text-center">{{ $payment->created_at }}</td>
                                                 <td class="text-center">
                                                     @if (RoleTrait::hasPermission(15))
@@ -751,9 +758,46 @@
                                 </table>
                             </div>
                         </div>
+                        <div class="tab-pane" id="icon-tab-4" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Estatus</th>
+                                            <th>Descripción</th>
+                                            <th class="text-center">Fecha de solicitud</th>
+                                            <th class="text-center">Fecha de aplicación</th>
+                                            <th class="text-center">comprobante de reembolso</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($reservation->refunds as $refund)
+                                            <tr>
+                                                <td>
+                                                    <button class="btn btn-{{ FinanceTrait::classStatusRefund($refund->status) }} btn-sm">{{ FinanceTrait::statusRefund($refund->status) }}</button>
+                                                </td>
+                                                <td>{{ $refund->message_refund }}</td>
+                                                <td class="text-center">{{ date("Y-m-d", strtotime($refund->created_at)) }}</td>
+                                                <td class="text-center">
+                                                    @if ( $refund->end_at != null )
+                                                        {{ date("Y-m-d", strtotime($refund->end_at)) }}        
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    @if ( $refund->link_refund != null )
+                                                        <a href="{{ $refund->link_refund }}" target="_black">click para ver</a>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach                                   
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                     
                     @if (RoleTrait::hasPermission(65))
-                        <div class="tab-pane" id="icon-tab-4" role="tabpanel">
+                        <div class="tab-pane" id="icon-tab-5" role="tabpanel">
                             @if (RoleTrait::hasPermission(64))
                                 <form id="upload-form" class="dropzone" action="/reservations/upload">
                                     @csrf

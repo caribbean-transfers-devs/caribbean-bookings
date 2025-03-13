@@ -160,22 +160,6 @@ if( __payment_infos.length > 0 ){
     });
 }
 
-// Lógica Para Seleccionar/Deseleccionar todos los checkboxes
-// $('#select-all').on('change', function () {
-//     const rows = __table_render.rows({ search: 'applied' }).nodes();
-//     console.log(rows);    
-//     $('input[type="checkbox"]', rows).prop('checked', this.checked);
-// });
-// document.getElementById('select-all').addEventListener('click', function () {
-//     const rows = __table_render.rows({ search: 'applied' }).nodes();
-//     console.log(rows);    
-//     rows.forEach(row => {
-//         const checkboxes = row.querySelectorAll('input[type="checkbox"]');
-//         checkboxes.forEach(checkbox => {
-//             checkbox.checked = this.checked;
-//         });
-//     });
-// });
 document.getElementById('select-all').addEventListener('change', function () {
     const isChecked = this.checked;
     const checkboxes = document.querySelectorAll('.row-check');

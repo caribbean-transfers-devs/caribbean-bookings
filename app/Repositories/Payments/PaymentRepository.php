@@ -18,6 +18,9 @@ use App\Repositories\Accounting\ConciliationRepository;
 use App\Traits\FollowUpTrait;
 use App\Traits\PayPalTrait;
 
+//MODELS
+use App\Models\ReservationsRefund;
+
 class PaymentRepository
 {
     use PayPalTrait, FollowUpTrait;
@@ -39,6 +42,11 @@ class PaymentRepository
             $payment->reference = $request->reference;
             $payment->user_id = auth()->user()->id;
 
+            if( isset($request->reservation_refund_id) ){
+                $payment->reservation_refund_id = $request->reservation_refund_id;
+                $payment->category = $request->category;
+            }
+
             if( isset($request->is_conciliated) && $request->is_conciliated == 1 ){
                 if( $request->payment_method != "PAYPAL" && $request->payment_method != "STRIPE" && $request->payment_method != "CARD" ){
                     $payment->is_conciliated = $request->is_conciliated;
@@ -46,31 +54,39 @@ class PaymentRepository
                     $payment->conciliation_comment = $request->conciliation_comment;
                 }
             }
-            $payment->save();
 
-            $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency, 'HISTORY', 'CREATE_PAYMENT');
-            $booking = Reservation::find($request->reservation_id);
-
-            //ACTUALIZAMOS EL ESTATUS DE LA RESERVA, CUANDO SE AGREGA UN PAGO Y ESTA ES COTIZACIÓN        
-            if( $booking && $booking->is_quotation == 1 ){
-                $booking->is_quotation = 0;
-                $booking->expires_at = NULL;
-                $booking->save();
-            }
-
-
-            //AQUI REGISTRAMOS EL PAGO, PARA SABER SI UN AGENTE O SUPERVISOR DE CALLCENTER LE ESTA DANDO SEGUIMIENTO, LO HACEMOS MEDIANTE EL ROL
-            // 3 Gerente - Call Center
-            // 4 Agente - Call Center
-            $roles = session()->get('roles');
-            if( isset($request->type_site) && !empty($request->type_site) && ( in_array(3, $roles['roles']) || in_array(4, $roles['roles']) ) ){
-                if( $booking->type_site == "CALLCENTER" ){
-                    $booking->agent_id_after_sales = auth()->user()->id;
-                }else{
-                    $booking->agent_id_pull_sales = auth()->user()->id;
+            if( $payment->save() ){
+                $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego un pago tipo: '.$request->payment_method.', por un monto de: '.$request->total.' '.$request->currency, 'HISTORY', 'CREATE_PAYMENT');
+                $booking = Reservation::find($request->reservation_id);
+    
+                //ACTUALIZAMOS EL ESTATUS DE LA RESERVA, CUANDO SE AGREGA UN PAGO Y ESTA ES COTIZACIÓN        
+                if( $booking && $booking->is_quotation == 1 ){
+                    $booking->is_quotation = 0;
+                    $booking->expires_at = NULL;
+                    $booking->save();
                 }
-                $booking->type_after_sales = ( $request->platform == "Bookign" ? "PENDING" : "SPAM" );
-                $booking->save();
+    
+                //AQUI REGISTRAMOS EL PAGO, PARA SABER SI UN AGENTE O SUPERVISOR DE CALLCENTER LE ESTA DANDO SEGUIMIENTO, LO HACEMOS MEDIANTE EL ROL
+                // 3 Gerente - Call Center
+                // 4 Agente - Call Center
+                $roles = session()->get('roles');
+                if( isset($request->type_site) && !empty($request->type_site) && ( in_array(3, $roles['roles']) || in_array(4, $roles['roles']) ) ){
+                    if( $booking->type_site == "CALLCENTER" ){
+                        $booking->agent_id_after_sales = auth()->user()->id;
+                    }else{
+                        $booking->agent_id_pull_sales = auth()->user()->id;
+                    }
+                    $booking->type_after_sales = ( $request->platform == "Bookign" ? "PENDING" : "SPAM" );
+                    $booking->save();
+                }
+
+                if( isset($request->reservation_refund_id) ){                    
+                    $refund = ReservationsRefund::find($request->reservation_refund_id);
+                    $refund->status = "REFUND_COMPLETED";
+                    $refund->end_at = date('Y-m-d H:m:s');
+                    $refund->link_refund = $request->link_refund;
+                    $refund->save();
+                }
             }
 
             DB::commit();
@@ -84,8 +100,8 @@ class PaymentRepository
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error al crear el pago, contacte a soporte',
-                // 'message' => $e->getMessage()
+                // 'message' => 'Error al crear el pago, contacte a soporte',
+                'message' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

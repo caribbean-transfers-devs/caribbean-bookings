@@ -82,7 +82,10 @@ let components = {
             }];
         }
 
-        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-12 col-lg-8 d-flex flex-column flex-sm-row justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3 ms-lg-3'B>><'col-12 col-sm-12 col-lg-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
+        // _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-12 col-lg-8 d-flex flex-column flex-sm-row justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3 ms-lg-3'B>><'col-12 col-sm-12 col-lg-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
+        //                 <'table-responsive'tr>
+        //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+        _settings.dom = `<'dt--top-section'<''<'left'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center'B>><'right'f>>>
                         <'table-responsive'tr>
                         <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;                        
         _settings.deferRender = true;
@@ -426,18 +429,11 @@ let components = {
     },
 
     loadScreen: function(){
-        // let __body = document.querySelector('body');
-        // let __div = document.createElement("div");
-        // __div.setAttribute('id', 'load_screen');
-        // __div.innerHTML = '<div class="loader"> <div class="loader-content"><img src="/assets/img/logos/brand_white.png" alt="loading" class="img-fluid" width="220"><img src="/assets/img/loader.gif" alt="loading"><p class="text-white mb-0" style="font-size: 16px;">' + this.getTranslation('loading.message') + '</p></div></div>';
-        // __body.insertBefore(__div, __body.firstChild);
         __load_screen.classList.remove('d-none');
     },
 
     removeLoadScreen(){
-        // let __load_screen = document.getElementById("load_screen");
         if( __load_screen != null ){
-            // document.body.removeChild(load_screen);
             __load_screen.classList.add('d-none');
         }
     },

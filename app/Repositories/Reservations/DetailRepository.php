@@ -54,6 +54,7 @@ class DetailRepository
             'sales.callCenterAgent',  // Mantienes la relación con ventas por si necesitas la información de ventas // Relación anidada
             'callCenterAgent',  // Relación directa con el agente del call center
             'payments',
+            'refunds',
             'followUps',
             'site',
             'cancellationType',

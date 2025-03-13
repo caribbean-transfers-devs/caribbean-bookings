@@ -10,6 +10,7 @@ use Carbon\Carbon;
 //MODELS
 use App\Models\Reservation;
 use App\Models\ReservationsItem;
+use App\Models\ReservationsRefund;
 
 //TRAITS
 use App\Traits\FollowUpTrait;
@@ -59,10 +60,10 @@ class ActionsRepository
         try {
             DB::beginTransaction();
 
-            $booking = Reservation::find($request->reservation_id);
-            $booking->status_refund = 'REFUND_REQUESTED';
-            $booking->request_date_refund = date('Y-m-d H:m:s');
+            $booking = new ReservationsRefund();
+            $booking->reservation_id = $request->reservation_id;
             $booking->message_refund = $request->message;
+            $booking->status = 'REFUND_REQUESTED';
             $booking->save();
 
             // ESTATUS DE RESERVACIÓN

@@ -43,7 +43,6 @@ class CommissionsRepository
             $userArray = MethodsTrait::parseArray($request->user ?? '');
             $statusArray = MethodsTrait::parseArray($request->status ?? '');
             $dataUser = MethodsTrait::DataUser($userArray, $statusArray);
-            // dd($statusArray, $dataUser);
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);

@@ -243,10 +243,10 @@
                             <th class="text-center">CORREO DEL CLIENTE</th>
                             <th class="text-center">VEHÍCULO</th>
                             <th class="text-center">PAX</th>
-                            <th class="text-center">ORIGEN</th>                            
-                            <th class="text-center">DESDE</th>
-                            <th class="text-center">DESTINO</th>
-                            <th class="text-center">HACIA</th>
+                            <th class="text-center normal">ORIGEN</th>                            
+                            <th class="text-center normal">DESDE</th>
+                            <th class="text-center normal">DESTINO</th>
+                            <th class="text-center normal">HACIA</th>
                             <th class="text-center">FECHA DE SERVICIO</th>
                             <th class="text-center">HORA DE SERVICIO</th>
                             <th class="text-center">ESTATUS DE SERVICIO(S)</th>
@@ -516,10 +516,10 @@
                                     <td class="text-center">{{ $item->client_email }}</td>
                                     <td class="text-center">{{ $item->service_type_name }}</td>
                                     <td class="text-center">{{ $item->passengers }}</td>
-                                    <td class="text-center">{{ $item->destination_name_from }}</td>
-                                    <td class="text-center">{{ $item->from_name }}</td>
-                                    <td class="text-center">{{ $item->destination_name_to }}</td>
-                                    <td class="text-center">{{ $item->to_name }}</td>
+                                    <td class="text-center normal">{{ $item->destination_name_from }}</td>
+                                    <td class="text-center normal">{{ $item->from_name }}</td>
+                                    <td class="text-center normal">{{ $item->destination_name_to }}</td>
+                                    <td class="text-center normal">{{ $item->to_name }}</td>
                                     <td class="text-center">
                                         @php
                                             $pickup_from = explode(',',$item->pickup_from);

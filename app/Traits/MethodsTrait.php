@@ -14,7 +14,7 @@ trait MethodsTrait
     public static function parseArray($user):array
     {
         if (is_array($user)) {
-            return array_filter($user); // Devuelve el array sin modificaciones si ya es un array
+            return array_filter($user, fn($value) => $value !== null); // Evita eliminar valores como 0 o "0"
         }
     
         if (!is_string($user)) {
@@ -22,7 +22,7 @@ trait MethodsTrait
         }
     
         preg_match_all('/["\']([^"\']+)["\']/', $user, $matches);
-        return $matches[1] ?? []; // Devuelve un array vacío si no hay coincidencias
+        return $matches[1] ?? []; // Devuelve un array vacío si no hay coincidencias        
     }
 
     /**
@@ -32,7 +32,7 @@ trait MethodsTrait
     {
         // Filtrar solo valores numéricos para evitar errores en la consulta
         $users = array_filter($users, fn($id) => is_numeric($id) && ctype_digit((string) $id));
-        $status = array_filter($status, fn($id) => is_numeric($status) && ctype_digit((string) $id));
+        //$status = array_filter($status, fn($id) => is_numeric($status) && ctype_digit((string) $id));
 
         // Construcción de la consulta base
         $query = User::where('is_commission', 1)->with('target');

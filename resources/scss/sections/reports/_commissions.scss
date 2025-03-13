@@ -60,7 +60,11 @@
     display: grid;                        
     grid-gap: 10px;
 
-    @media (min-width: 992px) {
+    @media (min-width: 768px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (min-width: 1400px) {
         grid-template-columns: 1fr 1fr 1fr 1fr;
     }
   }

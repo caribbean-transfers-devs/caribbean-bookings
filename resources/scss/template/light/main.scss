@@ -6,7 +6,6 @@ html {
 body {
   color: #888ea8;
   height: 100%;
-  // font-size: 0.875rem;
   font-size: 0.75rem;
   background: #f1f2f3;
   overflow-x: hidden;
@@ -3073,11 +3072,10 @@ fieldset:disabled .btn {
   background-color: $danger;
 }
 
-.badge {
-  font-weight: 600;
-  line-height: 1.4;
+.badge {  
   font-size: 11.9px;
   font-weight: 600;
+  line-height: 1.4;
   transition: all 0.3s ease-out;
   -webkit-transition: all 0.3s ease-out;
   display: inline-block;
@@ -3709,87 +3707,86 @@ fieldset:disabled .btn {
     ====================
 */
 
-// .table {
-//   color: #515365;
-//   border-collapse: separate;
-//   border-spacing: 0;
+.table {
+  color: #515365;
+  border-collapse: separate;
+  border-spacing: 0;
 
-//   th .form-check, td .form-check {
-//     margin-right: 0;
-//     display: inline-flex;
-//     margin-bottom: 0;
-//   }
+  th .form-check, td .form-check {
+    margin-right: 0;
+    display: inline-flex;
+    margin-bottom: 0;
+  }
 
-//   .form-check-input {
-//     background-color: #bfc9d4;
-//     border-color: #bfc9d4;
-//   }
+  .form-check-input {
+    background-color: #bfc9d4;
+    border-color: #bfc9d4;
+  }
   
-//   thead {
-//     color: #515365;
+  thead {
+    color: #000;
 
-//     tr {
-//       th {
-//         border: none;
-//         background: #ebedf2;
-//         padding: 10px 21px 10px 21px;
-//         vertical-align: middle;
-//         font-weight: 500;
-//       }
+    tr {
+      th {
+        border: none;
+        // padding: 10px 21px 10px 21px;
+        background: #ebedf2;
+        vertical-align: middle;
+        // white-space: nowrap;
+        font-weight: 500;
+      }
 
-//       &.table-row-hidden {
-//         border: none;
-//       }
-//     }
-//   }
+      &.table-row-hidden {
+        border: none;
+      }
+    }
+  }
 
-//   &:not(.dataTable) thead tr th {
-//     // &:first-child {
-//     //   border-top-left-radius: 10px;
-//     //   border-bottom-left-radius: 10px;
-//     // }
+  &:not(.dataTable) thead tr th {
+    // &:first-child {
+    //   border-top-left-radius: 10px;
+    //   border-bottom-left-radius: 10px;
+    // }
 
-//     // &:last-child {
-//     //   border-top-right-radius: 10px;
-//     //   border-bottom-right-radius: 10px;
-//     // }
+    // &:last-child {
+    //   border-top-right-radius: 10px;
+    //   border-bottom-right-radius: 10px;
+    // }
 
-//     &.checkbox-area {
-//       width: 5%;
-//     }
-//   }
+    &.checkbox-area {
+      width: 5%;
+    }
+  }
   
-//   tbody {
-//     border: none;
+  tbody {
+    border: none;
 
-//     tr {
-//       th {
-//         border: none;
-//       }
+    tr {
+      th {
+        border: none;
+      }
 
-//       td {
-//         border: none;
-//         // padding: 10px 21px 10px 21px;
-//         padding: 10px;
-//         vertical-align: middle;
-//         letter-spacing: normal;
-//         // white-space: nowrap;
-//         font-weight: 400;
-//       }
-//     }
-//   }
+      td {
+        border: none;
+        // padding: 10px 21px 10px 21px;
+        vertical-align: middle;
+        // white-space: nowrap;
+        font-weight: 400;
+      }
+    }
+  }
 
-//   > :not(:first-child) {
-//     border: none;
-//   }
+  > :not(:first-child) {
+    border: none;
+  }
 
-//   &:not(.dataTable) tbody tr td svg {
-//     width: 17px;
-//     height: 17px;
-//     vertical-align: text-top;
-//     color: $primary;
-//     stroke-width: 1.5;
-//   }
+  &:not(.dataTable) tbody tr td svg {
+    width: 17px;
+    height: 17px;
+    vertical-align: text-top;
+    color: $primary;
+    stroke-width: 1.5;
+  }
 
 //   tbody tr td .table-inner-text {
 //     margin-left: 5px;
@@ -3843,7 +3840,7 @@ fieldset:disabled .btn {
 //       }
 //     }
 //   }
-// }
+}
 
 /*
 

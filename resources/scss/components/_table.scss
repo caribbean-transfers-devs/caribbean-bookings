@@ -13,16 +13,16 @@ table.custom-table {
     thead, tfoot {
         tr{
             th {
-            background-color: rgba(251, 86, 7, 0.72) !important; // Fondo azul claro
-            padding: 0.5rem; /*8px*/
-            font-size: 0.688rem; /*11px*/
-            color: #16161D;
-            text-align: left;
-            border: 1px solid #CCD6EB; // Bordes claros
+                background-color: rgba(251, 86, 7, 0.72) !important; // Fondo azul claro
+                padding: 0.5rem; /*8px*/
+                font-size: 0.688rem; /*11px*/
+                color: #16161D;
+                text-align: left;
+                border: 1px solid #CCD6EB; // Bordes claros
 
-            &:first-child {
-                font-weight: 600; // Estatus en negrita
-            }
+                &:first-child {
+                    font-weight: 600; // Estatus en negrita
+                }
             }
         }
     }

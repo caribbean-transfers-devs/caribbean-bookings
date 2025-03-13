@@ -44,8 +44,7 @@
                             <strong id="exchangeInfo"></strong>
                         </div>
                     </div>
-                </div>                
-                {{-- <button class="btn btn-warning btn-sm">Tipo de cambio comisiones: </button> --}}
+                </div>
             </div>
         </div>
 
@@ -107,7 +106,7 @@
                                 </span>
                             </div>
                             <div class="balance-info">
-                                <h6>Total de comisiones</h6>
+                                <h6>Total de comisiones a pagar</h6>
                                 <p id="totalCommissions">0.00</p>
                             </div>
                         </div>

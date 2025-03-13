@@ -18,11 +18,11 @@
     $cancellations = FiltersTrait::CancellationTypes();
 @endphp
 @extends('layout.app')
-@section('title') Reporte De Reservaciones @endsection
+@section('title') Reembolsos @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/report_reservations.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/report_reservations.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/finances/refunds.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/finances/refunds.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -33,7 +33,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    <script src="{{ mix('assets/js/sections/reports/reservations.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/finances/refunds.min.js') }}"></script>
 @endpush
 
 @section('content')
@@ -59,17 +59,7 @@
                     'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
                     'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
                 )                
-            ),
-            array(
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas',
-                'titleAttr' => 'Ver graficas de ventas',
-                'className' => 'btn btn-primary __btn_chart2',
-                'attr' => array(
-                    'data-title' =>  "Grafica de ventas",
-                    'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#chartsModal2',
-                )
-            ),            
+            ),        
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar Excel',
                 'extend' => 'excelHtml5',
@@ -78,11 +68,6 @@
                 'exportOptions' => [
                     'columns' => ':visible'  // Solo exporta las columnas visibles   
                 ]
-            ),
-            array(
-                'text' => 'Tipo de cambio: '.$exchange,
-                'titleAttr' => 'Tipo de cambio',
-                'className' => 'btn btn-warning',
             ),
         );
     @endphp
@@ -100,32 +85,29 @@
                     </div>
                 @endif
                 
-                <table id="dataSales" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
+                <table id="dataRefunds" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
-                            <th class="text-center">ID</th>
                             <th class="text-center">ESTATUS DE REEMBOLSO</th>
+                            <th class="text-center">MENSAJE DE REEMBOLSO</th>
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">FECHA DE RESERVACIÓN</th>
-                            <th class="text-center">HORA DE RESERVACIÓN</th>
                             <th class="text-center">ESTATUS DE RESERVACIÓN</th>
                             <th class="text-center">FECHA DE SERVICIO</th>
-                            <th class="text-center">HORA DE SERVICIO</th>
                             <th class="text-center">ESTATUS DE SERVICIO(S)</th>
-                            <th class="text-center">ESTATUS DE PAGO</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">MONEDA</th>
-                            <th class="text-center">MÉTODO DE PAGO</th> 
+                            <th class="text-center">MÉTODO DE PAGO</th>
                             <th class="text-center">INFORMACIÓN DE MÉTODO DE PAGO</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
-                                <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
-                                    <td class="text-center">{{ $item->reservation_id }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ FinanceTrait::classStatusRefund($item->status_refund) }}">{{ FinanceTrait::statusRefund($item->status_refund) }}</button></td>
+                                <tr>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ FinanceTrait::classStatusRefund($item->status) }} {{ $item->status == "REFUND_REQUESTED" ? 'danger __btn_redund' : 'success' }}" data-reservation="{{ $item->reservation_id }}" data-refund="{{ $item->id }}">{{ FinanceTrait::statusRefund($item->status) }}</button></td>
+                                    <td class="text-center">{{ $item->message_refund }}</td>
                                     <td class="text-center"><span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
                                         @php
@@ -142,7 +124,6 @@
                                         @endif
                                     </td>
                                     <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
-                                    <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }}">{{ BookingTrait::statusBooking($item->reservation_status) }}</button></td>
                                     <td class="text-center">
                                         @php
@@ -155,21 +136,14 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        [{{ date("H:i", strtotime($pickup_from[0])) }}] <br>
-                                        @if ( $item->is_round_trip != 0 )
-                                            [{{ date("H:i", strtotime($pickup_to[0])) }}]
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
                                         <?=BookingTrait::renderServiceStatus($item->one_service_status)?><br>
                                         @if ( $item->is_round_trip != 0 )
                                             <?=BookingTrait::renderServiceStatus($item->two_service_status)?>
                                         @endif
                                     </td>
-                                    <td class="text-center" <?=BookingTrait::classStatusPayment($item)?>>{{ BookingTrait::statusPayment($item->payment_status) }}</td>
                                     <td class="text-center" <?=BookingTrait::classStatusPayment($item)?>>{{ number_format(($item->total_sales),2) }}</td>
                                     <td class="text-center">{{ $item->currency }}</td>
-                                    <td class="text-center">{{ $item->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $item->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                    <td class="text-center">{{ $item->payment_type_name }}</td>
                                     <td class="text-center">
                                         @if ( !empty($item->payment_details) )
                                             [{{ $item->payment_details }}]
@@ -184,8 +158,7 @@
         </div>
     </div>
 
-    {{-- <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :istoday="1" :isbalance="1" :isduplicated="1" :isagency="1" /> --}}
+    <x-modals.filters.bookings :data="$data" :isSearch="1" />
     <x-modals.reports.columns />
-    {{-- <x-modals.charts.sales2 :bookingsStatus="$bookingsStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataSites="$dataSites" :dataDestinations="$dataDestinations" :dataOriginSale="$dataOriginSale" />
-    <x-modals.reservations.payments /> --}}
+    <x-modals.new_payment_conciliation />
 @endsection

@@ -52,7 +52,7 @@ class RefundsRepository
             "is_agency" => $request->is_agency ?? 0,
         ];
 
-        $query = ' AND rez.site_id NOT IN(21,11) AND request_date_refund IS NOT NULL AND rez.request_date_refund BETWEEN :init AND :end ';
+        $query = '  AND refund.created_at BETWEEN :init AND :end AND rez.site_id NOT IN(21,11) ';
         $havingConditions = [];
         $queryHaving = '';
         $queryData = [
@@ -145,7 +145,7 @@ class RefundsRepository
             $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
         }
 
-        $bookings = $this->queryBookings($query, $queryHaving, $queryData);
+        $bookings = $this->queryRefunds($query, $queryHaving, $queryData);
 
         return view('finances.refunds.index', [
             'breadcrumbs' => [

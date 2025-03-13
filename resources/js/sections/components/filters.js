@@ -55,6 +55,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     if( __lookup_date ){
-        filters.calendarFilter(__lookup_date, { mode: "range" });
+        filters.calendarFilter(__lookup_date, { mode: "range", minDate: null });
     }    
 });

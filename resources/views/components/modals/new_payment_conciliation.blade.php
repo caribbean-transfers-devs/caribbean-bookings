@@ -41,6 +41,17 @@
                             <input type="number" class="form-control mb-2" id="servicePaymentsExchangeModal" name="exchange_rate" value="1.00" readonly>
                         </div>
                         <div class="col-sm-12 col-md-6">
+                            <label class="form-label" for="servicePaymentsCategory">Tipo de pago</label>
+                            <select class="form-select mb-2" id="servicePaymentsCategory" name="category">
+                                <option value="PAYOUT">PAGO</option>
+                                <option value="REFUND">REEMBOLSO</option>
+                            </select>                            
+                        </div>
+                        <div class="col-sm-12 col-md-12">
+                            <label class="form-label" for="servicePaymentsLinkRefund">Link del reembolso</label>
+                            <input type="text" class="form-control mb-2" id="servicePaymentsLinkRefund" name="link_refund">
+                        </div>                        
+                        <div class="col-sm-12 col-md-6 d-none">
                             <label class="form-label" for="servicePaymentsConciliationModal">Conciliado</label>
                             <select class="form-select mb-2" id="servicePaymentsConciliationModal" name="is_conciliated">
                                 <option value="0">No</option>
@@ -52,7 +63,8 @@
                             <textarea class="form-control" id="servicePaymentsMessageConciliationModal" name="conciliation_comment" cols="5" rows="5"></textarea>
                         </div>
                     </div>
-                    <input type="hidden" name="reservation_id" value="" id="reserv_id_pay">
+                    <input type="hidden" name="reservation_id" value="" id="reservation_id">
+                    <input type="hidden" name="reservation_refund_id" value="" id=reservation_refund_id>
                     <input type="hidden" name="operation" value="multiplication" id="operation_pay">
                 </form>
                 <input type="hidden" id="type_form_pay" value="1">

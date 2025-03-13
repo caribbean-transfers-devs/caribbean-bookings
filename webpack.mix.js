@@ -36,6 +36,9 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         // TPV
         mix.sass('resources/scss/sections/tpv.scss', data.assets + "css/sections/tpv.min.css"); //TPV
 
+        // FINANCES
+        mix.sass('resources/scss/sections/finances/_refunds.scss', data.assets + "css/sections/finances/refunds.min.css"); //REEMBOLSOS
+
         //STYLES REPORTS
         mix.sass('resources/scss/sections/_report_payments.scss', data.assets + "css/sections/report_payments.min.css"); //PAYMENTS
         mix.sass('resources/scss/sections/_report_sales.scss', data.assets + "css/sections/report_sales.min.css"); //SALES
@@ -96,24 +99,36 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         //TPV
         mix.combine(['resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/tpv/index.js'], data.assets + "js/sections/tpv/index.min.js");
 
+        //FINANCES
+            //REEMBOLSOS
+            mix.combine([
+                'resources/plugins/table/datatable/datatables5.js',
+                'resources/plugins/flatpickr/flatpickr.js',
+                'resources/plugins/flatpickr/es.min.js',
+                'resources/plugins/flatpickr/monthSelect.js',
+                'resources/plugins/bootstrap-select/select.js',
+                'resources/js/sections/components/filters.js',
+                'resources/js/sections/finances/refunds.js'
+            ], data.assets + "js/sections/finances/refunds.min.js");
+
         //REPORTS
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/payments.js'], data.assets + "js/sections/reports/payments.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/sales.js'], data.assets + "js/sections/reports/sales.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/cash.js'], data.assets + "js/sections/reports/cash.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/cancellations.js'], data.assets + "js/sections/reports/cancellations.min.js");
 
-        //COMISIONES
-        mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/commissions.js'], data.assets + "js/sections/reports/commissions.min.js");
-        mix.combine([
-            'resources/plugins/apex/apexcharts.min.js', 
-            'resources/plugins/table/datatable/datatables5.js',
-            'resources/plugins/flatpickr/flatpickr.js',
-            'resources/plugins/flatpickr/es.min.js',
-            'resources/plugins/flatpickr/monthSelect.js',
-            'resources/plugins/bootstrap-select/select.js',
-            'resources/js/sections/components/filters.js',
-            'resources/js/sections/reports/commissions_new.js'
-        ], data.assets + "js/sections/reports/commissions_new.min.js");
+            //COMISIONES
+            mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/reports/commissions.js'], data.assets + "js/sections/reports/commissions.min.js");
+            mix.combine([
+                'resources/plugins/apex/apexcharts.min.js', 
+                'resources/plugins/table/datatable/datatables5.js',
+                'resources/plugins/flatpickr/flatpickr.js',
+                'resources/plugins/flatpickr/es.min.js',
+                'resources/plugins/flatpickr/monthSelect.js',
+                'resources/plugins/bootstrap-select/select.js',
+                'resources/js/sections/components/filters.js',
+                'resources/js/sections/reports/commissions_new.js'
+            ], data.assets + "js/sections/reports/commissions_new.min.js");
 
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/components/charts.js', 'resources/js/sections/reports/reservations.js'], data.assets + "js/sections/reports/reservations.min.js");
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/components/charts.js', 'resources/js/sections/reports/operations.js'], data.assets + "js/sections/reports/operations.min.js");
