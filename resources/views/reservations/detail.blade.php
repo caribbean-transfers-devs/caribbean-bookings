@@ -74,18 +74,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/relativeTime.min.js"></script>    
     <script src="{{ mix('assets/js/sections/reservations/details.min.js') }}"></script>
-    <script>
-        window.onload = () => {
-            const resources = performance.getEntriesByType("resource");
-            const script = resources.find(res => res.name.includes("details.min.js"));
-
-            if (script) {
-                console.log(`El archivo tardó ${script.responseEnd - script.startTime} ms en cargarse.`);
-            } else {
-                console.warn("No se encontró el archivo en la lista de recursos.");
-            }
-        };        
-    </script>
     @if ( $data['status'] == "QUOTATION" )
         <script>
             dayjs.extend(dayjs_plugin_duration);
