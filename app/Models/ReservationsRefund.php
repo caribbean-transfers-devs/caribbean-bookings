@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class ReservationsRefund extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'reservation_id',
+        'message_refund',
+        'status',
+        'end_at',
+        'link_refund',
+    ];    
 }

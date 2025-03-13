@@ -30,9 +30,9 @@ class PaymentRepository
         try {
             DB::beginTransaction();
             
-            $payment = new Payment();            
+            $payment = new Payment();
             $payment->description = 'Panel';
-            $payment->total = $request->total;            
+            $payment->total = $request->total;
             $payment->exchange_rate = $request->exchange_rate;
             $payment->status = 1;
             $payment->operation = $request->operation;

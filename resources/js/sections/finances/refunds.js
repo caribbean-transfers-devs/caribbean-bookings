@@ -6,10 +6,12 @@ const __btn_redunds = document.querySelectorAll('.__btn_redund');
 const __close_modals = document.querySelectorAll('.__close_modal');
 const __reservation_id = document.getElementById('reservation_id');
 const __reservation_refund_id = document.getElementById("reservation_refund_id")
-
 const __type_pay = document.getElementById('type_form_pay');
 const __code_pay = document.getElementById('payment_id');
 
+//ACCIONES
+const __formPayment = document.getElementById('frm_new_payment');
+const __addPaymentRefund = document.getElementById('btn_new_payment');
 
 document.addEventListener("DOMContentLoaded", function() {
     components.titleModalFilter();
@@ -65,11 +67,66 @@ document.addEventListener("DOMContentLoaded", function() {
                 $("#btn_new_payment").prop('disabled', false);
             },
         });
-    });
+    });   
+
+    if( __addPaymentRefund ){
+        __addPaymentRefund.addEventListener('click', function(event){
+            event.preventDefault();
     
-    $("#btn_new_payment").on('click', function(){
-        $("#btn_new_payment").prop('disabled', true);
-        let __params = components.serialize(document.getElementById('frm_new_payment'),'object');
-        components.request_exec_ajax( _LOCAL_URL + ( __type_pay.value == 1 ? "/payments" : "/payments/" + __code_pay.value ), ( __type_pay.value == 1 ? 'POST' : 'PUT' ), __params );
-    });    
+            Swal.fire({
+                html: '¿Está seguro de aplicar el reembolso a la reservación?',
+                icon: 'warning', 
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let __params = components.serialize(__formPayment,'object');
+                    
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se aplica reembolso de la reserva.",
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+    
+                    fetch('/action/addPaymentRefund', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },            
+                        body: JSON.stringify(__params)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if( data.status  == "success" ){                        
+                            $("#addPaymentsModal").modal('hide');
+                        }
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }
+            });       
+        })
+    }    
 })

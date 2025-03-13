@@ -263,7 +263,7 @@
                 @endif
 
                 {{-- NOS PERMITE INDICAR QUE CLIENTE PAGARA A LA LLEGADA, SOLO SE MOSTRARA CUANDO SEA COTIZACIÓN --}}
-                @if ( $data['status'] == "QUOTATION" )
+                @if ( $data['status'] == "QUOTATION" || $data['status'] == "PENDING" )
                     <button class="btn btn-warning btn-sm enablePayArrival" id="enablePayArrival" data-code="{{ $reservation->id }}"><i class="align-middle" data-feather="plus"></i> ACTIVAR PAGO A LA LLEGADA</button>
                 @endif
 

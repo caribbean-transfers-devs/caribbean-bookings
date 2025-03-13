@@ -74,7 +74,7 @@ if( enablePayArrival ){
                 });
             }
         });       
-    })
+    });
 }
 
 //SOLITAMOS REEMBOLSO
@@ -147,7 +147,7 @@ if( refundRequest ){
                 });
             }
         });       
-    })
+    });
 }
 
 

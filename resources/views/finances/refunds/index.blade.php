@@ -106,7 +106,10 @@
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $item)
                                 <tr>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ FinanceTrait::classStatusRefund($item->status) }} {{ $item->status == "REFUND_REQUESTED" ? 'danger __btn_redund' : 'success' }}" data-reservation="{{ $item->reservation_id }}" data-refund="{{ $item->id }}">{{ FinanceTrait::statusRefund($item->status) }}</button></td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn w-100 mb-2 btn-{{ FinanceTrait::classStatusRefund($item->status) }} {{ $item->status == "REFUND_REQUESTED" ? 'danger __btn_redund' : 'success' }}" data-reservation="{{ $item->reservation_id }}" data-refund="{{ $item->id }}">{{ FinanceTrait::statusRefund($item->status) }}</button>
+                                        <button type="button" class="btn w-100 btn-primary" data-bs-toggle="modal" data-bs-target="#viewProofsModal">VER EVIDENCIA</button>
+                                    </td>
                                     <td class="text-center">{{ $item->message_refund }}</td>
                                     <td class="text-center"><span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
@@ -160,5 +163,6 @@
 
     <x-modals.filters.bookings :data="$data" :isSearch="1" />
     <x-modals.reports.columns />
+    <x-modals.finances.proofs />
     <x-modals.new_payment_conciliation />
 @endsection

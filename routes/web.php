@@ -49,6 +49,7 @@ use App\Http\Controllers\Settings\ExchangeReportsController;
 use App\Http\Controllers\Settings\RatesEnterpriseController;
 use App\Http\Controllers\Settings\TypesCancellationsController;
 
+use App\Http\Controllers\Actions\FinanceController;
 use App\Http\Controllers\Actions\ActionsController;
 
 use Illuminate\Support\Facades\Route;
@@ -285,6 +286,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/config/rates/delete', [RatesController::class, 'deleteRates'])->name('config.deleteRates');
     Route::put('/config/rates/update', [RatesController::class, 'updateRates'])->name('config.updateRates');
 
+    //ACCIONES UTILIZADAS EN FINANZAS
+    Route::post('/action/addPaymentRefund', [FinanceController::class, 'addPaymentRefund'])->name('add.payment.refund');
+    Route::post('/action/getLogReservation', [FinanceController::class, 'getLogReservation'])->name('get.log.reservation');
 
     //ACCIONES GENERALES
     Route::post('/action/enablePayArrival', [ActionsController::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
