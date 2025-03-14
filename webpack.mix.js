@@ -108,6 +108,7 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
                 'resources/plugins/flatpickr/monthSelect.js',
                 'resources/plugins/bootstrap-select/select.js',
                 'resources/js/sections/components/filters.js',
+                'resources/plugins/lightbox/lightbox.js',
                 'resources/js/sections/finances/refunds.js'
             ], data.assets + "js/sections/finances/refunds.min.js");
 

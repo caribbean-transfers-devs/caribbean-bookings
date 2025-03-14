@@ -287,8 +287,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/config/rates/update', [RatesController::class, 'updateRates'])->name('config.updateRates');
 
     //ACCIONES UTILIZADAS EN FINANZAS
+    Route::match(['get', 'post'], '/action/getBasicInformationReservation', [FinanceController::class, 'getBasicInformationReservation'])->name('get.basic-information.reservation');
+    Route::match(['get', 'post'], '/action/getPhotosReservation', [FinanceController::class, 'getPhotosReservation'])->name('get.photos.reservation');
+    Route::match(['get', 'post'], '/action/getHistoryReservation', [FinanceController::class, 'getHistoryReservation'])->name('get.history.reservation');
+    Route::match(['get', 'post'], '/action/getPaymentsReservation', [FinanceController::class, 'getPaymentsReservation'])->name('get.payments.reservation');
     Route::post('/action/addPaymentRefund', [FinanceController::class, 'addPaymentRefund'])->name('add.payment.refund');
-    Route::post('/action/getLogReservation', [FinanceController::class, 'getLogReservation'])->name('get.log.reservation');
 
     //ACCIONES GENERALES
     Route::post('/action/enablePayArrival', [ActionsController::class, 'enablePayArrival'])->name('update.booking.pay.arrival');

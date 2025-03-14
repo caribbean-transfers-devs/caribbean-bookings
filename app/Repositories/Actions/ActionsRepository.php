@@ -94,7 +94,6 @@ class ActionsRepository
 
             // Obtener el item de la reservación
             $item = ReservationsItem::with('reservations')->where('id', $request->item_id)->first();
-            // dd($item->toArray());
             
             if (!$item) {
                 return response()->json([

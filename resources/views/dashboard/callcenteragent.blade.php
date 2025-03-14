@@ -14,8 +14,7 @@
 @extends('layout.app')
 @section('title') Dashboard Agente de Call Center @endsection
 
-@push('Css')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+@push('Css')    
     <link href="{{ mix('/assets/css/sections/dashboard/callcenteragent.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/dashboard/callcenteragent.min.css') }}" rel="stylesheet" >
     <style>
@@ -36,7 +35,7 @@
 @endpush
 
 @section('content')
-    <div class="row layout-top-spacing callcenter-container">    
+    <div class="row layout-top-spacing callcenter-container">
         {{-- <div class="col-12 layout-spacing">
             <div class="alert alert-arrow-left alert-icon-left alert-light-primary alert-dismissible fade show mb-2" role="alert">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" data-bs-dismiss="alert" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x close"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>

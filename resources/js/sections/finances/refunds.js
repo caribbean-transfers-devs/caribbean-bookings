@@ -1,8 +1,109 @@
 if( document.querySelector('.table-rendering') != null ){
     components.actionTable($('.table-rendering'), 'fixedheaderPagination');
 }
+let refunds = {
+    reservation_id: 0,
+    getLoader: function() {
+        return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
+    },
+    /**
+     * 
+     * @param {*} url 
+     * @param {*} containerId 
+     * @param {*} params 
+     * @returns 
+     */
+    fetchData: async function(url, containerId, params) {
+        if (!containerId) return;
+    
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(params),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+    
+            const data = await response.text();
+            containerId.innerHTML = data.trim();
+        } catch (error) {
+            console.error("Error en la petición:", error);
+            container.innerHTML = '<p style="color:red;">Error al cargar datos.</p>'.trim();
+        }
+    },
+    /**
+     * 
+     */
+    getBasicInformationReservation: function() {
+        // Elementos HTML
+        const data       = document.getElementById("pills-general");
 
-const __btn_redunds = document.querySelectorAll('.__btn_redund');
+        // Actualizar resumen general, al mostrar el loader ANTES de la solicitud
+        data.innerHTML   = this.getLoader().trim();
+
+        // Definir parámetros de la petición
+        const _params    = {
+            id: this.reservation_id,
+        };
+
+        this.fetchData('/action/getBasicInformationReservation', data, _params);
+    },
+    /**
+     * 
+     */
+    getPhotosReservation: function() {
+        // Elementos HTML
+        const data       = document.getElementById("media-listing");
+
+        // Actualizar resumen general, al mostrar el loader ANTES de la solicitud
+        data.innerHTML   = this.getLoader().trim();
+
+        // Definir parámetros de la petición
+        const _params    = {
+            id: this.reservation_id,
+        };
+        this.fetchData('/action/getPhotosReservation', data, _params);
+    },
+    /**
+     * 
+     */
+    getHistoryReservation: function() {
+        // Elementos HTML
+        const data       = document.getElementById("pills-history");
+
+        // Actualizar resumen general, al mostrar el loader ANTES de la solicitud
+        data.innerHTML   = this.getLoader().trim();
+
+        // Definir parámetros de la petición
+        const _params    = {
+            id: this.reservation_id,
+        };
+        this.fetchData('/action/getHistoryReservation', data, _params);
+    },
+    /**
+     * 
+     */
+    getPaymentsReservation: function() {
+        // Elementos HTML
+        const data       = document.getElementById("pills-payments");
+
+        // Actualizar resumen general, al mostrar el loader ANTES de la solicitud
+        data.innerHTML   = this.getLoader().trim();
+
+        // Definir parámetros de la petición
+        const _params    = {
+            id: this.reservation_id,
+        };
+        this.fetchData('/action/getPaymentsReservation', data, _params);
+    },
+};
+
 const __close_modals = document.querySelectorAll('.__close_modal');
 const __reservation_id = document.getElementById('reservation_id');
 const __reservation_refund_id = document.getElementById("reservation_refund_id")
@@ -10,8 +111,8 @@ const __type_pay = document.getElementById('type_form_pay');
 const __code_pay = document.getElementById('payment_id');
 
 //ACCIONES
-const __formPayment = document.getElementById('frm_new_payment');
-const __addPaymentRefund = document.getElementById('btn_new_payment');
+const __formPayment = document.getElementById('frm_new_payment'); //FORMULARIO DEL PAGO
+const __addPaymentRefund = document.getElementById('btn_new_payment'); //BOTON PARA PODER GUARDAR EL PAGO
 
 document.addEventListener("DOMContentLoaded", function() {
     components.titleModalFilter();
@@ -19,6 +120,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     components.renderCheckboxColumns('dataRefunds', 'columns');
     components.setValueSelectpicker();
+
+    function debounce(func, delay) {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }    
 
     if( __close_modals.length > 0 ){
         __close_modals.forEach(__close_modal => {
@@ -32,27 +141,37 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
     
-    if( __btn_redunds.length > 0 ){
-        __btn_redunds.forEach(__btn_redund => {
-            __btn_redund.addEventListener('click', function(event){
-                event.preventDefault();
-                const { reservation, refund } = this.dataset;
-                $("#addPaymentsModal").modal('show');
-                const __loading_container = document.getElementById('loading_container');
-                const __form_container = document.getElementById('form_container');
-    
-                __loading_container.classList.remove('d-none');
-                __loading_container.innerHTML = '<div class="spinner-grow align-self-center">';
-    
-                setTimeout(() => {
-                    __loading_container.classList.add('d-none');
-                    __form_container.classList.remove('d-none');                
-                }, 500);
-                __reservation_id.value = reservation;
-                __reservation_refund_id.value = refund;
-            });
-        });
-    }
+    document.addEventListener("click", debounce(function (event) {
+        if( event.target.classList.contains('__btn_redund') ){
+            event.preventDefault();
+            const { reservation, refund } = event.target.dataset;
+
+            $("#addPaymentsModal").modal('show');
+            const __loading_container = document.getElementById('loading_container');
+            const __form_container = document.getElementById('form_container');
+
+            __loading_container.classList.remove('d-none');
+            __loading_container.innerHTML = '<div class="spinner-grow align-self-center">';
+
+            setTimeout(() => {
+                __loading_container.classList.add('d-none');
+                __form_container.classList.remove('d-none');                
+            }, 500);
+            __reservation_id.value = reservation;
+            __reservation_refund_id.value = refund;            
+        }
+
+        if ( event.target.classList.contains('__show_reservation') ) {
+            event.preventDefault();
+
+            // Definir parámetros de la petición
+            const target     = event.target;
+            refunds.reservation_id = target.dataset.reservation || 0,
+                        
+            $("#viewProofsModal").modal('show');
+            document.getElementById("pills-general-tab").click();
+        }
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
 
     $("#servicePaymentsCurrencyModal").on('change', function(){
         let currency = $(this).val();
@@ -128,5 +247,5 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });       
         })
-    }    
+    }
 })

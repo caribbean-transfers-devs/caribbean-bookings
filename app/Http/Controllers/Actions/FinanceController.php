@@ -22,13 +22,27 @@ class FinanceController extends Controller
         $this->FinanceRepository = $FinanceRepository;
     }
 
+    public function getBasicInformationReservation(Request $request){
+        return $this->FinanceRepository->getBasicInformationReservation($request);
+    }
+
+    public function getPhotosReservation(Request $request)
+    {
+        return $this->FinanceRepository->getPhotosReservation($request);
+    }
+
+    public function getHistoryReservation(Request $request)
+    {
+        return $this->FinanceRepository->getHistoryReservation($request);
+    }
+
+    public function getPaymentsReservation(Request $request)
+    {
+        return $this->FinanceRepository->getPaymentsReservation($request);
+    }
+
     public function addPaymentRefund(Request $request)
     {
         return $this->FinanceRepository->addPaymentRefund($request);
-    }
-
-    public function getLogReservation(Request $request)
-    {
-        return $this->FinanceRepository->getLogReservation($request);
     }
 }

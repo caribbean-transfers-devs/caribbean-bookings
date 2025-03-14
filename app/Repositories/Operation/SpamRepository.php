@@ -91,7 +91,7 @@ class SpamRepository
     
     public function getBasicInformation($request){
 
-        $validator = Validator::make($request->all(), [            
+        $validator = Validator::make($request->all(), [
             'id' => 'required',            
         ]);
 
@@ -104,16 +104,32 @@ class SpamRepository
                 ], 422);
         }
         
-        $item = DB::select("SELECT rez.id as rez_id, rit.id as rit_id, rit.code, CONCAT(rez.client_first_name, ' ', rez.client_last_name) as client_full_name, rez.client_phone, rez.client_email, rit.spam, COALESCE(comments_.counter, 0) AS counter, comments_.last_date, comments_.last_user,
-                                    rit.from_name, rit.to_name, sit.name as site_name, COALESCE(SUM(s.total_sales), 0) as total_sales, rez.currency, rit.op_one_pickup, rit.op_one_status
-                                    FROM reservations_items as rit
+        $item = DB::select("SELECT 
+                                rez.id as rez_id, 
+                                rit.id as rit_id, 
+                                rit.code, CONCAT(rez.client_first_name, ' ', rez.client_last_name) as client_full_name, 
+                                rez.client_phone, 
+                                rez.client_email, 
+                                rit.spam, 
+                                COALESCE(comments_.counter, 0) AS counter, 
+                                comments_.last_date, 
+                                comments_.last_user,
+                                rit.from_name, 
+                                rit.to_name, 
+                                sit.name as site_name,
+                                COALESCE(SUM(s.total_sales), 0) as total_sales, 
+                                rez.currency, rit.op_one_pickup, 
+                                rit.op_one_status
+                            FROM reservations_items as rit
                             INNER JOIN reservations as rez ON rez.id = rit.reservation_id
                             INNER JOIN sites as sit ON sit.id = rez.site_id
                             LEFT JOIN (
-                                        SELECT reservation_id,  ROUND( COALESCE(SUM(total), 0), 2) as total_sales
-                                            FROM sales
-                                                WHERE deleted_at IS NULL
-                                            GROUP BY reservation_id
+                                SELECT 
+                                    reservation_id,  
+                                    ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+                                FROM sales
+                                    WHERE deleted_at IS NULL
+                                    GROUP BY reservation_id
                             ) as s ON s.reservation_id = rez.id
                             LEFT JOIN (
                                     SELECT fup.reservation_id as reservation_id, count(*) as counter,  MAX(fup.created_at) AS last_date,

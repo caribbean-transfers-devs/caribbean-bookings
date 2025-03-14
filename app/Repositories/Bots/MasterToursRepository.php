@@ -175,28 +175,7 @@ class MasterToursRepository
                              WHERE rt.destination_id = :destination_id
                                 AND rt.destination_service_id = :destination_service_id
                                 AND ( (rt.zone_one = :zone_one AND rt.zone_two = :zone_two) OR ( rt.zone_one = :zone_three AND rt.zone_two = :zone_four )  ) 
-                                AND e.id = :enterprise_id", $params);
-
-        // $rates = DB::select("SELECT 
-        //                             ds.name as service_name, 
-        //                             ds.price_type, 
-        //                             rt.*, 
-        //                             zoneOne.name as from_name, 
-        //                             zoneTwo.name as to_name
-        //                         FROM (
-        //                             SELECT * FROM rates_enterprises 
-        //                             WHERE destination_id = :destination_id
-        //                             AND destination_service_id = :destination_service_id
-        //                             AND (
-        //                                 (zone_one = :zone_one AND zone_two = :zone_two) 
-        //                                 OR (zone_one = :zone_three AND zone_two = :zone_four)
-        //                             )
-        //                             AND enterprise_id = :enterprise_id
-        //                         ) as rt
-        //                         LEFT JOIN destination_services as ds ON ds.id = rt.destination_service_id
-        //                         LEFT JOIN enterprises as e ON e.id = rt.enterprise_id
-        //                         LEFT JOIN zones as zoneOne ON zoneOne.id = rt.zone_one
-        //                         LEFT JOIN zones as zoneTwo ON zoneTwo.id = rt.zone_two", $params);        
+                                AND e.id = :enterprise_id", $params);       
 
         if( $rates ){
             if( $vehicle == 1 || $vehicle == 3 || $vehicle == 6 ){

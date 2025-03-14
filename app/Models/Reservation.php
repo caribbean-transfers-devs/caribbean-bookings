@@ -52,6 +52,11 @@ class Reservation extends Model
     //     return $this->hasOneThrough(User::class, Sale::class, 'reservation_id', 'id', 'id', 'call_center_agent_id');
     // }
 
+    public function photos()
+    {
+        return $this->hasMany(ReservationsMedia::class, 'reservation_id', 'id');
+    }    
+
     public function followUps()
     {
         return $this->hasMany(ReservationFollowUp::class, 'reservation_id', 'id')->orderBy('created_at', 'desc');

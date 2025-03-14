@@ -104,52 +104,52 @@
                     </thead>
                     <tbody>
                         @if(sizeof($bookings) >= 1)
-                            @foreach ($bookings as $item)
+                            @foreach ($bookings as $booking)
                                 <tr>
                                     <td class="text-center">
-                                        <button type="button" class="btn w-100 mb-2 btn-{{ FinanceTrait::classStatusRefund($item->status) }} {{ $item->status == "REFUND_REQUESTED" ? 'danger __btn_redund' : 'success' }}" data-reservation="{{ $item->reservation_id }}" data-refund="{{ $item->id }}">{{ FinanceTrait::statusRefund($item->status) }}</button>
-                                        <button type="button" class="btn w-100 btn-primary" data-bs-toggle="modal" data-bs-target="#viewProofsModal">VER EVIDENCIA</button>
+                                        <button type="button" class="btn w-100 mb-2 btn-{{ FinanceTrait::classStatusRefund($booking->status) }} {{ $booking->status == "REFUND_REQUESTED" ? 'danger __btn_redund' : 'success' }}" data-reservation="{{ $booking->reservation_id }}" data-refund="{{ $booking->id }}">{{ FinanceTrait::statusRefund($booking->status) }}</button>
+                                        <button type="button" class="btn w-100 btn-primary __show_reservation" data-reservation="{{ $booking->reservation_id }}" data-bs-toggle="modal" data-bs-target="#viewProofsModal">VER EVIDENCIA</button>
                                     </td>
-                                    <td class="text-center">{{ $item->message_refund }}</td>
-                                    <td class="text-center"><span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
+                                    <td class="text-center">{{ $booking->message_refund }}</td>
+                                    <td class="text-center"><span class="badge badge-{{ $booking->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $booking->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
                                         @php
                                             $codes_string = "";
-                                            $codes = explode(",",$item->reservation_codes);
+                                            $codes = explode(",",$booking->reservation_codes);
                                             foreach ($codes as $key => $code) {
                                                 $codes_string .= '<p class="mb-1">'.$code.'</p>';
                                             }
                                         @endphp
                                         @if (RoleTrait::hasPermission(38))
-                                            <a href="/reservations/detail/{{ $item->reservation_id }}"><?=$codes_string?></a>
+                                            <a href="/reservations/detail/{{ $booking->reservation_id }}"><?=$codes_string?></a>
                                         @else
                                             <?=$codes_string?>
                                         @endif
                                     </td>
-                                    <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }}">{{ BookingTrait::statusBooking($item->reservation_status) }}</button></td>
+                                    <td class="text-center">{{ date("Y-m-d", strtotime($booking->created_at)) }}</td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($booking->reservation_status) }}">{{ BookingTrait::statusBooking($booking->reservation_status) }}</button></td>
                                     <td class="text-center">
                                         @php
-                                            $pickup_from = explode(',',$item->pickup_from);
-                                            $pickup_to = explode(',',$item->pickup_to);
+                                            $pickup_from = explode(',',$booking->pickup_from);
+                                            $pickup_to = explode(',',$booking->pickup_to);
                                         @endphp
                                         [{{ date("Y-m-d", strtotime($pickup_from[0])) }}] <br>
-                                        @if ( $item->is_round_trip != 0 )
+                                        @if ( $booking->is_round_trip != 0 )
                                             [{{ date("Y-m-d", strtotime($pickup_to[0])) }}]
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <?=BookingTrait::renderServiceStatus($item->one_service_status)?><br>
-                                        @if ( $item->is_round_trip != 0 )
-                                            <?=BookingTrait::renderServiceStatus($item->two_service_status)?>
+                                        <?=BookingTrait::renderServiceStatus($booking->one_service_status)?><br>
+                                        @if ( $booking->is_round_trip != 0 )
+                                            <?=BookingTrait::renderServiceStatus($booking->two_service_status)?>
                                         @endif
                                     </td>
-                                    <td class="text-center" <?=BookingTrait::classStatusPayment($item)?>>{{ number_format(($item->total_sales),2) }}</td>
-                                    <td class="text-center">{{ $item->currency }}</td>
-                                    <td class="text-center">{{ $item->payment_type_name }}</td>
+                                    <td class="text-center" <?=BookingTrait::classStatusPayment($booking)?>>{{ number_format(($booking->total_sales),2) }}</td>
+                                    <td class="text-center">{{ $booking->currency }}</td>
+                                    <td class="text-center">{{ $booking->payment_type_name }}</td>
                                     <td class="text-center">
-                                        @if ( !empty($item->payment_details) )
-                                            [{{ $item->payment_details }}]
+                                        @if ( !empty($booking->payment_details) )
+                                            [{{ $booking->payment_details }}]
                                         @endif
                                     </td>
                                 </tr>

@@ -11,21 +11,27 @@
                 <div class="simple-pill">
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="spamResumeInformationContainer-tab" data-bs-toggle="pill" data-bs-target="#spamResumeInformationContainer" type="button" role="tab" aria-controls="spamResumeInformationContainer" aria-selected="true">General</button>
+                            <button class="nav-link active" id="pills-general-tab" data-bs-toggle="pill" data-bs-target="#pills-general" type="button" role="tab" aria-controls="pills-general" aria-selected="true" onclick="refunds.getBasicInformationReservation()">Datos Generales</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Seguimiento</button>
+                            <button class="nav-link" id="pills-photos-tab" data-bs-toggle="pill" data-bs-target="#pills-photos" type="button" role="tab" aria-controls="pills-photos" aria-selected="false" onclick="refunds.getPhotosReservation()">Fotos</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="spamHistory-tab" data-bs-toggle="pill" data-bs-target="#spamHistory" type="button" role="tab" aria-controls="spamHistory" aria-selected="false">Historial</button>
+                            <button class="nav-link" id="pills-history-tab" data-bs-toggle="pill" data-bs-target="#pills-history" type="button" role="tab" aria-controls="pills-history" aria-selected="false" onclick="refunds.getHistoryReservation()">Historial</button>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-payments-tab" data-bs-toggle="pill" data-bs-target="#pills-payments" type="button" role="tab" aria-controls="pills-payments" aria-selected="false" onclick="refunds.getPaymentsReservation()">Pagos</button>
+                        </li>                        
                     </ul>
                     <div class="tab-content" id="pills-tabContent">
-                        <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="spamResumeInformationContainer-tab" tabindex="0" id="spamResumeInformationContainer"></div>
-                        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab" tabindex="0"></div>
-                        <div class="tab-pane fade" id="spamHistory" role="tabpanel" aria-labelledby="spamHistory-tab" tabindex="0"></div>
+                        <div class="tab-pane fade show active" id="pills-general" role="tabpanel" aria-labelledby="pills-general-tab" tabindex="0"></div>
+                        <div class="tab-pane fade" id="pills-photos" role="tabpanel" aria-labelledby="pills-photos-tab" tabindex="0">
+                            <div class="image-listing" id="media-listing"></div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-history" role="tabpanel" aria-labelledby="pills-history-tab" tabindex="0"></div>
+                        <div class="tab-pane fade" id="pills-payments" role="tabpanel" aria-labelledby="pills-payments-tab" tabindex="0"></div>
                     </div>                
-                </div>                
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light-dark" data-bs-dismiss="modal">Cerrar</button>

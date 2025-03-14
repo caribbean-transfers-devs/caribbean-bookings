@@ -5,6 +5,8 @@ namespace App\Repositories\Actions;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 //MODELS
@@ -22,6 +24,154 @@ use App\Traits\PayPalTrait;
 class FinanceRepository
 {
     use FollowUpTrait;
+
+    public function getBasicInformationReservation($request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [            
+                'id' => 'required',            
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => [
+                        'code' => 'REQUIRED_PARAMS',
+                        'message' =>  $validator->errors()->all()
+                    ],
+                    "message" => $validator->errors()->all(),
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+    
+            $reservation = $this->getReservation($request->id);
+            // dd($reservation->toArray());
+
+            // Si la reserva no existe, se retorna vacío
+            if (!$reservation) {
+                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.basic-information', ["reservation" => null]);
+            }
+            
+            // Retornar la vista
+            return view('components.html.finances.basic-information', ["reservation" => $reservation]);
+        } catch (Exception $e) {
+            // Log del error para depuración
+            Log::error("Error en getBasicInformationReservation: " . $e->getMessage());
+
+            // Retorno de error dependiendo del tipo de solicitud
+            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.basic-information', ["reservation" => null]);            
+        }
+    }
+
+    /**
+     * NOS AYUDA A OBTENER LOS LOG DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
+    public function getPhotosReservation($request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required',            
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => [
+                        'code' => 'REQUIRED_PARAMS',
+                        'message' =>  $validator->errors()->all()
+                    ],
+                    "message" => $validator->errors()->all(),
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+    
+            $reservation = $this->getReservation($request->id);
+            // dd($reservation->photos->toArray());
+
+            // Si la reserva no existe, se retorna vacío
+            if (!$reservation) {
+                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.photos', ["photos" => null]);
+            }
+            
+            // Retornar la vista
+            return view('components.html.finances.photos', ["photos" => $reservation->photos]);
+        } catch (Exception $e) {
+            // Log del error para depuración
+            Log::error("Error en getPhotosReservation: " . $e->getMessage());
+
+            // Retorno de error dependiendo del tipo de solicitud
+            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.photos', ["photos" => null]);
+        }
+    }
+
+    public function getHistoryReservation($request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required',            
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => [
+                        'code' => 'REQUIRED_PARAMS',
+                        'message' =>  $validator->errors()->all()
+                    ],
+                    "message" => $validator->errors()->all(),
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+    
+            $reservation = $this->getReservation($request->id);
+            // dd($reservation->followUps->toArray());
+
+            // Si la reserva no existe, se retorna vacío
+            if (!$reservation) {
+                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.history', ["followUps" => null]);
+            }
+            
+            // Retornar la vista
+            return view('components.html.finances.history', ["followUps" => $reservation->followUps]);
+        } catch (Exception $e) {
+            // Log del error para depuración
+            Log::error("Error en getHistoryReservation: " . $e->getMessage());
+
+            // Retorno de error dependiendo del tipo de solicitud
+            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.history', ["followUps" => null]);
+        }
+    }
+
+    public function getPaymentsReservation($request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required',            
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => [
+                        'code' => 'REQUIRED_PARAMS',
+                        'message' =>  $validator->errors()->all()
+                    ],
+                    "message" => $validator->errors()->all(),
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+    
+            $reservation = $this->getReservation($request->id);
+            // dd($reservation->followUps->toArray());
+
+            // Si la reserva no existe, se retorna vacío
+            if (!$reservation) {
+                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.payments', ["payments" => null]);
+            }
+            
+            // Retornar la vista
+            return view('components.html.finances.payments', ["payments" => $reservation->payments]);
+        } catch (Exception $e) {
+            // Log del error para depuración
+            Log::error("Error en getPaymentsReservation: " . $e->getMessage());
+
+            // Retorno de error dependiendo del tipo de solicitud
+            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.payments', ["payments" => null]);
+        }
+    }
 
     /**
      * NOS AYUDA A PODER AGREGAR UN PAGO TIPO REEMBOLSO
@@ -114,19 +264,50 @@ class FinanceRepository
         }
     }
 
-    /**
-     * NOS AYUDA A OBTENER LOS LOG DE LA RESERVACIÓN
-     * @param request :la información recibida en la solicitud
-    */
-    public function getLogReservation($request)
+
+    public function getReservation($id)
     {
-        try {
-            //code...
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $reservation = Reservation::with([
+            'destination.destination_services',
+            'items' => function ($query) {
+                $query->join('zones as zone_one', 'zone_one.id', '=', 'reservations_items.from_zone')
+                        ->join('zones as zone_two', 'zone_two.id', '=', 'reservations_items.to_zone')
+                        ->select(
+                            'reservations_items.*', 
+                            'reservations_items.id as reservations_item_id',
+                            'zone_one.name as from_zone_name',
+                            'zone_one.is_primary as is_primary_from',
+                            'zone_two.name as to_zone_name',
+                            'zone_two.is_primary as is_primary_to',
+                            // Final Service Type para zone_one
+                            DB::raw("
+                                CASE 
+                                    WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 1 THEN 'DEPARTURE'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                END AS final_service_type_one
+                            "),
+                            
+                            // Final Service Type para zone_two
+                            DB::raw("
+                                CASE 
+                                    WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1 THEN 'DEPARTURE'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                    ELSE 'ARRIVAL'
+                                END AS final_service_type_two
+                            ")
+                        );
+            },
+            'site',
+            'sales',
+            'payments',
+            'refunds',
+            'followUps',
+            'photos',
+            'cancellationType',
+            'originSale'
+        ])->find($id);
+
+        return $reservation;
     }
 }
