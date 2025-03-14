@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Repositories\Operation;
+namespace App\Repositories\Management;
 
 use Exception;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Response as ResponseFile;
+
+//FACADES
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Response as ResponseFile;
+
+//MODELS
 use App\Models\ReservationsItem;
 use App\Models\ReservationFollowUp;
-use Illuminate\Support\Facades\Validator;
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
 
 class PendingRepository
 {
@@ -161,6 +161,6 @@ class PendingRepository
                                     // AND DATE(rez.created_at) = :date 
                                     // "date" => date("Y-m-d"),
 
-        return view('management.pending.view', [ "items" => $items ]);
+        return view('components.html.management.pending.view', [ "items" => $items ]);
     }
 }

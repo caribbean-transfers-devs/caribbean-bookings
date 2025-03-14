@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Repositories\Dashboards\DashboardRepository;
 use App\Repositories\Dashboards\CallCenterResository;
 use App\Repositories\Operation\OperationRepository;
-use App\Repositories\Management\ManagementRepository;
 use App\Traits\RoleTrait;
 
 class DashboardController extends Controller
@@ -16,14 +15,12 @@ class DashboardController extends Controller
     private $DashboardRepository;
     private $CallCenterResository;
     private $OperationRepository;
-    private $ManagementRepository;
 
-    public function __construct(DashboardRepository $DashboardRepository, CallCenterResository $CallCenterResository, OperationRepository $OperationRepository, ManagementRepository $ManagementRepository)
+    public function __construct(DashboardRepository $DashboardRepository, CallCenterResository $CallCenterResository, OperationRepository $OperationRepository)
     {
         $this->DashboardRepository = $DashboardRepository;
         $this->CallCenterResository = $CallCenterResository;
         $this->OperationRepository = $OperationRepository;
-        $this->ManagementRepository = $ManagementRepository;
     }    
 
     public function index(Request $request){

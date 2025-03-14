@@ -486,7 +486,7 @@
                                                             <p><strong>Lugar</strong>: {{ $item->to_name }}</p>
                                                         </td>
                                                         <td>{{ date("Y/m/d H:i", strtotime( $item->op_one_pickup )) }}</td>
-                                                        <td>                                                            
+                                                        <td>
                                                             @php
                                                                 $btn_op_one_type = 'btn-secondary';
                                                                 switch ($item->op_one_status) {
@@ -534,11 +534,11 @@
                                                                         $message_operation_one = ( $item->op_one_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" );
                                                                     @endphp
                                                                     @if ( RoleTrait::hasPermission(69))
-                                                                        <button class="btn {{ (($item->op_one_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'arrival', {{ (($item->op_one_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})">
+                                                                        <button class="btn {{ $item->op_one_confirmation == 1 ? 'btn-success' : 'btn-warning' }} confirmService" type="button" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="{{ $item->op_one_confirmation == 1 ? 0 : 1 }}" data-type="TYPE_ONE">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle align-middle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                                                                         </button>
                                                                     @endif
-                                                                    <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $message_operation_one }}" class="btn btn-{{ $item->op_one_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_one_operation_close == 1 ? "unlock" : "" }} bs-tooltip" type="button" data-id="{{ $item->reservations_item_id }}" data-type="arrival" data-rez_id="{{ $item->reservation_id }}">
+                                                                    <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $message_operation_one }}" class="btn btn-{{ $item->op_one_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_one_operation_close == 1 ? "updateServiceUnlock" : "" }} bs-tooltip" type="button" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-type="TYPE_ONE">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-{{ $item->op_one_operation_close == 1 ? "unlock" : "lock" }} align-middle"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
                                                                     </button>
                                                                 </div>
@@ -568,7 +568,7 @@
                                                                 <p><strong>Lugar</strong>: {{ $item->from_name }}</p>
                                                             </td>
                                                             <td>{{ date("Y/m/d H:i", strtotime( $item->op_two_pickup )) }}</td>
-                                                            <td>                                                                
+                                                            <td>
                                                                 @php
                                                                     $btn_op_two_type = 'btn-secondary';
                                                                     switch ($item->op_two_status) {
@@ -616,11 +616,11 @@
                                                                     @endphp
                                                                     <div class="d-flex gap-2">
                                                                         @if (RoleTrait::hasPermission(69))
-                                                                            <button class="btn {{ (($item->op_two_confirmation == 1)? 'btn-success':'btn-warning') }}" type="button" onclick="updateConfirmation(event, {{ $item->reservations_item_id }}, 'departure', {{ (($item->op_two_confirmation == 0)? 0:1) }}, {{ $item->reservation_id }})">
+                                                                            <button class="btn {{ $item->op_two_confirmation == 1 ? 'btn-success' : 'btn-warning' }} confirmService" type="button" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_two }}" data-status="{{ $item->op_two_confirmation == 1 ? 0 : 1 }}" data-type="TYPE_TWO">
                                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle align-middle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                                                                             </button>
                                                                         @endif
-                                                                        <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $message_operation_two }}" class="btn btn-{{ $item->op_two_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_two_operation_close == 1 ? "unlock" : "" }}" type="button" data-id="{{ $item->reservations_item_id }}" data-type="departure" data-rez_id="{{ $item->reservation_id }}">
+                                                                        <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $message_operation_two }}" class="btn btn-{{ $item->op_two_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_two_operation_close == 1 ? "updateServiceUnlock" : "" }} bs-tooltip" type="button" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_two }}" data-type="TYPE_TWO">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-{{ $item->op_two_operation_close == 1 ? "unlock" : "lock" }} align-middle"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
                                                                         </button>
                                                                     </div>

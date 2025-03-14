@@ -72,9 +72,7 @@ trait OperationTrait
     // BOTON DE CONFIRMACION
     
     public static function renderStatusConfirmation($service){
-        $confirmation_type = self::serviceStatusConfirmation($service);
-        $operation_type = "'".$service->operation_type."'";
-        return '<button type="button" class="btn  btn-order btn-'.( self::serviceStatusConfirmation($service) == 0 ? 'warning' : 'success' ).'" onClick="updateConfirmation(event,'.$service->id.','.$operation_type.','.$confirmation_type.','.$service->reservation_id.')">'.( self::serviceStatusConfirmation($service) == 0 ? 'N' : 'Y' ).'</button>';
+        return '<button type="button" class="btn btn-'.( self::serviceStatusConfirmation($service) == 0 ? 'warning' : 'success' ).' confirmService" data-item="'.$service->id.'" data-service="'.$service->final_service_type.'" data-status="'.( self::serviceStatusConfirmation($service) == 1 ? 0 : 1 ).'" data-type="'.$service->op_type.'">'.( self::serviceStatusConfirmation($service) == 0 ? 'N' : 'Y' ).'</button>';
     }
 
     //COLOR AGENCY

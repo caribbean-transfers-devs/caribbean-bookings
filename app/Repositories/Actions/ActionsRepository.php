@@ -5,6 +5,7 @@ namespace App\Repositories\Actions;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
 //MODELS
@@ -174,6 +175,165 @@ class ActionsRepository
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * NOS AYUDA A PODER CAMBIAR EL ESTATUS DE CONFIRMACION DEL SERVICIO, EN LOS DETALLES DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
+    public function confirmService($request)
+    {
+        // Reglas de validación
+        $rules = [
+            'item_id' => 'required|integer',
+            'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
+            'status' => 'required|integer|in:1,0',
+            'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',
+        ];
+
+        // Validación de datos
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422
+        }
+
+        // Obtener el item de la reservación
+        $item = ReservationsItem::with('reservations')->where('id', $request->item_id)->first();
+        
+        if (!$item) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'not_found', 
+                    'message' =>  "Ítem no encontrado" 
+                ],
+                'status' => 'error',
+                'message' => 'Ítem no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $confimrationOld = $request->type == "TYPE_ONE" ? $item->op_one_confirmation : $item->op_two_confirmation;
+            if($request->type == "TYPE_ONE"):
+                $item->op_one_confirmation = $request->status ?: 0;
+            endif;
+
+            if($request->type == "TYPE_TWO"):
+                $item->op_two_confirmation = $request->status ?: 0;
+            endif;
+
+            // Guardar el cambio y verificar que se guardó correctamente
+            if (!$item->save()) {
+                DB::rollBack();
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Error al actualizar la confirmación del servicio'
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            // ESTATUS DE RESERVACIÓN
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la confirmación de: ". ( $confimrationOld == 0 ? '"No enviado"' : '"Enviado"' )." a ".( $request->status == 0 ? '"No enviado"' : '"Enviado"' ).", de la ".$request->service.", con ID: ".$item->id, 'HISTORY', "UPDATE_CONFIRMATION");
+    
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo correctamente la confirmación del servicio',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * NOS AYUDA A PODER CAMBIAR EL ESTATUS DE CONFIRMACION DEL SERVICIO, EN LOS DETALLES DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
+    public function updateServiceUnlock($request)
+    {
+        // Reglas de validación
+        $rules = [
+            'item_id' => 'required|integer',
+            'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
+            'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',
+        ];
+
+        // Validación de datos
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422
+        }
+
+        // Obtener el item de la reservación
+        $item = ReservationsItem::with('reservations')->where('id', $request->item_id)->first();
+        
+        if (!$item) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'not_found', 
+                    'message' =>  "Ítem no encontrado" 
+                ],
+                'status' => 'error',
+                'message' => 'Ítem no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $operationCloseOld = $request->type == "TYPE_ONE" ? $item->op_one_operation_close : $item->op_two_operation_close;
+            if($request->type == "TYPE_ONE"):
+                $item->op_one_operation_close = 0;
+            endif;
+
+            if($request->type == "TYPE_TWO"):
+                $item->op_two_operation_close = 0;
+            endif;
+
+            // Guardar el cambio y verificar que se guardó correctamente
+            if (!$item->save()) {
+                DB::rollBack();
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Error al actualizar la confirmación del servicio'
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            // ESTATUS DE RESERVACIÓN
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", desbloqueo el servicio de: ". ( $operationCloseOld == 0 ? '"ABIERTO"' : '"CERRADO"' ).' a "ABIERTO", de la '.$request->service.", con ID: ".$item->id, 'HISTORY', "UPDATE_SERIVE_UNLOCK");
+    
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo correctamente estatus del servicio',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
 
     public function sendEmail($baseUrl = '', $request = []){
         $data = [

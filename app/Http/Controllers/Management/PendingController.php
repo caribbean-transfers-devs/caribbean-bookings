@@ -1,10 +1,10 @@
 <?php
-namespace App\Http\Controllers\Operation;
+namespace App\Http\Controllers\Management;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-use App\Repositories\Operation\PendingRepository;
+use App\Repositories\Management\PendingRepository;
 
 //TRIT
 use App\Traits\RoleTrait;

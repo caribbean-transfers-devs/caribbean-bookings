@@ -11,7 +11,7 @@ function getSpamByDate(event) {
 
 function getSpamRequest(date, status, partial = 0){
     $.ajax({
-        url: '/operation/spam/get',
+        url: '/management/spam/get',
         type: 'POST',
         data: { date, status, partial},
         dataType: 'text',
@@ -54,7 +54,7 @@ window.spamOnenModal = function(event, ritID, rezID, status = 'PENDING'){
 
 function getSpamClientDetails(id){
     $.ajax({
-        url: '/operation/spam/get/basic-information',
+        url: '/management/spam/get/basic-information',
         type: 'POST',
         data: { id},
         dataType: 'text',
@@ -71,7 +71,7 @@ function getSpamClientDetails(id){
 
 function getSpamHistory(id){
     $.ajax({
-        url: '/operation/spam/history/get',
+        url: '/management/spam/history/get',
         type: 'POST',
         data: { id},
         dataType: 'text',
@@ -90,7 +90,7 @@ window.saveSpamComment = function(event){
     event.preventDefault();
     let frm_data = $("#formSpamAddComment").serializeArray();
     $.ajax({
-        url: '/operation/spam/history/add',
+        url: '/management/spam/history/add',
         type: 'POST',
         data: frm_data,
         beforeSend: function() {        
@@ -155,7 +155,7 @@ $(document).ready(function () {
 
 function getPendingRequest(){
     $.ajax({
-        url: '/operation/pending/get',
+        url: '/management/pending/get',
         type: 'POST',
         data: {},
         dataType: 'text',
@@ -172,7 +172,7 @@ function getPendingRequest(){
 
 function getQuotationRequest(){
     $.ajax({
-        url: '/operation/quotation/get',
+        url: '/management/quotation/get',
         type: 'POST',
         data: { date: document.getElementById('lookup_date').value },
         dataType: 'text',

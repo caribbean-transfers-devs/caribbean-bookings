@@ -1,11 +1,11 @@
-@import '../template/light/users/account-setting';
-@import '../template/dark/users/account-setting';
+@import '../../template/light/users/account-setting';
+@import '../../template/dark/users/account-setting';
 
-@import '../template/light/components/modal';
+@import '../../template/light/components/modal';
 
-@import '../components/filters';
-@import '../components/table';
-@import '../components/loaders';
+@import '../../components/filters';
+@import '../../components/table';
+@import '../../components/loaders';
 
 .card-data{
     max-height: 700px;

@@ -69,6 +69,11 @@
                     'columns' => ':visible'  // Solo exporta las columnas visibles   
                 ]
             ),
+            array(
+                'text' => 'Tipo de cambio: '.$exchange,
+                'titleAttr' => 'Tipo de cambio',
+                'className' => 'btn btn-warning',
+            ),            
         );
     @endphp
     <div class="row layout-top-spacing">

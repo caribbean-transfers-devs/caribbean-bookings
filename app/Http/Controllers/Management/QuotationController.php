@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Operation;
+namespace App\Http\Controllers\Management;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-use App\Repositories\Operation\QuotationRepository;
+use App\Repositories\Management\QuotationRepository;
 
 //TRIT
 use App\Traits\RoleTrait;

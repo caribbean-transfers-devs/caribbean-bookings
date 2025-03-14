@@ -15,11 +15,21 @@ const __code = document.getElementById('sale_id');
 const __type_pay = document.getElementById('type_form_pay');
 const __code_pay = document.getElementById('payment_id');
 
-//DECLARAMOS VARIABLES PARA ACCIONES DE RESERVAS
+//DECLARAMOS VARIABLES PARA ACCIONES DE RESERVA
 const enablePayArrival = document.getElementById('enablePayArrival');
 const refundRequest = document.getElementById('refundRequest');
 
-//HABILIDATAMOS PAGO A LA LLEGADA
+//DECLARAMOS VARIABLES PARA ITEMS DE SERVICIOS
+
+function debounce(func, delay) {
+    let timer;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+//HABILIDATAMOS PAGO A LA LLEGADA DE UNA RESERVA
 if( enablePayArrival ){
     enablePayArrival.addEventListener('click', function(event){
         event.preventDefault();
@@ -77,7 +87,7 @@ if( enablePayArrival ){
     });
 }
 
-//SOLITAMOS REEMBOLSO
+//SOLITAMOS REEMBOLSO DE UNA RESERVA
 if( refundRequest ){
     refundRequest.addEventListener('click', function(event){
         event.preventDefault();
@@ -146,11 +156,140 @@ if( refundRequest ){
                     );
                 });
             }
-        });       
+        });
     });
 }
 
+//VALIDAMOS DOM
+document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("click", debounce(function (event) {
+        //ACTUALIZA LA CONFIRMACIÓN DEL SERVICIO
+        if (event.target.classList.contains('confirmService')) {
+            event.preventDefault();
 
+            // Definir parámetros de la petición
+            const target     = event.target;
+            const _params    = {
+                item_id: target.dataset.item || "",
+                service: target.dataset.service || "",
+                status: target.dataset.status || "",
+                type: target.dataset.type || "",
+            };
+            
+            Swal.fire({
+                html: '¿Está seguro de actualizar el estatus de confirmación del servicio?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se actualiza el estatus de confirmación.",
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+    
+                    fetch('/action/confirmService', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },            
+                        body: JSON.stringify(_params)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }
+            });            
+        }
+        //ACTUALIZA PARA DESBLOQUEAR SERVICIO DEL CIERRE DE OPERACIÓN
+        if (event.target.classList.contains('updateServiceUnlock')) {
+            event.preventDefault();
+
+            // Definir parámetros de la petición
+            const target     = event.target;
+            const _params    = {
+                item_id: target.dataset.item || "",
+                service: target.dataset.service || "",
+                type: target.dataset.type || "",
+            };
+            
+            Swal.fire({
+                html: '¿Está seguro de desbloquear este servicio del cierre de operación?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se desbloque el servicio de la operación.",
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+    
+                    fetch('/action/updateServiceUnlock', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },            
+                        body: JSON.stringify(_params)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }
+            });            
+        }            
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
+});
 
 if( document.querySelectorAll('.timeline-item').length > 0 ){
     document.querySelectorAll('.timeline-item').forEach(item => {
@@ -1257,126 +1396,6 @@ function setStatus(event, type, status, item_id, rez_id){
             }            
         }
     })();    
-}
-
-function updateConfirmation(event, id, type, status, rez_id){
-    event.preventDefault();
-    swal.fire({
-        title: '¿Está seguro de actualizar el estatus?',
-        text: "Esta acción no se puede revertir",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if(result.isConfirmed == true){
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });                
-            $.ajax({
-                url: `/operation/confirmation/update-status`,
-                type: 'PUT',
-                data: { id, type, status, rez_id},
-                beforeSend: function() {        
-                    
-                },
-                success: function(resp) {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        icon: 'success',
-                        html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
-                        timer: 2500,
-                        timerProgressBar: true,
-                        didOpen: () => {
-                            Swal.showLoading()
-                            const b = Swal.getHtmlContainer().querySelector('b')
-                            timerInterval = setInterval(() => {
-                                b.textContent = (Swal.getTimerLeft() / 1000)
-                                    .toFixed(0)
-                            }, 100)
-                        },
-                        willClose: () => {
-                            clearInterval(timerInterval)
-                        }
-                    }).then((result) => {
-                        location.reload();
-                    });
-                }
-            }).fail(function(xhr, status, error) {
-                    console.log(xhr);
-                    Swal.fire(
-                        '¡ERROR!',
-                        xhr.responseJSON.message,
-                        'error'
-                    );
-            });
-        }
-    });  
-}
-
-const __unlocks = document.querySelectorAll('.unlock');
-if (__unlocks.length > 0) {
-    __unlocks.forEach(__unlocks => {
-        __unlocks.addEventListener('click', function(event){
-            event.preventDefault();
-            const { id, type, rez_id } = this.dataset;
-            swal.fire({
-                title: '¿Está seguro de desbloquear este servicio del cierre de operación?',
-                text: "Esta acción no se puede revertir",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if(result.isConfirmed == true){
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });                
-                    $.ajax({
-                        url: `/operation/unlock/service`,
-                        type: 'PUT',
-                        data: { id, type, rez_id},
-                        beforeSend: function() {        
-                            
-                        },
-                        success: function(resp) {
-                            Swal.fire({
-                                title: '¡Éxito!',
-                                icon: 'success',
-                                html: 'Servicio actualizado con éxito. Será redirigido en <b></b>',
-                                timer: 2500,
-                                timerProgressBar: true,
-                                didOpen: () => {
-                                    Swal.showLoading()
-                                    const b = Swal.getHtmlContainer().querySelector('b')
-                                    timerInterval = setInterval(() => {
-                                        b.textContent = (Swal.getTimerLeft() / 1000)
-                                            .toFixed(0)
-                                    }, 100)
-                                },
-                                willClose: () => {
-                                    clearInterval(timerInterval)
-                                }
-                            }).then((result) => {
-                                location.reload();
-                            });
-                        }
-                    }).fail(function(xhr, status, error) {
-                            console.log(xhr);
-                            Swal.fire(
-                                '¡ERROR!',
-                                xhr.responseJSON.message,
-                                'error'
-                            );
-                    });
-                }
-            });            
-        });
-    });
 }
 
 function enableReservation(id){

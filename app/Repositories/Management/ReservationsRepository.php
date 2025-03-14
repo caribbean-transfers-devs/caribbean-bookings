@@ -1,23 +1,24 @@
 <?php
 
-namespace App\Repositories\Operation;
+namespace App\Repositories\Management;
 
 use Exception;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
-use App\Models\ReservationsItem;
 
-//TRAIT
+//FACADES
+use Illuminate\Support\Facades\DB;
+
+//TRAITS
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
-use App\Traits\Reports\PaymentsTrait;
 use App\Traits\FollowUpTrait;
+use App\Traits\Reports\PaymentsTrait;
 
-class OperationRepository
+class ReservationsRepository
 {
     use FiltersTrait, QueryTrait, PaymentsTrait, FollowUpTrait;
 
-    public function reservations($request)
+    public function index($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
 
@@ -194,7 +195,7 @@ class OperationRepository
         // dd($query, $queryHaving, $queryData);
         $bookings = $this->queryBookings($query, $queryHaving, $queryData);
         
-        return view('operation.reservations', [
+        return view('management.reservations.index', [
             'breadcrumbs' => [
                 [
                     "route" => "",
@@ -205,29 +206,5 @@ class OperationRepository
             'bookings' => $bookings,
             'data' => $data,
         ]);
-    }
-
-    public function updateStatusConfirmation($request)
-    {
-        try {
-            DB::beginTransaction();
-            
-            $item = ReservationsItem::find($request->id);
-            if($request->type == "arrival"):
-                $item->op_one_confirmation = (( $request->status == 1 )? 0 : 1 );
-            endif;
-            if($request->type == "departure"):
-                $item->op_two_confirmation = (( $request->status == 1 )? 0 : 1 );
-            endif;
-            $item->save();            
-
-            $this->create_followUps($request->rez_id, "Confirmación actualizada a ". (( $request->status == 1 )? 'No enviado' : 'Enviado' ), 'HISTORY', auth()->user()->name);
-
-            DB::commit();
-            return response()->json(['message' => 'Estatus actualizado con éxito', 'success' => true], Response::HTTP_OK);
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Error al actualizar el estatus'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 }

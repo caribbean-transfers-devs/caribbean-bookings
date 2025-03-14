@@ -585,7 +585,6 @@
 
     <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :istoday="1" :isbalance="1" :isduplicated="1" :isagency="1" />
     <x-modals.reports.columns />
-    {{-- <x-modals.charts.sales :bookingsStatus="$bookingsStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataSites="$dataSites" :dataOriginSale="$dataOriginSale" :dataVehicles="$dataVehicles" :dataDestinations="$dataDestinations" /> --}}
     <x-modals.charts.sales2 :bookingsStatus="$bookingsStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataSites="$dataSites" :dataDestinations="$dataDestinations" :dataOriginSale="$dataOriginSale" />
     <x-modals.reservations.payments />
 @endsection

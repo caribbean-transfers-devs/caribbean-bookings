@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories\Operation;
+namespace App\Repositories\Management;
 
+use Exception;
 use Illuminate\Http\Response;
 use Carbon\Carbon;
-use Exception;
 
 //TRAIT
 use App\Traits\FiltersTrait;
@@ -43,6 +43,6 @@ class QuotationRepository
 
         $bookings = $this->queryBookings($query, $queryHavingBooking, $queryData);
 
-        return view('management.quotation.view', [ "items" => $bookings ]);
+        return view('components.html.management.quotation.view', [ "items" => $bookings ]);
     }
 }

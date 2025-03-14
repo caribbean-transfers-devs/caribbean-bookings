@@ -7,8 +7,8 @@
 @section('title') Confirmaciónes @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/management_confirmation.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/management_confirmation.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/management/confirmations.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/management/confirmations.min.css') }}" rel="stylesheet" >
     <style>
         .bell-button {
             /* font-size: 24px; */
@@ -41,7 +41,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>    
-    <script src="{{ mix('assets/js/sections/operations/confirmation.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/management/confirmations.min.js') }}"></script>
 @endpush
 
 @section('content')

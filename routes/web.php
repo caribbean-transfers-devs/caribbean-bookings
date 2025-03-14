@@ -10,7 +10,6 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Configs\RatesController;
 use App\Http\Controllers\Configs\ZonesController;
 use App\Http\Controllers\Driver\DriverController;
-use App\Http\Controllers\Operation\OperationController;
 use App\Http\Controllers\Operations\OperationsController as Operations;
 use App\Http\Controllers\Payments\PaymentsController;
 
@@ -21,12 +20,15 @@ use App\Http\Controllers\Finances\SalesController as SaleFinance;
 //REPORTES
 use App\Http\Controllers\Reports\ReportsController;
 use App\Http\Controllers\Reports\CommissionsController as CommissionsReports;
-
-use App\Http\Controllers\Management\ManagementController;
-use App\Http\Controllers\Operation\SpamController as SPAM;
-use App\Http\Controllers\Operation\PendingController as PENDING;
-use App\Http\Controllers\Operation\QuotationController as QUOTATION;
 use App\Http\Controllers\Reports\CashController as ReportCash;
+
+//GESTION
+use App\Http\Controllers\Management\ConfirmationsController;
+use App\Http\Controllers\Management\AfterSalesController;
+use App\Http\Controllers\Management\QuotationController as QUOTATION;
+use App\Http\Controllers\Management\PendingController as PENDING;
+use App\Http\Controllers\Management\SpamController as SPAM;
+use App\Http\Controllers\Management\ReservationsController as RESERVATIONS;
 
 use App\Http\Controllers\Reservations\ReservationsController;
 use App\Http\Controllers\RoleController;
@@ -174,23 +176,17 @@ Route::group(['middleware' => ['auth']], function () {
 
     //GESTION
         //CONFIRMACIONES
-        Route::get('/operation/confirmation', [ManagementController::class, 'confirmation'])->name('operation.confirmation');
-        Route::post('/operation/confirmation', [ManagementController::class, 'confirmation'])->name('operation.confirmation.search');
+        Route::match(['get', 'post'], '/management/confirmations', [ConfirmationsController::class, 'index'])->name('management.confirmations');
         //POST VENTA, MAENEJO DE SPAM Y RESERVAS PENDIENTES
-        Route::match(['get', 'post'], '/aftersales', [ManagementController::class, 'afterSales'])->name('operation.after.sales');
-        Route::match(['post'], '/operation/quotation/get', [QUOTATION::class, 'get'])->name('operation.quotation.get'); // TRAE LAS COTIZACIONES DE AGENTE DE CALL CENTER
-        Route::match(['post'], '/operation/pending/get', [PENDING::class, 'get'])->name('operation.pending.get'); // TRAE LAS RESERVAS PENDIENTES
-        Route::match(['post'], '/operation/spam/get', [SPAM::class, 'get'])->name('operation.spam.get');
-        Route::match(['post'], '/operation/spam/get/basic-information', [SPAM::class, 'getBasicInformation'])->name('operation.spam.get.basicInformation');
-        Route::match(['post'], '/operation/spam/history/get', [SPAM::class, 'getHistory'])->name('operation.spam.get.history');
-        Route::match(['post'], '/operation/spam/history/add', [SPAM::class, 'addHistory'])->name('operation.spam.add.history');
-
-        Route::put('/operation/confirmation/update-status', [OperationController::class, 'updateStatusConfirmation'])->name('operation.confirmation.update');   
-        Route::put('/operation/unlock/service', [OperationController::class, 'updateUnlock'])->name('operation.unlock.update');
-
+        Route::match(['get', 'post'], '/management/aftersales', [AfterSalesController::class, 'index'])->name('management.after.sales');
+        Route::match(['post'], '/management/quotation/get', [QUOTATION::class, 'get'])->name('management.quotation.get'); // TRAE LAS COTIZACIONES DE AGENTE DE CALL CENTER
+        Route::match(['post'], '/management/pending/get', [PENDING::class, 'get'])->name('management.pending.get'); // TRAE LAS RESERVAS PENDIENTES
+        Route::match(['post'], '/management/spam/get', [SPAM::class, 'get'])->name('management.spam.get');
+        Route::match(['post'], '/management/spam/get/basic-information', [SPAM::class, 'getBasicInformation'])->name('management.spam.get.basicInformation');
+        Route::match(['post'], '/management/spam/history/get', [SPAM::class, 'getHistory'])->name('management.spam.get.history');
+        Route::match(['post'], '/management/spam/history/add', [SPAM::class, 'addHistory'])->name('management.spam.add.history');
         //RESERVACIONES
-        Route::get('/operation/reservations', [OperationController::class, 'reservations'])->name('operation.reservations');
-        Route::post('/operation/reservations', [OperationController::class, 'reservations'])->name('operation.reservations.search');
+        Route::match(['get', 'post'], '/management/reservations', [RESERVATIONS::class, 'index'])->name('management.reservations');
 
         //OPERACIONES
         Route::get('/operation/board', [Operations::class, 'index'])->name('operation.index');
@@ -263,8 +259,6 @@ Route::group(['middleware' => ['auth']], function () {
         
 
 
-
-
     Route::resource('/vehicles', VehicleController::class);
     Route::resource('/drivers', DriverController::class);
     Route::resource('/users', UserController::class);
@@ -296,5 +290,7 @@ Route::group(['middleware' => ['auth']], function () {
     //ACCIONES GENERALES
     Route::post('/action/enablePayArrival', [ActionsController::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
     Route::post('/action/refundRequest', [ActionsController::class, 'refundRequest'])->name('update.booking.refund.request');
-    Route::put('/action/updateServiceStatus', [ActionsController::class, 'updateServiceStatus'])->name('update.service.status');    
+    Route::put('/action/updateServiceStatus', [ActionsController::class, 'updateServiceStatus'])->name('update.service.status');
+    Route::post('/action/confirmService', [ActionsController::class, 'confirmService'])->name('update.service.confirm');
+    Route::post('/action/updateServiceUnlock', [ActionsController::class, 'updateServiceUnlock'])->name('update.service.unlock');
 });

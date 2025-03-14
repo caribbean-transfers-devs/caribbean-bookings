@@ -10,11 +10,11 @@ use Illuminate\Support\Facades\DB;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
 
-class ManagementRepository
+class ConfirmationsRepository
 {
     use FiltersTrait, QueryTrait;
 
-    public function confirmation($request)
+    public function index($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
         set_time_limit(120); // Aumenta el límite a 60 segundos
@@ -35,7 +35,7 @@ class ManagementRepository
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
         $confirmations = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
 
-        return view('management.confirmations', [
+        return view('management.confirmations.index', [
             'breadcrumbs' => [
                 [
                     "route" => "",
@@ -45,19 +45,6 @@ class ManagementRepository
             ],
             'confirmations' => $confirmations,
             'data' => $data,
-        ]);
-    }
-
-    public function afterSales($request)
-    {
-        return view('management.aftersales', [
-            'breadcrumbs' => [
-                [
-                    "route" => "",
-                    "name" => "Gestion de post venta",
-                    "active" => true
-                ]
-            ],            
         ]);
     }
 }

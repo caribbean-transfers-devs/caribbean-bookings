@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Repositories\Operation;
+namespace App\Repositories\Management;
 
 use Exception;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Response as ResponseFile;
+
+//FACADES
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Response as ResponseFile;
+
+//MODELS
 use App\Models\ReservationsItem;
 use App\Models\ReservationFollowUp;
-use Illuminate\Support\Facades\Validator;
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
 
 class SpamRepository
 {
@@ -83,9 +83,9 @@ class SpamRepository
         endif;
 
         if($partial == false):
-            return view('management.spam.view', ['date' => $request->date, 'status' => $request->status, 'items' => $items]);
+            return view('components.html.management.spam.view', ['date' => $request->date, 'status' => $request->status, 'items' => $items]);
         else:
-            return view('management.spam.partial', ['date' => $request->date, 'status' => $request->status, 'items' => $items]);
+            return view('components.html.management.spam.partial', ['date' => $request->date, 'status' => $request->status, 'items' => $items]);
         endif;
     }
     
@@ -165,7 +165,7 @@ class SpamRepository
                                 rit.op_one_pickup, 
                                 rit.op_one_status;", [ 'id' => $request->id ]);
 
-        return view('management.spam.basic-information', ["item" => $item[0]]);
+        return view('components.html.management.spam.basic-information', ["item" => $item[0]]);
     }
 
     public function getHistory($request){
@@ -190,7 +190,7 @@ class SpamRepository
                                 WHERE fup.categories = 'SPAM' AND fup.reservation_id = :id
                             ORDER BY created_at DESC", [ 'id' => $request->id ]);
 
-        return view('management.spam.history', [ "items" => $items ]);
+        return view('components.html.management.spam.history', [ "items" => $items ]);
     }
 
     public function addHistory($request){

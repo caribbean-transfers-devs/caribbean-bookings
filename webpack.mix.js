@@ -54,13 +54,12 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         mix.sass('resources/scss/sections/_report_receivable.scss', data.assets + "css/sections/report_receivable.min.css"); //CUENTAS POR COBRAR
 
         //STYLES MANAGEMENT
-        mix.sass('resources/scss/sections/_management_confirmation.scss', data.assets + "css/sections/management_confirmation.min.css"); //MANAGEMENT CONFIRMATION
-        mix.sass('resources/scss/sections/_management_aftersales.scss', data.assets + "css/sections/management_aftersales.min.css"); //MANAGEMENT POST VENTA
+            //CONFIRMATIONS
+            mix.sass('resources/scss/sections/management/_confirmations.scss', data.assets + "css/sections/management/confirmations.min.css");
+            //AFTER SALES
+            mix.sass('resources/scss/sections/management/_aftersales.scss', data.assets + "css/sections/management/aftersales.min.css");        
 
-        mix.combine(['resources/js/sections/operations/spam-v2.js'], data.assets + "js/sections/operations/spam-v2.min.js");    
-        mix.sass('resources/scss/sections/_new_spam.scss', data.assets + "css/sections/new_spam.min.css"); //MANAGEMENT POST VENTA        
-
-        mix.sass('resources/scss/sections/_management_spam.scss', data.assets + "css/sections/management_spam.min.css"); //MANAGEMENT SPAM
+    
         mix.sass('resources/scss/sections/_management_reservations.scss', data.assets + "css/sections/management_reservations.min.css"); //MANAGEMENT RESERVATIONS
         mix.sass('resources/scss/sections/operations.scss', data.assets + "css/sections/operations.min.css"); //MANAGEMENT OPERATIONS
 
@@ -94,7 +93,7 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
 
         //DASHBOARD
         mix.combine(['resources/plugins/apex/apexcharts.min.js', 'resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/dashboard/management.js'], data.assets + "js/sections/dashboard/management.min.js");
-        mix.combine(['resources/plugins/apex/apexcharts.min.js', 'resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/dashboard/callcenteragent.js', 'resources/js/sections/operations/spam-v2.js'], data.assets + "js/sections/dashboard/callcenteragent.min.js");
+        mix.combine(['resources/plugins/apex/apexcharts.min.js', 'resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/dashboard/callcenteragent.js', 'resources/js/sections/management/aftersales.js'], data.assets + "js/sections/dashboard/callcenteragent.min.js");
 
         //TPV
         mix.combine(['resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/tpv/index.js'], data.assets + "js/sections/tpv/index.min.js");
@@ -137,7 +136,16 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/components/charts.js', 'resources/js/sections/reports/receivable.js'], data.assets + "js/sections/reports/receivable.min.js");
 
         //MANAGEMENT
-        mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/operations/confirmation.js'], data.assets + "js/sections/operations/confirmation.min.js");
+            //CONDIRMATIONS
+            mix.combine([
+                'resources/plugins/table/datatable/datatables5.js',
+                'resources/js/sections/management/confirmations.js'
+            ], data.assets + "js/sections/management/confirmations.min.js");
+            //AFTERSALES
+            mix.combine([
+                'resources/plugins/table/datatable/datatables5.js',
+                'resources/js/sections/management/aftersales.js'
+            ], data.assets + "js/sections/management/aftersales.min.js");    
 
         //OPERATION
         mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/plugins/bootstrap-select/select.js', 'resources/js/sections/components/filters.js', 'resources/js/sections/operations/reservations.js'], data.assets + "js/sections/operations/reservations.min.js");

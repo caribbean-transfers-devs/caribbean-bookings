@@ -145,24 +145,24 @@
             if(RoleTrait::hasPermission(39)):
                 $links_operations[] = [
                     'name' => 'Confirmaciones',
-                    'route' => route('operation.confirmation'),
-                    'active' => request()->routeIs('operation.confirmation','operation.confirmation.search'),
+                    'route' => route('management.confirmations'),
+                    'active' => request()->routeIs('management.confirmations'),
                 ];
             endif;
             // POST VENTA
             if(RoleTrait::hasPermission(47)):
                 $links_operations[] = [
                     'name' => 'Post venta',
-                    'route' => route('operation.after.sales'),
-                    'active' => request()->routeIs('operation.after.sales'),
+                    'route' => route('management.after.sales'),
+                    'active' => request()->routeIs('management.after.sales'),
                 ];
             endif;
             // RESERVACIONES
             if(RoleTrait::hasPermission(10)):
                 $links_operations[] = [
                     'name' => 'Reservaciones',
-                    'route' => route('operation.reservations'),
-                    'active' => request()->routeIs('operation.reservations','operation.reservations.search'),
+                    'route' => route('management.reservations'),
+                    'active' => request()->routeIs('management.reservations'),
                 ];
             endif;
             // OPERACIONES
@@ -179,7 +179,7 @@
                 'code' => 'operations',
                 'name' => 'Gestion',
                 'route' => null,
-                'active' => request()->routeIs('operation.*','operation.after.sales'),
+                'active' => request()->routeIs('management.*','operation.*'),
                 'urls' => $links_operations
             ]);
         endif;        

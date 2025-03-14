@@ -35,4 +35,12 @@ class ActionsController extends Controller
     public function updateServiceStatus(Request $request){
         return $this->ActionsRepository->updateServiceStatus($request);
     }
+
+    public function confirmService(Request $request){
+        return $this->ActionsRepository->confirmService($request);
+    }
+
+    public function updateServiceUnlock(Request $request){
+        return $this->ActionsRepository->updateServiceUnlock($request);
+    }    
 }

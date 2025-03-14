@@ -159,7 +159,6 @@
                 )
             );
         }
-
         if (RoleTrait::hasPermission(82)){
             array_push($buttons,
                 array(
@@ -171,7 +170,6 @@
                 )
             );
         }
-
         if (RoleTrait::hasPermission(83)){
             array_push($buttons,
                 array(
@@ -183,7 +181,6 @@
                 )
             );
         }
-
         if (RoleTrait::hasPermission(84)){
             // array_push($buttons,
             //     array(
@@ -195,7 +192,6 @@
             //     )
             // );
         }
-
         if (RoleTrait::hasPermission(85)){
             array_push($buttons,
                 array(
@@ -207,7 +203,6 @@
                 )
             );
         }
-
         if( sizeof($items) >= 1 ):
             foreach ($items as $operation) {
                 $close_operation = ( ( ( $operation->final_service_type == 'ARRIVAL' || $operation->final_service_type == 'TRANSFER' || $operation->final_service_type == 'DEPARTURE' ) && $operation->op_type == "TYPE_ONE" && ( $operation->is_round_trip == 0 || $operation->is_round_trip == 1 ) ) ? $operation->op_one_operation_close : $operation->op_two_operation_close );
@@ -468,7 +463,7 @@
                                 </td>
                                 <td class="text-center" style="{{ ( $value->service_type_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_type_name }}</td>
                                 <td class="text-center" <?=BookingTrait::classStatusPayment($value)?>>{{ BookingTrait::statusPayment($value->payment_status) }}</td>
-                                <td class="text-center" >{{ number_format(( $value->pay_at_arrival == 1 || $value->payment_status == "PENDING" ? $value->total_sales : 0 ),2) }}</td>
+                                <td class="text-center" >{{ number_format(( $value->pay_at_arrival == 1 || ( $value->pay_at_arrival == 0 && $value->payment_status == "PENDING" ) ? $value->total_sales : 0 ),2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
