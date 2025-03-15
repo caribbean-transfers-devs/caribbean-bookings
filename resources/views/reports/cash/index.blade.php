@@ -13,8 +13,8 @@
 @section('title') Operación @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/report_cash.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/report_cash.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/reports/cash.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/reports/cash.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -66,6 +66,7 @@
                         </ul>
                     </div>
                 @endif
+
                 <table id="dataCash" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>

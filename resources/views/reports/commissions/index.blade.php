@@ -16,8 +16,8 @@
 @section('title') Reporte de comisiones @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/report_commissions.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/report_commissions.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/reports/commissions.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/reports/commissions.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')

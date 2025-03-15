@@ -188,8 +188,8 @@
 @section('title') Reporte De Operaciones @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/report_operations.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/report_operations.min.css') }}" rel="stylesheet" >   
+    <link href="{{ mix('/assets/css/sections/reports/operations.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/reports/operations.min.css') }}" rel="stylesheet" >   
 @endpush
 
 @push('Js')

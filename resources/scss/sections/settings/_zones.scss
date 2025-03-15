@@ -1,0 +1,11 @@
+@import "../../../plugins/table/datatable/datatables5";
+@import "../../template/plugins/light/table/datatable/custom_dt";
+
+@import '../../template/light/components/accordions';
+@import '../../template/light/components/modal';
+
+#zone_map_container{
+    width: 100%;
+    height: 550px;
+    text-align: center;
+}

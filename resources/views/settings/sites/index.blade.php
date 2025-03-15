@@ -5,12 +5,12 @@
 @section('title') Sitios de empresa @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/settings_enterprises.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/settings_enterprises.min.css') }}" rel="stylesheet" > 
+    <link href="{{ mix('/assets/css/sections/settings/sites.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/settings/sites.min.css') }}" rel="stylesheet" > 
 @endpush
 
 @push('Js')
-    <script src="{{ mix('assets/js/sections/settings/enterprises.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/settings/sites.min.js') }}"></script>
 @endpush
 
 @section('content')

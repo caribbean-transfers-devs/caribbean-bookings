@@ -115,7 +115,7 @@ class OperationsController extends Controller
 
         // $sorted_reservations = array_merge($not_preassigned, $preassigned);
 
-        return view('operation.operations', [
+        return view('management.operations.index', [
             'items' => $items,
             'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ),
             'nexDate' => date('Y-m-d', strtotime($request->date . ' +1 day')),

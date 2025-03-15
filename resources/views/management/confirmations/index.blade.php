@@ -4,7 +4,7 @@
     use App\Traits\OperationTrait;
 @endphp
 @extends('layout.app')
-@section('title') Confirmaciónes @endsection
+@section('title') Gestión De Confirmaciónes @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/management/confirmations.min.css') }}" rel="preload" as="style" >

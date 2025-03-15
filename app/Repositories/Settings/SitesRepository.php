@@ -40,7 +40,7 @@ class SitesRepository
                         "route" => route('sites.index'),
                         "name" => "Listado de sitios",
                         "active" => true
-                    ],                    
+                    ],
                     [
                         "route" => "",
                         "name" => "Crear un nuevo sitio",

@@ -16,8 +16,8 @@
 @section('title') Reporte De Pagos @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/report_payments.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/report_payments.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/reports/payments.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/reports/payments.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -57,6 +57,7 @@
                         </ul>
                     </div>
                 @endif
+                
                 <table id="dataPayments" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>

@@ -1,23 +1,25 @@
 <?php
 
 use App\Http\Controllers\Bots\MasterToursController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Accounting\ConciliationController;
 
+//DASHBOARD
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\CallCenterController;
 
-use App\Http\Controllers\Accounting\ConciliationController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Configs\RatesController;
-use App\Http\Controllers\Configs\ZonesController;
-use App\Http\Controllers\Driver\DriverController;
-use App\Http\Controllers\Operations\OperationsController as Operations;
-use App\Http\Controllers\Payments\PaymentsController;
+//TPV
+use App\Http\Controllers\Tpv\TpvController as TPV;
+use App\Http\Controllers\Tpv\TpvController2;
+use App\Http\Controllers\Tpv\Api\AutocompleteController as APIAutocomplete;
+use App\Http\Controllers\Tpv\Api\QuoteController as APIQuote;
+use App\Http\Controllers\Bookings\BookingsController;
 
-//FINANZAS
+//FINANCES
 use App\Http\Controllers\Finances\RefundsController as RefundsFinances;
 use App\Http\Controllers\Finances\SalesController as SaleFinance;
 
-//REPORTES
+//REPORTS
 use App\Http\Controllers\Reports\PaymentsController as PAYMENTS;
 use App\Http\Controllers\Reports\CashController as CASH;
 use App\Http\Controllers\Reports\CancellationsController as CANCELLATIONS;
@@ -25,38 +27,38 @@ use App\Http\Controllers\Reports\CommissionsController as COMMISSIONS;
 use App\Http\Controllers\Reports\SalesController as SALES;
 use App\Http\Controllers\Reports\OperationsController as OPERATIONSS;
 
-//GESTION
+//MANAGEMENT
 use App\Http\Controllers\Management\ConfirmationsController;
 use App\Http\Controllers\Management\AfterSalesController;
 use App\Http\Controllers\Management\QuotationController as QUOTATION;
 use App\Http\Controllers\Management\PendingController as PENDING;
 use App\Http\Controllers\Management\SpamController as SPAM;
 use App\Http\Controllers\Management\ReservationsController as RESERVATIONS;
+use App\Http\Controllers\Operations\OperationsController as Operations;
 
-use App\Http\Controllers\Reservations\ReservationsController;
-use App\Http\Controllers\RoleController;
+//SETTINGS
+use App\Http\Controllers\Settings\RoleController as ROLES;
+use App\Http\Controllers\Settings\UserController as USERS;
+use App\Http\Controllers\Settings\EnterpriseController as ENTERPRISES;
+use App\Http\Controllers\Settings\SitesController as SITES;
+use App\Http\Controllers\Settings\VehicleController as VEHICLES;
+use App\Http\Controllers\Settings\DriverController as DRIVERS;
+use App\Http\Controllers\Settings\ExchangeReportsController as EXCHANGE_REPORTS;
+use App\Http\Controllers\Settings\ZonesController as ZONES;
+use App\Http\Controllers\Settings\RatesController as RATES;
+use App\Http\Controllers\Settings\RatesEnterpriseController as RATES_ENTERPRISE;
+use App\Http\Controllers\Settings\TypesCancellationsController as TYPES_CANCELLATIONS;
 
+//DETAILS RESERVATION
+use App\Http\Controllers\Reservations\ReservationsController as DETAILS_RESERVATION;
+
+//GENERALS
 use App\Http\Controllers\Sales\SalesController;
-use App\Http\Controllers\Users\UserController;
-use App\Http\Controllers\Vehicle\VehicleController;
+use App\Http\Controllers\Payments\PaymentsController;
 
-//Tpv
-use App\Http\Controllers\Tpv\TpvController;
-use App\Http\Controllers\Tpv\TpvController2;
-use App\Http\Controllers\Tpv\Api\AutocompleteController as APIAutocomplete;
-use App\Http\Controllers\Tpv\Api\QuoteController as APIQuote;
-use App\Http\Controllers\Bookings\BookingsController;
-
-//Settings
-use App\Http\Controllers\Settings\EnterpriseController;
-use App\Http\Controllers\Settings\SitesController;
-use App\Http\Controllers\Settings\ExchangeReportsController;
-use App\Http\Controllers\Settings\RatesEnterpriseController;
-use App\Http\Controllers\Settings\TypesCancellationsController;
-
-use App\Http\Controllers\Actions\FinanceController;
-use App\Http\Controllers\Actions\ActionsController;
-
+//ACTIONS
+use App\Http\Controllers\Actions\FinanceController as FINANCE;
+use App\Http\Controllers\Actions\ActionsController as ACTIONS_RESERVATION;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -130,11 +132,11 @@ Route::group(['middleware' => ['auth']], function () {
         Route::match(['post','get'], '/destinations/list', [CallCenterController::class, 'destinationsList'])->name('destinations.list');
 
     //TPV        
-        Route::get('/tpv/handler', [TpvController::class, 'handler'])->name('tpv.handler');
-        Route::get('/tpv/edit/{code}', [TpvController::class, 'index'])->name('tpv.new');
-        Route::post('/tpv/quote', [TpvController::class, 'quote'])->name('tpv.quote');
-        Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
-        Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
+        Route::get('/tpv/handler', [TPV::class, 'handler'])->name('tpv.handler');
+        Route::get('/tpv/edit/{code}', [TPV::class, 'index'])->name('tpv.new');
+        Route::post('/tpv/quote', [TPV::class, 'quote'])->name('tpv.quote');
+        Route::post('/tpv/create', [TPV::class, 'create'])->name('tpv.create');
+        Route::get('/tpv/autocomplete/{keyword}', [TPV::class, 'autocomplete'])->name('tpv.autocomplete');
 
     //FINANZAS         
         Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS                
@@ -142,11 +144,12 @@ Route::group(['middleware' => ['auth']], function () {
 
     //REPORTES        
         Route::match(['get', 'post'], '/reports/payments', [PAYMENTS::class, 'index'])->name('reports.payments'); //PAGOS
+        // Route::match(['post'], '/payments/conciliation', [PAYMENTS::class, 'conciliation'])->name('payments.conciliation');
         Route::match(['get', 'post'], '/reports/cash', [CASH::class, 'index'])->name('reports.cash'); //EFECTIVO
         Route::put('/reports/cash/update-status', [CASH::class, 'update'])->name('reports.cash.action.update'); //EFECTIVO
         ////////////
         Route::match(['get', 'post'], '/reports/cancellations', [CANCELLATIONS::class, 'index'])->name('reports.cancellations'); //CANCELACIONES
-        Route::match(['get', 'post'], '/reports/commissions', [COMMISSIONS::class, 'index'])->name('reports.commissions'); //COMISIONES
+        Route::match(['get', 'post'], '/reports/commissions', [COMMISSIONS::class, 'index2'])->name('reports.commissions'); //COMISIONES
         Route::match(['get', 'post'], '/reports/commissions2', [COMMISSIONS::class, 'index2'])->name('reports.commissions2'); //COMISIONES
         Route::match(['post','get'], '/reports/stats/commissions/get', [COMMISSIONS::class, 'getStats'])->name('reports.stats.get');
         Route::match(['post','get'], '/reports/sales/stats/charts/commissions', [COMMISSIONS::class, 'chartsSales'])->name('reports.sales.stats.charts.comissions.get');
@@ -186,90 +189,91 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/operation/board/exportExcelCommission', [Operations::class, 'exportExcelBoardCommision'])->name('operation.board.exportExcelComission');
 
     //CONFIGURACIONES
-        Route::put('/reservations/{reservation}', [ReservationsController::class, 'update'])->name('reservations.update');
-        Route::get('/reservation/payments/{reservation}', [ReservationsController::class, 'reservationPayments'])->name('reservation.payments');
-        Route::put('/reservationsDuplicated/{reservation}', [ReservationsController::class, 'duplicated'])->name('reservations.duplicated');
-        Route::put('/reservation/removeCommission/{reservation}', [ReservationsController::class, 'removeCommission'])->name('reservation.removeCommission');
-        Route::put('/reservationsOpenCredit/{reservation}', [ReservationsController::class, 'openCredit'])->name('reservations.openCredit');
-        Route::put('/reservationsEnablePlusService/{reservation}', [ReservationsController::class, 'enablePlusService'])->name('reservations.enablePlusService');
-        Route::put('/reservationsEnable/{reservation}', [ReservationsController::class, 'enable'])->name('reservations.enable');
-        Route::delete('/reservations/{reservation}', [ReservationsController::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA
-        Route::get('/reservations/detail/{id}', [ReservationsController::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');
-        Route::get('/GetExchange/{reservation}', [ReservationsController::class, 'get_exchange'])->name('reservations.get_exchange');
-        Route::post('/reservationsfollowups', [ReservationsController::class, 'followups'])->name('reservations.followups');
-        Route::put('/editreservitem/{item}', [ReservationsController::class, 'editreservitem'])->name('reservations.editreservitem');    
-        // Route::post('/reservations/confirmation/contact-points', [ReservationsController::class, 'contactPoint'])->name('reservations.confirmation');
-        Route::post('/reservations/confirmation/arrival', [ReservationsController::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
-        Route::post('/reservations/confirmation/departure', [ReservationsController::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');
-        Route::post('/reservations/payment-request', [ReservationsController::class, 'paymentRequest'])->name('reservations.paymentRequest');
-        Route::post('/reservations/upload', [ReservationsController::class, 'uploadMedia'])->name('reservations.upload');
-        Route::get('/reservations/upload/{id}', [ReservationsController::class, 'getMedia'])->name('reservations.upload.getmedia');
-        Route::delete('/reservations/upload/{id}', [ReservationsController::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
+        Route::resource('/roles', ROLES::class);
+        //USERS
+        Route::resource('/users', USERS::class);
+        Route::put('/ChangePass/{user}', [USERS::class, 'change_pass'])->name('users.change_pass');
+        Route::put('/ChangeStatus/{user}', [USERS::class, 'change_status'])->name('users.change_status');
+        Route::post('/StoreIP', [USERS::class, 'store_ips'])->name('users.store_ips');
+        Route::delete('/DeleteIPs/{ip}', [USERS::class, 'delete_ips'])->name('users.delete_ips');
+        //EMPRESAS
+        Route::resource('/enterprises', ENTERPRISES::class);
+        //SITIOS
+        Route::resource('/sites', SITES::class);
+        //VEHICULOS
+        Route::resource('/vehicles', VEHICLES::class);
+        //CONDUCTORES
+        Route::resource('/drivers', DRIVERS::class);
+        //TIPO DE CAMBIO PARA REPORTES
+        Route::get('/config/exchange-reports', [EXCHANGE_REPORTS::class, 'index'])->name('exchanges.index');
+        Route::get('/config/exchange-reports/create', [EXCHANGE_REPORTS::class, 'create'])->name('exchanges.create');
+        Route::post('/config/exchange-reports/store', [EXCHANGE_REPORTS::class, 'store'])->name('exchanges.store');
+        Route::get('/config/exchange-reports/{exchage}/edit', [EXCHANGE_REPORTS::class, 'edit'])->name('exchanges.edit');
+        Route::put('/config/exchange-reports/{exchage}', [EXCHANGE_REPORTS::class, 'update'])->name('exchanges.update');
+        Route::delete('/config/exchange-reports/{exchage}', [EXCHANGE_REPORTS::class, 'destroy'])->name('exchanges.destroy');
+        //ZONES
+        Route::get('/config/destinations', [ZONES::class, 'index'])->name('config.zones');
+        Route::get('/config/destinations/{id}', [ZONES::class, 'getZones'])->name('config.zones.getZones');
+        Route::get('/config/destinations/{id}/points', [ZONES::class, 'getPoints'])->name('config.getPoints');
+        Route::put('/config/destinations/{id}/points', [ZONES::class, 'setPoints'])->name('config.setPoints');
+        //RATES        
+        Route::get('/config/rates/destination', [RATES::class, 'index'])->name('config.ratesDestination');
+        Route::get('/config/rates/destination/{id}/get', [RATES::class, 'items'])->name('config.ratesZones');
+        Route::post('/config/rates/get', [RATES::class, 'getRates'])->name('config.getRates');
+        Route::post('/config/rates/new', [RATES::class, 'newRates'])->name('config.newRates');
+        Route::delete('/config/rates/delete', [RATES::class, 'deleteRates'])->name('config.deleteRates');
+        Route::put('/config/rates/update', [RATES::class, 'updateRates'])->name('config.updateRates');        
+        //RATES ENTERPRISES
+        Route::get('/config/rates/enterprise', [RATES_ENTERPRISE::class, 'index'])->name('config.ratesEnterprise');
+        Route::get('/config/rates/enterprise/destination/{id}/get', [RATES_ENTERPRISE::class, 'items'])->name('config.ratesEnterpriseZones');
+        Route::post('/config/rates/enterprise/get', [RATES_ENTERPRISE::class, 'getRates'])->name('config.getRatesEnterprise');
+        Route::post('/config/rates/enterprise/new', [RATES_ENTERPRISE::class, 'newRates'])->name('config.newRatesEnterprise');
+        Route::delete('/config/rates/enterprise/delete', [RATES_ENTERPRISE::class, 'deleteRates'])->name('config.deleteRatesEnterprise');
+        Route::put('/config/rates/enterprise/update', [RATES_ENTERPRISE::class, 'updateRates'])->name('config.updateRatesEnterprise');
+        //TYPES CANCELLATIONS
+        Route::get('/config/types-cancellations', [TYPES_CANCELLATIONS::class, 'index'])->name('config.types-cancellations.index');
+        Route::get('/config/types-cancellations/create', [TYPES_CANCELLATIONS::class, 'create'])->name('config.types-cancellations.create');
+        Route::post('/config/types-cancellations', [TYPES_CANCELLATIONS::class, 'store'])->name('config.types-cancellations.store');
+        Route::get('/config/types-cancellations/{cancellation}/edit', [TYPES_CANCELLATIONS::class, 'edit'])->name('config.types-cancellations.edit');
+        Route::put('/config/types-cancellations/{cancellation}', [TYPES_CANCELLATIONS::class, 'update'])->name('config.types-cancellations.update');
+        Route::delete('/config/types-cancellations/{cancellation}', [TYPES_CANCELLATIONS::class, 'destroy'])->name('config.types-cancellations.destroy');
 
+        Route::put('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'update'])->name('reservations.update');
+        Route::get('/reservation/payments/{reservation}', [DETAILS_RESERVATION::class, 'reservationPayments'])->name('reservation.payments');
+        Route::put('/reservationsDuplicated/{reservation}', [DETAILS_RESERVATION::class, 'duplicated'])->name('reservations.duplicated');
+        Route::put('/reservation/removeCommission/{reservation}', [DETAILS_RESERVATION::class, 'removeCommission'])->name('reservation.removeCommission');
+        Route::put('/reservationsOpenCredit/{reservation}', [DETAILS_RESERVATION::class, 'openCredit'])->name('reservations.openCredit');
+        Route::put('/reservationsEnablePlusService/{reservation}', [DETAILS_RESERVATION::class, 'enablePlusService'])->name('reservations.enablePlusService');
+        Route::put('/reservationsEnable/{reservation}', [DETAILS_RESERVATION::class, 'enable'])->name('reservations.enable');
+        Route::delete('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA
+        Route::get('/reservations/detail/{id}', [DETAILS_RESERVATION::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');
+        Route::get('/GetExchange/{reservation}', [DETAILS_RESERVATION::class, 'get_exchange'])->name('reservations.get_exchange');
+        Route::post('/reservationsfollowups', [DETAILS_RESERVATION::class, 'followups'])->name('reservations.followups');
+        Route::put('/editreservitem/{item}', [DETAILS_RESERVATION::class, 'editreservitem'])->name('reservations.editreservitem');
+
+        Route::post('/reservations/confirmation/arrival', [DETAILS_RESERVATION::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
+        Route::post('/reservations/confirmation/departure', [DETAILS_RESERVATION::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');
+        Route::post('/reservations/payment-request', [DETAILS_RESERVATION::class, 'paymentRequest'])->name('reservations.paymentRequest');
+        Route::post('/reservations/upload', [DETAILS_RESERVATION::class, 'uploadMedia'])->name('reservations.upload');
+        Route::get('/reservations/upload/{id}', [DETAILS_RESERVATION::class, 'getMedia'])->name('reservations.upload.getmedia');
+        Route::delete('/reservations/upload/{id}', [DETAILS_RESERVATION::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
+
+
+    //ACCIONES GENRALES UTILIZADAS EN DETALLE DE RESERVACION
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);
-    Route::match(['post'], '/payments/conciliation', [PaymentsController::class, 'conciliation'])->name('payments.conciliation');
-
-        //EMPRESAS
-        Route::resource('/enterprises', EnterpriseController::class);
-        //SITIOS
-        Route::resource('/sites', SitesController::class);
-        //TIPO DE CAMBIO PARA REPORTES
-        Route::get('/config/exchange-reports', [ExchangeReportsController::class, 'index'])->name('exchanges.index');
-        Route::get('/config/exchange-reports/create', [ExchangeReportsController::class, 'create'])->name('exchanges.create');
-        Route::post('/config/exchange-reports/store', [ExchangeReportsController::class, 'store'])->name('exchanges.store');
-        Route::get('/config/exchange-reports/{exchage}/edit', [ExchangeReportsController::class, 'edit'])->name('exchanges.edit');
-        Route::put('/config/exchange-reports/{exchage}', [ExchangeReportsController::class, 'update'])->name('exchanges.update');
-        Route::delete('/config/exchange-reports/{exchage}', [ExchangeReportsController::class, 'destroy'])->name('exchanges.destroy');
-        //TARIFAS DE EMPRESAS
-        Route::get('/config/rates/enterprise', [RatesEnterpriseController::class, 'index'])->name('config.ratesEnterprise');
-        Route::get('/config/rates/enterprise/destination/{id}/get', [RatesEnterpriseController::class, 'items'])->name('config.ratesEnterpriseZones');
-        Route::post('/config/rates/enterprise/get', [RatesEnterpriseController::class, 'getRates'])->name('config.getRatesEnterprise');
-        Route::post('/config/rates/enterprise/new', [RatesEnterpriseController::class, 'newRates'])->name('config.newRatesEnterprise');
-        Route::delete('/config/rates/enterprise/delete', [RatesEnterpriseController::class, 'deleteRates'])->name('config.deleteRatesEnterprise');
-        Route::put('/config/rates/enterprise/update', [RatesEnterpriseController::class, 'updateRates'])->name('config.updateRatesEnterprise');
-        //TIPO DE CANCELACIONES
-        Route::get('/config/types-cancellations', [TypesCancellationsController::class, 'index'])->name('config.types-cancellations.index');
-        Route::get('/config/types-cancellations/create', [TypesCancellationsController::class, 'create'])->name('config.types-cancellations.create');
-        Route::post('/config/types-cancellations', [TypesCancellationsController::class, 'store'])->name('config.types-cancellations.store');
-        Route::get('/config/types-cancellations/{cancellation}/edit', [TypesCancellationsController::class, 'edit'])->name('config.types-cancellations.edit');
-        Route::put('/config/types-cancellations/{cancellation}', [TypesCancellationsController::class, 'update'])->name('config.types-cancellations.update');
-        Route::delete('/config/types-cancellations/{cancellation}', [TypesCancellationsController::class, 'destroy'])->name('config.types-cancellations.destroy');
-        
-
-
-    Route::resource('/vehicles', VehicleController::class);
-    Route::resource('/drivers', DriverController::class);
-    Route::resource('/users', UserController::class);
-
-    Route::put('/ChangePass/{user}', [UserController::class, 'change_pass'])->name('users.change_pass');
-    Route::put('/ChangeStatus/{user}', [UserController::class, 'change_status'])->name('users.change_status');
-    Route::post('/StoreIP', [UserController::class, 'store_ips'])->name('users.store_ips');
-    Route::delete('/DeleteIPs/{ip}', [UserController::class, 'delete_ips'])->name('users.delete_ips');
-    Route::resource('/roles', RoleController::class);
-
-    Route::get('/config/destinations', [ZonesController::class, 'index'])->name('config.zones');
-    Route::get('/config/destinations/{id}', [ZonesController::class, 'getZones'])->name('config.zones.getZones');
-    Route::get('/config/destinations/{id}/points', [ZonesController::class, 'getPoints'])->name('config.getPoints');
-    Route::put('/config/destinations/{id}/points', [ZonesController::class, 'setPoints'])->name('config.setPoints');
-    Route::get('/config/rates/destination', [RatesController::class, 'index'])->name('config.ratesDestination');
-    Route::get('/config/rates/destination/{id}/get', [RatesController::class, 'items'])->name('config.ratesZones');
-    Route::post('/config/rates/get', [RatesController::class, 'getRates'])->name('config.getRates');
-    Route::post('/config/rates/new', [RatesController::class, 'newRates'])->name('config.newRates');
-    Route::delete('/config/rates/delete', [RatesController::class, 'deleteRates'])->name('config.deleteRates');
-    Route::put('/config/rates/update', [RatesController::class, 'updateRates'])->name('config.updateRates');
 
     //ACCIONES UTILIZADAS EN FINANZAS
-    Route::match(['get', 'post'], '/action/getBasicInformationReservation', [FinanceController::class, 'getBasicInformationReservation'])->name('get.basic-information.reservation');
-    Route::match(['get', 'post'], '/action/getPhotosReservation', [FinanceController::class, 'getPhotosReservation'])->name('get.photos.reservation');
-    Route::match(['get', 'post'], '/action/getHistoryReservation', [FinanceController::class, 'getHistoryReservation'])->name('get.history.reservation');
-    Route::match(['get', 'post'], '/action/getPaymentsReservation', [FinanceController::class, 'getPaymentsReservation'])->name('get.payments.reservation');
-    Route::post('/action/addPaymentRefund', [FinanceController::class, 'addPaymentRefund'])->name('add.payment.refund');
+    Route::match(['get', 'post'], '/action/getBasicInformationReservation', [FINANCE::class, 'getBasicInformationReservation'])->name('get.basic-information.reservation');
+    Route::match(['get', 'post'], '/action/getPhotosReservation', [FINANCE::class, 'getPhotosReservation'])->name('get.photos.reservation');
+    Route::match(['get', 'post'], '/action/getHistoryReservation', [FINANCE::class, 'getHistoryReservation'])->name('get.history.reservation');
+    Route::match(['get', 'post'], '/action/getPaymentsReservation', [FINANCE::class, 'getPaymentsReservation'])->name('get.payments.reservation');
+    Route::post('/action/addPaymentRefund', [FINANCE::class, 'addPaymentRefund'])->name('add.payment.refund');
 
     //ACCIONES GENERALES
-    Route::post('/action/enablePayArrival', [ActionsController::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
-    Route::post('/action/refundRequest', [ActionsController::class, 'refundRequest'])->name('update.booking.refund.request');
-    Route::put('/action/updateServiceStatus', [ActionsController::class, 'updateServiceStatus'])->name('update.service.status');
-    Route::post('/action/confirmService', [ActionsController::class, 'confirmService'])->name('update.service.confirm');
-    Route::post('/action/updateServiceUnlock', [ActionsController::class, 'updateServiceUnlock'])->name('update.service.unlock');
+    Route::post('/action/enablePayArrival', [ACTIONS_RESERVATION::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
+    Route::post('/action/refundRequest', [ACTIONS_RESERVATION::class, 'refundRequest'])->name('update.booking.refund.request');
+    Route::put('/action/updateServiceStatus', [ACTIONS_RESERVATION::class, 'updateServiceStatus'])->name('update.service.status');
+    Route::post('/action/confirmService', [ACTIONS_RESERVATION::class, 'confirmService'])->name('update.service.confirm');
+    Route::post('/action/updateServiceUnlock', [ACTIONS_RESERVATION::class, 'updateServiceUnlock'])->name('update.service.unlock');
 });

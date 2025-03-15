@@ -7,8 +7,8 @@
 
 @push('Css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
-    <link href="{{ mix('/assets/css/sections/reports/commissions.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/reports/commissions.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/reports/commissions2.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/reports/commissions2.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')

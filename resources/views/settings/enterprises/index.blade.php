@@ -5,8 +5,8 @@
 @section('title') Empresas @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/settings_enterprises.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/settings_enterprises.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/settings/enterprises.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/settings/enterprises.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')

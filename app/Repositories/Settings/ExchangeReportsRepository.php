@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class ExchangeReportsRepository{
     public function index($request){
-        return view('settings.exchanges.index', [            
+        return view('settings.exchanges_reports.index', [            
             'breadcrumbs' => [
                 [
                     "route" => "",
@@ -27,7 +27,7 @@ class ExchangeReportsRepository{
 
     public function create($request){
         try {
-            return view('settings.exchanges.new', [
+            return view('settings.exchanges_reports.new', [
                 'breadcrumbs' => [
                     [
                         "route" => route('exchanges.index'),
@@ -69,7 +69,7 @@ class ExchangeReportsRepository{
     public function edit($request, $id){
         try {
             $exchange = ExchangeRateReport::find($id);
-            return view('settings.exchanges.new',[
+            return view('settings.exchanges_reports.new',[
                 'breadcrumbs' => [
                     [
                         "route" => route('exchanges.index'),

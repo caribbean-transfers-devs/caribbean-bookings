@@ -146,8 +146,8 @@
 @section('title') Reporte De Ventas @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/report_reservations.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/report_reservations.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/reports/sales.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/reports/sales.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -158,7 +158,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    <script src="{{ mix('assets/js/sections/reports/reservations.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/reports/sales.min.js') }}"></script>
 @endpush
 
 @section('content')

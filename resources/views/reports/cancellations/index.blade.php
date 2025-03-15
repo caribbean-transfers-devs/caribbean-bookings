@@ -6,8 +6,8 @@
 @section('title') Operación @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/report_cancellations.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/report_cancellations.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/reports/cancellations.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/reports/cancellations.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')

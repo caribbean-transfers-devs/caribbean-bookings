@@ -13,7 +13,7 @@
 
 @endphp
 @extends('layout.app')
-@section('title') POST Venta @endsection
+@section('title') Gestión De POST Venta @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/management/aftersales.min.css') }}" rel="preload" as="style" >

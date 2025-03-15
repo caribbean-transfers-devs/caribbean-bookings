@@ -17,11 +17,11 @@
     $cancellations = FiltersTrait::CancellationTypes();
 @endphp
 @extends('layout.app')
-@section('title') Reservaciones @endsection
+@section('title') Gestión De Reservaciones @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/management_reservations.min.css') }}" rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/sections/management_reservations.min.css') }}" rel="stylesheet" >
+    <link href="{{ mix('/assets/css/sections/management/reservations.min.css') }}" rel="preload" as="style" >
+    <link href="{{ mix('/assets/css/sections/management/reservations.min.css') }}" rel="stylesheet" >
 @endpush
 
 @push('Js')
@@ -30,7 +30,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="{{ mix('assets/js/sections/operations/reservations.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/management/reservations.min.js') }}"></script>
 @endpush
 
 @section('content')
