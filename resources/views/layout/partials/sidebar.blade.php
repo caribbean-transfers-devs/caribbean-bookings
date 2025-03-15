@@ -75,31 +75,31 @@
             if(RoleTrait::hasPermission(43)):
                 $links_reports[] = [
                     'name' => 'Pagos',
-                    'route' => route('reports.payment'),
-                    'active' => request()->routeIs('reports.payment','reports.payment.action'),
-                ];
-            endif;
-            if(RoleTrait::hasPermission(45)):
-                $links_reports[] = [
-                    'name' => 'Comisiones',
-                    'route' => route('reports.commissions'),
-                    'active' => request()->routeIs('reports.commissions','reports.commissions.action'),
+                    'route' => route('reports.payments'),
+                    'active' => request()->routeIs('reports.payments'),
                 ];
             endif;
             if(RoleTrait::hasPermission(50)):
                 $links_reports[] = [
                     'name' => 'Efectivo',
                     'route' => route('reports.cash'),
-                    'active' => request()->routeIs('reports.cash','reports.cash.action'),
+                    'active' => request()->routeIs('reports.cash'),
                 ];
             endif;
             if(RoleTrait::hasPermission(71)):
                 $links_reports[] = [
                     'name' => 'Cancelaciones',
                     'route' => route('reports.cancellations'),
-                    'active' => request()->routeIs('reports.cancellations','reports.cancellations.action'),
+                    'active' => request()->routeIs('reports.cancellations'),
                 ];
             endif;
+            if(RoleTrait::hasPermission(45)):
+                $links_reports[] = [
+                    'name' => 'Comisiones',
+                    'route' => route('reports.commissions'),
+                    'active' => request()->routeIs('reports.commissions'),
+                ];
+            endif;            
             if(RoleTrait::hasPermission(98)):
                 $links_reports[] = [
                     'name' => 'Ventas',
@@ -111,7 +111,7 @@
                 $links_reports[] = [
                     'name' => 'Operaciones',
                     'route' => route('reports.operations'),
-                    'active' => request()->routeIs('reports.operations','reports.operations.action'),
+                    'active' => request()->routeIs('reports.operations'),
                 ];
             endif;
             // if(RoleTrait::hasPermission(99)):

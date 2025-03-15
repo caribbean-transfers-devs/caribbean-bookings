@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Reports;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 //REPOSITORY
 use App\Repositories\Reports\CommissionsRepository;
@@ -28,6 +28,14 @@ class CommissionsController extends Controller
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $this->CommissionsRepository->index($request);
+    }
+
+    public function index2(Request $request)
+    {
+        if(!$this->hasPermission(45)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+        return $this->CommissionsRepository->index2($request);
     }
 
     public function getStats(Request $request)

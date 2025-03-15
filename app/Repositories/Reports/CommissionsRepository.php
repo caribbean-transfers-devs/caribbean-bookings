@@ -4,6 +4,8 @@ namespace App\Repositories\Reports;
 
 use Exception;
 use Illuminate\Http\Response;
+
+//FACADES
 use Illuminate\Support\Facades\DB;
 
 //TRAIT
@@ -19,9 +21,76 @@ class CommissionsRepository
     private $months = [
         1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril', 5 => 'mayo', 6 => 'junio',
         7 => 'julio', 8 => 'agosto', 9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
-    ];    
+    ];
 
     public function index($request)
+    {
+        ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
+
+        $data = [
+            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
+            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
+            "user" => ( isset($request->user) ? $request->user : 0 ),
+        ];
+        
+        // $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two 
+        //               AND rez.is_commissionable = 1 
+        //               AND rez.is_cancelled = 0 
+        //               AND rez.is_duplicated = 0 ";
+
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two 
+                      AND rez.is_commissionable = 1 
+                      AND rez.is_cancelled = 0 
+                      AND rez.is_duplicated = 0
+                    --   AND rez.open_credit = 0 
+                      AND rez.is_quotation = 0 ";
+
+        // $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four 
+        //               AND rez.is_commissionable = 1 
+        //               AND rez.is_cancelled = 0 
+        //               AND rez.is_duplicated = 0 
+        //               AND it.is_round_trip = 1 ";
+
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four 
+                      AND rez.is_commissionable = 1 
+                      AND rez.is_cancelled = 0 
+                      AND rez.is_duplicated = 0 
+                    --   AND rez.open_credit = 0 
+                      AND rez.is_quotation = 0 
+                      AND it.is_round_trip = 1 ";                      
+
+        $havingConditions = []; $queryHaving = "";
+        $queryData = [
+            'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
+            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",            
+        ];
+
+        //VENDEDOR
+        if(isset( $request->user ) && !empty( $request->user )){
+            $params = $this->parseArrayQuery($request->user);
+            $queryOne .= " AND us.id IN ($params) ";
+            $queryTwo .= " AND us.id IN ($params) ";
+        }
+    
+        // dd($queryOne, $queryTwo, $queryHaving, $queryData);
+        $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
+
+        return view('reports.commissions.index', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Reporte de comisiones del ". date("Y-m-d", strtotime($data['init'])) ." al ". date("Y-m-d", strtotime($data['end'])),
+                    "active" => true
+                ]
+            ],       
+            'operations' => $items,
+            'exchange' => FiltersTrait::ExchangeCommission(date("Y-m-d", strtotime($data['init'])), date("Y-m-d", strtotime($data['end']))),
+            'data' => $data,
+        ]);        
+    }
+
+    public function index2($request)
     {
         return view('reports.commissions.index2', [
             'breadcrumbs' => [

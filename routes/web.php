@@ -18,9 +18,12 @@ use App\Http\Controllers\Finances\RefundsController as RefundsFinances;
 use App\Http\Controllers\Finances\SalesController as SaleFinance;
 
 //REPORTES
-use App\Http\Controllers\Reports\ReportsController;
-use App\Http\Controllers\Reports\CommissionsController as CommissionsReports;
-use App\Http\Controllers\Reports\CashController as ReportCash;
+use App\Http\Controllers\Reports\PaymentsController as PAYMENTS;
+use App\Http\Controllers\Reports\CashController as CASH;
+use App\Http\Controllers\Reports\CancellationsController as CANCELLATIONS;
+use App\Http\Controllers\Reports\CommissionsController as COMMISSIONS;
+use App\Http\Controllers\Reports\SalesController as SALES;
+use App\Http\Controllers\Reports\OperationsController as OPERATIONSS;
 
 //GESTION
 use App\Http\Controllers\Management\ConfirmationsController;
@@ -115,11 +118,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/bot/conciliation/stripe', [ConciliationController::class, 'StripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
         Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
 
-    //DASHBOARD
-        // GERENCIA
-        Route::match(['get', 'post'], '/', [DashboardController::class, 'index'])->name('dashboard');
-        // AGENTES DE CALL CENTER
-        Route::match(['get', 'post'], '/callcenters', [CallCenterController::class, 'index'])->name('callcenters.index');
+    //DASHBOARD        
+        Route::match(['get', 'post'], '/', [DashboardController::class, 'index'])->name('dashboard'); // GERENCIA
+        ////////////
+        Route::match(['get', 'post'], '/callcenters', [CallCenterController::class, 'index'])->name('callcenters.index'); // AGENTES DE CALL CENTER
         Route::match(['post'], '/callcenters/sales/get', [CallCenterController::class, 'getSales'])->name('callcenters.sales.get');
         Route::match(['post'], '/callcenters/operations/get', [CallCenterController::class, 'getOperations'])->name('callcenters.operations.get');
         Route::match(['post','get'], '/callcenters/stats/get', [CallCenterController::class, 'getStats'])->name('callcenters.stats.get');
@@ -134,60 +136,37 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/tpv/create', [TpvController::class, 'create'])->name('tpv.create');
         Route::get('/tpv/autocomplete/{keyword}', [TpvController::class, 'autocomplete'])->name('tpv.autocomplete');
 
-    //FINANZAS 
-        //REEMBOLSOS
-        Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds');   
-        //PAGOS        
-        Route::get('/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales');
-        Route::post('/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales.action');
+    //FINANZAS         
+        Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS                
+        Route::match(['get', 'post'], '/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS
 
-    //REPORTES
-        //PAGOS
-        Route::get('/reports/payments', [ReportsController::class, 'payments'])->name('reports.payment');
-        Route::post('/reports/payments', [ReportsController::class, 'payments'])->name('reports.payment.action');
-        //EFECTIVO
-        Route::get('/reports/cash', [ReportsController::class, 'cash'])->name('reports.cash');
-        Route::post('/reports/cash', [ReportsController::class, 'cash'])->name('reports.cash.action');
-        Route::put('/reports/cash/update-status', [ReportCash::class, 'update'])->name('reports.cash.action.update');
-        //CANCELACIONES
-        Route::get('/reports/cancellations', [ReportsController::class, 'cancellations'])->name('reports.cancellations');
-        Route::post('/reports/cancellations', [ReportsController::class, 'cancellations'])->name('reports.cancellations.action');
-        //COMISIONES
-        Route::get('/reports/commissions', [ReportsController::class, 'commissions2'])->name('reports.commissions');
-        Route::post('/reports/commissions', [ReportsController::class, 'commissions2'])->name('reports.commissions.action');
+    //REPORTES        
+        Route::match(['get', 'post'], '/reports/payments', [PAYMENTS::class, 'index'])->name('reports.payments'); //PAGOS
+        Route::match(['get', 'post'], '/reports/cash', [CASH::class, 'index'])->name('reports.cash'); //EFECTIVO
+        Route::put('/reports/cash/update-status', [CASH::class, 'update'])->name('reports.cash.action.update'); //EFECTIVO
+        ////////////
+        Route::match(['get', 'post'], '/reports/cancellations', [CANCELLATIONS::class, 'index'])->name('reports.cancellations'); //CANCELACIONES
+        Route::match(['get', 'post'], '/reports/commissions', [COMMISSIONS::class, 'index'])->name('reports.commissions'); //COMISIONES
+        Route::match(['get', 'post'], '/reports/commissions2', [COMMISSIONS::class, 'index2'])->name('reports.commissions2'); //COMISIONES
+        Route::match(['post','get'], '/reports/stats/commissions/get', [COMMISSIONS::class, 'getStats'])->name('reports.stats.get');
+        Route::match(['post','get'], '/reports/sales/stats/charts/commissions', [COMMISSIONS::class, 'chartsSales'])->name('reports.sales.stats.charts.comissions.get');
+        Route::match(['post','get'], '/reports/operations/stats/charts/commissions', [COMMISSIONS::class, 'chartsOperations'])->name('reports.operations.stats.charts.comissions.get');
+        ////////////
+        Route::match(['post','get'], '/reports/sales', [SALES::class, 'index'])->name('reports.sales'); //VENTAS
+        Route::match(['post','get'], '/reports/operations', [OPERATIONSS::class, 'index'])->name('reports.operations'); //OPERACIONES
 
-        Route::match(['get', 'post'], '/reports/commissions2', [CommissionsReports::class, 'index'])->name('reports.commissions2');
-        Route::match(['post','get'], '/reports/stats/commissions/get', [CommissionsReports::class, 'getStats'])->name('reports.stats.get');
-        Route::match(['post','get'], '/reports/sales/stats/charts/commissions', [CommissionsReports::class, 'chartsSales'])->name('reports.sales.stats.charts.comissions.get');
-        Route::match(['post','get'], '/reports/operations/stats/charts/commissions', [CommissionsReports::class, 'chartsOperations'])->name('reports.operations.stats.charts.comissions.get');
-
-        //VENTAS
-        Route::get('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales');
-        Route::post('/reports/sales', [ReportsController::class, 'sales'])->name('reports.sales.action');
-        //OPERACIONES
-        Route::get('/reports/operations', [ReportsController::class, 'operations'])->name('reports.operations');
-        Route::post('/reports/operations', [ReportsController::class, 'operations'])->name('reports.operations.action');
-        //PAGOS
-        Route::get('/reports/conciliation', [ReportsController::class, 'conciliation'])->name('reports.conciliation');
-        Route::post('/reports/conciliation', [ReportsController::class, 'conciliation'])->name('reports.conciliation.action');
-        //CUENTAS POR COBRAR
-        Route::get('/reports/accounts-receivable', [ReportsController::class, 'receivable'])->name('reports.receivable');
-        Route::post('/reports/accounts-receivable', [ReportsController::class, 'receivable'])->name('reports.receivable.action');
-
-    //GESTION
-        //CONFIRMACIONES
-        Route::match(['get', 'post'], '/management/confirmations', [ConfirmationsController::class, 'index'])->name('management.confirmations');
-        //POST VENTA, MAENEJO DE SPAM Y RESERVAS PENDIENTES
-        Route::match(['get', 'post'], '/management/aftersales', [AfterSalesController::class, 'index'])->name('management.after.sales');
+    //GESTION        
+        Route::match(['get', 'post'], '/management/confirmations', [ConfirmationsController::class, 'index'])->name('management.confirmations'); //CONFIRMACIONES
+        ////////////
+        Route::match(['get', 'post'], '/management/aftersales', [AfterSalesController::class, 'index'])->name('management.after.sales'); //POST VENTA, MAENEJO DE SPAM Y RESERVAS PENDIENTES
         Route::match(['post'], '/management/quotation/get', [QUOTATION::class, 'get'])->name('management.quotation.get'); // TRAE LAS COTIZACIONES DE AGENTE DE CALL CENTER
         Route::match(['post'], '/management/pending/get', [PENDING::class, 'get'])->name('management.pending.get'); // TRAE LAS RESERVAS PENDIENTES
         Route::match(['post'], '/management/spam/get', [SPAM::class, 'get'])->name('management.spam.get');
         Route::match(['post'], '/management/spam/get/basic-information', [SPAM::class, 'getBasicInformation'])->name('management.spam.get.basicInformation');
         Route::match(['post'], '/management/spam/history/get', [SPAM::class, 'getHistory'])->name('management.spam.get.history');
         Route::match(['post'], '/management/spam/history/add', [SPAM::class, 'addHistory'])->name('management.spam.add.history');
-        //RESERVACIONES
-        Route::match(['get', 'post'], '/management/reservations', [RESERVATIONS::class, 'index'])->name('management.reservations');
-
+        ////////////
+        Route::match(['get', 'post'], '/management/reservations', [RESERVATIONS::class, 'index'])->name('management.reservations'); //RESERVACIONES
         //OPERACIONES
         Route::get('/operation/board', [Operations::class, 'index'])->name('operation.index');
         Route::post('/operation/board', [Operations::class, 'index'])->name('operation.index.search');    
