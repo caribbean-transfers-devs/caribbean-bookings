@@ -112,7 +112,7 @@
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN MXN</th>
                             <th class="text-center">TOTAL VENDIDO POR PRECIO DE SERVICIO</th>
-                            <th class="text-center">TOTAL COMISIONADO POR PRECIO DE SERVICIO</th>
+                            {{-- <th class="text-center">TOTAL COMISIONADO POR PRECIO DE SERVICIO</th> --}}
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
@@ -197,7 +197,7 @@
                                     <td class="text-center">{{ number_format(($operation->total_sales),2) }}</td>
                                     <td class="text-center">{{ number_format($total_sales,2) }}</td>
                                     <td class="text-center">{{ number_format($total_cost,2) }}</td>
-                                    <td class="text-center">{{ number_format(( OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" ? $total_cost : 0 ),2) }}</td>
+                                    {{-- <td class="text-center">{{ number_format(( OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" ? $total_cost : 0 ),2) }}</td> --}}
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     <td class="text-center">
                                         @if ( ($operation->reservation_status == "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") )

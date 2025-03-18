@@ -88,7 +88,7 @@
                         </div>
 
                         <div class="card-bottom-section">
-                            <a href="javascript:void(0);" class="getData" data-type="completed">Ver reporte</a>
+                            <a href="javascript:void(0);" class="getData" data-type="operations">Ver reporte</a>
                         </div>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                         </div>
 
                         <div class="card-bottom-section">
-                            <a href="javascript:void(0);" class="getData" data-type="pending">Ver reporte</a>
+                            <a href="javascript:void(0);" class="getData" data-type="commissions">Ver reporte</a>
                         </div>
                     </div>
                 </div>
@@ -143,5 +143,5 @@
         </div>
     </div>
 
-    {{-- <x-modals.filters.bookings :users="$users" /> --}}
+    <x-modals.dashboard.callcenteragent />
 @endsection

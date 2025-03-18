@@ -124,8 +124,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::match(['get', 'post'], '/', [DashboardController::class, 'index'])->name('dashboard'); // GERENCIA
         ////////////
         Route::match(['get', 'post'], '/callcenters', [CallCenterController::class, 'index'])->name('callcenters.index'); // AGENTES DE CALL CENTER
-        Route::match(['post'], '/callcenters/sales/get', [CallCenterController::class, 'getSales'])->name('callcenters.sales.get');
-        Route::match(['post'], '/callcenters/operations/get', [CallCenterController::class, 'getOperations'])->name('callcenters.operations.get');
+        Route::match(['post','get'], '/callcenters/sales/get', [CallCenterController::class, 'getSales'])->name('callcenters.sales.get');
+        Route::match(['post','get'], '/callcenters/operations/get', [CallCenterController::class, 'getOperations'])->name('callcenters.operations.get');
         Route::match(['post','get'], '/callcenters/stats/get', [CallCenterController::class, 'getStats'])->name('callcenters.stats.get');
         Route::match(['post','get'], '/callcenters/stats/charts/sales', [CallCenterController::class, 'chartsSales'])->name('callcenters.charts.sales.get');
         Route::match(['post','get'], '/callcenters/stats/charts/opertions', [CallCenterController::class, 'chartsOperations'])->name('callcenters.charts.operations.get');
@@ -150,10 +150,15 @@ Route::group(['middleware' => ['auth']], function () {
         ////////////
         Route::match(['get', 'post'], '/reports/cancellations', [CANCELLATIONS::class, 'index'])->name('reports.cancellations'); //CANCELACIONES
         Route::match(['get', 'post'], '/reports/commissions', [COMMISSIONS::class, 'index2'])->name('reports.commissions'); //COMISIONES
-        Route::match(['get', 'post'], '/reports/commissions2', [COMMISSIONS::class, 'index2'])->name('reports.commissions2'); //COMISIONES
+        Route::match(['get', 'post'], '/reports/commissions2', [COMMISSIONS::class, 'index'])->name('reports.commissions2'); //COMISIONES
+
+        Route::match(['post','get'], '/reports/sales/data/commissions/get', [COMMISSIONS::class, 'getSales'])->name('reports.sales.data.commissions.get');
+        Route::match(['post','get'], '/reports/operations/data/commissions/get', [COMMISSIONS::class, 'getOperations'])->name('reports.operations.data.commissions.get');
+        Route::match(['post','get'], '/reports/commissions/data/commissions/get', [COMMISSIONS::class, 'getCommissions'])->name('reports.commissions.data.commissions.get');
+
         Route::match(['post','get'], '/reports/stats/commissions/get', [COMMISSIONS::class, 'getStats'])->name('reports.stats.get');
-        Route::match(['post','get'], '/reports/sales/stats/charts/commissions', [COMMISSIONS::class, 'chartsSales'])->name('reports.sales.stats.charts.comissions.get');
-        Route::match(['post','get'], '/reports/operations/stats/charts/commissions', [COMMISSIONS::class, 'chartsOperations'])->name('reports.operations.stats.charts.comissions.get');
+        Route::match(['post','get'], '/reports/sales/stats/charts/commissions', [COMMISSIONS::class, 'chartsSales'])->name('reports.sales.stats.charts.commissions.get');
+        Route::match(['post','get'], '/reports/operations/stats/charts/commissions', [COMMISSIONS::class, 'chartsOperations'])->name('reports.operations.stats.charts.commissions.get');
         ////////////
         Route::match(['post','get'], '/reports/sales', [SALES::class, 'index'])->name('reports.sales'); //VENTAS
         Route::match(['post','get'], '/reports/operations', [OPERATIONSS::class, 'index'])->name('reports.operations'); //OPERACIONES

@@ -103,6 +103,239 @@ class CommissionsRepository
         ]);
     }
 
+    public function getSales($request)
+    {
+        ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
+
+        $userArray = MethodsTrait::parseArray($request->user ?? '');
+        $statusArray = MethodsTrait::parseArray($request->status ?? '');
+        $dataUser = MethodsTrait::DataUser($userArray, $statusArray);
+        // Manejo de Fechas
+        $dates = MethodsTrait::parseDateRange($request->date ?? '');
+        $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
+        $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
+        $data = MethodsTrait::SalesArrayStructure($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
+
+        //Para las ventas velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
+        $paramBookingStatus = MethodsTrait::parseArrayQuery2(['CONFIRMED', 'CREDIT', 'OPENCREDIT'], "single");
+        $queryHavingBooking = " HAVING reservation_status IN ($paramBookingStatus) ";
+
+        $query = " AND rez.site_id != 21 AND rez.site_id != 11 
+                   AND rez.created_at BETWEEN :init AND :end 
+                   AND rez.is_commissionable = 1 
+                   AND rez.is_duplicated = 0 ";                   
+        
+        $queryData = [
+            'init' => $datesMonth['initTime'],
+            'end' => $datesMonth['endTime']
+        ];
+
+        if ($userArray) {
+            $params = MethodsTrait::parseArrayQuery2($userArray, 'single');
+            $query .= " AND us.id IN ($params) ";
+        }
+        
+        $bookings = $this->queryBookings($query, $queryHavingBooking, $queryData);
+
+        // Recorremos para poder obtener el total de venta diaria y mensual
+        if ($bookings) {
+            foreach ($bookings as $booking) {
+                $date_ = date("Y-m-d", strtotime($booking->created_at));
+                $total_sales = ($booking->currency == "USD") 
+                    ? ($booking->total_sales * $exchange_commission) 
+                    : $booking->total_sales;
+
+                if ( isset($data[$date_]) && isset($data[$date_]['DATA'][$booking->employee_code]) ) {
+                    $data[$date_]['TOTAL'] += round($total_sales, 2);
+                    $data[$date_][$booking->currency] += round($booking->total_sales, 2);
+                    $data[$date_]['QUANTITY']++;
+                    $data[$date_]['BOOKINGS'][] = $booking;
+
+                    $data[$date_]['DATA'][$booking->employee_code]['TOTAL'] += round($total_sales, 2);
+                    $data[$date_]['DATA'][$booking->employee_code][$booking->currency] += round($booking->total_sales, 2);
+                    $data[$date_]['DATA'][$booking->employee_code]['QUANTITY']++;
+                    $data[$date_]['DATA'][$booking->employee_code]['BOOKINGS'][] = $booking;
+                }
+            }
+        }
+
+        return view('components.html.dashboard.callcenteragent.sales', [ 'sales' => $bookings, 'exchange' => FiltersTrait::ExchangeCommission($dates['init'], $dates['end']) ]);
+    }
+
+    public function getOperations($request)
+    {
+        ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
+
+        $userArray = MethodsTrait::parseArray($request->user ?? '');
+        $statusArray = MethodsTrait::parseArray($request->status ?? '');
+        $dataUser = MethodsTrait::DataUser($userArray, $statusArray);
+        // Manejo de Fechas
+        $dates = MethodsTrait::parseDateRange($request->date ?? '');
+        $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
+        $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
+        $data = MethodsTrait::SalesArrayStructure($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
+
+        //Para la operación velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
+        $paramsOperation = $this->parseArrayQuery(['CONFIRMED', 'CREDIT', 'OPENCREDIT'],"single");
+        $queryHavingOperation = " HAVING reservation_status IN (".$paramsOperation.") ";
+
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two 
+                      AND rez.is_commissionable = 1 
+                      AND rez.is_cancelled = 0 
+                      AND rez.is_duplicated = 0
+                    --   AND rez.open_credit = 0 
+                      AND rez.is_quotation = 0 ";
+
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four 
+                      AND rez.is_commissionable = 1 
+                      AND rez.is_cancelled = 0 
+                      AND rez.is_duplicated = 0 
+                    --   AND rez.open_credit = 0 
+                      AND rez.is_quotation = 0 
+                      AND it.is_round_trip = 1 ";
+
+        $params = $this->parseArrayQuery(['COMPLETED'], "single");
+        $queryOne .= " AND it.op_one_status IN ($params) ";
+        $queryTwo .= " AND it.op_two_status IN ($params) ";
+
+        $queryData = [
+            'init' => $datesMonth['initTime'],
+            'end' => $datesMonth['endTime']
+        ];
+
+        if ($userArray) {
+            $params = MethodsTrait::parseArrayQuery2($userArray, 'single');
+            $queryOne .= " AND us.id IN ($params) ";
+            $queryTwo .= " AND us.id IN ($params) ";
+        }
+
+        $operations = $this->queryOperations($queryOne, $queryTwo, $queryHavingOperation, $queryData);
+
+        // Recorremos para poder obtener el total de servicios pendientes y completados
+        if( $operations ){
+            foreach ($operations as $operation) {
+                $date_ = OperationTrait::setDateTime($operation, "date");
+                $total_sales = $operation->currency == "USD"
+                ? ($operation->cost * $exchange_commission)
+                : $operation->cost;
+
+                if( isset($data[$date_]) && isset($data[$date_]['DATA'][$operation->employee_code]) ){
+                    $data[$date_]['TOTAL'] += round($total_sales,2);
+                    $data[$date_][$operation->currency] += round($operation->cost,2);
+                    $data[$date_]['QUANTITY'] ++;
+                    $data[$date_]['BOOKINGS'][] = $operation;
+
+                    // if ( isset($data[$date_]['DATA'][$operation->employee_code]) ) {
+                        $data[$date_]['DATA'][$operation->employee_code]['TOTAL'] += round($total_sales, 2);
+                        $data[$date_]['DATA'][$operation->employee_code][$operation->currency] += round($operation->cost, 2);
+                        $data[$date_]['DATA'][$operation->employee_code]['QUANTITY']++;
+                        $data[$date_]['DATA'][$operation->employee_code]['BOOKINGS'][] = $operation;
+                    // }
+                }
+            }
+        }        
+        
+        return view('components.html.dashboard.callcenteragent.operations', [ 'sales' => $operations, 'exchange' => FiltersTrait::ExchangeCommission($dates['init'], $dates['end']) ]);
+    }
+    
+    public function getCommissions($request)
+    {
+        ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el tiempo de ejecución, pero evita desactivar los límites de memoria
+
+        $userArray = MethodsTrait::parseArray($request->user ?? '');
+        $statusArray = MethodsTrait::parseArray($request->status ?? '');
+        $dataUser = MethodsTrait::DataUser($userArray, $statusArray);
+        // Manejo de Fechas
+        $dates = MethodsTrait::parseDateRange($request->date ?? '');
+        $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
+        $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
+        $percentage_commission_investment = FiltersTrait::PercentageCommissionInvestment();
+        $data['USERS'] = MethodsTrait::UserArrayStructure($dataUser->toArray());
+
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two 
+                      AND rez.is_commissionable = 1 
+                      AND rez.is_cancelled = 0 
+                      AND rez.is_duplicated = 0
+                    --   AND rez.open_credit = 0 
+                      AND rez.is_quotation = 0 ";
+
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four 
+                      AND rez.is_commissionable = 1 
+                      AND rez.is_cancelled = 0 
+                      AND rez.is_duplicated = 0 
+                    --   AND rez.open_credit = 0 
+                      AND rez.is_quotation = 0 
+                      AND it.is_round_trip = 1 ";
+
+        $queryData = [
+            'init' => $datesMonth['initTime'],
+            'end' => $datesMonth['endTime']
+        ];
+
+        if ($userArray) {
+            $params = MethodsTrait::parseArrayQuery2($userArray, 'single');
+            $queryOne .= " AND us.id IN ($params) ";
+            $queryTwo .= " AND us.id IN ($params) ";
+        }
+
+        $operations = $this->queryOperations($queryOne, $queryTwo, "", $queryData);
+
+        // Recorremos para poder obtener el total de servicios pendientes y completados
+        if( $operations ){
+            foreach ($operations as $operation) {
+                $total_sales = $operation->currency == "USD"
+                ? ($operation->cost * $exchange_commission)
+                : $operation->cost;
+                     
+                if( isset($data["USERS"][$operation->employee_code]) ){
+
+                    $data["USERS"][$operation->employee_code]['TOTAL'] += round($total_sales, 2);
+                    $data["USERS"][$operation->employee_code][$operation->currency] += round($operation->cost, 2);
+                    $data["USERS"][$operation->employee_code]['QUANTITY'] ++;
+                    $data["USERS"][$operation->employee_code]['BOOKINGS'][] = $operation;
+
+                    if( OperationTrait::serviceStatus($operation, "no_translate") == "PENDING" ){
+                        $data["USERS"][$operation->employee_code]['TOTAL_PENDING'] += round($total_sales, 2);
+                    }
+
+                    if( OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" ){
+                        $data["USERS"][$operation->employee_code]['TOTAL_COMPLETED'] += round($total_sales, 2);
+                    }                    
+                }
+            }
+        }
+
+        foreach ($data['USERS'] as $key => $item) {
+            $percentage_commission = $item['SETTINGS']['type_commission'] === 'target' ? 0 : $item['SETTINGS']['percentage'];
+            $targets = is_string($item['SETTINGS']['targets']) ? json_decode($item['SETTINGS']['targets'], true) : $item['SETTINGS']['targets'];
+            foreach ( $targets as &$target ) {
+                if ($item['TOTAL_COMPLETED'] >= $target['amount']) {
+                    $percentage_commission = $target['percentage'];
+                    $target['status'] = true; // Modificar status a true donde se obtiene el percentage
+                }
+            }
+            unset($targets); // Romper la referencia para evitar efectos secundarios
+
+            //Desglose de las comisiones de servicios operados
+            $total_investment_discount_operated = round( ($item['TOTAL_COMPLETED'] * ( $percentage_commission_investment / 100) ), 2);
+            $total_services_operated_investment_discount = round(MethodsTrait::calculateTotalDiscount($item['TOTAL_COMPLETED'], $percentage_commission_investment), 2);
+            $total_commission_operated = round(( $total_services_operated_investment_discount * $percentage_commission ) / 100, 2);
+            $data['USERS'][$key]['TOTAL_DISCOUNT'] += $total_investment_discount_operated;
+            $data['USERS'][$key]['TOTAL_LESS_DISCOUNT'] += $total_services_operated_investment_discount;
+            $data['USERS'][$key]['COMMISSION'] += $total_commission_operated;
+        }
+        
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'se encontraron datos',
+        //     'data' => $data,
+        // ], Response::HTTP_OK);
+        return view('components.html.dashboard.callcenteragent.commissions', [ 'users' => $data['USERS'] ]);
+    }    
+
     public function getStats($request)
     {
         try {
@@ -115,7 +348,6 @@ class CommissionsRepository
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
-            $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
             $data = [
                 "EXCHANGE_COMMISSION" => FiltersTrait::ExchangeCommission($dates['init'], $dates['end']),
                 "PERCENTAGE_COMMISSION_INVESTMENT" => FiltersTrait::PercentageCommissionInvestment(),
@@ -199,7 +431,7 @@ class CommissionsRepository
                         $data['TOTAL_OPERATIONS'] += $total_sales;
 
                         $data["DATA"][$operation->employee_code]['TOTAL'] += round($total_sales, 2);
-                        $data["DATA"][$operation->employee_code][$booking->currency] += round($operation->cost, 2);
+                        $data["DATA"][$operation->employee_code][$operation->currency] += round($operation->cost, 2);
                         $data["DATA"][$operation->employee_code]['QUANTITY'] ++;
 
                     }
@@ -282,7 +514,7 @@ class CommissionsRepository
             if ($bookings) {
                 foreach ($bookings as $booking) {
                     $date_ = date("Y-m-d", strtotime($booking->created_at));
-                    $total_sales = ($booking->currency == "USD") 
+                    $total_sales = ($booking->currency == "USD")
                         ? ($booking->total_sales * $exchange_commission) 
                         : $booking->total_sales;
     

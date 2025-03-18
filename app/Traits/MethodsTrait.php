@@ -146,8 +146,19 @@ trait MethodsTrait
                                 "TOTAL" => 0,
                                 "USD" => 0,
                                 "MXN" => 0,
+                                "TOTAL_PENDING" => 0,
+                                "TOTAL_COMPLETED" => 0,                                
+                                "TOTAL_DISCOUNT" => 0,
+                                "TOTAL_LESS_DISCOUNT" => 0,
+                                "COMMISSION" => 0,
                                 "QUANTITY" => 0,
-                                "BOOKINGS" => []
+                                "BOOKINGS" => [],
+                                "SETTINGS" => [
+                                    'daily_goal' => $value['daily_goal'] ?? 0,
+                                    'type_commission' => $value['type_commission'] ?? "target",
+                                    'percentage' => $value['percentage'] ?? 0,
+                                    'targets' => $value['target']['object'] ?? [],                            
+                                ]
                             ];
                         }                        
                     }
@@ -171,6 +182,11 @@ trait MethodsTrait
                         "TOTAL" => 0,
                         "USD" => 0,
                         "MXN" => 0,
+                        "TOTAL_PENDING" => 0,
+                        "TOTAL_COMPLETED" => 0,                        
+                        "TOTAL_DISCOUNT" => 0,
+                        "TOTAL_LESS_DISCOUNT" => 0,                        
+                        "COMMISSION" => 0,
                         "QUANTITY" => 0,
                         "BOOKINGS" => [],
                         "SETTINGS" => [

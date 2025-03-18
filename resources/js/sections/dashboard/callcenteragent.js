@@ -450,5 +450,5 @@ document.addEventListener("DOMContentLoaded", function() {
             const containerBreakdown = document.getElementById('containerBreakdownCommissions');
             containerBreakdown.classList.toggle('d-none');
         }
-    }, 300)); // 300ms de espera antes de ejecutar de nuevo    
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
 });

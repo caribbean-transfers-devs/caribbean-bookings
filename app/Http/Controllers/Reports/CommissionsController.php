@@ -38,10 +38,25 @@ class CommissionsController extends Controller
         return $this->CommissionsRepository->index2($request);
     }
 
+    public function getSales(Request $request)
+    {
+        return $this->CommissionsRepository->getSales($request);
+    }
+    
+    public function getOperations(Request $request)
+    {
+        return $this->CommissionsRepository->getOperations($request);
+    }
+    
+    public function getCommissions(Request $request)
+    {
+        return $this->CommissionsRepository->getCommissions($request);
+    }
+
     public function getStats(Request $request)
     {
         return $this->CommissionsRepository->getStats($request);
-    }    
+    }
 
     public function chartsSales(Request $request)
     {

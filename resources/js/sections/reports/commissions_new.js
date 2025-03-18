@@ -117,7 +117,7 @@ let commissions = {
           },
         }]
     },
-
+   
     getStats: async function() {
         try {
             const _params    = {
@@ -147,7 +147,7 @@ let commissions = {
             return { data: { daily_goal: "N/A", total_day: "N/A", percentage_daily_goal: "N/A", total_month: "N/A", total_services_operated: "N/A", total_pending_services: "N/A" } }; // Devolver valores por defecto            
         }
     },
-    fetchDataCharts: async function(url) {
+    fetchData: async function(url) {
         try {
             const _params    = {
                 date: this.GetDate(),
@@ -155,7 +155,7 @@ let commissions = {
                 status: this.selectedStatus()
             };
 
-            const http = await fetch(url, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -164,16 +164,44 @@ let commissions = {
                 body: JSON.stringify(_params),
             });
     
-            if (!http.ok) {
-                throw new Error(`Error ${http.status}: ${http.statusText}`);
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
     
-            return await http.json();
+            return await response.text();
+        } catch (error) {
+            console.error("Error en fetchData:", error);
+            return { data: { daily_goal: "N/A", total_day: "N/A", percentage_daily_goal: "N/A", total_month: "N/A", total_services_operated: "N/A", total_pending_services: "N/A" } }; // Devolver valores por defecto
+        }
+    },    
+    fetchDataCharts: async function(url) {
+        try {
+            const _params    = {
+                date: this.GetDate(),
+                user: this.selectedUsers(),
+                status: this.selectedStatus()
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(_params),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+    
+            return await response.json();
         } catch (error) {
             console.error("Error en fetchDataCharts:", error);
-            return { data: { daily_goal: "N/A", total_day: "N/A", percentage_daily_goal: "N/A", total_month: "N/A", total_services_operated: "N/A", total_pending_services: "N/A" } }; // Devolver valores por defecto            
+            return { data: { daily_goal: "N/A", total_day: "N/A", percentage_daily_goal: "N/A", total_month: "N/A", total_services_operated: "N/A", total_pending_services: "N/A" } }; // Devolver valores por defecto
         }
     },
+
     cleanNumber: function(value) {
         if (!value) return 0;
         return Number(value.toString().replace(/[^0-9.-]+/g, ""));
@@ -521,11 +549,76 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    if( document.getElementById('status') ){        
+    if( document.getElementById('status') ){
         document.getElementById('status').addEventListener('change', function() {
             let selectedValues = commissions.selectedStatus(); // Obtener valores seleccionados
             commissions.reloadAll(); // Inicializar cargando las estadisticas
             commissions.reloadSalesCharts();
         });
-    }    
+    }
+
+    function debounce(func, delay) {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    document.addEventListener("click", debounce(async function (event) {
+        if (event.target.classList.contains('getData')) {
+            event.preventDefault();
+            
+            // Obtener datos del elemento clickeado
+            const { type } = event.target.dataset;
+            
+            $("#callcenterModal").modal('show');
+            
+            // Elementos HTML
+            const elements = {
+                title: document.getElementById("callcenterModalLabel"),
+                container: document.getElementById("data"),
+            };
+
+            // Validar que los elementos existen antes de usarlos
+            if (!elements.title || !elements.container) {
+                console.error("Error: No se encontraron los elementos del DOM necesarios.");
+                return;
+            }
+
+            // Actualizar resumen general, al mostrar el loader ANTES de la solicitud
+            Object.values(elements).forEach(el => el.innerHTML = commissions.getLoader().trim());
+
+            // Determinar la URL según el tipo de reporte
+            let title;
+            let url;
+            switch (type) {
+                case "sales":
+                    title = "Listado de reservas vendidas";
+                    url = "/reports/sales/data/commissions/get";
+                    break;
+                case "operations":
+                    title = "Listado de servicios operados";
+                    url = "/reports/operations/data/commissions/get";
+                    break;
+                default:
+                    title = "Listado de comisiones";
+                    url = "/reports/commissions/data/commissions/get";
+                    break;
+            }            
+
+            try {
+                const data = await commissions.fetchData(url);
+                
+                // Validar que los elementos existen antes de modificar el contenido
+                await Promise.all([
+                    elements.title.innerHTML = title.trim(),
+                    elements.container.innerHTML = data.trim(),
+                ]);
+            } catch (error) {
+                console.error("Error al obtener datos:", error);
+                Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar datos.</p>');
+            }
+        }
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
 });

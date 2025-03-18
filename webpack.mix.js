@@ -26,8 +26,7 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         mix.sass('resources/scss/panel.scss', data.assets + "css/panel/panel2.min.css");//panel2 styles
         mix.sass('resources/scss/error.scss', data.assets + "css/panel/error.min.css");//error styles
         
-        mix.sass('resources/scss/sections/reservation_details.scss', data.assets + "css/sections/reservation_details.min.css"); //RESERVATION DETAILS    
-        mix.sass('resources/scss/sections/managment.scss', data.assets + "css/sections/managment.min.css"); //LO UTILIZA LA VISTA DE COMISIONES 
+        mix.sass('resources/scss/sections/reservation_details.scss', data.assets + "css/sections/reservation_details.min.css"); //RESERVATION DETAILS
 
         //DASHBOARD
             mix.sass('resources/scss/sections/dashboard/_management.scss', data.assets + "css/sections/dashboard/management.min.css"); //DASHBOARD DE GERENCIA
@@ -64,19 +63,14 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
             mix.sass('resources/scss/sections/settings/_vehicles.scss', data.assets + "css/sections/settings/vehicles.min.css"); //VEHICLES
             mix.sass('resources/scss/sections/settings/_drivers.scss', data.assets + "css/sections/settings/drivers.min.css"); //DRIVERS
             mix.sass('resources/scss/sections/settings/_exchanges_reports.scss', data.assets + "css/sections/settings/exchanges_reports.min.css"); //EXCHANGE REPORTS
-            mix.sass('resources/scss/sections/settings/_zones.scss', data.assets + "css/sections/settings/zones.min.css"); //ZONES
-        
-        mix.sass('resources/scss/sections/rates.scss', data.assets + "css/sections/rates.min.css"); //RATES
-        
-        mix.sass('resources/scss/sections/_settings_rates_enterprise.scss', data.assets + "css/sections/settings_rates_enterprise.min.css"); //RATES ENTERPRISE
-        mix.sass('resources/scss/sections/_settings_types_cancellations.scss', data.assets + "css/sections/settings_types_cancellations.min.css"); //TIPOS DE CANCELACIÓN
+            mix.sass('resources/scss/sections/settings/_zones.scss', data.assets + "css/sections/settings/zones.min.css"); //ZONES        
+            mix.sass('resources/scss/sections/settings/_rates.scss', data.assets + "css/sections/settings/rates.min.css"); //RATES
+            mix.sass('resources/scss/sections/settings/_rates_enterprise.scss', data.assets + "css/sections/settings/rates_enterprise.min.css"); //RATES ENTERPRISE
+            mix.sass('resources/scss/sections/settings/_types_cancellations.scss', data.assets + "css/sections/settings/types_cancellations.min.css"); //TYPES CANCELLATIONS
 
 
-        mix.sass('resources/scss/sections/enterprise.scss', data.assets + "css/sections/enterprise.min.css");
         mix.sass('resources/scss/sections/enterprise_forms.scss', data.assets + "css/sections/enterprise_forms.min.css");
-        mix.sass('resources/scss/sections/vehicle.scss', data.assets + "css/sections/vehicle.min.css");
         mix.sass('resources/scss/sections/vehicle_forms.scss', data.assets + "css/sections/vehicle_forms.min.css");
-        mix.sass('resources/scss/sections/driver.scss', data.assets + "css/sections/driver.min.css");
         mix.sass('resources/scss/sections/driver_forms.scss', data.assets + "css/sections/driver_forms.min.css");
 
         /************************************************************
@@ -269,12 +263,26 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
             mix.combine([
                 'resources/plugins/table/datatable/datatables5.js', 
                 'resources/js/sections/settings/zones.js'
-            ], data.assets + "js/sections/settings/zones.min.js");            
+            ], data.assets + "js/sections/settings/zones.min.js");
 
-        mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/settings/exchanges.js'], data.assets + "js/sections/settings/exchanges.min.js"); //EXCHANGE
-        mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/settings/rates_enterprise.js'], data.assets + "js/sections/settings/rates_enterprise.min.js"); //RATES ENTERPRISE
-        mix.combine(['resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/settings/types_cancellations.js'], data.assets + "js/sections/settings/types_cancellations.min.js"); //TIPOS DE CANCELACIÓN
-        mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/rates.js'], data.assets + "js/sections/rates.min.js"); //RATES
+            //RATES
+            mix.combine([
+                'resources/plugins/table/datatable/datatables5.js', 
+                'resources/js/sections/settings/rates.js'
+            ], data.assets + "js/sections/settings/rates.min.js");
+
+            //RATES ENTERPRISE
+            mix.combine([
+                'resources/plugins/table/datatable/datatables5.js', 
+                'resources/js/sections/settings/rates_enterprise.js'
+            ], data.assets + "js/sections/settings/rates_enterprise.min.js");
+
+            //TYPES CANCELLATIONS
+            mix.combine([
+                'resources/plugins/table/datatable/datatables5.js', 
+                'resources/js/sections/settings/types_cancellations.js'
+            ], data.assets + "js/sections/settings/types_cancellations.min.js");
+
         mix.combine(['resources/plugins/choices/choices.js'], data.assets + "js/sections/user_edit.min.js");
 
 //tpv styles

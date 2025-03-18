@@ -2,12 +2,12 @@
 @section('title') Tarifas @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/rates.min.css') }}" rel="preload" as="style">
-    <link href="{{ mix('/assets/css/sections/rates.min.css') }}" rel="stylesheet">
+    <link href="{{ mix('/assets/css/sections/settings/rates.min.css') }}" rel="preload" as="style">
+    <link href="{{ mix('/assets/css/sections/settings/rates.min.css') }}" rel="stylesheet">
 @endpush
 
 @push('Js')    
-    <script src="{{ mix('/assets/js/sections/rates.min.js') }}"></script>
+    <script src="{{ mix('/assets/js/sections/settings/rates.min.js') }}"></script>
 @endpush
 
 @section('content')

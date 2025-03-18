@@ -68,7 +68,7 @@ class CallCenterResository
         
         $bookings = $this->queryBookings($query, $queryHavingBooking, $queryData);
 
-        return view('dashboard.sales_callcenter', [ 'sales' => $bookings, 'exchange' => FiltersTrait::ExchangeCommission($dates[0], $dates[1]) ]);
+        return view('components.html.dashboard.callcenteragent.sales', [ 'sales' => $bookings, 'exchange' => FiltersTrait::ExchangeCommission($dates[0], $dates[1]) ]);
     }
 
     public function getOperations($request)
@@ -117,7 +117,7 @@ class CallCenterResository
 
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHavingOperation, $queryData);
 
-        return view('dashboard.operations_callcenter', [ 'sales' => $operations, 'exchange' => FiltersTrait::ExchangeCommission($dates[0], $dates[1]) ]);
+        return view('components.html.dashboard.callcenteragent.operations', [ 'sales' => $operations, 'exchange' => FiltersTrait::ExchangeCommission($dates[0], $dates[1]) ]);
     }
 
     public function getStats($request)
