@@ -77,6 +77,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     _data = this.dataChartSaleStatus();
                     break;
             };
+            console.log(_data);            
+            let options = {};
+            options.data = _data.map(row => row.counter);
+            if( _option == "Status" || _option == "serviceType" ){
+                options.backgroundColor = _data.map(row => row.color || '#ccc'); // Usa el color definido o gris por defecto
+            }
+            options.borderWidth = 0; // Hace las líneas del gráfico más delgadas
+            options.cutout = '70%'; // Reduce el grosor del doughnut
+
             return {
                 type: _type,
                 data: {
@@ -85,13 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         const percentage = ((row.counter / total) * 100).toFixed(2) + '%';
                         return `${row.name} (${percentage})`; // Agrega el porcentaje en la leyenda
                     }),
-                    datasets: [
-                        {
-                            data: _data.map(row => row.counter),
-                            borderWidth: 0, // Hace las líneas del gráfico más delgadas
-                            cutout: '70%' // Reduce el grosor del doughnut
-                        }
-                    ]
+                    datasets: [options]
                 },
                 options: {
                     responsive: true, // Hacer el gráfico responsivo

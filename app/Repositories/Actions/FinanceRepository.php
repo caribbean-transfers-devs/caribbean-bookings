@@ -238,7 +238,7 @@ class FinanceRepository
                 );
 
                 // Actualizar estado de reembolso si aplica
-                if ($reservationRefundId) {                    
+                if ($reservationRefundId) {
                     $refund = ReservationsRefund::find($reservationRefundId);
                     if ($refund) {
                         $refund->update([
@@ -263,7 +263,6 @@ class FinanceRepository
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 
     public function getReservation($id)
     {

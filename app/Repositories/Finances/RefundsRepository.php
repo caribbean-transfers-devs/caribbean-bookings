@@ -52,7 +52,7 @@ class RefundsRepository
             "is_agency" => $request->is_agency ?? 0,
         ];
 
-        $query = '  AND refund.created_at BETWEEN :init AND :end AND rez.site_id NOT IN(21,11) ';
+        $query = ' AND refund.created_at BETWEEN :init AND :end AND refund.deleted_at IS NULL AND rez.site_id NOT IN(21,11) ';
         $havingConditions = [];
         $queryHaving = '';
         $queryData = [

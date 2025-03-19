@@ -40,6 +40,10 @@ class ActionsController extends Controller
         return $this->ActionsRepository->confirmService($request);
     }
 
+    public function enabledLike(Request $request){
+        return $this->ActionsRepository->enabledLike($request);
+    }
+
     public function updateServiceUnlock(Request $request){
         return $this->ActionsRepository->updateServiceUnlock($request);
     }    

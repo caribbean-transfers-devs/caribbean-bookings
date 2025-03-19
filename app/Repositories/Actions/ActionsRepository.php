@@ -177,6 +177,78 @@ class ActionsRepository
     }
 
     /**
+     * NOS AYUDA A PODER CALIFICAR EL ESTATUS DE RESERVACIÓN, EN LOS DETALLES DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
+    public function enabledLike($request)
+    {
+        // Reglas de validación
+        $rules = [
+            'reservation_id' => 'required|integer',
+            'status' => 'required|integer|in:1,0',
+        ];
+
+        // Validación de datos
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422
+        }
+
+        // Obtener el item de la reservación
+        $booking = Reservation::where('id', $request->reservation_id)->first();
+        
+        if (!$booking) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'not_found', 
+                    'message' =>  "reservación no encontrada" 
+                ],
+                'status' => 'error',
+                'message' => 'reservación no encontrada'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $likeOld = $booking->reserve_rating;
+            $booking->reserve_rating = $request->status;
+
+            // Guardar el cambio y verificar que se guardó correctamente
+            if (!$booking->save()) {
+                DB::rollBack();
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Error al actualizar la calificación de la reservación'
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            // ESTATUS DE RESERVACIÓN
+            $this->create_followUps($booking->id, "El usuario: ".auth()->user()->name.", califico la reservación como: ". ( $likeOld == NULL ? ( $request->status == 1 ? '"POSITVO"' : '"NEGATIVO"' ) : ( $likeOld == 1 ? '"POSITIVO"' : '"NEGATIVO"' )." a ".( $request->status == 1 ? '"POSITIVO"' : '"NEGATIVO"' ) ), 'HISTORY', "UPDATE_LIKE");
+    
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo correctamente la calificación de la reservación',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
+
+    /**
      * NOS AYUDA A PODER CAMBIAR EL ESTATUS DE CONFIRMACION DEL SERVICIO, EN LOS DETALLES DE LA RESERVACIÓN
      * @param request :la información recibida en la solicitud
     */

@@ -186,6 +186,7 @@ trait QueryTrait
                                     rez.is_quotation,
                                     rez.was_is_quotation,
                                     rez.campaign,
+                                    rez.reserve_rating,
                                     
                                     us.id AS employee_code,
                                     us.status AS employee_status,
@@ -333,6 +334,7 @@ trait QueryTrait
                                 rez.is_complete,
                                 rez.created_at,
                                 rez.campaign,
+                                rez.reserve_rating,
 
                                 us.id AS employee_code,
                                 us.status AS employee_status,
@@ -523,6 +525,7 @@ trait QueryTrait
                                 rez.is_complete,
                                 rez.created_at,
                                 rez.campaign,
+                                rez.reserve_rating,
 
                                 us.id AS employee_code,
                                 us.status AS employee_status,

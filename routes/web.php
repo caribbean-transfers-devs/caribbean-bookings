@@ -108,8 +108,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/logout/all', [LoginController::class, 'logoutAllSessions'])->name('logout.all');    
 
     //BOTS
-        //SET RATE MASTER TOUR
-        Route::get('/set/rate/master', [MasterToursController::class, 'ListServicesMasterTour'])->name('list.services.master.tours')->withoutMiddleware(['auth']);
+        //SET RATES MASTER TOUR
+        Route::get('/set/rates/MasterTour', [MasterToursController::class, 'ListServicesMasterTour'])->name('list.services.master.tours')->withoutMiddleware(['auth']);
 
         //PAYPAL
         Route::get('/bot/conciliation/paypal', [ConciliationController::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
@@ -275,10 +275,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::match(['get', 'post'], '/action/getPaymentsReservation', [FINANCE::class, 'getPaymentsReservation'])->name('get.payments.reservation');
     Route::post('/action/addPaymentRefund', [FINANCE::class, 'addPaymentRefund'])->name('add.payment.refund');
 
-    //ACCIONES GENERALES
+    //ACCIONES GENERALES DE DETALLES DE RESERVA
     Route::post('/action/enablePayArrival', [ACTIONS_RESERVATION::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
     Route::post('/action/refundRequest', [ACTIONS_RESERVATION::class, 'refundRequest'])->name('update.booking.refund.request');
     Route::put('/action/updateServiceStatus', [ACTIONS_RESERVATION::class, 'updateServiceStatus'])->name('update.service.status');
+
+    Route::post('/action/enabledLike', [ACTIONS_RESERVATION::class, 'enabledLike'])->name('update.booking.like');
+
     Route::post('/action/confirmService', [ACTIONS_RESERVATION::class, 'confirmService'])->name('update.service.confirm');
     Route::post('/action/updateServiceUnlock', [ACTIONS_RESERVATION::class, 'updateServiceUnlock'])->name('update.service.unlock');
 });

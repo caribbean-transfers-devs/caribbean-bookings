@@ -11,9 +11,11 @@ use App\Http\Requests\SiteRequest;
 //REPOSITORY
 use App\Repositories\Settings\SitesRepository;
 
-
 //TRAITS
 use App\Traits\RoleTrait;
+
+//MODELS
+use App\Models\Site;
 
 class SitesController extends Controller
 {

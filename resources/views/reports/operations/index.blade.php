@@ -313,7 +313,7 @@
                             <th class="text-center">ESTATUS DE PAGO</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">BALANCE</th>
-                            <th class="text-center">COSTO POR SERVICIO</th>
+                            <th class="text-center">PRECIO POR SERVICIO</th>
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">MÉTODO DE PAGO</th>
                             <th class="text-center">PAGO AL LLEGAR</th>

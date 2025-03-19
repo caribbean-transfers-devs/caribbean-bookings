@@ -118,7 +118,8 @@ trait OperationTrait
     }
 
     //
-    public static function serviceStatus($service, $action = "translate"){
+    public static function serviceStatus($service, $action = "translate")
+    {
         if( $action == "translate" ){
             return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ));
         }else if( $action == "translate_name" ){
@@ -129,12 +130,14 @@ trait OperationTrait
     }
 
     //AQUI NOS MUESTRA EL BOTON CON EL ESTATUS DEL SERVICIO, CUANDO SE CERRO LA OPERACIÓN
-    public static function renderServiceStatus($service){
+    public static function renderServiceStatus($service)
+    {
         return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ), 'OPERATION').'">'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status )).'</button>';
     }
 
     //AQUI NOS MUESTRA EL BOTON CON LAS OPCIONES DE ESTATUS, CUANDO LA OPERACIÓN ESTA ABIERTA
-    public static function renderServiceOptionsStatus($key,$service){
+    public static function renderServiceOptionsStatus($key,$service)
+    {
         // <div class="dropdown-divider"></div>
         // <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="CANCELLED" data-item="'. $service->id .'" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>        
         return '<div class="btn-group" role="group">
@@ -151,7 +154,8 @@ trait OperationTrait
     } 
 
     //MOSTRAMOS EL NOMBRE DE LA UNIDAD, SELECCIONADA EN LA OPERCION
-    public static function setOperationUnit($service){
+    public static function setOperationUnit($service)
+    {
         if( $service->op_type == "TYPE_ONE" && $service->vehicle_one_name != null ){
             return $service->vehicle_one_name." - ".$service->vehicle_name_one;
         }else if( $service->op_type == "TYPE_TWO" && $service->vehicle_two_name != null ){

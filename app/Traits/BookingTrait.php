@@ -25,16 +25,44 @@ trait BookingTrait
                 return 'secondary';
                 break;
             case 'CREDIT':
-            case 'OPENCREDIT':
             case 'REFUND':
             case 'E':
                 return 'info';
+                break;
+            case 'OPENCREDIT':
+                return 'dark';
                 break;
             case 'QUOTATION':
                 return 'primary';
                 break;                
             default:
                 return 'success';
+                break;
+        }
+    }
+
+    public static function colorStatusBooking($status = "CONFIRMED"){
+        switch ($status) {
+            case 'PENDING':
+                return '#e2a03f';
+                break;
+            case 'CANCELLED':
+                return '#e7515a';
+                break;
+            case 'DUPLICATED':
+                return '#805dca';
+                break;
+            case 'CREDIT':
+                return '#2196f3';
+                break;
+            case 'OPENCREDIT':
+                return '#3b3f5c';
+                break;                
+            case 'QUOTATION':
+                return '#4361ee';
+                break;                
+            default:
+                return '#00ab55';
                 break;
         }
     }

@@ -163,6 +163,68 @@ if( refundRequest ){
 //VALIDAMOS DOM
 document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("click", debounce(function (event) {
+        //PERMITE CALIFICAR LA RESERVACION        
+        if (event.target.classList.contains('enabledLike')) {
+            event.preventDefault();
+
+            // Definir parámetros de la petición
+            const target     = event.target;
+            const _params    = {
+                reservation_id: target.dataset.reservation || "",
+                status: target.dataset.status || "",
+            };
+            
+            Swal.fire({
+                html: '¿Está seguro de la calificación de la reservación?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se actualiza el estatus de calificación de la reservación.",
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+    
+                    fetch('/action/enabledLike', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },            
+                        body: JSON.stringify(_params)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }
+            });            
+        }
+
         //ACTUALIZA LA CONFIRMACIÓN DEL SERVICIO
         if (event.target.classList.contains('confirmService')) {
             event.preventDefault();
