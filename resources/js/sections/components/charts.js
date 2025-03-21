@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(_data);            
             let options = {};
             options.data = _data.map(row => row.counter);
-            if( _option == "Status" || _option == "serviceType" ){
+            if( _option == "Status" || _option == "serviceType" || _option == "Currency" ){
                 options.backgroundColor = _data.map(row => row.color || '#ccc'); // Usa el color definido o gris por defecto
             }
             options.borderWidth = 0; // Hace las líneas del gráfico más delgadas

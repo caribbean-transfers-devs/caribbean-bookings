@@ -43,6 +43,7 @@ use App\Http\Controllers\Settings\EnterpriseController as ENTERPRISES;
 use App\Http\Controllers\Settings\SitesController as SITES;
 use App\Http\Controllers\Settings\VehicleController as VEHICLES;
 use App\Http\Controllers\Settings\DriverController as DRIVERS;
+use App\Http\Controllers\Settings\DriverSchedulesController as SCHEDULES;
 use App\Http\Controllers\Settings\ExchangeReportsController as EXCHANGE_REPORTS;
 use App\Http\Controllers\Settings\ZonesController as ZONES;
 use App\Http\Controllers\Settings\RatesController as RATES;
@@ -90,8 +91,8 @@ use Illuminate\Support\Facades\Route;
             Route::get('/tpv2/book/{id}', [TpvController2::class, 'book'])->name('tpv.book.es');
             Route::post('/tpv2/book/{id}/make', [TpvController2::class, 'create'])->name('tpv.create.es');
 
-            Route::get('/thank-you', [TpvController::class, 'success'])->name('process.success.es');
-            Route::get('/cancel', [TpvController::class, 'cancel'])->name('process.cancel.es');
+            Route::get('/thank-you', [TpvController2::class, 'success'])->name('process.success.es');
+            Route::get('/cancel', [TpvController2::class, 'cancel'])->name('process.cancel.es');
             Route::get('/my-reservation-detail', [BookingsController::class, 'ReservationDetail'])->name('reservation.detail.es');
         });
     });
@@ -209,6 +210,15 @@ Route::group(['middleware' => ['auth']], function () {
         Route::resource('/vehicles', VEHICLES::class);
         //CONDUCTORES
         Route::resource('/drivers', DRIVERS::class);
+
+        //HORARIO DE CONDUCTORES
+        Route::match(['get', 'post'], '/schedules', [SCHEDULES::class, 'index'])->name('schedules.index');
+        Route::get('/schedules/create', [SCHEDULES::class, 'create'])->name('schedules.create');
+        Route::post('/schedules/store', [SCHEDULES::class, 'store'])->name('schedules.store');
+        Route::get('/schedules/{schedule}/edit', [SCHEDULES::class, 'edit'])->name('schedules.edit');
+        Route::put('/schedules/{schedule}', [SCHEDULES::class, 'update'])->name('schedules.update');
+        Route::delete('/schedules/{schedule}', [SCHEDULES::class, 'destroy'])->name('schedules.destroy');
+
         //TIPO DE CAMBIO PARA REPORTES
         Route::get('/config/exchange-reports', [EXCHANGE_REPORTS::class, 'index'])->name('exchanges.index');
         Route::get('/config/exchange-reports/create', [EXCHANGE_REPORTS::class, 'create'])->name('exchanges.create');

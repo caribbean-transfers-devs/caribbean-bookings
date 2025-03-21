@@ -234,6 +234,13 @@
                     'active' => request()->routeIs('drivers.*'),
                 ];
             endif;
+            // if(RoleTrait::hasPermission(75)):
+                $links_settings[] = [
+                    'name' => 'Horarios',
+                    'route' => route('schedules.index'),
+                    'active' => request()->routeIs('schedules.*'),
+                ];
+            // endif;            
             //TIPO DE CAMBIO PARA REPORTES
             if(RoleTrait::hasPermission(103)):
                 $links_settings[] = [
@@ -280,7 +287,7 @@
                 'code' => 'settings',
                 'name' => 'Configuraciones',
                 'route' => null,
-                'active' => request()->routeIs('users.*','roles.*','enterprises.*','sites.*','vehicles.*','drivers.*','exchanges.*','config.zones','config.zones.getZones','config.ratesDestination','config.ratesZones','config.types-cancellations.*'),
+                'active' => request()->routeIs('users.*','roles.*','enterprises.*','sites.*','vehicles.*','drivers.*','schedules.*','exchanges.*','config.zones','config.zones.getZones','config.ratesDestination','config.ratesZones','config.types-cancellations.*'),
                 'urls' => $links_settings
             ]);
         endif;

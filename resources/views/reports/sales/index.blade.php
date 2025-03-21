@@ -332,9 +332,10 @@
                                     if (!isset( $dataCurrency['data'][$item->currency] ) ){
                                         $dataCurrency['data'][$item->currency] = [
                                             "name" => $item->currency,
+                                            "color" => ( $item->currency == "USD" ? "#4361ee" : "#2196f3" ),
                                             "total" => 0,
                                             "gran_total" => 0,
-                                            "counter" => 0,                                            
+                                            "counter" => 0,
                                         ];
                                     }
                                     $dataCurrency['total'] += $item->total_sales;

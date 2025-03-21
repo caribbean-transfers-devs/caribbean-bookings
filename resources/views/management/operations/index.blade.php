@@ -64,28 +64,28 @@
         }
 
         /*ESTILO DE CAMPANA*/
-.bell-button {
-    /* font-size: 24px; */
-    border: none;
-    background: none;
-    cursor: pointer;
-    position: relative;
-    /* animation: ring 1s infinite ease-in-out; */
-    transition: transform 0.3s;
-}
-.bell-button.active {
-    animation: ring 1s infinite ease-in-out;
-    box-shadow: 0 0 10px red, 0 0 20px red;
-}
-@keyframes ring {
-    0% { transform: rotate(0); }
-    15% { transform: rotate(-15deg); }
-    30% { transform: rotate(15deg); }
-    45% { transform: rotate(-10deg); }
-    60% { transform: rotate(10deg); }
-    75% { transform: rotate(-5deg); }
-    100% { transform: rotate(0); }
-}
+        .bell-button {
+            /* font-size: 24px; */
+            border: none;
+            background: none;
+            cursor: pointer;
+            position: relative;
+            /* animation: ring 1s infinite ease-in-out; */
+            transition: transform 0.3s;
+        }
+        .bell-button.active {
+            animation: ring 1s infinite ease-in-out;
+            box-shadow: 0 0 10px red, 0 0 20px red;
+        }
+        @keyframes ring {
+            0% { transform: rotate(0); }
+            15% { transform: rotate(-15deg); }
+            30% { transform: rotate(15deg); }
+            45% { transform: rotate(-10deg); }
+            60% { transform: rotate(10deg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0); }
+        }
     </style>
 @endpush
 

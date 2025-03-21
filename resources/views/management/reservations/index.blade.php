@@ -96,6 +96,7 @@
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">MÉTODO DE PAGO</th>
                             <th class="text-center">PAGO AL LLEGAR</th>
+                            <th class="text-center">CALIFICACIÓN</th>
                             <th class="text-center">COMISIÓNABLE</th>
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
