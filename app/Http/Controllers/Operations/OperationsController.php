@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Response as ResponseFile;
 
+//MODELS
 use App\Models\Enterprise;
 use App\Models\Driver;
 use App\Models\Vehicle;
@@ -16,6 +17,7 @@ use App\Models\Sale;
 use App\Models\Zones;
 use App\Models\Destination;
 use App\Models\DestinationService;
+use App\Models\DriverSchedule;
 
 //TRAIT
 use App\Traits\ApiTrait;
@@ -1263,5 +1265,15 @@ class OperationsController extends Controller
         $writer->save($temp_file);
 
         return ResponseFile::download($temp_file, $fileName)->deleteFileAfterSend(true);        
+    }
+
+    public function getSchedules(Request $request)
+    {
+        $schedules = DriverSchedule::where('date', ( isset($request->date) ? $request->date : date('Y-m-d') ))
+                                    ->orderBy('date', 'ASC')
+                                    ->orderBy('check_in_time', 'ASC')
+                                    ->get();
+
+        return view('components.html.management.operations.schedules', [ 'schedules' => $schedules ]);
     }
 }

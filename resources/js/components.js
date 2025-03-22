@@ -87,7 +87,7 @@ let components = {
         //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
         _settings.dom = `<'dt--top-section'<''<'left'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center'B>><'right'f>>>
                         <'table-responsive'tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;                        
+                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
         _settings.deferRender = true;
         _settings.responsive = false; // La tabla sigue siendo responsive
         _settings.buttons =  _buttons;

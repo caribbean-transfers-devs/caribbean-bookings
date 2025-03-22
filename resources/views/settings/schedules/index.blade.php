@@ -1,5 +1,7 @@
 @php
     use App\Traits\RoleTrait;
+    use Carbon\Carbon;
+    Carbon::setLocale('es');
 @endphp
 @extends('layout.app')
 @section('title') Empresas @endsection
@@ -51,21 +53,45 @@
                     <thead>
                         <tr>
                             <th class="text-center">Fecha</th>
-                            <th class="text-center">Hora Entrada</th>
-                            <th class="text-center">Hora Salida</th>
+                            <th class="text-center">Hora entrada</th>
+                            <th class="text-center">Hora salida</th>
+                            <th class="text-center">Hora salida/final</th>
+                            <th class="text-center">Horas extras</th>
                             <th class="text-center">Unidad</th>
                             <th class="text-center">Driver</th>
+                            <th class="text-center">Estatus</th>
+                            <th class="text-center">Observaciónes</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($schedules as $schedule)
                             <tr>
-                                <td class="text-center">{{ $schedule->date }}</td>
-                                <td class="text-center">{{ $schedule->check_in_time }}</td>
-                                <td class="text-center">{{ $schedule->check_out_time }}</td>
-                                <td class="text-center">{{ $schedule->vehicle->name }}</td>
-                                <td class="text-center">{{ $schedule->driver->names }}</td>
+                                <td class="text-center">{{ Carbon::parse($schedule->date)->translatedFormat('d F Y') }}</td>
+                                <td class="text-center">{{ Carbon::parse($schedule->check_in_time)->format('H:i A') }}</td>
+                                <td class="text-center"><span class="badge badge-success w-100">{{ Carbon::parse($schedule->check_out_time)->format('H:i A') }}</span></td>
+                                <td class="text-center">
+                                    @php
+                                        $time = Carbon::parse($schedule->end_check_out_time)->format('H:i A');
+                                    @endphp
+                                    <?=( $schedule->end_check_out_time != NULL ? '<span class="badge badge-'.( $schedule->extra_hours != NULL ? 'danger' : 'success' ).' w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
+                                </td>
+                                <td class="text-center">
+                                    @php
+                                        $time = Carbon::parse($schedule->extra_hours)->format('H:i');
+                                    @endphp                                    
+                                    <?=( $schedule->extra_hours != NULL ? '<span class="badge badge-success w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
+                                </td>
+                                <td class="text-center"><button class="btn btn-dark w-100">{{ isset($schedule->vehicle->name) ? $schedule->vehicle->name : 'NO DEFINIDO' }} - {{ isset($schedule->vehicle->destination_service->name) ? $schedule->vehicle->destination_service->name : 'NO DEFINIDO' }} - {{ isset($schedule->vehicle->enterprise->names) ? $schedule->vehicle->enterprise->names : 'NO DEFINIDO' }}</button></td>
+                                <td class="text-center">{{ isset($schedule->driver->names) ? $schedule->driver->names : 'NO DEFINIDO' }} {{ isset($schedule->driver->surnames) ? $schedule->driver->surnames : 'NO DEFINIDO' }}</td>
+                                <td class="text-center">
+                                    @if ( $schedule->status != NULL )
+                                        <button class="btn btn-{{ $schedule->status == "DT" ? 'info' : ( $schedule->status == "F" ? 'danger' : 'success' ) }} w-100">{{ $schedule->status }}</button>
+                                    @else
+                                        {{ "NO DEFINIDO" }}                                        
+                                    @endif
+                                </td>
+                                <td class="text-center">{{ $schedule->observations }}</td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
                                         <a class="btn btn-primary" href="{{ route('schedules.edit', [$schedule->id]) }}">Editar</a>

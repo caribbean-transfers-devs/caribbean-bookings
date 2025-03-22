@@ -7,12 +7,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title') | Bookings</title>
-	<meta name="description" content="Caribbean Transfers | Affiliates">
+	<meta name="description" content="Caribbean Transfers | Bookings">
     <link rel="preconnect" href="https://fonts.gstatic.com">
-	<link rel="shortcut icon" href="/assets/img/icons/favicon-32x32.png">
+    <link rel="shortcut icon" href="/assets/img/icons/favicon.ico">
 
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <link href="/assets/css/core/core.min.css" rel="preload" as="style" >
     <link href="/assets/css/core/core.min.css" rel="stylesheet" >
     <link href="/assets/css/panel/panel.min.css" rel="preload" as="style" >

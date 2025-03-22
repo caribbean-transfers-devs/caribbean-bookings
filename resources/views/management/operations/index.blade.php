@@ -115,94 +115,7 @@
 @section('content')
     @php
         $total_close = 0;
-        $buttons = array(
-            array(
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
-                'className' => 'btn btn-primary',
-                'attr' => array(
-                    'data-title' =>  "Filtros de operacion",
-                    'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#filterModal'
-                )
-            ),
-            array(
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
-                'titleAttr' => 'Administrar columnas',
-                'className' => 'btn btn-primary __btn_columns',
-                'attr' => array(
-                    'data-title' =>  "Filtro de reservaciones",
-                    'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#columnsModal',
-                    'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
-                    'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
-                )                
-            ),
-            array(
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas',
-                'titleAttr' => 'Ver graficas',
-                'className' => 'btn btn-primary',
-                'attr' => array(
-                    'id' => 'showLayer',
-                )
-            ),            
-        );
-        if (RoleTrait::hasPermission(80)){
-            array_push($buttons,
-                array(
-                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg> Agregar nuevo servicio',
-                    'className' => 'btn btn-primary',
-                    'attr' => array(
-                        'data-title' =>  "Agregar nuevo servicio",
-                        'data-bs-toggle' => 'modal',
-                        'data-bs-target' => '#operationModal'
-                    )
-                )
-            );
-        }
-        if (RoleTrait::hasPermission(82)){
-            array_push($buttons,
-                array(
-                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Pre-asignación',
-                    'className' => 'btn btn-primary',
-                    'attr' => array(
-                        'id' =>  "btn_preassignment",
-                    )
-                )
-            );
-        }
-        if (RoleTrait::hasPermission(83)){
-            array_push($buttons,
-                array(
-                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Descargar operación',
-                    'className' => 'btn btn-primary',
-                    'attr' => array(
-                        'id' =>  "btn_dowload_operation",
-                    )
-                )
-            );
-        }
-        if (RoleTrait::hasPermission(84)){
-            // array_push($buttons,
-            //     array(
-            //         'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Descargar comisiones de operación',
-            //         'className' => 'btn btn-primary',
-            //         'attr' => array(
-            //             'id' =>  "btn_dowload_operation_comission",
-            //         )
-            //     )
-            // );
-        }
-        if (RoleTrait::hasPermission(85)){
-            array_push($buttons,
-                array(
-                    'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Cerrar operación',
-                    'className' => 'btn btn-danger',
-                    'attr' => array(
-                        'id' =>  "btn_close_operation",
-                    )
-                )
-            );
-        }
+        $buttons = array();
         if( sizeof($items) >= 1 ):
             foreach ($items as $operation) {
                 $close_operation = ( ( ( $operation->final_service_type == 'ARRIVAL' || $operation->final_service_type == 'TRANSFER' || $operation->final_service_type == 'DEPARTURE' ) && $operation->op_type == "TYPE_ONE" && ( $operation->is_round_trip == 0 || $operation->is_round_trip == 1 ) ) ? $operation->op_one_operation_close : $operation->op_two_operation_close );
@@ -223,6 +136,31 @@
         </div>
     @endif
     <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
+
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 layout-spacing">
+        <div class="btn-group" role="group" aria-label="options">
+            <button type="button" class="btn btn-primary" data-title="Filtros de operación" data-bs-toggle="modal" data-bs-target="#filterModal"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros</button>
+            <button type="button" class="btn btn-primary __btn_columns" title="Administrar columnas" data-title="columnas de operaciones" data-bs-toggle="modal" data-bs-target="#columnsModal" data-table="bookings" data-container="columns"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas</button>
+            <button type="button" class="btn btn-primary" title="Ver graficas" id="showLayer"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas</button>
+
+            @if ( RoleTrait::hasPermission(80) )
+                <button type="button" class="btn btn-primary" data-title="Agregar nuevo servicio" data-bs-toggle="modal" data-bs-target="#operationModal"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg> Agregar nuevo servicio</button>
+            @endif            
+            @if ( RoleTrait::hasPermission(82) )
+                <button type="button" class="btn btn-primary" id="btn_preassignment"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Pre-asignación</button>
+            @endif
+            @if ( RoleTrait::hasPermission(83) )
+                <button type="button" class="btn btn-primary" id="btn_dowload_operation"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Descargar operación</button>
+            @endif
+            @if ( RoleTrait::hasPermission(84) )
+                <button type="button" class="btn btn-primary" id="btn_dowload_operation_comission"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Descargar comisiones de operación</button>
+            @endif
+            <button type="button" class="btn btn-danger" id="getSchedules"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-watch"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path></svg> Ver horario de conductores</button>
+            @if ( RoleTrait::hasPermission(85) )
+                <button type="button" class="btn btn-danger" id="btn_close_operation"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Cerrar operación</button>
+            @endif
+        </div>        
+    </div>
 
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 layout-spacing">
         <div class="widget-content widget-content-area br-8">
@@ -283,7 +221,7 @@
                 </thead>
                 <tbody>
                     @if(sizeof($items)>=1)
-                        @foreach($items as $key => $value)      
+                        @foreach($items as $key => $value)
                             {{-- @dump($value) --}}
                             @php
                                 // dump($value);
@@ -360,33 +298,32 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex gap-2 w-100">
-                                        <div class="d-flex gap-2 comment-default">
+                                    <div class="d-flex flex-column gap-2 w-100">
+                                        <div class="d-flex flex-column gap-2 comment-default">
                                             @if ( !empty($value->messages) )
-                                                <div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver historial de reservación" data-type="history" data-code="{{ $value->reservation_id }}">
+                                                <div class="btn btn-primary btn_operations __open_modal_history bs-tooltip w-100" title="Ver historial de reservación" data-type="history" data-code="{{ $value->reservation_id }}">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                                 </div>
                                             @endif
-                                            <div class="btn btn-primary btn_operations __open_modal_customer bs-tooltip" title="Ver datos del cliente" data-code="{{ $value->reservation_id }}">
+                                            <div class="btn btn-primary btn_operations __open_modal_customer bs-tooltip w-100" title="Ver datos del cliente" data-code="{{ $value->reservation_id }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                             </div>
-
                                             @if ( $value->is_round_trip == 1 && $value->final_service_type == "DEPARTURE" && ( $value->one_service_status == "CANCELLED" || $value->one_service_status == "NOSHOW" ) )
-                                                <div class="btn btn-primary btn_operations active notifications bell-button bs-tooltip" data-json="<?=json_encode($value)?>" onclick="notificationInfo({{ json_encode($value) }})" title="Por favor de confirmar el regreso con el cliente"> 
+                                                <div class="btn btn-primary btn_operations active notifications bell-button bs-tooltip w-100" data-json="<?=json_encode($value)?>" onclick="notificationInfo({{ json_encode($value) }})" title="Por favor de confirmar el regreso con el cliente"> 
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>                                                    
                                                 </div>                                                
                                             @endif
                                         </div>
                                         <div class="comment_new" id="comment_new_{{ $key.$value->id }}">
                                             @if ( $flag_comment )
-                                                <div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver mensaje de operaciones" data-type="comment" data-comment="{{ $comment }}">
+                                                <div class="btn btn-primary btn_operations __open_modal_history bs-tooltip w-100" title="Ver mensaje de operaciones" data-type="comment" data-comment="{{ $comment }}">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                                 </div>
                                             @endif
                                         </div>
                                         <div class="upload_new" id="upload_new_{{ $key.$value->id }}">
                                             @if ( !empty($value->pictures) )
-                                                <div class="btn btn-primary btn_operations __open_modal_media bs-tooltip" title="Esta reservación tiene imagenes" data-code="{{ $value->reservation_id }}">
+                                                <div class="btn btn-primary btn_operations __open_modal_media bs-tooltip w-100" title="Esta reservación tiene imagenes" data-code="{{ $value->reservation_id }}">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                                 </div>
                                             @endif
@@ -466,7 +403,7 @@
                                 <td class="text-center" >{{ number_format(( $value->pay_at_arrival == 1 || ( $value->pay_at_arrival == 0 && $value->payment_status == "PENDING" ) ? $value->total_sales : 0 ),2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
-                                    <div class="d-flex gap-3">
+                                    <div class="d-flex flex-column gap-2">
                                         <div class="btn btn-primary btn_operations {{ RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) || $close_operation == 1 ? 'disabled' : '__open_modal_comment' }} bs-tooltip" title="{{ ( $flag_comment ) ? 'Modificar comentario' : 'Agregar comentario' }}" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-reservation="{{ $value->reservation_id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                         </div>
@@ -515,6 +452,9 @@
 
     <x-modals.filters.bookings :data="$data" :websites="$websites" :units="$units" :drivers="$drivers" :reservationstatus="$reservation_status" />
     <x-modals.reports.columns />
+
+    <x-modals.management.operations.schedules />
+
     <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :vehicles="$vehicles" />
     <x-modals.reservations.comments /> <!-- MODAL PARA PODER AGREGAR COMENTARIO DE OPERACION Y IMAGENES -->
     <x-modals.reservations.operation_messages_history /> <!-- HISTORIAL DE MENSAJES DE LA RESERVACION -->

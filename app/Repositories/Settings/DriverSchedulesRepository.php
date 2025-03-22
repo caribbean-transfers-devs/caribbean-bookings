@@ -5,6 +5,7 @@ namespace App\Repositories\Settings;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 //TRAIT
 use App\Traits\FiltersTrait;
@@ -19,7 +20,9 @@ class DriverSchedulesRepository
 
     public function index($request)
     {
-        $schedules = DriverSchedule::all();
+        $schedules = DriverSchedule::orderBy('date', 'ASC')
+                                    ->orderBy('check_in_time', 'ASC')
+                                    ->get();
         return view('settings.schedules.index', [
             'breadcrumbs' => [
                 [
@@ -61,8 +64,8 @@ class DriverSchedulesRepository
             $schedule->date = $request->date;
             $schedule->check_in_time = $request->check_in_time;
             $schedule->check_out_time = $request->check_out_time;
-            $schedule->vehicle_id = $request->vehicle_id;
-            $schedule->driver_id = $request->driver_id;
+            $schedule->vehicle_id = $request->vehicle_id ?? NULL;
+            $schedule->driver_id = $request->driver_id ?? NULL;
             $schedule->save();
 
             DB::commit();
@@ -78,23 +81,23 @@ class DriverSchedulesRepository
 
     public function edit($request, $schedule){
         try {
-            $cancellation = TypesCancellation::find($id);
-            return view('settings.scheduless.new',[
+            return view('settings.schedules.new',[
                 'breadcrumbs' => [
                     [
                         "route" => route('schedules.index'),
-                        "name" => "Listado de tipos de cancelaciones",
+                        "name" => "Listado de horarios de conductores",
                         "active" => false
                     ],
                     [
                         "route" => "",
-                        "name" => "Editar el tipo de cancelación",
+                        "name" => "Editar el horario del conductor: ".$schedule->driver->names,
                         "active" => true
                     ]
                 ],
-                'cancellation' => $cancellation,
+                'schedule' => $schedule,
             ]);
         } catch (Exception $e) {
+            echo $e->getMessage();
         }
     }
 
@@ -105,9 +108,20 @@ class DriverSchedulesRepository
             $schedule->date = $request->date;
             $schedule->check_in_time = $request->check_in_time;
             $schedule->check_out_time = $request->check_out_time;
+
+            if ( isset($request->end_check_out_time) ) {
+                $time_in = Carbon::createFromFormat('H:i:s', $request->check_out_time.':00');
+                $time_out = Carbon::createFromFormat('H:i:s', $request->end_check_out_time.':00');
+                $difference = $time_in->diff($time_out);
+                $schedule->end_check_out_time = $request->end_check_out_time;
+                $schedule->extra_hours = $difference->h.':'.$difference->i.':00';
+            }
+
             $schedule->vehicle_id = $request->vehicle_id;
             $schedule->driver_id = $request->driver_id;
-            $schedule->save();          
+            $schedule->status = $request->status ?? NULL;
+            $schedule->observations = $request->observations ?? NULL;
+            $schedule->save();
 
             DB::commit();
 
@@ -116,7 +130,7 @@ class DriverSchedulesRepository
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('schedules.edit', $id)->with('danger', 'Error al actualizar el tipo de cancelación.');
+            return redirect()->route('schedules.edit', $schedule->id)->with('danger', $e->getMessage());
         }
     }
 

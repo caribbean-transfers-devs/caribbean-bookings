@@ -195,13 +195,12 @@ let setup = {
             });
         }
 
-        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-9 d-flex justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-1'B>><'col-12 col-sm-3 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
-                        <''tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+        _settings.dom = `<'dt--top-section'<''<'left'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center'B>><'right'f>>>
+                         <''tr>
+                         <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
         _settings.deferRender = true;
-        _settings.responsive = true;
+        _settings.responsive = false;
         _settings.buttons =  _buttons;
-        // _settings.order = [[ 2, "asc" ]];
         _settings.order = [];
         _settings.paging = false;
         _settings.oLanguage = {
@@ -286,7 +285,57 @@ let setup = {
         const horas = String(ahora.getHours()).padStart(2, '0');
         const minutos = String(ahora.getMinutes()).padStart(2, '0');
         return `${horas}:${minutos}`;
-    }
+    },
+
+    calendarFilter: function(selector, options = {}){
+        const defaultConfig = {
+            mode: "single",
+            locale: "es", // Idioma dinámico
+            enableTime: false, // Activamos o Desactivamos la selección de hora
+            // noCalendar: true, // Ocultamos la selección de fecha
+            dateFormat: "Y-m-d", // Formato por defecto
+            altInput: true, // Input visual más amigable
+            altFormat: "j F Y", // Formato más legible
+            allowInput: true,
+            // altFormat: "h:i K", // Formato 12h con AM/PM
+            defaultDate: "today",
+            minDate: "today",
+            plugins: [] // Aseguramos que sea un array
+        };
+    
+        let config = { ...defaultConfig, ...options };
+    
+        const fp = flatpickr(selector, config);
+        return fp;
+    },    
+    fetchData: async function(url) {
+        try {
+            const _params    = {
+                date: document.getElementById('lookup_date').value,
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(_params),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+    
+            return await response.text();
+        } catch (error) {
+            console.error("Error en fetchData:", error);
+            return { data: { daily_goal: "N/A", total_day: "N/A", percentage_daily_goal: "N/A", total_month: "N/A", total_services_operated: "N/A", total_pending_services: "N/A" } }; // Devolver valores por defecto
+        }
+    },
+    getLoader: function() {
+        return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
+    },    
 };
 
 if( document.querySelector('.table-rendering') != null ){
@@ -386,13 +435,95 @@ const __copy_confirmation = document.querySelector('.copy_confirmation'); //* ==
 const __send_confirmation_whatsapp = document.querySelector('.send_confirmation_whatsapp'); //* ===== BUTTON TO COPY CONFIRMATION CONTENT ===== */
 
 const __is_open = document.getElementById('is_open');
-
 const __notifications = document.querySelectorAll('.notifications');
+
+const _getSchedules = document.getElementById('getSchedules');
+const __end_check_outs = document.querySelectorAll('.end_check_out_time');
 
 //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
 const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhost:4000': 'https://socket-caribbean-transfers.up.railway.app' );
 console.log(socket);
 socket.on('connection');
+
+//NOS PERMITE VER LOS HORARIOS DE LOS CONDUCTORES
+if (_getSchedules) {
+    _getSchedules.addEventListener('click', async function(event){
+        event.preventDefault();
+        $("#schedulesModal").modal('show');
+
+        // Elementos HTML
+        const elements = {            
+            container: document.getElementById("data"),
+        };
+
+        // Validar que los elementos existen antes de usarlos
+        if (!elements.container) {
+            console.error("Error: No se encontraron los elementos del DOM necesarios.");
+            return;
+        }
+
+        // Actualizar resumen general, al mostrar el loader ANTES de la solicitud
+        Object.values(elements).forEach(el => el.innerHTML = setup.getLoader().trim());
+
+        try {
+            const data = await setup.fetchData('/management/operation/schedules/get');
+            
+            // Validar que los elementos existen antes de modificar el contenido
+            await Promise.all([
+                elements.container.innerHTML = data.trim(),
+            ]);
+
+            $('.selectpicker').selectpicker({
+                liveSearch: true
+            });            
+        } catch (error) {
+            console.error("Error al obtener datos:", error);
+            Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar datos.</p>');
+        }
+    })
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    function debounce(func, delay) {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    if( __end_check_outs.length > 0 ){
+        __end_check_outs.forEach(__end_check_out => {
+            if( __end_check_out ){
+                setup.calendarFilter(__end_check_out, { enableTime: true, noCalendar: true, dateFormat: "H:i", altFormat: "h:i K", defaultDate: __end_check_out.value ?? '00', minDate: null });
+            }            
+        });
+    }
+
+    document.addEventListener("change", debounce(async function (event) {
+        if (event.target.classList.contains('change_schedule')) {
+            event.preventDefault();
+            
+            // Obtener datos del elemento clickeado
+            const { code, type } = event.target.dataset;
+            
+            console.log(code, type, event.target.value);
+                    
+        }
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo 
+    
+    document.addEventListener("input", debounce(async function (event) {
+        if (event.target.classList.contains('change_schedule')) {
+            event.preventDefault();
+            
+            // Obtener datos del elemento clickeado
+            const { code, type } = event.target.dataset;
+            
+            console.log(code, type, event.target.value);
+                    
+        }
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo     
+});
 
 if ( document.getElementById('lookup_date') != null ) {
     const picker = new easepick.create({
@@ -677,8 +808,6 @@ $('#dataManagementOperations').on('click', '.extract_confirmation', function() {
 function notificationInfo(item){
     console.log(item);    
 }
-
-
 
 if( __is_open != null ){
     __is_open.addEventListener('change', function(){
@@ -1625,7 +1754,7 @@ socket.on("addCommentClient", function(data){
     const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
     ( __btn_comment != null ?  __btn_comment.dataset.status = data.status : "" );
     const __comment_new = document.getElementById('comment_new_' + data.item);
-    __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_history bs-tooltip" title="Ver mensaje de operaciones" data-type="comment" data-comment="'+ data.value +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>'
+    __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_history bs-tooltip w-100" title="Ver mensaje de operaciones" data-type="comment" data-comment="'+ data.value +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>'
 
     history();
     setup.bsTooltip();
@@ -1644,7 +1773,7 @@ socket.on("uploadBookingClient", function(data){
 
     //DECLARACION DE VARIABLES
     const __comment_new = document.getElementById('upload_new_' + data.item);
-    __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_media bs-tooltip" title="Esta reservación tiene imagenes" data-code="'+ data.reservation +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>'
+    __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_media bs-tooltip w-100" title="Esta reservación tiene imagenes" data-code="'+ data.reservation +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>'
 
     mediaBooking();
     setup.bsTooltip();
