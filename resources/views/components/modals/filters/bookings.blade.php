@@ -1,4 +1,4 @@
-@props(['data','users','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','istoday','isbalance','isduplicated','isagency','request'])
+@props(['data','users','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','rating','istoday','isbalance','isduplicated','isagency','request'])
 @php
     $date = "";
     if( isset($data) ){
@@ -215,16 +215,6 @@
                                 </select>
                             @endif
 
-                            @if ( isset($iscommissionable) )
-                                {{-- <div class="col-lg-4 col-md-6 col-12"> --}}
-                                    <select class="form-control selectpicker" title="Reservas comisionables" name="is_commissionable" id="is_commissionable">
-                                        <option value="">Selecciona una opción</option>
-                                        <option {{ $data['is_commissionable'] == '1' ? 'selected' : '' }} value="1">Sí</option>
-                                        <option {{ $data['is_commissionable'] == '0' ? 'selected' : '' }} value="0">No</option>
-                                    </select>
-                                {{-- </div> --}}
-                            @endif
-
                             @if ( isset($ispayarrival) )
                                 {{-- <div class="col-lg-4 col-md-6 col-12"> --}}
                                     <select class="form-control selectpicker" title="Reservas pago al llegar" name="is_pay_at_arrival" id="is_pay_at_arrival">
@@ -233,7 +223,27 @@
                                         <option {{ $data['is_pay_at_arrival'] == '0' ? 'selected' : '' }} value="0">No</option>
                                     </select>
                                 {{-- </div> --}}
-                            @endif                        
+                            @endif
+
+                            @if ( isset($rating) )
+                            {{-- <div class="col-lg-4 col-md-6 col-12"> --}}
+                                <select class="form-control selectpicker" title="Likes" name="reserve_rating" id="reserve_rating">
+                                    <option value="">Selecciona una opción</option>
+                                    <option {{ $data['reserve_rating'] == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                    <option {{ $data['reserve_rating'] == '0' ? 'selected' : '' }} value="0">No</option>
+                                </select>
+                            {{-- </div> --}}
+                        @endif
+
+                            @if ( isset($iscommissionable) )
+                                {{-- <div class="col-lg-4 col-md-6 col-12"> --}}
+                                    <select class="form-control selectpicker" title="Reservas comisionables" name="is_commissionable" id="is_commissionable">
+                                        <option value="">Selecciona una opción</option>
+                                        <option {{ $data['is_commissionable'] == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                        <option {{ $data['is_commissionable'] == '0' ? 'selected' : '' }} value="0">No</option>
+                                    </select>
+                                {{-- </div> --}}
+                            @endif                            
 
                             @if ( !empty($cancellations) )
                                 {{-- <div class="col-lg-4 col-md-6 col-12"> --}}

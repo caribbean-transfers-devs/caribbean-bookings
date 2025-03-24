@@ -195,6 +195,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/operation/board/exportExcelCommission', [Operations::class, 'exportExcelBoardCommision'])->name('operation.board.exportExcelComission');
 
         Route::match(['get', 'post'], '/management/operation/schedules/get', [Operations::class, 'getSchedules'])->name('management.operation.schedules.get');
+        Route::match(['post'], '/management/operation/schedules/update', [Operations::class, 'updateSchedules'])->name('management.operation.schedules.update');
 
     //CONFIGURACIONES
         Route::resource('/roles', ROLES::class);

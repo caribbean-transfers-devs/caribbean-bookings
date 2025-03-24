@@ -1276,4 +1276,95 @@ class OperationsController extends Controller
 
         return view('components.html.management.operations.schedules', [ 'schedules' => $schedules ]);
     }
+
+    public function updateSchedules(Request $request)
+    {
+        // Reglas de validación
+        $rules = [
+            'code' => 'required|integer',
+            'type' => 'required|stringer|in:end_check_out_time,vehicle,driver,status,observations',
+        ];
+
+        // Validación de datos
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422
+        }
+
+        // Obtener el item de la reservación
+        $schedule = DriverSchedule::where('id', $request->code)->first();
+        
+        if (!$schedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'not_found', 
+                    'message' =>  "Horario no encontrado" 
+                ],
+                'status' => 'error',
+                'message' => 'Horario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            switch ($request->type) {
+                case 'end_check_out_time':
+                        if (!empty($request->value)) {
+                            $time_in = Carbon::createFromFormat('H:i:s', $schedule->check_out_time);
+                            $time_out = Carbon::createFromFormat('H:i:s', $request->value.':00');
+                            $difference = $time_in->diff($time_out);
+                            $schedule->end_check_out_time = $request->value;
+                            // Asigna el valor si hay diferencia, de lo contrario deja null
+                            if ($difference->h != 0 || $difference->i != 0) {
+                                $schedule->extra_hours = sprintf('%02d:%02d:00', $difference->h, $difference->i);
+                            } else {
+                                $schedule->extra_hours = null;
+                            }
+                        }
+                    break;
+                case 'vehicle':
+                        $schedule->vehicle_id = ($request->value ?? 0) != 0 ? $request->value : NULL;                    
+                    break;
+                case 'driver':
+                        $schedule->driver_id = ($request->value ?? 0) != 0 ? $request->value : NULL;
+                    break;
+                case 'status':
+                        $schedule->status = $request->value ?? NULL;
+                    break;
+                default:
+                        $schedule->observations = $request->value ?? NULL;
+                    break;
+            }
+
+            // Guardar el cambio y verificar que se guardó correctamente
+            if (!$schedule->save()) {
+                DB::rollBack();
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Error al actualizar el horario.'
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }            
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo correctamente el horario.',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -227,7 +227,7 @@ class ActionsRepository
                 DB::rollBack();
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Error al actualizar la calificación de la reservación'
+                    'message' => 'Error al actualizar la calificación de la reservación.'
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
@@ -237,7 +237,7 @@ class ActionsRepository
             DB::commit();
             return response()->json([
                 'status' => 'success',
-                'message' => 'Se actualizo correctamente la calificación de la reservación',
+                'message' => 'Se actualizo correctamente la calificación de la reservación.',
             ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();

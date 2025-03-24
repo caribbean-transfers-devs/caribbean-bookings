@@ -109,16 +109,21 @@ class DriverSchedulesRepository
             $schedule->check_in_time = $request->check_in_time;
             $schedule->check_out_time = $request->check_out_time;
 
-            if ( isset($request->end_check_out_time) ) {
+            if (!empty($request->end_check_out_time)) { 
                 $time_in = Carbon::createFromFormat('H:i:s', $request->check_out_time.':00');
                 $time_out = Carbon::createFromFormat('H:i:s', $request->end_check_out_time.':00');
                 $difference = $time_in->diff($time_out);
                 $schedule->end_check_out_time = $request->end_check_out_time;
-                $schedule->extra_hours = $difference->h.':'.$difference->i.':00';
+                // Asigna el valor si hay diferencia, de lo contrario deja null
+                if ($difference->h != 0 || $difference->i != 0) {
+                    $schedule->extra_hours = sprintf('%02d:%02d:00', $difference->h, $difference->i);
+                } else {
+                    $schedule->extra_hours = null;
+                }
             }
-
-            $schedule->vehicle_id = $request->vehicle_id;
-            $schedule->driver_id = $request->driver_id;
+        
+            $schedule->vehicle_id = ($request->vehicle_id ?? 0) != 0 ? $request->vehicle_id : NULL;
+            $schedule->driver_id = ($request->driver_id ?? 0) != 0 ? $request->driver_id : NULL;
             $schedule->status = $request->status ?? NULL;
             $schedule->observations = $request->observations ?? NULL;
             $schedule->save();

@@ -38,6 +38,7 @@ class ReservationsRepository
             "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
             "is_commissionable" => ( isset($request->is_commissionable) ? $request->is_commissionable : NULL ),
             "is_pay_at_arrival" => ( isset($request->is_pay_at_arrival) ? $request->is_pay_at_arrival : NULL ),
+            "reserve_rating" => ( isset($request->reserve_rating) ? $request->reserve_rating : NULL ),
             "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),            
             "is_balance" => ( isset($request->is_balance) ? $request->is_balance : NULL ),
             "is_today" => ( isset($request->is_today) ? $request->is_today : NULL ),
@@ -150,7 +151,13 @@ class ReservationsRepository
         if( $request->is_pay_at_arrival !=  NULL ){
             $params = $request->is_pay_at_arrival;
             $query .= " AND rez.pay_at_arrival = $params ";
-        }        
+        }
+
+        //TIPO DE LIKE
+        if(isset( $request->reserve_rating )){
+            $params = $request->reserve_rating;
+            $query .= " AND rez.reserve_rating = $params ";      
+        }
 
         //MOTIVOS DE CANCELACIÓN
         if(isset( $request->cancellation_status ) && !empty( $request->cancellation_status )){

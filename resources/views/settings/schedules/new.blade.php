@@ -52,26 +52,26 @@
                                     <div class="col-md-{{ isset($schedule) ? '3' : '2' }}">
                                         <div class="form-group mb-3">
                                             <label for="date_schedule">Selecciona una fecha</label>
-                                            <input type="text" id="date_schedule" name="date" class="form-control mb-3" placeholder="Selecciona una fecha" value="{{ isset($schedule->date) ? $schedule->date : date('Y-m-d') }}">
+                                            <input type="text" id="date_schedule" name="date" class="form-control" placeholder="Selecciona una fecha" value="{{ isset($schedule->date) ? $schedule->date : date('Y-m-d') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-{{ isset($schedule) ? '3' : '2' }}">
                                         <div class="form-group mb-3">
                                             <label for="check_in_time">Hora de entrada</label>
-                                            <input type="text" id="check_in_time" name="check_in_time" class="form-control mb-3" placeholder="Hora de entrada" value="{{ isset($schedule->check_in_time) ? $schedule->check_in_time : '00' }}">
+                                            <input type="text" id="check_in_time" name="check_in_time" class="form-control" placeholder="Hora de entrada" value="{{ isset($schedule->check_in_time) ? $schedule->check_in_time : '00' }}">
                                         </div>
                                     </div>
                                     <div class="col-md-{{ isset($schedule) ? '3' : '2' }}">
                                         <div class="form-group mb-3">
                                             <label for="check_out_time">Hora de salida</label>
-                                            <input type="text" id="check_out_time" name="check_out_time" class="form-control mb-3" placeholder="Hora de salida" value="{{ isset($schedule->check_out_time) ? $schedule->check_out_time : '00' }}">
+                                            <input type="text" id="check_out_time" name="check_out_time" class="form-control" placeholder="Hora de salida" value="{{ isset($schedule->check_out_time) ? $schedule->check_out_time : '00' }}">
                                         </div>
                                     </div>
                                     @if ( isset($schedule) )
                                         <div class="col-md-3">
                                             <div class="form-group mb-3">
                                                 <label for="end_check_out_time">Hora de salida final</label>
-                                                <input type="text" id="end_check_out_time" name="end_check_out_time" class="form-control mb-3" placeholder="Hora de salida final" value="{{ isset($schedule->end_check_out_time) ? $schedule->end_check_out_time : '00' }}">
+                                                <input type="text" id="end_check_out_time" name="end_check_out_time" class="form-control" placeholder="Hora de salida final" value="{{ isset($schedule->end_check_out_time) ? $schedule->end_check_out_time : '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-4">

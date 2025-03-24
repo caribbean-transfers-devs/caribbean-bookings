@@ -209,6 +209,8 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
                 // 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 
                 'resources/plugins/table/datatable/datatables5.js', 
                 'resources/plugins/notification/snackbar/snackbar.min.js', 
+                'resources/plugins/flatpickr/flatpickr.js',
+                'resources/plugins/flatpickr/es.min.js',
                 'resources/plugins/bootstrap-select/select.js', 
                 'resources/plugins/flatpickr/flatpickr.js', 
                 'resources/js/sections/management/operations.js'
@@ -258,7 +260,7 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
             mix.combine([
                 'resources/plugins/table/datatable/datatables5.js', 
                 'resources/plugins/flatpickr/flatpickr.js',
-                'resources/plugins/flatpickr/es.min.js',                
+                'resources/plugins/flatpickr/es.min.js',
                 'resources/plugins/bootstrap-select/select.js',
                 'resources/js/sections/settings/schedules.js'
             ], data.assets + "js/sections/settings/schedules.min.js");            

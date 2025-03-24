@@ -8,6 +8,7 @@
 @import "../../template/plugins/light/table/datatable/custom_dt";
 
 @import "../../../plugins/flatpickr/flatpickr";
+@import "../../../plugins/flatpickr/flatpickr.scss";
 @import "../../../plugins/notification/snackbar/snackbar";
 @import "../../../plugins/bootstrap-select/select";
 
@@ -75,6 +76,39 @@
     width: 100%;
     background-color: rgba(234, 241, 255, 0.74); /* Asegúrate de que el fondo sea blanco o del color de la tabla */
 }
+
+//TABLA DE HORARIOS
+.table.custom-table {
+
+    > {
+        tbody > tr > td {
+            .bootstrap-select{
+                &.btn-group{
+                    > .dropdown-toggle{
+                        font-family: "Poppins", serif;
+                        align-items: center;
+                        display: inline-flex;
+                        justify-content: space-between;
+                        position: relative;
+                        text-align: right;
+                        white-space: unset;
+                        width: 100%;
+                        font-size: 11px;
+                        height: calc(1.3em + 1.8rem + 2px);
+                        padding: 0.75rem 1.25rem;
+                        letter-spacing: 0;
+
+                        .filter-option{
+                            overflow: hidden;
+                            height: 100%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 //CUSTOMER BOOTSTRAP SELECT 
 .table.table-rendering {

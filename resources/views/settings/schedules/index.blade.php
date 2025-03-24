@@ -74,13 +74,13 @@
                                     @php
                                         $time = Carbon::parse($schedule->end_check_out_time)->format('H:i A');
                                     @endphp
-                                    <?=( $schedule->end_check_out_time != NULL ? '<span class="badge badge-'.( $schedule->extra_hours != NULL ? 'danger' : 'success' ).' w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
+                                    <?=( $schedule->end_check_out_time != NULL ? '<span class="badge badge-'.( $schedule->extra_hours != NULL && $schedule->check_out_time != $schedule->end_check_out_time ? 'danger' : 'success' ).' w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
                                 </td>
                                 <td class="text-center">
                                     @php
                                         $time = Carbon::parse($schedule->extra_hours)->format('H:i');
                                     @endphp                                    
-                                    <?=( $schedule->extra_hours != NULL ? '<span class="badge badge-success w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
+                                    <?=( $schedule->extra_hours != NULL && $schedule->extra_hours != "00:00:00" ? '<span class="badge badge-success w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
                                 </td>
                                 <td class="text-center"><button class="btn btn-dark w-100">{{ isset($schedule->vehicle->name) ? $schedule->vehicle->name : 'NO DEFINIDO' }} - {{ isset($schedule->vehicle->destination_service->name) ? $schedule->vehicle->destination_service->name : 'NO DEFINIDO' }} - {{ isset($schedule->vehicle->enterprise->names) ? $schedule->vehicle->enterprise->names : 'NO DEFINIDO' }}</button></td>
                                 <td class="text-center">{{ isset($schedule->driver->names) ? $schedule->driver->names : 'NO DEFINIDO' }} {{ isset($schedule->driver->surnames) ? $schedule->driver->surnames : 'NO DEFINIDO' }}</td>

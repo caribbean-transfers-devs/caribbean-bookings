@@ -30,24 +30,24 @@
                             $time = Carbon::parse($schedule->end_check_out_time)->format('H:i A');
                         @endphp
                         @if ( $schedule->end_check_out_time != NULL )
-                            <?=( $schedule->end_check_out_time != NULL ? '<span class="badge badge-'.( $schedule->extra_hours != NULL ? 'danger' : 'success' ).' w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
+                            <?=( $schedule->end_check_out_time != NULL ? '<span class="badge badge-'.( $schedule->extra_hours != NULL && $schedule->check_out_time != $schedule->end_check_out_time ? 'danger' : 'success' ).' w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
                         @else
-                            <div class="form-group mb-3">
-                                <input type="text" id="end_check_out_time" name="end_check_out_time" class="form-control mb-3 change_schedule end_check_out_time" data-code="{{ $schedule->id }}" data-type="end_check_out_time" placeholder="Hora de salida final" value="{{ isset($schedule->end_check_out_time) ? $schedule->end_check_out_time : '00' }}">
+                            <div class="form-group">
+                                <input type="text" id="end_check_out_time" name="end_check_out_time" class="form-control change_schedule end_check_out_time" data-code="{{ $schedule->id }}" data-type="end_check_out_time" placeholder="Hora de salida final" value="{{ isset($schedule->end_check_out_time) ? $schedule->end_check_out_time : '' }}">
                             </div>                            
                         @endif                        
                     </td>
                     <td class="text-center">
                         @php
                             $time = Carbon::parse($schedule->extra_hours)->format('H:i');
-                        @endphp                                    
-                        <?=( $schedule->extra_hours != NULL ? '<span class="badge badge-success w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
+                        @endphp
+                        <?=( $schedule->extra_hours != NULL && $schedule->extra_hours != "00:00:00" ? '<span class="badge badge-success w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
                     </td>
                     <td class="text-center">
                         @if ( $schedule->vehicle_id != NULL )
                             <button class="btn btn-dark w-100">{{ isset($schedule->vehicle->name) ? $schedule->vehicle->name : 'NO DEFINIDO' }} - {{ isset($schedule->vehicle->destination_service->name) ? $schedule->vehicle->destination_service->name : 'NO DEFINIDO' }} - {{ isset($schedule->vehicle->enterprise->names) ? $schedule->vehicle->enterprise->names : 'NO DEFINIDO' }}</button>
                         @else
-                            <div class="form-group mb-3">
+                            <div class="form-group">
                                 <select class="form-control selectpicker change_schedule" data-code="{{ $schedule->id }}" data-type="vehicle" data-live-search="true" id="vehicle_id" name="vehicle_id">
                                     <option value="0">Selecciona una unidad</option>
                                     @if ( isset($units) && count($units) >= 1 )
@@ -63,7 +63,7 @@
                         @if ( $schedule->driver_id != NULL )
                             {{ isset($schedule->driver->names) ? $schedule->driver->names : 'NO DEFINIDO' }} {{ isset($schedule->driver->surnames) ? $schedule->driver->surnames : 'NO DEFINIDO' }}
                         @else
-                            <div class="form-group mb-3">
+                            <div class="form-group">
                                 <select class="form-control selectpicker change_schedule" data-code="{{ $schedule->id }}" data-type="driver" data-live-search="true" id="driver_id" name="driver_id">
                                     <option value="0">Selecciona un conductor</option>
                                     @if ( isset($drivers) && count($drivers) >= 1 )
@@ -93,7 +93,7 @@
                         @if ( $schedule->observations != NULL )
                             {{ $schedule->observations }}
                         @else
-                            <div class="form-group mb-3">
+                            <div class="form-group">
                                 <input type="text" class="form-control change_schedule" data-code="{{ $schedule->id }}" data-type="observations" name="observations" id="observations" value="{{ isset($schedule->observations) ? $schedule->observations : '' }}">
                             </div>                            
                         @endif

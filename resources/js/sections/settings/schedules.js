@@ -47,6 +47,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     if( __end_check_out ){
-        schedules.calendarFilter(__end_check_out, { enableTime: true, noCalendar: true, dateFormat: "H:i", altFormat: "h:i K", defaultDate: __end_check_out.value ?? '00', minDate: null });
+        schedules.calendarFilter(__end_check_out, { enableTime: true, noCalendar: true, dateFormat: "H:i", altFormat: "h:i K", defaultDate: __end_check_out.value ?? '', minDate: null });
     }
 });

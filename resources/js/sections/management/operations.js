@@ -335,7 +335,93 @@ let setup = {
     },
     getLoader: function() {
         return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
-    },    
+    },
+    reloadAll: async function(){
+       // Elementos HTML
+        const elements = {
+            container: document.getElementById("data"),
+        };
+
+        // Validar que los elementos existen antes de usarlos
+        if (!elements.container) {
+            console.error("Error: No se encontraron los elementos del DOM necesarios.");
+            return;
+        }
+
+        // Actualizar resumen general, al mostrar el loader ANTES de la solicitud
+        Object.values(elements).forEach(el => el.innerHTML = setup.getLoader().trim());
+
+        try {
+            const data = await setup.fetchData('/management/operation/schedules/get');
+            
+            // Validar que los elementos existen antes de modificar el contenido
+            await Promise.all([
+                elements.container.innerHTML = data.trim(),
+            ]);
+
+            const __end_check_outs = document.querySelectorAll('.end_check_out_time');
+            // console.log(__end_check_outs);
+            // if( __end_check_outs.length > 0 ){
+            //     __end_check_outs.forEach(__end_check_out => {
+            //         if( __end_check_out ){
+            //             setup.calendarFilter(__end_check_out, { enableTime: true, noCalendar: true, dateFormat: "H:i", altFormat: "h:i K", defaultDate: __end_check_out.value ?? '', minDate: null });
+            //         }            
+            //     });
+            // }            
+
+            $('.selectpicker').selectpicker({
+                liveSearch: true
+            });
+        } catch (error) {
+            console.error("Error al obtener datos:", error);
+            Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar datos.</p>');
+        }
+    },
+    fetchExacute: function(_params){
+        Swal.fire({
+            title: "Procesando solicitud...",
+            text: "Por favor, espera mientras se realizan los cambios.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('/management/operation/schedules/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },            
+            body: JSON.stringify(_params),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if( data.hasOwnProperty('status') && data.status == "success" ){
+                this.reloadAll();
+            }else{
+                Swal.fire({
+                    icon: data.status,
+                    html: data.message,
+                    allowOutsideClick: false,
+                }).then(() => {
+                    Swal.close(); // Cierra el Swal al recibir respuesta
+                });                
+            }         
+        })
+        .catch(error => {
+            Swal.fire(
+                '¡ERROR!',
+                error.message || 'Ocurrió un error',
+                'error'
+            );
+        });
+    } 
 };
 
 if( document.querySelector('.table-rendering') != null ){
@@ -438,7 +524,6 @@ const __is_open = document.getElementById('is_open');
 const __notifications = document.querySelectorAll('.notifications');
 
 const _getSchedules = document.getElementById('getSchedules');
-const __end_check_outs = document.querySelectorAll('.end_check_out_time');
 
 //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
 const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhost:4000': 'https://socket-caribbean-transfers.up.railway.app' );
@@ -450,36 +535,7 @@ if (_getSchedules) {
     _getSchedules.addEventListener('click', async function(event){
         event.preventDefault();
         $("#schedulesModal").modal('show');
-
-        // Elementos HTML
-        const elements = {            
-            container: document.getElementById("data"),
-        };
-
-        // Validar que los elementos existen antes de usarlos
-        if (!elements.container) {
-            console.error("Error: No se encontraron los elementos del DOM necesarios.");
-            return;
-        }
-
-        // Actualizar resumen general, al mostrar el loader ANTES de la solicitud
-        Object.values(elements).forEach(el => el.innerHTML = setup.getLoader().trim());
-
-        try {
-            const data = await setup.fetchData('/management/operation/schedules/get');
-            
-            // Validar que los elementos existen antes de modificar el contenido
-            await Promise.all([
-                elements.container.innerHTML = data.trim(),
-            ]);
-
-            $('.selectpicker').selectpicker({
-                liveSearch: true
-            });            
-        } catch (error) {
-            console.error("Error al obtener datos:", error);
-            Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar datos.</p>');
-        }
+        setup.reloadAll();
     })
 }
 
@@ -492,23 +548,20 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     }
 
-    if( __end_check_outs.length > 0 ){
-        __end_check_outs.forEach(__end_check_out => {
-            if( __end_check_out ){
-                setup.calendarFilter(__end_check_out, { enableTime: true, noCalendar: true, dateFormat: "H:i", altFormat: "h:i K", defaultDate: __end_check_out.value ?? '00', minDate: null });
-            }            
-        });
-    }
-
     document.addEventListener("change", debounce(async function (event) {
         if (event.target.classList.contains('change_schedule')) {
             event.preventDefault();
             
             // Obtener datos del elemento clickeado
             const { code, type } = event.target.dataset;
+            const _params    = {
+                code: code,
+                type: type,
+                value: event.target.value,
+            };
+            console.log(_params);
             
-            console.log(code, type, event.target.value);
-                    
+            // setup.fetchExacute(_params);
         }
     }, 300)); // 300ms de espera antes de ejecutar de nuevo 
     
@@ -516,11 +569,14 @@ document.addEventListener("DOMContentLoaded", function() {
         if (event.target.classList.contains('change_schedule')) {
             event.preventDefault();
             
-            // Obtener datos del elemento clickeado
-            const { code, type } = event.target.dataset;
-            
-            console.log(code, type, event.target.value);
-                    
+            const { code, type } = event.target.dataset;            
+            const _params    = {
+                code: code,
+                type: type,
+                value: event.target,
+            };
+
+            // setup.fetchExacute(_params);
         }
     }, 300)); // 300ms de espera antes de ejecutar de nuevo     
 });
