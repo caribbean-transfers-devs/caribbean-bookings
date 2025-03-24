@@ -53,6 +53,13 @@ trait RoleTrait
         return false;
     }
 
+    public function hasPermission2(int $submodule_id): bool
+    {
+        $roles = session('roles');
+    
+        return !empty($roles) && in_array($submodule_id, $roles['permissions'] ?? []);
+    } 
+
     /**
      * Summary of hasPermission
      * @param int $role id del rol obtenido de la DB al cual se quiere acceder

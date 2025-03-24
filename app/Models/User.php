@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Traits\RoleTrait;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, RoleTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -57,11 +57,7 @@ class User extends Authenticatable
     public function roles(){
         return $this->hasMany(UserRole::class, 'user_id', 'id');
     }
-
-    public function whitelist_ips(){
-        return $this->hasMany(WhitelistIp::class, 'user_id', 'id');
-    }
-
+    
     public function sales(){
         return $this->hasMany(Sale::class, 'call_center_agent_id', 'id');
     }

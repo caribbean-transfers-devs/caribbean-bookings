@@ -22,9 +22,13 @@
 </head> 
 <body class="">
 
-    @include('layout.partials.loader')
+    @once
+        @include('layout.partials.loader')
+    @endonce
 
-    @include('layout.partials.header')
+    @once
+        @include('layout.partials.header')
+    @endonce
 
     <!--  BEGIN MAIN CONTAINER  -->
     <div class="main-container" id="container">
@@ -32,14 +36,18 @@
         <div class="overlay"></div>
         {{-- <div class="search-overlay"></div> --}}
 
-        @include('layout.partials.sidebar')
+        @once
+            @include('layout.partials.sidebar')
+        @endonce
 
         <!--  BEGIN CONTENT AREA  -->
         <div id="content" class="main-content">
             <div class="layout-px-spacing">
                 <div class="middle-content p-0">
 
-                    @include('layout.partials.breadcrumbs')
+                    @once
+                        @include('layout.partials.breadcrumbs')
+                    @endonce
                     
                     {{-- <div class="row layout-top-spacing"> --}}
 
@@ -49,7 +57,11 @@
 
                 </div>
             </div>
-            @include('layout.partials.footer')
+
+            @once
+                @include('layout.partials.footer')
+            @endonce
+
         </div>
         <!--  END CONTENT AREA  -->
 

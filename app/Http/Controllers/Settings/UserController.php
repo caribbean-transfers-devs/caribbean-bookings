@@ -22,6 +22,8 @@ use App\Models\WhitelistIp;
 
 class UserController extends Controller
 {
+    use RoleTrait;
+
     private $UserRepository;
 
     public function __construct(UserRepository $UserRepository)
@@ -31,7 +33,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        if(RoleTrait::hasPermission(1)){
+        if($this->hasPermission2(1)){
             return $this->UserRepository->indexUsers($request);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
@@ -40,7 +42,7 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
-        if(RoleTrait::hasPermission(2)){
+        if($this->hasPermission2(2)){
             return $this->UserRepository->createUser($request);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
@@ -49,7 +51,7 @@ class UserController extends Controller
 
     public function edit(Request $request, User $user)
     {
-        if(RoleTrait::hasPermission(3)){
+        if($this->hasPermission2(3)){
             return $this->UserRepository->editUser($request, $user);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
@@ -58,42 +60,42 @@ class UserController extends Controller
 
     public function store(UserRequest $request)
     {
-        if(RoleTrait::hasPermission(2)){
+        if($this->hasPermission2(2)){
             return $this->UserRepository->storeUser($request);
         }
     }
 
     public function update(UserRequest $request, User $user)
     {
-        if(RoleTrait::hasPermission(3)){
+        if($this->hasPermission2(3)){
             return $this->UserRepository->updateUser($request, $user);
         }
     }
 
     public function change_pass(ChgPassRequest $request, User $user)
     {
-        if(RoleTrait::hasPermission(3)){
+        if($this->hasPermission2(3)){
             return $this->UserRepository->changePass($request, $user);
         }
     }
 
     public function change_status(Request $request, User $user)
     {
-        if(RoleTrait::hasPermission(4)){
+        if($this->hasPermission2(4)){
             return $this->UserRepository->changeStatus($request, $user);
         }       
     }
 
     public function store_ips(ValidIPRequest $request)
     {
-        if(RoleTrait::hasPermission(5)){
+        if($this->hasPermission2(5)){
             return $this->UserRepository->storeIps($request);
         }        
     }
 
     public function delete_ips(Request $request, WhitelistIp $ip)
     {
-        if(RoleTrait::hasPermission(5)){
+        if($this->hasPermission2(5)){
             return $this->UserRepository->deleteIps($request, $ip);
         }
     }

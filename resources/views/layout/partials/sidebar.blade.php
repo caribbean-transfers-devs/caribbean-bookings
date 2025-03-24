@@ -1,7 +1,4 @@
     @php
-        use App\Traits\RoleTrait;
-    @endphp
-    @php
         $links = []; //LINKS GENERALES
         $links_dashboard = [];
         $links_finances = [];
@@ -9,10 +6,9 @@
         $links_operations = [];
         $links_settings = [];
 
-
         //DASHBOARD
             // DASHBOARD GERENCIA
-            if(RoleTrait::hasPermission(42)):
+            if(auth()->user()->hasPermission2(42)):
                 $links_dashboard[] = [
                     'name' => 'Dashboard de Gerencia',
                     'route' => route('dashboard'),
@@ -21,7 +17,7 @@
             endif;
 
             // DASHBOARD AGENTE DE CALL CENTER
-            if(RoleTrait::hasPermission(113) && auth()->user()->is_commission == 1 ):
+            if(auth()->user()->hasPermission2(113) && auth()->user()->is_commission == 1 ):
                 $links_dashboard[] = [
                     'name' => 'Dashboard Agente Call Center',
                     'route' => route('callcenters.index'),
@@ -39,7 +35,7 @@
             ]);
 
         //TPV
-        if(RoleTrait::hasPermission(26)):
+        if(auth()->user()->hasPermission2(26)):
             array_push($links,[
                 'type' => 'single',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>',
@@ -51,8 +47,8 @@
         endif;
 
         // FINANZAS
-        if(RoleTrait::hasPermission(114)):
-            if(RoleTrait::hasPermission(114)):
+        if(auth()->user()->hasPermission2(114)):
+            if(auth()->user()->hasPermission2(114)):
                 $links_finances[] = [
                     'name' => 'Reembolsos',
                     'route' => route('finances.refunds'),
@@ -71,57 +67,57 @@
         endif;
 
         //REPORTES
-        if(RoleTrait::hasPermission(43) || RoleTrait::hasPermission(45) || RoleTrait::hasPermission(50) || RoleTrait::hasPermission(71) || RoleTrait::hasPermission(97) || RoleTrait::hasPermission(98) || RoleTrait::hasPermission(99) || RoleTrait::hasPermission(101)):
-            if(RoleTrait::hasPermission(43)):
+        if(auth()->user()->hasPermission2(43) || auth()->user()->hasPermission2(45) || auth()->user()->hasPermission2(50) || auth()->user()->hasPermission2(71) || auth()->user()->hasPermission2(97) || auth()->user()->hasPermission2(98) || auth()->user()->hasPermission2(99) || auth()->user()->hasPermission2(101)):
+            if(auth()->user()->hasPermission2(43)):
                 $links_reports[] = [
                     'name' => 'Pagos',
                     'route' => route('reports.payments'),
                     'active' => request()->routeIs('reports.payments'),
                 ];
             endif;
-            if(RoleTrait::hasPermission(50)):
+            if(auth()->user()->hasPermission2(50)):
                 $links_reports[] = [
                     'name' => 'Efectivo',
                     'route' => route('reports.cash'),
                     'active' => request()->routeIs('reports.cash'),
                 ];
             endif;
-            if(RoleTrait::hasPermission(71)):
+            if(auth()->user()->hasPermission2(71)):
                 $links_reports[] = [
                     'name' => 'Cancelaciones',
                     'route' => route('reports.cancellations'),
                     'active' => request()->routeIs('reports.cancellations'),
                 ];
             endif;
-            if(RoleTrait::hasPermission(45)):
+            if(auth()->user()->hasPermission2(45)):
                 $links_reports[] = [
                     'name' => 'Comisiones',
                     'route' => route('reports.commissions'),
                     'active' => request()->routeIs('reports.commissions'),
                 ];
             endif;            
-            if(RoleTrait::hasPermission(98)):
+            if(auth()->user()->hasPermission2(98)):
                 $links_reports[] = [
                     'name' => 'Ventas',
                     'route' => route('reports.sales'),
                     'active' => request()->routeIs('reports.sales','reports.sales.action'),
                 ];
             endif;
-            if(RoleTrait::hasPermission(97)):
+            if(auth()->user()->hasPermission2(97)):
                 $links_reports[] = [
                     'name' => 'Operaciones',
                     'route' => route('reports.operations'),
                     'active' => request()->routeIs('reports.operations'),
                 ];
             endif;
-            // if(RoleTrait::hasPermission(99)):
+            // if(auth()->user()->hasPermission2(99)):
             //     $links_reports[] = [
             //         'name' => 'Conciliacion',
             //         'route' => route('reports.conciliation'),
             //         'active' => request()->routeIs('reports.conciliation','reports.conciliation.action'),
             //     ];
             // endif;
-            // if(RoleTrait::hasPermission(101)):
+            // if(auth()->user()->hasPermission2(101)):
             //     $links_reports[] = [
             //         'name' => 'Cuentas por Cobrar',
             //         'route' => route('reports.receivable'),
@@ -140,9 +136,9 @@
         endif;
 
         //GESTION
-        if(RoleTrait::hasPermission(39) || RoleTrait::hasPermission(47) || RoleTrait::hasPermission(10) || RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79) ):
+        if(auth()->user()->hasPermission2(39) || auth()->user()->hasPermission2(47) || auth()->user()->hasPermission2(10) || auth()->user()->hasPermission2(76) || auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79) ):
             // CONFIRMACIONES
-            if(RoleTrait::hasPermission(39)):
+            if(auth()->user()->hasPermission2(39)):
                 $links_operations[] = [
                     'name' => 'Confirmaciones',
                     'route' => route('management.confirmations'),
@@ -150,7 +146,7 @@
                 ];
             endif;
             // POST VENTA
-            if(RoleTrait::hasPermission(47)):
+            if(auth()->user()->hasPermission2(47)):
                 $links_operations[] = [
                     'name' => 'Post venta',
                     'route' => route('management.after.sales'),
@@ -158,7 +154,7 @@
                 ];
             endif;
             // RESERVACIONES
-            if(RoleTrait::hasPermission(10)):
+            if(auth()->user()->hasPermission2(10)):
                 $links_operations[] = [
                     'name' => 'Reservaciones',
                     'route' => route('management.reservations'),
@@ -166,7 +162,7 @@
                 ];
             endif;
             // OPERACIONES
-            if(RoleTrait::hasPermission(76) || RoleTrait::hasPermission(78) || RoleTrait::hasPermission(79)):
+            if(auth()->user()->hasPermission2(76) || auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79)):
                 $links_operations[] = [
                     'name' => 'Operaciones',
                     'route' => route('operation.index'),
@@ -185,9 +181,9 @@
         endif;        
 
         //CONFIGURACIONES
-        if(RoleTrait::hasPermission(6) || RoleTrait::hasPermission(1) || RoleTrait::hasPermission(73) || RoleTrait::hasPermission(74) || RoleTrait::hasPermission(75) || RoleTrait::hasPermission(28) || RoleTrait::hasPermission(32) || RoleTrait::hasPermission(102) || RoleTrait::hasPermission(103) || RoleTrait::hasPermission(104) || RoleTrait::hasPermission(108)):
+        if(auth()->user()->hasPermission2(6) || auth()->user()->hasPermission2(1) || auth()->user()->hasPermission2(73) || auth()->user()->hasPermission2(74) || auth()->user()->hasPermission2(75) || auth()->user()->hasPermission2(28) || auth()->user()->hasPermission2(32) || auth()->user()->hasPermission2(102) || auth()->user()->hasPermission2(103) || auth()->user()->hasPermission2(104) || auth()->user()->hasPermission2(108)):
             //ROLES
-            if(RoleTrait::hasPermission(6)):
+            if(auth()->user()->hasPermission2(6)):
                 $links_settings[] = [
                     'name' => 'Roles',
                     'route' => route('roles.index'),
@@ -195,7 +191,7 @@
                 ];
             endif;
             //USUARIOS
-            if(RoleTrait::hasPermission(1)):
+            if(auth()->user()->hasPermission2(1)):
                 $links_settings[] = [
                     'name' => 'Usuarios',
                     'route' => route('users.index'),
@@ -203,7 +199,7 @@
                 ];
             endif;
             //EMPRESAS
-            if(RoleTrait::hasPermission(73)):
+            if(auth()->user()->hasPermission2(73)):
                 $links_settings[] = [
                     'name' => 'Empresas',
                     'route' => route('enterprises.index'),
@@ -211,7 +207,7 @@
                 ];
             endif;
             //SITIOS
-            if(RoleTrait::hasPermission(102)):
+            if(auth()->user()->hasPermission2(102)):
                 $links_settings[] = [
                     'name' => 'Sitios',
                     'route' => route('sites.index'),
@@ -219,7 +215,7 @@
                 ];
             endif;
             //VEHÍCULOS
-            if(RoleTrait::hasPermission(74)):
+            if(auth()->user()->hasPermission2(74)):
                 $links_settings[] = [
                     'name' => 'Vehiculos',
                     'route' => route('vehicles.index'),
@@ -227,14 +223,14 @@
                 ];
             endif;
             //CONDUCTORES
-            if(RoleTrait::hasPermission(75)):
+            if(auth()->user()->hasPermission2(75)):
                 $links_settings[] = [
                     'name' => 'Conductores',
                     'route' => route('drivers.index'),
                     'active' => request()->routeIs('drivers.*'),
                 ];
             endif;
-            // if(RoleTrait::hasPermission(75)):
+            // if(auth()->user()->hasPermission2(75)):
                 $links_settings[] = [
                     'name' => 'Horarios',
                     'route' => route('schedules.index'),
@@ -242,7 +238,7 @@
                 ];
             // endif;            
             //TIPO DE CAMBIO PARA REPORTES
-            if(RoleTrait::hasPermission(103)):
+            if(auth()->user()->hasPermission2(103)):
                 $links_settings[] = [
                     'name' => 'Tipos de cambio reportes',
                     'route' => route('exchanges.index'),
@@ -250,7 +246,7 @@
                 ];
             endif;
             //ZONAS
-            if(RoleTrait::hasPermission(28)):
+            if(auth()->user()->hasPermission2(28)):
                 $links_settings[] = [
                     'name' => 'Zonas',
                     'route' => route('config.zones'),
@@ -258,7 +254,7 @@
                 ];
             endif;
             //TARIFAS
-            if(RoleTrait::hasPermission(32)):
+            if(auth()->user()->hasPermission2(32)):
                 $links_settings[] = [
                     'name' => 'Tarifas',
                     'route' => route('config.ratesDestination'),
@@ -266,7 +262,7 @@
                 ];
             endif;
             //TARIFAS PARA EMPRESAS
-            if(RoleTrait::hasPermission(104)):
+            if(auth()->user()->hasPermission2(104)):
                 $links_settings[] = [
                     'name' => 'Tarifas de empresas',
                     'route' => route('config.ratesEnterprise'),
@@ -274,7 +270,7 @@
                 ];
             endif;
             //TIPOS DE CANCELACIONES
-            if(RoleTrait::hasPermission(108)):
+            if(auth()->user()->hasPermission2(108)):
                 $links_settings[] = [
                     'name' => 'Tipos de cancelaciónes',
                     'route' => route('config.types-cancellations.index'),
