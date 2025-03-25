@@ -2,89 +2,111 @@
 
 namespace App\Repositories\Settings;
 
-use App\Models\Module;
-use App\Models\Role;
-use App\Models\RolesPermit;
-use App\Models\User;
-use App\Models\UserRole;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+
+use App\Models\Role;
+use App\Models\RolesPermit;
+use App\Models\UserRole;
+use App\Models\Module;
 
 class RoleRepository
 {
     public function indexRoles($request)
     {
         try {
-            
-            $roles = Role::all();
-
-            $breadcrumbs = array(
-                array(
-                    "route" => "",
-                    "name" => "Listado de roles",
-                    "active" => true
-                ),
-            );            
-
-            return view('settings.roles.index', compact('roles','breadcrumbs'));
-            
-        } catch (\Throwable $e) {
-
-            $roles = [];
-            
-            return view('settings.roles.index', compact('roles'));
+            return view('settings.roles.index', [
+                'roles' => Role::select('id', 'role')->get(),
+                'breadcrumbs' => [
+                    [
+                        "route" => "",
+                        "name" => "Listado de roles",
+                        "active" => true                        
+                    ]
+                ]
+            ]);
+        } catch (Exception $e) {
+            return view('settings.roles.index', [
+                'roles' => []
+            ]);
         }
     }
     
-
     public function createRole($request){
-        return view('settings.roles.new', [
-            'modules' => Module::all(),
-            'v_type' => 1,
-            'role' => new Role()
-        ]);
+        try {
+            return view('settings.roles.new', [
+                'breadcrumbs' => [
+                    [
+                        "route" => route('roles.index'),
+                        "name" => "Listado de roles",
+                        "active" => true                        
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Nuevo Rol",
+                        "active" => false                        
+                    ],                
+                ],            
+                'v_type' => 1,
+                'role' => new Role(),
+                'modules' => Module::with('submodules')->get(),
+            ]);
+        } catch (Exception $e) {
+            return back()->withErrors(['danger' => $e->getMessage()]);
+        }
     }
 
     public function editRole($request,$role){
-        return view('settings.roles.new', [
-            'modules' => Module::all(),
-            'v_type' => 2,
-            'role' => $role
-        ]);
+        try {
+            return view('settings.roles.new', [
+                'breadcrumbs' => [
+                    [
+                        "route" => route('roles.index'),
+                        "name" => "Listado de roles",
+                        "active" => false                        
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Editar Rol: ".$role->role,
+                        "active" => true                        
+                    ],                
+                ],
+                'v_type' => 2,
+                'role' => $role,
+                'modules' => Module::with('submodules')->get(),
+            ]);
+        } catch (Exception $e) {
+            return back()->withErrors(['danger' => $e->getMessage()]);
+        }
     }
 
     public function storeRole($request){
         try {
             DB::beginTransaction();
 
-            $role = new Role();
-            $role->role = $request->role;
-            $role->save();
+            $role = Role::create(['role' => $request->role]); // Usar create() en lugar de new + save()
 
-            foreach ($request->permits as $permit) {
-                $role_permit = new RolesPermit();
-                $role_permit->role_id = $role->id;
-                $role_permit->submodule_id = $permit;
-                $role_permit->save();
-            }
+            $permits = collect($request->permits)->map(fn($permit) => [
+                'role_id' => $role->id,
+                'submodule_id' => $permit
+            ])->toArray();
+
+            RolesPermit::insert($permits); // Insertar en una sola consulta
 
             DB::commit();
-
             return response()->json([
                 'success' => true, 
                 'message' => 'Rol creado correctamente',
                 'status' => Response::HTTP_OK
             ]);
-
-        } catch (\Throwable $e) {
+        } catch (Exception $e) {
             DB::rollBack();
-
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear el usuario',
-                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-            ]);
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -92,45 +114,41 @@ class RoleRepository
         try {
             DB::beginTransaction();
 
-            $role->role = $request->role;
-            $role->save();
+            $role->update(['role' => $request->role]); // Usar update()
 
-            $role->permits()->delete();
-            foreach ($request->permits as $permit) {
-                $role_permit = new RolesPermit();
-                $role_permit->role_id = $role->id;
-                $role_permit->submodule_id = $permit;
-                $role_permit->save();
-            }
+            RolesPermit::where('role_id', $role->id)->delete(); // Eliminar permisos en una sola consulta
+
+            $permits = collect($request->permits)->map(fn($permit) => [
+                'role_id' => $role->id,
+                'submodule_id' => $permit
+            ])->toArray();
+
+            RolesPermit::insert($permits); // Insertar en una sola consulta
 
             DB::commit();
-
             return response()->json([
                 'success' => true, 
+                'status' => 'success',
                 'message' => 'Rol actualizado correctamente',
-                'status' => Response::HTTP_OK
-            ]);
-
-        } catch (\Throwable $e) {
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
             DB::rollBack();
-
             return response()->json([
-                'success' => false, 
-                'message' => 'Error al actualizar el usuario',
-                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-            ]);
+                'success' => false,
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     public function deleteRole($role){
         try {
-            //Check if roles has users
-            $users = $role->users()->get();
-            if(count($users) > 0){
+            // Verificar si el rol tiene usuarios asignados con exists() en lugar de get()
+            if ($role->users()->exists()) {
                 return response()->json([
-                    'success' => false, 
-                    'message' => 'El rol tiene usuarios asignados',
-                    'status' => Response::HTTP_UNPROCESSABLE_ENTITY
+                    'success' => false,
+                    'status' => 'error',
+                    'message' => 'El rol tiene usuarios asignados',                    
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
@@ -139,21 +157,18 @@ class RoleRepository
             $role->delete();
 
             DB::commit();
-
             return response()->json([
                 'success' => true, 
+                'status' => 'success',
                 'message' => 'Rol eliminado correctamente',
-                'status' => Response::HTTP_OK
-            ]);
-
-        } catch (\Throwable $e) {
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
             DB::rollBack();
-
             return response()->json([
-                'success' => false, 
-                'message' => 'Error al eliminar la IP',
-                'status' => Response::HTTP_UNPROCESSABLE_ENTITY
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                'success' => false,
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

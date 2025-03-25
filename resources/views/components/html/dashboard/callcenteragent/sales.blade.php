@@ -1,6 +1,4 @@
 @php
-    use App\Traits\RoleTrait;
-    use App\Traits\BookingTrait;
     $data = [
         "total" => 0,
     ];
@@ -43,7 +41,7 @@
                                 $codes_string .= '<p class="mb-1">'.$code.'</p>';
                             }
                         @endphp
-                        @if (RoleTrait::hasPermission(38))
+                        @if (auth()->user()->hasPermission(38))
                             <a href="/reservations/detail/{{ $booking->reservation_id }}"><?=$codes_string?></a>
                         @else
                             <?=$codes_string?>
@@ -52,8 +50,8 @@
                     <td class="text-center">{{ date("Y-m-d", strtotime($booking->created_at)) }}</td>
                     <td class="text-center">{{ date("H:i", strtotime($booking->created_at)) }}</td>
                     <td class="text-center">{{ $booking->site_name }}</td>
-                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($booking->reservation_status) }}">{{ BookingTrait::statusBooking($booking->reservation_status) }}</button></td>
-                    <td class="text-center" <?=BookingTrait::classStatusPayment($booking)?>>{{ BookingTrait::statusPayment($booking->payment_status) }}</td>
+                    <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($booking->reservation_status) }}">{{ auth()->user()->statusBooking($booking->reservation_status) }}</button></td>
+                    <td class="text-center" <?=auth()->user()->classStatusPayment($booking)?>>{{ auth()->user()->statusPayment($booking->payment_status) }}</td>
                     <td class="text-center">$ {{ number_format(round($booking->total_sales, 2),2) }}</td>
                     <td class="text-center">$ {{ number_format(round($total, 2),2) }}</td>
                     <td class="text-center">{{ $booking->currency }}</td>
@@ -77,9 +75,9 @@
                         @endif
                     </td>
                     <td class="text-center">
-                        <?=BookingTrait::renderServiceStatus($booking->one_service_status)?><br>
+                        <?=auth()->user()->renderServiceStatus($booking->one_service_status)?><br>
                         @if ( $booking->is_round_trip != 0 )
-                            <?=BookingTrait::renderServiceStatus($booking->two_service_status)?>
+                            <?=auth()->user()->renderServiceStatus($booking->two_service_status)?>
                         @endif
                     </td>
                 </tr>

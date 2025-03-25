@@ -13,6 +13,8 @@ use App\Traits\RoleTrait;
 
 class CallCenterController extends Controller
 {
+    use RoleTrait;
+
     private $CallCenterResository;
 
     public function __construct(CallCenterResository $CallCenterResository)
@@ -21,7 +23,7 @@ class CallCenterController extends Controller
     }    
 
     public function index(Request $request){
-        if(RoleTrait::hasPermission(113)){
+        if($this->hasPermission(113)){
             return $this->CallCenterResository->index($request);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');

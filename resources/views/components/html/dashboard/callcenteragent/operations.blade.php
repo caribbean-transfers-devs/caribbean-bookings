@@ -1,7 +1,4 @@
 @php
-    use App\Traits\RoleTrait;
-    use App\Traits\BookingTrait;
-    use App\Traits\OperationTrait;
     $data = [
         "total" => 0,
         "total_operated" => 0,
@@ -40,7 +37,7 @@
                 <tr>
                     <td class="text-center"><span class="badge badge-{{ $booking->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $booking->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                     <td class="text-center">
-                        @if (RoleTrait::hasPermission(38))
+                        @if (auth()->user()->hasPermission(38))
                             <a href="/reservations/detail/{{ $booking->reservation_id }}"><?=$booking->code?></a>
                         @else
                             <?=$codes_string?>
@@ -48,18 +45,18 @@
                     </td>
                     <td class="text-center">{{ date("Y-m-d", strtotime($booking->created_at)) }}</td>
                     <td class="text-center">{{ $booking->site_name }}</td>
-                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($booking->reservation_status) }}">{{ BookingTrait::statusBooking($booking->reservation_status) }}</button></td>
-                    <td class="text-center" <?=BookingTrait::classStatusPayment($booking)?>>{{ BookingTrait::statusPayment($booking->payment_status) }}</td>
+                    <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($booking->reservation_status) }}">{{ auth()->user()->statusBooking($booking->reservation_status) }}</button></td>
+                    <td class="text-center" <?=auth()->user()->classStatusPayment($booking)?>>{{ auth()->user()->statusPayment($booking->payment_status) }}</td>
                     <td class="text-center">$ {{ number_format(round($booking->total_sales, 2),2) }}</td>
                     <td class="text-center">$ {{ number_format(round($total,2),2) }}</td>
                     <td class="text-center">$ {{ number_format(round($total_operated,2),2) }}</td>
                     <td class="text-center">{{ $booking->currency }}</td>                            
                     <td class="text-center">{{ $booking->full_name }}</td>
-                    <td class="text-center">{{ OperationTrait::setFrom($booking, "name") }}</td>
-                    <td class="text-center">{{ OperationTrait::setTo($booking, "name") }}</td>
-                    <td class="text-center">{{ OperationTrait::setDateTime($booking, "date") }}</td>
-                    <td class="text-center"><?=OperationTrait::renderServiceStatus($booking)?></td>
-                    <td class="text-center"><?=OperationTrait::renderOperationStatus($booking)?></td>
+                    <td class="text-center">{{ auth()->user()->setFrom($booking, "name") }}</td>
+                    <td class="text-center">{{ auth()->user()->setTo($booking, "name") }}</td>
+                    <td class="text-center">{{ auth()->user()->setDateTime($booking, "date") }}</td>
+                    <td class="text-center"><?=auth()->user()->renderServiceStatusOP($booking)?></td>
+                    <td class="text-center"><?=auth()->user()->renderOperationStatus($booking)?></td>
                 </tr>
             @endforeach
         </tbody>

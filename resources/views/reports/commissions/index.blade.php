@@ -1,8 +1,4 @@
 @php
-    use App\Traits\FiltersTrait;
-    use App\Traits\RoleTrait;
-    use App\Traits\BookingTrait;
-    use App\Traits\OperationTrait;
     use Illuminate\Support\Str;
     $usersData = [];
     $accountingData = [
@@ -10,7 +6,7 @@
         "TOTAL_SALE" => 0,
         "TOTAL_COMMISSION" => 0
     ];
-    $users = FiltersTrait::CallCenterAgent();
+    $users = auth()->user()->CallCenterAgent();
 @endphp
 @extends('layout.app')
 @section('title') Reporte de comisiones @endsection
@@ -152,12 +148,12 @@
                                         $usersData[Str::slug($operation->employee)]['TOTAL'] += $total_cost;
                                         $usersData[Str::slug($operation->employee)][$operation->currency] += $operation->cost;
 
-                                        if( OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" ){
+                                        if( auth()->user()->serviceStatus($operation, "no_translate") == "COMPLETED" ){
                                             $usersData[Str::slug($operation->employee)]['TOTAL_COMPLETED'] += $total_cost;
                                             $accountingData['TOTAL_COMMISSION'] = $total_cost;
                                         }
 
-                                        if( OperationTrait::serviceStatus($operation, "no_translate") == "PENDING" ){
+                                        if( auth()->user()->serviceStatus($operation, "no_translate") == "PENDING" ){
                                             $usersData[Str::slug($operation->employee)]['TOTAL_PENDING'] += $total_cost;
                                         }
 
@@ -182,25 +178,25 @@
                                     <td class="text-center">{{ $operation->employee }}</td>
                                     <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
-                                        @if (RoleTrait::hasPermission(38))
+                                        @if (auth()->user()->hasPermission2(38))
                                             <a href="/reservations/detail/{{ $operation->reservation_id }}"><p class="mb-1">{{ $operation->code }}</p></a>
                                         @else
                                             <p class="mb-1">{{ $operation->code }}</p>
                                         @endif
                                     </td>
                                     <td class="text-center">{{ $operation->site_name }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($operation->reservation_status) }}">{{ BookingTrait::statusBooking($operation->reservation_status) }}</button></td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($operation->reservation_status) }}">{{ auth()->user()->statusBooking($operation->reservation_status) }}</button></td>
                                     <td class="text-center">{{ $operation->full_name }}</td>
-                                    <td class="text-center">{{ OperationTrait::setDateTime($operation, "date") }}</td>
-                                    <td class="text-center"><?=OperationTrait::renderServiceStatus($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::renderOperationStatus($operation)?></td>
+                                    <td class="text-center">{{ auth()->user()->setDateTime($operation, "date") }}</td>
+                                    <td class="text-center"><?=auth()->user()->renderServiceStatus($operation)?></td>
+                                    <td class="text-center"><?=auth()->user()->renderOperationStatus($operation)?></td>
                                     <td class="text-center">{{ number_format(($operation->total_sales),2) }}</td>
                                     <td class="text-center">{{ number_format($total_sales,2) }}</td>
                                     <td class="text-center">{{ number_format($total_cost,2) }}</td>
-                                    {{-- <td class="text-center">{{ number_format(( OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" ? $total_cost : 0 ),2) }}</td> --}}
+                                    {{-- <td class="text-center">{{ number_format(( auth()->user()->serviceStatus($operation, "no_translate") == "COMPLETED" ? $total_cost : 0 ),2) }}</td> --}}
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     <td class="text-center">
-                                        @if ( ($operation->reservation_status == "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") )
+                                        @if ( ($operation->reservation_status == "CANCELLED" && auth()->user()->serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && auth()->user()->serviceStatus($operation, "no_translate") == "CANCELLED") )
                                             @if ( !empty($operation->cancellation_reason) )
                                                 {{ $operation->cancellation_reason }}
                                             @else

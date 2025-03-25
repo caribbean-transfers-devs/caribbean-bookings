@@ -1,8 +1,3 @@
-@php
-    use App\Traits\RoleTrait;
-    use App\Traits\BookingTrait;
-    use App\Traits\OperationTrait;
-@endphp
 @extends('layout.app')
 @section('title') Gestión De Confirmaciónes @endsection
 
@@ -100,8 +95,8 @@
                                 <tr>
                                     <td class="text-center">{{ $confirmation->reservation_id }}</td>
                                     <td class="text-center">
-                                        @if (RoleTrait::hasPermission(40))
-                                            <?=OperationTrait::renderStatusConfirmation($confirmation)?>
+                                        @if (auth()->user()->hasPermission2(40))
+                                            <?=auth()->user()->renderStatusConfirmation($confirmation)?>
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -112,11 +107,11 @@
                                         @endif
                                     </td>
                                     <td class="text-center">{{ $confirmation->site_name }}</td>
-                                    <td class="text-center">{{ OperationTrait::setDateTime($confirmation, "time") }}</td>
+                                    <td class="text-center">{{ auth()->user()->setDateTime($confirmation, "time") }}</td>
                                     <td class="text-center">{{ $confirmation->final_service_type }}</td>
-                                    <td class="text-center"><?=OperationTrait::renderServiceStatus($confirmation)?></td>
+                                    <td class="text-center"><?=auth()->user()->renderServiceStatusOP($confirmation)?></td>
                                     <td class="text-center">
-                                        @if (RoleTrait::hasPermission(38))
+                                        @if (auth()->user()->hasPermission2(38))
                                             <a href="/reservations/detail/{{ $confirmation->reservation_id }}"><p class="mb-1">{{ $confirmation->code }}</p></a>
                                         @else
                                             <p class="mb-1">{{ $confirmation->code }}</p>
@@ -125,9 +120,9 @@
                                     <td class="text-center">{{ $confirmation->full_name }}</td>
                                     <td class="text-center">{{ $confirmation->service_type_name }}</td>
                                     <td class="text-center">{{ $confirmation->passengers }}</td>
-                                    <td class="text-center">{{ OperationTrait::setFrom($confirmation, "name") }} {{ $confirmation->operation_type == 'arrival' && !empty($confirmation->flight_number) ? ' ('.$confirmation->flight_number.')' : '' }}</td>
-                                    <td class="text-center">{{ OperationTrait::setTo($confirmation, "name") }}</td>
-                                    <td class="text-center" <?=BookingTrait::classStatusPayment($confirmation)?>>{{ BookingTrait::statusPayment($confirmation->payment_status) }}</td>
+                                    <td class="text-center">{{ auth()->user()->setFrom($confirmation, "name") }} {{ $confirmation->operation_type == 'arrival' && !empty($confirmation->flight_number) ? ' ('.$confirmation->flight_number.')' : '' }}</td>
+                                    <td class="text-center">{{ auth()->user()->setTo($confirmation, "name") }}</td>
+                                    <td class="text-center" <?=auth()->user()->classStatusPayment($confirmation)?>>{{ auth()->user()->statusPayment($confirmation->payment_status) }}</td>
                                     <td class="text-center">{{ number_format($confirmation->total_balance,2) }}</td>
                                     <td class="text-center">{{ $confirmation->currency }}</td>
                                     <td class="text-center">

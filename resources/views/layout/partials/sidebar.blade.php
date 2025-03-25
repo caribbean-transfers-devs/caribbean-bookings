@@ -236,15 +236,7 @@
                     'route' => route('schedules.index'),
                     'active' => request()->routeIs('schedules.*'),
                 ];
-            // endif;            
-            //TIPO DE CAMBIO PARA REPORTES
-            if(auth()->user()->hasPermission2(103)):
-                $links_settings[] = [
-                    'name' => 'Tipos de cambio reportes',
-                    'route' => route('exchanges.index'),
-                    'active' => request()->routeIs('exchanges.*'),
-                ];
-            endif;
+            // endif;
             //ZONAS
             if(auth()->user()->hasPermission2(28)):
                 $links_settings[] = [
@@ -256,7 +248,7 @@
             //TARIFAS
             if(auth()->user()->hasPermission2(32)):
                 $links_settings[] = [
-                    'name' => 'Tarifas',
+                    'name' => 'Tarifas de paginas web',
                     'route' => route('config.ratesDestination'),
                     'active' => request()->routeIs('config.ratesDestination','config.ratesZones'),
                 ];
@@ -269,6 +261,14 @@
                     'active' => request()->routeIs('config.ratesEnterprise'),
                 ];
             endif;
+            //TIPO DE CAMBIO PARA REPORTES
+            if(auth()->user()->hasPermission2(103)):
+                $links_settings[] = [
+                    'name' => 'Tipos de cambio reportes',
+                    'route' => route('exchanges.index'),
+                    'active' => request()->routeIs('exchanges.*'),
+                ];
+            endif;            
             //TIPOS DE CANCELACIONES
             if(auth()->user()->hasPermission2(108)):
                 $links_settings[] = [

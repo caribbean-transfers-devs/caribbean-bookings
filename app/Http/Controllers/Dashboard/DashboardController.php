@@ -25,7 +25,7 @@ class DashboardController extends Controller
     }
 
     public function admin(Request $request){
-        if(!RoleTrait::hasPermission(42)){
+        if(!$this->hasPermission(42)){
             //abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $this->DashboardRepository->admin($request);        

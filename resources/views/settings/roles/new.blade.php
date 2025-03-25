@@ -82,7 +82,6 @@
                                     </ul>
                                 </div>
                             @endif
-
                             @if (session('success'))
                                 <div class="alert alert-light-success alert-dismissible fade show border-0 mb-4" role="alert"> 
                                     {{ session('success') }}
@@ -93,57 +92,47 @@
                                     {{ session('danger') }}
                                 </div>
                             @endif
+
                             @php
-                                if(count($role->permits) > 0) {
-                                    $permits = $role->permits->pluck('submodule_id')->toArray();
-                                } else {
-                                    $permits = [];
-                                }
-                            @endphp                            
+                                $permits = $role->permits->isNotEmpty() ? $role->permits->pluck('submodule_id')->toArray() : [];
+                            @endphp
 
                             <form id="frm_role">
                                 @csrf
-                                <div class="row mb-3">
-                                    <div class="col-12">
-                                        <label for="role" class="form-label">Nombre</label>
-                                        <input type="text" class="form-control" id="role" name="role"
-                                                value="{{ $role->role }}" required>
-                                    </div>                                
-                                </div>  
-                                <div class="row mb-3">
-                                    <ul class="nav nav-tabs" role="tablist">
-                                        @foreach ($modules as $module)
-                                            <li class="nav-item" role="presentation"><a class="nav-link @if ($loop->first)
-                                                active
-                                            @endif" href="#tab-{{ $module->id }}" data-bs-toggle="tab" role="tab" aria-selected="true">{{ $module->module }}</a></li>
-                                        @endforeach                                    
-                                    </ul>
-                                    <div class="tab-content">
-                                        @foreach ($modules as $module)
-                                            @php
-                                                // dump($module);
-                                            @endphp
-                                            <div class="tab-pane @if ($loop->first) active show @endif" id="tab-{{ $module->id }}" role="tabpanel">
-                                                <div class="row mt-2">
-                                                    @foreach ($module->submodules as $submodule)
-                                                        <div class="col-4 my-2">
-                                                            <label class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="{{ $submodule->id }}" name="permits[]" @if (in_array($submodule->id, $permits) )
-                                                                    checked                                                                
-                                                                @endif>
-                                                                <span class="form-check-label">
-                                                                    {{ $submodule->submodule }}
-                                                                </span>
-                                                            </label>
-                                                        </div>                                                        
-                                                    @endforeach
-                                                </div>                                            
-                                            </div>
-                                        @endforeach
-                                        
-                                    </div>
+
+                                <label for="role" class="form-label">Nombre</label>
+                                <input type="text" class="form-control mb-3" id="role" name="role" value="{{ $role->role }}" required>
+
+                                <ul class="nav nav-tabs" role="tablist">
+                                    @foreach ($modules as $module)
+                                        <li class="nav-item" role="presentation"><a class="nav-link @if ($loop->first)
+                                            active
+                                        @endif" href="#tab-{{ $module->id }}" data-bs-toggle="tab" role="tab" aria-selected="true">{{ $module->module }}</a></li>
+                                    @endforeach                                    
+                                </ul>
+                                <div class="tab-content">
+                                    @foreach ($modules as $module)
+                                        <div class="tab-pane @if ($loop->first) active show @endif" id="tab-{{ $module->id }}" role="tabpanel">
+                                            <div class="row mt-2">
+                                                @foreach ($module->submodules as $submodule)
+                                                    <div class="col-4 my-2">
+                                                        <label class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value="{{ $submodule->id }}" name="permits[]" @if (in_array($submodule->id, $permits) )
+                                                                checked                                                                
+                                                            @endif>
+                                                            <span class="form-check-label">
+                                                                {{ $submodule->submodule }}
+                                                            </span>
+                                                        </label>
+                                                    </div>                                                        
+                                                @endforeach
+                                            </div>                                            
+                                        </div>
+                                    @endforeach
+                                    
                                 </div>
-                            </form>                           
+
+                            </form>
                             <button class="btn btn-success" id="save">@if ($v_type == 1)
                                 Crear
                             @else

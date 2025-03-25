@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 trait OperationTrait
 {
-
     use BookingTrait;
 
     //NOS AYUDA A COLOCAR LA CLASE, QUE TENDRA LA PREASIGNACION DEL SERVICIO
@@ -38,7 +37,7 @@ trait OperationTrait
     }
 
     //TIPO DE SERVICIO EN OPERACIONES
-    public static function typeService($status){
+    public function typeService($status){
         switch ($status) {
             case 'DEPARTURE':
                 return 'SALIDA';
@@ -60,7 +59,7 @@ trait OperationTrait
         }
     }
 
-    public static function renderServicePreassignment($service){
+    public function renderServicePreassignment($service){
         return '<button type="button" class="btn btn-'.( self::validatePreassignment($service) ? self::classServiceNumber($service->final_service_type) : 'danger' ).' btn-sm">'.( self::validatePreassignment($service) ? self::typePreassignment($service) : 'ADD' ).'</button>';
     }
 
@@ -71,24 +70,21 @@ trait OperationTrait
 
     // BOTON DE CONFIRMACION
     
-    public static function renderStatusConfirmation($service){
+    public function renderStatusConfirmation($service){
         return '<button type="button" class="btn btn-'.( self::serviceStatusConfirmation($service) == 0 ? 'warning' : 'success' ).' confirmService" data-item="'.$service->id.'" data-service="'.$service->final_service_type.'" data-status="'.( self::serviceStatusConfirmation($service) == 1 ? 0 : 1 ).'" data-type="'.$service->op_type.'">'.( self::serviceStatusConfirmation($service) == 0 ? 'N' : 'Y' ).'</button>';
     }
 
     //COLOR AGENCY
-
-    public static function setClassColorAgency(){
-        
+    public function setClassColorAgency(){        
     }
 
     // ZONAS
-
-    public static function classCutOffZone($service){
+    public function classCutOffZone($service){
         $cut_off_zone = ( $service->op_type == "TYPE_ONE" ? $service->zone_one_cut_off : $service->zone_two_cut_off );
         return 'style="'.( $cut_off_zone >= 3 ? 'background-color:#e2a03f;color:#fff;' : ( $cut_off_zone >= 2 && $cut_off_zone < 3 ? 'background-color:#805dca;color:#fff;' : '' ) ).'"';
     }
 
-    public static function setFrom($service, $type = "destination"){
+    public function setFrom($service, $type = "destination"){
         if ($type == "destination") {
             return ( $service->operation_type == 'arrival' ? $service->destination_name_from : $service->destination_name_to );
         }else{
@@ -97,7 +93,7 @@ trait OperationTrait
         
     }
 
-    public static function setTo($service, $type = "destination"){
+    public function setTo($service, $type = "destination"){
         if ($type == "destination") {
             return ( $service->operation_type == 'arrival' ? $service->destination_name_to : $service->destination_name_from );
         }else{
@@ -106,7 +102,7 @@ trait OperationTrait
     }
 
     //SETEA LA FECHA O HORA, DEPENDIENDO DEL TIPE, DATE TIME
-    public static function setDateTime($service, $type = "")
+    public function setDateTime($service, $type = "")
     {
         if ($type == "date") {
             return date("Y-m-d", strtotime(( $service->operation_type == 'arrival' ? $service->pickup_from : $service->pickup_to )));
@@ -118,7 +114,7 @@ trait OperationTrait
     }
 
     //
-    public static function serviceStatus($service, $action = "translate")
+    public function serviceStatus($service, $action = "translate")
     {
         if( $action == "translate" ){
             return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ));
@@ -130,13 +126,13 @@ trait OperationTrait
     }
 
     //AQUI NOS MUESTRA EL BOTON CON EL ESTATUS DEL SERVICIO, CUANDO SE CERRO LA OPERACIÓN
-    public static function renderServiceStatus($service)
+    public function renderServiceStatusOP($service)
     {
-        return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ), 'OPERATION').'">'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status )).'</button>';
+        return '<button type="button" class="btn btn-'.$this->classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ), 'OPERATION').'">'.$this->statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status )).'</button>';
     }
 
     //AQUI NOS MUESTRA EL BOTON CON LAS OPCIONES DE ESTATUS, CUANDO LA OPERACIÓN ESTA ABIERTA
-    public static function renderServiceOptionsStatus($key,$service)
+    public function renderServiceOptionsStatus($key,$service)
     {
         // <div class="dropdown-divider"></div>
         // <a href="javascript:void(0);" class="dropdown-item btn_update_status_booking" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="CANCELLED" data-item="'. $service->id .'" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>        
@@ -154,7 +150,7 @@ trait OperationTrait
     } 
 
     //MOSTRAMOS EL NOMBRE DE LA UNIDAD, SELECCIONADA EN LA OPERCION
-    public static function setOperationUnit($service)
+    public function setOperationUnit($service)
     {
         if( $service->op_type == "TYPE_ONE" && $service->vehicle_one_name != null ){
             return $service->vehicle_one_name." - ".$service->vehicle_name_one;
@@ -166,7 +162,7 @@ trait OperationTrait
     }
 
     //MOSTRAMOS EL NOMBRE DEL VEHÍCULO, BASADO EN LA UNIDAD SELECCIONADA EN LA OPERACIÓN
-    public static function setOperationVehicle($service){
+    public function setOperationVehicle($service){
         if( $service->op_type == "TYPE_ONE" && $service->vehicle_one_name != null ){
             return $service->vehicle_name_one;
         }else if( $service->op_type == "TYPE_TWO" && $service->vehicle_two_name != null ){
@@ -177,7 +173,7 @@ trait OperationTrait
         //return ( $service->op_type == "TYPE_ONE" ? $service->vehicle_name_one : $service->vehicle_name_two );
     }
 
-    public static function setOperationDriver($service){
+    public function setOperationDriver($service){
         if( $service->op_type == "TYPE_ONE" && $service->driver_one_name != null ){
             return $service->driver_one_name;
         }else if( $service->op_type == "TYPE_TWO" && $service->driver_two_name != null ){
@@ -187,7 +183,7 @@ trait OperationTrait
         }
     }
 
-    public static function setOperationTime($service){
+    public function setOperationTime($service){
         if( $service->op_type == "TYPE_ONE" ){
             return date("H:i", strtotime($service->op_one_time_operation));
         }else if( $service->op_type == "TYPE_TWO" ){
@@ -197,7 +193,7 @@ trait OperationTrait
         }
     }
 
-    public static function setOperatingCost($service){
+    public function setOperatingCost($service){
         if( $service->op_type == "TYPE_ONE" ){
             return $service->op_one_operating_cost;
         }else if( $service->op_type == "TYPE_TWO" ){
@@ -207,7 +203,7 @@ trait OperationTrait
         }
     }
     
-    public static function operationStatus($service, $action = "translate"){
+    public function operationStatus($service, $action = "translate"){
         if( $action == "translate" ){
             return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ));
         }else if( $action == "no_translate" ){
@@ -215,11 +211,11 @@ trait OperationTrait
         }        
     }
 
-    public static function renderOperationStatus($service){
+    public function renderOperationStatus($service){
         return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ), 'OPERATION').'">'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status )).'</button>';
     }
 
-    public static function renderOperationOptionsStatus($key,$service){
+    public function renderOperationOptionsStatus($key,$service){
         return '<div class="btn-group" role="group">
                     <button id="optionsOperation'.$key.$service->id.'" data-item="'.$key.$service->id.'" type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ), 'OPERATION').' dropdown-toggle btn_status_action" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span>'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status )).'</span>
@@ -235,7 +231,7 @@ trait OperationTrait
                 </div>';
     }    
 
-    public static function commissionOperation($service){
+    public function commissionOperation($service){
         $payment = ( $service->site_id == 21 ? ( $service->currency == "USD" ? ( $service->total_sales * 16 ) : $service->total_sales ) : ( $service->op_type == "TYPE_ONE" ? $service->op_one_operating_cost : $service->op_two_operating_cost ) );
         $percentage = ( $service->site_id == 21 ? 0.04 : 0.05 );
         return ( $payment * $percentage );

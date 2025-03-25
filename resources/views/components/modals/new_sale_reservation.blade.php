@@ -1,6 +1,5 @@
 @php
-    use App\Traits\FiltersTrait;
-    $typeSales = FiltersTrait::TypeSales();
+    $typeSales = auth()->user()->TypeSales();
 @endphp
 <div class="modal fade" id="serviceSalesModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">

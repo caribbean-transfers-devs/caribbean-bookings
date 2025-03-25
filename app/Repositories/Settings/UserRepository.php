@@ -11,7 +11,6 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\UserSession;
 use App\Models\UserRole;
-use App\Models\Target;
 use App\Models\WhitelistIp;
 
 class UserRepository
@@ -19,10 +18,24 @@ class UserRepository
     public function indexUsers($request)
     {
         try {
+            $users = User::whereIn('status', [0, 1])
+            ->with(['target','roles.role'])
+            ->get();
+
+            // $active_users = User::where('status', 1)
+            // ->with(['target', 'roles.role'])
+            // ->paginate(20, ['*'], 'active_page');
+
+            // $inactive_users = User::where('status', 0)
+            //     ->with(['target', 'roles.role'])
+            //     ->paginate(20, ['*'], 'inactive_page');
+
             return view('settings.users.index', [
-                'active_users' => User::where('status', 1)->get(),                
-                'inactive_users' => User::where('status', 0)->get(),
-                'valid_ips' => WhitelistIp::all(), 
+                'active_users' =>  $users->where('status', 1),
+                'inactive_users' => $users->where('status', 0),
+                // 'active_users' =>  $active_users,
+                // 'inactive_users' => $inactive_users,
+                'valid_ips' => WhitelistIp::with(['user'])->get(),
                 'breadcrumbs' => [
                     [
                         "route" => "",
@@ -33,13 +46,9 @@ class UserRepository
             ]);
             
         } catch (Exception $e) {
-            $active_users = [];
-            $inactive_users = [];
-            $valid_ips = WhitelistIp::all();
             return view('settings.users.index', [
                 'active_users' => [], 
                 'inactive_users' => [],
-                'active_users_callcenter' => [], 
                 'valid_ips' => []
             ]);
         }
@@ -60,28 +69,43 @@ class UserRepository
                         "active" => true
                     ]
                 ],
-                // 'roles' => ( $request->type === 'callcenter' ? Role::where('id', 4)->get() : Role::where('id', '!=', 4)->get() ),
-                'roles' => Role::all(),
                 'v_type' => 1,
+                'roles' => cache()->remember('roles_list', 60, fn() => Role::all()),                
                 'user' => new User()                
             ]);
         } catch (Exception $e) {
-            return back()->withErrors(['danger' => 'Ocurrió un error al cargar la página.']);
+            return back()->withErrors(['danger' => $e->getMessage()]);
         }
     }
 
     public function editUser($request,$user){
-        // Comparar el dispositivo actual con las sesiones guardadas
-        $currentSession = UserSession::where('user_id', $user->id)
-            ->where('ip_address', $request->ip())
-            ->where('user_agent', $request->userAgent())
-            ->first();        
-        return view('settings.users.new', [
-            'roles' => Role::all(),
-            'v_type' => 2,
-            'user' => $user,
-            'currentSession' => $currentSession
-        ]);
+        try {
+            // Comparar el dispositivo actual con las sesiones guardadas
+            $currentSession = UserSession::where('user_id', $user->id)
+                ->where('ip_address', $request->ip())
+                ->where('user_agent', $request->userAgent())
+                ->first();
+            return view('settings.users.new', [
+                'breadcrumbs' => [
+                    [
+                        "route" => route('users.index'),
+                        "name" => "Listado de usuarios",
+                        "active" => false                        
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Editar usuario: ".$user->name,
+                        "active" => true                        
+                    ],                
+                ],
+                'v_type' => 2,
+                'roles' => cache()->remember('roles_list', 60, fn() => Role::all()),                
+                'user' => $user,
+                'currentSession' => $currentSession
+            ]);
+        } catch (Exception $e) {
+            return back()->withErrors(['danger' => $e->getMessage()]);
+        }
     }
 
     public function storeUser($request){
@@ -93,23 +117,20 @@ class UserRepository
             $user->email = strtolower($request->email);
             $user->password = bcrypt($request->password);
             $user->restricted = $request->restricted;
-            $user->is_commission = $request->is_commission;
-        
+            $user->is_commission = $request->is_commission;    
             ( isset($request->type_commission) ? $user->type_commission = $request->type_commission : "target" );
             ( isset($request->type_commission) && $request->type_commission == "target" ? $user->target_id = 1 : NULL );
             ( isset($request->percentage) ? $user->percentage = $request->percentage : 0 );
             ( isset($request->daily_goal) ? $user->daily_goal = $request->daily_goal : 0 );
-
             $user->is_external = $request->is_external;
-
             $user->save();
 
-            foreach ($request->roles as $role) {
-                $user_role = new UserRole();
-                $user_role->role_id = $role;
-                $user_role->user_id = $user->id;
-                $user_role->save();
-            }
+            $user_roles = collect($request->roles)->map(fn($role) => [
+                'user_id' => $user->id,
+                'role_id' => $role
+            ])->toArray();
+            
+            UserRole::insert($user_roles);
 
             DB::commit();
 
@@ -118,15 +139,13 @@ class UserRepository
                 'message' => 'Usuario creado correctamente',
                 'status' => Response::HTTP_OK
             ]);
-
-        } catch (\Throwable $e) {
+        } catch (Exception $e) {
             DB::rollBack();
-
             return response()->json([
                 'success' => false,
+                'status' => 'error',
                 'message' => $e->getMessage(),
-                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-            ]);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -138,40 +157,28 @@ class UserRepository
             $user->email = strtolower($request->email);
             $user->restricted = $request->restricted;
             $user->is_commission = $request->is_commission;
-
             ( isset($request->type_commission) ? $user->type_commission = $request->type_commission : "target" );
             ( isset($request->type_commission) && $request->type_commission == "target" ? $user->target_id = 1 : NULL );
             ( isset($request->percentage) ? $user->percentage = $request->percentage : 0 );
             ( isset($request->daily_goal) ? $user->daily_goal = $request->daily_goal : 0 );
-
             $user->is_external = $request->is_external;
-
             $user->save();
 
-            $user->roles()->delete();
-            foreach ($request->roles as $role) {
-                $user_role = new UserRole();
-                $user_role->role_id = $role;
-                $user_role->user_id = $user->id;
-                $user_role->save();
-            }
+            $user->roles()->sync($request->roles);
 
             DB::commit();
-
             return response()->json([
                 'success' => true, 
+                'status' => 'success',
                 'message' => 'Usuario actualizado correctamente',
-                'status' => Response::HTTP_OK
-            ]);
-
+            ], Response::HTTP_OK);
         } catch (\Throwable $e) {
             DB::rollBack();
-
             return response()->json([
-                'success' => false, 
+                'success' => false,
+                'status' => 'error',
                 'message' => $e->getMessage(),
-                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-            ]);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -183,21 +190,18 @@ class UserRepository
             $user->save();
 
             DB::commit();
-
             return response()->json([
                 'success' => true, 
+                'status' => 'success',
                 'message' => 'Contraseña actualizada correctamente',
-                'status' => Response::HTTP_OK
-            ]);
-
-        } catch (\Throwable $e) {
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
             DB::rollBack();
-
             return response()->json([
-                'success' => false, 
-                'message' => 'Error al actualizar la contraseña',
-                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-            ]);
+                'success' => false,
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -209,21 +213,18 @@ class UserRepository
             $user->save();
 
             DB::commit();
-
             return response()->json([
-                'success' => true, 
+                'success' => true,
+                'status' => 'success', 
                 'message' => 'Estado actualizado correctamente',
-                'status' => Response::HTTP_OK
-            ]);
-
+            ], Response::HTTP_OK);
         } catch (\Throwable $e) {
             DB::rollBack();
-
             return response()->json([
-                'success' => false, 
-                'message' => 'Error al actualizar el estado',
-                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-            ]);
+                'success' => false,
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -238,21 +239,18 @@ class UserRepository
             $ip->save();
 
             DB::commit();
-
             return response()->json([
                 'success' => true, 
+                'status' => 'success',
                 'message' => 'IP guardada correctamente',
-                'status' => Response::HTTP_OK
-            ]);
-
-        } catch (\Throwable $e) {
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
             DB::rollBack();
-
             return response()->json([
-                'success' => false, 
-                'message' => 'Error al guardar la IP',
-                'status' => Response::HTTP_UNPROCESSABLE_ENTITY
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                'success' => false,
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -263,16 +261,13 @@ class UserRepository
             $ip->delete();
 
             DB::commit();
-
             return response()->json([
                 'success' => true, 
+                'status' => 'success',
                 'message' => 'IP eliminada correctamente',
-                'status' => Response::HTTP_OK
-            ]);
-
-        } catch (\Throwable $e) {
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
             DB::rollBack();
-
             return response()->json([
                 'success' => false, 
                 'message' => 'Error al eliminar la IP',

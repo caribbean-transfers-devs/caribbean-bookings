@@ -1,8 +1,3 @@
-@php
-    use App\Traits\RoleTrait;
-    use App\Traits\BookingTrait;
-@endphp
-
 @if(sizeof($photos) > 0)
     @foreach($photos as $key => $value)
         @php
@@ -29,7 +24,7 @@
                         <button class="btn btn-danger btn-sm deleteMedia" data-id="{{ $value->id }}" data-name="{{ $value->path }}">Eliminar</button>
                     @endif
                     {{-- LA CATEGORIA DE LA IMAGEN --}}
-                    <?=BookingTrait::renderCategoryPicture($value->type_media)?>
+                    <?=auth()->user()->renderCategoryPicture($value->type_media)?>
                 </div>
             </div>
             <div class="content-bottom">

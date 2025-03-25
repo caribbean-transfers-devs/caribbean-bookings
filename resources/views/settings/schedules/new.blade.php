@@ -1,7 +1,6 @@
 @php
-    use App\Traits\FiltersTrait;
-    $units = FiltersTrait::Units('active'); //LAS UNIDADES DADAS DE ALTA
-    $drivers = FiltersTrait::Drivers('active');
+    $units = auth()->user()->Units('active'); //LAS UNIDADES DADAS DE ALTA
+    $drivers = auth()->user()->Drivers('active');
 @endphp
 @extends('layout.app')
 @section('title') Vehiculos @endsection

@@ -7,10 +7,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Traits\RoleTrait;
+use App\Traits\FiltersTrait;
+use App\Traits\FinanceTrait;
+use App\Traits\BookingTrait;
+use App\Traits\OperationTrait;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, RoleTrait;
+    use HasApiTokens, HasFactory, Notifiable, RoleTrait, FiltersTrait, FinanceTrait, BookingTrait, OperationTrait;
 
     /**
      * The attributes that are mass assignable.

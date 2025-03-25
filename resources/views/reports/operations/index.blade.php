@@ -1,26 +1,22 @@
 @php
-    use App\Traits\FiltersTrait;
-    use App\Traits\RoleTrait;
-    use App\Traits\BookingTrait;
-    use App\Traits\OperationTrait;
     use Illuminate\Support\Str;
     use Carbon\Carbon;
 
-    $services = FiltersTrait::Services();
-    $websites = FiltersTrait::Sites();
-    $origins = FiltersTrait::Origins();
-    $reservation_status = FiltersTrait::reservationStatus();
-    $services_operation = FiltersTrait::servicesOperation();
-    $vehicles = FiltersTrait::Vehicles();
-    $zones = FiltersTrait::Zones();
-    $service_operation_status = FiltersTrait::statusOperationService();
-    $units = FiltersTrait::Units(); //LAS UNIDADES DADAS DE ALT;
-    $drivers = FiltersTrait::Drivers();
-    $operation_status = FiltersTrait::statusOperation();
-    $payment_status = FiltersTrait::paymentStatus();
-    $currencies = FiltersTrait::Currencies();
-    $methods = FiltersTrait::Methods();
-    $cancellations = FiltersTrait::CancellationTypes();
+    $services = auth()->user()->Services();
+    $websites = auth()->user()->Sites();
+    $origins = auth()->user()->Origins();
+    $reservation_status = auth()->user()->reservationStatus();
+    $services_operation = auth()->user()->servicesOperation();
+    $vehicles = auth()->user()->Vehicles();
+    $zones = auth()->user()->Zones();
+    $service_operation_status = auth()->user()->statusOperationService();
+    $units = auth()->user()->Units(); //LAS UNIDADES DADAS DE ALT;
+    $drivers = auth()->user()->Drivers();
+    $operation_status = auth()->user()->statusOperation();
+    $payment_status = auth()->user()->paymentStatus();
+    $currencies = auth()->user()->Currencies();
+    $methods = auth()->user()->Methods();
+    $cancellations = auth()->user()->CancellationTypes();
 
     $operationStatus = [
         "total" => 0,
@@ -326,9 +322,9 @@
                             @foreach ($operations as $operation)
                                 @php
                                     //ESTATUS
-                                    if (!isset( $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")] ) ){
-                                        $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")] = [
-                                            "name" => OperationTrait::serviceStatus(OperationTrait::serviceStatus($operation,"no_translate"),"translate_name"),
+                                    if (!isset( $operationStatus['data'][auth()->user()->serviceStatus($operation,"no_translate")] ) ){
+                                        $operationStatus['data'][auth()->user()->serviceStatus($operation,"no_translate")] = [
+                                            "name" => auth()->user()->serviceStatus(auth()->user()->serviceStatus($operation,"no_translate"),"translate_name"),
                                             "total" => 0,
                                             "gran_total" => 0,
                                             "USD" => [
@@ -348,11 +344,11 @@
                                     $operationStatus[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                     $operationStatus[$operation->currency]['counter']++;
                                     $operationStatus['counter']++;
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")][$operation->currency]['total'] += $operation->service_cost;
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")][$operation->currency]['counter']++;
-                                    $operationStatus['data'][OperationTrait::serviceStatus($operation,"no_translate")]['counter']++;
+                                    $operationStatus['data'][auth()->user()->serviceStatus($operation,"no_translate")]['total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
+                                    $operationStatus['data'][auth()->user()->serviceStatus($operation,"no_translate")]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
+                                    $operationStatus['data'][auth()->user()->serviceStatus($operation,"no_translate")][$operation->currency]['total'] += $operation->service_cost;
+                                    $operationStatus['data'][auth()->user()->serviceStatus($operation,"no_translate")][$operation->currency]['counter']++;
+                                    $operationStatus['data'][auth()->user()->serviceStatus($operation,"no_translate")]['counter']++;
 
                                     //METODOS DE PAGO
                                     if (!isset( $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))] ) ){
@@ -371,7 +367,7 @@
                                             "counter" => 0,                                            
                                         ];
                                     }
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
                                         $dataMethodPayments['total'] += $operation->service_cost;
                                         $dataMethodPayments['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataMethodPayments[$operation->currency]['total'] += $operation->service_cost;
@@ -402,7 +398,7 @@
                                             "counter" => 0,                                            
                                         ];
                                     }
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
                                         $dataSites['total'] += $operation->service_cost;
                                         $dataSites['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataSites[$operation->currency]['total'] += $operation->service_cost;
@@ -433,7 +429,7 @@
                                             "counter" => 0,                                            
                                         ];
                                     }
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
                                         $dataOriginSale['total'] += $operation->service_cost;
                                         $dataOriginSale['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataOriginSale[$operation->currency]['total'] += $operation->service_cost;
@@ -456,7 +452,7 @@
                                             "counter" => 0,
                                         ];
                                     }
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
                                         $dataCurrency['total'] += $operation->service_cost;
                                         $dataCurrency['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataCurrency['data'][$operation->currency]['total'] += $operation->service_cost;
@@ -466,10 +462,10 @@
                                     }
 
                                     //CONDUCTORES DE OPERACION
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
-                                        if (!isset( $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))] ) ){
-                                            $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))] = [
-                                                "name" => OperationTrait::setOperationDriver($operation),
+                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
+                                        if (!isset( $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))] ) ){
+                                            $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))] = [
+                                                "name" => auth()->user()->setOperationDriver($operation),
                                                 "total" => 0,
                                                 "gran_total" => 0,
                                                 "units" => [],
@@ -490,26 +486,26 @@
                                         $dataDriver[$operation->currency]['total'] += $operation->service_cost;
                                         $dataDriver[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataDriver[$operation->currency]['counter']++;
-                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['total'] += $operation->service_cost;
-                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
+                                        $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))]['total'] += $operation->service_cost;
+                                        $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
 
-                                        if( !in_array(OperationTrait::setOperationUnit($operation), $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['units']) ){
-                                            array_push($dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['units'], OperationTrait::setOperationUnit($operation));
+                                        if( !in_array(auth()->user()->setOperationUnit($operation), $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))]['units']) ){
+                                            array_push($dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))]['units'], auth()->user()->setOperationUnit($operation));
                                         }
 
-                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))][$operation->currency]['total'] += $operation->service_cost;
-                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))][$operation->currency]['counter']++;
-                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['counter']++;
-                                        $dataDriver['data'][strtoupper(Str::slug(OperationTrait::setOperationDriver($operation)))]['commission'] += OperationTrait::commissionOperation($operation);
-                                        $dataDriver['commission'] += OperationTrait::commissionOperation($operation);
+                                        $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))][$operation->currency]['total'] += $operation->service_cost;
+                                        $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))][$operation->currency]['counter']++;
+                                        $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))]['counter']++;
+                                        $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))]['commission'] += auth()->user()->commissionOperation($operation);
+                                        $dataDriver['commission'] += auth()->user()->commissionOperation($operation);
                                         $dataDriver['counter']++;
                                     }
                                     
                                     //UNIDADES DE OPERACION
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
-                                        if (!isset( $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))] ) ){
-                                            $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))] = [
-                                                "name" => OperationTrait::setOperationUnit($operation),
+                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
+                                        if (!isset( $dataUnit['data'][strtoupper(Str::slug(auth()->user()->setOperationUnit($operation)))] ) ){
+                                            $dataUnit['data'][strtoupper(Str::slug(auth()->user()->setOperationUnit($operation)))] = [
+                                                "name" => auth()->user()->setOperationUnit($operation),
                                                 "total" => 0,
                                                 "gran_total" => 0,
                                                 "USD" => [
@@ -529,18 +525,18 @@
                                         $dataUnit[$operation->currency]['total'] += $operation->service_cost;
                                         $dataUnit[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataUnit[$operation->currency]['counter']++;
-                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['total'] += $operation->service_cost;
-                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
-                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))][$operation->currency]['total'] += $operation->service_cost;
-                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))][$operation->currency]['counter']++;
-                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['counter']++;
-                                        $dataUnit['data'][strtoupper(Str::slug(OperationTrait::setOperationUnit($operation)))]['operating_cost'] += OperationTrait::setOperatingCost($operation);
-                                        $dataUnit['operating_cost'] += OperationTrait::setOperatingCost($operation);
+                                        $dataUnit['data'][strtoupper(Str::slug(auth()->user()->setOperationUnit($operation)))]['total'] += $operation->service_cost;
+                                        $dataUnit['data'][strtoupper(Str::slug(auth()->user()->setOperationUnit($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
+                                        $dataUnit['data'][strtoupper(Str::slug(auth()->user()->setOperationUnit($operation)))][$operation->currency]['total'] += $operation->service_cost;
+                                        $dataUnit['data'][strtoupper(Str::slug(auth()->user()->setOperationUnit($operation)))][$operation->currency]['counter']++;
+                                        $dataUnit['data'][strtoupper(Str::slug(auth()->user()->setOperationUnit($operation)))]['counter']++;
+                                        $dataUnit['data'][strtoupper(Str::slug(auth()->user()->setOperationUnit($operation)))]['operating_cost'] += auth()->user()->setOperatingCost($operation);
+                                        $dataUnit['operating_cost'] += auth()->user()->setOperatingCost($operation);
                                         $dataUnit['counter']++;                                        
                                     }
 
                                     //TIPO DE SERVICIO
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
                                         if (!isset( $dataServiceType['data'][strtoupper(Str::slug($operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP'))] ) ){
                                             $dataServiceType['data'][strtoupper(Str::slug($operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP'))] = [
                                                 "name" => strtoupper($operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP'),
@@ -571,7 +567,7 @@
                                     }                                    
 
                                     //TIPO DE SERVICIO EN OPERACION
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){
+                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
                                         if (!isset( $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] ) ){
                                             $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] = [
                                                 "name" => $operation->final_service_type,
@@ -602,10 +598,10 @@
                                     }
 
                                     //VEHICULOS
-                                    if( OperationTrait::serviceStatus($operation) == "COMPLETADO" && OperationTrait::operationStatus($operation) == "OK" ){                               
-                                        if (!isset( $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))] ) ){
-                                            $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))] = [
-                                                "name" => OperationTrait::setOperationVehicle($operation),
+                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){                               
+                                        if (!isset( $dataVehicles['data'][strtoupper(Str::slug(auth()->user()->setOperationVehicle($operation)))] ) ){
+                                            $dataVehicles['data'][strtoupper(Str::slug(auth()->user()->setOperationVehicle($operation)))] = [
+                                                "name" => auth()->user()->setOperationVehicle($operation),
                                                 "total" => 0,
                                                 "gran_total" => 0,
                                                 "USD" => [
@@ -625,12 +621,12 @@
                                         $dataVehicles[$operation->currency]['total'] += $operation->service_cost;
                                         $dataVehicles[$operation->currency]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataVehicles[$operation->currency]['counter']++;
-                                        $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['total'] += $operation->service_cost;
-                                        $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
-                                        $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))][$operation->currency]['total'] += $operation->service_cost;
-                                        $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))][$operation->currency]['counter']++;
-                                        $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['counter']++;
-                                        $dataVehicles['data'][strtoupper(Str::slug(OperationTrait::setOperationVehicle($operation)))]['codes'][] = $operation->code;
+                                        $dataVehicles['data'][strtoupper(Str::slug(auth()->user()->setOperationVehicle($operation)))]['total'] += $operation->service_cost;
+                                        $dataVehicles['data'][strtoupper(Str::slug(auth()->user()->setOperationVehicle($operation)))]['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
+                                        $dataVehicles['data'][strtoupper(Str::slug(auth()->user()->setOperationVehicle($operation)))][$operation->currency]['total'] += $operation->service_cost;
+                                        $dataVehicles['data'][strtoupper(Str::slug(auth()->user()->setOperationVehicle($operation)))][$operation->currency]['counter']++;
+                                        $dataVehicles['data'][strtoupper(Str::slug(auth()->user()->setOperationVehicle($operation)))]['counter']++;
+                                        $dataVehicles['data'][strtoupper(Str::slug(auth()->user()->setOperationVehicle($operation)))]['codes'][] = $operation->code;
                                         $dataVehicles['counter']++;
                                     }
                                 @endphp
@@ -638,7 +634,7 @@
                                     <td class="text-center">{{ $operation->reservation_id }}</td>
                                     <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
-                                        @if (RoleTrait::hasPermission(38))
+                                        @if (auth()->user()->hasPermission2(38))
                                             <a href="/reservations/detail/{{ $operation->reservation_id }}"><p class="mb-1">{{ $operation->code }}</p></a>
                                         @else
                                             <p class="mb-1">{{ $operation->code }}</p>
@@ -650,29 +646,29 @@
                                     <td class="text-center">{{ $operation->site_name }}</td>
                                     <td class="text-center">{{ !empty($operation->origin_code) ? $operation->origin_code : 'PAGINA WEB' }}</td>
                                     <td class="text-center">{{ $operation->campaign }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($operation->reservation_status) }}">{{ BookingTrait::statusBooking($operation->reservation_status) }}</button></td>
-                                    <td class="text-center"><?=OperationTrait::renderServicePreassignment($operation)?></td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($operation->reservation_status) }}">{{ auth()->user()->statusBooking($operation->reservation_status) }}</button></td>
+                                    <td class="text-center"><?=auth()->user()->renderServicePreassignment($operation)?></td>
                                     <td class="text-center">{{ $operation->final_service_type }}</td>
                                     <td class="text-center">{{ $operation->full_name }}</td>
                                     <td class="text-center">{{ $operation->client_phone }}</td>
                                     <td class="text-center">{{ $operation->client_email }}</td>
                                     <td class="text-center">{{ $operation->service_type_name }}</td>
                                     <td class="text-center">{{ $operation->passengers }}</td>
-                                    <td class="text-center">{{ OperationTrait::setFrom($operation, "destination") }}</td>
-                                    <td class="text-center" <?=OperationTrait::classCutOffZone($operation)?>>{{ OperationTrait::setFrom($operation, "name") }}</td>
-                                    <td class="text-center">{{ OperationTrait::setTo($operation, "destination") }}</td>
-                                    <td class="text-center" <?=OperationTrait::classCutOffZone($operation)?>>{{ OperationTrait::setTo($operation, "name") }}</td>
-                                    <td class="text-center">{{ OperationTrait::setDateTime($operation, "date") }}</td>
-                                    <td class="text-center">{{ OperationTrait::setDateTime($operation, "time") }}</td>
-                                    <td class="text-center"><?=OperationTrait::renderServiceStatus($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::setOperationUnit($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::setOperationDriver($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::setOperationTime($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::setOperatingCost($operation)?></td>
-                                    <td class="text-center"><?=OperationTrait::renderOperationStatus($operation)?></td>
-                                    <td class="text-center">{{ OperationTrait::commissionOperation($operation) }}</td>
-                                    <td class="text-center" <?=BookingTrait::classStatusPayment($operation)?>>{{ BookingTrait::statusPayment($operation->payment_status) }}</td>
-                                    <td class="text-center" <?=BookingTrait::classStatusPayment($operation)?>>{{ number_format(($operation->total_sales),2) }}</td>
+                                    <td class="text-center">{{ auth()->user()->setFrom($operation, "destination") }}</td>
+                                    <td class="text-center" <?=auth()->user()->classCutOffZone($operation)?>>{{ auth()->user()->setFrom($operation, "name") }}</td>
+                                    <td class="text-center">{{ auth()->user()->setTo($operation, "destination") }}</td>
+                                    <td class="text-center" <?=auth()->user()->classCutOffZone($operation)?>>{{ auth()->user()->setTo($operation, "name") }}</td>
+                                    <td class="text-center">{{ auth()->user()->setDateTime($operation, "date") }}</td>
+                                    <td class="text-center">{{ auth()->user()->setDateTime($operation, "time") }}</td>
+                                    <td class="text-center"><?=auth()->user()->renderServiceStatusOP($operation)?></td>
+                                    <td class="text-center"><?=auth()->user()->setOperationUnit($operation)?></td>
+                                    <td class="text-center"><?=auth()->user()->setOperationDriver($operation)?></td>
+                                    <td class="text-center"><?=auth()->user()->setOperationTime($operation)?></td>
+                                    <td class="text-center"><?=auth()->user()->setOperatingCost($operation)?></td>
+                                    <td class="text-center"><?=auth()->user()->renderOperationStatus($operation)?></td>
+                                    <td class="text-center">{{ auth()->user()->commissionOperation($operation) }}</td>
+                                    <td class="text-center" <?=auth()->user()->classStatusPayment($operation)?>>{{ auth()->user()->statusPayment($operation->payment_status) }}</td>
+                                    <td class="text-center" <?=auth()->user()->classStatusPayment($operation)?>>{{ number_format(($operation->total_sales),2) }}</td>
                                     <td class="text-center" {{ (($operation->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($operation->total_balance,2) }}</td>
                                     <td class="text-center">{{ number_format($operation->service_cost,2) }}</td>
                                     <td class="text-center">{{ $operation->currency }}</td>
@@ -684,7 +680,7 @@
                                         <button class="btn btn-{{ $operation->is_commissionable == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->is_commissionable == 1 ? "SI" : "NO" }}</button>
                                     </td>
                                     <td class="text-center">
-                                        @if ( ($operation->reservation_status == "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && OperationTrait::serviceStatus($operation, "no_translate") == "CANCELLED") )
+                                        @if ( ($operation->reservation_status == "CANCELLED" && auth()->user()->serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && auth()->user()->serviceStatus($operation, "no_translate") == "CANCELLED") )
                                             @if ( !empty($operation->cancellation_reason) )
                                                 {{ $operation->cancellation_reason }}
                                             @else

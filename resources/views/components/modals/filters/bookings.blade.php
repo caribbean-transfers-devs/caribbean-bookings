@@ -33,14 +33,14 @@
                                 <svg width="24" height="24"><use xlink:href="{{ asset('/assets/img/icons/icons.svg#caret-down') }}"></use></svg>
                             </div>
                         </div>
-                        @if ( isset($isSearch) || ( isset($services) && !empty($services) ) )
-                            <div class="item {{ !isset($isSearch) || (!isset($services) && empty($services)) ? 'one' : '' }}">
-                                @if ( isset($isSearch) )
+                        @if ( ( isset($isSearch) && !empty($isSearch) ) || ( isset($services) && !empty($services) ) )
+                            <div class="item {{ (!isset($isSearch) && empty($isSearch)) || (!isset($services) && empty($services)) ? 'one' : '' }}">
+                                @if ( isset($isSearch) && !empty($isSearch) )
                                     <div class="box_input transparent_border">
                                         <svg width="24" height="24"><use xlink:href="{{ asset('/assets/img/icons/icons.svg#search') }}"></use></svg>
                                         <div class="input">
                                             <label for="filter_text">Buscar Por:</label>
-                                            <input type="text" name="filter_text" id="filter_text" class="form-control" placeholder="#/nombre/correo/telefono/Referencia" value="{{ trim($data['filter_text']) }}">
+                                            <input type="text" name="filter_text" id="filter_text" class="form-control" placeholder="#/nombre/correo/telefono/Referencia" value="{{ isset($data['filter_text']) ? trim($data['filter_text']) : '' }}">
                                         </div>
                                     </div>
                                 @endif
@@ -280,7 +280,7 @@
                                 </select>
                             @endif --}}
                         </div>
-                    @endif                    
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light-dark" data-bs-dismiss="modal"><i class="flaticon-cancel-12"></i> Cerrar</button>

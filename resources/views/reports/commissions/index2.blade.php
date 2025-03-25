@@ -1,6 +1,5 @@
 @php
-    use App\Traits\FiltersTrait;
-    $users = FiltersTrait::CallCenterAgent();
+    $users = auth()->user()->CallCenterAgent();
 @endphp
 @extends('layout.app')
 @section('title') Reporte de comisiones @endsection

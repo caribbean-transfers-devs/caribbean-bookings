@@ -2,7 +2,7 @@
     use App\Traits\RoleTrait;
 @endphp
 @extends('layout.app')
-@section('title') Roles @endsection
+@section('title') Administración De Roles @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/settings/roles.min.css') }}" rel="preload" as="style" >
@@ -16,14 +16,13 @@
 @section('content')
     @php
         $buttons = array();
-        if(RoleTrait::hasPermission(7)):
+        if(auth()->user()->hasPermission(7)):
             array_push($buttons,array(
                 'text' => 'Añadir Rol',
                 'className' => 'btn btn-primary ',
                 'url' => route('roles.create')
             ));
         endif;
-        // dump($buttons);
     @endphp
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
@@ -40,21 +39,14 @@
                             <tr>
                                 <td>{{ $role->role }}</td>                                            
                                 <td>
-                                    <div class="btn-group mb-2 me-4">
-                                        <button type="button" class="btn btn-primary">Acciones</button>
-                                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                            <span class="visually-hidden ">Toggle Dropdown</span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            @csrf
-                                            @if(RoleTrait::hasPermission(8)) 
-                                                <li><a class="dropdown-item" href="{{ route('roles.edit', $role->id) }}">Editar</a></li>
-                                                <li><hr class="dropdown-divider"></li>
-                                            @endif
-                                            @if(RoleTrait::hasPermission(9))
-                                                <li><a class="dropdown-item" href="#" onclick="DelRole({{ $role->id }})">Eliminar</a></li>
-                                            @endif
-                                        </ul>
+                                    <div class="d-flex flex-column gap-2">
+                                        @if(auth()->user()->hasPermission2(8)) 
+                                            <a type="button" class="btn btn-primary w-100" href="{{ route('roles.edit', $role->id) }}">Editar</a>
+                                        @endif
+
+                                        @if(auth()->user()->hasPermission2(9)) 
+                                            <button type="button" class="btn btn-danger w-100" onclick="DelRole({{ $role->id }})">Eliminar</button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>                                        

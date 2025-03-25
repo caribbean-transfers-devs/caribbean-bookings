@@ -1,8 +1,4 @@
 @php
-    use App\Traits\RoleTrait;
-    use App\Traits\FinanceTrait;
-    use App\Traits\BookingTrait;
-    use App\Traits\OperationTrait;
     use Carbon\Carbon;
     // dump($reservation->toArray());
 @endphp
@@ -118,7 +114,7 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-actions float-end">
-                        @if (RoleTrait::hasPermission(11))
+                        @if (auth()->user()->hasPermission(11))
                         <div class="dropdown show">
                             <a href="#" data-bs-toggle="dropdown" data-bs-display="static">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal align-middle"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
@@ -137,7 +133,7 @@
                             <tbody>
                                 <tr>
                                     <th>Estatus</th>
-                                    <td><span class="badge bg-{{ BookingTrait::classStatusBooking($data['status']) }}">{{ BookingTrait::statusBooking($data['status']) }}</span></td>
+                                    <td><span class="badge bg-{{ auth()->user()->classStatusBooking($data['status']) }}">{{ auth()->user()->statusBooking($data['status']) }}</span></td>
                                 </tr>
                                 @if ( $data['status'] == "QUOTATION" )
                                     <tr>
@@ -186,7 +182,7 @@
                                     </tr>
                                     <tr>
                                         <th>Estatus de comisión</th>
-                                        <td><span class="badge btn-{{ $reservation->is_commissionable == 1 ? "success ".( RoleTrait::hasPermission(95) ? '__remove_commission' : '' ) : "danger" }}" data-reservation="{{ $reservation->id }}" style="cursor: pointer;">{{ $reservation->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span></td>
+                                        <td><span class="badge btn-{{ $reservation->is_commissionable == 1 ? "success ".( auth()->user()->hasPermission(95) ? '__remove_commission' : '' ) : "danger" }}" data-reservation="{{ $reservation->id }}" style="cursor: pointer;">{{ $reservation->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span></td>
                                     </tr>
                                 @endif
                                 <tr>
@@ -215,7 +211,7 @@
                         </table>
                     </div>
                     <hr style="width:95%; margin-left: auto; margin-right: auto;">
-                    @if (RoleTrait::hasPermission(25))
+                    @if (auth()->user()->hasPermission(25))
                         <div class="followUps px-2 pb-2">
                             <h6>Actividad</h6>
                             <ul class="timeline m-0">
@@ -243,7 +239,7 @@
                 <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
 
                 {{-- NOS PERMITE REENVIO DE CORREO DE LA RESERVACIÓN AL CLIENTE, CUANDO TENEMOS EL PERMISO Y ES PENDIENTE, CONFIRMADA O A CREDITO --}}
-                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(20) )
+                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(20) )
                     <div class="btn-group btn-group-sm" role="group">
                         <button id="btndefault" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             RE-ENVIO DE CORREO
@@ -258,7 +254,7 @@
                 @endif
 
                 {{-- NOS PERMITE AGREGAR SEGUIMIENTOS DE LA RESERVA, SOLO CUANDO ESTA COMO PENDIENTE, CONFIRMADA O A CREDITO --}}
-                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(23))
+                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(23))
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> AGREGAR SEGUIMIENTO</button>
                 @endif
 
@@ -268,7 +264,7 @@
                 @endif
 
                 {{-- NOS PERMITE ENVIAR UNA INVITACIÓN DE PAGO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACIÓN --}}
-                @if ( ( $data['status'] != "CANCELLED") && RoleTrait::hasPermission(22))
+                @if ( ( $data['status'] != "CANCELLED") && auth()->user()->hasPermission(22))
                     <div class="btn-group btn-group-sm" role="group">
                         <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             INVITACIÓN DE PAGO
@@ -297,7 +293,7 @@
                     </div>
                 @endif                
 
-                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && RoleTrait::hasPermission(21) )
+                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && auth()->user()->hasPermission(21) )
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             ENVIAR MENSAJE
@@ -310,23 +306,23 @@
                 @endif
 
                 {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
-                @if (RoleTrait::hasPermission(94) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
+                @if (auth()->user()->hasPermission(94) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
                     <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> ACTIVAR SERVICIO PLUS</button>
                 @endif
-                @if (RoleTrait::hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                @if (auth()->user()->hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
                     {{-- <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button> --}}
                 @endif
-                @if (RoleTrait::hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                @if (auth()->user()->hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
                     <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> MARCAR COMO DUPLICADO</button>
                 @endif
                     
                 {{-- NOS PERMITE PODER ACTIVAR LA RESERVA CUANDO ESTA COMO CREDITO ABIERTO --}}
-                @if ( $data['status'] == "OPENCREDIT" && RoleTrait::hasPermission(67) )
+                @if ( $data['status'] == "OPENCREDIT" && auth()->user()->hasPermission(67) )
                     <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> ACTIVAR RESERVA</button>
                 @endif
 
                 {{-- NOS PERMITE PONER COMO CREDITO ABIERTO CUANDO LA RESERVA ESTA CONFIRMADA Y EL CLIENTE QUIERE CANCELAR --}}
-                @if ( $data['status'] == "CONFIRMED" && RoleTrait::hasPermission(72) )
+                @if ( $data['status'] == "CONFIRMED" && auth()->user()->hasPermission(72) )
                     <button class="btn btn-warning btn-sm" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> CRÉDITO ABIERTO</button>
                 @endif
 
@@ -377,7 +373,7 @@
                             </a>
                         </li>                        
 
-                    @if (RoleTrait::hasPermission(65))
+                    @if (auth()->user()->hasPermission(65))
                         <li class="nav-item">
                             <a class="nav-link" href="#icon-tab-5" data-bs-toggle="tab" role="tab">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera align-middle"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
@@ -407,7 +403,7 @@
                                             <p><strong># de Vuelo:</strong> {{ $item->flight_number ?? 'N/A' }}</p>
                                         </div>
                                         <div class="actions mb-3">
-                                            @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && RoleTrait::hasPermission(13))
+                                            @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(13))
                                                 <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" onclick="itemInfo({{ $item }})">EDITAR SERVICIO</button>
                                             @endif
 
@@ -485,9 +481,9 @@
                                                                     'op_one_preassignment' => $item->op_one_preassignment 
                                                                 );
                                                             @endphp
-                                                            <?=OperationTrait::renderServicePreassignment($service)?>
+                                                            <?=auth()->user()->renderServicePreassignment($service)?>
                                                         </td>
-                                                        <td>{{ OperationTrait::typeService($item->final_service_type_one) }}</td>
+                                                        <td>{{ auth()->user()->typeService($item->final_service_type_one) }}</td>
                                                         <td>
                                                             <p><strong>Zona</strong>: {{ $item->origin->name }}</p>
                                                             <p><strong>Lugar</strong>: {{ $item->from_name }}</p>
@@ -520,9 +516,9 @@
                                                             {{-- SOLO CUANDO SE TENGA EL PERMISO --}}
                                                             {{-- NO ESTE CERRADA LA OPERACION --}}
                                                             {{-- CUANDO EL ESTATUS DE LA RESERVA SEA PENDIENTE, CONFIMADO O CREDTIO --}}
-                                                            @if ( RoleTrait::hasPermission(68) && $item->op_one_operation_close == 0 && ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) )
+                                                            @if ( auth()->user()->hasPermission(68) && $item->op_one_operation_close == 0 && ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) )
                                                                 <div class="btn-group btn-group-sm">
-                                                                    <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ BookingTrait::statusBooking($item->op_one_status) }}</button>
+                                                                    <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ auth()->user()->statusBooking($item->op_one_status) }}</button>
                                                                     <div class="dropdown-menu" style="">
                                                                         <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
                                                                         <a class="dropdown-item" href="#" onclick="setStatus(event,  'arrival', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
@@ -532,7 +528,7 @@
                                                                     </div>
                                                                 </div>
                                                             @else
-                                                                <button <?=$tooltip?> type="button" class="btn {{ $btn_op_one_type }} btn-sm bs-tooltip">{{ BookingTrait::statusBooking($item->op_one_status) }}</button>                                
+                                                                <button <?=$tooltip?> type="button" class="btn {{ $btn_op_one_type }} btn-sm bs-tooltip">{{ auth()->user()->statusBooking($item->op_one_status) }}</button>                                
                                                             @endif
                                                         </td>
                                                         <td>
@@ -542,14 +538,14 @@
                                                             @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" )
                                                                 <div class="d-flex gap-2">                                                                
                                                                     @php
-                                                                        $message_operation_one = ( $item->op_one_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" );
+                                                                        $message_operation_one = ( $item->op_one_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( auth()->user()->hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" );
                                                                     @endphp
-                                                                    @if ( RoleTrait::hasPermission(69))
+                                                                    @if ( auth()->user()->hasPermission(69))
                                                                         <button class="btn {{ $item->op_one_confirmation == 1 ? 'btn-success' : 'btn-warning' }} confirmService" type="button" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="{{ $item->op_one_confirmation == 1 ? 0 : 1 }}" data-type="TYPE_ONE">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle align-middle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                                                                         </button>
                                                                     @endif
-                                                                    <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $message_operation_one }}" class="btn btn-{{ $item->op_one_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_one_operation_close == 1 ? "updateServiceUnlock" : "" }} bs-tooltip" type="button" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-type="TYPE_ONE">
+                                                                    <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $message_operation_one }}" class="btn btn-{{ $item->op_one_operation_close == 1 ? "danger" : "success" }} {{  auth()->user()->hasPermission(92) && $item->op_one_operation_close == 1 ? "updateServiceUnlock" : "" }} bs-tooltip" type="button" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-type="TYPE_ONE">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-{{ $item->op_one_operation_close == 1 ? "unlock" : "lock" }} align-middle"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
                                                                     </button>
                                                                 </div>
@@ -567,9 +563,9 @@
                                                                         'op_two_preassignment' => $item->op_two_preassignment 
                                                                     );
                                                                 @endphp
-                                                                <?=OperationTrait::renderServicePreassignment($service)?>
+                                                                <?=auth()->user()->renderServicePreassignment($service)?>
                                                             </td>
-                                                            <td>{{ OperationTrait::typeService($item->final_service_type_two) }}</td>
+                                                            <td>{{ auth()->user()->typeService($item->final_service_type_two) }}</td>
                                                             <td>
                                                                 <p><strong>Zona</strong>: {{ $item->destination->name }}</p>
                                                                 <p><strong>Lugar</strong>: {{ $item->to_name }}</p>                                                                
@@ -602,9 +598,9 @@
                                                                 {{-- SOLO CUANDO SE TENGA EL PERMISO --}}
                                                                 {{-- NO ESTE CERRADA LA OPERACION --}}
                                                                 {{-- CUANDO EL ESTATUS DE LA RESERVA SEA PENDIENTE, CONFIMADO O CREDTIO --}}
-                                                                @if ( RoleTrait::hasPermission(68) && $item->op_two_operation_close == 0 && ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) )
+                                                                @if ( auth()->user()->hasPermission(68) && $item->op_two_operation_close == 0 && ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) )
                                                                     <div class="btn-group btn-group-sm">
-                                                                        <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ BookingTrait::statusBooking($item->op_two_status) }}</button>
+                                                                        <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ auth()->user()->statusBooking($item->op_two_status) }}</button>
                                                                         <div class="dropdown-menu" style="">
                                                                             <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
                                                                             <a class="dropdown-item" href="#" onclick="setStatus(event,  'departure', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
@@ -614,7 +610,7 @@
                                                                         </div>
                                                                     </div>
                                                                 @else
-                                                                    <button <?=$tooltip?> type="button" class="btn {{ $btn_op_two_type }} btn-sm bs-tooltip">{{ BookingTrait::statusBooking($item->op_two_status) }}</button> 
+                                                                    <button <?=$tooltip?> type="button" class="btn {{ $btn_op_two_type }} btn-sm bs-tooltip">{{ auth()->user()->statusBooking($item->op_two_status) }}</button> 
                                                                 @endif
                                                             </td>
                                                             <td>
@@ -623,15 +619,15 @@
                                                                 {{-- SOLO CUANDO LA RESERVA ESTA PENDIENTE, CONFIRMADA O A CREDITO --}}
                                                                 @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" )
                                                                     @php
-                                                                        $message_operation_two = ( $item->op_two_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( RoleTrait::hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" );
+                                                                        $message_operation_two = ( $item->op_two_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( auth()->user()->hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" );
                                                                     @endphp
                                                                     <div class="d-flex gap-2">
-                                                                        @if (RoleTrait::hasPermission(69))
+                                                                        @if (auth()->user()->hasPermission(69))
                                                                             <button class="btn {{ $item->op_two_confirmation == 1 ? 'btn-success' : 'btn-warning' }} confirmService" type="button" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_two }}" data-status="{{ $item->op_two_confirmation == 1 ? 0 : 1 }}" data-type="TYPE_TWO">
                                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle align-middle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                                                                             </button>
                                                                         @endif
-                                                                        <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $message_operation_two }}" class="btn btn-{{ $item->op_two_operation_close == 1 ? "danger" : "success" }} {{  RoleTrait::hasPermission(92) && $item->op_two_operation_close == 1 ? "updateServiceUnlock" : "" }} bs-tooltip" type="button" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_two }}" data-type="TYPE_TWO">
+                                                                        <button data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $message_operation_two }}" class="btn btn-{{ $item->op_two_operation_close == 1 ? "danger" : "success" }} {{  auth()->user()->hasPermission(92) && $item->op_two_operation_close == 1 ? "updateServiceUnlock" : "" }} bs-tooltip" type="button" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_two }}" data-type="TYPE_TWO">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-{{ $item->op_two_operation_close == 1 ? "unlock" : "lock" }} align-middle"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
                                                                         </button>
                                                                     </div>
@@ -653,7 +649,7 @@
                     </div>
                     <div class="tab-pane" id="icon-tab-2" role="tabpanel">
                         <div class="d-flex align-items-center justify-content-between mb-2">
-                            @if (RoleTrait::hasPermission(14))
+                            @if (auth()->user()->hasPermission(14))
                                 <button class="btn btn-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceSalesModal">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                     NUEVA VENTA
@@ -683,12 +679,12 @@
                                             {{-- <td class="text-center">{{ $sale->callCenterAgent->name ?? 'System' }}</td> --}}
                                             <td class="text-center">{{ $sale->created_at }}</td>
                                             <td class="text-center">
-                                                @if (RoleTrait::hasPermission(15))
+                                                @if (auth()->user()->hasPermission(15))
                                                     <a href="#" class="action-btn btn-delete" data-bs-toggle="modal" data-bs-target="#serviceSalesModal" onclick="getSale({{ $sale->id }})">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 align-middle"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
                                                     </a>
                                                 @endif
-                                                @if (RoleTrait::hasPermission(16))
+                                                @if (auth()->user()->hasPermission(16))
                                                     <a href="#" class="action-btn btn-delete" onclick="deleteSale({{ $sale->id }})">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash align-middle"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                                     </a>
@@ -705,7 +701,7 @@
                         <div class="tab-pane" id="icon-tab-3" role="tabpanel">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 @if ( $data['status'] != "CREDIT" )
-                                    @if (RoleTrait::hasPermission(14) )
+                                    @if (auth()->user()->hasPermission(14) )
                                         <button class="btn btn-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                             NUEVO PAGO
@@ -740,12 +736,12 @@
                                                 <td class="text-start">{{ $payment->category }}</td>
                                                 <td class="text-center">{{ $payment->created_at }}</td>
                                                 <td class="text-center">
-                                                    @if (RoleTrait::hasPermission(15))
+                                                    @if (auth()->user()->hasPermission(15))
                                                         <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 align-middle"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
                                                         </a>
                                                     @endif
-                                                    @if (RoleTrait::hasPermission(16))
+                                                    @if (auth()->user()->hasPermission(16))
                                                         <a href="#" onclick="deletePayment({{ $payment->id }})">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash align-middle"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                                         </a>
@@ -773,7 +769,7 @@
                                         @foreach ($reservation->refunds as $refund)
                                             <tr>
                                                 <td>
-                                                    <button class="btn btn-{{ FinanceTrait::classStatusRefund($refund->status) }} btn-sm">{{ FinanceTrait::statusRefund($refund->status) }}</button>
+                                                    <button class="btn btn-{{ auth()->user()->classStatusRefund($refund->status) }} btn-sm">{{ auth()->user()->statusRefund($refund->status) }}</button>
                                                 </td>
                                                 <td>{{ $refund->message_refund }}</td>
                                                 <td class="text-center">{{ date("Y-m-d", strtotime($refund->created_at)) }}</td>
@@ -795,15 +791,15 @@
                         </div>
 
                     
-                    @if (RoleTrait::hasPermission(65))
+                    @if (auth()->user()->hasPermission(65))
                         <div class="tab-pane" id="icon-tab-5" role="tabpanel">
-                            @if (RoleTrait::hasPermission(64))
+                            @if (auth()->user()->hasPermission(64))
                                 <form id="upload-form" class="dropzone" action="/reservations/upload">
                                     @csrf
                                     <input type="hidden" name="folder" value="{{ $reservation->id }}">
                                 </form>
                             @endif
-                            @if (RoleTrait::hasPermission(65))
+                            @if (auth()->user()->hasPermission(65))
                                 <div class="image-listing" id="media-listing"></div>
                             @endif
                         </div>

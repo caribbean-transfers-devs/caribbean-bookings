@@ -1,6 +1,4 @@
 @php
-    use App\Traits\RoleTrait;
-    use App\Traits\BookingTrait;
     use Illuminate\Support\Str;
     use Carbon\Carbon;
     $conciliationPayments = [
@@ -211,7 +209,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center"><button class="btn btn-{{ $conciliation->is_conciliated == 1 ? 'success' : 'danger' }} __btn_conciliation bs-tooltip" data-reservation="{{ $conciliation->reservation_id }}" data-payment="{{ $conciliation->code_payment }}" data-currency="{{ $conciliation->currency_payment }}" title="{{ $conciliation->is_conciliated == 1 ? 'Click para ver la conciliación' : 'click para conciliar el pago' }}">{{ $conciliation->is_conciliated == 1 ? 'SÍ' : 'NO' }}</button></td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($conciliation->reservation_status) }}">{{ BookingTrait::statusBooking($conciliation->reservation_status) }}</button></td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($conciliation->reservation_status) }}">{{ auth()->user()->statusBooking($conciliation->reservation_status) }}</button></td>
                                     {{-- <td class="text-center">{{ $conciliation->description }}</td> --}}
                                     <td class="text-center">{{ $conciliation->reference }}</td>
                                     <td class="text-center">{{ number_format(( $conciliation->payment_method == "STRIPE" && $conciliation->currency_payment == "MXN" && $conciliation->currency == "USD" ? $conciliation->total / $conciliation->exchange_rate : $conciliation->total ), 2) }}</td>

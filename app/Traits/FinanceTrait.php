@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 trait FinanceTrait
 {
-    public static function classStatusRefund($status = "REFUND_REQUESTED"){
+    public function classStatusRefund($status = "REFUND_REQUESTED"){
         switch ($status) {
             case 'REFUND_MADE':
                 return 'warning';
@@ -24,7 +24,7 @@ trait FinanceTrait
         }
     }
 
-    public static function statusRefund($status = "REFUND_REQUESTED"){
+    public function statusRefund($status = "REFUND_REQUESTED"){
         switch ($status) {
             case 'REFUND_MADE':
                 return 'REEMBOLSO EFECTUADO';

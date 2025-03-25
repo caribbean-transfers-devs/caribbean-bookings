@@ -1,6 +1,4 @@
 @php
-    use App\Traits\RoleTrait;
-    use App\Traits\BookingTrait;
     use Illuminate\Support\Str;
     $total_general = 0;
     $total_conciliation = 0;
@@ -73,14 +71,14 @@
                                                                     $codes_string .= '<p class="mb-1">'.$code.'</p>';
                                                                 }
                                                             @endphp
-                                                            @if (RoleTrait::hasPermission(38))
+                                                            @if (auth()->user()->hasPermission(38))
                                                                 <a href="/reservations/detail/{{ $item->reservation_id }}"><?=$codes_string?></a>
                                                             @else
                                                                 <?=$codes_string?>
                                                             @endif
                                                         </td>
                                                         <td class="text-center">
-                                                            <button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }} mb-1">{{ BookingTrait::statusBooking($item->reservation_status) }}</button>
+                                                            <button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($item->reservation_status) }} mb-1">{{ auth()->user()->statusBooking($item->reservation_status) }}</button>
                                                             <span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>                                        
                                                         </td>
                                                         <td class="text-center">{{ $item->currency }}</td>
@@ -134,14 +132,14 @@
                                                                     $codes_string .= '<p class="mb-1">'.$code.'</p>';
                                                                 }
                                                             @endphp
-                                                            @if (RoleTrait::hasPermission(38))
+                                                            @if (auth()->user()->hasPermission(38))
                                                                 <a href="/reservations/detail/{{ $item2->reservation_id }}"><?=$codes_string?></a>
                                                             @else
                                                                 <?=$codes_string?>
                                                             @endif
                                                         </td>
                                                         <td class="text-center">
-                                                            <button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item2->reservation_status) }} mb-1">{{ BookingTrait::statusBooking($item2->reservation_status) }}</button>
+                                                            <button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($item2->reservation_status) }} mb-1">{{ auth()->user()->statusBooking($item2->reservation_status) }}</button>
                                                             <span class="badge badge-{{ $item2->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item2->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>                                        
                                                         </td>
                                                         <td class="text-center">{{ $item2->currency }}</td>

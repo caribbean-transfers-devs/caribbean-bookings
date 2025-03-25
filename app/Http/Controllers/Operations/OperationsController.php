@@ -899,24 +899,67 @@ class OperationsController extends Controller
         }
     }
 
-    public function getHistory(Request $request){
+    public function getHistory(Request $request)
+    {
         try {
-            //DECLARACION DE VARIABLES
-            $message = $this->getMessages($request->code);
+            $validator = Validator::make($request->all(), [            
+                'code' => 'required',            
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => [
+                        'code' => 'REQUIRED_PARAMS',
+                        'message' =>  $validator->errors()->all()
+                    ],
+                    "message" => $validator->errors()->all(),
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+    
+            $xHTML  = '';
+            $reservation = $this->getReservation($request->code);
+
+            if (!$reservation) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Reservación no encontrada'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            $xHTML .= '[<strong>(DESDE):</strong> '. $reservation->items[0]->from_name.' [<strong>LATITUD:</strong> '.$reservation->items[0]->from_lat.'] - [<strong>LONGITUD:</strong> '.$reservation->items[0]->from_lng.'] ] </br> </br>';
+            $xHTML .= '[<strong>(HACIA):</strong> '. $reservation->items[0]->to_name.'   [<strong>LATITUD:</strong> '.$reservation->items[0]->to_lat.']   - [<strong>LONGITUD:</strong> '.$reservation->items[0]->to_lng.'] ] </br> </br>';
+            foreach ($reservation->followUps as $followUp) {
+                $xHTML .= '[('.$followUp->type.') '. $followUp->text.'] </br> </br>';
+            }
 
             return response()->json([
-                'success' => ( !empty($message) ? true : false ),
-                'message' => $message,
-            ], 200);
+                'success' => ( !empty($xHTML) ? true : false ),
+                'message' => $xHTML,
+            ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([
-                'errors' => [
-                    'code' => 'internal_server',
-                    'message' => $e->getMessage()
-                ],
+                'status' => 'error',
                 'message' => $e->getMessage()
-            ], 500);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);       
         }
+
+        // try {
+        //     //DECLARACION DE VARIABLES
+        //     $message = $this->getMessages($request->code);
+
+        //     return response()->json([
+        //         'success' => ( !empty($message) ? true : false ),
+        //         'message' => $message,
+        //     ], 200);
+        // } catch (Exception $e) {
+        //     return response()->json([
+        //         'errors' => [
+        //             'code' => 'internal_server',
+        //             'message' => $e->getMessage()
+        //         ],
+        //         'message' => $e->getMessage()
+        //     ], 500);
+        // }
     }
 
     public function getDataCustomer(Request $request){
@@ -1367,4 +1410,52 @@ class OperationsController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function getReservation($id)
+    {
+        $reservation = Reservation::with([
+            'destination.destination_services',
+            'items' => function ($query) {
+                $query->join('zones as zone_one', 'zone_one.id', '=', 'reservations_items.from_zone')
+                        ->join('zones as zone_two', 'zone_two.id', '=', 'reservations_items.to_zone')
+                        ->select(
+                            'reservations_items.*', 
+                            'reservations_items.id as reservations_item_id',
+                            'zone_one.name as from_zone_name',
+                            'zone_one.is_primary as is_primary_from',
+                            'zone_two.name as to_zone_name',
+                            'zone_two.is_primary as is_primary_to',
+                            // Final Service Type para zone_one
+                            DB::raw("
+                                CASE 
+                                    WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 1 THEN 'DEPARTURE'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                END AS final_service_type_one
+                            "),
+                            
+                            // Final Service Type para zone_two
+                            DB::raw("
+                                CASE 
+                                    WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1 THEN 'DEPARTURE'
+                                    WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+                                    ELSE 'ARRIVAL'
+                                END AS final_service_type_two
+                            ")
+                        );
+            },
+            'site',
+            'sales',
+            'payments',
+            'refunds',
+            'followUps' => function ($query) {
+                $query->whereIn('type', ['CLIENT', 'OPERATION']);
+            },
+            'photos',
+            'cancellationType',
+            'originSale'
+        ])->find($id);
+
+        return $reservation;
+    }    
 }

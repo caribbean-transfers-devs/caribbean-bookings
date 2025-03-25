@@ -33,70 +33,63 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        if($this->hasPermission2(1)){
-            return $this->UserRepository->indexUsers($request);
-        }else{
-            abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }
+        $this->authorizeAction(1);
+        return $this->UserRepository->indexUsers($request);
     }
 
     public function create(Request $request)
     {
-        if($this->hasPermission2(2)){
-            return $this->UserRepository->createUser($request);
-        }else{
-            abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }
+        $this->authorizeAction(2);
+        return $this->UserRepository->createUser($request);
     }
 
     public function edit(Request $request, User $user)
     {
-        if($this->hasPermission2(3)){
-            return $this->UserRepository->editUser($request, $user);
-        }else{
-            abort(403, 'NO TIENE AUTORIZACIÓN.');
-        }
+        $this->authorizeAction(3);
+        return $this->UserRepository->editUser($request, $user);
     }
 
     public function store(UserRequest $request)
     {
-        if($this->hasPermission2(2)){
-            return $this->UserRepository->storeUser($request);
-        }
+        $this->authorizeAction(2);
+        return $this->UserRepository->storeUser($request);
     }
 
     public function update(UserRequest $request, User $user)
     {
-        if($this->hasPermission2(3)){
-            return $this->UserRepository->updateUser($request, $user);
-        }
+        $this->authorizeAction(3);
+        return $this->UserRepository->updateUser($request, $user);
     }
 
     public function change_pass(ChgPassRequest $request, User $user)
     {
-        if($this->hasPermission2(3)){
-            return $this->UserRepository->changePass($request, $user);
-        }
+        $this->authorizeAction(3);
+        return $this->UserRepository->changePass($request, $user);
     }
 
     public function change_status(Request $request, User $user)
     {
-        if($this->hasPermission2(4)){
-            return $this->UserRepository->changeStatus($request, $user);
-        }       
+        $this->authorizeAction(4);
+        return $this->UserRepository->changeStatus($request, $user);
     }
 
     public function store_ips(ValidIPRequest $request)
     {
-        if($this->hasPermission2(5)){
-            return $this->UserRepository->storeIps($request);
-        }        
+        $this->authorizeAction(5);
+        return $this->UserRepository->storeIps($request);
     }
 
     public function delete_ips(Request $request, WhitelistIp $ip)
     {
-        if($this->hasPermission2(5)){
-            return $this->UserRepository->deleteIps($request, $ip);
-        }
+        $this->authorizeAction(5);
+        return $this->UserRepository->deleteIps($request, $ip);
     }
+
+    /**
+     * Verifica si el usuario tiene el permiso requerido.
+     */
+    private function authorizeAction(int $permissionId)
+    {
+        abort_unless($this->hasPermission2($permissionId), 403, 'NO TIENE AUTORIZACIÓN.');
+    } 
 }

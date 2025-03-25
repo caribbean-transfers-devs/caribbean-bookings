@@ -1,21 +1,17 @@
 @php
-    use App\Traits\RoleTrait;
-    use App\Traits\FiltersTrait;
-    use App\Traits\FinanceTrait;
-    use App\Traits\BookingTrait;
     use Illuminate\Support\Str;
     use Carbon\Carbon;
 
-    $services = FiltersTrait::Services();
-    $websites = FiltersTrait::Sites();
-    $origins = FiltersTrait::Origins();
-    $reservation_status = FiltersTrait::reservationStatus();
-    $vehicles = FiltersTrait::Vehicles();
-    $zones = FiltersTrait::Zones();
-    $payment_status = FiltersTrait::paymentStatus();
-    $currencies = FiltersTrait::Currencies();
-    $methods = FiltersTrait::Methods();
-    $cancellations = FiltersTrait::CancellationTypes();
+    $services = auth()->user()->Services();
+    $websites = auth()->user()->Sites();
+    $origins = auth()->user()->Origins();
+    $reservation_status = auth()->user()->reservationStatus();
+    $vehicles = auth()->user()->Vehicles();
+    $zones = auth()->user()->Zones();
+    $payment_status = auth()->user()->paymentStatus();
+    $currencies = auth()->user()->Currencies();
+    $methods = auth()->user()->Methods();
+    $cancellations = auth()->user()->CancellationTypes();
 @endphp
 @extends('layout.app')
 @section('title') Reembolsos @endsection
@@ -112,7 +108,7 @@
                             @foreach ($bookings as $booking)
                                 <tr>
                                     <td class="text-center">
-                                        <button type="button" class="btn w-100 mb-2 btn-{{ FinanceTrait::classStatusRefund($booking->status) }} {{ $booking->status == "REFUND_REQUESTED" ? 'danger __btn_redund' : 'success' }}" data-reservation="{{ $booking->reservation_id }}" data-refund="{{ $booking->id }}">{{ FinanceTrait::statusRefund($booking->status) }}</button>
+                                        <button type="button" class="btn w-100 mb-2 btn-{{ auth()->user()->classStatusRefund($booking->status) }} {{ $booking->status == "REFUND_REQUESTED" ? 'danger __btn_redund' : 'success' }}" data-reservation="{{ $booking->reservation_id }}" data-refund="{{ $booking->id }}">{{ auth()->user()->statusRefund($booking->status) }}</button>
                                         <button type="button" class="btn w-100 btn-primary __show_reservation" data-reservation="{{ $booking->reservation_id }}" data-bs-toggle="modal" data-bs-target="#viewProofsModal">VER EVIDENCIA</button>
                                     </td>
                                     <td class="text-center">{{ $booking->message_refund }}</td>
@@ -125,14 +121,14 @@
                                                 $codes_string .= '<p class="mb-1">'.$code.'</p>';
                                             }
                                         @endphp
-                                        @if (RoleTrait::hasPermission(38))
+                                        @if (auth()->user()->hasPermission2(38))
                                             <a href="/reservations/detail/{{ $booking->reservation_id }}"><?=$codes_string?></a>
                                         @else
                                             <?=$codes_string?>
                                         @endif
                                     </td>
                                     <td class="text-center">{{ date("Y-m-d", strtotime($booking->created_at)) }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($booking->reservation_status) }}">{{ BookingTrait::statusBooking($booking->reservation_status) }}</button></td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($booking->reservation_status) }}">{{ auth()->user()->statusBooking($booking->reservation_status) }}</button></td>
                                     <td class="text-center">
                                         @php
                                             $pickup_from = explode(',',$booking->pickup_from);
@@ -144,12 +140,12 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <?=BookingTrait::renderServiceStatus($booking->one_service_status)?><br>
+                                        <?=auth()->user()->renderServiceStatus($booking->one_service_status)?><br>
                                         @if ( $booking->is_round_trip != 0 )
-                                            <?=BookingTrait::renderServiceStatus($booking->two_service_status)?>
+                                            <?=auth()->user()->renderServiceStatus($booking->two_service_status)?>
                                         @endif
                                     </td>
-                                    <td class="text-center" <?=BookingTrait::classStatusPayment($booking)?>>{{ number_format(($booking->total_sales),2) }}</td>
+                                    <td class="text-center" <?=auth()->user()->classStatusPayment($booking)?>>{{ number_format(($booking->total_sales),2) }}</td>
                                     <td class="text-center">{{ $booking->currency }}</td>
                                     <td class="text-center">{{ $booking->payment_type_name }}</td>
                                     <td class="text-center">

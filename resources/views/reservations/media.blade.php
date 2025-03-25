@@ -1,7 +1,4 @@
-@php
-    use App\Traits\RoleTrait;
-    use App\Traits\BookingTrait;
-@endphp
+
 
 @if(sizeof($media) > 0)
     @foreach($media as $key => $value)
@@ -27,11 +24,11 @@
             <div class="content-top">
                 <div class="btn_">
                     {{-- PERMITE ELIMINAR UNA IMAGEN --}}
-                    @if (RoleTrait::hasPermission(66))
+                    @if (auth()->user()->hasPermission(66))
                         <button class="btn btn-danger btn-sm deleteMedia" data-id="{{ $value->id }}" data-name="{{ $value->path }}">Eliminar</button>
                     @endif
                     {{-- LA CATEGORIA DE LA IMAGEN --}}
-                    <?=BookingTrait::renderCategoryPicture($value->type_media)?>
+                    <?=auth()->user()->renderCategoryPicture($value->type_media)?>
                 </div>                    
             </div>
             <div class="content-bottom">

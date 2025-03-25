@@ -1,20 +1,17 @@
 @php
-    use App\Traits\FiltersTrait;
-    use App\Traits\RoleTrait;
-    use App\Traits\BookingTrait;
     use Illuminate\Support\Str;
     use Carbon\Carbon;
 
-    $services = FiltersTrait::Services();
-    $websites = FiltersTrait::Sites();
-    $origins = FiltersTrait::Origins();
-    $reservation_status = FiltersTrait::reservationStatus();
-    $vehicles = FiltersTrait::Vehicles();
-    $zones = FiltersTrait::Zones();
-    $payment_status = FiltersTrait::paymentStatus();
-    $currencies = FiltersTrait::Currencies();
-    $methods = FiltersTrait::Methods();
-    $cancellations = FiltersTrait::CancellationTypes();
+    $services = auth()->user()->Services();
+    $websites = auth()->user()->Sites();
+    $origins = auth()->user()->Origins();
+    $reservation_status = auth()->user()->reservationStatus();
+    $vehicles = auth()->user()->Vehicles();
+    $zones = auth()->user()->Zones();
+    $payment_status = auth()->user()->paymentStatus();
+    $currencies = auth()->user()->Currencies();
+    $methods = auth()->user()->Methods();
+    $cancellations = auth()->user()->CancellationTypes();
 
     $bookingsStatus = [
         "total" => 0,
@@ -272,8 +269,8 @@
                                     //ESTATUS
                                     if (!isset( $bookingsStatus['data'][$item->reservation_status] )){
                                         $bookingsStatus['data'][$item->reservation_status] = [
-                                            "name" => BookingTrait::statusBooking($item->reservation_status),
-                                            "color" => BookingTrait::colorStatusBooking($item->reservation_status),
+                                            "name" => auth()->user()->statusBooking($item->reservation_status),
+                                            "color" => auth()->user()->colorStatusBooking($item->reservation_status),
                                             "total" => 0,
                                             "gran_total" => 0,
                                             "USD" => [
@@ -502,7 +499,7 @@
                                                 $codes_string .= '<p class="mb-1">'.$code.'</p>';
                                             }
                                         @endphp
-                                        @if (RoleTrait::hasPermission(38))
+                                        @if (auth()->user()->hasPermission2(38))
                                             <a href="/reservations/detail/{{ $item->reservation_id }}"><?=$codes_string?></a>
                                         @else
                                             <?=$codes_string?>
@@ -514,7 +511,7 @@
                                     <td class="text-center">{{ $item->site_name }}</td>
                                     <td class="text-center">{{ !empty($item->origin_code) ? $item->origin_code : 'PAGINA WEB' }}</td>
                                     <td class="text-center">{{ $item->campaign }}</td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ BookingTrait::classStatusBooking($item->reservation_status) }}">{{ BookingTrait::statusBooking($item->reservation_status) }}</button></td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($item->reservation_status) }}">{{ auth()->user()->statusBooking($item->reservation_status) }}</button></td>
                                     <td class="text-center">{{ $item->full_name }}</td>
                                     <td class="text-center">{{ $item->client_phone }}</td>
                                     <td class="text-center">{{ $item->client_email }}</td>
@@ -541,13 +538,13 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <?=BookingTrait::renderServiceStatus($item->one_service_status)?><br>
+                                        <?=auth()->user()->renderServiceStatus($item->one_service_status)?><br>
                                         @if ( $item->is_round_trip != 0 )
-                                            <?=BookingTrait::renderServiceStatus($item->two_service_status)?>
+                                            <?=auth()->user()->renderServiceStatus($item->two_service_status)?>
                                         @endif
                                     </td>
-                                    <td class="text-center" <?=BookingTrait::classStatusPayment($item)?>>{{ BookingTrait::statusPayment($item->payment_status) }}</td>
-                                    <td class="text-center" <?=BookingTrait::classStatusPayment($item)?>>{{ number_format(($item->total_sales),2) }}</td>
+                                    <td class="text-center" <?=auth()->user()->classStatusPayment($item)?>>{{ auth()->user()->statusPayment($item->payment_status) }}</td>
+                                    <td class="text-center" <?=auth()->user()->classStatusPayment($item)?>>{{ number_format(($item->total_sales),2) }}</td>
                                     <td class="text-center">{{ number_format(($item->total_payments),2) }}</td>
                                     <td class="text-center" {{ (($item->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>
                                     <td class="text-center">{{ number_format(($item->is_round_trip != 0 ? ( $item->total_sales / 2 ) : $item->total_sales),2) }}</td>

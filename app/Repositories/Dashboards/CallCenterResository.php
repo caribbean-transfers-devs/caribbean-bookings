@@ -68,7 +68,7 @@ class CallCenterResository
         
         $bookings = $this->queryBookings($query, $queryHavingBooking, $queryData);
 
-        return view('components.html.dashboard.callcenteragent.sales', [ 'sales' => $bookings, 'exchange' => FiltersTrait::ExchangeCommission($dates[0], $dates[1]) ]);
+        return view('components.html.dashboard.callcenteragent.sales', [ 'sales' => $bookings, 'exchange' => $this->ExchangeCommission($dates[0], $dates[1]) ]);
     }
 
     public function getOperations($request)
@@ -117,7 +117,7 @@ class CallCenterResository
 
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHavingOperation, $queryData);
 
-        return view('components.html.dashboard.callcenteragent.operations', [ 'sales' => $operations, 'exchange' => FiltersTrait::ExchangeCommission($dates[0], $dates[1]) ]);
+        return view('components.html.dashboard.callcenteragent.operations', [ 'sales' => $operations, 'exchange' => $this->ExchangeCommission($dates[0], $dates[1]) ]);
     }
 
     public function getStats($request)
@@ -138,8 +138,8 @@ class CallCenterResository
             $end = $startDate->copy()->endOfMonth();
 
             $data = [
-                "exchange_commission" => FiltersTrait::ExchangeCommission($dates[0], $dates[1]),
-                "percentage_commission_investment" => FiltersTrait::PercentageCommissionInvestment(),
+                "exchange_commission" => $this->ExchangeCommission($dates[0], $dates[1]),
+                "percentage_commission_investment" => $this->PercentageCommissionInvestment(),
                 "targets" => auth()->user()->target->object ?? [],
                 "daily_goal" => round($dataUser->daily_goal, 2),
                 "total_day" => 0,
@@ -320,7 +320,7 @@ class CallCenterResository
             $startDate = Carbon::parse($dates[0]); // Tomar la primera fecha
             $start = $startDate->copy()->startOfMonth();
             $end = $startDate->copy()->endOfMonth();
-            $exchange_commission = FiltersTrait::ExchangeCommission($start->toDateString(), $end->toDateString());
+            $exchange_commission = $this->ExchangeCommission($start->toDateString(), $end->toDateString());
             $data = $this->dataSales($start, $end);
 
             // Condiciones de Reservas
@@ -395,7 +395,7 @@ class CallCenterResository
             $startDate = Carbon::parse($dates[0]); // Tomar la primera fecha
             $start = $startDate->copy()->startOfMonth();
             $end = $startDate->copy()->endOfMonth();
-            $exchange_commission = FiltersTrait::ExchangeCommission($start->toDateString(), $end->toDateString());
+            $exchange_commission = $this->ExchangeCommission($start->toDateString(), $end->toDateString());
             $data = $this->dataSalesOperation($start, $end);
 
             // Condiciones de Reservas

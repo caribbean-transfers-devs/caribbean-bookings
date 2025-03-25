@@ -1,10 +1,9 @@
 @php
     use App\Traits\RoleTrait;
-    use App\Traits\FiltersTrait;
     use Carbon\Carbon;
     Carbon::setLocale('es');
-    $units = FiltersTrait::Units('active'); //LAS UNIDADES DADAS DE ALTA
-    $drivers = FiltersTrait::Drivers('active');
+    $units = auth()->user()->Units('active'); //LAS UNIDADES DADAS DE ALTA
+    $drivers = auth()->user()->Drivers('active');
 @endphp
 <div class="table-responsive">
     <table class="table custom-table">

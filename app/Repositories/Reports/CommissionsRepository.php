@@ -85,7 +85,7 @@ class CommissionsRepository
                 ]
             ],       
             'operations' => $items,
-            'exchange' => FiltersTrait::ExchangeCommission(date("Y-m-d", strtotime($data['init'])), date("Y-m-d", strtotime($data['end']))),
+            'exchange' => $this->ExchangeCommission(date("Y-m-d", strtotime($data['init'])), date("Y-m-d", strtotime($data['end']))),
             'data' => $data,
         ]);        
     }
@@ -114,7 +114,7 @@ class CommissionsRepository
         // Manejo de Fechas
         $dates = MethodsTrait::parseDateRange($request->date ?? '');
         $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
-        $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
+        $exchange_commission = $this->ExchangeCommission($dates['init'], $dates['end']);
         $data = MethodsTrait::SalesArrayStructure($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
 
         //Para las ventas velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
@@ -160,7 +160,7 @@ class CommissionsRepository
             }
         }
 
-        return view('components.html.dashboard.callcenteragent.sales', [ 'sales' => $bookings, 'exchange' => FiltersTrait::ExchangeCommission($dates['init'], $dates['end']) ]);
+        return view('components.html.dashboard.callcenteragent.sales', [ 'sales' => $bookings, 'exchange' => $this->ExchangeCommission($dates['init'], $dates['end']) ]);
     }
 
     public function getOperations($request)
@@ -174,7 +174,7 @@ class CommissionsRepository
         // Manejo de Fechas
         $dates = MethodsTrait::parseDateRange($request->date ?? '');
         $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
-        $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
+        $exchange_commission = $this->ExchangeCommission($dates['init'], $dates['end']);
         $data = MethodsTrait::SalesArrayStructure($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
 
         //Para la operación velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
@@ -237,7 +237,7 @@ class CommissionsRepository
             }
         }        
         
-        return view('components.html.dashboard.callcenteragent.operations', [ 'sales' => $operations, 'exchange' => FiltersTrait::ExchangeCommission($dates['init'], $dates['end']) ]);
+        return view('components.html.dashboard.callcenteragent.operations', [ 'sales' => $operations, 'exchange' => $this->ExchangeCommission($dates['init'], $dates['end']) ]);
     }
     
     public function getCommissions($request)
@@ -251,8 +251,8 @@ class CommissionsRepository
         // Manejo de Fechas
         $dates = MethodsTrait::parseDateRange($request->date ?? '');
         $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
-        $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
-        $percentage_commission_investment = FiltersTrait::PercentageCommissionInvestment();
+        $exchange_commission = $this->ExchangeCommission($dates['init'], $dates['end']);
+        $percentage_commission_investment = $this->PercentageCommissionInvestment();
         $data['USERS'] = MethodsTrait::UserArrayStructure($dataUser->toArray());
 
         $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two 
@@ -349,8 +349,8 @@ class CommissionsRepository
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
             $data = [
-                "EXCHANGE_COMMISSION" => FiltersTrait::ExchangeCommission($dates['init'], $dates['end']),
-                "PERCENTAGE_COMMISSION_INVESTMENT" => FiltersTrait::PercentageCommissionInvestment(),
+                "EXCHANGE_COMMISSION" => $this->ExchangeCommission($dates['init'], $dates['end']),
+                "PERCENTAGE_COMMISSION_INVESTMENT" => $this->PercentageCommissionInvestment(),
                 "TOTAL_SALES" => 0,
                 "TOTAL_OPERATIONS" => 0,
                 "TOTAL_COMMISSIONS" => 0,
@@ -486,7 +486,7 @@ class CommissionsRepository
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
-            $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
+            $exchange_commission = $this->ExchangeCommission($dates['init'], $dates['end']);
             $data = MethodsTrait::SalesArrayStructure($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
             
             //Para las ventas velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO
@@ -560,7 +560,7 @@ class CommissionsRepository
             // Manejo de Fechas
             $dates = MethodsTrait::parseDateRange($request->date ?? '');
             $datesMonth = MethodsTrait::parseDateRangeMonth($dates['init']);
-            $exchange_commission = FiltersTrait::ExchangeCommission($dates['init'], $dates['end']);
+            $exchange_commission = $this->ExchangeCommission($dates['init'], $dates['end']);
             $data = MethodsTrait::SalesArrayStructure($datesMonth['initCarbon'], $datesMonth['endCarbon'], "users", $dataUser->toArray());
 
             //Para la operación velidamos que su estatus de reserva sea CONFIRMADO, CREDITO O CREDITO ABIERTO

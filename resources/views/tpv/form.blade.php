@@ -1,6 +1,5 @@
 @php
-    use App\Traits\FiltersTrait;
-    $users = FiltersTrait::CallCenterAgent([1]);    
+    $users = auth()->user()->CallCenterAgent([1]);    
 @endphp
 <form class="col-xl-12 quote_container" id="formReservation">
     <div class="left_">

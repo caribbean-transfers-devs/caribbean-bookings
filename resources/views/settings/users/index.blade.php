@@ -1,6 +1,3 @@
-@php
-    use App\Traits\RoleTrait;
-@endphp
 @extends('layout.app')
 @section('title') Usuarios @endsection
 
@@ -22,10 +19,10 @@
             <div class="widget-four">
                 <div class="widget-heading">
                     <div class="d-flex gap-3">
-                        @if(RoleTrait::hasPermission(2))
+                        @if(auth()->user()->hasPermission2(2))
                             <a href="{{ route('users.create') }}" class="btn btn-success">Añadir Usuario</a>
                         @endif
-                        @if(RoleTrait::hasPermission(5))
+                        @if(auth()->user()->hasPermission2(5))
                             <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#whiteIPsModal">Ver IPs</button>
                         @endif
                     </div>
@@ -92,32 +89,32 @@
                                                 @endif
                                             </td>
                                             <td class="text-center">
-                                                @foreach ($user->roles as $role)
-                                                    <span class="badge bg-primary">{{ $role->role->role }}</span>
-                                                @endforeach
+                                                <div class="d-flex flex-column gap-2">
+                                                    @foreach ($user->roles as $role)
+                                                        <span class="badge bg-primary w-100">{{ $role->role->role }}</span>
+                                                    @endforeach
+                                                </div>
                                             </td>
                                             <td class="text-center">
-                                                <div class="btn-group mb-2 me-4">
-                                                    <button type="button" class="btn btn-primary">Acciones</button>
-                                                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                                        <span class="visually-hidden ">Toggle Dropdown</span>
-                                                    </button>
-                                                    <ul class="dropdown-menu" aria-labelledby="actions">
-                                                        @if(RoleTrait::hasPermission(3)) 
-                                                            <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}?type=callcenter">Editar</a></li>
-                                                            <li><a class="dropdown-item" href="#" onclick="ChangePass({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#chgPassModal">Contraseña</a></li>
-                                                            <li><hr class="dropdown-divider"></li>
-                                                        @endif
-                                                        @if(RoleTrait::hasPermission(4)) 
-                                                            <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},0)">Desactivar</a></li>
-                                                        @endif
-                                                    </ul>
+                                                <div class="d-flex flex-column gap-2">
+                                                    @if(auth()->user()->hasPermission2(3))
+                                                        <a type="button" class="btn btn-primary w-100" href="{{ route('users.edit', $user->id) }}">Editar</a>
+                                                        <button type="button" class="btn btn-info w-100" onclick="ChangePass({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#chgPassModal">Actualizar contraseña</button>
+                                                    @endif
+
+                                                    @if(auth()->user()->hasPermission2(4))
+                                                        <button type="button" class="btn btn-danger w-100" onclick="chgStatus({{ $user->id }},0)" >Desactivar usuario</button>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
+                            <!-- Links de paginación -->
+                            <div>
+                                {{-- {{ $active_users->links() }} --}}
+                            </div>
                         </div>                       
                         <div class="tab-pane fade" id="tab-2" role="tabpanel">
                             <table id="inactive_users" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
@@ -150,11 +147,11 @@
                                                         <span class="visually-hidden ">Toggle Dropdown</span>
                                                     </button>
                                                     <ul class="dropdown-menu" aria-labelledby="actions">
-                                                        @if(RoleTrait::hasPermission(3)) 
+                                                        @if(auth()->user()->hasPermission2(3)) 
                                                             <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
                                                             <li><hr class="dropdown-divider"></li>
                                                         @endif
-                                                        @if(RoleTrait::hasPermission(4)) 
+                                                        @if(auth()->user()->hasPermission2(4)) 
                                                             <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},1)">Activar</a></li>
                                                         @endif
                                                     </ul>
@@ -164,6 +161,10 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            <!-- Links de paginación -->
+                            <div>
+                                {{-- {{ $inactive_users->links() }} --}}
+                            </div>
                         </div>
                     </div>                        
                 </div>

@@ -1,6 +1,3 @@
-@php
-    use App\Traits\BookingTrait;
-@endphp
 @props(['bookingsStatus','dataMethodPayments','dataCurrency','dataVehicles','dataServiceType','dataServiceTypeOperation','dataSites','dataDriver','dataDestinations','dataUnit','dataOriginSale'])
 <!-- Modal -->
 <div class="modal fade" id="chartsModal2" tabindex="-1" role="dialog" aria-labelledby="chartsModalLabel2" aria-hidden="true">
@@ -11,7 +8,7 @@
                 <div class="items_status">
                     @if ( isset($bookingsStatus) )
                         @foreach ($bookingsStatus['data'] as $key => $status)
-                        <div class="btn btn-{{ BookingTrait::classStatusBooking($key) }}">
+                        <div class="btn btn-{{ auth()->user()->classStatusBooking($key) }}">
                             <strong>Total {{ ucfirst(strtolower($status['name'])) }}:</strong> $ {{ number_format($status['gran_total'],2) }}
                         </div>
                         @endforeach

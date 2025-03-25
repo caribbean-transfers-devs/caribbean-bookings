@@ -222,13 +222,6 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::put('/schedules/{schedule}', [SCHEDULES::class, 'update'])->name('schedules.update');
         Route::delete('/schedules/{schedule}', [SCHEDULES::class, 'destroy'])->name('schedules.destroy');
 
-        //TIPO DE CAMBIO PARA REPORTES
-        Route::get('/config/exchange-reports', [EXCHANGE_REPORTS::class, 'index'])->name('exchanges.index');
-        Route::get('/config/exchange-reports/create', [EXCHANGE_REPORTS::class, 'create'])->name('exchanges.create');
-        Route::post('/config/exchange-reports/store', [EXCHANGE_REPORTS::class, 'store'])->name('exchanges.store');
-        Route::get('/config/exchange-reports/{exchage}/edit', [EXCHANGE_REPORTS::class, 'edit'])->name('exchanges.edit');
-        Route::put('/config/exchange-reports/{exchage}', [EXCHANGE_REPORTS::class, 'update'])->name('exchanges.update');
-        Route::delete('/config/exchange-reports/{exchage}', [EXCHANGE_REPORTS::class, 'destroy'])->name('exchanges.destroy');
         //ZONES
         Route::get('/config/destinations', [ZONES::class, 'index'])->name('config.zones');
         Route::get('/config/destinations/{id}', [ZONES::class, 'getZones'])->name('config.zones.getZones');
@@ -248,6 +241,15 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::post('/config/rates/enterprise/new', [RATES_ENTERPRISE::class, 'newRates'])->name('config.newRatesEnterprise');
         Route::delete('/config/rates/enterprise/delete', [RATES_ENTERPRISE::class, 'deleteRates'])->name('config.deleteRatesEnterprise');
         Route::put('/config/rates/enterprise/update', [RATES_ENTERPRISE::class, 'updateRates'])->name('config.updateRatesEnterprise');
+
+        //TIPO DE CAMBIO PARA REPORTES
+        Route::get('/config/exchange-reports', [EXCHANGE_REPORTS::class, 'index'])->name('exchanges.index');
+        Route::get('/config/exchange-reports/create', [EXCHANGE_REPORTS::class, 'create'])->name('exchanges.create');
+        Route::post('/config/exchange-reports/store', [EXCHANGE_REPORTS::class, 'store'])->name('exchanges.store');
+        Route::get('/config/exchange-reports/{exchage}/edit', [EXCHANGE_REPORTS::class, 'edit'])->name('exchanges.edit');
+        Route::put('/config/exchange-reports/{exchage}', [EXCHANGE_REPORTS::class, 'update'])->name('exchanges.update');
+        Route::delete('/config/exchange-reports/{exchage}', [EXCHANGE_REPORTS::class, 'destroy'])->name('exchanges.destroy');
+
         //TYPES CANCELLATIONS
         Route::get('/config/types-cancellations', [TYPES_CANCELLATIONS::class, 'index'])->name('config.types-cancellations.index');
         Route::get('/config/types-cancellations/create', [TYPES_CANCELLATIONS::class, 'create'])->name('config.types-cancellations.create');

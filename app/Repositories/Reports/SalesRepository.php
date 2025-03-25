@@ -219,7 +219,7 @@ class SalesRepository
                 ]
             ],
             'bookings' => $bookings,
-            'exchange' => FiltersTrait::Exchange(date("Y-m-d", strtotime($data['init'])), date("Y-m-d", strtotime($data['end']))),
+            'exchange' => $this->Exchange(date("Y-m-d", strtotime($data['init'])), date("Y-m-d", strtotime($data['end']))),
             'data' => $data,
         ]);
     }

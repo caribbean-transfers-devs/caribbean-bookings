@@ -1,6 +1,5 @@
 @php
-    use App\Traits\FiltersTrait;
-    $terminals = FiltersTrait::ContactPoints($reservation->destination_id);    
+    $terminals = auth()->user()->ContactPoints($reservation->destination_id);    
 @endphp
 <div class="modal" tabindex="-1" id="arrivalConfirmationModal">
     <div class="modal-dialog modal-dialog-centered modal-lg">

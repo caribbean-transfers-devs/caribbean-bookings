@@ -1,6 +1,4 @@
 @php
-    use App\Traits\FiltersTrait;
-    use App\Traits\RoleTrait;
     $totals = [
         'TOTAL' => 0,
         'USD' => 0,
@@ -12,7 +10,7 @@
         'COMMISSION' => 0,
         'QUANTITY' => 0,
     ];
-    $PercentageCommissionInvestment = FiltersTrait::PercentageCommissionInvestment();
+    $PercentageCommissionInvestment = auth()->user()->PercentageCommissionInvestment();
 @endphp
 @props(['users'])
 <!-- Modal -->
@@ -78,7 +76,7 @@
                                         <td class="text-center">{{ number_format($user['TOTAL_COMPLETED'],2) }}</td>
                                         <td class="text-center">{{ number_format($TotalInvestmentDiscountOperated,2) }}</td>
                                         <td class="text-center">{{ number_format($TotalServicesOperatedInvestmentDiscount,2) }}</td>
-                                        {{-- @if ( RoleTrait::hasPermission(96) ) --}}
+                                        {{-- @if ( auth()->user()->hasPermission2(96) ) --}}
                                             <td class="text-center">{{ number_format($TotalCommissionOperated,2) }}</td>                                                
                                         {{-- @endif --}}
                                     </tr>

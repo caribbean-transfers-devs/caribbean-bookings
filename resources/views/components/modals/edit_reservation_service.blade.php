@@ -1,6 +1,5 @@
 @php
-    use App\Traits\FiltersTrait;
-    $zones = FiltersTrait::Zones($reservation->destination->id);
+    $zones = auth()->user()->Zones($reservation->destination->id);
 @endphp
 <div class="modal fade" id="serviceEditModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">

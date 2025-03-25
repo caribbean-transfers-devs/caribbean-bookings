@@ -24,7 +24,8 @@ trait FiltersTrait
 {
 
     //NOS TRAE EL TIPO DE CAMBIO DEPENDIENDO DE LA FECHA, PARA LOS REPORTES
-    public static function Exchange($in, $end){
+    public function Exchange($in, $end)
+    {
         $in = ( isset($in) ? $in : date('Y-m-d') );
         $end = ( isset($in) ? $in : date('Y-m-d') );
         $report = ExchangeRateReport::where('status', 1)->where('date_init', '<=', $in)
@@ -38,7 +39,8 @@ trait FiltersTrait
         }
     }
 
-    public static function ExchangeCommission($in, $end){
+    public function ExchangeCommission($in, $end)
+    {
         $in = ( isset($in) ? $in : date('Y-m-d') );
         $end = ( isset($in) ? $in : date('Y-m-d') );
         $report = ExchangeRateCommission::where('status', 1)->where('date_init', '<=', $in)
@@ -52,16 +54,19 @@ trait FiltersTrait
         }
     }
 
-    public static function PercentageCommissionInvestment(){
+    public function PercentageCommissionInvestment()
+    {
         return 20; // Ejemplo: 20.00
     }
 
-    public static function Users(){
+    public function Users()
+    {
         return User::where('status', 1)->get();
     }
 
     //NOS TRAE LOS AGENTES DE CALL CENTER
-    public static function CallCenterAgent(array $status = []){
+    public function CallCenterAgent(array $status = [])
+    {
         $status = array_filter($status, fn($id) => is_numeric($id) && ctype_digit((string) $id));
 
         // Base de la consulta
@@ -75,12 +80,14 @@ trait FiltersTrait
         return $query->get();        
     }
 
-    public static function Enterprises(){
+    public function Enterprises()
+    {
         return Enterprise::all();
     }
 
     //TIPO DE SERVICIO
-    public static function Services(){
+    public function Services()
+    {
         return array(
             "0" => "One Way",
             "1" => "Round Trip",
@@ -88,11 +95,13 @@ trait FiltersTrait
     }
 
     //SITIOS O AGENCIAS
-    public static function Sites(){
+    public function Sites()
+    {
         return DB::select("SELECT id, name, type_site FROM sites ORDER BY name ASC");
     }
 
-    public static function Origins(){
+    public function Origins()
+    {
         $origins[] = (object) array(
             "id" => 0,
             "code" => "PAGINA WEB"
@@ -109,7 +118,8 @@ trait FiltersTrait
     }
 
     //ESTATUS DE RESERVACIÓN
-    public static function reservationStatus(){
+    public function reservationStatus()
+    {
         return array(
             "CONFIRMED" => "Confirmado",
             "PENDING" => "Pendiente",
@@ -122,7 +132,8 @@ trait FiltersTrait
     }
 
     //TIPO DE SERVICIO EN OPERACIÓN
-    public static function servicesOperation(){
+    public function servicesOperation()
+    {
         return array(
             "ARRIVAL" => "Llegada",
             "DEPARTURE" => "Salida",
@@ -131,12 +142,14 @@ trait FiltersTrait
     }
 
     //TIPO DE VEHÍCULO
-    public static function Vehicles(){
+    public function Vehicles()
+    {
         return DestinationService::all();
     }
 
     //ZONAS DE ORIGEN Y DESTINO
-    public static function Zones($destination_id = NULL){
+    public function Zones($destination_id = NULL)
+    {
         if( $destination_id ){
             return Zones::where('destination_id', $destination_id)->get();
         }else{
@@ -145,7 +158,8 @@ trait FiltersTrait
     }
 
     //ESTATUS DE SERVICIO
-    public static function statusOperationService(){
+    public function statusOperationService()
+    {
         return array(
             "PENDING" => "Pendiente",
             "COMPLETED" => "Completado",
@@ -157,16 +171,16 @@ trait FiltersTrait
     //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADOS COMO LOS VEHICULOS QUE TENEMOS
     // SI LE MANDAMOS EL PARAMERO ACTION COMO FILTERS, NOS TRAE TODAS LAS UNIDADES SI IMPORTAR QUE ESTEN INACTIVAS
     // SI LE MANDAMOS EL PARAMERO ACTION COMO DIFERENTE DE FILTERS, NOS TRAE TODAS LAS UNIDADES QUE SOLO ESTEN ACTIVAS
-    public static function Units($action = "filters"){
-        if( $action == "filters" ){
-            return Vehicle::all();
-        }else{
-            return Vehicle::where('status',1)->get();
-        }
+    public function Units($action = "filters")
+    {
+        return $action === "filters" 
+            ? Vehicle::with(['enterprise','destination_service','destination'])->get() 
+            : Vehicle::with(['enterprise','destination_service','destination'])->where('status', 1)->get();
     }
 
     //CONDUCTOR
-    public static function Drivers($action = "filters"){
+    public function Drivers($action = "filters")
+    {
         if( $action == "filters" ){
             return Driver::orderBy('names','ASC')->get();
         }else{
@@ -175,7 +189,8 @@ trait FiltersTrait
     }
 
     //ESTATUS DE OPERACIÓN
-    public static function statusOperation(){
+    public function statusOperation()
+    {
         return array(
             "PENDING" => "Pendiente",
             "E" => "E",
@@ -185,7 +200,8 @@ trait FiltersTrait
     }    
     
     //ESTATUS DE PAGO DE RESERVACIÓN
-    public static function paymentStatus(){
+    public function paymentStatus()
+    {
         return array(
             "PAID" => "Pagado",
             "PENDING" => "Pendiente",
@@ -193,7 +209,8 @@ trait FiltersTrait
     }
 
     //MONEDA DE RESERVACIÓN
-    public static function Currencies(){
+    public function Currencies()
+    {
         return array(
             "USD" => "USD",
             "MXN" => "MXN",
@@ -201,7 +218,8 @@ trait FiltersTrait
     }
     
     //METODO DE PAGO DE RESERVACIÓN
-    public static function Methods(){
+    public function Methods()
+    {
         return array(
             "CREDIT" => "CREDITO",
             "CASH" => "EFECTIVO",
@@ -212,20 +230,21 @@ trait FiltersTrait
     }
 
     //MOTIVOS DE CANCELACIÓN
-    public static function CancellationTypes(){
+    public function CancellationTypes()
+    {
         return CancellationTypes::where('status',1)->get();
     }
 
-    public static function TypeSales()
+    public function TypeSales()
     {
         return SalesType::all();
     }
 
-    public static function ContactPoints($destination_id = NULL){
+    public function ContactPoints($destination_id = NULL){
         return ContactPoints::where('destination_id', $destination_id )->get();
     }
 
-    public static function parseArrayQuery($data, $marks = NULL){
+    public function parseArrayQuery($data, $marks = NULL){
         if (is_array($data)) {
             $filteredData = array_filter($data, function($value) {
                 return $value !== NULL && $value !== 0;
