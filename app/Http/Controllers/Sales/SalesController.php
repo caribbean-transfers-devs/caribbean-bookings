@@ -11,9 +11,10 @@ use App\Traits\RoleTrait;
 
 class SalesController extends Controller
 {
+    use RoleTrait;
     public function store(SaleRequest $request, SaleRepository $saleRepository)
     {
-        if(RoleTrait::hasPermission(17)){
+        if($this->hasPermission(17)){
             return $saleRepository->store($request);
         }
     }
@@ -25,14 +26,14 @@ class SalesController extends Controller
 
     public function update(SaleRequest $request, SaleRepository $saleRepository,Sale $sale)
     {
-        if(RoleTrait::hasPermission(18)){
+        if($this->hasPermission(18)){
             return $saleRepository->update($request,$sale);
         }
     }
 
     public function destroy(Request $request, SaleRepository $saleRepository,Sale $sale)
     {
-        if(RoleTrait::hasPermission(19)){
+        if($this->hasPermission(19)){
             return $saleRepository->destroy($request,$sale);
         }
     }

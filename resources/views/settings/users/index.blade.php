@@ -19,10 +19,10 @@
             <div class="widget-four">
                 <div class="widget-heading">
                     <div class="d-flex gap-3">
-                        @if(auth()->user()->hasPermission2(2))
+                        @if(auth()->user()->hasPermission(2))
                             <a href="{{ route('users.create') }}" class="btn btn-success">Añadir Usuario</a>
                         @endif
-                        @if(auth()->user()->hasPermission2(5))
+                        @if(auth()->user()->hasPermission(5))
                             <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#whiteIPsModal">Ver IPs</button>
                         @endif
                     </div>
@@ -97,12 +97,12 @@
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex flex-column gap-2">
-                                                    @if(auth()->user()->hasPermission2(3))
+                                                    @if(auth()->user()->hasPermission(3))
                                                         <a type="button" class="btn btn-primary w-100" href="{{ route('users.edit', $user->id) }}">Editar</a>
                                                         <button type="button" class="btn btn-info w-100" onclick="ChangePass({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#chgPassModal">Actualizar contraseña</button>
                                                     @endif
 
-                                                    @if(auth()->user()->hasPermission2(4))
+                                                    @if(auth()->user()->hasPermission(4))
                                                         <button type="button" class="btn btn-danger w-100" onclick="chgStatus({{ $user->id }},0)" >Desactivar usuario</button>
                                                     @endif
                                                 </div>
@@ -147,11 +147,11 @@
                                                         <span class="visually-hidden ">Toggle Dropdown</span>
                                                     </button>
                                                     <ul class="dropdown-menu" aria-labelledby="actions">
-                                                        @if(auth()->user()->hasPermission2(3)) 
+                                                        @if(auth()->user()->hasPermission(3)) 
                                                             <li><a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">Editar</a></li>
                                                             <li><hr class="dropdown-divider"></li>
                                                         @endif
-                                                        @if(auth()->user()->hasPermission2(4)) 
+                                                        @if(auth()->user()->hasPermission(4)) 
                                                             <li><a class="dropdown-item" href="#" onclick="chgStatus({{ $user->id }},1)">Activar</a></li>
                                                         @endif
                                                     </ul>

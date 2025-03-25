@@ -40,11 +40,11 @@
                                 <td>{{ $role->role }}</td>                                            
                                 <td>
                                     <div class="d-flex flex-column gap-2">
-                                        @if(auth()->user()->hasPermission2(8)) 
+                                        @if(auth()->user()->hasPermission(8)) 
                                             <a type="button" class="btn btn-primary w-100" href="{{ route('roles.edit', $role->id) }}">Editar</a>
                                         @endif
 
-                                        @if(auth()->user()->hasPermission2(9)) 
+                                        @if(auth()->user()->hasPermission(9)) 
                                             <button type="button" class="btn btn-danger w-100" onclick="DelRole({{ $role->id }})">Eliminar</button>
                                         @endif
                                     </div>

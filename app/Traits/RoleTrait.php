@@ -40,7 +40,7 @@ trait RoleTrait
      * @param int $submodule_id id del Submodulo obtenido de la DB al cual se quiere acceder
      * @return bool Retorna true or false para autorizar o negar el permiso respectivamente.
      */
-    public static function hasPermission(int $submodule_id){
+    public static function hasPermission2(int $submodule_id){
         $roles = session()->get('roles');
         if(isset($roles) && $submodule_id > 0){
             if(in_array($submodule_id,$roles['permissions'])){
@@ -53,7 +53,7 @@ trait RoleTrait
         return false;
     }
 
-    public function hasPermission2(int $submodule_id): bool
+    public function hasPermission(int $submodule_id): bool
     {
         $roles = session('roles');
     

@@ -16,7 +16,7 @@ class RatesController extends Controller
     use RoleTrait;
 
     public function index(Request $request, RatesRepository $ratesRepository){
-        if(!RoleTrait::hasPermission(32)){
+        if(!$this->hasPermission(32)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $ratesRepository->index($request);
@@ -27,28 +27,28 @@ class RatesController extends Controller
     }
 
     public function getRates(RatesRequest $request, RatesRepository $ratesRepository){
-        if(!RoleTrait::hasPermission(32)){
+        if(!$this->hasPermission(32)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $ratesRepository->getRates($request);
     }
 
     public function newRates(RatesNewRequest $request, RatesRepository $ratesRepository){
-        if(!RoleTrait::hasPermission(33)){
+        if(!$this->hasPermission(33)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $ratesRepository->newRates($request);
     }
 
     public function deleteRates(RatesDeleteRequest $request, RatesRepository $ratesRepository){
-        if(!RoleTrait::hasPermission(35)){
+        if(!$this->hasPermission(35)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $ratesRepository->deleteRates($request);
     }
 
     public function updateRates(RatesUpdateRequest $request, RatesRepository $ratesRepository){
-        if(!RoleTrait::hasPermission(34)){
+        if(!$this->hasPermission(34)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $ratesRepository->updateRates($request);

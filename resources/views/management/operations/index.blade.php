@@ -119,7 +119,7 @@
             }
         endif;
     @endphp
-    @if (auth()->user()->hasPermission2(79))
+    @if (auth()->user()->hasPermission(79))
         <input type="hidden" class="" id="permission_reps" value="true" required>
     @endif
 
@@ -139,20 +139,20 @@
             <button type="button" class="btn btn-primary __btn_columns" title="Administrar columnas" data-title="columnas de operaciones" data-bs-toggle="modal" data-bs-target="#columnsModal" data-table="bookings" data-container="columns"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas</button>
             <button type="button" class="btn btn-primary" title="Ver graficas" id="showLayer"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas</button>
 
-            @if ( auth()->user()->hasPermission2(80) )
+            @if ( auth()->user()->hasPermission(80) )
                 <button type="button" class="btn btn-primary" data-title="Agregar nuevo servicio" data-bs-toggle="modal" data-bs-target="#operationModal"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg> Agregar nuevo servicio</button>
             @endif            
-            @if ( auth()->user()->hasPermission2(82) )
+            @if ( auth()->user()->hasPermission(82) )
                 <button type="button" class="btn btn-primary" id="btn_preassignment"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Pre-asignación</button>
             @endif
-            @if ( auth()->user()->hasPermission2(83) )
+            @if ( auth()->user()->hasPermission(83) )
                 <button type="button" class="btn btn-primary" id="btn_dowload_operation"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Descargar operación</button>
             @endif
-            @if ( auth()->user()->hasPermission2(84) )
+            @if ( auth()->user()->hasPermission(84) )
                 <button type="button" class="btn btn-primary" id="btn_dowload_operation_comission"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Descargar comisiones de operación</button>
             @endif
             <button type="button" class="btn btn-danger" id="getSchedules"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-watch"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path></svg> Ver horario de conductores</button>
-            @if ( auth()->user()->hasPermission2(85) )
+            @if ( auth()->user()->hasPermission(85) )
                 <button type="button" class="btn btn-danger" id="btn_close_operation"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Cerrar operación</button>
             @endif
         </div>        
@@ -287,9 +287,9 @@
                             <tr class="item-{{ $key.$value->id }} {{ $class_agency }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
                                 <td class="text-center">
                                     @if ( $flag_preassignment )
-                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase {{ auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79) || $close_operation == 1 ? 'disabled' : '' }}">{{ $preassignment }}</button>
+                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase {{ auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 ? 'disabled' : '' }}">{{ $preassignment }}</button>
                                     @else
-                                        <button type="button" class="btn btn-danger text-uppercase btn_operations {{ auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79) || $close_operation == 1 ? 'disabled' : 'add_preassignment' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
+                                        <button type="button" class="btn btn-danger text-uppercase btn_operations {{ auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 ? 'disabled' : 'add_preassignment' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
                                     @endif
                                 </td>
                                 <td class="text-center">
@@ -343,7 +343,7 @@
                                 <td class="text-center">{{ auth()->user()->setTo($value, "name") }}</td>
                                 <td class="text-center">{{ $value->site_name }}</td>
                                 <td class="text-center" data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}" data-name="{{ auth()->user()->setOperationUnit($value) }}">
-                                    @if ( auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79) || $close_operation == 1 )
+                                    @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
                                         {{ auth()->user()->setOperationUnit($value) }}
                                     @else
                                         <select class="form-control vehicles selectpicker" data-live-search="true" id="vehicle_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
@@ -357,7 +357,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center" data-order="{{ ( $driver_d != NULL ) ? $driver_d : 0 }}" data-name="{{ auth()->user()->setOperationDriver($value) }}">
-                                    @if ( auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79) || $close_operation == 1 )
+                                    @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
                                         {{  auth()->user()->setOperationDriver($value) }}
                                     @else
                                         <select class="form-control drivers selectpicker" data-live-search="true" id="driver_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
@@ -371,7 +371,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if ( auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79) || $close_operation == 1 )
+                                    @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
                                         <?=auth()->user()->renderOperationStatus($value)?>
                                     @else
                                         <?=auth()->user()->renderOperationOptionsStatus($key,$value)?>
@@ -380,14 +380,14 @@
                                 <td class="text-center"><?=auth()->user()->setOperationTime($value)?></td>
                                 <td class="text-center"><?=auth()->user()->setOperatingCost($value)?></td>
                                 <td class="text-center">
-                                    @if ( auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79) || $close_operation == 1 )
-                                        <?=auth()->user()->renderServiceStatus($value)?>
+                                    @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
+                                        <?=auth()->user()->renderServiceStatusOP($value)?>
                                     @else
                                         <?=auth()->user()->renderServiceOptionsStatus($key,$value)?>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if (auth()->user()->hasPermission2(38))
+                                    @if (auth()->user()->hasPermission(38))
                                         <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
                                     @else
                                         {{ $value->code }}
@@ -395,11 +395,11 @@
                                 </td>
                                 <td class="text-center" style="{{ ( $value->service_type_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_type_name }}</td>
                                 <td class="text-center" <?=auth()->user()->classStatusPayment($value)?>>{{ auth()->user()->statusPayment($value->payment_status) }}</td>
-                                <td class="text-center" >{{ number_format(( $value->pay_at_arrival == 1 || ( $value->pay_at_arrival == 0 && $value->payment_status == "PENDING" ) ? $value->total_sales : 0 ),2) }}</td>
+                                <td class="text-center" >{{ number_format(( ( $value->pay_at_arrival == 1  && $value->payment_status == "PENDING" ) || ( $value->pay_at_arrival == 0 && $value->payment_status == "PENDING" ) ? $value->total_sales : 0 ),2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column gap-2">
-                                        <div class="btn btn-primary btn_operations {{ auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79) || $close_operation == 1 ? 'disabled' : '__open_modal_comment' }} bs-tooltip" title="{{ ( $flag_comment ) ? 'Modificar comentario' : 'Agregar comentario' }}" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-reservation="{{ $value->reservation_id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}">
+                                        <div class="btn btn-primary btn_operations {{ auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 ? 'disabled' : '__open_modal_comment' }} bs-tooltip" title="{{ ( $flag_comment ) ? 'Modificar comentario' : 'Agregar comentario' }}" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-reservation="{{ $value->reservation_id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                         </div>
                                         <div class="btn btn-primary btn_operations extract_whatsapp bs-tooltip" title="Ver información para enviar por whatsApp" id="extract_whatsapp{{ $key.$value->id }}" data-bs-toggle="modal" data-bs-target="#operationWhatsAppModal">

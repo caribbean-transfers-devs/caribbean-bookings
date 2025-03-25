@@ -8,7 +8,7 @@
 
         //DASHBOARD
             // DASHBOARD GERENCIA
-            if(auth()->user()->hasPermission2(42)):
+            if(auth()->user()->hasPermission(42)):
                 $links_dashboard[] = [
                     'name' => 'Dashboard de Gerencia',
                     'route' => route('dashboard'),
@@ -17,7 +17,7 @@
             endif;
 
             // DASHBOARD AGENTE DE CALL CENTER
-            if(auth()->user()->hasPermission2(113) && auth()->user()->is_commission == 1 ):
+            if(auth()->user()->hasPermission(113) && auth()->user()->is_commission == 1 ):
                 $links_dashboard[] = [
                     'name' => 'Dashboard Agente Call Center',
                     'route' => route('callcenters.index'),
@@ -35,7 +35,7 @@
             ]);
 
         //TPV
-        if(auth()->user()->hasPermission2(26)):
+        if(auth()->user()->hasPermission(26)):
             array_push($links,[
                 'type' => 'single',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>',
@@ -47,8 +47,8 @@
         endif;
 
         // FINANZAS
-        if(auth()->user()->hasPermission2(114)):
-            if(auth()->user()->hasPermission2(114)):
+        if(auth()->user()->hasPermission(114)):
+            if(auth()->user()->hasPermission(114)):
                 $links_finances[] = [
                     'name' => 'Reembolsos',
                     'route' => route('finances.refunds'),
@@ -67,57 +67,57 @@
         endif;
 
         //REPORTES
-        if(auth()->user()->hasPermission2(43) || auth()->user()->hasPermission2(45) || auth()->user()->hasPermission2(50) || auth()->user()->hasPermission2(71) || auth()->user()->hasPermission2(97) || auth()->user()->hasPermission2(98) || auth()->user()->hasPermission2(99) || auth()->user()->hasPermission2(101)):
-            if(auth()->user()->hasPermission2(43)):
+        if(auth()->user()->hasPermission(43) || auth()->user()->hasPermission(45) || auth()->user()->hasPermission(50) || auth()->user()->hasPermission(71) || auth()->user()->hasPermission(97) || auth()->user()->hasPermission(98) || auth()->user()->hasPermission(99) || auth()->user()->hasPermission(101)):
+            if(auth()->user()->hasPermission(43)):
                 $links_reports[] = [
                     'name' => 'Pagos',
                     'route' => route('reports.payments'),
                     'active' => request()->routeIs('reports.payments'),
                 ];
             endif;
-            if(auth()->user()->hasPermission2(50)):
+            if(auth()->user()->hasPermission(50)):
                 $links_reports[] = [
                     'name' => 'Efectivo',
                     'route' => route('reports.cash'),
                     'active' => request()->routeIs('reports.cash'),
                 ];
             endif;
-            if(auth()->user()->hasPermission2(71)):
+            if(auth()->user()->hasPermission(71)):
                 $links_reports[] = [
                     'name' => 'Cancelaciones',
                     'route' => route('reports.cancellations'),
                     'active' => request()->routeIs('reports.cancellations'),
                 ];
             endif;
-            if(auth()->user()->hasPermission2(45)):
+            if(auth()->user()->hasPermission(45)):
                 $links_reports[] = [
                     'name' => 'Comisiones',
                     'route' => route('reports.commissions'),
                     'active' => request()->routeIs('reports.commissions'),
                 ];
             endif;            
-            if(auth()->user()->hasPermission2(98)):
+            if(auth()->user()->hasPermission(98)):
                 $links_reports[] = [
                     'name' => 'Ventas',
                     'route' => route('reports.sales'),
                     'active' => request()->routeIs('reports.sales','reports.sales.action'),
                 ];
             endif;
-            if(auth()->user()->hasPermission2(97)):
+            if(auth()->user()->hasPermission(97)):
                 $links_reports[] = [
                     'name' => 'Operaciones',
                     'route' => route('reports.operations'),
                     'active' => request()->routeIs('reports.operations'),
                 ];
             endif;
-            // if(auth()->user()->hasPermission2(99)):
+            // if(auth()->user()->hasPermission(99)):
             //     $links_reports[] = [
             //         'name' => 'Conciliacion',
             //         'route' => route('reports.conciliation'),
             //         'active' => request()->routeIs('reports.conciliation','reports.conciliation.action'),
             //     ];
             // endif;
-            // if(auth()->user()->hasPermission2(101)):
+            // if(auth()->user()->hasPermission(101)):
             //     $links_reports[] = [
             //         'name' => 'Cuentas por Cobrar',
             //         'route' => route('reports.receivable'),
@@ -136,9 +136,9 @@
         endif;
 
         //GESTION
-        if(auth()->user()->hasPermission2(39) || auth()->user()->hasPermission2(47) || auth()->user()->hasPermission2(10) || auth()->user()->hasPermission2(76) || auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79) ):
+        if(auth()->user()->hasPermission(39) || auth()->user()->hasPermission(47) || auth()->user()->hasPermission(10) || auth()->user()->hasPermission(76) || auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) ):
             // CONFIRMACIONES
-            if(auth()->user()->hasPermission2(39)):
+            if(auth()->user()->hasPermission(39)):
                 $links_operations[] = [
                     'name' => 'Confirmaciones',
                     'route' => route('management.confirmations'),
@@ -146,7 +146,7 @@
                 ];
             endif;
             // POST VENTA
-            if(auth()->user()->hasPermission2(47)):
+            if(auth()->user()->hasPermission(47)):
                 $links_operations[] = [
                     'name' => 'Post venta',
                     'route' => route('management.after.sales'),
@@ -154,7 +154,7 @@
                 ];
             endif;
             // RESERVACIONES
-            if(auth()->user()->hasPermission2(10)):
+            if(auth()->user()->hasPermission(10)):
                 $links_operations[] = [
                     'name' => 'Reservaciones',
                     'route' => route('management.reservations'),
@@ -162,7 +162,7 @@
                 ];
             endif;
             // OPERACIONES
-            if(auth()->user()->hasPermission2(76) || auth()->user()->hasPermission2(78) || auth()->user()->hasPermission2(79)):
+            if(auth()->user()->hasPermission(76) || auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79)):
                 $links_operations[] = [
                     'name' => 'Operaciones',
                     'route' => route('operation.index'),
@@ -181,9 +181,9 @@
         endif;        
 
         //CONFIGURACIONES
-        if(auth()->user()->hasPermission2(6) || auth()->user()->hasPermission2(1) || auth()->user()->hasPermission2(73) || auth()->user()->hasPermission2(74) || auth()->user()->hasPermission2(75) || auth()->user()->hasPermission2(28) || auth()->user()->hasPermission2(32) || auth()->user()->hasPermission2(102) || auth()->user()->hasPermission2(103) || auth()->user()->hasPermission2(104) || auth()->user()->hasPermission2(108)):
+        if(auth()->user()->hasPermission(6) || auth()->user()->hasPermission(1) || auth()->user()->hasPermission(73) || auth()->user()->hasPermission(74) || auth()->user()->hasPermission(75) || auth()->user()->hasPermission(28) || auth()->user()->hasPermission(32) || auth()->user()->hasPermission(102) || auth()->user()->hasPermission(103) || auth()->user()->hasPermission(104) || auth()->user()->hasPermission(108)):
             //ROLES
-            if(auth()->user()->hasPermission2(6)):
+            if(auth()->user()->hasPermission(6)):
                 $links_settings[] = [
                     'name' => 'Roles',
                     'route' => route('roles.index'),
@@ -191,7 +191,7 @@
                 ];
             endif;
             //USUARIOS
-            if(auth()->user()->hasPermission2(1)):
+            if(auth()->user()->hasPermission(1)):
                 $links_settings[] = [
                     'name' => 'Usuarios',
                     'route' => route('users.index'),
@@ -199,7 +199,7 @@
                 ];
             endif;
             //EMPRESAS
-            if(auth()->user()->hasPermission2(73)):
+            if(auth()->user()->hasPermission(73)):
                 $links_settings[] = [
                     'name' => 'Empresas',
                     'route' => route('enterprises.index'),
@@ -207,7 +207,7 @@
                 ];
             endif;
             //SITIOS
-            if(auth()->user()->hasPermission2(102)):
+            if(auth()->user()->hasPermission(102)):
                 $links_settings[] = [
                     'name' => 'Sitios',
                     'route' => route('sites.index'),
@@ -215,7 +215,7 @@
                 ];
             endif;
             //VEHÍCULOS
-            if(auth()->user()->hasPermission2(74)):
+            if(auth()->user()->hasPermission(74)):
                 $links_settings[] = [
                     'name' => 'Vehiculos',
                     'route' => route('vehicles.index'),
@@ -223,14 +223,14 @@
                 ];
             endif;
             //CONDUCTORES
-            if(auth()->user()->hasPermission2(75)):
+            if(auth()->user()->hasPermission(75)):
                 $links_settings[] = [
                     'name' => 'Conductores',
                     'route' => route('drivers.index'),
                     'active' => request()->routeIs('drivers.*'),
                 ];
             endif;
-            // if(auth()->user()->hasPermission2(75)):
+            // if(auth()->user()->hasPermission(75)):
                 $links_settings[] = [
                     'name' => 'Horarios',
                     'route' => route('schedules.index'),
@@ -238,7 +238,7 @@
                 ];
             // endif;
             //ZONAS
-            if(auth()->user()->hasPermission2(28)):
+            if(auth()->user()->hasPermission(28)):
                 $links_settings[] = [
                     'name' => 'Zonas',
                     'route' => route('config.zones'),
@@ -246,7 +246,7 @@
                 ];
             endif;
             //TARIFAS
-            if(auth()->user()->hasPermission2(32)):
+            if(auth()->user()->hasPermission(32)):
                 $links_settings[] = [
                     'name' => 'Tarifas de paginas web',
                     'route' => route('config.ratesDestination'),
@@ -254,7 +254,7 @@
                 ];
             endif;
             //TARIFAS PARA EMPRESAS
-            if(auth()->user()->hasPermission2(104)):
+            if(auth()->user()->hasPermission(104)):
                 $links_settings[] = [
                     'name' => 'Tarifas de empresas',
                     'route' => route('config.ratesEnterprise'),
@@ -262,7 +262,7 @@
                 ];
             endif;
             //TIPO DE CAMBIO PARA REPORTES
-            if(auth()->user()->hasPermission2(103)):
+            if(auth()->user()->hasPermission(103)):
                 $links_settings[] = [
                     'name' => 'Tipos de cambio reportes',
                     'route' => route('exchanges.index'),
@@ -270,7 +270,7 @@
                 ];
             endif;            
             //TIPOS DE CANCELACIONES
-            if(auth()->user()->hasPermission2(108)):
+            if(auth()->user()->hasPermission(108)):
                 $links_settings[] = [
                     'name' => 'Tipos de cancelaciónes',
                     'route' => route('config.types-cancellations.index'),

@@ -29,7 +29,7 @@ class RatesEnterpriseController extends Controller
     }
 
     public function index(Request $request){
-        if(!RoleTrait::hasPermission(103)){
+        if(!$this->hasPermission(103)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $this->RatesEnterpriseRepository->index($request);
@@ -40,28 +40,28 @@ class RatesEnterpriseController extends Controller
     }
 
     public function getRates(RatesEnterpriseRequest $request){
-        if(!RoleTrait::hasPermission(103)){
+        if(!$this->hasPermission(103)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $this->RatesEnterpriseRepository->getRates($request);
     }
 
     public function newRates(RatesEnterpriseNewRequest $request){
-        if(!RoleTrait::hasPermission(105)){
+        if(!$this->hasPermission(105)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $this->RatesEnterpriseRepository->newRates($request);
     }
 
     public function deleteRates(RatesEnterpriseDeleteRequest $request){
-        if(!RoleTrait::hasPermission(107)){
+        if(!$this->hasPermission(107)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $this->RatesEnterpriseRepository->deleteRates($request);
     }
 
     public function updateRates(RatesEnterpriseUpdateRequest $request){
-        if(!RoleTrait::hasPermission(106)){
+        if(!$this->hasPermission(106)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }    
         return $this->RatesEnterpriseRepository->updateRates($request);

@@ -226,16 +226,16 @@ class CallCenterResository
             // Recorremos para poder obtener el total de servicios pendientes y completados
             if( $operations ){
                 foreach ($operations as $operation) {
-                    $date_ = OperationTrait::setDateTime($operation, "date");
+                    $date_ = $this->setDateTime($operation, "date");
                     $total_sales = $operation->currency == "USD"
                     ? ($operation->cost * $data['exchange_commission'])
                     : $operation->cost;
 
-                    if( OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" ){
+                    if( $this->serviceStatus($operation, "no_translate") == "COMPLETED" ){
                         $data['total_services_operated'] += $total_sales;
                     }
 
-                    if( OperationTrait::serviceStatus($operation, "no_translate") == "PENDING" ){
+                    if( $this->serviceStatus($operation, "no_translate") == "PENDING" ){
                         $data['total_pending_services'] += $total_sales;
                     }
                 }
@@ -243,12 +243,12 @@ class CallCenterResository
 
             if( $operations_month ){
                 foreach ($operations_month as $operation_m) {
-                    $date_ = OperationTrait::setDateTime($operation_m, "date");
+                    $date_ = $this->setDateTime($operation_m, "date");
                     $total_sales = $operation_m->currency == "USD"
                     ? ($operation_m->cost * $data['exchange_commission'])
                     : $operation_m->cost;
 
-                    if( OperationTrait::serviceStatus($operation_m, "no_translate") == "COMPLETED" ){
+                    if( $this->serviceStatus($operation_m, "no_translate") == "COMPLETED" ){
                         $data['total_services_operated_month'] += $total_sales;
                     }
                 }
@@ -435,7 +435,7 @@ class CallCenterResository
             // Recorremos para poder obtener el total de servicios pendientes y completados
             if( $operations ){
                 foreach ($operations as $operation) {
-                    $date_ = OperationTrait::setDateTime($operation, "date");
+                    $date_ = $this->setDateTime($operation, "date");
                     $total_sales = $operation->currency == "USD"
                     ? ($operation->cost * $exchange_commission)
                     : $operation->cost;
@@ -445,10 +445,10 @@ class CallCenterResository
                         $data[$date_][$operation->currency] += round($operation->cost,2);
                         $data[$date_]['QUANTITY'] ++;
 
-                        $data[$date_][OperationTrait::serviceStatus($operation, "no_translate")]['TOTAL'] += round($total_sales,2);
-                        $data[$date_][OperationTrait::serviceStatus($operation, "no_translate")][$operation->currency] += round($operation->cost,2);
-                        $data[$date_][OperationTrait::serviceStatus($operation, "no_translate")]['QUANTITY'] ++;
-                        $data[$date_][OperationTrait::serviceStatus($operation, "no_translate")]['BOOKINGS'][] = $operation;
+                        $data[$date_][$this->serviceStatus($operation, "no_translate")]['TOTAL'] += round($total_sales,2);
+                        $data[$date_][$this->serviceStatus($operation, "no_translate")][$operation->currency] += round($operation->cost,2);
+                        $data[$date_][$this->serviceStatus($operation, "no_translate")]['QUANTITY'] ++;
+                        $data[$date_][$this->serviceStatus($operation, "no_translate")]['BOOKINGS'][] = $operation;
                     }
                 }
             }

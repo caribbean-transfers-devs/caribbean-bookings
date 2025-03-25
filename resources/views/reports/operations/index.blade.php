@@ -634,7 +634,7 @@
                                     <td class="text-center">{{ $operation->reservation_id }}</td>
                                     <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
-                                        @if (auth()->user()->hasPermission2(38))
+                                        @if (auth()->user()->hasPermission(38))
                                             <a href="/reservations/detail/{{ $operation->reservation_id }}"><p class="mb-1">{{ $operation->code }}</p></a>
                                         @else
                                             <p class="mb-1">{{ $operation->code }}</p>

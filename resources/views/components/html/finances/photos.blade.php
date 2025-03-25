@@ -20,7 +20,7 @@
             <div class="content-top">
                 <div class="btn_">
                     {{-- PERMITE ELIMINAR UNA IMAGEN --}}
-                    @if (RoleTrait::hasPermission(66))
+                    @if (auth()->user()->hasPermission(66))
                         <button class="btn btn-danger btn-sm deleteMedia" data-id="{{ $value->id }}" data-name="{{ $value->path }}">Eliminar</button>
                     @endif
                     {{-- LA CATEGORIA DE LA IMAGEN --}}

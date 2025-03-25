@@ -27,7 +27,7 @@ class DriverSchedulesController extends Controller
 
     public function index(Request $request)
     {
-        // if(!RoleTrait::hasPermission(108)){
+        // if(!$this->hasPermission(108)){
         //     abort(403, 'NO TIENE AUTORIZACIÓN.');
         // }
         return $this->DriverSchedulesRepository->index($request);
@@ -35,7 +35,7 @@ class DriverSchedulesController extends Controller
 
     public function create(Request $request)
     {
-        // if(!RoleTrait::hasPermission(109)){
+        // if(!$this->hasPermission(109)){
         //     abort(403, 'NO TIENE AUTORIZACIÓN.');
         // }
         return $this->DriverSchedulesRepository->create($request);
@@ -44,7 +44,7 @@ class DriverSchedulesController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
-        // if(!RoleTrait::hasPermission(109)){
+        // if(!$this->hasPermission(109)){
         //     abort(403, 'NO TIENE AUTORIZACIÓN.');
         // }
         return $this->DriverSchedulesRepository->store($request);
@@ -52,7 +52,7 @@ class DriverSchedulesController extends Controller
 
     public function edit(Request $request, DriverSchedule $schedule)
     {
-        // if(!RoleTrait::hasPermission(110)){
+        // if(!$this->hasPermission(110)){
         //     abort(403, 'NO TIENE AUTORIZACIÓN.');
         // }
         return $this->DriverSchedulesRepository->edit($request, $schedule);
@@ -60,7 +60,7 @@ class DriverSchedulesController extends Controller
 
     public function update(Request $request, DriverSchedule $schedule)
     {
-        // if(!RoleTrait::hasPermission(110)){
+        // if(!$this->hasPermission(110)){
         //     abort(403, 'NO TIENE AUTORIZACIÓN.');
         // }
         return $this->DriverSchedulesRepository->update($request, $schedule);
@@ -68,7 +68,7 @@ class DriverSchedulesController extends Controller
 
     public function destroy(Request $request, DriverSchedule $schedule)
     {
-        // if(!RoleTrait::hasPermission(111)){
+        // if(!$this->hasPermission(111)){
         //     abort(403, 'NO TIENE AUTORIZACIÓN.');
         // }
         return $this->DriverSchedulesRepository->destroy($request, $schedule);

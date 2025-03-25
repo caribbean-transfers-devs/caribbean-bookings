@@ -1,5 +1,4 @@
 @php
-    use App\Traits\RoleTrait;
     $resume = [];
 @endphp
 @extends('layout.app')
@@ -124,7 +123,7 @@
                                     <td class="text-center">{{ $value->final_service_type }}</td>
                                     <td class="text-center"><span class="badge badge-light-{{ $label }} mb-2 me-4">{{ $operation_status }}</span></td>
                                     <td class="text-center">
-                                        @if (RoleTrait::hasPermission(38))
+                                        @if (auth()->user()->hasPermission(38))
                                             <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
                                         @else
                                             {{ $value->code }}

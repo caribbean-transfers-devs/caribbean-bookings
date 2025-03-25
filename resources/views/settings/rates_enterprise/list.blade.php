@@ -1,10 +1,6 @@
-@php
-    use App\Traits\RoleTrait;
-@endphp
-
 @if(sizeof($rates) >= 1)
     <form id="editPriceForm">
-        @if (RoleTrait::hasPermission(106))
+        @if (auth()->user()->hasPermission(106))
             <button type="button" class="btn btn-success btnUpdateRates">Actualizar Tarifas</button>
         @endif
         @foreach($rates as $key => $value)
@@ -32,7 +28,7 @@
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][operating_cost]" value="{{ $value->operating_cost }}">
                             </div>
                         </div>
-                        @if (RoleTrait::hasPermission(107))
+                        @if (auth()->user()->hasPermission(107))
                             <button class="btn btn-sm btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
                         @endif
                     </div>
@@ -70,7 +66,7 @@
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][operating_cost]" value="{{ $value->operating_cost }}">
                             </div>
                         </div>
-                        @if (RoleTrait::hasPermission(107))
+                        @if (auth()->user()->hasPermission(107))
                             <button class="btn btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
                         @endif
                     </div>
@@ -78,7 +74,7 @@
                 
             </div>
         @endforeach
-        @if (RoleTrait::hasPermission(106))
+        @if (auth()->user()->hasPermission(106))
             <button type="button" class="btn btn-success btnUpdateRates">Actualizar Tarifas</button>
         @endif
     </form>
@@ -114,7 +110,7 @@
                         <input type="text" class="form-control" value="0.00" name="operating_cost">
                     </div>
                 </div>
-                @if (RoleTrait::hasPermission(105))
+                @if (auth()->user()->hasPermission(105))
                     <button class="btn btn-sm btn-success" type="button" id="btn_add_rate">Agregar Tarifa</button>
                 @endif
             </div>
@@ -152,7 +148,7 @@
                         <input type="text" class="form-control" value="0.00" name="operating_cost">
                     </div>
                 </div>
-                @if (RoleTrait::hasPermission(105))
+                @if (auth()->user()->hasPermission(105))
                     <button class="btn btn-sm btn-success" type="button" id="btn_add_rate">Agregar Tarifa</button>
                 @endif
             </div>

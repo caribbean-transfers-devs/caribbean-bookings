@@ -17,8 +17,10 @@ use App\Traits\RoleTrait;
 
 class ReservationsController extends Controller
 {
+    use RoleTrait;
+    
     public function detail(Request $request, DetailRepository $detailRepository, $id){
-        if(RoleTrait::hasPermission(10) || RoleTrait::hasPermission(61)){
+        if($this->hasPermission(10) || $this->hasPermission(61)){
             return $detailRepository->detail($request,$id);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
@@ -31,51 +33,51 @@ class ReservationsController extends Controller
     }
 
     public function update(ReservationDetailsRequest $request, ReservationsRepository $reservationRepository, Reservation $reservation){
-        if(RoleTrait::hasPermission(11)){
+        if($this->hasPermission(11)){
             return $reservationRepository->update($request,$reservation);
         }
     }
 
     public function destroy(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
-        if(RoleTrait::hasPermission(24)){
+        if($this->hasPermission(24)){
             return $reservationRepository->destroy($request,$reservation);
         }
     }
 
     public function duplicated(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
-        if(RoleTrait::hasPermission(24)){
+        if($this->hasPermission(24)){
             return $reservationRepository->duplicated($request,$reservation);
         }
     }
 
     public function removeCommission(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
     {
-        if(RoleTrait::hasPermission(24)){
+        if($this->hasPermission(24)){
             return $reservationRepository->removeCommission($request,$reservation);
         }
     }
 
     public function openCredit(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
     {
-        if(RoleTrait::hasPermission(72)){
+        if($this->hasPermission(72)){
             return $reservationRepository->openCredit($request,$reservation);
         }
     }
 
     public function enablePlusService(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
-        if(RoleTrait::hasPermission(94)){
+        if($this->hasPermission(94)){
             return $reservationRepository->enablePlusService($request,$reservation);
         }
     }
 
     public function enable(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
-        if(RoleTrait::hasPermission(67)){
+        if($this->hasPermission(67)){
             return $reservationRepository->enableReservation($request,$reservation);
         }
     }
 
     public function followups(ReservationFollowUpsRequest $request, ReservationsRepository $reservationRepository){
-        if(RoleTrait::hasPermission(23)){
+        if($this->hasPermission(23)){
             return $reservationRepository->follow_ups($request);
         }
     }
@@ -85,7 +87,7 @@ class ReservationsController extends Controller
     }
 
     public function editreservitem(ReservationItemRequest $request, ReservationsRepository $reservationRepository, ReservationsItem $item){
-        if(RoleTrait::hasPermission(13)){
+        if($this->hasPermission(13)){
             return $reservationRepository->editreservitem($request,$item);
         }
     }
@@ -103,19 +105,19 @@ class ReservationsController extends Controller
     }
 
     public function uploadMedia(Request $request, UploadRepository $uploadRepository){
-        if(RoleTrait::hasPermission(64)){
+        if($this->hasPermission(64)){
             return $uploadRepository->add($request);
         }
     } 
 
     public function deleteMedia(Request $request, UploadRepository $uploadRepository){
-        if(RoleTrait::hasPermission(66)){
+        if($this->hasPermission(66)){
             return $uploadRepository->delete($request);
         }
     }
 
     public function getMedia(Request $request, DetailRepository $detailRepository){
-        if(RoleTrait::hasPermission(65)){
+        if($this->hasPermission(65)){
             return $detailRepository->getMedia($request);
         }
     }

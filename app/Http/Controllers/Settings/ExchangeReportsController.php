@@ -17,6 +17,7 @@ use App\Traits\RoleTrait;
 class ExchangeReportsController extends Controller
 {
     use RoleTrait;
+    
     private $ExchangeReportsRepository;
 
     public function __construct(ExchangeReportsRepository $ExchangeReportsRepository)
@@ -26,7 +27,7 @@ class ExchangeReportsController extends Controller
 
     public function index(Request $request)
     {
-        if(RoleTrait::hasPermission(103)){
+        if($this->hasPermission(103)){
             return $this->ExchangeReportsRepository->index($request);
         }
     }

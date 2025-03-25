@@ -63,6 +63,6 @@ class RoleController extends Controller
      */
     private function authorizeAction(int $permissionId)
     {
-        abort_unless($this->hasPermission2($permissionId), 403, 'NO TIENE AUTORIZACIÓN.');
+        abort_unless($this->hasPermission($permissionId), 403, 'NO TIENE AUTORIZACIÓN.');
     }    
 }

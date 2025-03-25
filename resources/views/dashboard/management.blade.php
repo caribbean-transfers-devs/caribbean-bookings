@@ -1,6 +1,3 @@
-@php
-    use App\Traits\RoleTrait;
-@endphp
 @extends('layout.app')
 @section('title') Dashboard @endsection
 
@@ -229,7 +226,7 @@
 
 @section('content')
     <div class="row layout-top-spacing">
-        @if (!RoleTrait::hasPermission(42))
+        @if (!auth()->user()->hasPermission(42))
             <div class="col-sm-12 col-xl-12">
                 <div class="alert alert-primary alert-dismissible" role="alert">                    
                     <div class="alert-message">
