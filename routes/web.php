@@ -73,37 +73,37 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-    Route::get('/qr/create/{type}/{id}/{language}', [TpvController2::class, 'createQr'])->name('qr.createQr');
-    Route::post('/tpv2/autocomplete', [APIAutocomplete::class,'index']);
-    Route::post('/tpv2/quote', [APIQuote::class,'index']);
-    Route::post('/tpv2/re-quote', [APIQuote::class,'checkout']);
+Route::get('/qr/create/{type}/{id}/{language}', [TpvController2::class, 'createQr'])->name('qr.createQr');
+Route::post('/tpv2/autocomplete', [APIAutocomplete::class,'index']);
+Route::post('/tpv2/quote', [APIQuote::class,'index']);
+Route::post('/tpv2/re-quote', [APIQuote::class,'checkout']);
 
-    //TPV AND BOOKING DETAILS
-    Route::middleware(['locale','ApiChecker'])->group(function () {
-        Route::get('/tpv2/book/{id}', [TpvController2::class, 'book'])->name('tpv.book');
-        Route::post('/tpv2/book/{id}/make', [TpvController2::class, 'create'])->name('tpv.create.en');
+//TPV AND BOOKING DETAILS
+Route::middleware(['locale','ApiChecker'])->group(function () {
+    Route::get('/tpv2/book/{id}', [TpvController2::class, 'book'])->name('tpv.book');
+    Route::post('/tpv2/book/{id}/make', [TpvController2::class, 'create'])->name('tpv.create.en');
 
-        Route::get('/thank-you', [TpvController2::class, 'success'])->name('process.success');
-        Route::get('/cancel', [TpvController2::class, 'cancel'])->name('process.cancel');
-        Route::get('/my-reservation-detail', [BookingsController::class, 'ReservationDetail'])->name('reservation.detail');
+    Route::get('/thank-you', [TpvController2::class, 'success'])->name('process.success');
+    Route::get('/cancel', [TpvController2::class, 'cancel'])->name('process.cancel');
+    Route::get('/my-reservation-detail', [BookingsController::class, 'ReservationDetail'])->name('reservation.detail');
 
-        Route::prefix('{locale}')->where(['locale' => '[a-zA-Z]{2}', 'ApiChecker'])->group(function () {
-            Route::get('/tpv2/book/{id}', [TpvController2::class, 'book'])->name('tpv.book.es');
-            Route::post('/tpv2/book/{id}/make', [TpvController2::class, 'create'])->name('tpv.create.es');
+    Route::prefix('{locale}')->where(['locale' => '[a-zA-Z]{2}', 'ApiChecker'])->group(function () {
+        Route::get('/tpv2/book/{id}', [TpvController2::class, 'book'])->name('tpv.book.es');
+        Route::post('/tpv2/book/{id}/make', [TpvController2::class, 'create'])->name('tpv.create.es');
 
-            Route::get('/thank-you', [TpvController2::class, 'success'])->name('process.success.es');
-            Route::get('/cancel', [TpvController2::class, 'cancel'])->name('process.cancel.es');
-            Route::get('/my-reservation-detail', [BookingsController::class, 'ReservationDetail'])->name('reservation.detail.es');
-        });
+        Route::get('/thank-you', [TpvController2::class, 'success'])->name('process.success.es');
+        Route::get('/cancel', [TpvController2::class, 'cancel'])->name('process.cancel.es');
+        Route::get('/my-reservation-detail', [BookingsController::class, 'ReservationDetail'])->name('reservation.detail.es');
     });
+});
 
-Route::middleware(['guest'])->group(function () {
+Route::middleware(['guest','Debug'])->group(function () {
     Route::get('login', [LoginController::class, 'index']);
     Route::post('login', [LoginController::class, 'check'])->name('login');
 });
 
 //Meter al middleware para protejer estas rutas...
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::post('/logout/other/{sessionId}', [LoginController::class, 'logoutOtherSession'])->name('logout.other');    
     Route::post('/logout/all', [LoginController::class, 'logoutAllSessions'])->name('logout.all');    
