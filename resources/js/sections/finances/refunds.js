@@ -112,7 +112,9 @@ const __code_pay = document.getElementById('payment_id');
 
 //ACCIONES
 const __formPayment = document.getElementById('frm_new_payment'); //FORMULARIO DEL PAGO
+const __formRefundNotApplicable = document.getElementById('formRefundNotApplicable'); //FORMULARIO DEL DECLINACION REEMBOLSO
 const __addPaymentRefund = document.getElementById('btn_new_payment'); //BOTON PARA PODER GUARDAR EL PAGO
+const __refundNotApplicable = document.getElementById('refundNotApplicable'); //BOTON PARA DECLINAR UN REEMBOLSO
 
 document.addEventListener("DOMContentLoaded", function() {
     components.titleModalFilter();
@@ -142,21 +144,26 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     document.addEventListener("click", debounce(function (event) {
-        if( event.target.classList.contains('__btn_redund') ){
+        if( event.target.classList.contains('__btn_refund') ){
             event.preventDefault();
-            const { reservation, refund } = event.target.dataset;
+            const { reservation, refund, type } = event.target.dataset;
 
-            $("#addPaymentsModal").modal('show');
-            const __loading_container = document.getElementById('loading_container');
-            const __form_container = document.getElementById('form_container');
+            if( type == "APPLY_REFUND" ){
+                $("#addPaymentsModal").modal('show');
+                const __loading_container = document.getElementById('loading_container');
+                const __form_container = document.getElementById('form_container');
+    
+                __loading_container.classList.remove('d-none');
+                __loading_container.innerHTML = '<div class="spinner-grow align-self-center">';
+    
+                setTimeout(() => {
+                    __loading_container.classList.add('d-none');
+                    __form_container.classList.remove('d-none');                
+                }, 500);
+            }else{
+                $("#refundNotApplicableModal").modal('show');
+            }
 
-            __loading_container.classList.remove('d-none');
-            __loading_container.innerHTML = '<div class="spinner-grow align-self-center">';
-
-            setTimeout(() => {
-                __loading_container.classList.add('d-none');
-                __form_container.classList.remove('d-none');                
-            }, 500);
             __reservation_id.value = reservation;
             __reservation_refund_id.value = refund;            
         }
@@ -248,4 +255,65 @@ document.addEventListener("DOMContentLoaded", function() {
             });       
         })
     }
+
+    if( __refundNotApplicable ){
+        __refundNotApplicable.addEventListener('click', function(event){
+            event.preventDefault();
+    
+            Swal.fire({
+                html: '¿Está seguro de declinar el reembolso a la reservación?',
+                icon: 'warning', 
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let __params = components.serialize(__formRefundNotApplicable,'object');
+                    
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se declina el reembolso de la reserva.",
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+    
+                    fetch('/action/refundNotApplicable', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },            
+                        body: JSON.stringify(__params)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if( data.status  == "success" ){                        
+                            $("#refundNotApplicableModal").modal('hide');
+                        }
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }
+            });       
+        })
+    }    
 })

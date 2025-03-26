@@ -164,7 +164,7 @@ class UserRepository
             $user->is_external = $request->is_external;
             $user->save();
 
-            $user->roles()->sync($request->roles);
+            $user->roles2()->sync($request->roles);
 
             DB::commit();
             return response()->json([
@@ -172,7 +172,7 @@ class UserRepository
                 'status' => 'success',
                 'message' => 'Usuario actualizado correctamente',
             ], Response::HTTP_OK);
-        } catch (\Throwable $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,

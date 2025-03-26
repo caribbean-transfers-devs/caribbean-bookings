@@ -758,8 +758,10 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
+                                            <th>SOLITADO</th>
                                             <th>Estatus</th>
                                             <th>Descripción</th>
+                                            <th>Respuesta</th>
                                             <th class="text-center">Fecha de solicitud</th>
                                             <th class="text-center">Fecha de aplicación</th>
                                             <th class="text-center">comprobante de reembolso</th>
@@ -768,19 +770,33 @@
                                     <tbody>
                                         @foreach ($reservation->refunds as $refund)
                                             <tr>
+                                                <td>{{ $refund->user->name }}</td>
                                                 <td>
                                                     <button class="btn btn-{{ auth()->user()->classStatusRefund($refund->status) }} btn-sm">{{ auth()->user()->statusRefund($refund->status) }}</button>
                                                 </td>
                                                 <td>{{ $refund->message_refund }}</td>
+                                                <td>{{ $refund->response_message != NULL ? $refund->response_message : 'NO DEFINIDA' }}</td>
                                                 <td class="text-center">{{ date("Y-m-d", strtotime($refund->created_at)) }}</td>
                                                 <td class="text-center">
-                                                    @if ( $refund->end_at != null )
-                                                        {{ date("Y-m-d", strtotime($refund->end_at)) }}        
+                                                    @if ( $refund->status == "REFUND_NOT_APPLICABLE" )
+                                                        {{ 'NO APLICA' }}
+                                                    @else
+                                                        @if ( $refund->end_at != null )
+                                                            {{ date("Y-m-d", strtotime($refund->end_at)) }}
+                                                        @else
+                                                            {{ 'NO DEFINIDO' }}
+                                                        @endif                                                    
                                                     @endif
                                                 </td>
                                                 <td class="text-center">
-                                                    @if ( $refund->link_refund != null )
-                                                        <a href="{{ $refund->link_refund }}" target="_black">click para ver</a>
+                                                    @if ( $refund->status == "REFUND_NOT_APPLICABLE" )
+                                                        {{ 'NO APLICA' }}
+                                                    @else
+                                                        @if ( $refund->link_refund != null )
+                                                            <a href="{{ $refund->link_refund }}" target="_black">click para ver</a>
+                                                        @else
+                                                            {{ 'NO DEFINIDO' }}
+                                                        @endif                                                    
                                                     @endif
                                                 </td>
                                             </tr>

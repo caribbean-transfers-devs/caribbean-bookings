@@ -16,5 +16,10 @@ class ReservationsRefund extends Model
         'status',
         'end_at',
         'link_refund',
-    ];    
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }    
 }

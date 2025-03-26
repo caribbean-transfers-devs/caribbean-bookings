@@ -90,15 +90,15 @@
                     <thead>
                         <tr>
                             <th class="text-center">ESTATUS DE REEMBOLSO</th>
+                            <th class="text-center">ACCIONES</th>
                             <th class="text-center">MENSAJE DE REEMBOLSO</th>
-                            <th class="text-center">TIPO DE SERVICIO</th>
-                            <th class="text-center">CÓDIGO</th>
+                            <th class="text-center">MENSAJE DE RESPUESTA</th>
+                            <th class="text-center">TIPO DE SERVICIO</th>                            
                             <th class="text-center">FECHA DE RESERVACIÓN</th>
                             <th class="text-center">ESTATUS DE RESERVACIÓN</th>
                             <th class="text-center">FECHA DE SERVICIO</th>
                             <th class="text-center">ESTATUS DE SERVICIO(S)</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
-                            <th class="text-center">MONEDA</th>
                             <th class="text-center">MÉTODO DE PAGO</th>
                             <th class="text-center">INFORMACIÓN DE MÉTODO DE PAGO</th>
                         </tr>
@@ -108,35 +108,55 @@
                             @foreach ($bookings as $booking)
                                 <tr>
                                     <td class="text-center">
-                                        <button type="button" class="btn w-100 mb-2 btn-{{ auth()->user()->classStatusRefund($booking->status) }} {{ $booking->status == "REFUND_REQUESTED" ? 'danger __btn_redund' : 'success' }}" data-reservation="{{ $booking->reservation_id }}" data-refund="{{ $booking->id }}">{{ auth()->user()->statusRefund($booking->status) }}</button>
-                                        <button type="button" class="btn w-100 btn-primary __show_reservation" data-reservation="{{ $booking->reservation_id }}" data-bs-toggle="modal" data-bs-target="#viewProofsModal">VER EVIDENCIA</button>
+                                        <button type="button" class="btn w-100 mb-2 btn-{{ auth()->user()->classStatusRefund($booking->status) }} {{ $booking->status == "REFUND_REQUESTED" ? 'danger' : 'success' }}">{{ auth()->user()->statusRefund($booking->status) }}</button>                                        
                                     </td>
-                                    <td class="text-center">{{ $booking->message_refund }}</td>
-                                    <td class="text-center"><span class="badge badge-{{ $booking->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $booking->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
                                         @php
                                             $codes_string = "";
                                             $codes = explode(",",$booking->reservation_codes);
                                             foreach ($codes as $key => $code) {
-                                                $codes_string .= '<p class="mb-1">'.$code.'</p>';
+                                                $codes_string .= '<p class="mb-1 text-white">'.$code.'</p>';
                                             }
                                         @endphp
                                         @if (auth()->user()->hasPermission(38))
-                                            <a href="/reservations/detail/{{ $booking->reservation_id }}"><?=$codes_string?></a>
+                                            <a class="btn btn-dark w-100 mb-2" href="/reservations/detail/{{ $booking->reservation_id }}" target="_black"><?=$codes_string?></a>
                                         @else
-                                            <?=$codes_string?>
+                                            <button type="button" class="btn btn-dark w-100 mb-2"><?=$codes_string?></button>
                                         @endif
-                                    </td>
+                                        @if ( $booking->status == "REFUND_REQUESTED" )
+                                            <button type="button" class="btn btn-success __btn_refund w-100 mb-2" data-reservation="{{ $booking->reservation_id }}" data-refund="{{ $booking->id }}" data-type="APPLY_REFUND">Aplicar reembolso</button>
+                                            <button type="button" class="btn btn-danger __btn_refund w-100 mb-2" data-reservation="{{ $booking->reservation_id }}" data-refund="{{ $booking->id }}" data-type="DECLINE_REFUND">Declinar reembolso</button>
+                                        @endif
+                                        <button type="button" class="btn btn-primary __show_reservation w-100" data-reservation="{{ $booking->reservation_id }}" data-bs-toggle="modal" data-bs-target="#viewProofsModal">VER EVIDENCIA</button>
+                                    </td>                                    
+                                    <td class="text-center">{{ $booking->message_refund }}</td>
+                                    <td class="text-center">{{ $booking->response_message }}</td>
+                                    <td class="text-center"><span class="badge badge-{{ $booking->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $booking->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">{{ date("Y-m-d", strtotime($booking->created_at)) }}</td>
                                     <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($booking->reservation_status) }}">{{ auth()->user()->statusBooking($booking->reservation_status) }}</button></td>
                                     <td class="text-center">
                                         @php
-                                            $pickup_from = explode(',',$booking->pickup_from);
-                                            $pickup_to = explode(',',$booking->pickup_to);
+                                            $pickupFrom = $booking->pickup_from ?? ''; // Asegurar que la variable exista
+                                            $pickupTo = $booking->pickup_to ?? ''; // Asegurar que la variable exista
+
+                                            // Verificar si hay una coma para dividir, de lo contrario, ponerlo en un array con un único valor
+                                            $pickupDatesFrom = strpos($pickupFrom, ',') !== false 
+                                                ? array_map('trim', explode(',', $pickupFrom)) 
+                                                : [$pickupFrom];
+
+                                            // Verificar si hay una coma para dividir, de lo contrario, ponerlo en un array con un único valor
+                                            $pickupDatesTo = strpos($pickupTo, ',') !== false 
+                                                ? array_map('trim', explode(',', $pickupTo)) 
+                                                : [$pickupTo];
+
+                                            // dump($pickupDatesFrom, $pickupDatesTo);
+                                            // $pickup_from = explode(',',$booking->pickup_from);                                            
+                                            // $pickup_to = explode(',',$booking->pickup_to);
+                                            // dump($booking->pickup_from);
                                         @endphp
-                                        [{{ date("Y-m-d", strtotime($pickup_from[0])) }}] <br>
+                                        [{{ date("Y-m-d", strtotime($pickupDatesFrom[0])) }}] <br>
                                         @if ( $booking->is_round_trip != 0 )
-                                            [{{ date("Y-m-d", strtotime($pickup_to[0])) }}]
+                                            [{{ date("Y-m-d", strtotime($pickupDatesTo[0])) }}]
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -145,8 +165,7 @@
                                             <?=auth()->user()->renderServiceStatus($booking->two_service_status)?>
                                         @endif
                                     </td>
-                                    <td class="text-center" <?=auth()->user()->classStatusPayment($booking)?>>{{ number_format(($booking->total_sales),2) }}</td>
-                                    <td class="text-center">{{ $booking->currency }}</td>
+                                    <td class="text-center" <?=auth()->user()->classStatusPayment($booking)?>>{{ number_format(($booking->total_sales),2) }} {{ $booking->currency }}</td>
                                     <td class="text-center">{{ $booking->payment_type_name }}</td>
                                     <td class="text-center">
                                         @if ( !empty($booking->payment_details) )
@@ -165,5 +184,6 @@
     <x-modals.filters.bookings :data="$data" :isSearch="1" />
     <x-modals.reports.columns />
     <x-modals.finances.proofs />
+    <x-modals.finances.refund_not_applicable />
     <x-modals.new_payment_conciliation />
 @endsection

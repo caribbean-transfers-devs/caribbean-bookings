@@ -7,10 +7,14 @@ use Illuminate\Support\Facades\DB;
 
 trait QueryTrait
 {
+    /**
+     * UTILIZADO EN SECCION DE FINANZAS
+     */
     public function queryRefunds($query, $query2, $queryData){
         $bookings = DB::select("SELECT 
                                     refund.id,
                                     refund.message_refund,
+                                    refund.response_message,
                                     refund.status,
                                     refund.end_at,
                                     refund.link_refund,
@@ -98,7 +102,7 @@ trait QueryTrait
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id, 
-                                            ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+                                            ROUND(COALESCE(SUM(total), 0), 2) as total_sales
                                         FROM sales
                                             WHERE deleted_at IS NULL 
                                         GROUP BY reservation_id

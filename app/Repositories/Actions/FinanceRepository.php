@@ -19,159 +19,10 @@ use App\Models\Payment;
 
 //TRAITS
 use App\Traits\FollowUpTrait;
-use App\Traits\PayPalTrait;
 
 class FinanceRepository
 {
     use FollowUpTrait;
-
-    public function getBasicInformationReservation($request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [            
-                'id' => 'required',            
-            ]);
-    
-            if ($validator->fails()) {
-                return response()->json([
-                    'errors' => [
-                        'code' => 'REQUIRED_PARAMS',
-                        'message' =>  $validator->errors()->all()
-                    ],
-                    "message" => $validator->errors()->all(),
-                ], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-    
-            $reservation = $this->getReservation($request->id);
-            // dd($reservation->toArray());
-
-            // Si la reserva no existe, se retorna vacío
-            if (!$reservation) {
-                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.basic-information', ["reservation" => null]);
-            }
-            
-            // Retornar la vista
-            return view('components.html.finances.basic-information', ["reservation" => $reservation]);
-        } catch (Exception $e) {
-            // Log del error para depuración
-            Log::error("Error en getBasicInformationReservation: " . $e->getMessage());
-
-            // Retorno de error dependiendo del tipo de solicitud
-            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.basic-information', ["reservation" => null]);            
-        }
-    }
-
-    /**
-     * NOS AYUDA A OBTENER LOS LOG DE LA RESERVACIÓN
-     * @param request :la información recibida en la solicitud
-    */
-    public function getPhotosReservation($request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'id' => 'required',            
-            ]);
-    
-            if ($validator->fails()) {
-                return response()->json([
-                    'errors' => [
-                        'code' => 'REQUIRED_PARAMS',
-                        'message' =>  $validator->errors()->all()
-                    ],
-                    "message" => $validator->errors()->all(),
-                ], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-    
-            $reservation = $this->getReservation($request->id);
-            // dd($reservation->photos->toArray());
-
-            // Si la reserva no existe, se retorna vacío
-            if (!$reservation) {
-                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.photos', ["photos" => null]);
-            }
-            
-            // Retornar la vista
-            return view('components.html.finances.photos', ["photos" => $reservation->photos]);
-        } catch (Exception $e) {
-            // Log del error para depuración
-            Log::error("Error en getPhotosReservation: " . $e->getMessage());
-
-            // Retorno de error dependiendo del tipo de solicitud
-            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.photos', ["photos" => null]);
-        }
-    }
-
-    public function getHistoryReservation($request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'id' => 'required',            
-            ]);
-    
-            if ($validator->fails()) {
-                return response()->json([
-                    'errors' => [
-                        'code' => 'REQUIRED_PARAMS',
-                        'message' =>  $validator->errors()->all()
-                    ],
-                    "message" => $validator->errors()->all(),
-                ], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-    
-            $reservation = $this->getReservation($request->id);
-            // dd($reservation->followUps->toArray());
-
-            // Si la reserva no existe, se retorna vacío
-            if (!$reservation) {
-                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.history', ["followUps" => null]);
-            }
-            
-            // Retornar la vista
-            return view('components.html.finances.history', ["followUps" => $reservation->followUps]);
-        } catch (Exception $e) {
-            // Log del error para depuración
-            Log::error("Error en getHistoryReservation: " . $e->getMessage());
-
-            // Retorno de error dependiendo del tipo de solicitud
-            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.history', ["followUps" => null]);
-        }
-    }
-
-    public function getPaymentsReservation($request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'id' => 'required',            
-            ]);
-    
-            if ($validator->fails()) {
-                return response()->json([
-                    'errors' => [
-                        'code' => 'REQUIRED_PARAMS',
-                        'message' =>  $validator->errors()->all()
-                    ],
-                    "message" => $validator->errors()->all(),
-                ], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-    
-            $reservation = $this->getReservation($request->id);
-            // dd($reservation->followUps->toArray());
-
-            // Si la reserva no existe, se retorna vacío
-            if (!$reservation) {
-                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.payments', ["payments" => null]);
-            }
-            
-            // Retornar la vista
-            return view('components.html.finances.payments', ["payments" => $reservation->payments]);
-        } catch (Exception $e) {
-            // Log del error para depuración
-            Log::error("Error en getPaymentsReservation: " . $e->getMessage());
-
-            // Retorno de error dependiendo del tipo de solicitud
-            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.payments', ["payments" => null]);
-        }
-    }
 
     /**
      * NOS AYUDA A PODER AGREGAR UN PAGO TIPO REEMBOLSO
@@ -258,9 +109,236 @@ class FinanceRepository
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
                 'status' => 'error',
                 'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+        /**
+     * NOS AYUDA A PODER AGREGAR UN PAGO TIPO REEMBOLSO
+     * @param request :la información recibida en la solicitud
+    */
+    public function refundNotApplicable($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reservation_id' => 'required|integer',
+            'reservation_refund_id' => 'required|integer',
+            'response_message' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        $refund = ReservationsRefund::find($request->reservation_refund_id);
+
+        if (!$refund) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Reembolso no encontrado'
+                ],
+                'status' => 'error',
+                'message' => 'Reembolso no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        try {
+            DB::beginTransaction();
+            
+            $refund->response_message = $request->response_message;
+            $refund->status = 'REFUND_NOT_APPLICABLE';
+
+            // Guardar el cambio y verificar que se guardó correctamente
+            if (!$refund->save()) {
+                DB::rollBack();
+                return response()->json([
+                    'errors' => [
+                        'code' => 'UPDATE_ERROR',
+                        'message' => 'Error al actualizar el reembolso'
+                    ],                    
+                    'status' => 'error',
+                    'message' => 'Error al actualizar el reembolso'
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo reembolso correctamente',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getBasicInformationReservation($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',            
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        try {
+            $reservation = $this->getReservation($request->id);
+
+            // Si la reserva no existe, se retorna vacío
+            if (!$reservation) {
+                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.basic-information', ["reservation" => null]);
+            }
+            
+            // Retornar la vista
+            return view('components.html.finances.basic-information', ["reservation" => $reservation]);
+        } catch (Exception $e) {
+            // Log del error para depuración
+            Log::error("Error en getBasicInformationReservation: " . $e->getMessage());
+
+            // Retorno de error dependiendo del tipo de solicitud
+            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.basic-information', ["reservation" => null]);            
+        }
+    }
+
+    /**
+     * NOS AYUDA A OBTENER LOS LOG DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
+    public function getPhotosReservation($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',            
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {    
+            $reservation = $this->getReservation($request->id);
+            // dd($reservation->photos->toArray());
+
+            // Si la reserva no existe, se retorna vacío
+            if (!$reservation) {
+                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.photos', ["photos" => null]);
+            }
+            
+            // Retornar la vista
+            return view('components.html.finances.photos', ["photos" => $reservation->photos]);
+        } catch (Exception $e) {
+            // Log del error para depuración
+            Log::error("Error en getPhotosReservation: " . $e->getMessage());
+
+            // Retorno de error dependiendo del tipo de solicitud
+            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.photos', ["photos" => null]);
+        }
+    }
+
+    public function getHistoryReservation($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',            
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {    
+            $reservation = $this->getReservation($request->id);
+
+            // Si la reserva no existe, se retorna vacío
+            if (!$reservation) {
+                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.history', ["followUps" => null]);
+            }
+            
+            // Retornar la vista
+            return view('components.html.finances.history', ["followUps" => $reservation->followUps]);
+        } catch (Exception $e) {
+            // Log del error para depuración
+            Log::error("Error en getHistoryReservation: " . $e->getMessage());
+
+            // Retorno de error dependiendo del tipo de solicitud
+            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.history', ["followUps" => null]);
+        }
+    }
+
+    public function getPaymentsReservation($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',            
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            $reservation = $this->getReservation($request->id);
+            // dd($reservation->followUps->toArray());
+
+            // Si la reserva no existe, se retorna vacío
+            if (!$reservation) {
+                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.payments', ["payments" => null]);
+            }
+            
+            // Retornar la vista
+            return view('components.html.finances.payments', ["payments" => $reservation->payments]);
+        } catch (Exception $e) {
+            // Log del error para depuración
+            Log::error("Error en getPaymentsReservation: " . $e->getMessage());
+
+            // Retorno de error dependiendo del tipo de solicitud
+            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.payments', ["payments" => null]);
         }
     }
 

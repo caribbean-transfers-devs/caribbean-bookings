@@ -143,7 +143,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS                
         Route::match(['get', 'post'], '/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS
 
-    //REPORTES        
+    //REPORTES
         Route::match(['get', 'post'], '/reports/payments', [PAYMENTS::class, 'index'])->name('reports.payments'); //PAGOS
         // Route::match(['post'], '/payments/conciliation', [PAYMENTS::class, 'conciliation'])->name('payments.conciliation');
         Route::match(['get', 'post'], '/reports/cash', [CASH::class, 'index'])->name('reports.cash'); //EFECTIVO
@@ -284,19 +284,18 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::resource('/payments',PaymentsController::class);
 
     //ACCIONES UTILIZADAS EN FINANZAS
+    Route::post('/action/addPaymentRefund', [FINANCE::class, 'addPaymentRefund'])->name('add.payment.refund');
+    Route::post('/action/refundNotApplicable', [FINANCE::class, 'refundNotApplicable'])->name('add.not.applicable.refund');
     Route::match(['get', 'post'], '/action/getBasicInformationReservation', [FINANCE::class, 'getBasicInformationReservation'])->name('get.basic-information.reservation');
     Route::match(['get', 'post'], '/action/getPhotosReservation', [FINANCE::class, 'getPhotosReservation'])->name('get.photos.reservation');
     Route::match(['get', 'post'], '/action/getHistoryReservation', [FINANCE::class, 'getHistoryReservation'])->name('get.history.reservation');
-    Route::match(['get', 'post'], '/action/getPaymentsReservation', [FINANCE::class, 'getPaymentsReservation'])->name('get.payments.reservation');
-    Route::post('/action/addPaymentRefund', [FINANCE::class, 'addPaymentRefund'])->name('add.payment.refund');
+    Route::match(['get', 'post'], '/action/getPaymentsReservation', [FINANCE::class, 'getPaymentsReservation'])->name('get.payments.reservation');    
 
     //ACCIONES GENERALES DE DETALLES DE RESERVA
     Route::post('/action/enablePayArrival', [ACTIONS_RESERVATION::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
     Route::post('/action/refundRequest', [ACTIONS_RESERVATION::class, 'refundRequest'])->name('update.booking.refund.request');
     Route::put('/action/updateServiceStatus', [ACTIONS_RESERVATION::class, 'updateServiceStatus'])->name('update.service.status');
-
     Route::post('/action/enabledLike', [ACTIONS_RESERVATION::class, 'enabledLike'])->name('update.booking.like');
-
     Route::post('/action/confirmService', [ACTIONS_RESERVATION::class, 'confirmService'])->name('update.service.confirm');
     Route::post('/action/updateServiceUnlock', [ACTIONS_RESERVATION::class, 'updateServiceUnlock'])->name('update.service.unlock');
 });

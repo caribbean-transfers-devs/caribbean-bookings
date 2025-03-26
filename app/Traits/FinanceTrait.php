@@ -13,6 +13,7 @@ trait FinanceTrait
     public function classStatusRefund($status = "REFUND_REQUESTED"){
         switch ($status) {
             case 'REFUND_MADE':
+            case 'REFUND_NOT_APPLICABLE':
                 return 'warning';
                 break;
             case 'REFUND_COMPLETED':
@@ -29,9 +30,12 @@ trait FinanceTrait
             case 'REFUND_MADE':
                 return 'REEMBOLSO EFECTUADO';
                 break;
+            case 'REFUND_NOT_APPLICABLE':
+                return 'REEMBOLSO DECLINADO';
+                break;
             case 'REFUND_COMPLETED':
                 return 'REEMBOLSO COMPLETO';
-                break;
+                break;                
             default:
                 return 'REEMBOLSO SOLICITADO';
                 break;

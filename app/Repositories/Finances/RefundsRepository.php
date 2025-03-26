@@ -4,7 +4,6 @@ namespace App\Repositories\Finances;
 
 use Exception;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 //MODELS
@@ -13,12 +12,11 @@ use Carbon\Carbon;
 use App\Traits\MethodsTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
-use App\Traits\PayPalTrait;
-use App\Traits\StripeTrait;
+use App\Traits\QueryTrait2;
 
 class RefundsRepository
 {
-    use MethodsTrait, QueryTrait, FiltersTrait;
+    use MethodsTrait, FiltersTrait, QueryTrait, QueryTrait2;
 
     public function index($request)
     {
@@ -146,6 +144,7 @@ class RefundsRepository
         }
 
         $bookings = $this->queryRefunds($query, $queryHaving, $queryData);
+        // dd($bookings);
 
         return view('finances.refunds.index', [
             'breadcrumbs' => [
