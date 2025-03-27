@@ -770,7 +770,7 @@
                                     <tbody>
                                         @foreach ($reservation->refunds as $refund)
                                             <tr>
-                                                <td>{{ $refund->user->name }}</td>
+                                                <td>{{ isset($refund->user->name) ? $refund->user->name : 'NO DEFINIDO' }}</td>
                                                 <td>
                                                     <button class="btn btn-{{ auth()->user()->classStatusRefund($refund->status) }} btn-sm">{{ auth()->user()->statusRefund($refund->status) }}</button>
                                                 </td>
