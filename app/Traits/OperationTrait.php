@@ -104,13 +104,17 @@ trait OperationTrait
     //SETEA LA FECHA O HORA, DEPENDIENDO DEL TIPE, DATE TIME
     public function setDateTime($service, $type = "")
     {
-        if ($type == "date") {
-            return date("Y-m-d", strtotime(( $service->operation_type == 'arrival' ? $service->pickup_from : $service->pickup_to )));
-        }else if ($type == "time"){
-            return date("H:i", strtotime(( $service->operation_type == 'arrival' ? $service->pickup_from : $service->pickup_to )));
-        }else{
-            return ( $service->operation_type == 'arrival' ? $service->pickup_from : $service->pickup_to );
+        $datetime = $service->operation_type == 'arrival' ? $service->pickup_from : $service->pickup_to;
+
+        if (!$datetime) {
+            return null;
         }
+        
+        return match ($type) {
+            "date" => date("Y-m-d", strtotime($datetime)),
+            "time" => date("H:i", strtotime($datetime)),
+            default => $datetime,
+        };
     }
 
     //
@@ -123,6 +127,19 @@ trait OperationTrait
         }else if( $action == "no_translate" ){
             return ( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status );
         }
+
+        // echo $service->op_type;
+
+        // $status = $service->op_type == "TYPE_ONE" 
+        // ? $service->one_service_status 
+        // : $service->two_service_status;
+
+        // return match ($action) {
+        //     "translate"      => self::statusBooking($status),
+        //     "translate_name" => self::statusBooking($service),
+        //     "no_translate"   => $status,
+        //     default          => null // Opcional: manejo de casos no esperados
+        // };
     }
 
     //AQUI NOS MUESTRA EL BOTON CON EL ESTATUS DEL SERVICIO, CUANDO SE CERRO LA OPERACIÓN
@@ -163,14 +180,11 @@ trait OperationTrait
 
     //MOSTRAMOS EL NOMBRE DEL VEHÍCULO, BASADO EN LA UNIDAD SELECCIONADA EN LA OPERACIÓN
     public function setOperationVehicle($service){
-        if( $service->op_type == "TYPE_ONE" && $service->vehicle_one_name != null ){
-            return $service->vehicle_name_one;
-        }else if( $service->op_type == "TYPE_TWO" && $service->vehicle_two_name != null ){
-            return $service->vehicle_name_two;
-        }else{
-            return "Unidad no seleccionada";
-        }        
-        //return ( $service->op_type == "TYPE_ONE" ? $service->vehicle_name_one : $service->vehicle_name_two );
+        return match ($service->op_type) {
+            "TYPE_ONE" => $service->vehicle_one_name ?? "Unidad no seleccionada",
+            "TYPE_TWO" => $service->vehicle_two_name ?? "Unidad no seleccionada",
+            default    => "Unidad no seleccionada"
+        };
     }
 
     public function setOperationDriver($service){
@@ -184,13 +198,13 @@ trait OperationTrait
     }
 
     public function setOperationTime($service){
-        if( $service->op_type == "TYPE_ONE" ){
-            return date("H:i", strtotime($service->op_one_time_operation));
-        }else if( $service->op_type == "TYPE_TWO" ){
-            return date("H:i", strtotime($service->op_two_time_operation));
-        }else{
-            return "";
+        $datetime = $service->op_type == 'TYPE_ONE' ? $service->op_one_time_operation : $service->op_two_time_operation;
+
+        if (!$datetime) {
+            return null;
         }
+        
+        return date("H:i", strtotime($datetime));
     }
 
     public function setOperatingCost($service){

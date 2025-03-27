@@ -14,6 +14,7 @@
     $cancellations = auth()->user()->CancellationTypes();
 
     $bookingsStatus = [
+        "type" => "BOOKING",
         "total" => 0,
         "gran_total" => 0,
         "USD" => [
@@ -30,7 +31,7 @@
         "data" => []
     ];
 
-    $dataMethodPayments = [
+    $dataMethodPayments = [        
         "total" => 0,
         "gran_total" => 0,
         "USD" => [
@@ -240,10 +241,10 @@
                             <th class="text-center">CORREO DEL CLIENTE</th>
                             <th class="text-center">VEHÍCULO</th>
                             <th class="text-center">PAX</th>
-                            <th class="text-center normal">ORIGEN</th>                            
-                            <th class="text-center normal">DESDE</th>
-                            <th class="text-center normal">DESTINO</th>
-                            <th class="text-center normal">HACIA</th>
+                            <th class="text-center">ORIGEN</th>                            
+                            <th class="text-center">DESDE</th>
+                            <th class="text-center">DESTINO</th>
+                            <th class="text-center">HACIA</th>
                             <th class="text-center">FECHA DE SERVICIO</th>
                             <th class="text-center">HORA DE SERVICIO</th>
                             <th class="text-center">ESTATUS DE SERVICIO(S)</th>
@@ -255,7 +256,6 @@
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">MÉTODO DE PAGO</th> 
                             <th class="text-center">INFORMACIÓN DE MÉTODO DE PAGO</th>
-                            <th class="text-center">PAGO AL LLEGAR</th>
                             <th class="text-center">FUE COTIZACIÓN</th>
                             <th class="text-center">CALIFICACIÓN</th>
                             <th class="text-center">COMISIÓNABLE</th>
@@ -300,6 +300,7 @@
                                     if (!isset( $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))] ) ){
                                         $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))] = [
                                             "name" => $item->payment_type_name,
+                                            "color" => auth()->user()->colorPaymentMethods($item->payment_type_name),
                                             "total" => 0,
                                             "gran_total" => 0,
                                             "USD" => [
@@ -329,7 +330,7 @@
                                     if (!isset( $dataCurrency['data'][$item->currency] ) ){
                                         $dataCurrency['data'][$item->currency] = [
                                             "name" => $item->currency,
-                                            "color" => ( $item->currency == "USD" ? "#4361ee" : "#2196f3" ),
+                                            "color" => ( $item->currency == "USD" ? "#27ae60" : "#f39c12" ),
                                             "total" => 0,
                                             "gran_total" => 0,
                                             "counter" => 0,
@@ -523,18 +524,28 @@
                                     <td class="text-center normal">{{ $item->to_name }}</td>
                                     <td class="text-center">
                                         @php
-                                            $pickup_from = explode(',',$item->pickup_from);
-                                            $pickup_to = explode(',',$item->pickup_to);
+                                            $pickupFrom = $item->pickup_from ?? ''; // Asegurar que la variable exista
+                                            $pickupTo = $item->pickup_to ?? ''; // Asegurar que la variable exista
+
+                                            // Verificar si hay una coma para dividir, de lo contrario, ponerlo en un array con un único valor
+                                            $pickupDatesFrom = strpos($pickupFrom, ',') !== false 
+                                                ? array_map('trim', explode(',', $pickupFrom)) 
+                                                : [$pickupFrom];
+
+                                            // Verificar si hay una coma para dividir, de lo contrario, ponerlo en un array con un único valor
+                                            $pickupDatesTo = strpos($pickupTo, ',') !== false 
+                                                ? array_map('trim', explode(',', $pickupTo)) 
+                                                : [$pickupTo];
                                         @endphp
-                                        [{{ date("Y-m-d", strtotime($pickup_from[0])) }}]
+                                        [{{ date("Y-m-d", strtotime($pickupDatesFrom[0])) }}] <br>
                                         @if ( $item->is_round_trip != 0 )
-                                            [{{ date("Y-m-d", strtotime($pickup_to[0])) }}]
+                                            [{{ date("Y-m-d", strtotime($pickupDatesTo[0])) }}]
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        [{{ date("H:i", strtotime($pickup_from[0])) }}] <br>
+                                        [{{ date("H:i", strtotime($pickupDatesFrom[0])) }}] <br>
                                         @if ( $item->is_round_trip != 0 )
-                                            [{{ date("H:i", strtotime($pickup_to[0])) }}]
+                                            [{{ date("H:i", strtotime($pickupDatesTo[0])) }}]
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -554,9 +565,6 @@
                                         @if ( !empty($item->payment_details) )
                                             [{{ $item->payment_details }}]
                                         @endif
-                                    </td>
-                                    <td class="text-center">
-                                        <button class="btn btn-{{ $item->pay_at_arrival == 1 ? 'success' : 'danger' }}" type="button">{{ $item->pay_at_arrival == 1 ? "SI" : "NO" }}</button>
                                     </td>
                                     <td class="text-center">
                                         @if ( $item->is_quotation == 0 && $item->was_is_quotation == 1 )

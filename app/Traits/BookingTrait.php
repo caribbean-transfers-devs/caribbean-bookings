@@ -8,6 +8,9 @@ trait BookingTrait
     public function classStatusBooking($status = "CONFIRMED", $section = "BOOKING")
     {
         switch ($status) {
+            case 'PAY_AT_ARRIVAL':
+                return 'success-regular';
+                break;
             case 'PENDING':
             case 'NOSHOW':
             case 'C':
@@ -42,6 +45,9 @@ trait BookingTrait
     public function colorStatusBooking($status = "CONFIRMED")
     {
         switch ($status) {
+            case 'PAY_AT_ARRIVAL':
+                return '#22c7d5';
+                break;            
             case 'PENDING':
                 return '#e2a03f';
                 break;
@@ -69,9 +75,12 @@ trait BookingTrait
     public function statusBooking($status = "CONFIRMED")
     {
         switch ($status) {
+            case 'PAY_AT_ARRIVAL':
+                return 'PAGO A LA LLEGADA';
+                break;
             case 'PENDING':
                 return 'PENDIENTE';
-                break;
+                break;                
             case 'CANCELLED':
                 return 'CANCELADO';
                 break;
@@ -155,5 +164,29 @@ trait BookingTrait
                 return 'PAGADO';
                 break;
         }
-    }    
+    }
+
+    public function colorPaymentMethods($method = "")
+    {
+        switch ($method) {
+            case 'CREDIT':
+                return '#3498db';
+                break;
+            case 'CASH':
+                return '#2ecc71';
+                break;
+            case 'SANTANDER':
+                return '#ec1c24';
+                break;
+            case 'STRIPE':
+                return '#6772e5';
+                break;
+            case 'PAYPAL':
+                return '#003087';
+                break;
+            default:
+                return '#ff6b00';
+                break;
+        }        
+    }
 }

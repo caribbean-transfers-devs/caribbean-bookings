@@ -19,6 +19,7 @@
     $cancellations = auth()->user()->CancellationTypes();
 
     $operationStatus = [
+        "type" => "OPERATION",
         "total" => 0,
         "gran_total" => 0,
         "USD" => [
@@ -312,7 +313,6 @@
                             <th class="text-center">PRECIO POR SERVICIO</th>
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">MÉTODO DE PAGO</th>
-                            <th class="text-center">PAGO AL LLEGAR</th>
                             <th class="text-center">COMISIÓNABLE</th> 
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                         </tr>
@@ -325,6 +325,7 @@
                                     if (!isset( $operationStatus['data'][auth()->user()->serviceStatus($operation,"no_translate")] ) ){
                                         $operationStatus['data'][auth()->user()->serviceStatus($operation,"no_translate")] = [
                                             "name" => auth()->user()->serviceStatus(auth()->user()->serviceStatus($operation,"no_translate"),"translate_name"),
+                                            "color" => auth()->user()->colorStatusBooking($operation->reservation_status),
                                             "total" => 0,
                                             "gran_total" => 0,
                                             "USD" => [
@@ -354,6 +355,7 @@
                                     if (!isset( $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))] ) ){
                                         $dataMethodPayments['data'][strtoupper(Str::slug($operation->payment_type_name))] = [
                                             "name" => $operation->payment_type_name,
+                                            "color" => auth()->user()->colorPaymentMethods($operation->payment_type_name),
                                             "total" => 0,
                                             "gran_total" => 0,
                                             "USD" => [
@@ -447,6 +449,7 @@
                                     if (!isset( $dataCurrency['data'][$operation->currency] ) ){
                                         $dataCurrency['data'][$operation->currency] = [
                                             "name" => $operation->currency,
+                                            "color" => ( $operation->currency == "USD" ? "#27ae60" : "#f39c12" ),
                                             "total" => 0,
                                             "gran_total" => 0,
                                             "counter" => 0,
@@ -540,6 +543,7 @@
                                         if (!isset( $dataServiceType['data'][strtoupper(Str::slug($operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP'))] ) ){
                                             $dataServiceType['data'][strtoupper(Str::slug($operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP'))] = [
                                                 "name" => strtoupper($operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP'),
+                                                "color" => strtoupper($operation->is_round_trip == 0 ? '#00ab55' : '#e7515a'),
                                                 "total" => 0,
                                                 "gran_total" => 0,
                                                 "USD" => [
@@ -674,9 +678,6 @@
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
                                     <td class="text-center">
-                                        <button class="btn btn-{{ $operation->pay_at_arrival == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->pay_at_arrival == 1 ? "SI" : "NO" }}</button>
-                                    </td>
-                                    <td class="text-center">
                                         <button class="btn btn-{{ $operation->is_commissionable == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->is_commissionable == 1 ? "SI" : "NO" }}</button>
                                     </td>
                                     <td class="text-center">
@@ -701,7 +702,6 @@
 
     <x-modals.filters.bookings :data="$data" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :servicesoperation="$services_operation" :serviceoperationstatus="$service_operation_status" :units="$units" :drivers="$drivers" :operationstatus="$operation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :request="$request" />
     <x-modals.reports.columns />
-    {{-- <x-modals.charts.sales :bookingsStatus="$operationStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataSites="$dataSites" :dataOriginSale="$dataOriginSale" :dataVehicles="$dataVehicles" :dataUnit="$dataUnit" :dataDriver="$dataDriver" :dataServiceTypeOperation="$dataServiceTypeOperation" /> --}}
     <x-modals.charts.sales2 :bookingsStatus="$operationStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataServiceTypeOperation="$dataServiceTypeOperation" :dataSites="$dataSites" :dataDriver="$dataDriver" :dataUnit="$dataUnit" :dataOriginSale="$dataOriginSale" />
     <x-modals.reservations.payments />
 @endsection

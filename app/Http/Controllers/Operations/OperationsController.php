@@ -98,7 +98,7 @@ class OperationsController extends Controller
         // $not_preassigned = [];
         // $preassigned = [];        
         // foreach ($items as $item) {
-        //     if( !OperationTrait::validatePreassignment($item) ){
+        //     if( !$this->validatePreassignment($item) ){
         //         $not_preassigned[] = $item;
         //     }else{
         //         $preassigned[] = $item;

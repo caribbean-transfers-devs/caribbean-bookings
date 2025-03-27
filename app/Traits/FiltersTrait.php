@@ -122,6 +122,7 @@ trait FiltersTrait
     {
         return array(
             "CONFIRMED" => "Confirmado",
+            "PAY_AT_ARRIVAL" => "Pago a la llegada",
             "PENDING" => "Pendiente",
             "CREDIT" => "Crédito",
             "OPENCREDIT" => "Credito abierto",
@@ -223,6 +224,7 @@ trait FiltersTrait
         return array(
             "CREDIT" => "CREDITO",
             "CASH" => "EFECTIVO",
+            "SANTANDER" => "SANTANDER",
             "STRIPE" => "STRIPE",
             "PAYPAL" => "PAYPAL",
             "MIFEL" => "MIFEL",

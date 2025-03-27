@@ -60,7 +60,7 @@
 
 @push('Js')
     <script>
-        const rez_id = {{ $reservation->id }};
+        const rez_id = {{ isset($reservation->id) ? $reservation->id : 0 }};
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.gmaps.key') }}&libraries=places"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">

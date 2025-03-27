@@ -4,11 +4,11 @@
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="chartsModalLabel2"></h5>
+                {{-- <h5 class="modal-title" id="chartsModalLabel2"></h5> --}}
                 <div class="items_status">
                     @if ( isset($bookingsStatus) )
                         @foreach ($bookingsStatus['data'] as $key => $status)
-                        <div class="btn btn-{{ auth()->user()->classStatusBooking($key) }}">
+                        <div class="btn btn-{{ auth()->user()->classStatusBooking($key, $bookingsStatus['type']) }}">
                             <strong>Total {{ ucfirst(strtolower($status['name'])) }}:</strong> $ {{ number_format($status['gran_total'],2) }}
                         </div>
                         @endforeach

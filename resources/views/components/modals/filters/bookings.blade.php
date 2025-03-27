@@ -199,14 +199,6 @@
                                 </select>
                             @endif
 
-                            {{-- @if ( !empty($currencies) )
-                                <select class="form-control selectpicker" title="Moneda de reservación" data-live-search="true" data-selected-text-format="count > 2" name="currency[]" id="currency" data-value="{{ json_encode($data['currency']) }}" multiple data-actions-box="true">
-                                    @foreach ($currencies as $key => $currency)
-                                        <option value="{{ $key }}">{{ $currency }}</option>
-                                    @endforeach
-                                </select>
-                            @endif --}}
-
                             @if ( !empty($methods) )
                                 <select class="form-control selectpicker" title="Metodo de pago" data-live-search="true" data-selected-text-format="count > 2" name="payment_method[]" id="payment_method" data-value="{{ json_encode($data['payment_method']) }}" multiple data-actions-box="true">
                                     @foreach ($methods as $key => $method)
@@ -216,69 +208,44 @@
                             @endif
 
                             @if ( isset($ispayarrival) )
-                                {{-- <div class="col-lg-4 col-md-6 col-12"> --}}
-                                    <select class="form-control selectpicker" title="Reservas pago al llegar" name="is_pay_at_arrival" id="is_pay_at_arrival">
-                                        <option value="">Selecciona una opción</option>
-                                        <option {{ $data['is_pay_at_arrival'] == '1' ? 'selected' : '' }} value="1">Sí</option>
-                                        <option {{ $data['is_pay_at_arrival'] == '0' ? 'selected' : '' }} value="0">No</option>
-                                    </select>
-                                {{-- </div> --}}
+                                <select class="form-control selectpicker" title="Pago a la llegada" name="is_pay_at_arrival" id="is_pay_at_arrival">
+                                    <option value="">Selecciona una opción</option>
+                                    <option {{ $data['is_pay_at_arrival'] == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                    <option {{ $data['is_pay_at_arrival'] == '0' ? 'selected' : '' }} value="0">No</option>
+                                </select>
                             @endif
 
                             @if ( isset($rating) )
-                            {{-- <div class="col-lg-4 col-md-6 col-12"> --}}
                                 <select class="form-control selectpicker" title="Likes" name="reserve_rating" id="reserve_rating">
                                     <option value="">Selecciona una opción</option>
                                     <option {{ $data['reserve_rating'] == '1' ? 'selected' : '' }} value="1">Sí</option>
                                     <option {{ $data['reserve_rating'] == '0' ? 'selected' : '' }} value="0">No</option>
                                 </select>
-                            {{-- </div> --}}
-                        @endif
+                            @endif
 
                             @if ( isset($iscommissionable) )
-                                {{-- <div class="col-lg-4 col-md-6 col-12"> --}}
-                                    <select class="form-control selectpicker" title="Reservas comisionables" name="is_commissionable" id="is_commissionable">
-                                        <option value="">Selecciona una opción</option>
-                                        <option {{ $data['is_commissionable'] == '1' ? 'selected' : '' }} value="1">Sí</option>
-                                        <option {{ $data['is_commissionable'] == '0' ? 'selected' : '' }} value="0">No</option>
-                                    </select>
-                                {{-- </div> --}}
+                                <select class="form-control selectpicker" title="Reservas comisionables" name="is_commissionable" id="is_commissionable">
+                                    <option value="">Selecciona una opción</option>
+                                    <option {{ $data['is_commissionable'] == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                    <option {{ $data['is_commissionable'] == '0' ? 'selected' : '' }} value="0">No</option>
+                                </select>
                             @endif                            
 
                             @if ( !empty($cancellations) )
-                                {{-- <div class="col-lg-4 col-md-6 col-12"> --}}
-                                    <select class="form-control selectpicker" title="Motivos de cancelación" data-live-search="true" data-selected-text-format="count > 2" name="cancellation_status[]" id="cancellation_status" data-value="{{ json_encode($data['cancellation_status']) }}" multiple data-actions-box="true">
-                                        @foreach ($cancellations as $key => $cancellation)
-                                            <option value="{{ $cancellation->id }}">{{ $cancellation->name_es }}</option>
-                                        @endforeach
-                                    </select>
-                                {{-- </div> --}}
+                                <select class="form-control selectpicker" title="Motivos de cancelación" data-live-search="true" data-selected-text-format="count > 2" name="cancellation_status[]" id="cancellation_status" data-value="{{ json_encode($data['cancellation_status']) }}" multiple data-actions-box="true">
+                                    @foreach ($cancellations as $key => $cancellation)
+                                        <option value="{{ $cancellation->id }}">{{ $cancellation->name_es }}</option>
+                                    @endforeach
+                                </select>
                             @endif
 
                             @if ( isset($isbalance) )
-                                {{-- <div class="col-lg-4 col-md-6 col-12"> --}}
-                                    <select class="form-control selectpicker" title="Reserva con balance" name="is_balance" id="is_today">
-                                        <option value="">Selecciona una opción</option>
-                                        <option {{ $data['is_balance'] == '1' ? 'selected' : '' }} value="1">Sí</option>
-                                        <option {{ $data['is_balance'] == '0' ? 'selected' : '' }} value="2">No</option>
-                                    </select>
-                                {{-- </div> --}}
+                                <select class="form-control selectpicker" title="Reserva con balance" name="is_balance" id="is_today">
+                                    <option value="">Selecciona una opción</option>
+                                    <option {{ $data['is_balance'] == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                    <option {{ $data['is_balance'] == '0' ? 'selected' : '' }} value="2">No</option>
+                                </select>
                             @endif
-
-                            {{-- @if ( isset($istoday) )
-                                <select class="form-control selectpicker" title="Operadas para hoy" name="is_today" id="is_today">
-                                    <option value="">Selecciona una opción</option>
-                                    <option {{ $data['is_today'] == '1' ? 'selected' : '' }} value="1">Sí</option>
-                                    <option {{ $data['is_today'] == '0' ? 'selected' : '' }} value="0">No</option>
-                                </select>
-                            @endif --}}
-
-                            {{-- @if ( isset($isduplicated) )
-                                <select class="form-control selectpicker" title="Reservas duplicadas" name="is_duplicated" id="is_duplicated">
-                                    <option value="">Selecciona una opción</option>
-                                    <option {{ $data['is_duplicated'] == '1' ? 'selected' : '' }} value="1">Sí</option>
-                                </select>
-                            @endif --}}
                         </div>
                     @endif
                 </div>

@@ -75,6 +75,7 @@ trait QueryTrait
                                         WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                         WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                         WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                        WHEN rez.pay_at_arrival = 1 THEN 'PAY_AT_ARRIVAL'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                         ELSE 'UNKNOWN'
@@ -88,8 +89,9 @@ trait QueryTrait
                                         DISTINCT 
                                         CASE
                                             WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
-                                            WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
-                                            ELSE 'CASH'
+                                            WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+                                            WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+                                            ELSE 'NO DEFENIDO'
                                         END
                                     ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                     GROUP_CONCAT(DISTINCT p.payment_details ORDER BY p.payment_details ASC SEPARATOR ', ') AS payment_details
@@ -226,6 +228,7 @@ trait QueryTrait
                                         WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                         WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                         WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                        WHEN rez.pay_at_arrival = 1 THEN 'PAY_AT_ARRIVAL'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                         ELSE 'UNKNOWN'
@@ -239,8 +242,9 @@ trait QueryTrait
                                         DISTINCT 
                                         CASE
                                             WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
-                                            WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
-                                            ELSE 'CASH'
+                                            WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+                                            WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+                                            ELSE 'NO DEFENIDO'
                                         END
                                     ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                     GROUP_CONCAT(DISTINCT p.payment_details ORDER BY p.payment_details ASC SEPARATOR ', ') AS payment_details
@@ -357,6 +361,7 @@ trait QueryTrait
                                     WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                     WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                     WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                    WHEN rez.pay_at_arrival = 1 THEN 'PAY_AT_ARRIVAL'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                     ELSE 'UNKNOWN'
@@ -428,9 +433,14 @@ trait QueryTrait
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE 
+                                        -- WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
+                                        -- WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
+                                        -- ELSE 'CASH'
+
                                         WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
-                                        WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
-                                        ELSE 'CASH'
+                                        WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+                                        WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+                                        ELSE 'NO DEFENIDO'
                                     END
                                 ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                 COALESCE(SUM(s.total_sales), 0) as total_sales, 
@@ -548,6 +558,7 @@ trait QueryTrait
                                     WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                     WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                     WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                    WHEN rez.pay_at_arrival = 1 THEN 'PAY_AT_ARRIVAL'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                     ELSE 'UNKNOWN'
@@ -619,9 +630,14 @@ trait QueryTrait
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE
+                                        -- WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
+                                        -- WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
+                                        -- ELSE 'CASH'
+
                                         WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
-                                        WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
-                                        ELSE 'CASH'
+                                        WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+                                        WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+                                        ELSE 'NO DEFENIDO'                                        
                                     END
                                 ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                 COALESCE(SUM(s.total_sales), 0) as total_sales, 

@@ -140,7 +140,9 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/tpv/autocomplete/{keyword}', [TPV::class, 'autocomplete'])->name('tpv.autocomplete');
 
     //FINANZAS         
-        Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS                
+        Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS
+        Route::match(['get', 'post'], '/finances/chargebacks', [RefundsFinances::class, 'index'])->name('finances.chargebacks'); //CONTRAGARGOS
+
         Route::match(['get', 'post'], '/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS
 
     //REPORTES
@@ -152,11 +154,9 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'], '/reports/cancellations', [CANCELLATIONS::class, 'index'])->name('reports.cancellations'); //CANCELACIONES
         Route::match(['get', 'post'], '/reports/commissions', [COMMISSIONS::class, 'index2'])->name('reports.commissions'); //COMISIONES
         Route::match(['get', 'post'], '/reports/commissions2', [COMMISSIONS::class, 'index'])->name('reports.commissions2'); //COMISIONES
-
         Route::match(['post','get'], '/reports/sales/data/commissions/get', [COMMISSIONS::class, 'getSales'])->name('reports.sales.data.commissions.get');
         Route::match(['post','get'], '/reports/operations/data/commissions/get', [COMMISSIONS::class, 'getOperations'])->name('reports.operations.data.commissions.get');
         Route::match(['post','get'], '/reports/commissions/data/commissions/get', [COMMISSIONS::class, 'getCommissions'])->name('reports.commissions.data.commissions.get');
-
         Route::match(['post','get'], '/reports/stats/commissions/get', [COMMISSIONS::class, 'getStats'])->name('reports.stats.get');
         Route::match(['post','get'], '/reports/sales/stats/charts/commissions', [COMMISSIONS::class, 'chartsSales'])->name('reports.sales.stats.charts.commissions.get');
         Route::match(['post','get'], '/reports/operations/stats/charts/commissions', [COMMISSIONS::class, 'chartsOperations'])->name('reports.operations.stats.charts.commissions.get');
@@ -193,7 +193,6 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::post('/operation/capture/service', [Operations::class, 'createService'])->name('operation.capture.service');
         Route::get('/operation/board/exportExcel', [Operations::class, 'exportExcelBoard'])->name('operation.board.exportExcel');
         Route::get('/operation/board/exportExcelCommission', [Operations::class, 'exportExcelBoardCommision'])->name('operation.board.exportExcelComission');
-
         Route::match(['get', 'post'], '/management/operation/schedules/get', [Operations::class, 'getSchedules'])->name('management.operation.schedules.get');
         Route::match(['post'], '/management/operation/schedules/update', [Operations::class, 'updateSchedules'])->name('management.operation.schedules.update');
 

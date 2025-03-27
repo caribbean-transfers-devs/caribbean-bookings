@@ -216,7 +216,7 @@ class CommissionsRepository
         // Recorremos para poder obtener el total de servicios pendientes y completados
         if( $operations ){
             foreach ($operations as $operation) {
-                $date_ = OperationTrait::setDateTime($operation, "date");
+                $date_ = $this->setDateTime($operation, "date");
                 $total_sales = $operation->currency == "USD"
                 ? ($operation->cost * $exchange_commission)
                 : $operation->cost;
@@ -297,11 +297,11 @@ class CommissionsRepository
                     $data["USERS"][$operation->employee_code]['QUANTITY'] ++;
                     $data["USERS"][$operation->employee_code]['BOOKINGS'][] = $operation;
 
-                    if( OperationTrait::serviceStatus($operation, "no_translate") == "PENDING" ){
+                    if( $this->serviceStatus($operation, "no_translate") == "PENDING" ){
                         $data["USERS"][$operation->employee_code]['TOTAL_PENDING'] += round($total_sales, 2);
                     }
 
-                    if( OperationTrait::serviceStatus($operation, "no_translate") == "COMPLETED" ){
+                    if( $this->serviceStatus($operation, "no_translate") == "COMPLETED" ){
                         $data["USERS"][$operation->employee_code]['TOTAL_COMPLETED'] += round($total_sales, 2);
                     }                    
                 }
@@ -602,7 +602,7 @@ class CommissionsRepository
             // Recorremos para poder obtener el total de servicios pendientes y completados
             if( $operations ){
                 foreach ($operations as $operation) {
-                    $date_ = OperationTrait::setDateTime($operation, "date");
+                    $date_ = $this->setDateTime($operation, "date");
                     $total_sales = $operation->currency == "USD"
                     ? ($operation->cost * $exchange_commission)
                     : $operation->cost;
