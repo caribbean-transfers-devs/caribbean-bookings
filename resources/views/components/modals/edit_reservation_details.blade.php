@@ -44,7 +44,7 @@
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="originSale">Origen de venta</label>
                             <select class="form-select mb-2" id="originSale" name="origin_sale_id">
-                                <option value="0">Selecciona una opción</option>
+                                <option value="">Selecciona una opción</option>
                                 @foreach($origins as $key => $origin)
                                     <option value="{{ $origin->id }}" {{ $reservation->origin_sale_id == $origin->id ? 'selected' : '' }}>{{ $origin->code }}</option>
                                 @endforeach

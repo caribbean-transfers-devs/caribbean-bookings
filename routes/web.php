@@ -106,7 +106,39 @@ Route::middleware(['guest','Debug'])->group(function () {
 Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::post('/logout/other/{sessionId}', [LoginController::class, 'logoutOtherSession'])->name('logout.other');    
-    Route::post('/logout/all', [LoginController::class, 'logoutAllSessions'])->name('logout.all');    
+    Route::post('/logout/all', [LoginController::class, 'logoutAllSessions'])->name('logout.all');
+
+    Route::get('/db-test', function() {
+        $start = microtime(true);
+        
+        // Test 1: Query simple
+        DB::select('SELECT 1');
+        $time1 = microtime(true) - $start;
+        
+        // Test 2: Tu query problemático
+        $start = microtime(true);
+        DB::select('SELECT * FROM users WHERE id = 1 LIMIT 1');
+        $time2 = microtime(true) - $start;
+        
+        return [
+            'simple_query' => $time1,
+            'problem_query' => $time2,
+            'server' => DB::select('SHOW VARIABLES LIKE "%version%"')
+        ];
+    });
+
+    Route::get('/db-indexes', function() {
+        $indexes = DB::select(
+            "SHOW INDEXES FROM users WHERE Key_name = 'PRIMARY' OR Column_name = 'id'"
+        );
+        
+        $tableStatus = DB::select("SHOW TABLE STATUS LIKE 'users'");
+        
+        return [
+            'indexes' => $indexes,
+            'table_status' => $tableStatus
+        ];
+    });    
 
     //BOTS
         //SET RATES MASTER TOUR
@@ -258,8 +290,11 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::delete('/config/types-cancellations/{cancellation}', [TYPES_CANCELLATIONS::class, 'destroy'])->name('config.types-cancellations.destroy');
 
         Route::put('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'update'])->name('reservations.update');
+        //_________
+        //VALIDAR reservationPayments
         Route::get('/reservation/payments/{reservation}', [DETAILS_RESERVATION::class, 'reservationPayments'])->name('reservation.payments');
-        Route::put('/reservationsDuplicated/{reservation}', [DETAILS_RESERVATION::class, 'duplicated'])->name('reservations.duplicated');
+        //_________
+        // Route::put('/reservationsDuplicated/{reservation}', [DETAILS_RESERVATION::class, 'duplicated'])->name('reservations.duplicated');
         Route::put('/reservation/removeCommission/{reservation}', [DETAILS_RESERVATION::class, 'removeCommission'])->name('reservation.removeCommission');
         Route::put('/reservationsOpenCredit/{reservation}', [DETAILS_RESERVATION::class, 'openCredit'])->name('reservations.openCredit');
         Route::put('/reservationsEnablePlusService/{reservation}', [DETAILS_RESERVATION::class, 'enablePlusService'])->name('reservations.enablePlusService');
@@ -293,6 +328,8 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     //ACCIONES GENERALES DE DETALLES DE RESERVA
     Route::post('/action/enablePayArrival', [ACTIONS_RESERVATION::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
     Route::post('/action/refundRequest', [ACTIONS_RESERVATION::class, 'refundRequest'])->name('update.booking.refund.request');
+    Route::post('/action/markReservationDuplicate', [ACTIONS_RESERVATION::class, 'markReservationDuplicate'])->name('update.booking.mark.duplicate');
+
     Route::put('/action/updateServiceStatus', [ACTIONS_RESERVATION::class, 'updateServiceStatus'])->name('update.service.status');
     Route::post('/action/enabledLike', [ACTIONS_RESERVATION::class, 'enabledLike'])->name('update.booking.like');
     Route::post('/action/confirmService', [ACTIONS_RESERVATION::class, 'confirmService'])->name('update.service.confirm');

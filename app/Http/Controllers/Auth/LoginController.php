@@ -1,11 +1,19 @@
 <?php
 namespace App\Http\Controllers\Auth;
 
+// use Illuminate\Http\Request;
+// use App\Http\Controllers\Controller;
+// use App\Http\Requests\LoginRequest;
+// use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Request as Device;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request as Device;
+use Jenssegers\Agent\Agent;
+
+//TRAITS
 use App\Traits\RoleTrait;
 
 //MODELS
@@ -13,103 +21,191 @@ use App\Models\UserSession;
 
 class LoginController extends Controller
 {   
-    public function index(){
-        return view('auth.login');
-    }
+    use RoleTrait;
 
-    public function check(LoginRequest $request){
-        if(!Auth::check())
+    // public function index(){
+    //     return view('auth.login');
+    // }
+
+    // public function check(LoginRequest $request){
+    //     if(!Auth::check())
+    //     {
+    //         $request->authenticate();
+    //         $request->session()->regenerate();
+    //         session(['roles' => $this->getRolesAndSubmodules()]);
+
+    //         $dataUser = auth()->user();
+    //         $this->handleLogin($dataUser);
+    //         if( $dataUser->is_commission == 1 ){
+    //             return redirect()->route('callcenters.index');    
+    //         }
+    //         return redirect()->route('dashboard');
+    //     }
+    // }
+
+    // public function logout(Request $request) {
+    //     Auth::logout();
+    //     $request->session()->invalidate();
+    //     $request->session()->regenerate();
+
+    //     return redirect(url('/'));
+    // }
+
+    // public function handleLogin($dataUser)
+    // {
+    //     UserSession::create([
+    //         'user_id' => $dataUser->id,
+    //         'ip_address' => Device::ip(),
+    //         'user_agent' => Device::userAgent(),
+    //         'device_name' => $this->getDeviceName(Device::userAgent()),
+    //         'last_activity' => now(),
+    //     ]);
+    // }
+
+    // private function getDeviceName($userAgent)
+    // {
+    //     // Aquí puedes usar un paquete como "jenssegers/agent" para identificar el dispositivo y navegador
+    //     $agent = new \Jenssegers\Agent\Agent();
+    //     $agent->setUserAgent($userAgent);
+    //     return $agent->device() . ' - ' . $agent->browser();
+    // }
+
+    // /**
+    //  * Cierra sesión en un dispositivo específico.
+    //  */    
+    // public function logoutOtherSession($sessionId)
+    // {
+    //     // $session = UserSession::find($sessionId);    
+    //     // if ($session && $session->user_id == Auth::id()) {
+    //     //     // Aquí puedes usar un sistema de cookies o una acción de logout
+    //     //     $session->delete();
+    //     //     // Puedes hacer algo aquí para invalidar la sesión en ese dispositivo
+    //     // }
+    //     // return back();
+    //     $user = Auth::user();
+
+    //     // Buscar la sesión y eliminarla solo si pertenece al usuario autenticado
+    //     $session = UserSession::where('user_id', $user->id)->where('id', $sessionId)->first();
+
+    //     if ($session) {
+    //         $session->delete();
+    //         return redirect()->back()->with('success', 'Sesión cerrada exitosamente.');
+    //     }
+
+    //     return redirect()->back()->with('error', 'No se pudo cerrar la sesión.');        
+    // }
+
+    // /**
+    //  * Cierra todas las sesiones excepto la actual.
+    //  */    
+    // public function logoutAllSessions(Request $request)
+    // {
+    //     // UserSession::where('user_id', Auth::id())->delete();
+    //     // Auth::logout();
+    //     // return redirect('/login');
+    //     $user = Auth::user();
+
+    //     // Obtener la sesión actual
+    //     // $currentSession = UserSession::where('user_id', $user->id)
+    //     //     ->where('ip_address', $request->ip())
+    //     //     ->where('user_agent', $request->userAgent())
+    //     //     ->first();
+    //     $currentSession = UserSession::where('user_id', $user->id)
+    //         ->where('ip_address', Device::ip())
+    //         ->where('user_agent', Device::userAgent())
+    //         ->first();        
+
+    //     // Eliminar todas las demás sesiones del usuario
+    //     UserSession::where('user_id', $user->id)
+    //         ->where('id', '!=', optional($currentSession)->id)
+    //         ->delete();
+
+    //     return redirect()->back()->with('success', 'Todas las demás sesiones han sido cerradas.');        
+    // }
+    
+    
+        protected $agent;
+    
+        public function __construct(Agent $agent)
+        {
+            $this->agent = $agent;
+        }
+    
+        public function index()
+        {
+            return view('auth.login');
+        }
+    
+        public function check(LoginRequest $request)
         {
             $request->authenticate();
             $request->session()->regenerate();
-            session(['roles' => RoleTrait::getRolesAndSubmodules()]);
-
+            
+            session(['roles' => $this->getRolesAndSubmodules()]);
+    
             $dataUser = auth()->user();
-            $this->handleLogin($dataUser);
-            if( $dataUser->is_commission == 1 ){
-                return redirect()->route('callcenters.index');    
-            }
-            return redirect()->route('dashboard');
+            $this->handleLogin($dataUser, $request);
+            
+            return redirect()->route(
+                $dataUser->is_commission == 1 ? 'callcenters.index' : 'dashboard'
+            );
         }
-    }
-
-    public function logout(Request $request) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerate();
-
-        return redirect(url('/'));
-    }
-
-    public function handleLogin($dataUser)
-    {
-        UserSession::create([
-            'user_id' => $dataUser->id,
-            'ip_address' => Device::ip(),
-            'user_agent' => Device::userAgent(),
-            'device_name' => $this->getDeviceName(Device::userAgent()),
-            'last_activity' => now(),
-        ]);
-    }
-
-    private function getDeviceName($userAgent)
-    {
-        // Aquí puedes usar un paquete como "jenssegers/agent" para identificar el dispositivo y navegador
-        $agent = new \Jenssegers\Agent\Agent();
-        $agent->setUserAgent($userAgent);
-        return $agent->device() . ' - ' . $agent->browser();
-    }
-
-    /**
-     * Cierra sesión en un dispositivo específico.
-     */    
-    public function logoutOtherSession($sessionId)
-    {
-        // $session = UserSession::find($sessionId);    
-        // if ($session && $session->user_id == Auth::id()) {
-        //     // Aquí puedes usar un sistema de cookies o una acción de logout
-        //     $session->delete();
-        //     // Puedes hacer algo aquí para invalidar la sesión en ese dispositivo
-        // }
-        // return back();
-        $user = Auth::user();
-
-        // Buscar la sesión y eliminarla solo si pertenece al usuario autenticado
-        $session = UserSession::where('user_id', $user->id)->where('id', $sessionId)->first();
-
-        if ($session) {
+    
+        public function logout(Request $request) 
+        {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerate();
+    
+            return redirect('/');
+        }
+    
+        protected function handleLogin($dataUser, Request $request)
+        {
+            $this->agent->setUserAgent($request->userAgent());
+            
+            UserSession::create([
+                'user_id' => $dataUser->id,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'device_name' => $this->agent->device() . ' - ' . $this->agent->browser(),
+                'last_activity' => now(),
+            ]);
+        }
+    
+        public function logoutOtherSession($sessionId)
+        {
+            $session = UserSession::where('user_id', Auth::id())
+                ->where('id', $sessionId)
+                ->first();
+    
+            if (!$session) {
+                return redirect()->back()->with('error', 'No se pudo cerrar la sesión.');
+            }
+    
             $session->delete();
             return redirect()->back()->with('success', 'Sesión cerrada exitosamente.');
         }
-
-        return redirect()->back()->with('error', 'No se pudo cerrar la sesión.');        
-    }
-
-    /**
-     * Cierra todas las sesiones excepto la actual.
-     */    
-    public function logoutAllSessions(Request $request)
-    {
-        // UserSession::where('user_id', Auth::id())->delete();
-        // Auth::logout();
-        // return redirect('/login');
-        $user = Auth::user();
-
-        // Obtener la sesión actual
-        // $currentSession = UserSession::where('user_id', $user->id)
-        //     ->where('ip_address', $request->ip())
-        //     ->where('user_agent', $request->userAgent())
-        //     ->first();
-        $currentSession = UserSession::where('user_id', $user->id)
-            ->where('ip_address', Device::ip())
-            ->where('user_agent', Device::userAgent())
-            ->first();        
-
-        // Eliminar todas las demás sesiones del usuario
-        UserSession::where('user_id', $user->id)
-            ->where('id', '!=', optional($currentSession)->id)
-            ->delete();
-
-        return redirect()->back()->with('success', 'Todas las demás sesiones han sido cerradas.');        
-    }
+    
+        public function logoutAllSessions(Request $request)
+        {
+            $user = Auth::user();
+            $currentSession = UserSession::where('user_id', $user->id)
+                ->where('ip_address', $request->ip())
+                ->where('user_agent', $request->userAgent())
+                ->first();
+    
+            $query = UserSession::where('user_id', $user->id);
+            
+            if ($currentSession) {
+                $query->where('id', '!=', $currentSession->id);
+            }
+    
+            $query->delete();
+    
+            return redirect()->back()->with(
+                'success', 
+                'Todas las demás sesiones han sido cerradas.'
+            );
+        }
 }

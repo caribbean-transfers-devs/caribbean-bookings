@@ -172,7 +172,6 @@ trait QueryTrait
     public function queryBookings($query, $query2, $queryData){
         $bookings = DB::select("SELECT 
                                     rez.id AS reservation_id, 
-                                    rez.categories,
                                     CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name,
                                     rez.client_email,
                                     rez.client_phone,
@@ -219,7 +218,7 @@ trait QueryTrait
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     SUM(it.is_round_trip) as is_round_trip,
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
-                                    COALESCE(SUM(p.total_payments), 0) as total_payments,                                    
+                                    COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                     SUM(p.is_conciliated) as is_conciliated,
                                     CASE
@@ -347,9 +346,12 @@ trait QueryTrait
                                 us.id AS employee_code,
                                 us.status AS employee_status,
                                 us.name AS employee,
+
                                 site.id as site_code,
                                 site.type_site AS type_site,
+                                site.color as site_color,
                                 site.name as site_name,
+
                                 origin.code AS origin_code,
                                 tc.name_es AS cancellation_reason,
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
@@ -544,9 +546,12 @@ trait QueryTrait
                                 us.id AS employee_code,
                                 us.status AS employee_status,
                                 us.name AS employee,
+
                                 site.id as site_code,
                                 site.type_site AS type_site,
+                                site.color as site_color,
                                 site.name as site_name,
+
                                 origin.code AS origin_code,
                                 tc.name_es AS cancellation_reason,
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,

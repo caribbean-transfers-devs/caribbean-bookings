@@ -133,7 +133,7 @@
                             <tbody>
                                 <tr>
                                     <th>Estatus</th>
-                                    <td><span class="badge bg-{{ auth()->user()->classStatusBooking($data['status']) }}">{{ auth()->user()->statusBooking($data['status']) }}</span></td>
+                                    <td><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($data['status']) }}">{{ auth()->user()->statusBooking($data['status']) }}</button></td>
                                 </tr>
                                 @if ( $data['status'] == "QUOTATION" )
                                     <tr>
@@ -239,7 +239,7 @@
                 <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
 
                 {{-- NOS PERMITE REENVIO DE CORREO DE LA RESERVACIÓN AL CLIENTE, CUANDO TENEMOS EL PERMISO Y ES PENDIENTE, CONFIRMADA O A CREDITO --}}
-                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(20) )
+                @if ( ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(20) )
                     <div class="btn-group btn-group-sm" role="group">
                         <button id="btndefault" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             RE-ENVIO DE CORREO
@@ -254,17 +254,25 @@
                 @endif
 
                 {{-- NOS PERMITE AGREGAR SEGUIMIENTOS DE LA RESERVA, SOLO CUANDO ESTA COMO PENDIENTE, CONFIRMADA O A CREDITO --}}
-                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(23))
+                @if ( ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(23))
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> AGREGAR SEGUIMIENTO</button>
                 @endif
 
-                {{-- NOS PERMITE INDICAR QUE CLIENTE PAGARA A LA LLEGADA, SOLO SE MOSTRARA CUANDO SEA COTIZACIÓN --}}
-                @if ( $data['status'] == "QUOTATION" || $data['status'] == "PENDING" )
-                    <button class="btn btn-warning btn-sm enablePayArrival" id="enablePayArrival" data-code="{{ $reservation->id }}"><i class="align-middle" data-feather="plus"></i> ACTIVAR PAGO A LA LLEGADA</button>
-                @endif
+                {{-- NOS PERMITE ENVIAR UN MENSAJE --}}
+                @if ( ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && auth()->user()->hasPermission(21) )
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            ENVIAR MENSAJE
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">SMS</a>
+                            <a class="dropdown-item" href="#">Whatsapp</a>
+                        </div>
+                    </div>
+                @endif                
 
                 {{-- NOS PERMITE ENVIAR UNA INVITACIÓN DE PAGO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACIÓN --}}
-                @if ( ( $data['status'] != "CANCELLED") && auth()->user()->hasPermission(22))
+                @if ( ( $data['status'] != "CANCELLED" && $data['status'] != "DUPLICATED" ) && auth()->user()->hasPermission(22))
                     <div class="btn-group btn-group-sm" role="group">
                         <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             INVITACIÓN DE PAGO
@@ -279,7 +287,7 @@
                 @endif
 
                 {{-- NOS PERMITE COPIAR EL LINK DE PAGO PARA ENVIARSELO AL CLIENTE CUANDO LA RESERVA SEA PENDIENTE O COTIZACIÓN --}}
-                @if ( $data['status'] != "CANCELLED" )
+                @if ( $data['status'] != "CANCELLED" && $data['status'] != "DUPLICATED" )
                     <div class="btn-group btn-group-sm" role="group">
                         <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             COPIAR LINK DE PAGO
@@ -291,19 +299,12 @@
                             <a class="dropdown-item" href="#" onclick="copyPaymentLink(event, '{{ $reservation->items[0]['code'] }}', '{{ trim($reservation->client_email) }}', 'es')">Español</a>
                         </div>
                     </div>
-                @endif                
-
-                @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && auth()->user()->hasPermission(21) )
-                    <div class="btn-group btn-group-sm">
-                        <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            ENVIAR MENSAJE
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">SMS</a>
-                            <a class="dropdown-item" href="#">Whatsapp</a>
-                        </div>
-                    </div>
                 @endif
+
+                {{-- NOS PERMITE INDICAR QUE CLIENTE PAGARA A LA LLEGADA, SOLO SE MOSTRARA CUANDO SEA COTIZACIÓN --}}
+                @if ( $reservation->pay_at_arrival == 0 && ( $data['status'] == "QUOTATION" || $data['status'] == "PENDING" ) )
+                    <button class="btn btn-warning btn-sm enablePayArrival" id="enablePayArrival" data-code="{{ $reservation->id }}"><i class="align-middle" data-feather="plus"></i> ACTIVAR PAGO A LA LLEGADA</button>
+                @endif                
 
                 {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
                 @if (auth()->user()->hasPermission(94) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
@@ -312,12 +313,9 @@
                 @if (auth()->user()->hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
                     {{-- <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button> --}}
                 @endif
-                @if (auth()->user()->hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                    <button class="btn btn-danger btn-sm" onclick="duplicatedReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> MARCAR COMO DUPLICADO</button>
-                @endif
                     
                 {{-- NOS PERMITE PODER ACTIVAR LA RESERVA CUANDO ESTA COMO CREDITO ABIERTO --}}
-                @if ( $data['status'] == "OPENCREDIT" && auth()->user()->hasPermission(67) )
+                @if ( ( $data['status'] == "CANCELLED" || $data['status'] == "OPENCREDIT" || ( $data['status'] == "CANCELLED" && $reservation->was_is_quotation == 1 ) ) && auth()->user()->hasPermission(67) )
                     <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> ACTIVAR RESERVA</button>
                 @endif
 
@@ -330,6 +328,11 @@
                 @if ( $data['status'] == "CONFIRMED" || $data['status'] == "CANCELLED" )
                     <button class="btn btn-warning btn-sm refundRequest" id="refundRequest" data-code="{{ $reservation->id }}"><i class="align-middle" data-feather="delete"></i> SOLICITUD DE REEMBOLSO A CONTABILIDAD</button>
                 @endif
+
+                {{-- NOS PERMITE MARCAR COMO DUPLICADA LA RESERVA --}}
+                @if (auth()->user()->hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                    <button class="btn btn-danger btn-sm markReservationDuplicate" id="markReservationDuplicate" data-code="{{ $reservation->id }}" data-status="{{ $data['status'] }}"><i class="align-middle" data-feather="delete"></i> MARCAR COMO DUPLICADO</button>
+                @endif                
             </div>
 
             @if ( $data['status'] == "QUOTATION" )
@@ -516,7 +519,7 @@
                                                             {{-- SOLO CUANDO SE TENGA EL PERMISO --}}
                                                             {{-- NO ESTE CERRADA LA OPERACION --}}
                                                             {{-- CUANDO EL ESTATUS DE LA RESERVA SEA PENDIENTE, CONFIMADO O CREDTIO --}}
-                                                            @if ( auth()->user()->hasPermission(68) && $item->op_one_operation_close == 0 && ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) )
+                                                            @if ( auth()->user()->hasPermission(68) && $item->op_one_operation_close == 0 && ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) )
                                                                 <div class="btn-group btn-group-sm">
                                                                     <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ auth()->user()->statusBooking($item->op_one_status) }}</button>
                                                                     <div class="dropdown-menu" style="">
@@ -535,7 +538,7 @@
                                                             {{-- NOS PERMITE ACTUALIZAR Y ENVIAR LA CONFIRMACION DEL SERVICIO AL CLIENTE POR CORREO --}}
                                                             {{-- VER SI EL SERVICIO ESTA EN UNA OPERACION ABIERTA O CERRADA --}}
                                                             {{-- SOLO CUANDO LA RESERVA ESTA PENDIENTE, CONFIRMADA O A CREDITO --}}
-                                                            @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" )
+                                                            @if ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" )
                                                                 <div class="d-flex gap-2">                                                                
                                                                     @php
                                                                         $message_operation_one = ( $item->op_one_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( auth()->user()->hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" );
@@ -598,7 +601,7 @@
                                                                 {{-- SOLO CUANDO SE TENGA EL PERMISO --}}
                                                                 {{-- NO ESTE CERRADA LA OPERACION --}}
                                                                 {{-- CUANDO EL ESTATUS DE LA RESERVA SEA PENDIENTE, CONFIMADO O CREDTIO --}}
-                                                                @if ( auth()->user()->hasPermission(68) && $item->op_two_operation_close == 0 && ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) )
+                                                                @if ( auth()->user()->hasPermission(68) && $item->op_two_operation_close == 0 && ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) )
                                                                     <div class="btn-group btn-group-sm">
                                                                         <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ auth()->user()->statusBooking($item->op_two_status) }}</button>
                                                                         <div class="dropdown-menu" style="">
@@ -617,7 +620,7 @@
                                                                 {{-- NOS PERMITE ACTUALIZAR Y ENVIAR LA CONFIRMACION DEL SERVICIO AL CLIENTE POR CORREO --}}
                                                                 {{-- VER SI EL SERVICIO ESTA EN UNA OPERACION ABIERTA O CERRADA --}}
                                                                 {{-- SOLO CUANDO LA RESERVA ESTA PENDIENTE, CONFIRMADA O A CREDITO --}}
-                                                                @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" )
+                                                                @if ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" )
                                                                     @php
                                                                         $message_operation_two = ( $item->op_two_operation_close == 1 ? "El servicio se encuentra en una operación cerrada".( auth()->user()->hasPermission(92) ? ", da click si desea desbloquear el servicio del cierre de operación" : "" ) : "El servicio se encuentra en una operacón abierta" );
                                                                     @endphp
@@ -698,114 +701,113 @@
                     </div>
                     {{-- CUANDO ES CREDITO NO DEJA QUE AGREGUEN PAGOS --}}
                     
-                        <div class="tab-pane" id="icon-tab-3" role="tabpanel">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                @if ( $data['status'] != "CREDIT" )
-                                    @if (auth()->user()->hasPermission(14) )
-                                        <button class="btn btn-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                            NUEVO PAGO
-                                        </button>
-                                    @endif
+                    <div class="tab-pane" id="icon-tab-3" role="tabpanel">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            @if ( $data['status'] != "CREDIT" )
+                                @if (auth()->user()->hasPermission(14) )
+                                    <button class="btn btn-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus align-middle"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        NUEVO PAGO
+                                    </button>
                                 @endif
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Método</th>
-                                            <th>Descripción</th>
-                                            <th class="text-center">Total</th>
-                                            <th class="text-center">Moneda</th>
-                                            <th class="text-center">TC</th>
-                                            <th class="text-start">Ref.</th>
-                                            <th class="text-start">Categoria.</th>
-                                            <th class="text-center">Fecha de pago</th>
-                                            <th class="text-center"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($reservation->payments as $payment)
-                                            <tr style="{{ $payment->category == "REFUND" ? 'background-color: #fbeced;' : '' }}">
-                                                <td>{{ $payment->payment_method }}</td>
-                                                <td>{{ $payment->description }}</td>
-                                                <td class="text-end">{{ number_format($payment->total) }}</td>
-                                                <td class="text-center">{{ $payment->currency }}</td>
-                                                <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
-                                                <td class="text-start">{{ $payment->reference }}</td>
-                                                <td class="text-start">{{ $payment->category }}</td>
-                                                <td class="text-center">{{ $payment->created_at }}</td>
-                                                <td class="text-center">
-                                                    @if (auth()->user()->hasPermission(15))
-                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 align-middle"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-                                                        </a>
-                                                    @endif
-                                                    @if (auth()->user()->hasPermission(16))
-                                                        <a href="#" onclick="deletePayment({{ $payment->id }})">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash align-middle"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                                        </a>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach                                   
-                                    </tbody>
-                                </table>
-                            </div>
+                            @endif
                         </div>
-                        <div class="tab-pane" id="icon-tab-4" role="tabpanel">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>SOLITADO</th>
-                                            <th>Estatus</th>
-                                            <th>Descripción</th>
-                                            <th>Respuesta</th>
-                                            <th class="text-center">Fecha de solicitud</th>
-                                            <th class="text-center">Fecha de aplicación</th>
-                                            <th class="text-center">comprobante de reembolso</th>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Método</th>
+                                        <th>Descripción</th>
+                                        <th class="text-center">Total</th>
+                                        <th class="text-center">Moneda</th>
+                                        <th class="text-center">TC</th>
+                                        <th class="text-start">Ref.</th>
+                                        <th class="text-start">Categoria.</th>
+                                        <th class="text-center">Fecha de pago</th>
+                                        <th class="text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($reservation->payments as $payment)
+                                        <tr style="{{ $payment->category == "REFUND" ? 'background-color: #fbeced;' : '' }}">
+                                            <td>{{ $payment->payment_method }}</td>
+                                            <td>{{ $payment->description }}</td>
+                                            <td class="text-end">{{ number_format($payment->total) }}</td>
+                                            <td class="text-center">{{ $payment->currency }}</td>
+                                            <td class="text-end">{{ number_format($payment->exchange_rate) }}</td>
+                                            <td class="text-start">{{ $payment->reference }}</td>
+                                            <td class="text-start">{{ $payment->category }}</td>
+                                            <td class="text-center">{{ $payment->created_at }}</td>
+                                            <td class="text-center">
+                                                @if (auth()->user()->hasPermission(15))
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#servicePaymentsModal" onclick="getPayment({{ $payment->id }})">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 align-middle"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                                    </a>
+                                                @endif
+                                                @if (auth()->user()->hasPermission(16))
+                                                    <a href="#" onclick="deletePayment({{ $payment->id }})">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash align-middle"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                    </a>
+                                                @endif
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($reservation->refunds as $refund)
-                                            <tr>
-                                                <td>{{ isset($refund->user->name) ? $refund->user->name : 'NO DEFINIDO' }}</td>
-                                                <td>
-                                                    <button class="btn btn-{{ auth()->user()->classStatusRefund($refund->status) }} btn-sm">{{ auth()->user()->statusRefund($refund->status) }}</button>
-                                                </td>
-                                                <td>{{ $refund->message_refund }}</td>
-                                                <td>{{ $refund->response_message != NULL ? $refund->response_message : 'NO DEFINIDA' }}</td>
-                                                <td class="text-center">{{ date("Y-m-d", strtotime($refund->created_at)) }}</td>
-                                                <td class="text-center">
-                                                    @if ( $refund->status == "REFUND_NOT_APPLICABLE" )
-                                                        {{ 'NO APLICA' }}
-                                                    @else
-                                                        @if ( $refund->end_at != null )
-                                                            {{ date("Y-m-d", strtotime($refund->end_at)) }}
-                                                        @else
-                                                            {{ 'NO DEFINIDO' }}
-                                                        @endif                                                    
-                                                    @endif
-                                                </td>
-                                                <td class="text-center">
-                                                    @if ( $refund->status == "REFUND_NOT_APPLICABLE" )
-                                                        {{ 'NO APLICA' }}
-                                                    @else
-                                                        @if ( $refund->link_refund != null )
-                                                            <a href="{{ $refund->link_refund }}" target="_black">click para ver</a>
-                                                        @else
-                                                            {{ 'NO DEFINIDO' }}
-                                                        @endif                                                    
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach                                   
-                                    </tbody>
-                                </table>
-                            </div>
+                                    @endforeach                                   
+                                </tbody>
+                            </table>
                         </div>
-
+                    </div>
+                    <div class="tab-pane" id="icon-tab-4" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>SOLITADO</th>
+                                        <th>Estatus</th>
+                                        <th>Descripción</th>
+                                        <th>Respuesta</th>
+                                        <th class="text-center">Fecha de solicitud</th>
+                                        <th class="text-center">Fecha de aplicación</th>
+                                        <th class="text-center">comprobante de reembolso</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($reservation->refunds as $refund)
+                                        <tr>
+                                            <td>{{ isset($refund->user->name) ? $refund->user->name : 'NO DEFINIDO' }}</td>
+                                            <td>
+                                                <button class="btn btn-{{ auth()->user()->classStatusRefund($refund->status) }} btn-sm">{{ auth()->user()->statusRefund($refund->status) }}</button>
+                                            </td>
+                                            <td>{{ $refund->message_refund }}</td>
+                                            <td>{{ $refund->response_message != NULL ? $refund->response_message : 'NO DEFINIDA' }}</td>
+                                            <td class="text-center">{{ date("Y-m-d", strtotime($refund->created_at)) }}</td>
+                                            <td class="text-center">
+                                                @if ( $refund->status == "REFUND_NOT_APPLICABLE" )
+                                                    {{ 'NO APLICA' }}
+                                                @else
+                                                    @if ( $refund->end_at != null )
+                                                        {{ date("Y-m-d", strtotime($refund->end_at)) }}
+                                                    @else
+                                                        {{ 'NO DEFINIDO' }}
+                                                    @endif                                                    
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                @if ( $refund->status == "REFUND_NOT_APPLICABLE" )
+                                                    {{ 'NO APLICA' }}
+                                                @else
+                                                    @if ( $refund->link_refund != null )
+                                                        <a href="{{ $refund->link_refund }}" target="_black">click para ver</a>
+                                                    @else
+                                                        {{ 'NO DEFINIDO' }}
+                                                    @endif                                                    
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach                                   
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                     
                     @if (auth()->user()->hasPermission(65))
                         <div class="tab-pane" id="icon-tab-5" role="tabpanel">

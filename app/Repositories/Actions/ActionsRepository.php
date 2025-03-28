@@ -47,10 +47,10 @@ class ActionsRepository
             return response()->json([
                 'errors' => [
                     'code' => 'NOT_FOUND',
-                    'message' => 'Reservación no encontrado'
+                    'message' => 'Reservación no encontrada'
                 ],
                 'status' => 'error',
-                'message' => 'Reservación no encontrado'
+                'message' => 'Reservación no encontrada'
             ], Response::HTTP_NOT_FOUND);
         }         
 
@@ -62,7 +62,7 @@ class ActionsRepository
             $booking->expires_at = NULL;
             $booking->save();
 
-            // ESTATUS DE RESERVACIÓN
+            // ESTATUS DE RESERVACIÓN            
             $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el estatus de la reservacion de (QUOTATION) a (PENDING), porque cliente pagara a la llegada", 'HISTORY', "UPDATE_BOOKING_PAY_ARRIVAL");
 
             DB::commit();
@@ -84,7 +84,7 @@ class ActionsRepository
     }
 
     /**
-     * NOS AYUDA A MARCAR LA RESERVACIÓN COMO SOLICITUD DE REEMBOLSO
+     * NOS AYUDA A SOLICITAR UN REEMBOLSO, EN LOS DETALLES DE LA RESERVACIÓN
      * @param request :la información recibida en la solicitud
     */
     public function refundRequest($request)
@@ -135,6 +135,85 @@ class ActionsRepository
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function markReservationDuplicate($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reservation_id' => 'required|integer',
+            'status' => 'required|string|in:CANCELLED,DUPLICATED,OPENCREDIT,QUOTATION,PAY_AT_ARRIVAL,CREDIT,PENDING,CONFIRMED',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        $booking = Reservation::find($request->reservation_id);
+
+        if (!$booking) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Reservación no encontrada'
+                ],
+                'status' => 'error',
+                'message' => 'Reservación no encontrada'
+            ], Response::HTTP_NOT_FOUND);
+        }         
+
+        try {
+            DB::beginTransaction();
+            
+            $booking->is_duplicated = 1;
+            $booking->save();
+
+            // Actualizar los estados de los ítems y el ID por el tipo de cancelación
+            $booking->items()->update([
+                'vehicle_id_one' => NULL,
+                'driver_id_one' => NULL,
+                'op_one_status' => 'DUPLICATE',
+                'op_one_status_operation' => 'PENDING',
+                'op_one_time_operation' => NULL,
+                'op_one_preassignment' => NULL,
+                'op_one_operating_cost' => 0,
+                'op_one_cancellation_type_id' => NULL,
+                'vehicle_id_two' => NULL,
+                'driver_id_two' => NULL,
+                'op_two_status' => 'DUPLICATE',
+                'op_two_status_operation' => 'PENDING',
+                'op_two_time_operation' => NULL,
+                'op_two_preassignment' => NULL,
+                'op_two_operating_cost' => 0,
+                'op_two_cancellation_type_id' => NULL,
+            ]);            
+
+            // ESTATUS DE RESERVACIÓN
+            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el estatus de la reservación de (".$request->status.") a (DUPLICATED), porque es una reserva duplicada", 'HISTORY', "UPDATE_BOOKING_DUPLICATED");
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se marco correctamente la reservación como duplicada',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        
+    }    
 
     /**
      * NOS AYUDA A PODER CALIFICAR EL ESTATUS DE RESERVACIÓN, EN LOS DETALLES DE LA RESERVACIÓN
@@ -305,7 +384,7 @@ class ActionsRepository
     }
 
     /**
-     * NOS AYUDA A PODER CAMBIAR EL ESTATUS DE CONFIRMACION DEL SERVICIO, EN LOS DETALLES DE LA RESERVACIÓN
+     * NOS AYUDA A PODER DESBLOQUEAR EL SERVICIO, EN LOS DETALLES DE LA RESERVACIÓN
      * @param request :la información recibida en la solicitud
     */
     public function updateServiceUnlock($request)
@@ -456,7 +535,7 @@ class ActionsRepository
             }
 
             //Declaramos variables
-            $reservationId = $item->reservations->id;
+            $reservationId = $item->reservation_id;
             $updateReservationStatus = true;
 
             // Verificar si todos los items están cancelados (solo si es round trip)
@@ -473,7 +552,10 @@ class ActionsRepository
 
             // Actualizar la reserva solo si debe hacerse
             if ( $request->status == "CANCELLED" && $updateReservationStatus ) {
-                $resultBooking = Reservation::where('id', $reservationId)->update([ 'is_cancelled' => 1, 'cancellation_type_id' => ( is_numeric($request->type_cancel) ? $request->type_cancel : NULL ) ]);
+                $resultBooking = Reservation::where('id', $reservationId)->update([ 
+                    'is_cancelled' => 1, 
+                    'cancellation_type_id' => ( is_numeric($request->type_cancel) ? $request->type_cancel : NULL ) 
+                ]);
                 if ( $resultBooking ) {
                     // Enviar correo en ambos casos
                     $result = $this->sendEmail("", array(

@@ -41,15 +41,15 @@
         }
 
         /*ESTILOS PARA IDENTIFICAR LOS COLORES DE AGENCIAS ESPECIFICAS*/
-        .agency_29{
+        /* .agency_29{
             background-color: #FE7A1F !important;
         }
         .agency_30{
             background-color: #00467e !important;
-        }
-        .is_open{
+        } */
+        /* .is_open{
             background-color: #e2a03f !important;
-        }
+        } */
 
         .agency_29 td,
         .is_open td{
@@ -223,8 +223,10 @@
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
                                 //SABER SI SON ARRIVAL, DEPARTURE O TRANSFER, MEDIANTE UN COLOR DE FONDO
                                 $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "f2eafa" : "dbe0f9" ) ).";";
+
+                                $color_agency = ( $value->type_site == "AGENCY" ? "background-color: ".$value->site_color.";color: #ffffff;" : '' )."";
                                 // $color = "color: #".( $value->site_code == 29 || $value->site_code == 30 ? "FFFFFF" : "515365" ).";";
-                                $class_agency = ( $value->site_code == 29 || $value->site_code == 30 ? "agency_".$value->site_code : ( $value->is_open ? "is_open" : "" ) );
+                                // $class_agency = ( $value->site_code == 29 || $value->site_code == 30 ? "agency_".$value->site_code : ( $value->is_open ? "is_open" : "" ) );
 
                                 //PREASIGNACION
                                 $flag_preassignment = ( ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ) && $value->op_one_preassignment != "" ? true : ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && ( $value->is_round_trip == 1 ) && $value->op_two_preassignment != "" ? true : false ) );
@@ -284,7 +286,7 @@
                                         $generalTimeGroup[$hour]['quantity']++;
                                     }
                             @endphp
-                            <tr class="item-{{ $key.$value->id }} {{ $class_agency }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
+                            <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
                                 <td class="text-center">
                                     @if ( $flag_preassignment )
                                         <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase {{ auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 ? 'disabled' : '' }}">{{ $preassignment }}</button>
@@ -341,7 +343,7 @@
                                 <td class="text-center">{{ $value->passengers }}</td>
                                 <td class="text-center" <?=auth()->user()->classCutOffZone($value)?>>{{ auth()->user()->setFrom($value, "name") }} {{ $value->operation_type == 'arrival' && !empty($value->flight_number) ? ' ('.$value->flight_number.')' : '' }}</td>
                                 <td class="text-center">{{ auth()->user()->setTo($value, "name") }}</td>
-                                <td class="text-center">{{ $value->site_name }}</td>
+                                <td class="text-center" style="{{ $color_agency }}">{{ $value->site_name }}</td>
                                 <td class="text-center" data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}" data-name="{{ auth()->user()->setOperationUnit($value) }}">
                                     @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
                                         {{ auth()->user()->setOperationUnit($value) }}

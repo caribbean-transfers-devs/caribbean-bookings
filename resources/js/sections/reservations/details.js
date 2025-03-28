@@ -18,6 +18,7 @@ const __code_pay = document.getElementById('payment_id');
 //DECLARAMOS VARIABLES PARA ACCIONES DE RESERVA
 const enablePayArrival = document.getElementById('enablePayArrival');
 const refundRequest = document.getElementById('refundRequest');
+const markReservationDuplicate = document.getElementById('markReservationDuplicate');
 
 //DECLARAMOS VARIABLES PARA ITEMS DE SERVICIOS
 
@@ -158,6 +159,66 @@ if( refundRequest ){
             }
         });
     });
+}
+
+//MARCAMOS COMO DUPLICADA UNA RESERVA
+if( markReservationDuplicate ){
+    markReservationDuplicate.addEventListener('click', function(event){
+        event.preventDefault();
+        const { code, status } = this.dataset;
+
+        Swal.fire({
+            html: '¿Está seguro de la marcar como duplicada la reservación?',
+            icon: 'warning',    
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',         
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let message = result.value;
+                
+                Swal.fire({
+                    title: "Procesando solicitud...",
+                    text: "Por favor, espera mientras se marca como duplicada la reserva.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/action/markReservationDuplicate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },            
+                    body: JSON.stringify({ reservation_id: code, status: status })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        icon: data.status,
+                        html: data.message,
+                        allowOutsideClick: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire(
+                        '¡ERROR!',
+                        error.message || 'Ocurrió un error',
+                        'error'
+                    );
+                });
+            }
+        });        
+    })
 }
 
 //VALIDAMOS DOM
@@ -670,49 +731,6 @@ async function uploadImages(files, id, status = "CANCELLATION") {
         }
     }
     return uploadedImages;
-}
-
-function duplicatedReservation(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
-    swal.fire({
-        title: '¿Está seguro de marcar como duplicado la reservación?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        console.log(result, id);
-        if (result.isConfirmed) {
-            var url = "/reservationsDuplicated/"+id;
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                dataType: 'json',
-                success: function (data) {
-                    swal.fire({
-                        title: 'Reservación duplicada',
-                        text: 'Se ha marcado como duplicado la reservación correctamente',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        location.reload();
-                    });
-                },
-                error: function (data) {
-                    swal.fire({
-                        title: 'Error',
-                        text: 'Ha ocurrido un error al marcar la reservación',
-                        icon: 'error',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            });
-        }
-    });
 }
 
 //ACCION PARA REMOVER UNA COMISION

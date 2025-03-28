@@ -11,6 +11,17 @@ class Reservation extends Model
 
     public $timestamps = false;
 
+    protected $fillable = [
+        'client_first_name',
+        'client_last_name',
+        'client_email',
+        'client_phone',
+        'site_id',
+        'reference',
+        'origin_sale_id',
+        'currency'
+    ];    
+
     /**
      * Relations
      */

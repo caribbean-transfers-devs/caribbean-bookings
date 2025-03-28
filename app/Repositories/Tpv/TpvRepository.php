@@ -17,7 +17,8 @@ class TpvRepository
 {
     use ApiTrait;
 
-    public function handler($request){
+    public function handler($request)
+    {
         // Session::forget('tpv');
         // $uuid = Str::uuid()->toString();
 

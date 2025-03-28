@@ -102,19 +102,10 @@ trait FiltersTrait
 
     public function Origins()
     {
-        $origins[] = (object) array(
+        return OriginSale::select('id', 'code')->get()->prepend((object)[
             "id" => 0,
             "code" => "PAGINA WEB"
-        );        
-        $data = OriginSale::All();
-        if( !empty($data) ){
-            foreach ($data as $key => $value) {
-                $origins[] = $value;
-            }
-        }
-        
-        // dd($origins);        
-        return $origins;
+        ]);
     }
 
     //ESTATUS DE RESERVACIÓN
@@ -145,17 +136,23 @@ trait FiltersTrait
     //TIPO DE VEHÍCULO
     public function Vehicles()
     {
-        return DestinationService::all();
+        return DestinationService::get();
     }
 
     //ZONAS DE ORIGEN Y DESTINO
+    /**
+     * Se evita llamar Zones::all() cuando hay un filtro.
+     * Se usa query() para construir dinámicamente la consulta.
+     */
     public function Zones($destination_id = NULL)
     {
-        if( $destination_id ){
-            return Zones::where('destination_id', $destination_id)->get();
-        }else{
-            return Zones::all();
-        }        
+        $query = Zones::query();
+
+        if ($destination_id) {
+            $query->where('destination_id', $destination_id);
+        }
+    
+        return $query->get();
     }
 
     //ESTATUS DE SERVICIO
@@ -172,21 +169,34 @@ trait FiltersTrait
     //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADOS COMO LOS VEHICULOS QUE TENEMOS
     // SI LE MANDAMOS EL PARAMERO ACTION COMO FILTERS, NOS TRAE TODAS LAS UNIDADES SI IMPORTAR QUE ESTEN INACTIVAS
     // SI LE MANDAMOS EL PARAMERO ACTION COMO DIFERENTE DE FILTERS, NOS TRAE TODAS LAS UNIDADES QUE SOLO ESTEN ACTIVAS
+    /**
+     * Se optimizó la consulta con query() en lugar de if separado.
+     * Se asegura de usar Eager Loading para relaciones.
+     */
     public function Units($action = "filters")
     {
-        return $action === "filters" 
-            ? Vehicle::with(['enterprise','destination_service','destination'])->get() 
-            : Vehicle::with(['enterprise','destination_service','destination'])->where('status', 1)->get();
+        $query = Vehicle::with(['enterprise', 'destination_service', 'destination']);
+
+        if ($action !== "filters") {
+            $query->where('status', 1);
+        }
+    
+        return $query->get();            
     }
 
     //CONDUCTOR
+    /**
+     * Se usa query() para construir la consulta más eficiente.
+     */
     public function Drivers($action = "filters")
     {
-        if( $action == "filters" ){
-            return Driver::orderBy('names','ASC')->get();
-        }else{
-            return Driver::where('status',1)->orderBy('names','ASC')->get();
+        $query = Driver::orderBy('names', 'ASC');
+
+        if ($action !== "filters") {
+            $query->where('status', 1);
         }
+    
+        return $query->get();
     }
 
     //ESTATUS DE OPERACIÓN
@@ -242,8 +252,18 @@ trait FiltersTrait
         return SalesType::all();
     }
 
+    /**
+     * Se evita llamar where() si $destination_id es NULL.
+     * Se usa query() para construir dinámicamente la consulta.
+     */
     public function ContactPoints($destination_id = NULL){
-        return ContactPoints::where('destination_id', $destination_id )->get();
+        $query = ContactPoints::query();
+
+        if ($destination_id) {
+            $query->where('destination_id', $destination_id);
+        }
+    
+        return $query->get();
     }
 
     public function parseArrayQuery($data, $marks = NULL){

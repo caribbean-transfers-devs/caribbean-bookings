@@ -2,6 +2,12 @@
 
 namespace App\Repositories\Reservations;
 
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Exception;
+use Carbon\Carbon;
+
 use App\Models\Reservation;
 use App\Models\DestinationService;
 use App\Models\ReservationFollowUp;
@@ -13,61 +19,44 @@ use App\Models\ContactPoints;
 use App\Models\Zones;
 use App\Models\Site;
 use App\Models\Sale;
-use Exception;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 //TRAITS
 use App\Traits\MailjetTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
 use App\Traits\FollowUpTrait;
-use App\Traits\Reports\PaymentsTrait;
 
 class ReservationsRepository
 {
-    use MailjetTrait, FiltersTrait, QueryTrait, FollowUpTrait, PaymentsTrait;
+    use MailjetTrait, FiltersTrait, QueryTrait, FollowUpTrait;
 
     public function reservationPayments($reservation){
         return $this->getPayments($reservation->id);
     }
 
-    public function update($request,$reservation){
+    public function update($request,$reservation)
+    {
+        $validatedData = $this->validateBookingRequest($request); //Validar y preparar los datos de la solicitud
+
         try{
             DB::beginTransaction();
-            $payments = Payment::where('reservation_id', $reservation->id)->get();
-            $this->logBooking($request, $reservation);
-            $reservation->client_first_name = $request->client_first_name;
-            $reservation->client_last_name = $request->client_last_name;
-            $reservation->client_email = $request->client_email;
-            $reservation->client_phone = $request->client_phone;
-            $reservation->site_id = $request->site_id;
-            $reservation->reference = $request->reference;
-            if( isset($request->origin_sale_id) && $request->origin_sale_id != 0 ){
-                $reservation->origin_sale_id = $request->origin_sale_id;
-            }            
-            $reservation->currency = $request->currency;
-            if( isset($request->origin_sale_id) && $request->origin_sale_id != 0 ){
-                $reservation->origin_sale_id = $request->origin_sale_id;
-            }
 
-            if ( ($request->site_id == 11 || $request->site_id == 21) && $request->vendor_id == NULL && $request->terminal == NULL && count($payments) == 0 ) {
-                $reservation->is_complete = 0;
-                $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", completo la reservación de Taquilla, que se creo desde operaciones", 'HISTORY', 'EDICIÓN RESERVACIÓN');
-            }
+            $this->logBookingChanges($reservation, $request);
+            $this->updateBookingAttributes($reservation, $validatedData); //Update item attributes with validated data
 
-            if( isset($request->special_request) && !empty($request->special_request) ){
-                $this->create_followUps($reservation->id, $request->special_request, 'CLIENT', auth()->user()->name);
-            }
-
-
-            $reservation->save();
             DB::commit();
-            return response()->json(['message' => 'Reservation updated successfully', 'success' => true], Response::HTTP_OK);
+            return response()->json([
+                'message' => 'Reserva actualizada exitosamente', 
+                'success' => true,
+                'status' => 'success',
+            ], Response::HTTP_OK);                 
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error editing reservation', 'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json([
+                'message' => 'Error al editar la reserva: ' . $e->getMessage(), 
+                'success' => false,
+                'status' => 'error',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -125,49 +114,6 @@ class ReservationsRepository
             return response()->json([
                 'status' => 'danger',
                 'message' => 'Error al cancelar la reserva',
-                // 'message' => $e->getMessage(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public function duplicated($request, $reservation){
-        try {            
-            DB::beginTransaction();
-            $reservation->is_duplicated = 1;
-            $reservation->save();
-
-            // Actualizar los estados de los ítems y el ID por el tipo de cancelación
-            $reservation->items()->update([
-                'vehicle_id_one' => NULL,
-                'driver_id_one' => NULL,
-                'op_one_status' => 'DUPLICATE',
-                'op_one_status_operation' => 'PENDING',
-                'op_one_time_operation' => NULL,
-                'op_one_preassignment' => NULL,
-                'op_one_operating_cost' => 0,
-                'op_one_cancellation_type_id' => NULL,
-                'vehicle_id_two' => NULL,
-                'driver_id_two' => NULL,
-                'op_two_status' => 'DUPLICATE',
-                'op_two_status_operation' => 'PENDING',
-                'op_two_time_operation' => NULL,
-                'op_two_preassignment' => NULL,
-                'op_two_operating_cost' => 0,
-                'op_two_cancellation_type_id' => NULL,
-            ]);
-
-            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", marco marco como duplicada la reservación: ".$reservation->id, 'HISTORY', 'DUPLICADA');
-
-            DB::commit();
-            return response()->json([
-                'status' => 'success', 
-                'message' => 'Reseva duplicada correctamente'
-            ], Response::HTTP_OK);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'status' => 'danger',
-                'message' => 'Error cancelling reservation',
                 // 'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -238,50 +184,370 @@ class ReservationsRepository
         return $exchange;
     }
 
-    public function editreservitem($request, $item){
+    public function editreservitem($request, $item)
+    {
+        $validatedData = $this->validateServiceRequest($request); //Validar y preparar los datos de la solicitud
+        
         try {
             DB::beginTransaction();
-            $this->logBookingService($request, $item);
-
-            if( isset($request->serviceTypeForm) && $request->serviceTypeForm == 1 ){
-                $item->is_round_trip = $request->serviceTypeForm;
-            }
-
-            $item->destination_service_id = $request->destination_service_id;
-            $item->passengers = $request->passengers;
-            $item->flight_number = $request->flight_number;
             
-            $item->from_name = $request->from_name;
-            $item->to_name = $request->to_name;
-        
-            $item->from_zone = $request->from_zone_id;
-            if($request->from_lat){
-                $item->from_lat = $request->from_lat;
-                $item->from_lng = $request->from_lng;
-            }
-
-            $item->to_zone = $request->to_zone_id;
-            if($request->to_lat){
-                $item->to_lat = $request->to_lat;
-                $item->to_lng = $request->to_lng;
-            }
-
-            $item->op_one_pickup = $request->op_one_pickup;
-            $item->op_two_pickup = $request->op_two_pickup ?? null;
-            $item->save();
+            $this->logBookingServiceChanges($item, $request);
+            $this->updateItemAttributes($item, $validatedData); //Update item attributes with validated data
+            $this->updateReservationExpiration($item->reservation_id, $validatedData);
+            
             DB::commit();
+            
             return response()->json([
                 'message' => 'Item updated successfully', 
-                'success' => true
-            ], Response::HTTP_OK);
+                'success' => true,
+                'status' => 'success',
+            ], Response::HTTP_OK);            
         } catch (Exception $e) {
-            DB::rollBack();
+            DB::rollBack();            
             return response()->json([
-                'message' => 'Error updating item', 
-                'success' => false
+                'message' => 'Error updating item: ' . $e->getMessage(), 
+                'success' => false,
+                'status' => 'error',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * Validar y preparar los datos de la solicitud
+     */
+    protected function validateBookingRequest($request): array
+    {
+        return [
+            'client_first_name' => $request->client_first_name,
+            'client_last_name' => $request->client_last_name,
+            'client_email' => $request->client_email,
+            'client_phone' => $request->client_phone,
+            'site_id' => $request->site_id,
+            'reference' => $request->reference,
+            'origin_sale_id' => isset($request->origin_sale_id) && ( $request->origin_sale_id !== '' || $request->origin_sale_id !== 0 ) ? $request->origin_sale_id : NULL,
+            'currency' => $request->currency,
+            'special_request' => $request->special_request ?: NULL,
+        ];
+    }
+
+    /**
+     * Validar y preparar los datos de la solicitud
+     */
+    protected function validateServiceRequest($request): array
+    {
+        return [
+            'serviceTypeForm' => $request->serviceTypeForm,
+            'destination_service_id' => $request->destination_service_id,
+            'passengers' => $request->passengers,
+            'flight_number' => $request->flight_number,
+            'from_zone_id' => $request->from_zone_id,
+            'from_name' => $request->from_name,
+            'from_lat' => $request->from_lat,
+            'from_lng' => $request->from_lng,
+            'to_zone_id' => $request->to_zone_id,
+            'to_name' => $request->to_name,
+            'to_lat' => $request->to_lat,
+            'to_lng' => $request->to_lng,
+            'op_one_pickup' => $request->op_one_pickup,
+            'op_two_pickup' => $request->op_two_pickup ?? null,
+        ];
+    }
+
+    protected function logBookingChanges($reservation, $request)
+    {
+        $changes = [
+            'client_first_name' => [
+                'condition' => $request->client_first_name != $reservation->client_first_name,
+                'message' => "actualizó el nombre del cliente de: {$reservation->client_first_name} a {$request->client_first_name}"
+            ],
+            'client_last_name' => [
+                'condition' => $request->client_last_name != $reservation->client_last_name,
+                'message' => "actualizó los apellidos del cliente de: {$reservation->client_last_name} a {$request->client_last_name}"
+            ],
+            'client_email' => [
+                'condition' => $request->client_email != $reservation->client_email,
+                'message' => "actualizó el correo del cliente de: {$reservation->client_email} a {$request->client_email}"
+            ],
+            'client_phone' => [
+                'condition' => $request->client_phone != $reservation->client_phone,
+                'message' => "actualizó el teléfono del cliente de: {$reservation->client_phone} a {$request->client_phone}"
+            ],
+            'site_id' => [
+                'condition' => $request->site_id != $reservation->site_id,
+                'action' => function() use ($request, $reservation) {
+                    $old = Site::find($reservation->site_id);
+                    $new = Site::find($request->site_id);
+                    return "actualizo el sitio de: {$old->name} a {$new->name}";
+                }
+            ],
+            'reference' => [
+                'condition' => $request->reference != $reservation->reference,
+                'message' => "actualizo la referencia de: {$reservation->reference} a {$request->reference}"
+            ],
+            'origin_sale_id' => [
+                'condition' => isset($request->origin_sale_id) && $request->origin_sale_id !== '' && ( $request->origin_sale_id != $reservation->origin_sale_id ),
+                'action' => function() use ($request, $reservation) {
+                    $old = OriginSale::find($reservation->origin_sale_id);
+                    $new = OriginSale::find($request->origin_sale_id);
+                    return "actualizo el origen de venta de: {$old->code} a {$new->code}";
+                }
+            ],
+            'currency' => [
+                'condition' => $request->currency != $reservation->currency,
+                'message' => "actualizo la moneda de: {$reservation->currency} a {$request->currency}"
+            ],
+            'special_request' => [
+                'condition' => '',
+                'message' => ""
+            ],            
+        ];
+    
+        foreach ($changes as $change) {
+            if ($change['condition']) {
+                $message = $change['message'] ?? null;
+                if (isset($change['action'])) {
+                    $result = $change['action']();
+                    if (is_array($result)) {
+                        foreach ($result as $msg) {
+                            $this->createLogEntry($reservation->id, $msg, 'UPDATE_RESERVATION');
+                        }
+                        continue;
+                    }
+                    $message = $result;
+                }                
+                $this->createLogEntry($reservation->id, $message, 'UPDATE_RESERVATION');
+            }
+        }
+    }    
+    
+    protected function logBookingServiceChanges($item, $request)
+    {
+        $changes = [
+            'service_type' => [
+                'condition' => isset($request->serviceTypeForm) && $request->serviceTypeForm == 1 && $request->serviceTypeForm != $item->is_round_trip,
+                'message' => 'actualizó el servicio: {$item->id}({$item->code}) de: "One Way" a "Round Trip"'
+            ],
+            'vehicle_type' => [
+                'condition' => $request->destination_service_id != $item->destination_service_id,
+                'action' => function() use ($request, $item) {
+                    $old = DestinationService::find($item->destination_service_id);
+                    $new = DestinationService::find($request->destination_service_id);
+                    return "actualizó el tipo de Vehículo de: {$old->name} a {$new->name}";
+                }
+            ],
+            'passengers' => [
+                'condition' => $request->passengers != $item->passengers,
+                'message' => "actualizó el número de pasajeros de: {$item->passengers} a {$request->passengers}"
+            ],
+            'flight_number' => [
+                'condition' => $request->flight_number != $item->flight_number,
+                'message' => "actualizó el número de vuelo de: {$item->flight_number} a {$request->flight_number}"
+            ],
+            'from_zone' => [
+                'condition' => $request->from_zone_id != $item->from_zone,
+                'action' => function() use ($request, $item) {
+                    $old = Zones::find($item->from_zone);
+                    $new = Zones::find($request->from_zone_id);
+                    return "actualizó la zona Desde de: {$old->name} a {$new->name}";
+                }
+            ],
+            'from_name' => [
+                'condition' => $request->from_name != $item->from_name,
+                'message' => "actualizó Desde de: {$item->from_name} a {$request->from_name}"
+            ],
+            'from_coords' => [
+                'condition' => $request->from_lat != $item->from_lat,
+                'message' => "actualizó las coordenadas Desde lat: {$item->from_lat} a {$request->from_lat}, lng: {$item->from_lng} a {$request->from_lng}"
+            ],
+            'to_zone' => [
+                'condition' => $request->to_zone_id != $item->to_zone,
+                'action' => function() use ($request, $item) {
+                    $old = Zones::find($item->to_zone);
+                    $new = Zones::find($request->to_zone_id);
+                    return "actualizó la zona Hacia de: {$old->name} a {$new->name}";
+                }
+            ],
+            'to_name' => [
+                'condition' => $request->to_name != $item->to_name,
+                'message' => "actualizó Hacia de: {$item->to_name} a {$request->to_name}"
+            ],
+            'to_coords' => [
+                'condition' => $request->to_lat != $item->to_lat,
+                'message' => "actualizó las coordenadas Hacia lat: {$item->to_lat} a {$request->to_lat}, lng: {$item->to_lng} a {$request->to_lng}"
+            ],
+            'pickup_time' => [
+                'condition' => $request->op_one_pickup != $item->op_one_pickup,
+                'action' => function() use ($request, $item) {
+                    $requestDate = date("Y-m-d", strtotime($request->op_one_pickup));
+                    $requestTime = date("H:i", strtotime($request->op_one_pickup));
+                    $itemDate = date("Y-m-d", strtotime($item->op_one_pickup));
+                    $itemTime = date("H:i", strtotime($item->op_one_pickup));
+                    
+                    $messages = [];
+                    if ($requestDate != $itemDate) {
+                        $messages[] = "actualizó la fecha de recogida de: {$itemDate} a {$requestDate}";
+                    }
+                    if ($requestTime != $itemTime) {
+                        $messages[] = "actualizó la hora de recogida de: {$itemTime} a {$requestTime}";
+                    }
+                    return $messages;
+                }
+            ],
+            'return_time' => [
+                'condition' => $item->is_round_trip == 1 && $request->op_two_pickup != $item->op_two_pickup,
+                'action' => function() use ($request, $item) {
+                    $requestDate = date("Y-m-d", strtotime($request->op_two_pickup));
+                    $requestTime = date("H:i", strtotime($request->op_two_pickup));
+                    $itemDate = date("Y-m-d", strtotime($item->op_two_pickup));
+                    $itemTime = date("H:i", strtotime($item->op_two_pickup));
+                    
+                    $messages = [];
+                    if ($requestDate != $itemDate) {
+                        $messages[] = "actualizó la fecha de regreso de: {$itemDate} a {$requestDate}";
+                    }
+                    if ($requestTime != $itemTime) {
+                        $messages[] = "actualizó la hora de regreso de: {$itemTime} a {$requestTime}";
+                    }
+                    return $messages;
+                }
+            ]
+        ];
+    
+        foreach ($changes as $change) {
+            if ($change['condition']) {
+                $message = $change['message'] ?? null;                
+                if (isset($change['action'])) {
+                    $result = $change['action']();
+                    if (is_array($result)) {
+                        foreach ($result as $msg) {
+                            $this->createLogEntry($item->reservation_id, $msg, 'UPDATE_SERVICE');
+                        }
+                        continue;
+                    }
+                    $message = $result;
+                }                
+                $this->createLogEntry($item->reservation_id, $message, 'UPDATE_SERVICE');
+            }
+        }
+    }
+
+    protected function createLogEntry($reservationId, $message, $action = "")
+    {
+        $this->create_followUps(
+            $reservationId, 
+            "El usuario: " . auth()->user()->name . ", " . $message, 
+            'HISTORY', 
+            // 'EDICIÓN RESERVACIÓN'
+            // 'EDICIÓN SERVICIO',
+            $action
+        );
+    }  
+    
+    /**
+     * Update item attributes with validated data
+     */    
+    protected function updateBookingAttributes($reservation, array $data): void
+    {
+        $oldSiteId = $reservation->site_id;
+
+        // Actualización de campos básicos
+        $reservation->fill($data);
+
+        // Manejo de solicitud especial
+        if (!empty($data['special_request'])) {
+            $this->createFollowUp(
+                $reservation->id, 
+                $data['special_request'], 
+                'CLIENT', 
+                auth()->user()->name
+            );
+        }
+
+        // Manejo de cambio de sitio
+        if ($oldSiteId != $data['site_id']) {
+            $this->handleSiteChange($reservation, $data['site_id']);
+        }
+
+        $reservation->save();
+    }    
+
+    /**
+     * Update item attributes with validated data
+     */
+    protected function updateItemAttributes($item, array $data): void
+    {
+        $item->is_round_trip = isset($data['serviceTypeForm']) && $data['serviceTypeForm'] == 1;
+        $item->destination_service_id = $data['destination_service_id'];
+        $item->passengers = $data['passengers'];
+        $item->flight_number = $data['flight_number'];
+        $item->from_name = $data['from_name'];
+        $item->to_name = $data['to_name'];
+        $item->from_zone = $data['from_zone_id'];
+        $item->to_zone = $data['to_zone_id'];
+        $item->op_one_pickup = $data['op_one_pickup'];
+        $item->op_two_pickup = $data['op_two_pickup'];
+
+        // Conditional location updates
+        if (!empty($data['from_lat'])) {
+            $item->from_lat = $data['from_lat'];
+            $item->from_lng = $data['from_lng'];
+        }
+
+        if (!empty($data['to_lat'])) {
+            $item->to_lat = $data['to_lat'];
+            $item->to_lng = $data['to_lng'];
+        }
+
+        $item->save();
+    }
+
+    protected function updateReservationExpiration(int $reservation_id, array $data): void
+    {
+        $booking = Reservation::find($reservation_id);
+        if ($booking && $booking->is_quotation == 1) {
+            $newDate = $this->calculateNewExpirationDate(date('Y-m-d H:i:s'), $data['op_one_pickup']);
+            if ($newDate) {
+                $booking->expires_at = $newDate;
+                $booking->save();
+            }
+        }
+    }
+
+    protected function calculateNewExpirationDate($currentDate, $pickupDate)
+    {
+        $current = Carbon::parse($currentDate);
+        $pickup = Carbon::parse($pickupDate);
+        $daysDifference = $current->diffInDays($pickup);
+    
+        return match(true) {
+            $daysDifference === 0 || $daysDifference === 1 => $pickup->copy()->subHours(3),
+            $daysDifference >= 2 && $daysDifference <= 4 => $pickup->copy()->subDay(),
+            $daysDifference >= 5 => $pickup->copy()->subDays(2),
+            default => null
+        };
+    }
+    
+    protected function handleSiteChange($reservation, $newSiteId)
+    {
+        $site = Site::where('id', $newSiteId)->where('is_cxc', 1)->first();
+        
+        if ($site) {
+            $reservation->is_quotation = 0;
+            $reservation->expires_at = null;
+            return;
+        }
+        
+        if ($reservation->was_is_quotation == 1) {
+            $item = $reservation->items->first();
+            if ($item) {
+                $newDate = $this->calculateNewExpirationDate(now(), $item['op_one_pickup']);
+                if ($newDate) {
+                    $reservation->is_quotation = 1;
+                    $reservation->expires_at = $newDate;
+                }
+            }
+        }      
+    }    
 
     public function sendArrivalConfirmation($request){
         $lang = $request['lang'];
@@ -662,106 +928,6 @@ class ReservationsRepository
         
         if( $request->currency != $reservation->currency ){
             $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la moneda de: ".$reservation->currency." a ".$request->currency, 'HISTORY', 'EDICIÓN RESERVACIÓN');
-        }
-    }
-
-    // NOS PERMITE GENERAR EL LOG DE CADA UNO DE LOS CAMBIOS DE LOS SERVICIOS DE LA RESERVACIÓN
-    public function logBookingService($request, $item){
-        //CAMBIANDO EL TIPO DE SERVICIO
-        if( ( isset($request->serviceTypeForm) && $request->serviceTypeForm == 1 ) && ( $request->serviceTypeForm != $item->is_round_trip ) ){
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el servicio: ".$item->id."(".$item->code.") de: One Way a Round Trip", 'HISTORY', 'EDICIÓN SERVICIO');
-        }        
-
-        //LOG DE TIPO DE VEHÍVULO
-        if( $request->destination_service_id != $item->destination_service_id ){
-            $destination_old = DestinationService::find($item->destination_service_id);
-            $destination_new = DestinationService::find($request->destination_service_id);
-            //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el tipo de Vehículo de: ".$destination_old->name." a ".$destination_new->name, 'HISTORY', 'EDICIÓN SERVICIO');
-        }
-
-        //LOG DE NUMERO DE PASAJEROS
-        if( $request->passengers != $item->passengers  ){
-            //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el número de pasajeros de: ".$item->passengers." a ".$request->passengers, 'HISTORY', 'EDICIÓN SERVICIO');
-        }
-
-        //LOG DE NÚMERO DE VUELO
-        if( $request->flight_number != $item->flight_number  ){
-            //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el numéro de vuelo de: ".$item->flight_number." a ".$request->flight_number, 'HISTORY', 'EDICIÓN SERVICIO');
-        }
-
-        //LOG DE ZONA DESDE
-        if( $request->from_zone_id != $item->from_zone ){
-            $zone_old = Zones::find($item->from_zone);            
-            $zone_new = Zones::find($request->from_zone_id);
-            //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la zona Desde de: ".$zone_old->name." a ".$zone_new->name, 'HISTORY', 'EDICIÓN SERVICIO');
-        }
-
-        if( $request->from_name != $item->from_name ){
-            //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo Desde de: ".$item->from_name." a ".$request->from_name, 'HISTORY', 'EDICIÓN SERVICIO');
-        }
-
-        if( $request->from_lat != $item->from_lat ){
-            //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo las coordenadas Desde lat: ".$item->from_lat." a ".$request->from_lat.", lng: ".$item->from_lng." a ".$request->from_lng, 'HISTORY', 'EDICIÓN SERVICIO');
-        }
-
-        //LOG DE ZONA HACIA
-        if( $request->to_zone_id != $item->to_zone ){
-            $zone_old = Zones::find($item->to_zone);
-            $zone_new = Zones::find($request->to_zone_id);
-            //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la zona Hacia de: ".$zone_old->name." a ".$zone_new->name, 'HISTORY', 'EDICIÓN SERVICIO');
-        }
-
-        if( $request->to_name != $item->to_name ){
-            //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo Hacia de: ".$item->to_name." a ".$request->to_name, 'HISTORY', 'EDICIÓN SERVICIO');
-        }
-
-        if( $request->to_lat != $item->to_lat ){
-            //CREAMOS UN LOG
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo las coordenadas Hacias lat: ".$item->to_lat." a ".$request->to_lat.", lng: ".$item->to_lng." a ".$request->to_lng, 'HISTORY', 'EDICIÓN SERVICIO');
-        }
-
-        //LOG DE FECHA Y HORA DE RECOGIDA
-        if( $request->op_one_pickup != $item->op_one_pickup ){
-            $one_pickup_request_date = date("Y-m-d", strtotime($request->op_one_pickup));
-            $one_pickup_request_time = date("H:i", strtotime($request->op_one_pickup));
-            $one_pickup_item_date = date("Y-m-d", strtotime($item->op_one_pickup));
-            $one_pickup_item_time = date("H:i", strtotime($item->op_one_pickup));
-
-            if( $one_pickup_request_date != $one_pickup_item_date ){
-                //CREAMOS UN LOG
-                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la fecha de recogida de: ".$one_pickup_item_date." a ".$one_pickup_request_date, 'HISTORY', 'EDICIÓN SERVICIO');
-            }
-
-            if( $one_pickup_request_time != $one_pickup_item_time ){
-                //CREAMOS UN LOG
-                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la hora de recogida de: ".$one_pickup_item_time." a ".$one_pickup_request_time, 'HISTORY', 'EDICIÓN SERVICIO');
-            }
-        }
-
-        //LOG DE FECHA Y HORA DE REGRESO
-        if( $item->is_round_trip == 1 && $request->op_two_pickup != $item->op_two_pickup ){
-            $two_pickup_request_date = date("Y-m-d", strtotime($request->op_two_pickup));
-            $two_pickup_request_time = date("H:i", strtotime($request->op_two_pickup));
-            $two_pickup_item_date = date("Y-m-d", strtotime($item->op_two_pickup));
-            $two_pickup_item_time = date("H:i", strtotime($item->op_two_pickup));
-
-            if( $two_pickup_request_date != $two_pickup_item_date ){
-                //CREAMOS UN LOG
-                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la fecha de regreso de: ".$two_pickup_item_date." a ".$two_pickup_request_date, 'HISTORY', 'EDICIÓN SERVICIO');
-            }
-
-            if( $two_pickup_request_time != $two_pickup_item_time ){
-                //CREAMOS UN LOG
-                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la hora de regreso de: ".$two_pickup_item_time." a ".$two_pickup_request_time, 'HISTORY', 'EDICIÓN SERVICIO');
-            }            
         }
     }
 

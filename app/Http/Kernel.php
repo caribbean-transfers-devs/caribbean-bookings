@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \Clockwork\Support\Laravel\ClockworkMiddleware::class,
     ];
 
     /**
@@ -67,5 +68,6 @@ class Kernel extends HttpKernel
         'locale' => \App\Http\Middleware\SetLocale::class,
         'ApiChecker' => \App\Http\Middleware\ApiChecker::class,
         'Debug' => \App\Http\Middleware\DebugbarMiddleware::class,
+        
     ];
 }

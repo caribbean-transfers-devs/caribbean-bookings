@@ -208,7 +208,7 @@ class SalesRepository
         }
 
         // dd($query, $queryHaving, $queryData);
-        $bookings = $this->queryBookings($query, $queryHaving, $queryData);        
+        $bookings = $this->queryBookings($query, $queryHaving, $queryData);
         
         return view('reports.sales.index', [
             'breadcrumbs' => [
@@ -222,5 +222,10 @@ class SalesRepository
             'exchange' => $this->Exchange(date("Y-m-d", strtotime($data['init'])), date("Y-m-d", strtotime($data['end']))),
             'data' => $data,
         ]);
+    }
+
+    private function helpers()
+    {
+        
     }
 }

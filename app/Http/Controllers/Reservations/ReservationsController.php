@@ -44,12 +44,6 @@ class ReservationsController extends Controller
         }
     }
 
-    public function duplicated(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
-        if($this->hasPermission(24)){
-            return $reservationRepository->duplicated($request,$reservation);
-        }
-    }
-
     public function removeCommission(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
     {
         if($this->hasPermission(24)){

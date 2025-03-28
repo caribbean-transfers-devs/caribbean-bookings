@@ -59,10 +59,10 @@ class DetailRepository
                 },
                 // 'items.cancellationTypeOrigin',
                 // 'items.cancellationTypeDestino',
-                'sales.callCenterAgent',  // Mantienes la relación con ventas por si necesitas la información de ventas // Relación anidada
+                'sales',  // Mantienes la relación con ventas por si necesitas la información de ventas // Relación anidada
                 'callCenterAgent',  // Relación directa con el agente del call center
                 'payments',
-                'refunds',
+                'refunds.user',
                 'followUps',
                 'site',
                 'cancellationType',
@@ -84,24 +84,31 @@ class DetailRepository
                 endif;                      
             endforeach;
     
-            if($reservation->is_cancelled == 1):
+            // Calcula la diferencia entre ventas y pagos (redondeada)
+            $balance = round($data['total_sales']) - round($data['total_payments']);
+            
+            // Determina el estado de la reservación basado en condiciones específicas
+            if ($reservation->is_cancelled) {
                 $data['status'] = "CANCELLED";
-            endif;
-            if($reservation->is_duplicated == 1):
+            } elseif ($reservation->is_duplicated) {
                 $data['status'] = "DUPLICATED";
-            endif;
-            if($reservation->open_credit == 1):
+            } elseif ($reservation->open_credit) {
                 $data['status'] = "OPENCREDIT";
-            endif;
-            if($reservation->is_quotation == 1):
+            } elseif ($reservation->is_quotation) {
                 $data['status'] = "QUOTATION";
-            endif;        
-            if( $reservation->site->is_cxc == 1 && ( round( $data['total_payments'], 2) == 0 || ( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ) ) ):
+            } elseif ($reservation->pay_at_arrival) {
+                $data['status'] = "PAY_AT_ARRIVAL";
+            } elseif ($reservation->site->is_cxc && (round($data['total_payments'], 2) == 0 || 
+                    round($data['total_payments'], 2) >= round($data['total_sales'], 2))) {
                 $data['status'] = "CREDIT";
-            endif;            
-            if( $reservation->site->is_cxc == 0 && round( $data['total_payments'], 2) != 0 && ( $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->open_credit == 0 ) && ( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ) ):
+            } elseif ($balance > 0) {
+                $data['status'] = "PENDING";
+            } else {
                 $data['status'] = "CONFIRMED";
-            endif;
+            }            
+            // if( $reservation->site->is_cxc == 0 && round( $data['total_payments'], 2) != 0 && ( $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->open_credit == 0 ) && ( round( $data['total_payments'], 2) >= round( $data['total_sales'], 2) ) ):
+            //     $data['status'] = "CONFIRMED";
+            // endif;
     
             return view('reservations.detail', [
                 'breadcrumbs' => [

@@ -2,17 +2,6 @@
     use Illuminate\Support\Str;
     use Carbon\Carbon;
 
-    $services = auth()->user()->Services();
-    $websites = auth()->user()->Sites();
-    $origins = auth()->user()->Origins();
-    $reservation_status = auth()->user()->reservationStatus();
-    $vehicles = auth()->user()->Vehicles();
-    $zones = auth()->user()->Zones();
-    $payment_status = auth()->user()->paymentStatus();
-    $currencies = auth()->user()->Currencies();
-    $methods = auth()->user()->Methods();
-    $cancellations = auth()->user()->CancellationTypes();
-
     $bookingsStatus = [
         "type" => "BOOKING",
         "total" => 0,
