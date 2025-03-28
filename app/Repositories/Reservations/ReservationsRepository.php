@@ -285,11 +285,13 @@ class ReservationsRepository
                 'message' => "actualizo la referencia de: {$reservation->reference} a {$request->reference}"
             ],
             'origin_sale_id' => [
-                'condition' => isset($request->origin_sale_id) && $request->origin_sale_id !== '' && ( $request->origin_sale_id != $reservation->origin_sale_id ),
+                'condition' => isset($request->origin_sale_id) && ( $request->origin_sale_id !== '' || $request->origin_sale_id !== 0 ) && ( $request->origin_sale_id != $reservation->origin_sale_id ),
                 'action' => function() use ($request, $reservation) {
                     $old = OriginSale::find($reservation->origin_sale_id);
                     $new = OriginSale::find($request->origin_sale_id);
-                    return "actualizo el origen de venta de: {$old->code} a {$new->code}";
+                    $name_old = ( isset($old->code) ? $old->code : "PAGINA WEB" );
+                    $name_new = ( isset($new->code) ? $new->code : "PAGINA WEB" );
+                    return "actualizo el origen de venta de: ({$name_old}) a ({$name_new})";
                 }
             ],
             'currency' => [
