@@ -19,42 +19,42 @@ trait RoleTrait
      */
     public function getRolesAndSubmodules(){
         //Validamos si existe una sessión abierta y obtenemos el id, en caso contrario retornamos 0
-        // $user_id = (Auth::check()) ? Auth::id() : 0;
-        $user_id = Auth::id() ?? 0;
+        $user_id = (Auth::check()) ? Auth::id() : 0;
+        // $user_id = Auth::id() ?? 0;
     
         if (!$user_id) {
             return [];
-        }        
+        }
         
-        // $roles = UserRole::where('user_id', $user_id)->pluck('role_id')->toArray();
+        $roles = UserRole::where('user_id', $user_id)->pluck('role_id')->toArray();
 
-        // $permissions_data = [];
-        // if (count($roles) > 0){
-        //     $permissions_data['roles'] = $roles;
-        //     $roles_permits = UserRole::where('user_id', $user_id)->leftJoin('roles_permits', 'roles_permits.role_id', '=', 'user_roles.role_id')
-        //     ->distinct()->pluck('submodule_id')->toArray();
-        //     $permissions_data['permissions'] = $roles_permits;
-        // }
+        $permissions_data = [];
+        if (count($roles) > 0){
+            $permissions_data['roles'] = $roles;
+            $roles_permits = UserRole::where('user_id', $user_id)->leftJoin('roles_permits', 'roles_permits.role_id', '=', 'user_roles.role_id')
+            ->distinct()->pluck('submodule_id')->toArray();
+            $permissions_data['permissions'] = $roles_permits;
+        }
 
-        // return $permissions_data;
+        return $permissions_data;
 
         // Una sola consulta para obtener ambos datos
-        $data = UserRole::where('user_id', $user_id)
-            ->with(['role.permissions']) // Asume relación Eloquent
-            ->get()
-            ->reduce(function ($carry, $userRole) {
-                $carry['roles'][] = $userRole->role_id;
-                foreach ($userRole->role->permissions ?? [] as $permission) {
-                    $carry['permissions'][] = $permission->submodule_id;
-                }
-                return $carry;
-            }, ['roles' => [], 'permissions' => []]);
+        // $data = UserRole::where('user_id', $user_id)
+        //     ->with(['role.permissions']) // Asume relación Eloquent
+        //     ->get()
+        //     ->reduce(function ($carry, $userRole) {
+        //         $carry['roles'][] = $userRole->role_id;
+        //         foreach ($userRole->role->permissions ?? [] as $permission) {
+        //             $carry['permissions'][] = $permission->submodule_id;
+        //         }
+        //         return $carry;
+        //     }, ['roles' => [], 'permissions' => []]);
 
-        // Eliminar duplicados
-        $data['roles'] = array_unique($data['roles']);
-        $data['permissions'] = array_unique($data['permissions']);
+        // // Eliminar duplicados
+        // $data['roles'] = array_unique($data['roles']);
+        // $data['permissions'] = array_unique($data['permissions']);
 
-        return $data;        
+        // return $data;        
     }
 
     /**

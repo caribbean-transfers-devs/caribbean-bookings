@@ -1,17 +1,17 @@
 <?php
 namespace App\Http\Controllers\Auth;
 
-// use Illuminate\Http\Request;
-// use App\Http\Controllers\Controller;
-// use App\Http\Requests\LoginRequest;
-// use Illuminate\Support\Facades\Auth;
-// use Illuminate\Support\Facades\Request as Device;
-
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
-use Jenssegers\Agent\Agent;
+use Illuminate\Support\Facades\Request as Device;
+
+// use Illuminate\Http\Request;
+// use App\Http\Controllers\Controller;
+// use App\Http\Requests\LoginRequest;
+// use Illuminate\Support\Facades\Auth;
+// use Jenssegers\Agent\Agent;
 
 //TRAITS
 use App\Traits\RoleTrait;
