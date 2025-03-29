@@ -194,7 +194,7 @@ class ReservationsRepository
     protected function validateServiceRequest($request): array
     {
         return [
-            'serviceTypeForm' => $request->serviceTypeForm,
+            'serviceTypeForm' => $request->serviceTypeForm ?: '',
             'destination_service_id' => $request->destination_service_id,
             'passengers' => $request->passengers,
             'flight_number' => $request->flight_number,
@@ -436,7 +436,7 @@ class ReservationsRepository
      */
     protected function updateItemAttributes($item, array $data): void
     {
-        $item->is_round_trip = isset($data['serviceTypeForm']) && $data['serviceTypeForm'] == 1;
+        ( isset($data['serviceTypeForm']) && $data['serviceTypeForm'] == 1 ? $item->is_round_trip = $data['serviceTypeForm'] : '' );
         $item->destination_service_id = $data['destination_service_id'];
         $item->passengers = $data['passengers'];
         $item->flight_number = $data['flight_number'];

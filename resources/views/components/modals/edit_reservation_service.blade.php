@@ -15,7 +15,7 @@
                         <div class="col-sm-12 col-md-12 serviceTypeForm d-none">
                             <label class="form-label" for="serviceTypeForm">Tipo de servicio</label>
                             <select class="form-control mb-2" id="serviceTypeForm">
-                                <option value="0">Selecciona una opción</option>
+                                <option value="">Selecciona una opción</option>
                                 <option value="1">Round Trip</option>
                             </select>
                         </div>
