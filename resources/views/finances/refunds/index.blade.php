@@ -118,7 +118,7 @@
                                                 $codes_string .= '<p class="mb-1 text-white">'.$code.'</p>';
                                             }
                                         @endphp
-                                        @if (auth()->user()->hasPermission(38))
+                                        @if (auth()->user()->hasPermission(61))
                                             <a class="btn btn-dark w-100 mb-2" href="/reservations/detail/{{ $booking->reservation_id }}" target="_black"><?=$codes_string?></a>
                                         @else
                                             <button type="button" class="btn btn-dark w-100 mb-2"><?=$codes_string?></button>

@@ -15,8 +15,12 @@ const __code = document.getElementById('sale_id');
 const __type_pay = document.getElementById('type_form_pay');
 const __code_pay = document.getElementById('payment_id');
 
+const deleteCommission = document.querySelector('.deleteCommission');
+
 //DECLARAMOS VARIABLES PARA ACCIONES DE RESERVA
 const enablePayArrival = document.getElementById('enablePayArrival');
+const enablePlusService = document.getElementById('enablePlusService');
+const markReservationOpenCredit = document.getElementById('markReservationOpenCredit');
 const refundRequest = document.getElementById('refundRequest');
 const markReservationDuplicate = document.getElementById('markReservationDuplicate');
 
@@ -28,6 +32,64 @@ function debounce(func, delay) {
         clearTimeout(timer);
         timer = setTimeout(() => func.apply(this, args), delay);
     };
+}
+
+//ACCION PARA REMOVER UNA COMISION
+if( deleteCommission ){
+    deleteCommission.addEventListener('click', function(event){
+        event.preventDefault();
+        const { code } = this.dataset;
+
+        Swal.fire({
+            html: '¿Está seguro de eliminar la comisión de la reservación?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Procesando solicitud...",
+                    text: "Por favor, espera mientras se elimina la comisión de la reserva.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/action/deleteCommission', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },            
+                    body: JSON.stringify({ reservation_id: code })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        icon: data.status,
+                        html: data.message,
+                        allowOutsideClick: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire(
+                        '¡ERROR!',
+                        error.message || 'Ocurrió un error',
+                        'error'
+                    );
+                });
+            }
+        });
+    })
 }
 
 //HABILIDATAMOS PAGO A LA LLEGADA DE UNA RESERVA
@@ -43,7 +105,7 @@ if( enablePayArrival ){
             confirmButtonText: 'Aceptar',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
-            if (result.isConfirmed) {                        
+            if (result.isConfirmed) {
                 Swal.fire({
                     title: "Procesando solicitud...",
                     text: "Por favor, espera mientras se marca como pago a la llegada la reserva.",
@@ -84,8 +146,124 @@ if( enablePayArrival ){
                     );
                 });
             }
+        });
+    });
+}
+
+//HABILIDATAMOS SERVICIO PLUS DE UNA RESERVA
+if( enablePlusService ){
+    enablePlusService.addEventListener('click', function(event){
+        event.preventDefault();
+        const { code } = this.dataset;
+
+        Swal.fire({
+            html: '¿Está seguro de activar el servicio plus de la reservación?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Procesando solicitud...",
+                    text: "Por favor, espera mientras se activa el servicio plus de la reserva.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/action/enablePlusService', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },            
+                    body: JSON.stringify({ reservation_id: code })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        icon: data.status,
+                        html: data.message,
+                        allowOutsideClick: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire(
+                        '¡ERROR!',
+                        error.message || 'Ocurrió un error',
+                        'error'
+                    );
+                });
+            }
         });       
     });
+}
+
+//MARCAMOS COMO CREDITO ABIERTO UNA RESERVA
+if( markReservationOpenCredit ){
+    markReservationOpenCredit.addEventListener('click', function(event){
+        event.preventDefault();
+        const { code, status } = this.dataset;
+
+        Swal.fire({
+            html: '¿Está seguro de la marcar como crédito abierto la reservación?',
+            icon: 'warning',    
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',         
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Procesando solicitud...",
+                    text: "Por favor, espera mientras se marca como crédito abierto la reserva.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/action/markReservationOpenCredit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },            
+                    body: JSON.stringify({ reservation_id: code, status: status })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        icon: data.status,
+                        html: data.message,
+                        allowOutsideClick: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire(
+                        '¡ERROR!',
+                        error.message || 'Ocurrió un error',
+                        'error'
+                    );
+                });
+            }
+        });        
+    })
 }
 
 //SOLITAMOS REEMBOLSO DE UNA RESERVA
@@ -175,8 +353,6 @@ if( markReservationDuplicate ){
             cancelButtonText: 'Cancelar',         
         }).then((result) => {
             if (result.isConfirmed) {
-                let message = result.value;
-                
                 Swal.fire({
                     title: "Procesando solicitud...",
                     text: "Por favor, espera mientras se marca como duplicada la reserva.",
@@ -731,55 +907,6 @@ async function uploadImages(files, id, status = "CANCELLATION") {
         }
     }
     return uploadedImages;
-}
-
-//ACCION PARA REMOVER UNA COMISION
-const __remove_commission = document.querySelector('.__remove_commission');
-if( __remove_commission != null ){
-    __remove_commission.addEventListener('click', function(event){
-        event.preventDefault();
-        const { reservation } = this.dataset;
-        console.log(reservation);
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-            }
-        });
-        swal.fire({
-            title: '¿Está seguro que desea remover la comisión de esta reservación?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var url = "/reservation/removeCommission/"+reservation;
-                $.ajax({
-                    url: url,
-                    type: 'PUT',
-                    dataType: 'json',
-                    success: function (data) {
-                        swal.fire({
-                            title: 'Comisión removida',
-                            text: 'Se ha removido la comisión para esta reservación',
-                            icon: 'success',
-                            confirmButtonText: 'Aceptar'
-                        }).then((result) => {
-                            location.reload();
-                        });
-                    },
-                    error: function (data) {
-                        swal.fire({
-                            title: 'Error',
-                            text: 'Ha ocurrido un error al remover comisión',
-                            icon: 'error',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    }
-                });
-            }
-        });        
-    })
 }
 
 function saveFollowUp(){
@@ -1552,92 +1679,6 @@ function copyPaymentLink(event, code, email, lang){
     }).catch(function(error) {
         console.error('Error al copiar el texto al portapapeles: ', error);
     });    
-}
-
-function openCredit(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
-    swal.fire({
-        title: '¿Está seguro de marcar como crédito abierto?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        console.log(result, id);
-        if (result.isConfirmed) {
-            var url = "/reservationsOpenCredit/"+id;
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                dataType: 'json',
-                success: function (data) {
-                    swal.fire({
-                        title: 'Reservación actualizada',
-                        text: 'La reservación ha sido marcada como Crédito Abierto',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        location.reload();
-                    });
-                },
-                error: function (data) {
-                    swal.fire({
-                        title: 'Error',
-                        text: 'Ha ocurrido un error al marcar como Crédito Abierto',
-                        icon: 'error',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            });
-        }
-    });
-}
-
-function enablePlusService(id){
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-        }
-    });
-    swal.fire({
-        title: '¿Está seguro de activar el servicio plus?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        console.log(result, id);
-        if (result.isConfirmed) {
-            var url = "/reservationsEnablePlusService/"+id;
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                dataType: 'json',
-                success: function (data) {
-                    swal.fire({
-                        title: 'Reservación actualizada',
-                        text: 'Se activo el servicio plus en la reservación',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        location.reload();
-                    });
-                },
-                error: function (data) {
-                    swal.fire({
-                        title: 'Error',
-                        text: 'Ha ocurrido un error al activar el servicio plus de la reservación',
-                        icon: 'error',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            });
-        }
-    });
 }
 
 const __site = document.getElementById('serviceSiteReference');

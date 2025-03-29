@@ -182,7 +182,7 @@
                                     </tr>
                                     <tr>
                                         <th>Estatus de comisión</th>
-                                        <td><span class="badge btn-{{ $reservation->is_commissionable == 1 ? "success ".( auth()->user()->hasPermission(95) ? '__remove_commission' : '' ) : "danger" }}" data-reservation="{{ $reservation->id }}" style="cursor: pointer;">{{ $reservation->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span></td>
+                                        <td><span class="badge btn-{{ $reservation->is_commissionable == 1 ? "success ".( auth()->user()->hasPermission(95) ? 'deleteCommission' : '' ) : "danger" }}" data-code="{{ $reservation->id }}" style="cursor: pointer;">{{ $reservation->is_commissionable == 1 ? "Comsionable" : "No comisionable" }}</span></td>
                                     </tr>
                                 @endif
                                 <tr>
@@ -308,24 +308,26 @@
 
                 {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
                 @if (auth()->user()->hasPermission(94) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
-                    <button class="btn btn-success btn-sm" onclick="enablePlusService({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> ACTIVAR SERVICIO PLUS</button>
-                @endif
-                @if (auth()->user()->hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
-                    {{-- <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button> --}}
-                @endif
-                    
-                {{-- NOS PERMITE PODER ACTIVAR LA RESERVA CUANDO ESTA COMO CREDITO ABIERTO --}}
-                @if ( ( $data['status'] == "CANCELLED" || $data['status'] == "OPENCREDIT" || ( $data['status'] == "CANCELLED" && $reservation->was_is_quotation == 1 ) ) && auth()->user()->hasPermission(67) )
-                    <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> ACTIVAR RESERVA</button>
+                    <button class="btn btn-success btn-sm enablePlusService" id="enablePlusService" data-code="{{ $reservation->id }}"><i class="align-middle" data-feather="delete"></i> ACTIVAR SERVICIO PLUS</button>
                 @endif
 
                 {{-- NOS PERMITE PONER COMO CREDITO ABIERTO CUANDO LA RESERVA ESTA CONFIRMADA Y EL CLIENTE QUIERE CANCELAR --}}
+                {{-- NECESITO APLICAR RECLAS MUCHO MAS ESPECIFICAS --}}
                 @if ( $data['status'] == "CONFIRMED" && auth()->user()->hasPermission(72) )
-                    <button class="btn btn-warning btn-sm" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> CRÉDITO ABIERTO</button>
+                    <button class="btn btn-warning btn-sm markReservationOpenCredit" id="markReservationOpenCredit" data-code="{{ $reservation->id }}" data-status="{{ $data['status'] }}" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> CRÉDITO ABIERTO</button>
+                @endif
+
+                {{-- @if (auth()->user()->hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                    <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
+                @endif --}}
+                    
+                {{-- NOS PERMITE PODER ACTIVAR LA RESERVA CUANDO ESTA COMO CREDITO ABIERTO --}}
+                @if ( ( $data['status'] == "OPENCREDIT" || ( $data['status'] == "CANCELLED" && $reservation->was_is_quotation == 1 ) ) && auth()->user()->hasPermission(67) )
+                    <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> ACTIVAR RESERVA</button>
                 @endif
 
                 {{-- NOS PERMITE INDICAR QUE CLIENTE ESTA SOLICITANDO UN REEMBOLSO --}}
-                @if ( $data['status'] == "CONFIRMED" || $data['status'] == "CANCELLED" )
+                @if ( ( $data['status'] == "CONFIRMED" || $data['status'] == "CANCELLED" ) && $data['total_payments'] > 0 )
                     <button class="btn btn-warning btn-sm refundRequest" id="refundRequest" data-code="{{ $reservation->id }}"><i class="align-middle" data-feather="delete"></i> SOLICITUD DE REEMBOLSO A CONTABILIDAD</button>
                 @endif
 

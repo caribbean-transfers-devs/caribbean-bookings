@@ -389,7 +389,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if (auth()->user()->hasPermission(38))
+                                    @if (auth()->user()->hasPermission(61))
                                         <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
                                     @else
                                         {{ $value->code }}

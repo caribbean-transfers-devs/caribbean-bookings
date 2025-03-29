@@ -111,7 +111,7 @@
                                     <td class="text-center">{{ $confirmation->final_service_type }}</td>
                                     <td class="text-center"><?=auth()->user()->renderServiceStatusOP($confirmation)?></td>
                                     <td class="text-center">
-                                        @if (auth()->user()->hasPermission(38))
+                                        @if (auth()->user()->hasPermission(61))
                                             <a href="/reservations/detail/{{ $confirmation->reservation_id }}"><p class="mb-1">{{ $confirmation->code }}</p></a>
                                         @else
                                             <p class="mb-1">{{ $confirmation->code }}</p>

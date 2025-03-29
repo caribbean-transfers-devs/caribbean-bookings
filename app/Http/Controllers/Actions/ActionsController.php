@@ -25,9 +25,33 @@ class ActionsController extends Controller
     /**
      * 
      */
+    public function deleteCommission(Request $request)
+    {
+        return $this->ActionsRepository->deleteCommission($request);
+    }
+
+    /**
+     * 
+     */
     public function enablePayArrival(Request $request)
     {
         return $this->ActionsRepository->enablePayArrival($request);
+    }
+
+    /**
+     * 
+     */
+    public function enablePlusService(Request $request)
+    {
+        return $this->ActionsRepository->enablePlusService($request);
+    }
+
+    /**
+     * 
+     */
+    public function markReservationOpenCredit(Request $request)
+    {
+        return $this->ActionsRepository->markReservationOpenCredit($request);
     }
 
     /**
@@ -44,7 +68,7 @@ class ActionsController extends Controller
     public function markReservationDuplicate(Request $request)
     {
         return $this->ActionsRepository->markReservationDuplicate($request);
-    }    
+    }
 
     /**
      * 

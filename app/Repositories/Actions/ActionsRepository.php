@@ -21,6 +21,67 @@ class ActionsRepository
     use FollowUpTrait;
 
     /**
+     * NOS AYUDA A REMOVER LA COMISION DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
+    public function deleteCommission($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reservation_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        $booking = Reservation::find($request->reservation_id);
+
+        if (!$booking) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Reservación no encontrada'
+                ],
+                'status' => 'error',
+                'message' => 'Reservación no encontrada'
+            ], Response::HTTP_NOT_FOUND);
+        }         
+
+        try {
+            DB::beginTransaction();
+            
+            $booking->is_commissionable = 0;
+            $booking->save();
+
+            // ESTATUS DE RESERVACIÓN            
+            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", elimino la comisión de la reservación de (COMISIONABLE) a (NO COMISIONABLE)", 'HISTORY', "UPDATE_BOOKING_DELETE_COMMISSION");
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se elimino correctamente la comisión de lareservación',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
+
+    /**
      * NOS AYUDA A MARCAR LA RESERVACIÓN COMO PAGO A LA LLEGADA
      * @param request :la información recibida en la solicitud
     */
@@ -63,7 +124,7 @@ class ActionsRepository
             $booking->save();
 
             // ESTATUS DE RESERVACIÓN            
-            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el estatus de la reservacion de (QUOTATION) a (PENDING), porque cliente pagara a la llegada", 'HISTORY', "UPDATE_BOOKING_PAY_ARRIVAL");
+            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el estatus de la reservación de (QUOTATION) a (PAY_AT_ARRIVAL), porque el cliente pagara a la llegada", 'HISTORY', "UPDATE_BOOKING_PAY_AT_ARRIVAL");
 
             DB::commit();
             return response()->json([
@@ -82,6 +143,149 @@ class ActionsRepository
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * NOS AYUDA A ACTIVAR EL SERVICIO PLUS DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
+    public function enablePlusService($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reservation_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        $booking = Reservation::find($request->reservation_id);
+
+        if (!$booking) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Reservación no encontrada'
+                ],
+                'status' => 'error',
+                'message' => 'Reservación no encontrada'
+            ], Response::HTTP_NOT_FOUND);
+        }         
+
+        try {
+            DB::beginTransaction();
+            
+            $booking->is_advanced = 1;
+            $booking->save();
+
+            // ESTATUS DE RESERVACIÓN            
+            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", activo el servicio plus de la reservación, por solicitud del cliente", 'HISTORY', "UPDATE_BOOKING_PLUS_SERVICE_ACTIVATION");
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se activo correctamente servicio plus de la reservación',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
+
+    /**
+     * NOS AYUDA A MARCAR COMO CREDITO ABIERTO, EN LOS DETALLES DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */    
+    public function markReservationOpenCredit($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reservation_id' => 'required|integer',
+            'status' => 'required|string|in:CANCELLED,DUPLICATED,OPENCREDIT,QUOTATION,PAY_AT_ARRIVAL,CREDIT,PENDING,CONFIRMED',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        $booking = Reservation::find($request->reservation_id);
+
+        if (!$booking) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Reservación no encontrada'
+                ],
+                'status' => 'error',
+                'message' => 'Reservación no encontrada'
+            ], Response::HTTP_NOT_FOUND);
+        }         
+
+        try {
+            DB::beginTransaction();
+            
+            $booking->open_credit = 1;
+            $booking->save();
+
+            // Actualizar los estados de los ítems y el ID por el tipo de cancelación
+            $booking->items()->update([
+                'vehicle_id_one' => NULL,
+                'driver_id_one' => NULL,
+                'op_one_status' => 'PENDING',
+                'op_one_status_operation' => 'PENDING',
+                'op_one_time_operation' => NULL,
+                'op_one_preassignment' => NULL,
+                'op_one_operating_cost' => 0,
+                'op_one_cancellation_type_id' => NULL,
+                'vehicle_id_two' => NULL,
+                'driver_id_two' => NULL,
+                'op_two_status' => 'PENDING',
+                'op_two_status_operation' => 'PENDING',
+                'op_two_time_operation' => NULL,
+                'op_two_preassignment' => NULL,
+                'op_two_operating_cost' => 0,
+                'op_two_cancellation_type_id' => NULL,
+            ]);            
+
+            // ESTATUS DE RESERVACIÓN
+            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el estatus de la reservación de (".$request->status.") a (OPENCREDIT), porque el cliente tomara el servicio en otras fechas", 'HISTORY', "UPDATE_BOOKING_OPENCREDIT");
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se marco correctamente la reservación como crédito abierto',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }        
+    }     
 
     /**
      * NOS AYUDA A SOLICITAR UN REEMBOLSO, EN LOS DETALLES DE LA RESERVACIÓN
@@ -136,6 +340,10 @@ class ActionsRepository
         }
     }
 
+    /**
+     * NOS AYUDA A MARCAR COMO DUPLICADA, EN LOS DETALLES DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */    
     public function markReservationDuplicate($request)
     {
         $validator = Validator::make($request->all(), [
@@ -194,7 +402,7 @@ class ActionsRepository
             ]);            
 
             // ESTATUS DE RESERVACIÓN
-            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el estatus de la reservación de (".$request->status.") a (DUPLICATED), porque es una reserva duplicada", 'HISTORY', "UPDATE_BOOKING_DUPLICATED");
+            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el estatus de la reservación de (".$request->status.") a (DUPLICATED), porque el cliente genero varias reservas", 'HISTORY', "UPDATE_BOOKING_DUPLICATED");
 
             DB::commit();
             return response()->json([
@@ -212,7 +420,6 @@ class ActionsRepository
                 'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
     }    
 
     /**

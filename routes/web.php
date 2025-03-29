@@ -294,10 +294,6 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         //VALIDAR reservationPayments
         Route::get('/reservation/payments/{reservation}', [DETAILS_RESERVATION::class, 'reservationPayments'])->name('reservation.payments');
         //_________
-        // Route::put('/reservationsDuplicated/{reservation}', [DETAILS_RESERVATION::class, 'duplicated'])->name('reservations.duplicated');
-        Route::put('/reservation/removeCommission/{reservation}', [DETAILS_RESERVATION::class, 'removeCommission'])->name('reservation.removeCommission');
-        Route::put('/reservationsOpenCredit/{reservation}', [DETAILS_RESERVATION::class, 'openCredit'])->name('reservations.openCredit');
-        Route::put('/reservationsEnablePlusService/{reservation}', [DETAILS_RESERVATION::class, 'enablePlusService'])->name('reservations.enablePlusService');
         Route::put('/reservationsEnable/{reservation}', [DETAILS_RESERVATION::class, 'enable'])->name('reservations.enable');
         Route::delete('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA
         Route::get('/reservations/detail/{id}', [DETAILS_RESERVATION::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');
@@ -326,9 +322,13 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::match(['get', 'post'], '/action/getPaymentsReservation', [FINANCE::class, 'getPaymentsReservation'])->name('get.payments.reservation');    
 
     //ACCIONES GENERALES DE DETALLES DE RESERVA
+    Route::post('/action/deleteCommission', [ACTIONS_RESERVATION::class, 'deleteCommission'])->name('update.booking.delete.commission');
+
     Route::post('/action/enablePayArrival', [ACTIONS_RESERVATION::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
+    Route::post('/action/enablePlusService', [ACTIONS_RESERVATION::class, 'enablePlusService'])->name('update.booking.plus.service');
+    Route::post('/action/markReservationOpenCredit', [ACTIONS_RESERVATION::class, 'markReservationOpenCredit'])->name('update.booking.mark.open.credit');
     Route::post('/action/refundRequest', [ACTIONS_RESERVATION::class, 'refundRequest'])->name('update.booking.refund.request');
-    Route::post('/action/markReservationDuplicate', [ACTIONS_RESERVATION::class, 'markReservationDuplicate'])->name('update.booking.mark.duplicate');
+    Route::post('/action/markReservationDuplicate', [ACTIONS_RESERVATION::class, 'markReservationDuplicate'])->name('update.booking.mark.duplicate');    
 
     Route::put('/action/updateServiceStatus', [ACTIONS_RESERVATION::class, 'updateServiceStatus'])->name('update.service.status');
     Route::post('/action/enabledLike', [ACTIONS_RESERVATION::class, 'enabledLike'])->name('update.booking.like');

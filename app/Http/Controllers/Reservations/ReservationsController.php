@@ -2,26 +2,45 @@
 namespace App\Http\Controllers\Reservations;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+//REPOSITORY
+use App\Repositories\Reservations\ReservationsRepository;
+use App\Repositories\Reservations\DetailRepository;
+use App\Repositories\Reservations\UploadRepository;
+
+//TRAITS
+use App\Traits\RoleTrait;
+
+//MODELS
+use App\Models\Reservation;
+use App\Models\ReservationsItem;
+use App\Models\Role;
+
+//REQUEST
 use App\Http\Requests\ReservationDetailsRequest;
 use App\Http\Requests\ReservationFollowUpsRequest;
 use App\Http\Requests\ReservationItemRequest;
 use App\Http\Requests\ReservationConfirmationRequest;
-use App\Models\Reservation;
-use App\Models\ReservationsItem;
-use App\Models\Role;
-use App\Repositories\Reservations\DetailRepository;
-use App\Repositories\Reservations\ReservationsRepository;
-use App\Repositories\Reservations\UploadRepository;
-use Illuminate\Http\Request;
-use App\Traits\RoleTrait;
 
 class ReservationsController extends Controller
 {
     use RoleTrait;
+
+    private $ReservationsRepository;
+    private $DetailRepository;
+    private $UploadRepository;
+
+    public function __construct(ReservationsRepository $ReservationsRepository, DetailRepository $DetailRepository, UploadRepository $UploadRepository)
+    {
+        $this->ReservationsRepository = $ReservationsRepository;
+        $this->DetailRepository = $DetailRepository;
+        $this->UploadRepository = $UploadRepository;
+    }
     
-    public function detail(Request $request, DetailRepository $detailRepository, $id){
-        if($this->hasPermission(10) || $this->hasPermission(61)){
-            return $detailRepository->detail($request,$id);
+    public function detail(Request $request, $id){
+        if($this->hasPermission(61)){
+            return $this->detailRepository->detail($request,$id);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
@@ -41,26 +60,6 @@ class ReservationsController extends Controller
     public function destroy(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
         if($this->hasPermission(24)){
             return $reservationRepository->destroy($request,$reservation);
-        }
-    }
-
-    public function removeCommission(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
-    {
-        if($this->hasPermission(24)){
-            return $reservationRepository->removeCommission($request,$reservation);
-        }
-    }
-
-    public function openCredit(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation)
-    {
-        if($this->hasPermission(72)){
-            return $reservationRepository->openCredit($request,$reservation);
-        }
-    }
-
-    public function enablePlusService(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
-        if($this->hasPermission(94)){
-            return $reservationRepository->enablePlusService($request,$reservation);
         }
     }
 

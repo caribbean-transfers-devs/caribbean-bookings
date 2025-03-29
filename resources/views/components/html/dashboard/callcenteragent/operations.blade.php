@@ -37,7 +37,7 @@
                 <tr>
                     <td class="text-center"><span class="badge badge-{{ $booking->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $booking->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                     <td class="text-center">
-                        @if (auth()->user()->hasPermission(38))
+                        @if (auth()->user()->hasPermission(61))
                             <a href="/reservations/detail/{{ $booking->reservation_id }}"><?=$booking->code?></a>
                         @else
                             <?=$codes_string?>

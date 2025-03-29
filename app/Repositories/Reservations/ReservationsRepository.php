@@ -119,48 +119,6 @@ class ReservationsRepository
         }
     }
 
-    public function removeCommission($request, $reservation){
-        try {            
-            DB::beginTransaction();
-            $reservation->is_commissionable = 0;
-            $reservation->save();
-            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", actualizo la comisión de: (comisionable) a (no comisionable)", 'HISTORY', 'EDICIÓN RESERVACIÓN');
-            DB::commit();
-            return response()->json(['message' => 'Reservation successfully'], Response::HTTP_OK);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Error reservation'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public function openCredit($request, $reservation){
-        try {            
-            DB::beginTransaction();
-            $reservation->open_credit = 1;
-            $reservation->save();
-            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", activo el crédito abierto a la reservación: ".$reservation->id, 'HISTORY', 'CRÉDITO ABIERTO');
-            DB::commit();
-            return response()->json(['message' => 'Update successfully completed'], Response::HTTP_OK);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Error marking as open credit'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public function enablePlusService($request, $reservation){
-        try {
-            DB::beginTransaction();
-            $reservation->is_advanced = 1;
-            $reservation->save();
-            $check = $this->create_followUps($reservation->id, 'El usuario: '.auth()->user()->name.", activo el servicio plus a la reservación: ".$reservation->id, 'HISTORY', 'SERVICIO PLUS');
-            DB::commit();
-            return response()->json(['message' => 'Update successfully completed'], Response::HTTP_OK);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Error activating plus service'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }    
-
     public function enableReservation($request, $reservation){
         try {            
             DB::beginTransaction();
@@ -258,31 +216,31 @@ class ReservationsRepository
         $changes = [
             'client_first_name' => [
                 'condition' => $request->client_first_name != $reservation->client_first_name,
-                'message' => "actualizó el nombre del cliente de: {$reservation->client_first_name} a {$request->client_first_name}"
+                'message' => "actualizó el nombre del cliente de: ({$reservation->client_first_name}) a ({$request->client_first_name})"
             ],
             'client_last_name' => [
                 'condition' => $request->client_last_name != $reservation->client_last_name,
-                'message' => "actualizó los apellidos del cliente de: {$reservation->client_last_name} a {$request->client_last_name}"
+                'message' => "actualizó los apellidos del cliente de: ({$reservation->client_last_name}) a ({$request->client_last_name})"
             ],
             'client_email' => [
                 'condition' => $request->client_email != $reservation->client_email,
-                'message' => "actualizó el correo del cliente de: {$reservation->client_email} a {$request->client_email}"
+                'message' => "actualizó el correo del cliente de: ({$reservation->client_email}) a ({$request->client_email})"
             ],
             'client_phone' => [
                 'condition' => $request->client_phone != $reservation->client_phone,
-                'message' => "actualizó el teléfono del cliente de: {$reservation->client_phone} a {$request->client_phone}"
+                'message' => "actualizó el teléfono del cliente de: ({$reservation->client_phone}) a ({$request->client_phone})"
             ],
             'site_id' => [
                 'condition' => $request->site_id != $reservation->site_id,
                 'action' => function() use ($request, $reservation) {
                     $old = Site::find($reservation->site_id);
                     $new = Site::find($request->site_id);
-                    return "actualizo el sitio de: {$old->name} a {$new->name}";
+                    return "actualizo el sitio de: ({$old->name}) a ({$new->name})";
                 }
             ],
             'reference' => [
                 'condition' => $request->reference != $reservation->reference,
-                'message' => "actualizo la referencia de: {$reservation->reference} a {$request->reference}"
+                'message' => "actualizo la referencia de: ({$reservation->reference}) a ({$request->reference})"
             ],
             'origin_sale_id' => [
                 'condition' => isset($request->origin_sale_id) && ( $request->origin_sale_id !== '' || $request->origin_sale_id !== 0 ) && ( $request->origin_sale_id != $reservation->origin_sale_id ),
@@ -296,7 +254,7 @@ class ReservationsRepository
             ],
             'currency' => [
                 'condition' => $request->currency != $reservation->currency,
-                'message' => "actualizo la moneda de: {$reservation->currency} a {$request->currency}"
+                'message' => "actualizo la moneda de: ({$reservation->currency}) a ({$request->currency})"
             ],
             'special_request' => [
                 'condition' => '',
@@ -327,55 +285,55 @@ class ReservationsRepository
         $changes = [
             'service_type' => [
                 'condition' => isset($request->serviceTypeForm) && $request->serviceTypeForm == 1 && $request->serviceTypeForm != $item->is_round_trip,
-                'message' => 'actualizó el servicio: {$item->id}({$item->code}) de: "One Way" a "Round Trip"'
+                'message' => 'actualizó el servicio: {$item->id}({$item->code}) de: (One Way) a (Round Trip)'
             ],
             'vehicle_type' => [
                 'condition' => $request->destination_service_id != $item->destination_service_id,
                 'action' => function() use ($request, $item) {
                     $old = DestinationService::find($item->destination_service_id);
                     $new = DestinationService::find($request->destination_service_id);
-                    return "actualizó el tipo de Vehículo de: {$old->name} a {$new->name}";
+                    return "actualizó el tipo de Vehículo de: ({$old->name}) a ({$new->name})";
                 }
             ],
             'passengers' => [
                 'condition' => $request->passengers != $item->passengers,
-                'message' => "actualizó el número de pasajeros de: {$item->passengers} a {$request->passengers}"
+                'message' => "actualizó el número de pasajeros de: ({$item->passengers}) a ({$request->passengers})"
             ],
             'flight_number' => [
                 'condition' => $request->flight_number != $item->flight_number,
-                'message' => "actualizó el número de vuelo de: {$item->flight_number} a {$request->flight_number}"
+                'message' => "actualizó el número de vuelo de: ({$item->flight_number}) a ({$request->flight_number})"
             ],
             'from_zone' => [
                 'condition' => $request->from_zone_id != $item->from_zone,
                 'action' => function() use ($request, $item) {
                     $old = Zones::find($item->from_zone);
                     $new = Zones::find($request->from_zone_id);
-                    return "actualizó la zona Desde de: {$old->name} a {$new->name}";
+                    return "actualizó la zona Desde de: ({$old->name}) a ({$new->name})";
                 }
             ],
             'from_name' => [
                 'condition' => $request->from_name != $item->from_name,
-                'message' => "actualizó Desde de: {$item->from_name} a {$request->from_name}"
+                'message' => "actualizó Desde de: ({$item->from_name}) a ({$request->from_name})"
             ],
             'from_coords' => [
                 'condition' => $request->from_lat != $item->from_lat,
-                'message' => "actualizó las coordenadas Desde lat: {$item->from_lat} a {$request->from_lat}, lng: {$item->from_lng} a {$request->from_lng}"
+                'message' => "actualizó las coordenadas Desde lat: ({$item->from_lat}) a ({$request->from_lat}), lng: ({$item->from_lng}) a ({$request->from_lng})"
             ],
             'to_zone' => [
                 'condition' => $request->to_zone_id != $item->to_zone,
                 'action' => function() use ($request, $item) {
                     $old = Zones::find($item->to_zone);
                     $new = Zones::find($request->to_zone_id);
-                    return "actualizó la zona Hacia de: {$old->name} a {$new->name}";
+                    return "actualizó la zona Hacia de: ({$old->name}) a ({$new->name})";
                 }
             ],
             'to_name' => [
                 'condition' => $request->to_name != $item->to_name,
-                'message' => "actualizó Hacia de: {$item->to_name} a {$request->to_name}"
+                'message' => "actualizó Hacia de: ({$item->to_name}) a ({$request->to_name})"
             ],
             'to_coords' => [
                 'condition' => $request->to_lat != $item->to_lat,
-                'message' => "actualizó las coordenadas Hacia lat: {$item->to_lat} a {$request->to_lat}, lng: {$item->to_lng} a {$request->to_lng}"
+                'message' => "actualizó las coordenadas Hacia lat: ({$item->to_lat}) a ({$request->to_lat}), lng: ({$item->to_lng}) a ({$request->to_lng})"
             ],
             'pickup_time' => [
                 'condition' => $request->op_one_pickup != $item->op_one_pickup,
@@ -387,10 +345,10 @@ class ReservationsRepository
                     
                     $messages = [];
                     if ($requestDate != $itemDate) {
-                        $messages[] = "actualizó la fecha de recogida de: {$itemDate} a {$requestDate}";
+                        $messages[] = "actualizó la fecha de recogida de: ({$itemDate}) a ({$requestDate})";
                     }
                     if ($requestTime != $itemTime) {
-                        $messages[] = "actualizó la hora de recogida de: {$itemTime} a {$requestTime}";
+                        $messages[] = "actualizó la hora de recogida de: ({$itemTime}) a ({$requestTime})";
                     }
                     return $messages;
                 }
@@ -405,10 +363,10 @@ class ReservationsRepository
                     
                     $messages = [];
                     if ($requestDate != $itemDate) {
-                        $messages[] = "actualizó la fecha de regreso de: {$itemDate} a {$requestDate}";
+                        $messages[] = "actualizó la fecha de regreso de: ({$itemDate}) a ({$requestDate})";
                     }
                     if ($requestTime != $itemTime) {
-                        $messages[] = "actualizó la hora de regreso de: {$itemTime} a {$requestTime}";
+                        $messages[] = "actualizó la hora de regreso de: ({$itemTime}) a ({$requestTime})";
                     }
                     return $messages;
                 }

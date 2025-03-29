@@ -110,7 +110,7 @@
                                                 $codes_string .= '<p class="mb-1">'.$code.'</p>';
                                             }
                                         @endphp
-                                        @if (auth()->user()->hasPermission(38))
+                                        @if (auth()->user()->hasPermission(61))
                                             <a href="/reservations/detail/{{ $item->reservation_id }}"><?=$codes_string?></a>
                                         @else
                                             <?=$codes_string?>
