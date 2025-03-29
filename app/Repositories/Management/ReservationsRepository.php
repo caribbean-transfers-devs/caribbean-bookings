@@ -9,12 +9,13 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 //TRAITS
+use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
 use App\Traits\FollowUpTrait;
 
 class ReservationsRepository
 {
-    use QueryTrait, FollowUpTrait;
+    use FiltersTrait, QueryTrait, FollowUpTrait;
 
     public function index($request)
     {

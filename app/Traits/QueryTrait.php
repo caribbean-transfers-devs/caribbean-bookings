@@ -569,7 +569,7 @@ trait QueryTrait
                                     ELSE 'UNKNOWN'
                                 END AS reservation_status,
 
-                                'departure' as operation_type,                                  
+                                'departure' as operation_type,
                                 'TYPE_TWO' as op_type,
                                 it.id,
                                 it.code,

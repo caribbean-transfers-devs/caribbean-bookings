@@ -413,7 +413,7 @@
                                             @endif
 
                                             {{-- NOS PERMITE REALIZAR ESTAS ACCIONES SOLO CUANDO LA RESERVA ESTA PENDIENTE CONFIRMADA O A CREDITO --}}
-                                            @if ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" )                                            
+                                            @if ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" )                                            
                                                 <button class="btn btn-secondary btn-sm arrivalConfirmation" type="button" data-id="{{ $item->reservations_item_id }}" data-bs-toggle="modal" data-bs-target="#arrivalConfirmationModal">CONFIRMACIÓN DE LLEGADA</button>                            
                                                 <div class="btn-group btn-group-sm" role="group">
                                                     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

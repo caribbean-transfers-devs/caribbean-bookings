@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 //REPOSITORY
 use App\Repositories\Actions\ActionsRepository;
 
-//TRIT
+//TRAITS
 use App\Traits\RoleTrait;
 
 class ActionsController extends Controller
