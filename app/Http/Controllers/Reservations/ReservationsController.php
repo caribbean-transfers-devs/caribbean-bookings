@@ -40,7 +40,7 @@ class ReservationsController extends Controller
     
     public function detail(Request $request, $id){
         if($this->hasPermission(61)){
-            return $this->detailRepository->detail($request,$id);
+            return $this->DetailRepository->detail($request,$id);
         }else{
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
@@ -109,9 +109,9 @@ class ReservationsController extends Controller
         }
     }
 
-    public function getMedia(Request $request, DetailRepository $detailRepository){
+    public function getMedia(Request $request){
         if($this->hasPermission(65)){
-            return $detailRepository->getMedia($request);
+            return $this->DetailRepository->getMedia($request);
         }
     }
 }
