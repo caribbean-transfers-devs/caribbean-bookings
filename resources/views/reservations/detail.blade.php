@@ -408,7 +408,7 @@
                                             <p><strong># de Vuelo:</strong> {{ $item->flight_number ?? 'N/A' }}</p>
                                         </div>
                                         <div class="actions mb-3">
-                                            @if ( ( $data['status'] == "PENDING" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(13))
+                                            @if ( ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(13))
                                                 <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#serviceEditModal" onclick="itemInfo({{ $item }})">EDITAR SERVICIO</button>
                                             @endif
 
