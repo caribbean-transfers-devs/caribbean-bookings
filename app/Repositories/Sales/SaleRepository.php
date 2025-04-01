@@ -46,7 +46,7 @@ class SaleRepository
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error al crear la venta, contacte a soporte',                
+                'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

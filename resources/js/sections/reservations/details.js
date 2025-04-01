@@ -397,6 +397,69 @@ if( markReservationDuplicate ){
     })
 }
 
+//SECCION DE VENTAS, PARA AGREGAR Y EDITAR
+const _btnNewSale = document.getElementById('btn_new_sale');
+if( _btnNewSale ){
+    _btnNewSale.addEventListener('click', function(event){
+        event.preventDefault();
+        _btnNewSale.disabled = true;
+        _btnNewSale.textContent = "Enviando...";        
+
+        Swal.fire({
+            html: '¿Está seguro de agregar la venta?',
+            icon: 'warning',    
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',         
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let __params = components.serialize(document.getElementById('frm_new_sale'),'object');
+                let __url = _LOCAL_URL + ( __type.value == 1 ? "/sales" : "/sales/" + __code.value );
+
+                Swal.fire({
+                    title: "Procesando solicitud...",
+                    text: "Por favor, espera mientras se agrega la venta.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+    
+                fetch(__url, {
+                    method: ( __type.value == 1 ? 'POST' : 'PUT' ),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },            
+                    body: JSON.stringify(__params)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        icon: data.status,
+                        html: data.message,
+                        allowOutsideClick: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire(
+                        '¡ERROR!',
+                        error.message || 'Ocurrió un error',
+                        'error'
+                    );
+                });
+            }
+        });        
+    })
+}
+
 //VALIDAMOS DOM
 document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("click", debounce(function (event) {
@@ -916,11 +979,11 @@ function saveFollowUp(){
 }
 
 /* ===== Start Events Sales Settings ===== */
-function saveSale(){
-    $("#btn_new_sale").prop('disabled', true);
-    let __params = components.serialize(document.getElementById('frm_new_sale'),'object');
-    components.request_exec_ajax( _LOCAL_URL + ( __type.value == 1 ? "/sales" : "/sales/" + __code.value ), ( __type.value == 1 ? 'POST' : 'PUT' ), __params );
-}
+// function saveSale(){
+//     $("#btn_new_sale").prop('disabled', true);
+//     let __params = components.serialize(document.getElementById('frm_new_sale'),'object');
+//     components.request_exec_ajax( _LOCAL_URL + ( __type.value == 1 ? "/sales" : "/sales/" + __code.value ), ( __type.value == 1 ? 'POST' : 'PUT' ), __params );
+// }
 
 function getSale(id){
     $("#btn_new_sale").prop('disabled', true);

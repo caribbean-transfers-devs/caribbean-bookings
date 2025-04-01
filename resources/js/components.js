@@ -85,9 +85,12 @@ let components = {
         // _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-12 col-lg-8 d-flex flex-column flex-sm-row justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3 ms-lg-3'B>><'col-12 col-sm-12 col-lg-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
         //                 <'table-responsive'tr>
         //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+
+
         _settings.dom = `<'dt--top-section'<''<'left'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center'B>><'right'f>>>
-                        <'table-responsive'tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+                         <'scroll-hint'><'table-responsive'tr>
+                         <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+
         _settings.deferRender = true;
         _settings.responsive = false; // La tabla sigue siendo responsive
         _settings.buttons =  _buttons;
@@ -146,7 +149,7 @@ let components = {
             table.on('draw', function () {
                 __table_render.columns.adjust();
             });
-        }    
+        }       
     },
 
     actionTableChart: function(table, section = "general"){
@@ -645,7 +648,28 @@ window.addEventListener("DOMContentLoaded", function() {
         __table_render.columns.adjust();
         __table_render.columns.adjust().draw();
         components.multiCheck(__table_render);
-    }    
+
+        const scrollHint = document.querySelector('.scroll-hint');
+        const tableResponsive = document.querySelector('.table-responsive');
+    
+        // Crear un elemento fantasma para forzar el mismo ancho que la tabla
+        const ghostElement = document.createElement('div');
+        ghostElement.style.width = tableResponsive.scrollWidth + 'px';
+        ghostElement.style.height = '1px';
+        ghostElement.style.visibility = 'hidden';
+        scrollHint.appendChild(ghostElement);
+    
+        // Sincronizar scroll
+        scrollHint.addEventListener('scroll', function() {
+            tableResponsive.scrollLeft = scrollHint.scrollLeft;
+        });
+    
+        // Actualizar el ancho si la tabla cambia (opcional, para datatables dinámicas)
+        const observer = new MutationObserver(function() {
+            ghostElement.style.width = tableResponsive.scrollWidth + 'px';
+        });
+        observer.observe(tableResponsive, { childList: true, subtree: true });      
+    }
 });
 
 window.addEventListener('resize', function() {

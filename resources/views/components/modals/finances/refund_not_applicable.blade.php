@@ -13,8 +13,8 @@
                         <label class="form-label" for="response_message">Agrega un mensaje</label>
                         <textarea class="form-control" id="response_message" name="response_message" cols="5" rows="5"></textarea>
                     </div>
-                    <input type="hidden" name="reservation_id" value="" id="reservation_id">
-                    <input type="hidden" name="reservation_refund_id" value="" id=reservation_refund_id>
+                    <input type="hidden" name="reservation_id" value="" id="reservation_id2">
+                    <input type="hidden" name="reservation_refund_id" value="" id=reservation_refund_id2>
                 </form>
             </div>
             <div class="modal-footer">

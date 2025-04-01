@@ -106,7 +106,9 @@ let refunds = {
 
 const __close_modals = document.querySelectorAll('.__close_modal');
 const __reservation_id = document.getElementById('reservation_id');
-const __reservation_refund_id = document.getElementById("reservation_refund_id")
+const __reservation_id2 = document.getElementById('reservation_id2');
+const __reservation_refund_id = document.getElementById("reservation_refund_id");
+const __reservation_refund_id2 = document.getElementById("reservation_refund_id2");
 const __type_pay = document.getElementById('type_form_pay');
 const __code_pay = document.getElementById('payment_id');
 
@@ -165,7 +167,9 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             __reservation_id.value = reservation;
-            __reservation_refund_id.value = refund;            
+            __reservation_refund_id.value = refund;
+            __reservation_id2.value = reservation;
+            __reservation_refund_id2.value = refund;    
         }
 
         if ( event.target.classList.contains('__show_reservation') ) {

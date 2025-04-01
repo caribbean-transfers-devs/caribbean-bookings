@@ -11,6 +11,25 @@
   background-color: #fff;
 }
 
+.scroll-hint {
+  width: 100%;
+  overflow-x: auto;
+  height: 15px;
+  margin-bottom: 5px;
+  background: transparent;
+  scrollbar-width: thin;
+}
+
+.scroll-hint::-webkit-scrollbar {
+  height: 8px;
+  background: #f1f1f1;
+}
+
+.scroll-hint::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
 .dt--top-section {
   font-family: "Poppins", serif;  
   margin: 10px;

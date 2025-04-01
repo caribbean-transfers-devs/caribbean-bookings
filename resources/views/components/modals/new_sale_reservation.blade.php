@@ -39,7 +39,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="btn_new_sale" onclick="saveSale()">Guardar</button>
+                <button type="button" class="btn btn-primary" id="btn_new_sale">Guardar</button>
             </div>
         </div>
     </div>
