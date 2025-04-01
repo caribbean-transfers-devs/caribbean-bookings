@@ -24,8 +24,10 @@ class OperationsRepository
         $data = [
             "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
             "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
-            // "filter_text" => NULL,
+            "filter_text" => ( isset( $request->filter_text ) && !empty( $request->filter_text ) ? $request->filter_text : NULL ),
+
             "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
+            "currency" => ( isset($request->currency) ? $request->currency : 0 ),            
             "site" => ( isset($request->site) ? $request->site : 0 ),
             "origin" => ( isset($request->origin) ? $request->origin : NULL ),
             "reservation_status" => ( isset($request->reservation_status) ? $request->reservation_status : 0 ),
@@ -38,16 +40,15 @@ class OperationsRepository
             "driver" => ( isset($request->driver) ? $request->driver : 0 ),
             "operation_status" => ( isset( $request->operation_status ) && !empty( $request->operation_status ) ? $request->operation_status : 0 ),
             "payment_status" => ( isset( $request->payment_status ) && !empty( $request->payment_status ) ? $request->payment_status : 0 ),
-            "currency" => ( isset($request->currency) ? $request->currency : 0 ),
+            "is_balance" => ( isset($request->is_balance) ? $request->is_balance : NULL ),
             "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
+            "was_is_quotation" => ( isset($request->was_is_quotation) ? $request->was_is_quotation : NULL ),
             "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),
-            // "is_balance" => ( isset($request->is_balance) ? $request->is_balance : NULL ),
-            // "is_today" => ( isset($request->is_today) ? $request->is_today : NULL ),
+            "is_pay_at_arrival" => ( isset($request->is_pay_at_arrival) ? $request->is_pay_at_arrival : NULL ),
+            "refund_request_count" => ( isset($request->refund_request_count) ? $request->refund_request_count : NULL ),
         ];
 
-        // AND rez.is_cancelled = 0
         $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
-        // AND rez.is_cancelled = 0
         $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
         $havingConditions = []; $queryHaving = "";
         $queryData = [
@@ -55,11 +56,36 @@ class OperationsRepository
             'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
         ];
 
+        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
+            $queryOne  .= " AND (
+                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
+                        ( rez.client_phone like '%".$data['filter_text']."%') OR
+                        ( rez.client_email like '%".$data['filter_text']."%') OR
+                        ( rez.reference like '%".$data['filter_text']."%') OR
+                        ( it.code like '%".$data['filter_text']."%' )
+                    )";
+
+            $queryTwo  .= " AND (
+                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
+                        ( rez.client_phone like '%".$data['filter_text']."%') OR
+                        ( rez.client_email like '%".$data['filter_text']."%') OR
+                        ( rez.reference like '%".$data['filter_text']."%') OR
+                        ( it.code like '%".$data['filter_text']."%' )
+                    )";                    
+        }
+
         //TIPO DE SERVICIO is_round_trip
         if(isset( $request->is_round_trip )){
             $params = $this->parseArrayQuery($request->is_round_trip);
             $queryOne .= " AND it.is_round_trip IN ($params) ";
             $queryTwo .= " AND it.is_round_trip IN ($params) ";
+        }
+
+        //MONEDA DE LA RESERVA
+        if(isset( $request->currency ) && !empty( $request->currency )){
+            $params = $this->parseArrayQuery($request->currency,"single");
+            $queryOne .= " AND rez.currency IN ($params) ";
+            $queryTwo .= " AND rez.currency IN ($params) ";
         }
 
         //SITIO
@@ -147,11 +173,9 @@ class OperationsRepository
             $havingConditions[] = " payment_status IN (".$params.") ";
         }
 
-        //MONEDA DE LA RESERVA
-        if(isset( $request->currency ) && !empty( $request->currency )){
-            $params = $this->parseArrayQuery($request->currency,"single");
-            $queryOne .= " AND rez.currency IN ($params) ";
-            $queryTwo .= " AND rez.currency IN ($params) ";
+        //RESERVAS CON UN BALANCE
+        if(isset( $request->is_balance )){
+            $havingConditions[] = ( $request->is_balance == 1 ? ' total_balance > 0 ' : ' total_balance <= 0 ' );
         }
 
         //METODO DE PAGO
@@ -164,16 +188,36 @@ class OperationsRepository
             $havingConditions[] = " (".$params.") "; 
         }
 
+        //FUE COTIZACIÓN
+        if( $request->was_is_quotation !=  NULL ){
+            $params = $request->was_is_quotation;
+            $queryOne .= " AND rez.is_quotation = 0 AND rez.was_is_quotation = $params ";
+            $queryTwo .= " AND rez.is_quotation = 0 AND rez.was_is_quotation = $params ";
+        }
+
         //MOTIVOS DE CANCELACIÓN
         if(isset( $request->cancellation_status ) && !empty( $request->cancellation_status )){
             $params = $this->parseArrayQuery($request->cancellation_status);
             $queryOne .= " AND tc.id IN ($params) ";
             $queryTwo .= " AND tc.id IN ($params) ";
+        }
+
+        //PAGO A LA LLEGADA
+        if( $request->is_pay_at_arrival !=  NULL ){
+            $params = $request->is_pay_at_arrival;
+            $queryOne .= " AND rez.pay_at_arrival = $params ";
+            $queryTwo .= " AND rez.pay_at_arrival = $params ";
         }        
 
-        if( (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || isset( $request->service_operation ) && !empty( $request->service_operation ) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) ){
-            $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
+        if(isset( $request->refund_request_count )){
+            $havingConditions[] = ( $request->refund_request_count == 1 ? ' refund_request_count > 0 ' : ' refund_request_count <= 0 ' );
         }
+
+        //if( (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || isset( $request->service_operation ) && !empty( $request->service_operation ) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) ){
+            if( !empty($havingConditions) ){
+                $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
+            }
+        //}
 
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);

@@ -179,7 +179,7 @@
         ],
         "counter" => 0,
         "data" => []
-    ];//7
+    ];//
 @endphp
 @extends('layout.app')
 @section('title') Reporte De Operaciones @endsection
@@ -224,20 +224,10 @@
                     'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
                 )                
             ),
-            // array(
-            //     'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas',
-            //     'titleAttr' => 'Ver graficas de operaciones',
-            //     'className' => 'btn btn-primary __btn_chart',
-            //     'attr' => array(
-            //         'data-title' =>  "Grafica de ventas",
-            //         'data-bs-toggle' => 'modal',
-            //         'data-bs-target' => '#chartsModal',
-            //     )
-            // ),
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas',
                 'titleAttr' => 'Ver graficas de operaciones',
-                'className' => 'btn btn-primary __btn_chart2',
+                'className' => 'btn btn-primary __btn_chart',
                 'attr' => array(
                     'data-title' =>  "Grafica de ventas",
                     'data-bs-toggle' => 'modal',
@@ -315,6 +305,9 @@
                             <th class="text-center">MÉTODO DE PAGO</th>
                             <th class="text-center">COMISIÓNABLE</th> 
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
+                            <th class="text-center">TIENE REEMBOLSO</th>
+                            <th class="text-center">CUANTAS SOLICITUDES</th>
+                            <th class="text-center">ESTATUS DE REEMBOLSO</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -676,9 +669,11 @@
                                     <td class="text-center" {{ (($operation->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($operation->total_balance,2) }}</td>
                                     <td class="text-center">{{ number_format($operation->service_cost,2) }}</td>
                                     <td class="text-center">{{ $operation->currency }}</td>
-                                    <td class="text-center">{{ $operation->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $operation->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                    <td class="text-center">{{ $operation->payment_type_name }}</td>
                                     <td class="text-center">
-                                        <button class="btn btn-{{ $operation->is_commissionable == 1 ? 'success' : 'danger' }}" type="button">{{ $operation->is_commissionable == 1 ? "SI" : "NO" }}</button>
+                                        @if ( $operation->is_commissionable == 1 )
+                                            <button class="btn btn-success" type="button">Sí</button>
+                                        @endif
                                     </td>
                                     <td class="text-center">
                                         @if ( ($operation->reservation_status == "CANCELLED" && auth()->user()->serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && auth()->user()->serviceStatus($operation, "no_translate") == "CANCELLED") )
@@ -689,6 +684,21 @@
                                             @endif
                                         @endif
                                     </td>
+                                    <td class="text-center">
+                                        @if ( $operation->has_refund_request )
+                                            <button class="btn btn-success" type="button">Sí</button>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if ( $operation->has_refund_request )
+                                            {{ $operation->refund_request_count }}
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if ( $operation->has_refund_request )
+                                            <button class="btn btn-{{ auth()->user()->classStatusRefund($operation->refund_status) }} btn-sm">{{ auth()->user()->statusRefund($operation->refund_status) }}</button>
+                                        @endif                                        
+                                    </td>
                                 </tr>
                             @endforeach
                         @endif
@@ -698,10 +708,7 @@
         </div>
     </div>
 
-    {{-- @dump($dataVehicles) --}}
-
-    <x-modals.filters.bookings :data="$data" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :servicesoperation="$services_operation" :serviceoperationstatus="$service_operation_status" :units="$units" :drivers="$drivers" :operationstatus="$operation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :request="$request" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :currencies="$currencies" :websites="$websites" :origins="$origins" :reservationstatus="$reservation_status" :vehicles="$vehicles" :zones="$zones" :servicesoperation="$services_operation" :serviceoperationstatus="$service_operation_status" :units="$units" :drivers="$drivers" :operationstatus="$operation_status" :paymentstatus="$payment_status" :isbalance="1" :methods="$methods" :wasIsQuotation="1" :cancellations="$cancellations" :ispayarrival="1" :refundRequestCount="1" />
     <x-modals.reports.columns />
     <x-modals.charts.sales2 :bookingsStatus="$operationStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataServiceTypeOperation="$dataServiceTypeOperation" :dataSites="$dataSites" :dataDriver="$dataDriver" :dataUnit="$dataUnit" :dataOriginSale="$dataOriginSale" />
-    <x-modals.reservations.payments />
 @endsection

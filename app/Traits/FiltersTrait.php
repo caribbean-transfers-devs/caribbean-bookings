@@ -215,6 +215,7 @@ trait FiltersTrait
     {
         return array(
             "PAID" => "Pagado",
+            "CREDIT" => "Crédito",
             "PENDING" => "Pendiente",
         );
     }

@@ -46,11 +46,6 @@ class ReservationsController extends Controller
         }
     }
 
-    //NOS TRAE LOS PAGOS DE LA RESERVACIÓN
-    public function reservationPayments(ReservationsRepository $reservationRepository, Reservation $reservation){
-        return $reservationRepository->reservationPayments($reservation);
-    }
-
     public function update(ReservationDetailsRequest $request, ReservationsRepository $reservationRepository, Reservation $reservation){
         if($this->hasPermission(11)){
             return $reservationRepository->update($request,$reservation);

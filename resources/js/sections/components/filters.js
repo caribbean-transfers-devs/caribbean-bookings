@@ -22,8 +22,12 @@ let filters = {
     
         let config = { ...defaultConfig, ...options };
     
-        const fp = flatpickr(selector, config);
-        return fp;
+        if (typeof flatpickr !== "undefined") {
+            const fp = flatpickr(selector, config);
+            return fp;
+        } else {
+            // console.error("Flatpickr no está definido. Verifica que la librería esté cargada correctamente.");
+        }
     },
 }
 

@@ -178,7 +178,7 @@ class DetailRepository
         if ($reservation->is_duplicated) return "DUPLICATED";
         if ($reservation->open_credit) return "OPENCREDIT";
         if ($reservation->is_quotation) return "QUOTATION";
-        if ($reservation->pay_at_arrival) return "PAY_AT_ARRIVAL";
+        if ($reservation->pay_at_arrival && round($data['total_sales'], 2) == 0) return "PAY_AT_ARRIVAL";
         
         // Condiciones de crédito
         $totalPayments = round($data['total_payments'], 2);

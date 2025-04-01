@@ -30,9 +30,9 @@ class ReservationsRepository
 {
     use MailjetTrait, FiltersTrait, QueryTrait, FollowUpTrait;
 
-    public function reservationPayments($reservation){
-        return $this->getPayments($reservation->id);
-    }
+    // public function reservationPayments($reservation){
+    //     return $this->getPayments($reservation->id);
+    // }
 
     public function update($request,$reservation)
     {

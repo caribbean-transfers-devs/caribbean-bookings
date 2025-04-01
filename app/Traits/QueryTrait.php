@@ -75,7 +75,7 @@ trait QueryTrait
                                         WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                         WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                         WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
-                                        WHEN rez.pay_at_arrival = 1 THEN 'PAY_AT_ARRIVAL'
+                                        WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                         ELSE 'UNKNOWN'
@@ -221,13 +221,23 @@ trait QueryTrait
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                     SUM(p.is_conciliated) as is_conciliated,
+
+                                    -- Información de reembolsos
+                                    CASE WHEN rr.reservation_id IS NOT NULL THEN 1 ELSE 0 END as has_refund_request,
+                                    COALESCE(rr.refund_count, 0) as refund_request_count,
+                                    CASE 
+                                        WHEN rr.reservation_id IS NULL THEN 'NO_REFUND'
+                                        WHEN rr.pending_refund_count > 0 THEN 'REFUND_REQUESTED'
+                                        ELSE 'REFUND_COMPLETED'
+                                    END as refund_status,
+
                                     CASE
                                         WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
                                         WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
                                         WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                         WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                         WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
-                                        WHEN rez.pay_at_arrival = 1 THEN 'PAY_AT_ARRIVAL'
+                                        WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                         ELSE 'UNKNOWN'
@@ -252,6 +262,17 @@ trait QueryTrait
                                     LEFT OUTER JOIN users as us ON us.id = rez.call_center_agent_id
                                     LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
                                     LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
+                                    
+                                    -- Nuevos JOINs para la tabla de reembolsos
+                                    LEFT OUTER JOIN (
+                                        SELECT 
+                                            reservation_id,
+                                            COUNT(*) as refund_count,
+                                            SUM(CASE WHEN status != 'REFUND_COMPLETED' THEN 1 ELSE 0 END) as pending_refund_count
+                                        FROM reservations_refunds
+                                        GROUP BY reservation_id
+                                    ) as rr ON rr.reservation_id = rez.id
+
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id, 
@@ -357,13 +378,22 @@ trait QueryTrait
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                 CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
 
+                                -- Información de reembolsos
+                                CASE WHEN rr.reservation_id IS NOT NULL THEN 1 ELSE 0 END as has_refund_request,
+                                COALESCE(rr.refund_count, 0) as refund_request_count,
+                                CASE 
+                                    WHEN rr.reservation_id IS NULL THEN 'NO_REFUND'
+                                    WHEN rr.pending_refund_count > 0 THEN 'REFUND_REQUESTED'
+                                    ELSE 'REFUND_COMPLETED'
+                                END as refund_status,
+
                                 CASE
                                     WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
                                     WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
                                     WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                     WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                     WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
-                                    WHEN rez.pay_at_arrival = 1 THEN 'PAY_AT_ARRIVAL'
+                                    WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                     ELSE 'UNKNOWN'
@@ -435,10 +465,6 @@ trait QueryTrait
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE 
-                                        -- WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
-                                        -- WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
-                                        -- ELSE 'CASH'
-
                                         WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
                                         WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
                                         WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
@@ -449,7 +475,7 @@ trait QueryTrait
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                 CASE
-                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAID'
+                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
                                     ELSE 'PENDING'
                                 END AS payment_status,
@@ -488,7 +514,18 @@ trait QueryTrait
                                     SELECT DISTINCT reservation_id
                                     FROM reservations_follow_up
                                     WHERE type IN ('CLIENT', 'OPERATION')
-                                ) as rfu ON rfu.reservation_id = rez.id                                
+                                ) as rfu ON rfu.reservation_id = rez.id
+
+                                -- Nuevos JOINs para la tabla de reembolsos
+                                LEFT OUTER JOIN (
+                                    SELECT 
+                                        reservation_id,
+                                        COUNT(*) as refund_count,
+                                        SUM(CASE WHEN status != 'REFUND_COMPLETED' THEN 1 ELSE 0 END) as pending_refund_count
+                                    FROM reservations_refunds
+                                    GROUP BY reservation_id
+                                ) as rr ON rr.reservation_id = rez.id
+
                                 LEFT JOIN (
                                         SELECT
                                             it.reservation_id,
@@ -516,7 +553,7 @@ trait QueryTrait
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryOne}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count {$queryHaving}
 
                             UNION
 
@@ -557,13 +594,22 @@ trait QueryTrait
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                 CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
 
+                                -- Información de reembolsos
+                                CASE WHEN rr.reservation_id IS NOT NULL THEN 1 ELSE 0 END as has_refund_request,
+                                COALESCE(rr.refund_count, 0) as refund_request_count,
+                                CASE 
+                                    WHEN rr.reservation_id IS NULL THEN 'NO_REFUND'
+                                    WHEN rr.pending_refund_count > 0 THEN 'REFUND_REQUESTED'
+                                    ELSE 'REFUND_COMPLETED'
+                                END as refund_status,                                
+
                                 CASE
                                     WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
                                     WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
                                     WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                     WHEN rez.is_quotation = 1 THEN 'QUOTATION'
                                     WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
-                                    WHEN rez.pay_at_arrival = 1 THEN 'PAY_AT_ARRIVAL'
+                                    WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                     ELSE 'UNKNOWN'
@@ -635,10 +681,6 @@ trait QueryTrait
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE
-                                        -- WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
-                                        -- WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
-                                        -- ELSE 'CASH'
-
                                         WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
                                         WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
                                         WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
@@ -649,7 +691,7 @@ trait QueryTrait
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                 CASE
-                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAID'
+                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
                                     ELSE 'PENDING'
                                 END AS payment_status,
@@ -689,6 +731,17 @@ trait QueryTrait
                                     FROM reservations_follow_up
                                     WHERE type IN ('CLIENT', 'OPERATION')
                                 ) as rfu ON rfu.reservation_id = rez.id
+
+                                -- Nuevos JOINs para la tabla de reembolsos
+                                LEFT OUTER JOIN (
+                                    SELECT 
+                                        reservation_id,
+                                        COUNT(*) as refund_count,
+                                        SUM(CASE WHEN status != 'REFUND_COMPLETED' THEN 1 ELSE 0 END) as pending_refund_count
+                                    FROM reservations_refunds
+                                    GROUP BY reservation_id
+                                ) as rr ON rr.reservation_id = rez.id
+
                                 LEFT JOIN (
                                         SELECT
                                             it.reservation_id,
@@ -715,7 +768,7 @@ trait QueryTrait
                                         GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryTwo}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count {$queryHaving}
                             ORDER BY filtered_date ASC ",[
                                 "init_date_one" => $queryData['init'],
                                 "init_date_two" => $queryData['end'],

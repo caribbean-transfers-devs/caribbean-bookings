@@ -144,7 +144,13 @@
                                 <tr>
                                     <th>Pago al llegar</th>
                                     <td><span class="badge bg-{{ $reservation->pay_at_arrival == 1 ? 'success' : 'danger' }}">{{ $reservation->pay_at_arrival == 1 ? 'Sí' : 'No' }}</span></td>
-                                </tr>                                
+                                </tr>
+                                @if ( $reservation->is_quotation == 0 && $reservation->was_is_quotation == 1 )
+                                    <tr>
+                                        <th>Fue cotización</th>
+                                        <td><span class="badge bg-{{ $reservation->was_is_quotation == 1 ? 'success' : 'danger' }}">{{ $reservation->was_is_quotation == 1 ? 'Sí' : 'No' }}</span></td>
+                                    </tr>
+                                @endif
                                 <tr>
                                     <th>Nombre</th>
                                     <td>{{ $reservation->client_first_name }} {{ $reservation->client_last_name }}</td>
@@ -701,8 +707,6 @@
                             </table>
                         </div>
                     </div>
-                    {{-- CUANDO ES CREDITO NO DEJA QUE AGREGUEN PAGOS --}}
-                    
                     <div class="tab-pane" id="icon-tab-3" role="tabpanel">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             @if ( $data['status'] != "CREDIT" )

@@ -290,10 +290,6 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::delete('/config/types-cancellations/{cancellation}', [TYPES_CANCELLATIONS::class, 'destroy'])->name('config.types-cancellations.destroy');
 
         Route::put('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'update'])->name('reservations.update');
-        //_________
-        //VALIDAR reservationPayments
-        Route::get('/reservation/payments/{reservation}', [DETAILS_RESERVATION::class, 'reservationPayments'])->name('reservation.payments');
-        //_________
         Route::put('/reservationsEnable/{reservation}', [DETAILS_RESERVATION::class, 'enable'])->name('reservations.enable');
         Route::delete('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA
         Route::get('/reservations/detail/{id}', [DETAILS_RESERVATION::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');

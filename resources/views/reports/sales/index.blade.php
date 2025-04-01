@@ -239,7 +239,6 @@
                             <th class="text-center">ESTATUS DE SERVICIO(S)</th>
                             <th class="text-center">ESTATUS DE PAGO</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
-                            <th class="text-center">TOTAL DE PAGO</th>
                             <th class="text-center">BALANCE</th>
                             <th class="text-center">PRECIO POR SERVICIO</th>
                             <th class="text-center">MONEDA</th>
@@ -249,6 +248,9 @@
                             <th class="text-center">CALIFICACIÓN</th>
                             <th class="text-center">COMISIÓNABLE</th>
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
+                            <th class="text-center">TIENE REEMBOLSO</th>
+                            <th class="text-center">CUANTAS SOLICITUDES</th>
+                            <th class="text-center">ESTATUS DE REEMBOLSO</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -545,11 +547,10 @@
                                     </td>
                                     <td class="text-center" <?=auth()->user()->classStatusPayment($item)?>>{{ auth()->user()->statusPayment($item->payment_status) }}</td>
                                     <td class="text-center" <?=auth()->user()->classStatusPayment($item)?>>{{ number_format(($item->total_sales),2) }}</td>
-                                    <td class="text-center">{{ number_format(($item->total_payments),2) }}</td>
                                     <td class="text-center" {{ (($item->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>
                                     <td class="text-center">{{ number_format(($item->is_round_trip != 0 ? ( $item->total_sales / 2 ) : $item->total_sales),2) }}</td>
                                     <td class="text-center">{{ $item->currency }}</td>
-                                    <td class="text-center">{{ $item->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $item->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                    <td class="text-center">{{ $item->payment_type_name }}</td>
                                     <td class="text-center">
                                         @if ( !empty($item->payment_details) )
                                             [{{ $item->payment_details }}]
@@ -566,7 +567,9 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <button class="btn btn-{{ $item->is_commissionable == 1 ? 'success' : 'danger' }}" type="button">{{ $item->is_commissionable == 1 ? "SI" : "NO" }}</button>
+                                        @if ( $item->is_commissionable == 1 )
+                                            <button class="btn btn-success" type="button">Sí</button>
+                                        @endif
                                     </td>
                                     <td class="text-center">
                                         @if ( $item->reservation_status == "CANCELLED" )
@@ -577,6 +580,21 @@
                                             @endif
                                         @endif
                                     </td>
+                                    <td class="text-center">
+                                        @if ( $item->has_refund_request )
+                                            <button class="btn btn-success" type="button">Sí</button>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if ( $item->has_refund_request )
+                                            {{ $item->refund_request_count }}
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if ( $item->has_refund_request )
+                                            <button class="btn btn-{{ auth()->user()->classStatusRefund($item->refund_status) }} btn-sm">{{ auth()->user()->statusRefund($item->refund_status) }}</button>
+                                        @endif                                        
+                                    </td>                                    
                                 </tr>
                             @endforeach
                         @endif
@@ -586,8 +604,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :cancellations="$cancellations" :currencies="$currencies" :zones="$zones" :websites="$websites" :origins="$origins" :iscommissionable="1" :ispayarrival="1" :rating="1" :istoday="1" :isbalance="1" :isduplicated="1" :isagency="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :istoday="1" :isduplicated="1" :isagency="1" :currencies="$currencies" :websites="$websites" :origins="$origins" :reservationstatus="$reservation_status" :vehicles="$vehicles" :zones="$zones" :paymentstatus="$payment_status" :isbalance="1" :methods="$methods" :wasIsQuotation="1" :rating="1" :iscommissionable="1" :cancellations="$cancellations" :ispayarrival="1" :refundRequestCount="1" />
     <x-modals.reports.columns />
     <x-modals.charts.sales2 :bookingsStatus="$bookingsStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataSites="$dataSites" :dataDestinations="$dataDestinations" :dataOriginSale="$dataOriginSale" />
-    <x-modals.reservations.payments />
 @endsection

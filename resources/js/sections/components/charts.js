@@ -77,7 +77,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     _data = this.dataChartSaleStatus();
                     break;
             };
-            console.log(_data);            
             let options = {};
             options.data = _data.map(row => row.counter);
             if( _option == "paymentMethod" || _option == "Status" || _option == "serviceType" || _option == "Currency" ){
