@@ -44,6 +44,7 @@ trait QueryTrait
                                     us.id AS employee_code,
                                     us.status AS employee_status,
                                     us.name AS employee,
+                                    
                                     site.id as site_code,
                                     site.type_site AS type_site,
                                     site.name AS site_name,
@@ -196,6 +197,7 @@ trait QueryTrait
                                     us.id AS employee_code,
                                     us.status AS employee_status,
                                     us.name AS employee,
+
                                     site.id as site_code,
                                     site.type_site AS type_site,
                                     site.name AS site_name,

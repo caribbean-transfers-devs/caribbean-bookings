@@ -31,6 +31,9 @@ class SalesRepository
             "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : 0 ),
             "is_agency" => ( isset($request->is_agency) ? $request->is_agency : 0 ),
             "currency" => ( isset($request->currency) ? $request->currency : 0 ),
+
+            "users" => ( isset($request->user) ? $request->user : NULL ),
+            
             "site" => ( isset($request->site) ? $request->site : 0 ),
             "origin" => ( isset($request->origin) ? $request->origin : NULL ),
             "reservation_status" => ( isset($request->reservation_status) ? $request->reservation_status : 0 ),
@@ -83,7 +86,7 @@ class SalesRepository
             $havingConditions[] = ' is_today != 0 ';
         }
 
-        //TIPO DE SERVICIO
+        //DUPLICADAS
         if(!isset( $request->is_duplicated )){
             $query .= " AND rez.is_duplicated = 0 ";
         }
@@ -100,6 +103,16 @@ class SalesRepository
         if(isset( $request->currency ) && !empty( $request->currency )){
             $params = $this->parseArrayQuery($request->currency,"single");
             $query .= " AND rez.currency IN ($params) ";
+        }
+
+        //USUARIO
+        if(isset( $request->user ) && !empty( $request->user )){
+            $queryweb = "";
+            if( in_array("0", $request->user) ){
+                $queryweb = " OR us.id IS NULL ";
+            }
+            $params = $this->parseArrayQuery($request->user);
+            $query .= " AND ( us.id IN ($params) $queryweb ) ";
         }
 
         //SITIO

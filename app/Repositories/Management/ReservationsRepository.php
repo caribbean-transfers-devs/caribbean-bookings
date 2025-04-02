@@ -11,11 +11,10 @@ use Illuminate\Support\Facades\DB;
 //TRAITS
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
-use App\Traits\FollowUpTrait;
 
 class ReservationsRepository
 {
-    use FiltersTrait, QueryTrait, FollowUpTrait;
+    use FiltersTrait, QueryTrait;
 
     public function index($request)
     {
@@ -24,24 +23,28 @@ class ReservationsRepository
         $data = [
             "init" => ( isset($request->date) ? $request->date : date('Y-m-d') ) . " 00:00:00",
             "end" => ( isset($request->date) ? $request->date : date('Y-m-d') ) . " 23:59:59",
-            "filter_text" => NULL,
+            "filter_text" => ( isset( $request->filter_text ) && !empty( $request->filter_text ) ? $request->filter_text : NULL ),
+
             "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
+            "is_today" => ( isset($request->is_today) ? $request->is_today : NULL ),
+            "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : NULL ),
+            "currency" => ( isset($request->currency) ? $request->currency : 0 ),
+
+            "users" => ( isset($request->user) ? $request->user : NULL ),
+            
             "site" => ( isset($request->site) ? $request->site : 0 ),
             "origin" => ( isset($request->origin) ? $request->origin : NULL ),
             "reservation_status" => ( isset($request->reservation_status) ? $request->reservation_status : 0 ),
             "product_type" => ( isset($request->product_type) ? $request->product_type : 0 ),
             "zone_one_id" => ( isset($request->zone_one_id) ? $request->zone_one_id : 0 ),
             "zone_two_id" => ( isset($request->zone_two_id) ? $request->zone_two_id : 0 ),
-            "currency" => ( isset($request->currency) ? $request->currency : 0 ),
             "payment_status" => ( isset( $request->payment_status ) && !empty( $request->payment_status ) ? $request->payment_status : 0 ),
-            "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
-            "is_commissionable" => ( isset($request->is_commissionable) ? $request->is_commissionable : NULL ),
-            "is_pay_at_arrival" => ( isset($request->is_pay_at_arrival) ? $request->is_pay_at_arrival : NULL ),
-            "reserve_rating" => ( isset($request->reserve_rating) ? $request->reserve_rating : NULL ),
-            "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),            
             "is_balance" => ( isset($request->is_balance) ? $request->is_balance : NULL ),
-            "is_today" => ( isset($request->is_today) ? $request->is_today : NULL ),
-            "is_duplicated" => ( isset($request->is_duplicated) ? $request->is_duplicated : NULL ),
+            "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
+            "reserve_rating" => ( isset($request->reserve_rating) ? $request->reserve_rating : NULL ),
+            "is_commissionable" => ( isset($request->is_commissionable) ? $request->is_commissionable : NULL ),
+            "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),
+            "is_pay_at_arrival" => ( isset($request->is_pay_at_arrival) ? $request->is_pay_at_arrival : NULL ),            
         ];
         
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end ';
@@ -51,7 +54,19 @@ class ReservationsRepository
             'end' => ( isset($request->date) ? $request->date : date('Y-m-d') ) . " 23:59:59",
         ];
 
-        //TIPO DE SERVICIO
+        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
+            $data['filter_text'] = $request->filter_text;
+            $queryData = [];
+            $query  = " AND (
+                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
+                        ( rez.client_phone like '%".$data['filter_text']."%') OR
+                        ( rez.client_email like '%".$data['filter_text']."%') OR
+                        ( rez.reference like '%".$data['filter_text']."%') OR
+                        ( it.code like '%".$data['filter_text']."%' )
+                    )";
+        }    
+
+        //TIPO DE SERVICIO is_round_trip
         if(isset( $request->is_round_trip )){
             $params = "";
             foreach( $request->is_round_trip as $key => $is_round_trip ){
@@ -61,6 +76,35 @@ class ReservationsRepository
             $params = rtrim($params, ' OR ');
             $query .= " AND (".$params.") ";            
         }
+
+        //RESERVAS OPERADAS EL MISMO DIA DE SU CREACION
+        if(isset( $request->is_today )){
+            $havingConditions[] = ( $request->is_today == 1 ? ' is_today != 0 ' : ' is_today = 0 ' );
+        }
+
+        //DUPLICADAS
+        if(!isset( $request->is_duplicated )){
+            $query .= " AND rez.is_duplicated = 0 ";
+        }        
+        if(isset( $request->is_duplicated )){
+            $query .= " AND rez.is_duplicated IN (1,0) ";
+        }        
+
+        //MONEDA DE LA RESERVA
+        if(isset( $request->currency ) && !empty( $request->currency )){
+            $params = $this->parseArrayQuery($request->currency,"single");
+            $query .= " AND rez.currency IN ($params) ";
+        }
+
+        //USUARIO
+        if(isset( $request->user ) && !empty( $request->user )){
+            $queryweb = "";
+            if( in_array("0", $request->user) ){
+                $queryweb = " OR us.id IS NULL ";
+            }
+            $params = $this->parseArrayQuery($request->user);
+            $query .= " AND ( us.id IN ($params) $queryweb ) ";
+        }        
 
         //SITIO
         if(isset( $request->site ) && !empty( $request->site )){
@@ -123,10 +167,9 @@ class ReservationsRepository
             $havingConditions[] = " payment_status IN (".$params.") ";
         }        
 
-        //MONEDA DE LA RESERVA
-        if(isset( $request->currency ) && !empty( $request->currency )){
-            $params = $this->parseArrayQuery($request->currency,"single");
-            $query .= " AND rez.currency IN ($params) ";
+        //RESERVAS CON UN BALANCE
+        if(isset( $request->is_balance )){
+            $havingConditions[] = ( $request->is_balance == 1 ? ' total_balance > 0 ' : ' total_balance <= 0 ' );
         }
 
         //METODO DE PAGO
@@ -140,11 +183,23 @@ class ReservationsRepository
             $havingConditions[] = " (".$params.") "; 
         }
 
-        //COMISIONABLES
+        //TIPO DE LIKE
+        if(isset( $request->reserve_rating )){
+            $params = $request->reserve_rating;
+            $query .= " AND rez.reserve_rating = $params ";      
+        }        
+
+        //RESERVAS COMISIONABLES
         if(isset( $request->is_commissionable )){
             $params = $request->is_commissionable;
             $query .= " AND rez.is_commissionable = $params ";
         }
+
+        //MOTIVOS DE CANCELACIÓN
+        if(isset( $request->cancellation_status ) && !empty( $request->cancellation_status )){
+            $params = $this->parseArrayQuery($request->cancellation_status);
+            $query .= " AND tc.id IN ($params) ";
+        }        
 
         //PAGO A LA LLEGADA
         if( $request->is_pay_at_arrival !=  NULL ){
@@ -152,51 +207,11 @@ class ReservationsRepository
             $query .= " AND rez.pay_at_arrival = $params ";
         }
 
-        //TIPO DE LIKE
-        if(isset( $request->reserve_rating )){
-            $params = $request->reserve_rating;
-            $query .= " AND rez.reserve_rating = $params ";      
-        }
-
-        //MOTIVOS DE CANCELACIÓN
-        if(isset( $request->cancellation_status ) && !empty( $request->cancellation_status )){
-            $params = $this->parseArrayQuery($request->cancellation_status);
-            $query .= " AND tc.id IN ($params) ";
-        }
-
-        //RESERVAS CON UN BALANCE
-        if(isset( $request->is_balance )){
-            $havingConditions[] = ( $request->is_balance == 1 ? ' total_balance > 0 ' : ' total_balance <= 0 ' );
-        }        
-
-        //RESERVAS OPERADAS EL MISMO DIA DE SU CREACION
-        if(isset( $request->is_today )){
-            $havingConditions[] = ( $request->is_today == 1 ? ' is_today != 0 ' : ' is_today = 0 ' );
-        }
-
-        //TIPO DE SERVICIO
-        if(!isset( $request->is_duplicated )){
-            $query .= " AND rez.is_duplicated = 0 ";
-        }        
-        if(isset( $request->is_duplicated )){
-            $query .= " AND rez.is_duplicated IN (1,0) ";
-        }
-
-        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
-            $data['filter_text'] = $request->filter_text;
-            $queryData = [];
-            $query  = " AND (
-                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
-                        ( rez.client_phone like '%".$data['filter_text']."%') OR
-                        ( rez.client_email like '%".$data['filter_text']."%') OR
-                        ( rez.reference like '%".$data['filter_text']."%') OR
-                        ( it.code like '%".$data['filter_text']."%' )
-                    )";
-        }
-
-        if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance )) || (isset( $request->is_today )) ){
-            $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
-        }
+        // if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance )) || (isset( $request->is_today )) ){
+            if( !empty($havingConditions) ){
+                $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
+            }
+        // }
 
         // dd($query, $queryHaving, $queryData);
         $bookings = $this->queryBookings($query, $queryHaving, $queryData);

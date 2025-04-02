@@ -39,11 +39,11 @@ class RatesEnterpriseController extends Controller
         return $this->RatesEnterpriseRepository->items($request);
     }
 
-    public function getRates(RatesEnterpriseRequest $request){
+    public function getRatesEnterprise(RatesEnterpriseRequest $request){
         if(!$this->hasPermission(103)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
-        return $this->RatesEnterpriseRepository->getRates($request);
+        return $this->RatesEnterpriseRepository->getRatesEnterprise($request);
     }
 
     public function newRates(RatesEnterpriseNewRequest $request){

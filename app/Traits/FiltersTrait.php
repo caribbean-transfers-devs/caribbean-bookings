@@ -77,7 +77,10 @@ trait FiltersTrait
             $query->whereIn('status', $status);
         }
 
-        return $query->get();        
+        return $query->get()->prepend((object)[
+            "id" => 0,
+            "name" => "System"
+        ]);
     }
 
     public function Enterprises()

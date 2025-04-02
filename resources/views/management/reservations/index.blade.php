@@ -2,6 +2,7 @@
     use Illuminate\Support\Str;
     use Carbon\Carbon;
 
+    $users = auth()->user()->CallCenterAgent();
     $services = auth()->user()->Services();
     $websites = auth()->user()->Sites();
     $origins = auth()->user()->Origins();
@@ -76,6 +77,7 @@
                             <th class="text-center">ID</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">REFERENCIA</th>
+                            <th class="text-center">VENDEDOR</th>
                             <th class="text-center">FECHA</th>
                             <th class="text-center">HORA</th>
                             <th class="text-center">SITIO</th>                            
@@ -117,6 +119,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center"><?=( !empty($item->reference) ? '<p class="mb-1">'.$item->reference.'</p>' : '' )?></td>
+                                    <td class="text-center">{{ $item->employee ? $item->employee : 'System' }}</td>
                                     <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ $item->site_name }}</td>
@@ -132,7 +135,7 @@
                                     <td class="text-center" <?=auth()->user()->classStatusPayment($item)?>>{{ number_format(($item->total_sales),2) }}</td>
                                     <td class="text-center" {{ (($item->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>                                
                                     <td class="text-center">{{ $item->currency }}</td>
-                                    <td class="text-center">{{ $item->payment_type_name }} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info __payment_info bs-tooltip" title="Ver informacón detallada de los pagos" data-reservation="{{ $item->reservation_id }}"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></td>
+                                    <td class="text-center">{{ $item->payment_type_name }}</td>
                                     <td class="text-center">
                                         @if ( $item->reserve_rating )
                                             <button class="btn btn-{{ $item->reserve_rating == 1 ? 'success' : 'danger' }}" type="button"><?=$item->reserve_rating == 1 ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>'?></button>
@@ -159,7 +162,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :isSearch="1" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :websites="$websites" :origins="$origins" :ispayarrival="1" :rating="1" :istoday="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :users="$users" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :websites="$websites" :origins="$origins" :ispayarrival="1" :rating="1" :istoday="1" />
     <x-modals.reports.columns />
     <x-modals.reservations.payments />
 @endsection

@@ -12,15 +12,16 @@ use App\Models\RatesTransfer;
 
 class RatesRepository{
     public function index($request){
-        $rate_groups = RatesGroup::all();
-        $breadcrumbs = array(
-            array(
-                "route" => "",
-                "name" => "Tarifas",
-                "active" => true
-            ),
-        );        
-        return view('settings.rates.index', compact('rate_groups','breadcrumbs'));
+        return view('settings.rates.index', [
+            'breadcrumbs' => [
+                [
+                    "route" => route('config.ratesDestination'),
+                    "name" => "Tarifas de pagina web",
+                    "active" => true                    
+                ]
+            ],
+            'rate_groups' => RatesGroup::all(),
+        ]);        
     }
 
     public function items($request){
@@ -41,8 +42,7 @@ class RatesRepository{
         $data['zones'] = Zones::where('destination_id', $request->id)->get();
         $data['services'] = DestinationService::select('id', 'name')->where('destination_id', $request->id)->get();
 
-        return response()->json($data, Response::HTTP_OK);
-        
+        return response()->json($data, Response::HTTP_OK);        
     }
 
     public function getRates($request){
@@ -114,11 +114,11 @@ class RatesRepository{
             $rate->ow_37 = isset($request->ow_37) ? $request->ow_37 : '0.00';
             $rate->rt_37 = isset($request->rt_37) ? $request->rt_37 : '0.00';
             $rate->up_8_ow = isset($request->up_8_ow) ? $request->up_8_ow : '0.00';
-            $rate->up_8_rt = isset($request->up_8_rt) ? $request->up_8_rt : '0.00';           
+            $rate->up_8_rt = isset($request->up_8_rt) ? $request->up_8_rt : '0.00';
+            $rate->operating_cost = isset($request->operating_cost) ? $request->operating_cost : '0.00';
             $rate->save();
 
             DB::commit();
-
             return response()->json([
                 'message' => 'Tarifa agregada con éxito',
                 'success' => true
@@ -126,7 +126,7 @@ class RatesRepository{
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Hubo un error, contacte a soporte',
+                'message' => $e->getMessage(),
                 'success' => false
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -150,7 +150,7 @@ class RatesRepository{
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Hubo un error, contacte a soporte',
+                'message' => $e->getMessage(),
                 'success' => false
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -171,11 +171,12 @@ class RatesRepository{
                     $item->rt_37 = (( isset($value['rt_37']) && !empty($value['rt_37']) )? $value['rt_37'] : '0.00' );
                     $item->up_8_ow = (( isset($value['up_8_ow']) && !empty($value['up_8_ow']) )? $value['up_8_ow'] : '0.00' );
                     $item->up_8_rt = (( isset($value['up_8_rt']) && !empty($value['up_8_rt']) )? $value['up_8_rt'] : '0.00' );
+                    $item->operating_cost = (( isset($value['operating_cost']) && !empty($value['operating_cost']) )? $value['operating_cost'] : '0.00' );
                     $item->save();
                 }
             endforeach;
-            DB::commit();
 
+            DB::commit();
             return response()->json([
                 'message' => 'Tarifas actualizadas con éxito',
                 'success' => true
@@ -183,7 +184,7 @@ class RatesRepository{
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Hubo un error, contacte a soporte',
+                'message' => $e->getMessage(),
                 'success' => false
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

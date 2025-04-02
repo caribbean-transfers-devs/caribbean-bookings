@@ -22,6 +22,10 @@
                                 <p>Round Trip</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][round_trip]" value="{{ $value->round_trip }}">
                             </div>
+                            <div>
+                                <p>Costo operativo (MXN)</p>
+                                <input type="text" class="form-control" name="price[{{ $value->id }}][operating_cost]" value="{{ $value->operating_cost }}">
+                            </div>
                         </div>
                         @if (auth()->user()->hasPermission(35))
                             <button class="btn btn-sm btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
@@ -55,6 +59,10 @@
                             <div>
                                 <p>Up RT (>8)</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][up_8_rt]" value="{{ $value->up_8_rt }}">
+                            </div>
+                            <div>                                    
+                                <p>Costo operativo (MXN)</p>
+                                <input type="text" class="form-control" name="price[{{ $value->id }}][operating_cost]" value="{{ $value->operating_cost }}">
                             </div>
                         </div>
                         @if (auth()->user()->hasPermission(35))
@@ -96,6 +104,10 @@
                         <p>Round Trip</p>
                         <input type="text" class="form-control" value="0.00" name="round_trip">
                     </div>
+                    <div>
+                        <p>Costo operativo (MXN)</p>
+                        <input type="text" class="form-control" value="0.00" name="operating_cost">
+                    </div>
                 </div>
                 @if (auth()->user()->hasPermission(33))
                     <button class="btn btn-sm btn-success" type="button" id="btn_add_rate">Agregar Tarifa</button>
@@ -129,6 +141,10 @@
                     <div>
                         <p>Round Trip (>8)</p>
                         <input type="text" class="form-control" value="0.00" name="up_8_rt">
+                    </div>
+                    <div>                                    
+                        <p>Costo operativo (MXN)</p>
+                        <input type="text" class="form-control" value="0.00" name="operating_cost">
                     </div>
                 </div>
                 @if (auth()->user()->hasPermission(33))

@@ -11,6 +11,7 @@ class FiltersComposer
     
     public function compose(View $view)
     {
+        $users = $this->CallCenterAgent();
         $services = $this->Services();
         $websites = $this->Sites();
         $origins = $this->Origins();
@@ -23,6 +24,7 @@ class FiltersComposer
         $cancellations = $this->CancellationTypes();
 
         // Aquí puedes cargar los datos y pasarlos a la vista
+        $view->with('users', $users);
         $view->with('services', $services);
         $view->with('websites', $websites);
         $view->with('origins', $origins);

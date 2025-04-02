@@ -88,6 +88,17 @@ class OperationsRepository
             $queryTwo .= " AND rez.currency IN ($params) ";
         }
 
+        //ORIGEN DE VENTA
+        if(isset( $request->user ) && !empty( $request->user )){
+            $queryweb = "";
+            if( in_array("0", $request->user) ){
+                $queryweb = " OR us.id IS NULL ";
+            }
+            $params = $this->parseArrayQuery($request->user);
+            $queryOne .= " AND ( us.id IN ($params) $queryweb ) ";
+            $queryTwo .= " AND ( us.id IN ($params) $queryweb ) ";
+        }
+
         //SITIO
         if( isset($request->site) && !empty($request->site) ){
             $params = $this->parseArrayQuery($request->site);

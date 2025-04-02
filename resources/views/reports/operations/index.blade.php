@@ -2,6 +2,7 @@
     use Illuminate\Support\Str;
     use Carbon\Carbon;
 
+    $users = auth()->user()->CallCenterAgent();
     $services = auth()->user()->Services();
     $websites = auth()->user()->Sites();
     $origins = auth()->user()->Origins();
@@ -271,6 +272,7 @@
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">REFERENCIA</th>
+                            <th class="text-center">VENDEDOR</th>
                             <th class="text-center">FECHA DE RESERVACIÓN</th>
                             <th class="text-center">HORA DE RESERVACIÓN</th>
                             <th class="text-center">SITIO</th>
@@ -638,6 +640,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center"><?=( !empty($operation->reference) ? '<p class="mb-1">'.$operation->reference.'</p>' : '' )?></td>
+                                    <td class="text-center">{{ $operation->employee ? $operation->employee : 'System' }}</td>
                                     <td class="text-center">{{ date("Y-m-d", strtotime($operation->created_at)) }}</td>
                                     <td class="text-center">{{ date("H:i", strtotime($operation->created_at)) }}</td>
                                     <td class="text-center">{{ $operation->site_name }}</td>
@@ -708,7 +711,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :currencies="$currencies" :websites="$websites" :origins="$origins" :reservationstatus="$reservation_status" :vehicles="$vehicles" :zones="$zones" :servicesoperation="$services_operation" :serviceoperationstatus="$service_operation_status" :units="$units" :drivers="$drivers" :operationstatus="$operation_status" :paymentstatus="$payment_status" :isbalance="1" :methods="$methods" :wasIsQuotation="1" :cancellations="$cancellations" :ispayarrival="1" :refundRequestCount="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :currencies="$currencies" :users="$users" :websites="$websites" :origins="$origins" :reservationstatus="$reservation_status" :vehicles="$vehicles" :zones="$zones" :servicesoperation="$services_operation" :serviceoperationstatus="$service_operation_status" :units="$units" :drivers="$drivers" :operationstatus="$operation_status" :paymentstatus="$payment_status" :isbalance="1" :methods="$methods" :wasIsQuotation="1" :cancellations="$cancellations" :ispayarrival="1" :refundRequestCount="1" />
     <x-modals.reports.columns />
     <x-modals.charts.sales2 :bookingsStatus="$operationStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataServiceTypeOperation="$dataServiceTypeOperation" :dataSites="$dataSites" :dataDriver="$dataDriver" :dataUnit="$dataUnit" :dataOriginSale="$dataOriginSale" />
 @endsection

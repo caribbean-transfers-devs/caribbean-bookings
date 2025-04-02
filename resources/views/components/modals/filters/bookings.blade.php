@@ -97,7 +97,7 @@
                         <div class="row g-0 bottom">
 
                             @if ( isset($users) && !empty($users) )
-                                <select class="form-control selectpicker" title="Vendedor" data-live-search="true" data-selected-text-format="count > 1" name="user[]" id="user" data-value="{{ json_encode(( isset($data['user']) ? $data['user'] : [] )) }}" multiple data-actions-box="true">                            
+                                <select class="form-control selectpicker" title="Vendedor" data-live-search="true" data-selected-text-format="count > 1" name="user[]" id="user" data-value="{{ json_encode(( isset($data['users']) ? $data['users'] : [] )) }}" multiple data-actions-box="true">                            
                                     @foreach ($users as $key => $user)
                                         <option value="{{ $user->id }}">{{ $user->name }}</option> 
                                     @endforeach

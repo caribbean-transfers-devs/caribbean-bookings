@@ -42,11 +42,10 @@ class RatesEnterpriseRepository{
         $data['zones'] = Zones::where('destination_id', $request->id)->get();
         $data['services'] = DestinationService::select('id', 'name')->where('destination_id', $request->id)->get();
 
-        return response()->json($data, Response::HTTP_OK);
-        
+        return response()->json($data, Response::HTTP_OK);        
     }
 
-    public function getRates($request){
+    public function getRatesEnterprise($request){
         $query = '';
         if($request->service_id != 0):
             $query = 'AND rt.destination_service_id = :destination_service_id';
@@ -74,7 +73,7 @@ class RatesEnterpriseRepository{
                                     LEFT JOIN destination_services as ds ON ds.id = rt.destination_service_id
                                     LEFT JOIN enterprises as e ON e.id = rt.enterprise_id
                                     LEFT JOIN zones as zoneOne ON zoneOne.id = rt.zone_one
-                                    LEFT JOIN zones as zoneTwo ON zoneTwo.id = rt.zone_one
+                                    LEFT JOIN zones as zoneTwo ON zoneTwo.id = rt.zone_two
                                 WHERE rt.destination_id = :destination_id
                                 AND ( (rt.zone_one = :zone_one AND rt.zone_two = :zone_two) OR ( rt.zone_one = :zone_three AND rt.zone_two = :zone_four )  ) 
                                 AND e.id = :enterprise_id
@@ -120,7 +119,6 @@ class RatesEnterpriseRepository{
             $rate->save();
 
             DB::commit();
-
             return response()->json([
                 'message' => 'Tarifa agregada con éxito',
                 'success' => true
@@ -128,7 +126,7 @@ class RatesEnterpriseRepository{
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Hubo un error, contacte a soporte',
+                'message' => $e->getMessage(),
                 'success' => false
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -151,7 +149,7 @@ class RatesEnterpriseRepository{
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Hubo un error, contacte a soporte',
+                'message' => $e->getMessage(),
                 'success' => false
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -178,7 +176,6 @@ class RatesEnterpriseRepository{
             endforeach;
 
             DB::commit();
-
             return response()->json([
                 'message' => 'Tarifas actualizadas con éxito',
                 'success' => true
@@ -186,7 +183,7 @@ class RatesEnterpriseRepository{
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Hubo un error, contacte a soporte',
+                'message' => $e->getMessage(),
                 'success' => false
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

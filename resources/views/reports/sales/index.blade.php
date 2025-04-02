@@ -219,6 +219,7 @@
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">REFERENCIA</th>
+                            <th class="text-center">VENDEDOR</th>
                             <th class="text-center">FECHA DE RESERVACIÓN</th>
                             <th class="text-center">HORA DE RESERVACIÓN</th>
                             <th class="text-center">SITIO</th>
@@ -498,6 +499,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center"><?=( !empty($item->reference) ? '<p class="mb-1">'.$item->reference.'</p>' : '' )?></td>
+                                    <td class="text-center">{{ $item->employee ? $item->employee : 'System' }}</td>
                                     <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ date("H:i", strtotime($item->created_at)) }}</td>
                                     <td class="text-center">{{ $item->site_name }}</td>
@@ -604,7 +606,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :istoday="1" :isduplicated="1" :isagency="1" :currencies="$currencies" :websites="$websites" :origins="$origins" :reservationstatus="$reservation_status" :vehicles="$vehicles" :zones="$zones" :paymentstatus="$payment_status" :isbalance="1" :methods="$methods" :wasIsQuotation="1" :rating="1" :iscommissionable="1" :cancellations="$cancellations" :ispayarrival="1" :refundRequestCount="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :istoday="1" :isduplicated="1" :isagency="1" :currencies="$currencies" :users="$users" :websites="$websites" :origins="$origins" :reservationstatus="$reservation_status" :vehicles="$vehicles" :zones="$zones" :paymentstatus="$payment_status" :isbalance="1" :methods="$methods" :wasIsQuotation="1" :rating="1" :iscommissionable="1" :cancellations="$cancellations" :ispayarrival="1" :refundRequestCount="1" />
     <x-modals.reports.columns />
     <x-modals.charts.sales2 :bookingsStatus="$bookingsStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataSites="$dataSites" :dataDestinations="$dataDestinations" :dataOriginSale="$dataOriginSale" />
 @endsection

@@ -26,6 +26,7 @@ use App\Http\Controllers\Reports\CancellationsController as CANCELLATIONS;
 use App\Http\Controllers\Reports\CommissionsController as COMMISSIONS;
 use App\Http\Controllers\Reports\SalesController as SALES;
 use App\Http\Controllers\Reports\OperationsController as OPERATIONSS;
+use App\Http\Controllers\Reports\OperationsDataController as DATAOPERATION;
 
 //MANAGEMENT
 use App\Http\Controllers\Management\ConfirmationsController;
@@ -195,6 +196,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         ////////////
         Route::match(['post','get'], '/reports/sales', [SALES::class, 'index'])->name('reports.sales'); //VENTAS
         Route::match(['post','get'], '/reports/operations', [OPERATIONSS::class, 'index'])->name('reports.operations'); //OPERACIONES
+        Route::match(['post','get'], '/reports/operations2', [DATAOPERATION::class, 'index'])->name('reports.operations2'); //OPERACIONES
 
     //GESTION        
         Route::match(['get', 'post'], '/management/confirmations', [ConfirmationsController::class, 'index'])->name('management.confirmations'); //CONFIRMACIONES
@@ -264,11 +266,11 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::post('/config/rates/get', [RATES::class, 'getRates'])->name('config.getRates');
         Route::post('/config/rates/new', [RATES::class, 'newRates'])->name('config.newRates');
         Route::delete('/config/rates/delete', [RATES::class, 'deleteRates'])->name('config.deleteRates');
-        Route::put('/config/rates/update', [RATES::class, 'updateRates'])->name('config.updateRates');        
+        Route::put('/config/rates/update', [RATES::class, 'updateRates'])->name('config.updateRates');
         //RATES ENTERPRISES
         Route::get('/config/rates/enterprise', [RATES_ENTERPRISE::class, 'index'])->name('config.ratesEnterprise');
         Route::get('/config/rates/enterprise/destination/{id}/get', [RATES_ENTERPRISE::class, 'items'])->name('config.ratesEnterpriseZones');
-        Route::post('/config/rates/enterprise/get', [RATES_ENTERPRISE::class, 'getRates'])->name('config.getRatesEnterprise');
+        Route::post('/config/rates/enterprise/get', [RATES_ENTERPRISE::class, 'getRatesEnterprise'])->name('config.getRatesEnterprise');
         Route::post('/config/rates/enterprise/new', [RATES_ENTERPRISE::class, 'newRates'])->name('config.newRatesEnterprise');
         Route::delete('/config/rates/enterprise/delete', [RATES_ENTERPRISE::class, 'deleteRates'])->name('config.deleteRatesEnterprise');
         Route::put('/config/rates/enterprise/update', [RATES_ENTERPRISE::class, 'updateRates'])->name('config.updateRatesEnterprise');
