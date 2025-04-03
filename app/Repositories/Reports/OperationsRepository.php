@@ -56,24 +56,6 @@ class OperationsRepository
             'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
         ];
 
-        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
-            $queryOne  .= " AND (
-                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
-                        ( rez.client_phone like '%".$data['filter_text']."%') OR
-                        ( rez.client_email like '%".$data['filter_text']."%') OR
-                        ( rez.reference like '%".$data['filter_text']."%') OR
-                        ( it.code like '%".$data['filter_text']."%' )
-                    )";
-
-            $queryTwo  .= " AND (
-                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
-                        ( rez.client_phone like '%".$data['filter_text']."%') OR
-                        ( rez.client_email like '%".$data['filter_text']."%') OR
-                        ( rez.reference like '%".$data['filter_text']."%') OR
-                        ( it.code like '%".$data['filter_text']."%' )
-                    )";                    
-        }
-
         //TIPO DE SERVICIO is_round_trip
         if(isset( $request->is_round_trip )){
             $params = $this->parseArrayQuery($request->is_round_trip);
@@ -218,11 +200,29 @@ class OperationsRepository
             $params = $request->is_pay_at_arrival;
             $queryOne .= " AND rez.pay_at_arrival = $params ";
             $queryTwo .= " AND rez.pay_at_arrival = $params ";
-        }        
+        }
 
         if(isset( $request->refund_request_count )){
             $havingConditions[] = ( $request->refund_request_count == 1 ? ' refund_request_count > 0 ' : ' refund_request_count <= 0 ' );
         }
+
+        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
+            $queryOne  .= " AND (
+                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
+                        ( rez.client_phone like '%".$data['filter_text']."%') OR
+                        ( rez.client_email like '%".$data['filter_text']."%') OR
+                        ( rez.reference like '%".$data['filter_text']."%') OR
+                        ( it.code like '%".$data['filter_text']."%' )
+                    )";
+
+            $queryTwo  .= " AND (
+                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
+                        ( rez.client_phone like '%".$data['filter_text']."%') OR
+                        ( rez.client_email like '%".$data['filter_text']."%') OR
+                        ( rez.reference like '%".$data['filter_text']."%') OR
+                        ( it.code like '%".$data['filter_text']."%' )
+                    )";                    
+        }        
 
         //if( (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || isset( $request->service_operation ) && !empty( $request->service_operation ) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) ){
             if( !empty($havingConditions) ){

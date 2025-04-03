@@ -260,7 +260,8 @@
                 @endif
 
                 {{-- NOS PERMITE AGREGAR SEGUIMIENTOS DE LA RESERVA, SOLO CUANDO ESTA COMO PENDIENTE, CONFIRMADA O A CREDITO --}}
-                @if ( ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(23))
+                {{-- ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) &&  --}}
+                @if ( auth()->user()->hasPermission(23) )
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> AGREGAR SEGUIMIENTO</button>
                 @endif
 
