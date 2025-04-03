@@ -173,20 +173,17 @@ class DetailRepository
      */    
     protected function determineReservationStatus(Reservation $reservation, array $data): string
     {
+        // Condiciones de crédito        
+        $totalSales = round($data['total_sales'], 2);
+        $totalPayments = round($data['total_payments'], 2);
+
         // Condiciones especiales que tienen prioridad
         if ($reservation->is_cancelled) return "CANCELLED";
         if ($reservation->is_duplicated) return "DUPLICATED";
         if ($reservation->open_credit) return "OPENCREDIT";
         if ($reservation->is_quotation) return "QUOTATION";
-        if ($reservation->pay_at_arrival && round($data['total_sales'], 2) == 0) return "PAY_AT_ARRIVAL";
-        
-        // Condiciones de crédito
-        $totalPayments = round($data['total_payments'], 2);
-        $totalSales = round($data['total_sales'], 2);
-        
-        if ($reservation->site->is_cxc && ($totalPayments == 0 || $totalPayments >= $totalSales)) {
-            return "CREDIT";
-        }
+        if ($reservation->pay_at_arrival && round($totalSales, 2) == 0) return "PAY_AT_ARRIVAL";
+        if ($reservation->site->is_cxc && round($totalSales, 2) == 0) return "CREDIT";
         
         // Condición de balance
         $balance = round($data['total_sales']) - round($data['total_payments']);
