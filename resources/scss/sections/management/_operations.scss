@@ -28,10 +28,6 @@
     z-index: 9;
 }
 
-.secondary-nav{
-    top: 0;
-}
-
 #wrapper_whatsApp{
     p{
         font-size: 0.75rem;
@@ -70,7 +66,7 @@
 /* Clase para hacer fija la cabecera */
 .fixed-header {
     position: sticky;
-    top: 52px;
+    top: 106px;
     z-index: 1;
     z-index: 1000;
     width: 100%;

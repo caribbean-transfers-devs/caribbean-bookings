@@ -18,6 +18,9 @@ use App\Models\Zones;
 use App\Models\Destination;
 use App\Models\DestinationService;
 use App\Models\DriverSchedule;
+use App\Models\RatesGroup;
+use App\Models\RatesTransfer;
+use App\Models\RatesEnterprise;
 
 //TRAIT
 use App\Traits\ApiTrait;
@@ -55,15 +58,14 @@ class OperationsController extends Controller
             "driver" => ( isset($request->driver) ? $request->driver : 0 ),
         ];
 
-        // AND rez.is_cancelled = 0 
         $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
-        // AND rez.is_cancelled = 0 
         $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
 
         $havingConditions = []; $queryHaving = "";
+        $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
         $queryData = [
-            'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") )." 00:00:00",
-            'end' => ( isset( $request->date ) ? $request->date : date("Y-m-d") )." 23:59:59"
+            'init' => $date." 00:00:00",
+            'end' => $date." 23:59:59"
         ];
 
         //SITIO
@@ -94,28 +96,6 @@ class OperationsController extends Controller
         }
 
         $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
-        
-        // $not_preassigned = [];
-        // $preassigned = [];        
-        // foreach ($items as $item) {
-        //     if( !$this->validatePreassignment($item) ){
-        //         $not_preassigned[] = $item;
-        //     }else{
-        //         $preassigned[] = $item;
-        //     }
-        // }
-
-        // // Ordenamos los preasignados por hora en orden ascendente
-        // usort($preassigned, function ($a, $b) {
-        //     // Validamos la hora según el tipo
-        //     $timeA = ($a->op_type === "TYPE_ONE") ? $a->pickup_from : $a->pickup_to;
-        //     $timeB = ($b->op_type === "TYPE_ONE") ? $b->pickup_from : $b->pickup_to;
-
-        //     // Comparación de tiempos
-        //     return strtotime($timeA) <=> strtotime($timeB);
-        // });
-
-        // $sorted_reservations = array_merge($not_preassigned, $preassigned);
 
         return view('management.operations.index', [
             'items' => $items,
@@ -124,7 +104,7 @@ class OperationsController extends Controller
             'breadcrumbs' => [
                 [
                     "route" => "",
-                    "name" => "Gestión de envío de operaciones",
+                    "name" => "Gestión de operaciones del: ".$date,
                     "active" => true
                 ]
             ],
@@ -253,6 +233,7 @@ class OperationsController extends Controller
             endif;
 
             return response()->json([
+                'status' => 'success',
                 'success' => true,
                 'message' => 'Se cerro la operación correctamente',
             ], 200);
@@ -262,6 +243,8 @@ class OperationsController extends Controller
                     'code' => 'internal_server',
                     'message' => $e->getMessage()
                 ],
+                'status' => 'error',
+                'success' => false,
                 'message' => $e->getMessage()
             ], 500);
         }
@@ -377,56 +360,218 @@ class OperationsController extends Controller
         }
     }
 
+    // VAMOS A VALIDAR PRIMERO SI LAS ZONAS DEL SERVICIO CUENTA CON COSTO OPERATIVO
+    public function validateOperatingCosts(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|string',            
+            'item_id' => 'required|string',
+            'service_id' => 'required|integer',
+            // 'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
+            // 'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                'success' => false,
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        // Obtener el item de la reservación
+        $item = ReservationsItem::with('reservations.site')->where('id', $request->item_id)->first();
+        
+        if (!$item) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Item no encontrado'
+                ],
+                'status' => 'error',
+                'success' => false,
+                'message' => 'Ítem no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        // dd($item->toArray());
+        try {
+            $codeSite = $item->reservations->site->id;
+            $siteIsCxC = $item->reservations->site->is_cxc;
+            $siteType = $item->reservations->site->type_site;
+            $rateGroup = RatesGroup::where('code', $item->reservations->rate_group)->first();
+
+            $params['destination_id'] = 1;
+            $params['zone_one'] = $item->from_zone;
+            $params['zone_two'] = $item->to_zone;
+            $params['zone_three'] = $item->to_zone;
+            $params['zone_four'] = $item->from_zone;
+            if( $siteType != "AGENCY" ){
+                $table = 'rates_transfers';
+                $leftJoin = 'LEFT JOIN rates_groups as rg ON rg.id = rt.rate_group_id';
+                $query = 'AND rg.id = :rate_group';
+                $params['rate_group'] = $rateGroup->id;
+            }else{
+                $table = 'rates_enterprises';
+                $leftJoin = 'LEFT JOIN enterprises as e ON e.id = rt.enterprise_id';
+                $query = 'AND e.id = :enterprise_id';
+                $params['enterprise_id'] = $item->reservations->site->enterprise_id;
+            }
+            $params['destination_service_id'] = $request->service_id;
+
+            $rates = DB::select("SELECT 
+                                        ds.name as service_name, ds.price_type,
+                                        rt.*,
+                                        zoneOne.name as from_name,
+                                        zoneTwo.name as to_name
+                                    FROM {$table} as rt
+                                        LEFT JOIN destination_services as ds ON ds.id = rt.destination_service_id
+                                        {$leftJoin}
+                                        LEFT JOIN zones as zoneOne ON zoneOne.id = rt.zone_one
+                                        LEFT JOIN zones as zoneTwo ON zoneTwo.id = rt.zone_two
+                                    WHERE rt.destination_id = :destination_id
+                                    AND ( (rt.zone_one = :zone_one AND rt.zone_two = :zone_two) OR ( rt.zone_one = :zone_three AND rt.zone_two = :zone_four )  )                                     
+                                    AND rt.destination_service_id = :destination_service_id
+                                    {$query}", $params);
+
+            // dd($rates, $rates[0]->operating_cost);
+            if( $rates ){
+                return response()->json([
+                    'status' => 'success',
+                    'success' => true,
+                    'value' => $rates[0]->operating_cost,
+                    'codeRate' => $rates[0]->id,
+                    'siteType' => $siteType,
+                    'message' => 'Se valido correctamente el costo operativo',
+                ], Response::HTTP_OK);
+            }else{
+                $rate = ( $siteType != "AGENCY" ? new RatesTransfer() : new RatesEnterprise() );
+                if( $siteType != "AGENCY" ){
+                    $rate->rate_group_id = $rateGroup->id;
+                }else{
+                    $rate->enterprise_id = $item->reservations->site->enterprise_id;
+                }                
+                $rate->destination_service_id = $request->service_id;
+                $rate->destination_id = 1;
+                $rate->zone_one = $item->from_zone;
+                $rate->zone_two = $item->to_zone;
+
+                $rate->one_way = isset($request->one_way) ? $request->one_way : '0.00';
+                $rate->round_trip = isset($request->round_trip) ? $request->round_trip : '0.00';
+                $rate->ow_12 = isset($request->ow_12) ? $request->ow_12 : '0.00';
+                $rate->rt_12 = isset($request->rt_12) ? $request->rt_12 : '0.00';
+                $rate->ow_37 = isset($request->ow_37) ? $request->ow_37 : '0.00';
+                $rate->rt_37 = isset($request->rt_37) ? $request->rt_37 : '0.00';
+                $rate->up_8_ow = isset($request->up_8_ow) ? $request->up_8_ow : '0.00';
+                $rate->up_8_rt = isset($request->up_8_rt) ? $request->up_8_rt : '0.00';
+                $rate->operating_cost = isset($request->operating_cost) ? $request->operating_cost : '0.00';
+                $rate->save();
+                return response()->json([
+                    'status' => 'success',
+                    'success' => true,
+                    'value' => NULL,
+                    'codeRate' => $rate->id,
+                    'siteType' => $siteType,
+                    'message' => 'Se valido correctamente el costo operativo',
+                ], Response::HTTP_OK);                
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],                
+                'status' => 'error',
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);            
+        }
+    }
+
     //SETEMOS LA UNIDAD E INGRESAMOS EL MONTO OPERATIVO, DEL SERVICIO
-    public function setVehicle(Request $request){
+    public function setVehicle(Request $request)
+    {
+        // dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|string',            
+            'item_id' => 'required|string',
+            'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
+            'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',
+            'vehicle_id' => 'required|integer',
+            'operating_cost' => 'required',
+            'code_rate' => 'required',
+            'site_type' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                'success' => false,
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        // Obtener el item de la reservación
+        $item = ReservationsItem::with('reservations.site')->where('id', $request->item_id)->first();
+        
+        if (!$item) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Item no encontrado'
+                ],
+                'status' => 'error',
+                'success' => false,
+                'message' => 'Ítem no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
         try {
             DB::beginTransaction();
             //OBTENEMOS INFORMACION
-            $service = ReservationsItem::find($request->reservation_item);            
+            $vehicleIdOld = ( $request->type == 'TYPE_ONE' ? $item->vehicle_id_one : $item->vehicle_id_two );
+            $operatingCostOld = ( $request->type == 'TYPE_ONE' ? $item->op_one_operating_cost : $item->op_two_operating_cost );
             $vehicle_new = Vehicle::find($request->vehicle_id);
+            $vehicle_current = Vehicle::find(( $request->type == 'TYPE_ONE' ? $item->vehicle_id_one : $item->vehicle_id_two ));
 
-            //ACTUALIZAMOS INFORMACION         
-            if( $request->operation == 'ARRIVAL' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
-                $vehicle_current = Vehicle::find($service->vehicle_id_one);
-                $service->vehicle_id_one = $request->vehicle_id;
-                $service->op_one_operating_cost = $request->operating_cost;
-            }
-            if( $request->operation == 'ARRIVAL' && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ){
-                $vehicle_current = Vehicle::find($service->vehicle_id_two);
-                $service->vehicle_id_two = $request->vehicle_id;
-                $service->op_two_operating_cost = $request->operating_cost;
-            }
+            if($request->type == "TYPE_ONE"):
+                $item->vehicle_id_one = $request->vehicle_id;
+                $item->op_one_operating_cost = $request->operating_cost;
+            endif;
 
-            if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
-                $vehicle_current = Vehicle::find($service->vehicle_id_one);
-                $service->vehicle_id_one = $request->vehicle_id;
-                $service->op_one_operating_cost = $request->operating_cost;
-            }
-            if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ){
-                $vehicle_current = Vehicle::find($service->vehicle_id_two);
-                $service->vehicle_id_two = $request->vehicle_id;
-                $service->op_two_operating_cost = $request->operating_cost;
-            }          
+            if($request->type == "TYPE_TWO"):
+                $item->vehicle_id_two = $request->vehicle_id;
+                $item->op_two_operating_cost = $request->operating_cost;
+            endif;
 
-            if( $request->operation == 'DEPARTURE' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
-                $vehicle_current = Vehicle::find($service->vehicle_id_one);
-                $service->vehicle_id_one = $request->vehicle_id;
-                $service->op_one_operating_cost = $request->operating_cost;
+            $item->save();
+
+            $rate = ( $request->site_type != "AGENCY" ? RatesTransfer::find($request->code_rate) : RatesEnterprise::find($request->code_rate) );
+            if( $rate->operating_cost == NULL || $rate->operating_cost == 0 ){
+                $rate->operating_cost = $request->operating_cost;
+                $rate->save();
             }
-            if( $request->operation == 'DEPARTURE' && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ){
-                $vehicle_current = Vehicle::find($service->vehicle_id_two);
-                $service->vehicle_id_two = $request->vehicle_id;
-                $service->op_two_operating_cost = $request->operating_cost;
-            }
-            $service->save();
 
             //CREAMOS UN LOG
-            $this->create_followUps($service->reservation_id, "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$service->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
+            $text_vehicle = ( $vehicleIdOld == NULL ? "asigno la unidad: (".$vehicle_new->name.")" : "actualizo la unidad de: (".$vehicle_current->name.") a (".$vehicle_new->name.")" );
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", ".$text_vehicle.", de la (".$request->service."), con ID: ".$item->id, 'HISTORY', "UPDATE_SERVICE_VEHICLE");
+            // $this->create_followUps($service->reservation_id, "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " al servicio: ".$service->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
 
-            $this->create_followUps($service->reservation_id, "Actualización de costo operativo por ".$request->value. " al servicio: ".$service->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
+            $text_operating_cost = ( $operatingCostOld == NULL ? "asigno el costo operativo: (".$request->operating_cost.")" : "actualizo el costo operativo de: (".$operatingCostOld.") a (".$request->operating_cost.")" );
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", ".$text_operating_cost.", de la (".$request->service."), con ID: ".$item->id, 'HISTORY', "UPDATE_SERVICE_OPERATING_COST");
+            // $this->create_followUps($service->reservation_id, "Actualización de costo operativo por ".$request->value. " al servicio: ".$service->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
 
             DB::commit();
             return response()->json([
+                'status' => 'success',
                 'success' => true,
                 'message' => 'Se asigno correctamente la unidad',
                 'data' => array(
@@ -434,18 +579,20 @@ class OperationsController extends Controller
                     "value"  => $request->vehicle_id,
                     "name" => $vehicle_new->name,
                     "cost"  => $request->operating_cost,
-                    "message" => "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " y costo de operación ".$request->operating_cost." al servicio: ".$service->id.", por ".auth()->user()->name
+                    "message" => "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " y costo de operación ".$request->operating_cost." al servicio: ".$item->id.", por ".auth()->user()->name
                 )
             ], 200);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'errors' => [
-                    'code' => 'internal_server',
-                    'message' => $e->getMessage()
-                ],
-                'message' => $e->getMessage()
-            ], 500);
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],                
+                'status' => 'error',
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);              
         }
     }
 

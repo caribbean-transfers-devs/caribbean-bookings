@@ -225,12 +225,6 @@ let setup = {
             var tooltip = new bootstrap.Tooltip(bsTooltip[index])
         }
     },
-    bsPopover: function() {
-        var bsPopover = document.querySelectorAll('.bs-popover');
-        for (let index = 0; index < bsPopover.length; index++) {
-            var popover = new bootstrap.Popover(bsPopover[index])
-        }
-    },
     setStatus: function(_status){
         let alert_type = 'btn-secondary';
         switch (_status) {
@@ -286,7 +280,6 @@ let setup = {
         const minutos = String(ahora.getMinutes()).padStart(2, '0');
         return `${horas}:${minutos}`;
     },
-
     calendarFilter: function(selector, options = {}){
         const defaultConfig = {
             mode: "single",
@@ -427,8 +420,6 @@ let setup = {
 if( document.querySelector('.table-rendering') != null ){
     setup.actionTable($('.table-rendering'));
 }
-setup.bsPopover();
-setup.bsTooltip();
 components.setValueSelectpicker();
 components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
 
@@ -509,7 +500,6 @@ const __title_modal = document.getElementById('filterModalLabel');
 const __button_form = document.getElementById('formComment'); //* ===== BUTTON FORM ===== */
 const __btn_preassignment = document.getElementById('btn_preassignment') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
 // const __btn_addservice = document.getElementById('btn_addservice') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
-const __btn_close_operation = document.getElementById('btn_close_operation') //* ===== BUTTON PRE ASSIGNMENT GENERAL ===== */
 
 const __btn_update_status_operations = document.querySelectorAll('.btn_update_status_operation');
 const serviceStatusUpdates = document.querySelectorAll('.serviceStatusUpdate'); //* ===== BUTTON SERVICE STATUS UPDATE ===== */
@@ -522,22 +512,14 @@ const __send_confirmation_whatsapp = document.querySelector('.send_confirmation_
 
 const __is_open = document.getElementById('is_open');
 const __notifications = document.querySelectorAll('.notifications');
-
-const _getSchedules = document.getElementById('getSchedules');
-
 //DEFINIMOS EL SERVIDOR SOCKET QUE ESCUCHARA LAS PETICIONES
 const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhost:4000': 'https://socket-caribbean-transfers.up.railway.app' );
-console.log(socket);
-socket.on('connection');
 
-//NOS PERMITE VER LOS HORARIOS DE LOS CONDUCTORES
-if (_getSchedules) {
-    _getSchedules.addEventListener('click', async function(event){
-        event.preventDefault();
-        $("#schedulesModal").modal('show');
-        setup.reloadAll();
-    })
-}
+//VARIABLES
+const btnDowloadOperation = document.getElementById('btn_dowload_operation')              //* ===== BUTTON DOWLOAD OPERATION ===== */
+const btnDowloadOperationCommissions = document.getElementById('btn_dowload_operation_comission')   //* ===== BUTTON DOWLOAD COMMISSION OPERATION ===== */
+const _getSchedules = document.getElementById('getSchedules');
+const btnCloseOperation = document.getElementById('btn_close_operation')                            //* ===== BUTTON CLOSE OPERATION ===== */
 
 document.addEventListener("DOMContentLoaded", function() {
     function debounce(func, delay) {
@@ -546,6 +528,163 @@ document.addEventListener("DOMContentLoaded", function() {
             clearTimeout(timer);
             timer = setTimeout(() => func.apply(this, args), delay);
         };
+    }
+
+    //FUNCIONALIDADES DE BARRA TOOLS, SON LOS BOTONES DE LA PARTE SUPERIOR
+    if( btnDowloadOperation ){
+        btnDowloadOperation.addEventListener('click', function(event){
+            event.preventDefault();
+            let date = document.getElementById('lookup_date').value;
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se decarga el reporte de operaciones.",
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });            
+
+            fetch("/operation/board/exportExcel?date=" + date, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                },
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                Swal.close();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'commissions_operating_'+ date +'.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });            
+        })
+    }
+
+    if( btnDowloadOperationCommissions ){
+        btnDowloadOperationCommissions.addEventListener('click', function(event){
+            event.preventDefault();
+            let date = document.getElementById('lookup_date').value;
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se decarga el reporte de comisiones de operaciones.",
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch("/operation/board/exportExcelCommission?date=" + date, {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                },
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                Swal.close();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'commissions_operating_drivers_'+ date +'.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });            
+        })
+    }
+
+    if (_getSchedules) {
+        _getSchedules.addEventListener('click', async function(event){
+            event.preventDefault();
+            $("#schedulesModal").modal('show');
+            setup.reloadAll();
+        })
+    }
+
+    if( btnCloseOperation ){
+        btnCloseOperation.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            swal.fire({
+                text: '¿Está seguro que desea cerrar la operación',
+                icon: 'warning',
+                inputLabel: "Selecciona la fecha de operación que desea cerrar",
+                input: "date",
+                inputValue: document.getElementById('lookup_date').value,
+                inputValidator: (result) => {
+                    return !result && "Selecciona un fecha";
+                },
+                didOpen: () => {
+                    const today = (new Date()).toISOString();
+                    Swal.getInput().min = today.split("T")[0];
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se realiza el cierre de la operación.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch("/operation/closeOperation", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({ date: result.value })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        }).then(() => {
+                            location.reload();
+                        });                        
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }
+            });
+        });
     }
 
     document.addEventListener("change", debounce(async function (event) {
@@ -563,7 +702,7 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // setup.fetchExacute(_params);
         }
-    }, 300)); // 300ms de espera antes de ejecutar de nuevo 
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
     
     document.addEventListener("input", debounce(async function (event) {
         if (event.target.classList.contains('change_schedule')) {
@@ -578,7 +717,223 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // setup.fetchExacute(_params);
         }
-    }, 300)); // 300ms de espera antes de ejecutar de nuevo     
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
+    
+    //EVENTOS DE BOTONES DEL DATATABLE
+    document.addEventListener("change", debounce(function (event) {
+
+        //* ===== SELECT VEHICLES ===== */
+        if (event.target.classList.contains('vehicles')) {
+            // Obtener datos del elemento clickeado
+            const { id, item, service, type, service_id } = event.target.dataset;
+            let vehicle = event.target.value;
+        
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras validamos el costo operativo.",
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch("/operation/validateOperatingCosts", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ id : id, item_id : item, service_id : service_id })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                let codeRate = data.codeRate;
+                let siteType = data.siteType;
+                let operatingCost = data.value;
+                if( data.success && data.value != null ){
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se asigana la unidad.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch("/operation/vehicle/set", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({id : id, item_id : item, service : service, type : type, vehicle_id : vehicle, operating_cost : operatingCost, code_rate: codeRate, site_type : siteType })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if( data.success ){
+                            Swal.fire({
+                                icon: "success",
+                                text: data.message,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                willClose: () => {
+                                    socket.emit("setVehicleReservationServer", data.data);
+                                }
+                            });
+                        }                        
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }else{
+                    swal.fire({
+                        inputLabel: "Ingresa el costo operativo",
+                        inputPlaceholder: "Ingresa el costo operativo",
+                        input: "text",
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Aceptar',
+                        cancelButtonText: 'Cancelar',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        preConfirm: async (login) => {
+                            try {
+                                if (login == "") {
+                                    return Swal.showValidationMessage(`
+                                        "Por favor, ingresa el costo operativo"
+                                    `);
+                                }
+                            } catch (error) {
+                                Swal.showValidationMessage(`
+                                    Request failed: ${error}
+                                `);
+                            }
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            operatingCost = result.value;
+                            Swal.fire({
+                                title: "Procesando solicitud...",
+                                text: "Por favor, espera mientras se asigana la unidad.",
+                                allowOutsideClick: false,
+                                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+        
+                            fetch("/operation/vehicle/set", {
+                                method: "POST",
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken
+                                },
+                                body: JSON.stringify({id : id, item_id : item, service : service, type : type, vehicle_id : vehicle, operating_cost : operatingCost, code_rate: codeRate, site_type : siteType })
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    return response.json().then(err => { throw err; });
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if( data.success ){
+                                    Swal.fire({
+                                        icon: "success",
+                                        text: data.message,
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                        willClose: () => {
+                                            socket.emit("setVehicleReservationServer", data.data);
+                                        }
+                                    });
+                                }                        
+                            })
+                            .catch(error => {
+                                Swal.fire(
+                                    '¡ERROR!',
+                                    error.message || 'Ocurrió un error',
+                                    'error'
+                                );
+                            });
+                        }
+                    });                    
+                }
+            })
+            .catch(error => {
+                Swal.fire(
+                    '¡ERROR!',
+                    error.message || 'Ocurrió un error',
+                    'error'
+                );
+            });
+
+            // swal.fire({
+            //     inputLabel: "Ingresa el costo operativo",
+            //     inputPlaceholder: "Ingresa el costo operativo",
+            //     input: "text",
+            //     icon: 'info',
+            //     showCancelButton: true,
+            //     confirmButtonText: 'Aceptar',
+            //     cancelButtonText: 'Cancelar',
+            //     // showLoaderOnConfirm: true,
+            //     preConfirm: async (login) => {
+            //         try {
+            //             if (login == "") {
+            //                 return Swal.showValidationMessage(`
+            //                     "Por favor, ingresa el costo operativo"
+            //                 `);
+            //             }
+            //         } catch (error) {
+            //             Swal.showValidationMessage(`
+            //                 Request failed: ${error}
+            //             `);
+            //         }
+            //     },
+            // }).then((result) => {
+            //     if(result.isConfirmed == true){
+            //         $.ajax({
+            //             url: `/operation/vehicle/set`,
+            //             type: 'PUT',
+            //             data: { id : id, reservation : reservation, reservation_item : item, operation : operation, service : service, vehicle_id : __vehicle.value, type : type, operating_cost : result.value },
+            //             beforeSend: function() {
+            //                 components.loadScreen();
+            //             },
+            //             success: function(resp) {
+            //                 if( resp.success ){
+            //                     Swal.fire({
+            //                         icon: "success",
+            //                         text: resp.message,
+            //                         showConfirmButton: false,
+            //                         timer: 1500,
+            //                         willClose: () => {
+            //                             socket.emit("setVehicleReservationServer", resp.data);
+            //                         }
+            //                     });
+            //                 }
+            //             }
+            //         });
+            //     }
+            // });
+        }
+
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
 });
 
 if ( document.getElementById('lookup_date') != null ) {
@@ -693,7 +1048,6 @@ let pickerInit = flatpickr("#departure_date", {
     mode: "single",
     dateFormat: "Y-m-d H:i",
     enableTime: true,
-    // minDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
 });
 
 //FUNCIONALIDAD DE CAMBIO DE MONEDA
@@ -930,53 +1284,6 @@ if( __btn_preassignment != null ){
   });
 }
 
-if( __btn_close_operation != null ){
-    __btn_close_operation.addEventListener('click', function() {
-        swal.fire({
-            text: '¿Está seguro que desea cerrar la operación',
-            icon: 'warning',
-            inputLabel: "Selecciona la fecha de operación que desea cerrar",
-            input: "date",
-            inputValue: document.getElementById('lookup_date').value,
-            inputValidator: (result) => {
-                return !result && "Selecciona un fecha";
-            },
-            didOpen: () => {
-                const today = (new Date()).toISOString();
-                Swal.getInput().min = today.split("T")[0];
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if(result.isConfirmed == true){
-                $.ajax({
-                    type: "POST",
-                    url: _LOCAL_URL + "/operation/closeOperation",
-                    data: JSON.stringify({ date: result.value }), // Datos a enviar al servidor                            
-                    dataType: "json",
-                    contentType: 'application/json; charset=utf-8',   
-                    beforeSend: function(){
-                        components.loadScreen();
-                    },
-                    success: function(response) {
-                        // Manejar la respuesta exitosa del servidor
-                        Swal.fire({
-                            icon: 'success',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 1500,
-                            willClose: () => {
-                                socket.emit("addPreassignmentServer", response.data);
-                            }                            
-                        });
-                    }
-                });
-            }
-        });               
-    });
-}
-
 if (__add_preassignments.length > 0) {
   __add_preassignments.forEach(__add_preassignment => {
       __add_preassignment.addEventListener('click', function(event) {
@@ -1011,63 +1318,6 @@ if (__add_preassignments.length > 0) {
                         });
                     }
                 });
-              }
-          });
-      });
-  });
-}
-
-if (__vehicles.length > 0) {
-  __vehicles.forEach(__vehicle => {
-      __vehicle.addEventListener('change', function(event) {
-          event.preventDefault();                    
-          const { id, reservation, item, operation, service, type } = this.dataset;
-          swal.fire({
-              inputLabel: "Ingresa el costo operativo",
-              inputPlaceholder: "Ingresa el costo operativo",
-              input: "text",
-              icon: 'info',
-              showCancelButton: true,
-              confirmButtonText: 'Aceptar',
-              cancelButtonText: 'Cancelar',
-              // showLoaderOnConfirm: true,
-              preConfirm: async (login) => {
-                  try {
-                      if (login == "") {
-                          return Swal.showValidationMessage(`
-                              "Por favor, ingresa el costo operativo"
-                          `);
-                      }
-                  } catch (error) {
-                      Swal.showValidationMessage(`
-                          Request failed: ${error}
-                      `);
-                  }
-              },
-              // allowOutsideClick: () => !Swal.isLoading()
-          }).then((result) => {
-              if(result.isConfirmed == true){
-                  $.ajax({
-                      url: `/operation/vehicle/set`,
-                      type: 'PUT',
-                      data: { id : id, reservation : reservation, reservation_item : item, operation : operation, service : service, vehicle_id : __vehicle.value, type : type, operating_cost : result.value },
-                      beforeSend: function() {
-                          components.loadScreen();
-                      },
-                      success: function(resp) {
-                          if( resp.success ){
-                              Swal.fire({
-                                  icon: "success",
-                                  text: resp.message,
-                                  showConfirmButton: false,
-                                  timer: 1500,
-                                  willClose: () => {
-                                      socket.emit("setVehicleReservationServer", resp.data);
-                                  }
-                              });
-                          }                            
-                      }
-                  });
               }
           });
       });
@@ -1610,71 +1860,6 @@ window.addEventListener('scroll', function() {
 //     __thead_shared.classList.remove('fixed-header');
 //   }
 });
-
-//BOTONES 
-if( document.getElementById('btn_dowload_operation') != null ){
-    document.getElementById('btn_dowload_operation').addEventListener('click', function() {
-        let date = document.getElementById('lookup_date').value;
-        let url = '/operation/board/exportExcel?date=' + date ;
-        // console.log(url);
-        
-        components.loadScreen();
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            },
-        })
-        .then(response => response.blob())
-        .then(blob => {
-            components.removeLoadScreen();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'spam_'+ date +'.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        })
-        .catch(error => {
-            components.removeLoadScreen();
-            console.error('Error:', error);
-        });
-    });
-}
-
-if( document.getElementById('btn_dowload_operation_comission') != null ){
-    document.getElementById('btn_dowload_operation_comission').addEventListener('click', function() {
-        let date = document.getElementById('lookup_date').value;
-        let url = '/operation/board/exportExcelCommission?date=' + date ;
-        components.loadScreen();
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            },
-        })
-        .then(response => response.blob())
-        .then(blob => {
-            components.removeLoadScreen();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'spam_'+ date +'.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        })
-        .catch(error => {
-            components.removeLoadScreen();
-            console.error('Error:', error);
-        });
-    });
-}
 
 components.renderCheckboxColumns('dataManagementOperations', 'columns');
 

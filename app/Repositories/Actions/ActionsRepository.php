@@ -482,7 +482,7 @@ class ActionsRepository
             }
 
             // ESTATUS DE RESERVACIÓN
-            $this->create_followUps($booking->id, "El usuario: ".auth()->user()->name.", califico la reservación como: ". ( $likeOld == NULL ? ( $request->status == 1 ? '"POSITVO"' : '"NEGATIVO"' ) : ( $likeOld == 1 ? '"POSITIVO"' : '"NEGATIVO"' )." a ".( $request->status == 1 ? '"POSITIVO"' : '"NEGATIVO"' ) ), 'HISTORY', "UPDATE_LIKE");
+            $this->create_followUps($booking->id, "El usuario: ".auth()->user()->name.", califico la reservación como: ". ( $likeOld == NULL ? ( $request->status == 1 ? '"POSITVO"' : '"NEGATIVO"' ) : ( $likeOld == 1 ? '"POSITIVO"' : '"NEGATIVO"' )." a ".( $request->status == 1 ? '"POSITIVO"' : '"NEGATIVO"' ) ), 'HISTORY', "UPDATE_BOOKING_LIKE");
     
             DB::commit();
             return response()->json([
@@ -570,7 +570,7 @@ class ActionsRepository
             }
 
             // ESTATUS DE RESERVACIÓN
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la confirmación de: ". ( $confimrationOld == 0 ? '"No enviado"' : '"Enviado"' )." a ".( $request->status == 0 ? '"No enviado"' : '"Enviado"' ).", de la ".$request->service.", con ID: ".$item->id, 'HISTORY', "UPDATE_CONFIRMATION");
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la confirmación de: ". ( $confimrationOld == 0 ? '(No enviado)' : '(Enviado)' )." a ".( $request->status == 0 ? '(No enviado)' : '(Enviado)' ).", de la (".$request->service."), con ID: ".$item->id, 'HISTORY', "UPDATE_SERVICE_CONFIRMATION");
     
             DB::commit();
             return response()->json([
@@ -657,7 +657,7 @@ class ActionsRepository
             }
 
             // ESTATUS DE RESERVACIÓN
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", desbloqueo el servicio de: ". ( $operationCloseOld == 0 ? '"ABIERTO"' : '"CERRADO"' ).' a "ABIERTO", de la '.$request->service.", con ID: ".$item->id, 'HISTORY', "UPDATE_SERIVE_UNLOCK");
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", desbloqueo el servicio de: ". ( $operationCloseOld == 0 ? '(ABIERTO)' : '(CERRADO)' )." a (ABIERTO), de la (".$request->service."), con ID: ".$item->id, 'HISTORY', "UPDATE_SERVICE_UNLOCK");
     
             DB::commit();
             return response()->json([
@@ -684,7 +684,9 @@ class ActionsRepository
     public function updateServiceStatus($request)
     {
         $validator = Validator::make($request->all(), [
-            'item_id' => 'required',            
+            'item_id' => 'required|integer',
+            'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
+            'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',      
         ]);
 
         if ($validator->fails()) {
@@ -716,7 +718,7 @@ class ActionsRepository
             DB::beginTransaction();           
 
             // ESTATUS DE RESERVACIÓN
-            $this->create_followUps($request->rez_id, "El usuario: ".auth()->user()->name.", actualizo el estatus del servicio de (".strtoupper($request->type).") de: ".( $request->type == "arrival" ? $item->op_one_status : $item->op_two_status  ). " a ".$request->status, 'HISTORY', "UPDATE_STATUS_SERVICE");
+            $this->create_followUps($request->rez_id, "El usuario: ".auth()->user()->name.", actualizo el estatus del servicio de (".strtoupper($request->type).") de: ".( $request->type == "arrival" ? "(".$item->op_one_status.")" : "(".$item->op_two_status.")" ). " a (".$request->status.")", 'HISTORY', "UPDATE_SERVICE_STATUS");
 
             if($request->type == "arrival"):
                 $item->op_one_status = $request->status;

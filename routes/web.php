@@ -212,8 +212,11 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'], '/management/reservations', [RESERVATIONS::class, 'index'])->name('management.reservations'); //RESERVACIONES
         //OPERACIONES
         Route::get('/operation/board', [Operations::class, 'index'])->name('operation.index');
-        Route::post('/operation/board', [Operations::class, 'index'])->name('operation.index.search');    
-        Route::put('/operation/vehicle/set', [Operations::class, 'setVehicle'])->name('operation.set.vehicle');
+        Route::post('/operation/board', [Operations::class, 'index'])->name('operation.index.search');
+
+        Route::match(['get', 'post'], '/operation/validateOperatingCosts', [Operations::class, 'validateOperatingCosts'])->name('validate.operating.cost');
+        Route::post('/operation/vehicle/set', [Operations::class, 'setVehicle'])->name('operation.set.vehicle');
+
         Route::put('/operation/driver/set', [Operations::class, 'setDriver'])->name('operation.set.driver');    
         Route::put('/operation/status/operation', [Operations::class, 'updateStatusOperation'])->name('operation.status.operation');
         Route::put('/operation/status/booking', [Operations::class, 'updateStatusBooking'])->name('operation.status.booking');

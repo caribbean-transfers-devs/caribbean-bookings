@@ -25,7 +25,7 @@ class UserRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'password' => 'nullable|string|min:6|confirmed',
-            'roles' => 'required|array',
+            // 'roles' => 'required|array',
             'restricted' => 'nullable|integer'
         ];
 
@@ -54,8 +54,8 @@ class UserRequest extends FormRequest
             'password.string' => 'El campo contraseña debe ser una cadena de texto',
             'password.min' => 'El campo contraseña debe tener mínimo 6 caracteres',
             'password.confirmed' => 'El campo contraseña no coincide con el campo confirmar contraseña',
-            'roles.required' => 'Al menos un rol es requerido',
-            'roles.array' => 'Los roles deben venir como un arreglo',
+            // 'roles.required' => 'Al menos un rol es requerido',
+            // 'roles.array' => 'Los roles deben venir como un arreglo',
             'restricted.integer' => 'El campo restringido debe estar dentro de las opciones'
         ];
     }

@@ -14,7 +14,7 @@
     $drivers = auth()->user()->Drivers();
     $drivers2 = auth()->user()->Drivers('active');
 @endphp
-@extends('layout.custom')
+@extends('layout.app')
 @section('title') Gestión De Operaciones @endsection
 
 @push('Css')
@@ -170,24 +170,6 @@
                     </ul>
                 </div>
             @endif
-
-            {{-- <div class="row layout-top-spacing mb-3">
-                <div class="col-md-12">
-                    <ul class="nav nav-pills" id="animateLine" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="animated-underline-private-tab" data-bs-toggle="tab" href="#animated-underline-private" role="tab" aria-controls="animated-underline-private" aria-selected="false" tabindex="-1"> Operación privada</button>
-                        </li>                
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="animated-underline-shared-tab" data-bs-toggle="tab" href="#animated-underline-shared" role="tab" aria-controls="animated-underline-shared" aria-selected="false" tabindex="-1"> Operación compartida</button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="tab-content" id="animateLineContent-4">
-                <div class="tab-pane fade show active" id="animated-underline-private" role="tabpanel" aria-labelledby="animated-underline-badge-private">                    
-                </div>
-            </div> --}}
 
             <table id="dataManagementOperations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                 <thead>
@@ -348,7 +330,7 @@
                                     @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
                                         {{ auth()->user()->setOperationUnit($value) }}
                                     @else
-                                        <select class="form-control vehicles selectpicker" data-live-search="true" id="vehicle_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
+                                        <select class="form-control vehicles selectpicker" data-live-search="true" id="vehicle_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-item="{{ $value->id }}" data-service="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}" data-service_id="{{ $value->service_type_id }}">
                                             <option value="0">Selecciona un vehículo</option>
                                             @if ( isset($units2) && count($units2) >= 1 )
                                                 @foreach ($units2 as $unit)
