@@ -504,7 +504,8 @@ class OperationsController extends Controller
             'vehicle_id' => 'required|integer',
             'operating_cost' => 'required',
             'code_rate' => 'required',
-            'site_type' => 'required|string'
+            'site_type' => 'required|string',
+            'date' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -537,6 +538,14 @@ class OperationsController extends Controller
         try {
             DB::beginTransaction();
             //OBTENEMOS INFORMACION
+            $infoUnitDriver = DriverSchedule::where('date', $request->date)
+                                            ->whereNull('end_check_out_time')
+                                            ->whereNull('deleted_at')
+                                            ->where('is_open', 1)
+                                            ->first();
+
+            $driver = Driver::find(( isset($infoUnitDriver->driver_id) ? $infoUnitDriver->driver_id : 0 ));
+
             $vehicleIdOld = ( $request->type == 'TYPE_ONE' ? $item->vehicle_id_one : $item->vehicle_id_two );
             $operatingCostOld = ( $request->type == 'TYPE_ONE' ? $item->op_one_operating_cost : $item->op_two_operating_cost );
             $vehicle_new = Vehicle::find($request->vehicle_id);
@@ -551,6 +560,16 @@ class OperationsController extends Controller
                 $item->vehicle_id_two = $request->vehicle_id;
                 $item->op_two_operating_cost = $request->operating_cost;
             endif;
+
+            if( $driver ){
+                if($request->type == "TYPE_ONE"):
+                    $item->driver_id_one = $driver->id;
+                endif;
+    
+                if($request->type == "TYPE_TWO"):
+                    $item->driver_id_two = $driver->id;
+                endif;
+            }
 
             $item->save();
 
@@ -569,6 +588,11 @@ class OperationsController extends Controller
             $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", ".$text_operating_cost.", de la (".$request->service."), con ID: ".$item->id, 'HISTORY', "UPDATE_SERVICE_OPERATING_COST");
             // $this->create_followUps($service->reservation_id, "Actualización de costo operativo por ".$request->value. " al servicio: ".$service->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
 
+            if( $driver ){
+                $text_driver = "asigno al conductor: (".$driver->names.' '.$driver->surnames.")";
+                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", ".$text_driver.", de la (".$request->service."), con ID: ".$item->id, 'HISTORY', "UPDATE_SERVICE_DRIVER");
+            }
+
             DB::commit();
             return response()->json([
                 'status' => 'success',
@@ -580,8 +604,14 @@ class OperationsController extends Controller
                     "name" => $vehicle_new->name,
                     "cost"  => $request->operating_cost,
                     "message" => "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" ).") por ".$vehicle_new->name. " y costo de operación ".$request->operating_cost." al servicio: ".$item->id.", por ".auth()->user()->name
-                )
-            ], 200);
+                ),
+                'data2' => array(
+                    "item"  => $request->id,
+                    "value"  => ( isset($driver->id) ? $driver->id : NULL ),
+                    "name" => ( isset($driver->id) ? $driver->names.' '.$driver->surnames : NULL ),
+                    "message" => "Se asigno al conductor (".( isset($driver->id) ? $driver->names.' '.$driver->surnames : NULL )."), por ".auth()->user()->name
+                )                
+            ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([

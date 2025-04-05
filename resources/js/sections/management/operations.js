@@ -753,9 +753,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 return response.json();
             })
             .then(data => {
-                let codeRate = data.codeRate;
-                let siteType = data.siteType;
+                let codeRate      = data.codeRate;
+                let siteType      = data.siteType;
                 let operatingCost = data.value;
+                let date          = document.getElementById('lookup_date').value;
                 if( data.success && data.value != null ){
                     Swal.fire({
                         title: "Procesando solicitud...",
@@ -773,7 +774,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': csrfToken
                         },
-                        body: JSON.stringify({id : id, item_id : item, service : service, type : type, vehicle_id : vehicle, operating_cost : operatingCost, code_rate: codeRate, site_type : siteType })
+                        body: JSON.stringify({id : id, item_id : item, service : service, type : type, vehicle_id : vehicle, operating_cost : operatingCost, code_rate: codeRate, site_type : siteType, date : date })
                     })
                     .then(response => {
                         if (!response.ok) {
@@ -792,6 +793,10 @@ document.addEventListener("DOMContentLoaded", function() {
                                     socket.emit("setVehicleReservationServer", data.data);
                                 }
                             });
+
+                            if( data.data2.value != null ){
+                                socket.emit("setDriverReservationServer", data.data2);
+                            }
                         }                        
                     })
                     .catch(error => {
@@ -844,7 +849,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                     'Content-Type': 'application/json',
                                     'X-CSRF-TOKEN': csrfToken
                                 },
-                                body: JSON.stringify({id : id, item_id : item, service : service, type : type, vehicle_id : vehicle, operating_cost : operatingCost, code_rate: codeRate, site_type : siteType })
+                                body: JSON.stringify({id : id, item_id : item, service : service, type : type, vehicle_id : vehicle, operating_cost : operatingCost, code_rate: codeRate, site_type : siteType, date : date })
                             })
                             .then(response => {
                                 if (!response.ok) {
@@ -863,6 +868,10 @@ document.addEventListener("DOMContentLoaded", function() {
                                             socket.emit("setVehicleReservationServer", data.data);
                                         }
                                     });
+
+                                    if( data.data2.value != null ){
+                                        socket.emit("setDriverReservationServer", data.data2);
+                                    }                                    
                                 }                        
                             })
                             .catch(error => {

@@ -59,8 +59,9 @@
                             <th class="text-center">Horas extras</th>
                             <th class="text-center">Unidad</th>
                             <th class="text-center">Driver</th>
-                            <th class="text-center">Estatus</th>
+                            <th class="text-center">Estatus</th>                            
                             <th class="text-center">Observaciónes</th>
+                            <th class="text-center">Estado</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -93,13 +94,21 @@
                                 </td>
                                 <td class="text-center">{{ $schedule->observations }}</td>
                                 <td class="text-center">
+                                    <button class="btn btn-{{ $schedule->is_open == 1 ? 'success' : 'danger' }} w-100">{{ $schedule->is_open == 1 ? 'ABIERTO' : 'CERRADO' }}</button>
+                                </td>
+                                <td class="text-center">
                                     <div class="d-flex gap-3">
-                                        <a class="btn btn-primary" href="{{ route('schedules.edit', [$schedule->id]) }}">Editar</a>
-                                        <form action="{{ route('schedules.destroy', $schedule->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                                        </form>
+                                        @if ( $schedule->is_open == 1 )
+                                            <a class="btn btn-primary" href="{{ route('schedules.edit', [$schedule->id]) }}">Editar</a>    
+                                        @endif
+
+                                        @if ( $schedule->is_open == 1 )
+                                            <form action="{{ route('schedules.destroy', $schedule->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                                            </form>                                            
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

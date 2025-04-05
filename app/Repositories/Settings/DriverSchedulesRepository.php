@@ -126,6 +126,7 @@ class DriverSchedulesRepository
             $schedule->driver_id = ($request->driver_id ?? 0) != 0 ? $request->driver_id : NULL;
             $schedule->status = $request->status ?? NULL;
             $schedule->observations = $request->observations ?? NULL;
+            $schedule->is_open = $request->is_open;
             $schedule->save();
 
             DB::commit();

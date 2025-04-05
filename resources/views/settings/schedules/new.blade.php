@@ -73,7 +73,7 @@
                                                 <input type="text" id="end_check_out_time" name="end_check_out_time" class="form-control" placeholder="Hora de salida final" value="{{ isset($schedule->end_check_out_time) ? $schedule->end_check_out_time : '' }}">
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <div class="form-group mb-3">
                                                 <label for="status">Selecciona un estatus</label>
                                                 <select class="form-control selectpicker" data-live-search="true" id="status" name="status">
@@ -85,7 +85,7 @@
                                             </div>
                                         </div>
                                     @endif
-                                    <div class="col-md-{{ isset($schedule) ? '4' : '3' }}">
+                                    <div class="col-md-{{ isset($schedule) ? '3' : '3' }}">
                                         <div class="form-group mb-3">
                                             <label for="vehicle_id">Selecciona una unidad</label>
                                             <select class="form-control selectpicker" data-live-search="true" id="vehicle_id" name="vehicle_id">
@@ -98,7 +98,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-{{ isset($schedule) ? '4' : '3' }}">
+                                    <div class="col-md-{{ isset($schedule) ? '3' : '3' }}">
                                         <div class="form-group mb-3">
                                             <label for="driver_id">Selecciona un conductor</label>
                                             <select class="form-control selectpicker" data-live-search="true" id="driver_id" name="driver_id">
@@ -113,6 +113,15 @@
                                     </div>
 
                                     @if ( isset($schedule) )
+                                        <div class="col-md-{{ isset($schedule) ? '3' : '3' }}">
+                                            <div class="form-group mb-3">
+                                                <label for="is_open">Selecciona un opción</label>
+                                                <select class="form-control selectpicker" data-live-search="true" id="is_open" name="is_open">
+                                                    <option value="1">Abierto</option>
+                                                    <option value="0">Cerrado</option>
+                                                </select>
+                                            </div>
+                                        </div>                                    
                                         <div class="col-md-12">
                                             <div class="form-group mb-3">
                                                 <label for="observations">Observaciones</label>

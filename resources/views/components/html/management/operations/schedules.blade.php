@@ -17,6 +17,7 @@
                 <th class="text-center">Driver</th>
                 <th class="text-center">Estatus</th>
                 <th class="text-center">Observaciónes</th>
+                <th class="text-center">Estado</th>
             </tr>
         </thead>
         <tbody>
@@ -28,13 +29,17 @@
                         @php
                             $time = Carbon::parse($schedule->end_check_out_time)->format('H:i A');
                         @endphp
-                        @if ( $schedule->end_check_out_time != NULL )
-                            <?=( $schedule->end_check_out_time != NULL ? '<span class="badge badge-'.( $schedule->extra_hours != NULL && $schedule->check_out_time != $schedule->end_check_out_time ? 'danger' : 'success' ).' w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
-                        @else
+                        {{-- @if ( $schedule->end_check_out_time != NULL ) --}}
+                            @if ( $schedule->status != NULL )
+                                <?=( $schedule->end_check_out_time != NULL ? '<span class="badge badge-'.( $schedule->extra_hours != NULL && $schedule->check_out_time != $schedule->end_check_out_time ? 'danger' : 'success' ).' w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
+                            @else
+                                {{ "NO DEFINIDO" }}                                        
+                            @endif
+                        {{-- @else
                             <div class="form-group">
                                 <input type="text" id="end_check_out_time" name="end_check_out_time" class="form-control change_schedule end_check_out_time" data-code="{{ $schedule->id }}" data-type="end_check_out_time" placeholder="Hora de salida final" value="{{ isset($schedule->end_check_out_time) ? $schedule->end_check_out_time : '' }}">
                             </div>                            
-                        @endif                        
+                        @endif --}}
                     </td>
                     <td class="text-center">
                         @php
@@ -43,9 +48,9 @@
                         <?=( $schedule->extra_hours != NULL && $schedule->extra_hours != "00:00:00" ? '<span class="badge badge-success w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
                     </td>
                     <td class="text-center">
-                        @if ( $schedule->vehicle_id != NULL )
+                        {{-- @if ( $schedule->vehicle_id != NULL ) --}}
                             <button class="btn btn-dark w-100">{{ isset($schedule->vehicle->name) ? $schedule->vehicle->name : 'NO DEFINIDO' }} - {{ isset($schedule->vehicle->destination_service->name) ? $schedule->vehicle->destination_service->name : 'NO DEFINIDO' }} - {{ isset($schedule->vehicle->enterprise->names) ? $schedule->vehicle->enterprise->names : 'NO DEFINIDO' }}</button>
-                        @else
+                        {{-- @else
                             <div class="form-group">
                                 <select class="form-control selectpicker change_schedule" data-code="{{ $schedule->id }}" data-type="vehicle" data-live-search="true" id="vehicle_id" name="vehicle_id">
                                     <option value="0">Selecciona una unidad</option>
@@ -56,12 +61,12 @@
                                     @endif
                                 </select>
                             </div>
-                        @endif                        
+                        @endif --}}
                     </td>
                     <td class="text-center">
-                        @if ( $schedule->driver_id != NULL )
+                        {{-- @if ( $schedule->driver_id != NULL ) --}}
                             {{ isset($schedule->driver->names) ? $schedule->driver->names : 'NO DEFINIDO' }} {{ isset($schedule->driver->surnames) ? $schedule->driver->surnames : 'NO DEFINIDO' }}
-                        @else
+                        {{-- @else
                             <div class="form-group">
                                 <select class="form-control selectpicker change_schedule" data-code="{{ $schedule->id }}" data-type="driver" data-live-search="true" id="driver_id" name="driver_id">
                                     <option value="0">Selecciona un conductor</option>
@@ -72,12 +77,16 @@
                                     @endif
                                 </select>
                             </div>
-                        @endif                        
+                        @endif --}}
                     </td>
                     <td class="text-center">
-                        @if ( $schedule->status != NULL )
-                            <button class="btn btn-{{ $schedule->status == "DT" ? 'info' : ( $schedule->status == "F" ? 'danger' : 'success' ) }} w-100">{{ $schedule->status }}</button>
-                        @else
+                        {{-- @if ( $schedule->status != NULL ) --}}
+                            @if ( $schedule->status != NULL )
+                                <button class="btn btn-{{ $schedule->status == "DT" ? 'info' : ( $schedule->status == "F" ? 'danger' : 'success' ) }} w-100">{{ $schedule->status }}</button>
+                            @else
+                                {{ "NO DEFINIDO" }}                                        
+                            @endif                                
+                        {{-- @else
                             <div class="form-group">
                                 <select class="form-control selectpicker change_schedule" data-code="{{ $schedule->id }}" data-type="status" data-live-search="true" id="status" name="status">
                                     <option value="0">Selecciona una opción</option>
@@ -86,17 +95,20 @@
                                     <option {{ isset($schedule->status) && $schedule->status == "DT" ? 'selected' : '' }} value="DT">DT</option>
                                 </select>
                             </div>
-                        @endif
+                        @endif --}}
                     </td>
                     <td class="text-center">
-                        @if ( $schedule->observations != NULL )
+                        {{-- @if ( $schedule->observations != NULL ) --}}
                             {{ $schedule->observations }}
-                        @else
+                        {{-- @else
                             <div class="form-group">
                                 <input type="text" class="form-control change_schedule" data-code="{{ $schedule->id }}" data-type="observations" name="observations" id="observations" value="{{ isset($schedule->observations) ? $schedule->observations : '' }}">
                             </div>                            
-                        @endif
+                        @endif --}}
                     </td>
+                    <td class="text-center">
+                        <button class="btn btn-{{ $schedule->is_open == 1 ? 'success' : 'danger' }} w-100">{{ $schedule->is_open == 1 ? 'ABIERTO' : 'CERRADO' }}</button>
+                    </td>                    
                 </tr>
             @endforeach
         </tbody>
