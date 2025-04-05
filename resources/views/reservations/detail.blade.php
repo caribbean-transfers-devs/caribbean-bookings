@@ -216,24 +216,29 @@
                             </tbody>
                         </table>
                     </div>
-                    <hr style="width:95%; margin-left: auto; margin-right: auto;">
+                    {{-- <hr style="width:95%; margin-left: auto; margin-right: auto;"> --}}
                     @if (auth()->user()->hasPermission(25))
-                        <div class="followUps px-2 pb-2">
-                            <h6>Actividad</h6>
-                            <ul class="timeline m-0">
-                                @foreach ($reservation->followUps as $followUp)
-                                    <li class="timeline-item">
-                                        <strong class="text-black">[{{ $followUp->type }}]</strong>
-                                        <span class=" text-muted text-sm">{{ date("Y/m/d H:i", strtotime($followUp->created_at)) }}</span>
+                        <div class="NewTimeLine">
+                            <h6 class="my-3">Actividad</h6>
+                            <ul>
+                                @foreach($reservation->followUps as $key => $followUp)
+                                    <li>
                                         @php
                                             $fecha = Carbon::parse($followUp->created_at);
                                         @endphp
-                                        <span class="text-muted text-sm">{{ $fecha->diffForHumans() }}</span>
-                                        <p>{{ $followUp->text }}</p>
+                                        <div style="display: flex;justify-content: space-between;align-items: center;">
+                                            <strong class="text-black">[{{ $followUp->type }}]</strong>
+                                            <span>{{ date("Y/m/d H:i", strtotime($followUp->created_at)) }}</span> 
+                                            <span>{{ $fecha->diffForHumans() }}</span>
+                                        </div>
+                                        <div class="content">
+                                            <h3>{{ $followUp->name }}</h3>
+                                            <p>{{ $followUp->text }}</p>
+                                        </div>
                                     </li>
                                 @endforeach
                             </ul>
-                        </div>
+                        </div>                        
                     @endif
                 </div>
             </div>
@@ -330,7 +335,7 @@
                     
                 {{-- NOS PERMITE PODER ACTIVAR LA RESERVA CUANDO ESTA COMO CREDITO ABIERTO --}}
                 @if ( ( $data['status'] == "OPENCREDIT" || ( $data['status'] == "CANCELLED" && $reservation->was_is_quotation == 1 ) ) && auth()->user()->hasPermission(67) )
-                    <button class="btn btn-success btn-sm" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> ACTIVAR RESERVA</button>
+                    <button class="btn btn-success btn-sm" data-code="{{ $reservation->id }}" data-status="{{ $data['status'] }}" onclick="enableReservation({{ $reservation->id }})"><i class="align-middle" data-feather="alert-circle"></i> ACTIVAR RESERVA</button>
                 @endif
 
                 {{-- NOS PERMITE INDICAR QUE CLIENTE ESTA SOLICITANDO UN REEMBOLSO --}}

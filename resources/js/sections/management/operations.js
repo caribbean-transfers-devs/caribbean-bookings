@@ -883,54 +883,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     'error'
                 );
             });
-
-            // swal.fire({
-            //     inputLabel: "Ingresa el costo operativo",
-            //     inputPlaceholder: "Ingresa el costo operativo",
-            //     input: "text",
-            //     icon: 'info',
-            //     showCancelButton: true,
-            //     confirmButtonText: 'Aceptar',
-            //     cancelButtonText: 'Cancelar',
-            //     // showLoaderOnConfirm: true,
-            //     preConfirm: async (login) => {
-            //         try {
-            //             if (login == "") {
-            //                 return Swal.showValidationMessage(`
-            //                     "Por favor, ingresa el costo operativo"
-            //                 `);
-            //             }
-            //         } catch (error) {
-            //             Swal.showValidationMessage(`
-            //                 Request failed: ${error}
-            //             `);
-            //         }
-            //     },
-            // }).then((result) => {
-            //     if(result.isConfirmed == true){
-            //         $.ajax({
-            //             url: `/operation/vehicle/set`,
-            //             type: 'PUT',
-            //             data: { id : id, reservation : reservation, reservation_item : item, operation : operation, service : service, vehicle_id : __vehicle.value, type : type, operating_cost : result.value },
-            //             beforeSend: function() {
-            //                 components.loadScreen();
-            //             },
-            //             success: function(resp) {
-            //                 if( resp.success ){
-            //                     Swal.fire({
-            //                         icon: "success",
-            //                         text: resp.message,
-            //                         showConfirmButton: false,
-            //                         timer: 1500,
-            //                         willClose: () => {
-            //                             socket.emit("setVehicleReservationServer", resp.data);
-            //                         }
-            //                     });
-            //                 }
-            //             }
-            //         });
-            //     }
-            // });
         }
 
     }, 300)); // 300ms de espera antes de ejecutar de nuevo

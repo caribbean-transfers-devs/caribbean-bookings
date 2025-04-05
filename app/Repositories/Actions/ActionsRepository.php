@@ -683,10 +683,15 @@ class ActionsRepository
     */
     public function updateServiceStatus($request)
     {
+        // __params.rez_id = rez_id;
+        // __params.item_id = item_id;
+        // __params.type = type;
+        // __params.status = status;
+        // __params.type_cancel = value;        
         $validator = Validator::make($request->all(), [
             'item_id' => 'required|integer',
-            'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
-            'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',      
+            // 'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
+            // 'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',
         ]);
 
         if ($validator->fails()) {

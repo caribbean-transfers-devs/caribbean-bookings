@@ -7,6 +7,7 @@
 
 @import '../components/gallery';
 @import '../components/cancelled';
+@import '../components/logs'; //ESTILOS PARA LOGS, DETALLES RESERVA
 
 .main-content{
     background-color: #ffffff;
@@ -27,25 +28,6 @@
     }
 }
 
-.tab {
-    .tab-content{
-        > .tab-pane{
-            &.services.active{
-                // display: flex;
-                // flex-direction: column;
-                // gap: 16px;
-            }
-
-            &:not(.services){
-                // background: #fff;
-                // padding: 1.25rem;
-                // box-shadow: 0 .1rem .2rem rgba(0, 0, 0, .05);
-                // border-radius: 0 0 .2rem .2rem;
-            }
-        }
-    }
-}
-
 .btn svg.feather-check-circle,
 .btn svg.feather-unlock,
 .btn svg.feather-lock,
@@ -53,65 +35,6 @@
     width: 15px;
     height: 15px;
     color: #fff !important;
-}
-
-.timeline-item:before, .timeline:before {
-    content: " ";
-    display: inline-block;
-    position: absolute;
-    z-index: 1;
-}
-
-.timeline {
-    list-style-type: none;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    height: 300px;
-    overflow: hidden;
-    overflow-y: scroll;
-
-    .timeline-item{
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 8px;
-
-        /* Elemento marcador */
-        &::before{
-            background: #fff;
-            border-radius: 50%;
-            border: 3px solid #3b7ddd;
-            left: 0;
-            width: 20px;
-            height: 20px;            
-        }
-
-        /* Línea de conexión entre los elementos */
-        &::after {
-            content: "";
-            position: absolute;
-            background: #3b7ddd;
-            width: 2px;
-            left: 9px; /* Centrado con el círculo */
-            top: 20px; /* Ajustado para empezar desde el centro del círculo */
-            height: var(--timeline-height); /* Ajustado para llegar hasta el final del item */
-            z-index: 0;
-        }
-    
-        &:last-child::after {
-            display: none; /* Oculta la línea en el último elemento */
-        }
-    }
-    
-    // &::before{
-    //     background: #000;
-    //     left: 9px;
-    //     width: 2px;
-    //     height: 100%;
-    // }
 }
 
 *>.callcenter-x:nth-child(1) {

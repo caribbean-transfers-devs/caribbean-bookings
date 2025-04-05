@@ -17,7 +17,7 @@
             cursor:pointer;
             transition:.5s;
             border-bottom: 1px solid #ebedf2;
-            > span{
+            > span, > div span{
                 display:inline-block;
                 background-color: #3b3f5c;
                 border-radius: 10px;                
