@@ -295,7 +295,6 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::delete('/config/types-cancellations/{cancellation}', [TYPES_CANCELLATIONS::class, 'destroy'])->name('config.types-cancellations.destroy');
 
         Route::put('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'update'])->name('reservations.update');
-        Route::put('/reservationsEnable/{reservation}', [DETAILS_RESERVATION::class, 'enable'])->name('reservations.enable');
         Route::delete('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA
         Route::get('/reservations/detail/{id}', [DETAILS_RESERVATION::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');
         Route::get('/GetExchange/{reservation}', [DETAILS_RESERVATION::class, 'get_exchange'])->name('reservations.get_exchange');
@@ -328,6 +327,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::post('/action/enablePayArrival', [ACTIONS_RESERVATION::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
     Route::post('/action/enablePlusService', [ACTIONS_RESERVATION::class, 'enablePlusService'])->name('update.booking.plus.service');
     Route::post('/action/markReservationOpenCredit', [ACTIONS_RESERVATION::class, 'markReservationOpenCredit'])->name('update.booking.mark.open.credit');
+    Route::post('/action/reactivateReservation', [ACTIONS_RESERVATION::class, 'reactivateReservation'])->name('update.booking.reactivate');
     Route::post('/action/refundRequest', [ACTIONS_RESERVATION::class, 'refundRequest'])->name('update.booking.refund.request');
     Route::post('/action/markReservationDuplicate', [ACTIONS_RESERVATION::class, 'markReservationDuplicate'])->name('update.booking.mark.duplicate');    
 

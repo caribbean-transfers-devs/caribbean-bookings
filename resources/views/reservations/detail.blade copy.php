@@ -328,10 +328,13 @@
                 @if ( $data['status'] == "CONFIRMED" && auth()->user()->hasPermission(72) )
                     <button class="btn btn-warning btn-sm markReservationOpenCredit" id="markReservationOpenCredit" data-code="{{ $reservation->id }}" data-status="{{ $data['status'] }}" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> CRÉDITO ABIERTO</button>
                 @endif
+
+                {{-- @if (auth()->user()->hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
+                    <button class="btn btn-danger btn-sm" onclick="cancelReservation({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> Cancelar reservación</button>
+                @endif --}}
                     
                 {{-- NOS PERMITE PODER ACTIVAR LA RESERVA CUANDO ESTA COMO CREDITO ABIERTO --}}
-                {{-- ( $data['status'] == "OPENCREDIT" || ( $data['status'] == "CANCELLED" && $reservation->was_is_quotation == 1 ) ) &&  --}}
-                @if ( auth()->user()->hasPermission(67) )
+                @if ( ( $data['status'] == "OPENCREDIT" || ( $data['status'] == "CANCELLED" && $reservation->was_is_quotation == 1 ) ) && auth()->user()->hasPermission(67) )
                     <button class="btn btn-success btn-sm reactivateReservation" id="reactivateReservation" data-code="{{ $reservation->id }}" data-status="{{ $data['status'] }}" data-pay_at_arrival="{{ $reservation->pay_at_arrival }}"><i class="align-middle" data-feather="alert-circle"></i> REACTIVAR RESERVA</button>
                 @endif
 

@@ -46,16 +46,13 @@ if( deleteCommission ){
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            allowEscapeKey: false, // Esta línea evita que se cierre con ESC            
+            cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
                     title: "Procesando solicitud...",
                     text: "Por favor, espera mientras se elimina la comisión de la reserva.",
                     allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     didOpen: () => {
                         Swal.showLoading();
                     }
@@ -80,8 +77,6 @@ if( deleteCommission ){
                         icon: data.status,
                         html: data.message,
                         allowOutsideClick: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC                        
                     }).then(() => {
                         location.reload();
                     });
@@ -109,16 +104,13 @@ if( enablePayArrival ){
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            allowEscapeKey: false, // Esta línea evita que se cierre con ESC            
+            cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
                     title: "Procesando solicitud...",
                     text: "Por favor, espera mientras se marca como pago a la llegada la reserva.",
                     allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     didOpen: () => {
                         Swal.showLoading();
                     }
@@ -143,7 +135,6 @@ if( enablePayArrival ){
                         icon: data.status,
                         html: data.message,
                         allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     }).then(() => {
                         location.reload();
                     });
@@ -171,16 +162,13 @@ if( enablePlusService ){
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+            cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
                     title: "Procesando solicitud...",
                     text: "Por favor, espera mientras se activa el servicio plus de la reserva.",
                     allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     didOpen: () => {
                         Swal.showLoading();
                     }
@@ -205,7 +193,6 @@ if( enablePlusService ){
                         icon: data.status,
                         html: data.message,
                         allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     }).then(() => {
                         location.reload();
                     });
@@ -233,16 +220,13 @@ if( markReservationOpenCredit ){
             icon: 'warning',    
             showCancelButton: true,
             confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+            cancelButtonText: 'Cancelar',         
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
                     title: "Procesando solicitud...",
                     text: "Por favor, espera mientras se marca como crédito abierto la reserva.",
                     allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     didOpen: () => {
                         Swal.showLoading();
                     }
@@ -267,7 +251,6 @@ if( markReservationOpenCredit ){
                         icon: data.status,
                         html: data.message,
                         allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     }).then(() => {
                         location.reload();
                     });
@@ -288,61 +271,8 @@ if( markReservationOpenCredit ){
 if( reactivateReservation ){
     reactivateReservation.addEventListener('click', function(event){
         event.preventDefault();
-        const { code, status, pay_at_arrival } = this.dataset;
+        const { code, status } = this.dataset;
 
-        Swal.fire({
-            html: '¿Está seguro de reactivar la reservación?',
-            icon: 'warning',    
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: "Procesando solicitud...",
-                    text: "Por favor, espera mientras se reactiva la reserva.",
-                    allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                fetch('/action/reactivateReservation', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },            
-                    body: JSON.stringify({ reservation_id: code, status: status })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw err; });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    Swal.fire({
-                        icon: data.status,
-                        html: data.message,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                    }).then(() => {
-                        location.reload();
-                    });
-                })
-                .catch(error => {
-                    Swal.fire(
-                        '¡ERROR!',
-                        error.message || 'Ocurrió un error',
-                        'error'
-                    );
-                });
-            }
-        });        
     })
 }
 
@@ -364,8 +294,6 @@ if( refundRequest ){
             showCancelButton: true,
             confirmButtonText: 'Aceptar',
             cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
             preConfirm: (comment) => {
                 if (!comment.trim()) {
                     Swal.showValidationMessage('Debe ingresar un comentario.');
@@ -381,7 +309,6 @@ if( refundRequest ){
                     title: "Procesando solicitud...",
                     text: "Por favor, espera mientras se envia la solicud de reembolso de la reserva.",
                     allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     didOpen: () => {
                         Swal.showLoading();
                     }
@@ -406,7 +333,6 @@ if( refundRequest ){
                         icon: data.status,
                         html: data.message,
                         allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     }).then(() => {
                         location.reload();
                     });
@@ -434,16 +360,13 @@ if( markReservationDuplicate ){
             icon: 'warning',    
             showCancelButton: true,
             confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+            cancelButtonText: 'Cancelar',         
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({
                     title: "Procesando solicitud...",
                     text: "Por favor, espera mientras se marca como duplicada la reserva.",
                     allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     didOpen: () => {
                         Swal.showLoading();
                     }
@@ -468,7 +391,6 @@ if( markReservationDuplicate ){
                         icon: data.status,
                         html: data.message,
                         allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     }).then(() => {
                         location.reload();
                     });
@@ -498,9 +420,7 @@ if( _btnNewSale ){
             icon: 'warning',    
             showCancelButton: true,
             confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            allowEscapeKey: false, // Esta línea evita que se cierre con ESC      
+            cancelButtonText: 'Cancelar',         
         }).then((result) => {
             if (result.isConfirmed) {
                 let __params = components.serialize(document.getElementById('frm_new_sale'),'object');
@@ -510,7 +430,6 @@ if( _btnNewSale ){
                     title: "Procesando solicitud...",
                     text: "Por favor, espera mientras se agrega la venta.",
                     allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     didOpen: () => {
                         Swal.showLoading();
                     }
@@ -535,7 +454,6 @@ if( _btnNewSale ){
                         icon: data.status,
                         html: data.message,
                         allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                     }).then(() => {
                         location.reload();
                     });
@@ -572,15 +490,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 showCancelButton: true,
                 confirmButtonText: 'Aceptar',
                 cancelButtonText: 'Cancelar',
-                allowOutsideClick: false,
-                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
                         title: "Procesando solicitud...",
                         text: "Por favor, espera mientras se actualiza el estatus de calificación de la reservación.",
                         allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                         didOpen: () => {
                             Swal.showLoading();
                         }
@@ -605,7 +520,6 @@ document.addEventListener("DOMContentLoaded", function() {
                             icon: data.status,
                             html: data.message,
                             allowOutsideClick: false,
-                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                         }).then(() => {
                             location.reload();
                         });
@@ -640,15 +554,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 showCancelButton: true,
                 confirmButtonText: 'Aceptar',
                 cancelButtonText: 'Cancelar',
-                allowOutsideClick: false,
-                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
                         title: "Procesando solicitud...",
                         text: "Por favor, espera mientras se actualiza el estatus de confirmación.",
                         allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                         didOpen: () => {
                             Swal.showLoading();
                         }
@@ -673,7 +584,6 @@ document.addEventListener("DOMContentLoaded", function() {
                             icon: data.status,
                             html: data.message,
                             allowOutsideClick: false,
-                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                         }).then(() => {
                             location.reload();
                         });
@@ -707,15 +617,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 showCancelButton: true,
                 confirmButtonText: 'Aceptar',
                 cancelButtonText: 'Cancelar',
-                allowOutsideClick: false,
-                allowEscapeKey: false, // Esta línea evita que se cierre con ESC                
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
                         title: "Procesando solicitud...",
                         text: "Por favor, espera mientras se desbloque el servicio de la operación.",
                         allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                         didOpen: () => {
                             Swal.showLoading();
                         }
@@ -740,7 +647,6 @@ document.addEventListener("DOMContentLoaded", function() {
                             icon: data.status,
                             html: data.message,
                             allowOutsideClick: false,
-                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                         }).then(() => {
                             location.reload();
                         });
@@ -903,6 +809,131 @@ function sendInvitation(event, item_id, lang = 'en'){
             });
         }
     });    
+}
+
+//FUNCION PARA PODER CANCELAR LA RESERVACIÓN PADRE Y SUS ITEMS, SIEMPRE QUE NO TENGA ALGUN SERVICIO COMPLETED
+function cancelReservation(id){
+    (async () => {
+        // Crear un contenedor para Dropzone y el select
+        const dropzoneContainer = document.createElement("div");
+        dropzoneContainer.classList.add('box_cancelation')
+        dropzoneContainer.innerHTML = `
+            <p>¿Está seguro de cancelar la reservación? <br>  Esta acción no se puede revertir</p>   
+            <label for="cancelReason">Selecciona el motivo de cancelación:</label>
+            <select id="cancelReason" class="swal2-input">
+                <option value="">Seleccione una opción</option>
+                ${Object.entries(types_cancellations).map(([key, value]) => `<option value="${key}">${value}</option>`).join('')}
+            </select>
+            <label for="attachPicture">Debes adjuntar al menos una imagen:</label>
+            <div id="dropzoneBooking" class="dropzone"></div>            
+        `;
+        let selectedFiles = []; // Array para almacenar las imágenes seleccionadas
+    
+        // Mostrar el SweetAlert con el formulario personalizado
+        // const { isConfirmed } = await Swal.fire({
+        const { isConfirmed, value } = await Swal.fire({
+            // title: "",
+            html: dropzoneContainer,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Aceptar",
+            cancelButtonText: "Cancelar",
+            allowOutsideClick: false,
+            didOpen: () => {
+                // Inicializar Dropzone
+                new Dropzone("#dropzoneBooking", {
+                    url: "/reservations/upload", // No se enviarán archivos aquí, solo los almacenaremos en memoria
+                    maxFilesize: 5, // Tamaño máximo del archivo en MB
+                    maxFiles: 5,
+                    acceptedFiles: "image/*",
+                    dictDefaultMessage: "Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...",
+                    addRemoveLinks: true,
+                    dictRemoveFile: "Eliminar imagen",
+                    autoProcessQueue: false,
+                    init: function () {
+                        let dz = this;
+                        dz.on("addedfile", function (file) {
+                            selectedFiles.push(file);
+                        });
+    
+                        dz.on("removedfile", function (file) {
+                            selectedFiles = selectedFiles.filter(f => f !== file);
+                        });
+                    }
+                });
+            },
+            preConfirm: () => {
+                const reason = document.getElementById("cancelReason").value;
+                const dropzone = Dropzone.forElement("#dropzoneBooking");
+    
+                if (!reason) {
+                    Swal.showValidationMessage("Debes seleccionar un motivo de cancelación.");
+                    return false;
+                }
+                if (dropzone.files.length === 0) {
+                    Swal.showValidationMessage("Debes subir al menos una imagen.");
+                    return false;
+                }
+
+                return { reason, images: dropzone.files };
+                // return { reason, images: dropzone.files.map(file => file) };
+            }
+        });
+    
+        if (isConfirmed) {
+            const { reason, images } = value;
+
+            Swal.fire({
+                title: "Subiendo imágenes...",
+                text: "Por favor, espera mientras se cargan las imágenes.", //Realiza la function de HTML en el Swal
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+                const uploadedImages = await uploadImages(images, id);
+    
+                if (uploadedImages.length === images.length) {
+                    // ✅ Todas las imágenes se subieron correctamente, ahora cancelar la reserva
+                    Swal.fire({
+                        title: "Confirmando cancelación...",
+                        text: "Procesando la cancelación de la reservación.", //Realiza la function de HTML en el Swal
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+    
+                    // Crear un formulario para enviar los datos
+                    // Crear los parametros para enviar los datos
+                    // const formData = new FormData();
+                    let __params = {};
+
+                    // formData.append("folder", id);
+                    // formData.append("type_media", "CANCELLATION");
+                    // dropzone.files.forEach((file, index) => {
+                    //     formData.append(`images[${index}]`, file);
+                    // });
+                    __params.loading = false;
+                    __params.type = reason;
+    
+                    // Enviar la solicitud AJAX para cancelar la reservación
+                    await components.request_exec_ajax(_LOCAL_URL + "/reservations/" + id, "DELETE", __params);
+    
+                    //Swal.fire("Reservación cancelada", "La reservación se ha cancelado con éxito.", "success");
+                } else {
+                    // Title, HTML, Icon
+                    Swal.fire("Error en la subida", "Algunas imágenes no se pudieron subir. Intenta de nuevo.", "error");
+                }
+            } catch (error) {
+                Swal.fire("Error", "Ocurrió un problema al subir las imágenes. Inténtalo nuevamente.", "error");
+            }
+            // const reason = document.getElementById("cancelReason").value;
+            // const dropzone = Dropzone.forElement("#dropzone");
+        }
+    })();
 }
 
 /**
@@ -1640,6 +1671,49 @@ function setStatus(event, type, status, item_id, rez_id){
             }            
         }
     })();    
+}
+
+function enableReservation(id){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
+        }
+    });
+    swal.fire({
+        title: '¿Está seguro de activar la reservación?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        console.log(result, id);
+        if (result.isConfirmed) {
+            var url = "/reservationsEnable/"+id;
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                dataType: 'json',
+                success: function (data) {
+                    swal.fire({
+                        title: 'Reservación activada',
+                        text: '¡Verifica los estatus de operación!',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        location.reload();
+                    });
+                },
+                error: function (data) {
+                    swal.fire({
+                        title: 'Error',
+                        text: 'Ha ocurrido un error al marcar la reservación',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        }
+    });
 }
 
 function copyPaymentLink(event, code, email, lang){

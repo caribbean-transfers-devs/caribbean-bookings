@@ -58,12 +58,6 @@ class ReservationsController extends Controller
         }
     }
 
-    public function enable(Request $request, ReservationsRepository $reservationRepository, Reservation $reservation){
-        if($this->hasPermission(67)){
-            return $reservationRepository->enableReservation($request,$reservation);
-        }
-    }
-
     public function followups(ReservationFollowUpsRequest $request, ReservationsRepository $reservationRepository){
         if($this->hasPermission(23)){
             return $reservationRepository->follow_ups($request);

@@ -285,7 +285,91 @@ class ActionsRepository
                 'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }        
-    }     
+    }
+    
+    /**
+     * NOS AYUDA A REACTIVAR UNA RESERVA, EN LOS DETALLES DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
+    public function reactivateReservation($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reservation_id' => 'required|integer',
+            'status' => 'required|string|in:CANCELLED,DUPLICATED,OPENCREDIT,QUOTATION,PAY_AT_ARRIVAL,CREDIT,PENDING,CONFIRMED',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        $booking = Reservation::find($request->reservation_id);
+
+        if (!$booking) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Reservación no encontrada'
+                ],
+                'status' => 'error',
+                'message' => 'Reservación no encontrada'
+            ], Response::HTTP_NOT_FOUND);
+        }         
+
+        try {
+            DB::beginTransaction();
+            
+            $booking->is_cancelled = 0;
+            $booking->is_duplicated = 0;
+            $booking->open_credit = 0;
+            $booking->save();
+
+            // Actualizar los estados de los ítems y el ID por el tipo de cancelación
+            $booking->items()->update([
+                'vehicle_id_one' => NULL,
+                'driver_id_one' => NULL,
+                'op_one_status' => 'PENDING',
+                'op_one_status_operation' => 'PENDING',
+                'op_one_time_operation' => NULL,
+                'op_one_preassignment' => NULL,
+                'op_one_operating_cost' => 0,
+                // 'op_one_cancellation_type_id' => NULL,
+                'vehicle_id_two' => NULL,
+                'driver_id_two' => NULL,
+                'op_two_status' => 'PENDING',
+                'op_two_status_operation' => 'PENDING',
+                'op_two_time_operation' => NULL,
+                'op_two_preassignment' => NULL,
+                'op_two_operating_cost' => 0,
+                // 'op_two_cancellation_type_id' => NULL,
+            ]);
+
+            // ESTATUS DE RESERVACIÓN
+            $this->create_followUps($request->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el estatus de la reservación de (".$request->status.") a (PENDING)", 'HISTORY', "UPDATE_BOOKING_REACTIVATE");
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se reactivo la reserva correctamente.',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }        
+    }    
 
     /**
      * NOS AYUDA A SOLICITAR UN REEMBOLSO, EN LOS DETALLES DE LA RESERVACIÓN

@@ -57,6 +57,14 @@ class ActionsController extends Controller
     /**
      * 
      */
+    public function reactivateReservation(Request $request)
+    {
+        return $this->ActionsRepository->reactivateReservation($request);
+    }    
+
+    /**
+     * 
+     */
     public function refundRequest(Request $request)
     {
         return $this->ActionsRepository->refundRequest($request);
