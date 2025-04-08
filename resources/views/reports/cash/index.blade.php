@@ -44,6 +44,18 @@
                     'columns' => ':visible'  // Solo exporta las columnas visibles   
                 ]
             ),
+            array(  
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-printer"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Imprimir',
+                'extend' => 'print',
+                'titleAttr' => 'Imprimir',
+                'className' => 'btn btn-primary',
+                'exportOptions' => [
+                    'columns' => ':visible',  // Solo exporta las columnas visibles   
+                    // 'modifier' => [
+                    //     'page' => 'current' // Imprimir solo la página actual
+                    // ]
+                ]
+            ),            
         );
     @endphp
     <div class="row layout-top-spacing">
@@ -68,11 +80,13 @@
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">REFERENCIA</th>
+                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>
                             <th class="text-center"># DE SERVICIO</th>
                             <th class="text-center">TIPO DE SERVICIO EN OPERACIÓN</th>
                             <th class="text-center">NOMBRE DEL CLIENTE</th>
                             <th class="text-center">DESDE</th>
                             <th class="text-center">HACIA</th>
+                            <th class="text-center">DETALLES</th>
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">TOTAL COBRADO EN EFECTIVO</th>
                             <th class="text-center">MONEDA</th>
@@ -89,30 +103,30 @@
                                         $resume[ $operation->payment_status ]['count']++;
                                     endif;
                                 @endphp
-                                {{-- @if ( in_array($operation->reservation_id, $resume['BOOKINGS']) ) --}}
-                                    <tr>
-                                        <td class="text-center">{{ $operation->reservation_id }}</td>
-                                        <td class="text-center">{{ auth()->user()->setDateTime($operation, "date") }}</td>
-                                        <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
-                                        <td class="text-center">
-                                            @if (auth()->user()->hasPermission(61))
-                                                <a href="/reservations/detail/{{ $operation->reservation_id }}"><p class="mb-1">{{ $operation->code }}</p></a>
-                                            @else
-                                                <p class="mb-1">{{ $operation->code }}</p>
-                                            @endif
-                                        </td>
-                                        <td class="text-center"><?=( !empty($operation->reference) ? '<p class="mb-1">'.$operation->reference.'</p>' : '' )?></td>
-                                        <td class="text-center"><?=auth()->user()->renderServicePreassignment($operation)?></td>
-                                        <td class="text-center">{{ $operation->final_service_type }}</td>
-                                        <td class="text-center">{{ $operation->full_name }}</td>
-                                        <td class="text-center">{{ auth()->user()->setFrom($operation, "name") }}</td>
-                                        <td class="text-center">{{ auth()->user()->setTo($operation, "name") }}</td>
-                                        <td class="text-center">{{ number_format($operation->total_sales,2) }}</td>
-                                        <td class="text-center">{{ number_format(( $operation->cash_amount > 0 ? $operation->cash_amount : $operation->total_sales ),2) }}</td>
-                                        <td class="text-center">{{ $operation->currency }}</td>
-                                        <td class="text-center" <?=auth()->user()->classStatusPayment($operation)?>>{{ auth()->user()->statusPayment($operation->payment_status) }}</td>
-                                    </tr>
-                                {{-- @endif --}}
+                                <tr>
+                                    <td class="text-center">{{ $operation->reservation_id }}</td>
+                                    <td class="text-center">{{ auth()->user()->setDateTime($operation, "date") }}</td>
+                                    <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
+                                    <td class="text-center">
+                                        @if (auth()->user()->hasPermission(61))
+                                            <a href="/reservations/detail/{{ $operation->reservation_id }}"><p class="mb-1">{{ $operation->code }}</p></a>
+                                        @else
+                                            <p class="mb-1">{{ $operation->code }}</p>
+                                        @endif
+                                    </td>
+                                    <td class="text-center"><?=( !empty($operation->reference) ? '<p class="mb-1">'.$operation->reference.'</p>' : '' )?></td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($operation->reservation_status) }}">{{ auth()->user()->statusBooking($operation->reservation_status) }}</button></td>
+                                    <td class="text-center"><?=auth()->user()->renderServicePreassignment($operation)?></td>
+                                    <td class="text-center">{{ $operation->final_service_type }}</td>
+                                    <td class="text-center">{{ $operation->full_name }}</td>
+                                    <td class="text-center">{{ auth()->user()->setFrom($operation, "name") }}</td>
+                                    <td class="text-center">{{ auth()->user()->setTo($operation, "name") }}</td>
+                                    <td class="text-center">{{ $operation->cash_references }}</td>
+                                    <td class="text-center">{{ number_format($operation->total_sales,2) }}</td>
+                                    <td class="text-center">{{ number_format(( $operation->cash_amount > 0 ? $operation->cash_amount : $operation->total_sales ),2) }}</td>
+                                    <td class="text-center">{{ $operation->currency }}</td>
+                                    <td class="text-center" <?=auth()->user()->classStatusPayment($operation)?>>{{ auth()->user()->statusPayment($operation->payment_status) }}</td>
+                                </tr>
                             @endforeach
                         @endif
                     </tbody>

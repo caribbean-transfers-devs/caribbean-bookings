@@ -129,6 +129,7 @@ trait QueryTrait
                                                     reference
                                             ) ORDER BY payment_method ASC SEPARATOR ', ') AS payment_details
                                         FROM payments
+                                            WHERE deleted_at IS NULL
                                         GROUP BY reservation_id, is_conciliated
                                     ) as p ON p.reservation_id = rez.id
                                     LEFT JOIN (
@@ -302,6 +303,7 @@ trait QueryTrait
                                                     reference
                                             ) ORDER BY payment_method ASC SEPARATOR ', ') AS payment_details
                                         FROM payments
+                                            WHERE deleted_at IS NULL
                                         GROUP BY reservation_id, is_conciliated
                                     ) as p ON p.reservation_id = rez.id
                                     LEFT JOIN (
@@ -475,13 +477,14 @@ trait QueryTrait
                                 ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
 
                                 -- Nuevos campos para pagos en efectivo
-                                CASE 
-                                    WHEN ( rez.pay_at_arrival = 1 OR p.payment_type_name LIKE '%CASH%' ) THEN 1 
-                                    ELSE 0 
-                                END AS has_cash_payment,
                                 COALESCE(p.cash_amount, 0) AS cash_amount,
+                                -- CASE 
+                                --     WHEN ( rez.pay_at_arrival = 1 OR p.payment_type_name LIKE '%CASH%' ) THEN 1 
+                                --     ELSE 0 
+                                -- END AS has_cash_payment,
+                                COALESCE(p.cash_references) AS cash_references,
 
-                                COALESCE(SUM(s.total_sales), 0) as total_sales, 
+                                COALESCE(SUM(s.total_sales), 0) as total_sales,
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                 CASE
@@ -568,12 +571,37 @@ trait QueryTrait
                                                     ELSE total 
                                                 END
                                             ELSE 0 
-                                        END), 2) AS cash_amount
+                                        END), 2) AS cash_amount,
+                                        -- Referencias de pagos en efectivo concatenadas
+                                        CONCAT(
+                                            '[',
+                                            GROUP_CONCAT(
+                                                DISTINCT 
+                                                CASE 
+                                                    WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                        CONCAT(
+                                                            'Referencia: ', IFNULL(reference, 'SIN REFERENCIA'), 
+                                                            ' - Monto: ', 
+                                                            ROUND(
+                                                                CASE 
+                                                                    WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                                    WHEN operation = 'division' THEN total / exchange_rate
+                                                                    ELSE total 
+                                                                END, 2
+                                                            )
+                                                        )
+                                                    ELSE NULL
+                                                END
+                                                SEPARATOR ']\n['
+                                            ),
+                                            ']'
+                                        ) AS cash_references
                                     FROM payments
-                                        GROUP BY reservation_id
+                                        WHERE deleted_at IS NULL
+                                    GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryOne}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, has_cash_payment {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references {$queryHaving}
 
                             UNION
 
@@ -709,13 +737,14 @@ trait QueryTrait
                                 ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
 
                                 -- Nuevos campos para pagos en efectivo
-                                CASE 
-                                    WHEN ( rez.pay_at_arrival = 1 OR p.payment_type_name LIKE '%CASH%' ) THEN 1 
-                                    ELSE 0 
-                                END AS has_cash_payment,
                                 COALESCE(p.cash_amount, 0) AS cash_amount,
+                                -- CASE 
+                                --     WHEN ( rez.pay_at_arrival = 1 OR p.payment_type_name LIKE '%CASH%' ) THEN 1 
+                                --     ELSE 0 
+                                -- END AS has_cash_payment,
+                                COALESCE(p.cash_references) AS cash_references,
 
-                                COALESCE(SUM(s.total_sales), 0) as total_sales, 
+                                COALESCE(SUM(s.total_sales), 0) as total_sales,
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                 CASE
@@ -780,7 +809,7 @@ trait QueryTrait
                                 LEFT JOIN (
                                     SELECT 
                                         reservation_id,  
-                                        ROUND( COALESCE(SUM(total), 0), 2) as total_sales                                            
+                                        ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                     FROM sales
                                         WHERE deleted_at IS NULL
                                     GROUP BY reservation_id
@@ -788,25 +817,52 @@ trait QueryTrait
                                 LEFT JOIN (
                                     SELECT 
                                         reservation_id,
-                                        ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
-                                                WHEN operation = 'division' THEN total / exchange_rate
-                                                ELSE total END), 2) AS total_payments,
-                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
-                                        -- Monto en efectivo
                                         ROUND(SUM(CASE 
-                                            WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
-                                                CASE 
                                                     WHEN operation = 'multiplication' THEN total * exchange_rate
                                                     WHEN operation = 'division' THEN total / exchange_rate
                                                     ELSE total 
+                                                END), 2) AS total_payments,
+                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
+                                        -- Monto en efectivo
+                                        ROUND(SUM(CASE 
+                                                    WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                    CASE 
+                                                        WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                        WHEN operation = 'division' THEN total / exchange_rate
+                                                        ELSE total 
+                                                    END
+                                                ELSE 0 
+                                        END), 2) AS cash_amount,
+                                        -- Referencias de pagos en efectivo concatenadas
+                                        CONCAT(
+                                            '[',
+                                            GROUP_CONCAT(
+                                                DISTINCT 
+                                                CASE 
+                                                    WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                        CONCAT(
+                                                            'Referencia: ', IFNULL(reference, 'SIN REFERENCIA'), 
+                                                            ' - Monto: ', 
+                                                            ROUND(
+                                                                CASE 
+                                                                    WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                                    WHEN operation = 'division' THEN total / exchange_rate
+                                                                    ELSE total 
+                                                                END, 2
+                                                            )
+                                                        )
+                                                    ELSE NULL
                                                 END
-                                            ELSE 0 
-                                        END), 2) AS cash_amount
+                                                SEPARATOR ']\n['
+                                            ),
+                                            ']'
+                                        ) AS cash_references
                                     FROM payments
-                                        GROUP BY reservation_id
+                                        WHERE deleted_at IS NULL
+                                    GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryTwo}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, has_cash_payment {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references {$queryHaving}
                             -- ) AS combined_results
                             ORDER BY filtered_date ASC ",[
                                 "init_date_one" => $queryData['init'],

@@ -37,14 +37,18 @@ class CashRepository
             'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
         ];
 
-        $havingConditions[] = " has_cash_payment = 1 ";
-        $havingConditions[] = " cash_amount > 0 ";
+        $params = $this->parseArrayQuery(['CREDIT','PENDING','PAY_AT_ARRIVAL','CONFIRMED'],"single");
+        $havingConditions[] = " reservation_status IN (".$params.") ";
+
+        $paramsPayment = "FIND_IN_SET('CASH', payment_type_name) > 0 OR ";
+        $paramsPayment = rtrim($paramsPayment, ' OR ');
+        $havingConditions[] = " (".$paramsPayment.") ";
 
         if( !empty($havingConditions) ){
             $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
         }
 
-        // dd($query, $queryHaving, $queryData);
+        // dd($queryOne, $queryTwo, $queryHaving, $queryData);
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
 
         return view('reports.cash.index', [
