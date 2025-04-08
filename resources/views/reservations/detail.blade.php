@@ -479,6 +479,7 @@
                                                         <th>Hacia</th>
                                                         <th>Pickup</th>
                                                         <th>Estatus de servicio</th>
+                                                        <th>Comentario</th>
                                                         <th></th>
                                                     </tr>
                                                 </thead>
@@ -542,6 +543,7 @@
                                                                 <button <?=$tooltip?> type="button" class="btn {{ $btn_op_one_type }} btn-sm bs-tooltip">{{ auth()->user()->statusBooking($item->op_one_status) }}</button>                                
                                                             @endif
                                                         </td>
+                                                        <td>{{ isset($item->op_one_comments) ? $item->op_one_comments : 'NO DEFINIDO' }}</td>
                                                         <td>
                                                             {{-- NOS PERMITE ACTUALIZAR Y ENVIAR LA CONFIRMACION DEL SERVICIO AL CLIENTE POR CORREO --}}
                                                             {{-- VER SI EL SERVICIO ESTA EN UNA OPERACION ABIERTA O CERRADA --}}
@@ -624,6 +626,7 @@
                                                                     <button <?=$tooltip?> type="button" class="btn {{ $btn_op_two_type }} btn-sm bs-tooltip">{{ auth()->user()->statusBooking($item->op_two_status) }}</button> 
                                                                 @endif
                                                             </td>
+                                                            <td>{{ isset($item->op_two_comments) ? $item->op_two_comments : 'NO DEFINIDO' }}</td>
                                                             <td>
                                                                 {{-- NOS PERMITE ACTUALIZAR Y ENVIAR LA CONFIRMACION DEL SERVICIO AL CLIENTE POR CORREO --}}
                                                                 {{-- VER SI EL SERVICIO ESTA EN UNA OPERACION ABIERTA O CERRADA --}}

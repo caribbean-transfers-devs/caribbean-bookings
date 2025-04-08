@@ -17,8 +17,9 @@
                 @foreach($items as $key => $value)
                     <tr class="{{ strtolower($value->type_site) }}">
                         <td>
-                            <a href="/reservations/detail/{{ $value->reservation_id }}/?trackingType=Bookign&bookingtracking={{ $value->type_site }}" class="btn btn-outline-dark" style="width:100%; margin-bottom: 10px !important;" target="_blank">{{ $value->reservation_codes }}</a>
-                            <button class="btn btn-{{ $value->type_site == "CALLCENTER" ? 'primary' : 'secondary' }}" style="width:100%;">{{ $value->site_name }}</button>
+                            <a href="/reservations/detail/{{ $value->reservation_id }}/?trackingType=Bookign&bookingtracking={{ $value->type_site }}" class="btn btn-outline-dark w-100" style="margin-bottom: 10px !important;" target="_blank">{{ $value->reservation_codes }}</a>
+                            <button class="btn btn-{{ $value->type_site == "CALLCENTER" ? 'primary' : 'secondary' }} w-100" style="margin-bottom: 10px !important;">{{ $value->site_name }}</button>
+                            <button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($value->reservation_status) }} w-100">{{ auth()->user()->statusBooking($value->reservation_status) }}</button>
                         </td>
                         <td>{{ $value->full_name }}</td>
                         <td class="text-center">{{ $value->service_type_name }}</td>

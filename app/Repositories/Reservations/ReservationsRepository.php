@@ -30,10 +30,6 @@ class ReservationsRepository
 {
     use MailjetTrait, FiltersTrait, QueryTrait, FollowUpTrait;
 
-    // public function reservationPayments($reservation){
-    //     return $this->getPayments($reservation->id);
-    // }
-
     public function update($request,$reservation)
     {
         $validatedData = $this->validateBookingRequest($request); //Validar y preparar los datos de la solicitud

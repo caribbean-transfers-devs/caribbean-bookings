@@ -58,21 +58,25 @@ class PendingRepository
                                 GROUP_CONCAT(DISTINCT it.two_service_status ORDER BY it.two_service_status ASC SEPARATOR ',') AS two_service_status,
                                 SUM(it.passengers) as passengers,
                                 COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
-                                -- MAX(it.latest_op_one_pickup) as latest_op_one_pickup,
-                                -- MAX(it.latest_op_two_pickup) as latest_op_two_pickup,
+                                MAX(it.latest_op_one_pickup) as latest_op_one_pickup,
+                                MAX(it.latest_op_two_pickup) as latest_op_two_pickup,
                                 SUM(it.is_round_trip) as is_round_trip,
                                 COALESCE(SUM(s.total_sales), 0) as total_sales,
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,                                    
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                 CASE
-                                    WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
-                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                    WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
                                     WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
+                                    WHEN rez.is_quotation = 1 THEN 'QUOTATION'
+                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                    WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                     ELSE 'UNKNOWN'
                                 END AS reservation_status,
                                 CASE
+                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
                                     ELSE 'PENDING'
                                 END AS payment_status                                
@@ -146,13 +150,14 @@ class PendingRepository
                                     AND rez.is_cancelled = 0 
                                     AND rez.is_duplicated = 0 
                                     AND rez.open_credit = 0
-                                    AND (DATE(it.latest_op_one_pickup) >= :in OR DATE(it.latest_op_two_pickup) >= :out)
+                                    -- AND (DATE(it.latest_op_one_pickup) >= :in OR DATE(it.latest_op_two_pickup) >= :out)
+                                    AND (DATE(it.latest_op_one_pickup) >= :in OR DATE(it.latest_op_one_pickup) <= :out)
                             GROUP BY 
-    rez.id, rez.client_first_name, rez.client_last_name, rez.client_email, rez.client_phone, rez.currency, 
-    rez.is_cancelled, rez.is_commissionable, rez.site_id, rez.pay_at_arrival, rez.reference, rez.affiliate_id, 
-    rez.terminal, rez.comments, rez.is_duplicated, rez.open_credit, rez.is_complete, rez.created_at, 
-    site.type_site, us.name, usc.name, usp.name, site.name, origin.code, tc.name_es                            
-                                    HAVING payment_status = :status ORDER BY rez.created_at DESC;", [
+                                    rez.id, rez.client_first_name, rez.client_last_name, rez.client_email, rez.client_phone, rez.currency, 
+                                    rez.is_cancelled, rez.is_commissionable, rez.site_id, rez.pay_at_arrival, rez.reference, rez.affiliate_id, 
+                                    rez.terminal, rez.comments, rez.is_duplicated, rez.open_credit, rez.is_complete, rez.created_at, 
+                                    site.type_site, us.name, usc.name, usp.name, site.name, site.is_cxc, origin.code, tc.name_es
+                                    HAVING reservation_status = :status ORDER BY rez.created_at DESC;", [
                                         "date" => date("Y-m-d"), 
                                         "in" => date("Y-m-d"), 
                                         "out" => date("Y-m-d"), 

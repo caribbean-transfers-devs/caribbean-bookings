@@ -1129,7 +1129,7 @@ function getPayment(id){
             $("#servicePaymentsTypeModal").val(data.payment_method);
             $("#servicePaymentsDescriptionModal").val(data.reference);
             $("#servicePaymentsTotalModal").val(data.total);
-            $("#servicePaymentsCurrencyModal").val(data.currency);
+            $("#servicePaymentsCurrencyModalPayment").val(data.currency);
             $("#servicePaymentsExchangeModal").val(data.exchange_rate);
             $("#servicePaymentsConciliationModal").val(data.is_conciliated);
             $("#servicePaymentsMessageConciliationModal").val(data.conciliation_comment);
@@ -1159,7 +1159,7 @@ function deletePayment(id){
 }
 /* ===== End Events Payments Settings ===== */
 
-$("#servicePaymentsCurrencyModal").on('change', function(){
+$("#servicePaymentsCurrencyModalPayment").on('change', function(){
     let currency = $(this).val();
     let reservation_id = $("#reserv_id_pay").val();
     $.ajax({

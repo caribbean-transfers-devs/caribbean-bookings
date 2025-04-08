@@ -175,7 +175,6 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     //FINANZAS         
         Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS
         Route::match(['get', 'post'], '/finances/chargebacks', [RefundsFinances::class, 'index'])->name('finances.chargebacks'); //CONTRAGARGOS
-
         Route::match(['get', 'post'], '/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS
 
     //REPORTES
