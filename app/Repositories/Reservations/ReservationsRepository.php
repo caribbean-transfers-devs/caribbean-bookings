@@ -477,16 +477,16 @@ class ReservationsRepository
             return;
         }
         
-        if ($reservation->was_is_quotation == 1) {
-            $item = $reservation->items->first();
-            if ($item) {
-                $newDate = $this->calculateNewExpirationDate(now(), $item['op_one_pickup']);
-                if ($newDate) {
-                    $reservation->is_quotation = 1;
-                    $reservation->expires_at = $newDate;
-                }
-            }
-        }      
+        // if ($reservation->was_is_quotation == 1) {
+        //     $item = $reservation->items->first();
+        //     if ($item) {
+        //         $newDate = $this->calculateNewExpirationDate(now(), $item['op_one_pickup']);
+        //         if ($newDate) {
+        //             $reservation->is_quotation = 1;
+        //             $reservation->expires_at = $newDate;
+        //         }
+        //     }
+        // }      
     }    
 
     public function sendArrivalConfirmation($request){

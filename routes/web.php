@@ -31,36 +31,36 @@ use App\Http\Controllers\Reports\OperationsDataController as DATAOPERATION;
 //MANAGEMENT
 use App\Http\Controllers\Management\ConfirmationsController;
 use App\Http\Controllers\Management\AfterSalesController;
-use App\Http\Controllers\Management\QuotationController as QUOTATION;
-use App\Http\Controllers\Management\PendingController as PENDING;
-use App\Http\Controllers\Management\SpamController as SPAM;
-use App\Http\Controllers\Management\ReservationsController as RESERVATIONS;
-use App\Http\Controllers\Operations\OperationsController as Operations;
+use App\Http\Controllers\Management\QuotationController as          QUOTATION;
+use App\Http\Controllers\Management\PendingController as            PENDING;
+use App\Http\Controllers\Management\SpamController as               SPAM;
+use App\Http\Controllers\Management\ReservationsController as       RESERVATIONS;
+use App\Http\Controllers\Operations\OperationsController as         Operations;
 
 //SETTINGS
-use App\Http\Controllers\Settings\RoleController as ROLES;
-use App\Http\Controllers\Settings\UserController as USERS;
-use App\Http\Controllers\Settings\EnterpriseController as ENTERPRISES;
-use App\Http\Controllers\Settings\SitesController as SITES;
-use App\Http\Controllers\Settings\VehicleController as VEHICLES;
-use App\Http\Controllers\Settings\DriverController as DRIVERS;
-use App\Http\Controllers\Settings\DriverSchedulesController as SCHEDULES;
-use App\Http\Controllers\Settings\ExchangeReportsController as EXCHANGE_REPORTS;
-use App\Http\Controllers\Settings\ZonesController as ZONES;
-use App\Http\Controllers\Settings\RatesController as RATES;
-use App\Http\Controllers\Settings\RatesEnterpriseController as RATES_ENTERPRISE;
-use App\Http\Controllers\Settings\TypesCancellationsController as TYPES_CANCELLATIONS;
+use App\Http\Controllers\Settings\RoleController as                 ROLES;
+use App\Http\Controllers\Settings\UserController as                 USERS;
+use App\Http\Controllers\Settings\EnterpriseController as           ENTERPRISES;
+use App\Http\Controllers\Settings\SitesController as                SITES;
+use App\Http\Controllers\Settings\VehicleController as              VEHICLES;
+use App\Http\Controllers\Settings\DriverController as               DRIVERS;
+use App\Http\Controllers\Settings\DriverSchedulesController as      SCHEDULES;
+use App\Http\Controllers\Settings\ExchangeReportsController as      EXCHANGE_REPORTS;
+use App\Http\Controllers\Settings\ZonesController as                ZONES;
+use App\Http\Controllers\Settings\RatesController as                RATES;
+use App\Http\Controllers\Settings\RatesEnterpriseController as      RATES_ENTERPRISE;
+use App\Http\Controllers\Settings\TypesCancellationsController as   TYPES_CANCELLATIONS;
 
 //DETAILS RESERVATION
-use App\Http\Controllers\Reservations\ReservationsController as DETAILS_RESERVATION;
+use App\Http\Controllers\Reservations\ReservationsController as     DETAILS_RESERVATION;
 
 //GENERALS
 use App\Http\Controllers\Sales\SalesController;
 use App\Http\Controllers\Payments\PaymentsController;
 
 //ACTIONS
-use App\Http\Controllers\Actions\FinanceController as FINANCE;
-use App\Http\Controllers\Actions\ActionsController as ACTIONS_RESERVATION;
+use App\Http\Controllers\Actions\FinanceController as               FINANCE;
+use App\Http\Controllers\Actions\ActionsController as               ACTIONS_RESERVATION;
 use Illuminate\Support\Facades\Route;
 
 /*

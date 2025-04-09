@@ -316,7 +316,7 @@
                 {{-- NOS PERMITE INDICAR QUE CLIENTE PAGARA A LA LLEGADA, SOLO SE MOSTRARA CUANDO SEA COTIZACIÓN O PENDIENTE --}}
                 @if ( $reservation->pay_at_arrival == 0 && ( $data['status'] == "QUOTATION" || $data['status'] == "PENDING" ) )
                     <button class="btn btn-warning btn-sm enablePayArrival" id="enablePayArrival" data-code="{{ $reservation->id }}"><i class="align-middle" data-feather="plus"></i> ACTIVAR PAGO A LA LLEGADA</button>
-                @endif                
+                @endif
 
                 {{-- MOSTRARA EL BOTON DE ACTIVACION DE SERVICIO PLUS, SIEMPRE QUE LA RESERVA NO ESTA CANCELADA NI DUPLICADA --}}
                 @if (auth()->user()->hasPermission(94) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 && $reservation->is_advanced == 0 )
@@ -330,8 +330,7 @@
                 @endif
                     
                 {{-- NOS PERMITE PODER ACTIVAR LA RESERVA CUANDO ESTA COMO CREDITO ABIERTO --}}
-                {{-- ( $data['status'] == "OPENCREDIT" || ( $data['status'] == "CANCELLED" && $reservation->was_is_quotation == 1 ) ) &&  --}}
-                @if ( auth()->user()->hasPermission(67) )
+                @if ( ( $data['status'] == "OPENCREDIT" || $data['status'] == "DUPLICATED" || $data['status'] == "CANCELLED" || ( $data['status'] == "CANCELLED" && $reservation->was_is_quotation == 1 ) ) && auth()->user()->hasPermission(67) )
                     <button class="btn btn-success btn-sm reactivateReservation" id="reactivateReservation" data-code="{{ $reservation->id }}" data-status="{{ $data['status'] }}" data-pay_at_arrival="{{ $reservation->pay_at_arrival }}"><i class="align-middle" data-feather="alert-circle"></i> REACTIVAR RESERVA</button>
                 @endif
 
