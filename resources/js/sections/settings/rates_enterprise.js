@@ -223,7 +223,7 @@ document.addEventListener('click', function (event) {
             Swal.fire({
                 title: '¡Éxito!',
                 icon: 'success',
-                html: 'Tarifas actualizadas con éxito.',
+                text: 'Tarifas actualizadas con éxito.',
                 allowOutsideClick: false,
             }).then(() => {
                 Swal.close(); // Cierra el Swal al recibir respuesta
@@ -301,7 +301,7 @@ function deleteItem(id){
                     error.message || 'Ocurrió un error inesperado',
                     'error'
                 );
-                if (button) {
+                if (_button) {
                     _button.disabled = false;
                     _button.textContent = "Eliminar";
                 }                

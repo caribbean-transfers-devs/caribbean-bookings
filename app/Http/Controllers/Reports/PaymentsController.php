@@ -22,7 +22,8 @@ class PaymentsController extends Controller
         $this->PaymentsRepository = $PaymentsRepository;
     }
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         if(!$this->hasPermission(43)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }

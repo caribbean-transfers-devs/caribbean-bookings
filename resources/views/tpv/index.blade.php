@@ -28,10 +28,6 @@
 @endpush
 
 @section('content')
-@php
-    // dump(Session('tpv'));
-    // dump($config);
-@endphp
     <div class="row layout-top-spacing">
         <div class="widget-content widget-content-area br-8">
             <form class="bookingbox" id="bookingboxForm" method="post">
@@ -99,7 +95,7 @@
                     </div>
                 </div>
                 <div class="button">
-                    <button class="btn btn-primary" onclick="saveQuote(event)" id="btn_quote">Cotizar</button>
+                    <button class="btn btn-primary" type="submit" id="btnQuote">Cotizar</button>
                 </div>
             </form>
         </div>

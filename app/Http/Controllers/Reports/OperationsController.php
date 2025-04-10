@@ -21,7 +21,11 @@ class OperationsController extends Controller
         $this->OperationsRepository = $OperationsRepository;
     } 
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
+        if(!$this->hasPermission(97)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
         return $this->OperationsRepository->index($request);
     }
 }

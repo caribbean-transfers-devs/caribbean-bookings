@@ -168,7 +168,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     //TPV        
         Route::get('/tpv/handler', [TPV::class, 'handler'])->name('tpv.handler');
         Route::get('/tpv/edit/{code}', [TPV::class, 'index'])->name('tpv.new');
-        Route::post('/tpv/quote', [TPV::class, 'quote'])->name('tpv.quote');
+        Route::POST('/tpv/quote', [TPV::class, 'quote'])->name('tpv.quote');
         Route::post('/tpv/create', [TPV::class, 'create'])->name('tpv.create');
         Route::get('/tpv/autocomplete/{keyword}', [TPV::class, 'autocomplete'])->name('tpv.autocomplete');
 

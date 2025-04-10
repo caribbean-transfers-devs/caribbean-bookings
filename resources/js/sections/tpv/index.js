@@ -1,7 +1,3 @@
-const __uuid = document.getElementById('uuid');
-var from_autocomplete = document.getElementById('aff-input-from');
-var to_autocomplete = document.getElementById('aff-input-to');
-
 let setup = {
   lang: 'es',
   currency: 'USD',
@@ -179,7 +175,15 @@ let setup = {
       console.log(error);
     });
   },
+  getLoader: function() {
+    return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
+  },
 };
+
+const __uuid = document.getElementById('uuid');
+var from_autocomplete = document.getElementById('aff-input-from');
+var to_autocomplete = document.getElementById('aff-input-to');
+const _form = document.getElementById('bookingboxForm');
 
 document.addEventListener('DOMContentLoaded', function() {
   const fechaInput = document.getElementById('bookingPickupForm');
@@ -207,6 +211,78 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   rangeCheckbox.addEventListener('change', updatePickerMode);
+
+  if( _form ){
+    _form.addEventListener('submit', function(event){
+      event.preventDefault();
+      const _loadContent = document.getElementById('loadContent');
+      const _formData     = new FormData(_form);
+      _formData.append('uuid', __uuid.value);
+      const _sendQuote   = document.getElementById('btnQuote');
+      _sendQuote.disabled = true;
+      _sendQuote.textContent = "Cotizando...";
+      _loadContent.innerHTML = setup.getLoader();
+      
+      Swal.fire({
+        title: "Procesando solicitud...",
+        text: "Por favor, espera mientras se realiza la cotización.",
+        allowOutsideClick: false,
+        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+  
+      fetch('/tpv/quote', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': csrfToken,
+          'Accept': 'application/json'
+        },
+        body: _formData
+      })
+      .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw err; });
+          }        
+          return response.text();
+      })
+      .then(data => {
+        Swal.close();
+        
+        // Mostrar resultado
+        loadContent.innerHTML = data;
+        window.scrollTo({
+          top: loadContent.offsetTop,
+          behavior: 'smooth'
+        });
+    
+        // Ejecutar función adicional si existe
+        if (typeof loaderSites === 'function') {
+          loaderSites();
+        }
+
+        $('.selectpicker').selectpicker({
+          liveSearch: true,
+          liveSearchNormalize: true,
+          size: 'integer'
+        });
+    
+        _sendQuote.disabled = false;
+        _sendQuote.textContent = "Cotizar";
+      })
+      .catch(error => {
+        Swal.fire(
+          '¡ERROR!',
+          error.message || 'Ocurrió un error',
+          'error'
+        );
+        _sendQuote.disabled = false;
+        _sendQuote.textContent = "Cotizar";
+        _loadContent.innerHTML = "";
+      });
+    });
+  }  
 });
 
 function loaderSites(){
@@ -218,42 +294,6 @@ function loaderSites(){
       actionSite(__site);    
     });
   }
-}
-
-function saveQuote(event){
-  event.preventDefault();
-  $("#btn_quote").prop('disabled', true);
-  $.ajaxSetup({
-      headers: {
-          'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-      }
-  });
-  let frm_data = $("#bookingboxForm").serializeArray();
-  frm_data.push({ name: 'uuid', value: __uuid.value });
-  
-  $.ajax({
-      url: '/tpv/quote',
-      type: 'POST',
-      data: frm_data,
-      beforeSend: function() {
-        $("#loadContent").html('<div class="loading"><span class="loader"></span></div>');
-      },
-      success: function(resp) {
-        $("html, body").animate({ scrollTop: $("#loadContent").offset().top }, 300);
-        $("#loadContent").html(resp);
-        loaderSites();
-        $("#btn_quote").prop('disabled', false);
-      },
-  }).fail(function(xhr, status, error) {
-      console.log(xhr);
-      Swal.fire(
-          '¡ERROR!',
-          xhr.responseJSON.message,
-          'error'
-      )
-      $("#loadContent").html("");
-      $("#btn_quote").prop('disabled', false);
-  });
 }
 
 function makeReservationButton(event){
@@ -318,11 +358,6 @@ to_autocomplete.addEventListener('focus', (e) => {
 
 $(document).on("change", "#formSite", function() {
   var selectedValue = $(this).val();
-  //$("#formTotal").attr("readonly", true);
-  
-  if(selectedValue == 2 || selectedValue == 4 || selectedValue == 5){
-    //$("#formTotal").attr("readonly", false);
-  }
   $("#formTotal").attr("readonly", false);
 });
 

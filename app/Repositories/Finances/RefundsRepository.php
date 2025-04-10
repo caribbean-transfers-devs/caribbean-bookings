@@ -128,14 +128,14 @@ class RefundsRepository
 
         // FILTRO DE TEXTO
         if (!empty($request->filter_text)) {
-            $query .= " AND (
-                CONCAT(rez.client_first_name,' ',rez.client_last_name) LIKE :filter_text
-                OR rez.client_phone LIKE :filter_text
-                OR rez.client_email LIKE :filter_text
-                OR rez.reference LIKE :filter_text
-                OR it.code LIKE :filter_text
+            $queryData = [];
+            $query  = " AND (
+                ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
+                ( rez.client_phone like '%".$data['filter_text']."%') OR
+                ( rez.client_email like '%".$data['filter_text']."%') OR
+                ( rez.reference like '%".$data['filter_text']."%') OR
+                ( it.code like '%".$data['filter_text']."%' )
             )";
-            $queryData['filter_text'] = '%' . $request->filter_text . '%';
         }
 
         // QUERY HAVING

@@ -22,7 +22,11 @@ class SalesController extends Controller
         $this->SalesRepository = $SalesRepository;
     }
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
+        if(!$this->hasPermission(98)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }        
         return $this->SalesRepository->index($request);
     }
 }

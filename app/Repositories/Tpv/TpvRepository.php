@@ -141,7 +141,7 @@ class TpvRepository
         $tpv[ $request->code ]['language'] = $request->language;
         $tpv[ $request->code ]['passengers'] = $request->passengers;
         $tpv[ $request->code ]['currency'] = $request->currency;
-        $tpv[ $request->code ]['rate_group'] = $request->rate_group;
+        $tpv[ $request->code ]['rate_group'] = 'xLjDl18';
         $tpv[ $request->code ]['lastminute'] = 1;
 
         Session::put('tpv', $tpv);
@@ -159,16 +159,11 @@ class TpvRepository
             ], Response::HTTP_BAD_REQUEST);
         endif;
 
-        // $sites = Site::all();
-        $sites = Site::orderByRaw("FIELD(name LIKE '%[CS]%', 1) DESC")
-                ->orderBy('name')
-                ->get();        
-        $origin_sales = OriginSale::where('status',1)->get();
-
-        // $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
-        // $agents = User::whereIn('id', $users_ids)->get();
-
-        return view('tpv.form', compact('quotation','sites','origin_sales'));
+        return view('tpv.form', [
+            'quotation' => $quotation,
+            'sites' => Site::orderByRaw("FIELD(name LIKE '%[CS]%', 1) DESC")->orderBy('name')->get(),
+            'origin_sales' => OriginSale::where('status',1)->get()
+        ]);
     }
 
     public function create($request){    

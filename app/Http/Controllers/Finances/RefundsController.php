@@ -24,6 +24,9 @@ class RefundsController extends Controller
 
     public function index(Request $request)
     {
+        if(!$this->hasPermission(114)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }        
         return $this->RefundsRepository->index($request);
     }
 }

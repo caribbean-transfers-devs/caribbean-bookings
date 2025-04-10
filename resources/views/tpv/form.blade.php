@@ -1,7 +1,7 @@
 @php
     $users = auth()->user()->CallCenterAgent([1]);    
 @endphp
-<form class="col-xl-12 quote_container" id="formReservation">
+<form class="quote_container" id="formReservation">
     <div class="left_">
         @if (isset( $quotation['items'] ))
             @php
@@ -12,27 +12,41 @@
                     $service_counter++;
                 @endphp    
                 <div class="item">
-                    <div class="one_">
-                        <img src="{{ $item['image'] }}">
-                    </div>
-                    <div class="two_">
+                    <div class="one_ one">
                         <h2>{{ $item['name'] }}</h2>
+                        <div class="stars">5/5</div>
+                        <img src="{{ $item['image'] }}" alt="" title="" width="" height="" loading="lazy">
+                        <div class="badges">
+                            <span>Impuestos incluidos</span>
+                            <span>Seguro de viaje</span>
+                        </div>
+                    </div>
+                    <div class="two_ two">
+                        <h3>Características</h3>
+                        <ul class="inline">
+                            <li><img src="/assets/img/svg/pax.svg"> Max {{ $item['passengers'] }} pasajeros</li>
+                            <li><img src="/assets/img/svg/luggage.svg"> Max {{ $item['luggage'] }} maletas</li>
+                        </ul>
+                        <h3>¿Qué incluye mi reserva?</h3>
                         <ul>
-                            <li>Cancelación gratuita</li>
-                            <li>Hasta {{ $item['passengers'] }} Pax</li>
-                            <li>Meet & greet</li>
-                            <li>{{ $item['luggage'] }} Maletas</li>
+                            {{-- <li>Cancelación gratuita</li> --}}
+                            {{-- <li>Meet & greet</li> --}}
+                            <li>Aire acondicionado</li>
+                            <li>Encuentro y bienvenida</li>
+                            {{-- <li>@lang('search.bilingual_drivers')</li> --}}
+                            <li>Parada de cortesía en la tienda</li>
                         </ul>
                     </div>
-                    <div class="three_">
-                        <div>
+                    <div class="three_ three">
+                        <div class="one">
+                            <p>Precio desde</p>
                             <p>${{ $item['price'] }} {{ $item['currency'] }}</p>
                             <p>Veículos ({{ $item['vehicles'] }})</p>
                         </div>
-                        <div>
+                        <div class="two">
                             <input type="radio" class="checkButton" id="serviceButton-{{$service_counter}}" name="service_token" value="{{ $item['token'] }}" onclick="setTotal('{{ $item['price'] }}')">
                             <label for="serviceButton-{{$service_counter}}" class="btn custom-button">
-                                Reservar
+                                Seleccionar
                             </label>
                         </div>
                     </div>
@@ -73,13 +87,13 @@
                     <label class="form-label" for="formSpecialRequest">Solicitudes especiales</label>
                     <textarea class="form-control" name="special_request" id="formSpecialRequest"></textarea>                    
                 </div>
-                <div>
+                {{-- <div>
                     <label class="form-label" for="formPaymentMethod">Método de pago</label>
                     <select class="form-control" id="formPaymentMethod" name="payment_method">
                         <option value="CARD">Tarjeta de crédito / Débito</option>
                         <option value="PAYPAL">PayPal</option>
                     </select>
-                </div>
+                </div> --}}
                 <input type="hidden" id="formQuotation" name="is_quotation" value="1">         
             </div>
         </div>
@@ -89,7 +103,7 @@
             <div class="one_">
                 <div>
                     <label class="form-label" for="formSite">Sitio</label>
-                    <select class="form-control" id="formSite" name="site_id">
+                    <select class="form-control selectpicker" data-live-search="true" id="formSite" name="site_id">
                         @if (isset( $sites ) && sizeof($sites) >= 1)
                             @foreach ($sites as $item)
                                 <option value="{{ $item->id }}" data-type="{{ $item->type_site }}">{{ $item->name }}</option>
@@ -99,7 +113,7 @@
                 </div>
                 <div>
                     <label class="form-label" for="formOriginSale">Origen de venta</label>
-                    <select class="form-control" id="formOriginSale" name="origin_sale_id">
+                    <select class="form-control selectpicker" data-live-search="true" id="formOriginSale" name="origin_sale_id">
                         <option value="">Selecciona un origen de venta</option>
                         @if (isset( $origin_sales ) && sizeof($origin_sales) >= 1)
                             @foreach ($origin_sales as $origin_sale)
@@ -114,7 +128,7 @@
                 </div>
                 <div>
                     <label class="form-label" for="formAgent">Agente</label>
-                    <select class="form-control" id="formAgent" name="call_center_agent">
+                    <select class="form-control selectpicker" data-live-search="true" id="formAgent" name="call_center_agent">
                         @if (isset( $users ) && $users)
                             @foreach ($users as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
@@ -129,6 +143,5 @@
                 <button type="button" class="btn btn-success" onclick="makeReservationButton(event)" id="btn_make_reservation">Enviar</button>
             </div>
         </div>
-
     </div>
 </form>

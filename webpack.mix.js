@@ -86,7 +86,12 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         mix.combine(['resources/plugins/apex/apexcharts.min.js', 'resources/plugins/table/datatable/datatables5.js', 'resources/js/sections/dashboard/callcenteragent.js', 'resources/js/sections/management/aftersales.js'], data.assets + "js/sections/dashboard/callcenteragent.min.js");
 
         //TPV
-        mix.combine(['resources/plugins/flatpickr/flatpickr.js', 'resources/js/sections/tpv/index.js'], data.assets + "js/sections/tpv/index.min.js");
+        mix.combine([
+            'resources/plugins/flatpickr/flatpickr.js', 
+            'resources/plugins/flatpickr/es.min.js', 
+            'resources/plugins/bootstrap-select/select.js', 
+            'resources/js/sections/tpv/index.js'
+        ], data.assets + "js/sections/tpv/index.min.js");
 
         //FINANCES
             //REEMBOLSOS
