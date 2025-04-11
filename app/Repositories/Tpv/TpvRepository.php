@@ -115,8 +115,7 @@ class TpvRepository
         ]);
     }
 
-    public function quote($request){
-        
+    public function quote($request){        
         $tpv = Session::get('tpv');
         if(!isset( $tpv[ $request->code ] )):
             return response()->json([
@@ -129,7 +128,8 @@ class TpvRepository
             ], Response::HTTP_BAD_REQUEST);
         endif;
             
-        $tpv[ $request->code ]['type'] = ((isset($request->is_round_trip))? 'round-trip' : 'one-way' );
+        $type = ( isset($request->is_round_trip) && $request->is_round_trip == 1 ? 'round-trip' : 'one-way' );
+        $tpv[ $request->code ]['type'] = $type;
         $tpv[ $request->code ]['start']['place'] = $request->from_name;
         $tpv[ $request->code ]['start']['lat'] = $request->from_lat;
         $tpv[ $request->code ]['start']['lng'] = $request->from_lng;

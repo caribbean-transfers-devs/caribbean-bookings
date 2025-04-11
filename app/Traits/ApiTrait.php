@@ -95,7 +95,6 @@ trait ApiTrait
     public static function makeQuote($data = [], $uuid = ''){
         self::checkToken($uuid);
         $tpv = Session::get('tpv')[$uuid];
-
         return self::sendRequest('/api/v1/quote', 'POST', $data, $tpv['token']['token']);
     }
 

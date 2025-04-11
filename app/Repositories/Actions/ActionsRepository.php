@@ -7,6 +7,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Twilio\Rest\Client;
 
 //MODELS
 use App\Models\Reservation;
@@ -79,7 +80,86 @@ class ActionsRepository
                 'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }    
+    }
+
+    /**
+     * 
+     * @param request :la información recibida en la solicitud
+    */
+    public function sendMessageWhatsApp($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reservation_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        $booking = Reservation::with('items')->where('id', $request->reservation_id)->first();
+        // dd($booking->toArray());
+
+        if (!$booking) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Reservación no encontrada'
+                ],
+                'status' => 'error',
+                'message' => 'Reservación no encontrada'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        try {
+            $twilio = new Client(config('services.twilio.sid'), config('services.twilio.token'));
+            
+            // // $mensaje = "https://api.caribbean-transfers.com/api/v1/reservation/viewQR?code={{$booking->items[0]->code}}&email={{$booking->client_email}}&language={{$booking->language}}";
+            $mensaje = urlencode("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
+
+            // 'whatsapp:+5219981499118 ⁠'.$booking->client_phone, // Número del destinatario
+            // $twilio->messages->create(
+            //     'whatsapp:+5219981499118', // Número del destinatario
+            //     [
+            //         'from' => config('services.twilio.phone'),
+            //         'body' => $mensaje
+            //     ]
+            // );
+            // $twilio->messages->create(
+            //     "whatsapp:+5219981499118", // To
+            //     [
+            //         "from" => "whatsapp:+14155238886", // From
+            //         "body" => "Hola desde Twilio por WhatsApp!"
+            //     ] 
+            // );           
+
+            $telefono = $booking->client_phone; // Código de país + número sin espacios
+            $mensaje = urlencode("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
+            $linkWhatsapp = "https://wa.me/$telefono?text=$mensaje";
+            // $linkWhatsapp = "";
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Mensaje enviado por WhatsApp con Twilio.',
+                'link' => $linkWhatsapp
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
     /**
      * NOS AYUDA A MARCAR LA RESERVACIÓN COMO PAGO A LA LLEGADA

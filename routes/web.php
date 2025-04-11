@@ -323,6 +323,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     //ACCIONES GENERALES DE DETALLES DE RESERVA
     Route::post('/action/deleteCommission', [ACTIONS_RESERVATION::class, 'deleteCommission'])->name('update.booking.delete.commission');
 
+    Route::post('/action/sendMessageWhatsApp', [ACTIONS_RESERVATION::class, 'sendMessageWhatsApp'])->name('update.booking.send.message.whatsapp');
     Route::post('/action/enablePayArrival', [ACTIONS_RESERVATION::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
     Route::post('/action/enablePlusService', [ACTIONS_RESERVATION::class, 'enablePlusService'])->name('update.booking.plus.service');
     Route::post('/action/markReservationOpenCredit', [ACTIONS_RESERVATION::class, 'markReservationOpenCredit'])->name('update.booking.mark.open.credit');

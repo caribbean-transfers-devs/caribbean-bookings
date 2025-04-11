@@ -106,15 +106,25 @@ div.box{
 }
 
 div.controls{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    // flex-wrap: wrap;
-    gap: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    column-gap: 8px;
+    row-gap: 8px;
     margin-bottom: 15px;
 
-    >div, >button{
-        width: 100%;
+    > button{
+        padding: 16px 14px;
+
+        &.social-button{
+            background: transparent;
+            align-items: center;
+            border: 1px solid #16161d;
+            border-radius: 8px;
+            color: #16161d;
+            display: flex;
+            gap: 16px;
+            justify-content: center;       
+        }
     }
 }
 
@@ -191,10 +201,6 @@ div#serviceMapModal{
     div#services_map{
         height: 350px;
     }
-}
-
-.pac-container{
-    z-index: 9999;
 }
 
 .table-container, .table-responsive {

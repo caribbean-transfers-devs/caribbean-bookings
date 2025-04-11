@@ -111,7 +111,7 @@
     {{-- @dump($reservation->toArray()); --}}
     <div class="row layout-top-spacing">
         <div class="col-xxl-3 col-xl-4 col-12">
-            <div class="card">
+            <div class="card mb-2">
                 <div class="card-header">
                     <div class="card-actions float-end">
                         @if (auth()->user()->hasPermission(11))
@@ -249,6 +249,11 @@
                 @csrf
                 <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
 
+                <button class="btn social-button" id="sendMessageWhatsApp" data-code="{{ $reservation->id }}">
+                    <img src="https://affiliates.gotransfers.us/assets/img/icons/png/whatsapp.png" alt="WhatsApp" class="img-fluid" width="20" height="20">
+                    WHATSAPP
+                </button>
+
                 {{-- NOS PERMITE REENVIO DE CORREO DE LA RESERVACIÓN AL CLIENTE, CUANDO TENEMOS EL PERMISO Y ES PENDIENTE, CONFIRMADA O A CREDITO --}}
                 @if ( ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(20) )
                     <div class="btn-group btn-group-sm" role="group">
@@ -267,7 +272,7 @@
                 {{-- NOS PERMITE AGREGAR SEGUIMIENTOS DE LA RESERVA, SOLO CUANDO ESTA COMO PENDIENTE, CONFIRMADA O A CREDITO --}}
                 {{-- ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) &&  --}}
                 @if ( auth()->user()->hasPermission(23) )
-                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal"><i class="align-middle" data-feather="plus"></i> AGREGAR SEGUIMIENTO</button>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#reservationFollowModal">AGREGAR SEGUIMIENTO</button>
                 @endif
 
                 {{-- NOS PERMITE ENVIAR UN MENSAJE --}}

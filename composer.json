@@ -18,7 +18,8 @@
         "laravel/tinker": "^2.8",
         "nesbot/carbon": "^2.72",
         "phpoffice/phpspreadsheet": "^2.1",
-        "stripe/stripe-php": "^16.4"
+        "stripe/stripe-php": "^16.4",
+        "twilio/sdk": "^8.5"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",

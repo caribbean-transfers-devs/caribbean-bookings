@@ -18,6 +18,7 @@ const __code_pay = document.getElementById('payment_id');
 const deleteCommission = document.querySelector('.deleteCommission');
 
 //DECLARAMOS VARIABLES PARA ACCIONES DE RESERVA
+const sendMessageWhatsApp = document.getElementById('sendMessageWhatsApp');
 const enablePayArrival = document.getElementById('enablePayArrival');
 const enablePlusService = document.getElementById('enablePlusService');
 const markReservationOpenCredit = document.getElementById('markReservationOpenCredit');
@@ -96,6 +97,58 @@ if( deleteCommission ){
             }
         });
     })
+}
+
+//ENVIAMOS RESERVA POR WHATSAPP
+if( sendMessageWhatsApp ){
+    sendMessageWhatsApp.addEventListener('click', function(event){
+        event.preventDefault();
+        const { code } = this.dataset;
+
+        Swal.fire({
+            title: "Procesando solicitud...",
+            text: "Por favor, espera mientras se envia la reserva por WhatsApp.",
+            allowOutsideClick: false,
+            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('/action/sendMessageWhatsApp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },            
+            body: JSON.stringify({ reservation_id: code })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
+        .then(data => {
+            Swal.close();
+            window.open(data.link, '_blank');
+            // Swal.fire({
+            //     icon: data.status,
+            //     html: data.message,
+            //     allowOutsideClick: false,
+            //     allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+            // }).then(() => {
+            //     location.reload();
+            // });
+        })
+        .catch(error => {
+            Swal.fire(
+                '¡ERROR!',
+                error.message || 'Ocurrió un error',
+                'error'
+            );
+        });
+    });
 }
 
 //HABILIDATAMOS PAGO A LA LLEGADA DE UNA RESERVA

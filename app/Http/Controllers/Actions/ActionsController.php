@@ -30,6 +30,11 @@ class ActionsController extends Controller
         return $this->ActionsRepository->deleteCommission($request);
     }
 
+    public function sendMessageWhatsApp(Request $request)
+    {
+        return $this->ActionsRepository->sendMessageWhatsApp($request);
+    }
+
     /**
      * 
      */

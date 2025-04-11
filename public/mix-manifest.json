@@ -1,6 +1,6 @@
 {
     "/assets/css/sections/dashboard/management.min.css": "/assets/css/sections/dashboard/management.min.css?id=baa8dd7b19f2819cfb4e8ed0ca37ac8f",
-    "/assets/css/sections/reservation_details.min.css": "/assets/css/sections/reservation_details.min.css?id=1737bbc11dad173aeb43ae4afe71b03a",
+    "/assets/css/sections/reservation_details.min.css": "/assets/css/sections/reservation_details.min.css?id=39c0594a96d8a744b7554cf40d60fa26",
     "/assets/css/panel/error.min.css": "/assets/css/panel/error.min.css?id=aebeb8cdf6b138c6ec70524b2ce5a099",
     "/assets/css/panel/panel2.min.css": "/assets/css/panel/panel2.min.css?id=e219bd2724e80b4173e2be35b89e9604",
     "/assets/css/core/core.min.css": "/assets/css/core/core.min.css?id=6814f8ffb7d1e2370ba200eea097fe60",
@@ -58,7 +58,7 @@
     "/assets/js/sections/management/aftersales.min.js": "/assets/js/sections/management/aftersales.min.js?id=72c5ab30d3c0a91c552349d5d2593e01",
     "/assets/js/sections/management/reservations.min.js": "/assets/js/sections/management/reservations.min.js?id=b0dd26386e66916e83ed928af2a4994d",
     "/assets/js/sections/management/operations.min.js": "/assets/js/sections/management/operations.min.js?id=935157e6ab588bb4246b7996e5851b40",
-    "/assets/js/sections/reservations/details.min.js": "/assets/js/sections/reservations/details.min.js?id=3cd2a9b1a8d318ceffe4d7c7a3468e00",
+    "/assets/js/sections/reservations/details.min.js": "/assets/js/sections/reservations/details.min.js?id=f9712ed2176c426caa185ab107098789",
     "/assets/js/sections/settings/roles.min.js": "/assets/js/sections/settings/roles.min.js?id=e5a369078a6e02800fe4a4ce473d2297",
     "/assets/js/sections/settings/users.min.js": "/assets/js/sections/settings/users.min.js?id=05772bebcb18eff74595238c7605c07d",
     "/assets/js/sections/settings/enterprises.min.js": "/assets/js/sections/settings/enterprises.min.js?id=de7b47855a2034efe8ca6b492c1adbf5",
