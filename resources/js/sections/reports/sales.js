@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
     components.formReset();
 
     components.titleModalFilter();
+    components.titleModalCharts();
     components.renderCheckboxColumns('dataSales', 'columns');
     components.setValueSelectpicker();
 });

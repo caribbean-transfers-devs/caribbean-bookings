@@ -125,6 +125,7 @@ class DriverSchedulesRepository
             $schedule->vehicle_id = ($request->vehicle_id ?? 0) != 0 ? $request->vehicle_id : NULL;
             $schedule->driver_id = ($request->driver_id ?? 0) != 0 ? $request->driver_id : NULL;
             $schedule->status = $request->status ?? NULL;
+            $schedule->status_unit = $request->status_unit ?? NULL;
             $schedule->observations = $request->observations ?? NULL;
             $schedule->is_open = $request->is_open;
             $schedule->save();

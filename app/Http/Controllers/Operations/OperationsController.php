@@ -539,12 +539,14 @@ class OperationsController extends Controller
             DB::beginTransaction();
             //OBTENEMOS INFORMACION
             $infoUnitDriver = DriverSchedule::where('date', $request->date)
+                                            ->where('vehicle_id', $request->vehicle_id)
                                             ->whereNull('end_check_out_time')
                                             ->whereNull('deleted_at')
                                             ->where('is_open', 1)
                                             ->first();
 
             $driver = Driver::find(( isset($infoUnitDriver->driver_id) ? $infoUnitDriver->driver_id : 0 ));
+            // dd($infoUnitDriver->toArray(), $driver->toArray());
 
             $vehicleIdOld = ( $request->type == 'TYPE_ONE' ? $item->vehicle_id_one : $item->vehicle_id_two );
             $operatingCostOld = ( $request->type == 'TYPE_ONE' ? $item->op_one_operating_cost : $item->op_two_operating_cost );

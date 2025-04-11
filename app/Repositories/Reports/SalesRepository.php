@@ -239,7 +239,7 @@ class SalesRepository
             'breadcrumbs' => [
                 [
                     "route" => "",
-                    "name" => "Reporte de ventas del " . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])),
+                    "name" => "Reporte de ventas del <strong>" . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])) .  "</strong>",
                     "active" => true
                 ]
             ],

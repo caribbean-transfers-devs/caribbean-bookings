@@ -1,5 +1,7 @@
 @php
-    use App\Traits\Reports\PaymentsTrait;    
+    $reservation_status = auth()->user()->reservationStatus();
+    $service_operation_status = auth()->user()->statusOperationService();
+
     $resume = [
         'BOOKINGS' => [],
         'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
@@ -80,8 +82,9 @@
                             <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">CÓDIGO</th>
                             <th class="text-center">REFERENCIA</th>
-                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>
+                            <th class="text-center">ESTATUS DE RESERVACIÓN</th>                            
                             <th class="text-center"># DE SERVICIO</th>
+                            <th class="text-center">ESTATUS DE SERVICIO</th>
                             <th class="text-center">TIPO DE SERVICIO EN OPERACIÓN</th>
                             <th class="text-center">NOMBRE DEL CLIENTE</th>
                             <th class="text-center">DESDE</th>
@@ -91,6 +94,7 @@
                             <th class="text-center">TOTAL COBRADO EN EFECTIVO</th>
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">ESTATUS DE PAGO</th>
+                            <th class="text-center">ESTATUS DE CONCILIACIÓN</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -115,17 +119,25 @@
                                         @endif
                                     </td>
                                     <td class="text-center"><?=( !empty($operation->reference) ? '<p class="mb-1">'.$operation->reference.'</p>' : '' )?></td>
-                                    <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($operation->reservation_status) }}">{{ auth()->user()->statusBooking($operation->reservation_status) }}</button></td>
+                                    <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($operation->reservation_status) }}">{{ auth()->user()->statusBooking($operation->reservation_status) }}</button></td>                                    
                                     <td class="text-center"><?=auth()->user()->renderServicePreassignment($operation)?></td>
+                                    <td class="text-center"><?=auth()->user()->renderServiceStatusOP($operation)?></td>
                                     <td class="text-center">{{ $operation->final_service_type }}</td>
                                     <td class="text-center">{{ $operation->full_name }}</td>
                                     <td class="text-center">{{ auth()->user()->setFrom($operation, "name") }}</td>
                                     <td class="text-center">{{ auth()->user()->setTo($operation, "name") }}</td>
-                                    <td class="text-center">{{ $operation->cash_references }}</td>
+                                    <td class="text-center">
+                                        {{ $operation->op_one_comments }}
+                                        {{ $operation->op_two_comments }}
+                                        {{ $operation->cash_references }}
+                                    </td>
                                     <td class="text-center">{{ number_format($operation->total_sales,2) }}</td>
                                     <td class="text-center">{{ number_format(( $operation->cash_amount > 0 ? $operation->cash_amount : $operation->total_sales ),2) }}</td>
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     <td class="text-center" <?=auth()->user()->classStatusPayment($operation)?>>{{ auth()->user()->statusPayment($operation->payment_status) }}</td>
+                                    <td class="text-center" data-code="{{ $operation->codes_payment }}" style="background-color:#e7515a;color:#fff;">
+                                        <button class="btn btn-danger">Click para conciliar pago</button>
+                                    </td>
                                 </tr>
                             @endforeach
                         @endif
@@ -167,5 +179,5 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" />
+    <x-modals.filters.bookings :data="$data" :reservationstatus="$reservation_status" :serviceoperationstatus="$service_operation_status" />
 @endsection

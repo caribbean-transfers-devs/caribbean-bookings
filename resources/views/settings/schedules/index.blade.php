@@ -58,8 +58,9 @@
                             <th class="text-center">Hora salida/final</th>
                             <th class="text-center">Horas extras</th>
                             <th class="text-center">Unidad</th>
-                            <th class="text-center">Driver</th>
-                            <th class="text-center">Estatus</th>                            
+                            <th class="text-center">Estatus unidad</th>
+                            <th class="text-center">Driver</th>                            
+                            <th class="text-center">Estatus</th>
                             <th class="text-center">Observaciónes</th>
                             <th class="text-center">Estado</th>
                             <th></th>
@@ -84,17 +85,24 @@
                                     <?=( $schedule->extra_hours != NULL && $schedule->extra_hours != "00:00:00" ? '<span class="badge badge-success w-100">'.$time.'</span>' : 'NO DEFINIDO' )?>
                                 </td>
                                 <td class="text-center"><button class="btn btn-dark w-100">{{ isset($schedule->vehicle->name) ? $schedule->vehicle->name : 'NO DEFINIDO' }} - {{ isset($schedule->vehicle->destination_service->name) ? $schedule->vehicle->destination_service->name : 'NO DEFINIDO' }} - {{ isset($schedule->vehicle->enterprise->names) ? $schedule->vehicle->enterprise->names : 'NO DEFINIDO' }}</button></td>
+                                <td class="text-center">
+                                    @if ( $schedule->status_unit != NULL )
+                                        <?=auth()->user()->renderStatusSchedulesUnit($schedule->status_unit)?>
+                                    @else
+                                        {{ "NO DEFINIDO" }}                                        
+                                    @endif
+                                </td>                                
                                 <td class="text-center">{{ isset($schedule->driver->names) ? $schedule->driver->names : 'NO DEFINIDO' }} {{ isset($schedule->driver->surnames) ? $schedule->driver->surnames : 'NO DEFINIDO' }}</td>
                                 <td class="text-center">
                                     @if ( $schedule->status != NULL )
-                                        <button class="btn btn-{{ $schedule->status == "DT" ? 'info' : ( $schedule->status == "F" ? 'danger' : 'success' ) }} w-100">{{ $schedule->status }}</button>
+                                        <?=auth()->user()->renderStatusSchedulesDriver($schedule->status)?>
                                     @else
                                         {{ "NO DEFINIDO" }}                                        
                                     @endif
                                 </td>
                                 <td class="text-center">{{ $schedule->observations }}</td>
                                 <td class="text-center">
-                                    <button class="btn btn-{{ $schedule->is_open == 1 ? 'success' : 'danger' }} w-100">{{ $schedule->is_open == 1 ? 'ABIERTO' : 'CERRADO' }}</button>
+                                    <button class="btn btn-{{ $schedule->is_open == 1 ? 'success' : ( $schedule->is_open == 2 ? 'warning' : 'danger' ) }} w-100">{{ $schedule->is_open == 1 ? 'ABIERTO' : ( $schedule->is_open == 2  ? 'OTRO HORARIO' : 'CERRADO' ) }}</button>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">

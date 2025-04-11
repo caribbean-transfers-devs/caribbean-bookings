@@ -75,7 +75,8 @@ trait QueryTrait
                                         WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
                                         WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                         WHEN rez.is_quotation = 1 THEN 'QUOTATION'
-                                        WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                        -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                        WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
                                         WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
@@ -163,6 +164,8 @@ trait QueryTrait
                                 GROUP BY refund.id, refund.message_refund, refund.status, refund.end_at, refund.link_refund, rez.id, site.id, site.type_site, site.name, site.is_cxc {$query2}",
                                     $queryData);
 
+                                    //, site.is_cxc
+
         if(sizeof( $bookings ) > 0):
             usort($bookings, array($this, 'orderByDateTime'));
         endif;
@@ -239,7 +242,12 @@ trait QueryTrait
                                         WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
                                         WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                         WHEN rez.is_quotation = 1 THEN 'QUOTATION'
-                                        WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                        -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                        -- WHEN site.is_cxc = 1 AND (
+                                        --     COALESCE(SUM(p.total_payments), 0) = 0
+                                        --     OR COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(p.total_sales), 0)
+                                        -- ) THEN 'CREDIT'
+                                        WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
                                         WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
@@ -396,7 +404,8 @@ trait QueryTrait
                                     WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
                                     WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                     WHEN rez.is_quotation = 1 THEN 'QUOTATION'
-                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                    -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                    WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
                                     WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
@@ -466,6 +475,7 @@ trait QueryTrait
                                 CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
 
                                 it_counter.quantity,
+                                GROUP_CONCAT(DISTINCT p.codes_payment ORDER BY p.codes_payment ASC SEPARATOR ',') AS codes_payment,
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE 
@@ -478,10 +488,6 @@ trait QueryTrait
 
                                 -- Nuevos campos para pagos en efectivo
                                 COALESCE(p.cash_amount, 0) AS cash_amount,
-                                -- CASE 
-                                --     WHEN ( rez.pay_at_arrival = 1 OR p.payment_type_name LIKE '%CASH%' ) THEN 1 
-                                --     ELSE 0 
-                                -- END AS has_cash_payment,
                                 COALESCE(p.cash_references) AS cash_references,
 
                                 COALESCE(SUM(s.total_sales), 0) as total_sales,
@@ -556,6 +562,7 @@ trait QueryTrait
                                 ) as s ON s.reservation_id = rez.id
                                 LEFT JOIN (
                                     SELECT 
+                                        CONCAT( '[',GROUP_CONCAT(DISTINCT id ORDER BY id ASC SEPARATOR ','),']' ) AS codes_payment,
                                         reservation_id,
                                         ROUND(SUM(CASE 
                                             WHEN operation = 'multiplication' THEN total * exchange_rate
@@ -571,7 +578,7 @@ trait QueryTrait
                                                     ELSE total 
                                                 END
                                             ELSE 0 
-                                        END), 2) AS cash_amount,
+                                        END), 2) AS cash_amount,                                        
                                         -- Referencias de pagos en efectivo concatenadas
                                         CONCAT(
                                             '[',
@@ -656,7 +663,8 @@ trait QueryTrait
                                     WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
                                     WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                     WHEN rez.is_quotation = 1 THEN 'QUOTATION'
-                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                    -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                    WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
                                     WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
@@ -726,6 +734,7 @@ trait QueryTrait
                                 CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
 
                                 it_counter.quantity,
+                                GROUP_CONCAT(DISTINCT p.codes_payment ORDER BY p.codes_payment ASC SEPARATOR ',') AS codes_payment,
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE
@@ -738,10 +747,6 @@ trait QueryTrait
 
                                 -- Nuevos campos para pagos en efectivo
                                 COALESCE(p.cash_amount, 0) AS cash_amount,
-                                -- CASE 
-                                --     WHEN ( rez.pay_at_arrival = 1 OR p.payment_type_name LIKE '%CASH%' ) THEN 1 
-                                --     ELSE 0 
-                                -- END AS has_cash_payment,
                                 COALESCE(p.cash_references) AS cash_references,
 
                                 COALESCE(SUM(s.total_sales), 0) as total_sales,
@@ -816,6 +821,7 @@ trait QueryTrait
                                 ) as s ON s.reservation_id = rez.id
                                 LEFT JOIN (
                                     SELECT 
+                                        CONCAT( '[',GROUP_CONCAT(DISTINCT id ORDER BY id ASC SEPARATOR ','),']' ) AS codes_payment,
                                         reservation_id,
                                         ROUND(SUM(CASE 
                                                     WHEN operation = 'multiplication' THEN total * exchange_rate

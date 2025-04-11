@@ -4,7 +4,7 @@
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                {{-- <h5 class="modal-title" id="chartsModalLabel2"></h5> --}}
+                <h5 class="modal-title" id="chartsModalLabel"></h5>
                 <div class="items_status">
                     @if ( isset($bookingsStatus) )
                         @foreach ($bookingsStatus['data'] as $key => $status)

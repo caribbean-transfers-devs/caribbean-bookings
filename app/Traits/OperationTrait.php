@@ -68,8 +68,7 @@ trait OperationTrait
         return ( $service->operation_type == 'arrival' ? $service->op_one_confirmation : $service->op_two_confirmation );
     }
 
-    // BOTON DE CONFIRMACION
-    
+    // BOTON DE CONFIRMACION    
     public function renderStatusConfirmation($service){
         return '<button type="button" class="btn btn-'.( self::serviceStatusConfirmation($service) == 0 ? 'warning' : 'success' ).' confirmService" data-item="'.$service->id.'" data-service="'.$service->final_service_type.'" data-status="'.( self::serviceStatusConfirmation($service) == 1 ? 0 : 1 ).'" data-type="'.$service->op_type.'">'.( self::serviceStatusConfirmation($service) == 0 ? 'N' : 'Y' ).'</button>';
     }
@@ -249,5 +248,94 @@ trait OperationTrait
         $payment = ( $service->site_id == 21 ? ( $service->currency == "USD" ? ( $service->total_sales * 16 ) : $service->total_sales ) : ( $service->op_type == "TYPE_ONE" ? $service->op_one_operating_cost : $service->op_two_operating_cost ) );
         $percentage = ( $service->site_id == 21 ? 0.04 : 0.05 );
         return ( $payment * $percentage );
+    }
+
+
+    //////
+    public function classScheduleDriver($status)
+    {
+        switch ($status) {
+            case 'PSG':
+            case 'OPB':
+                return 'warning';
+                break;
+            case 'INC':
+            case 'S':
+                return 'dark';
+                break;
+            case 'D':
+                return 'secondary';
+                break;
+            case 'V':
+                return 'info';
+                break;                                                            
+            case 'DT':
+            case 'T':
+                return 'primary';
+                break;
+            case 'F':
+            case 'FO':
+                return 'danger';
+                break;
+            default:
+                return 'success';
+                break;
+        }
+    }
+
+    public function statusScheduleUnit($status)
+    {
+        switch ($status) {
+            case 'T':
+                return 'TALLER';
+                break;
+            case 'FO':
+                return 'FALTA DE OPERADOR';
+                break;                                                            
+            case 'OPB':
+                return 'OPERACIÓN BAJA';
+                break;
+            case 'S':
+                return 'SINIESTRO';
+                break;
+            default:
+                return 'OPERACIÓN';
+                break;
+        }
+    }    
+
+    public function statusScheduleDriver($status)
+    {
+        switch ($status) {
+            case 'PSG':
+                return 'PERMISO SIN GOZE';
+                break;
+            case 'INC':
+                return 'INCAPACIDAD';
+                break;
+            case 'D':
+                return 'DESCANSO';
+                break;
+            case 'V':
+                return 'VACACIONES';
+                break;                                                            
+            case 'DT':
+                return 'DESCANSO TRABAJADO';
+                break;
+            case 'F':
+                return 'FALTA';
+                break;
+            default:
+                return 'ASISTENCIA';
+                break;
+        }
+    }
+
+    public function renderStatusSchedulesUnit($status){
+        return '<button type="button" class="btn btn-'.self::classScheduleDriver($status).' w-100">'.self::statusScheduleUnit($status).'</button>';        
+    }
+
+    public function renderStatusSchedulesDriver($status){
+        return '<button type="button" class="btn btn-'.self::classScheduleDriver($status).' w-100">'.self::statusScheduleDriver($status).'</button>';        
     }
 }

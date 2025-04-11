@@ -27,6 +27,8 @@ class CashRepository
         $data = [
             "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
             "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
+            "reservation_status" => ( isset($request->reservation_status) ? $request->reservation_status : 0 ),
+            "service_operation_status" => ( isset($request->service_operation_status) ? $request->service_operation_status : 0 ),
         ];
 
         $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
@@ -39,6 +41,17 @@ class CashRepository
 
         $params = $this->parseArrayQuery(['CREDIT','PENDING','PAY_AT_ARRIVAL','CONFIRMED'],"single");
         $havingConditions[] = " reservation_status IN (".$params.") ";
+
+        //ESTATUS DE SERVICIO
+        if(isset( $request->service_operation_status ) && !empty( $request->service_operation_status )){
+            $params = $this->parseArrayQuery($request->service_operation_status,"single");
+            $queryOne .= " AND it.op_one_status IN ($params) ";
+            $queryTwo .= " AND it.op_two_status IN ($params) ";
+        }else{
+            $params = $this->parseArrayQuery(['COMPLETED'],"single");
+            $queryOne .= " AND it.op_one_status IN ($params) ";
+            $queryTwo .= " AND it.op_two_status IN ($params) ";            
+        }
 
         $paramsPayment = "FIND_IN_SET('CASH', payment_type_name) > 0 OR ";
         $paramsPayment = rtrim($paramsPayment, ' OR ');

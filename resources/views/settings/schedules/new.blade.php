@@ -73,17 +73,6 @@
                                                 <input type="text" id="end_check_out_time" name="end_check_out_time" class="form-control" placeholder="Hora de salida final" value="{{ isset($schedule->end_check_out_time) ? $schedule->end_check_out_time : '' }}">
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group mb-3">
-                                                <label for="status">Selecciona un estatus</label>
-                                                <select class="form-control selectpicker" data-live-search="true" id="status" name="status">
-                                                    <option value="0">Selecciona una opción</option>
-                                                    <option {{ isset($schedule->status) && $schedule->status == "A" ? 'selected' : '' }} value="A">A</option>
-                                                    <option {{ isset($schedule->status) && $schedule->status == "F" ? 'selected' : '' }} value="F">F</option>
-                                                    <option {{ isset($schedule->status) && $schedule->status == "DT" ? 'selected' : '' }} value="DT">DT</option>
-                                                </select>
-                                            </div>
-                                        </div>
                                     @endif
                                     <div class="col-md-{{ isset($schedule) ? '3' : '3' }}">
                                         <div class="form-group mb-3">
@@ -98,6 +87,21 @@
                                             </select>
                                         </div>
                                     </div>
+                                    @if ( isset($schedule) )
+                                        <div class="col-md-3">
+                                            <div class="form-group mb-3">
+                                                <label for="status">Selecciona un estatus unidad</label>
+                                                <select class="form-control selectpicker" data-live-search="true" id="status_unit" name="status_unit">
+                                                    <option value="0">Selecciona una opción</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "OP" ? 'selected' : '' }} value="OP">OPERACIÓN</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "S" ? 'selected' : '' }} value="S">SINIESTRO</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "OPB" ? 'selected' : '' }} value="OPB">OPERACIÓN BAJA</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "FO" ? 'selected' : '' }} value="FO">FALTA DE OPERADOR</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "T" ? 'selected' : '' }} value="T">TALLER</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    @endif                                    
                                     <div class="col-md-{{ isset($schedule) ? '3' : '3' }}">
                                         <div class="form-group mb-3">
                                             <label for="driver_id">Selecciona un conductor</label>
@@ -111,6 +115,23 @@
                                             </select>
                                         </div>
                                     </div>
+                                    @if ( isset($schedule) )
+                                        <div class="col-md-3">
+                                            <div class="form-group mb-3">
+                                                <label for="status">Selecciona un estatus</label>
+                                                <select class="form-control selectpicker" data-live-search="true" id="status" name="status">
+                                                    <option value="0">Selecciona una opción</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "A" ? 'selected' : '' }} value="A">ASISTENCIA</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "F" ? 'selected' : '' }} value="F">FALTA</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "DT" ? 'selected' : '' }} value="DT">DESCANSO TRABAJADO</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "PSG" ? 'selected' : '' }} value="PSG">PERMISO SIN GOZE</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "INC" ? 'selected' : '' }} value="INC">INCAPACIDAD</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "D" ? 'selected' : '' }} value="D">DESCANSO</option>
+                                                    <option {{ isset($schedule->status) && $schedule->status == "V" ? 'selected' : '' }} value="V">VACACIONES</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    @endif
 
                                     @if ( isset($schedule) )
                                         <div class="col-md-{{ isset($schedule) ? '3' : '3' }}">
@@ -118,6 +139,7 @@
                                                 <label for="is_open">Selecciona un opción</label>
                                                 <select class="form-control selectpicker" data-live-search="true" id="is_open" name="is_open">
                                                     <option value="1">Abierto</option>
+                                                    <option value="2">Otro horario</option>
                                                     <option value="0">Cerrado</option>
                                                 </select>
                                             </div>

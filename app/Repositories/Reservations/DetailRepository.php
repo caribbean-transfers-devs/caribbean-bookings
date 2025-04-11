@@ -183,7 +183,7 @@ class DetailRepository
         if ($reservation->open_credit) return "OPENCREDIT";
         if ($reservation->is_quotation) return "QUOTATION";
         if ($reservation->pay_at_arrival && round($totalPayments, 2) == 0) return "PAY_AT_ARRIVAL";
-        if ($reservation->site->is_cxc && round($totalPayments, 2) == 0) return "CREDIT";
+        if ($reservation->site->is_cxc && ( round($totalPayments, 2) == 0 || ( round($totalPayments, 2) <  round($totalSales,2) ) )) return "CREDIT";
         
         // Condición de balance
         $balance = round($data['total_sales']) - round($data['total_payments']);

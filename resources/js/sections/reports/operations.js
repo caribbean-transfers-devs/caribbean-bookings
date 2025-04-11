@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     components.formReset();
 
     components.titleModalFilter();
+    components.titleModalCharts();
     components.renderCheckboxColumns('dataOperations', 'columns');
     components.setValueSelectpicker();    
 });

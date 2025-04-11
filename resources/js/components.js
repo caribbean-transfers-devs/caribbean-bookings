@@ -452,6 +452,12 @@ let components = {
         }
     },
 
+    titleModalCharts: function(){
+        const __titleModalCharts = document.getElementById('chartsModalLabel');
+        const __breadcrumItem = document.querySelector('.breadcrumb-item strong');
+        __titleModalCharts.innerHTML = __breadcrumItem.textContent;
+    },
+
     calendarFilter: function(){
         if ( document.getElementById('lookup_date') ) {
             const picker = new easepick.create({
