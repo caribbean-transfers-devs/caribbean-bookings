@@ -44,7 +44,7 @@
                             <p>Veículos ({{ $item['vehicles'] }})</p>
                         </div>
                         <div class="two">
-                            <input type="radio" class="checkButton" id="serviceButton-{{$service_counter}}" name="service_token" value="{{ $item['token'] }}" onclick="setTotal('{{ $item['price'] }}')">
+                            <input type="radio" class="checkButton" id="serviceButton-{{$service_counter}}" name="service_token" value="{{ $item['token'] }}" data-total="{{ $item['price'] }}">
                             <label for="serviceButton-{{$service_counter}}" class="btn custom-button">
                                 Seleccionar
                             </label>
@@ -55,7 +55,6 @@
         @endif
     </div>
     <div class="right_">
-
         <div class="client_information">
             <h3>Información personal</h3>
             <div class="one_">
@@ -87,20 +86,27 @@
                     <label class="form-label" for="formSpecialRequest">Solicitudes especiales</label>
                     <textarea class="form-control" name="special_request" id="formSpecialRequest"></textarea>                    
                 </div>
-                {{-- <div>
-                    <label class="form-label" for="formPaymentMethod">Método de pago</label>
-                    <select class="form-control" id="formPaymentMethod" name="payment_method">
-                        <option value="CARD">Tarjeta de crédito / Débito</option>
-                        <option value="PAYPAL">PayPal</option>
-                    </select>
-                </div> --}}
-                <input type="hidden" id="formQuotation" name="is_quotation" value="1">         
             </div>
         </div>
         
         <div class="additional">
             <h3>Información adicional</h3>
             <div class="one_">
+                <div>
+                    <label class="form-label" for="formPaymentMethod">Es una cotización</label>
+                    <select class="form-control" id="formIsQuotation" name="is_quotation">
+                        <option value="0">No</option>
+                        <option value="1">Sí</option>
+                    </select>
+                </div>                
+                <div>
+                    <label class="form-label" for="formPaymentMethod">Método de pago</label>
+                    <select class="form-control" id="formPaymentMethod" name="payment_method">
+                        <option value="CASH">Efectivo</option>
+                        <option value="CARD">Tarjeta de crédito / Débito</option>
+                        <option value="PAYPAL">PayPal</option>
+                    </select>
+                </div>                
                 <div>
                     <label class="form-label" for="formSite">Sitio</label>
                     <select class="form-control selectpicker" data-live-search="true" id="formSite" name="site_id">
@@ -138,9 +144,9 @@
                 </div>
                 <div>
                     <label class="form-label" for="formTotal">Total</label>
-                    <input class="form-control" type="number" name="data[callcenter][total]" id="formTotal" autocomplete="off" value="0" readonly>
+                    <input class="form-control" type="tel" name="data[callcenter][total]" id="formTotal" autocomplete="off" value="0" readonly>
                 </div>
-                <button type="button" class="btn btn-success" onclick="makeReservationButton(event)" id="btn_make_reservation">Enviar</button>
+                <button type="submit" class="btn" id="sendReservation">Enviar</button>
             </div>
         </div>
     </div>

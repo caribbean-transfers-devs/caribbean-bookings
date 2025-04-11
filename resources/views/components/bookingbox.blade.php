@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="elements">
-            <div class="one">                    
+            <div class="one">
                 <div>
                     <label for="aff-input-from">@lang('bookingbox.leaving_from')</label>
                     <input type="text" class="form-control" id="aff-input-from" placeholder="@lang('bookingbox.enter_pickup')" autocomplete="off">
@@ -75,8 +75,4 @@
             ¡Disfruta del viaje!
         <?php endif; ?>
     </p>
-    {{-- @php
-        dump(Session('token'));
-        dump(Session('token_data'));
-    @endphp --}}
 </div>

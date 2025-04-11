@@ -136,9 +136,9 @@ document.addEventListener('click', function (event) {
 
     if (event.target && event.target.id === 'btn_add_rate') {
         event.preventDefault();
-        const _form         = document.getElementById("newPriceForm");
-        const _formData     = new FormData(_form);
-        const _btnAddRate   = document.getElementById('btn_add_rate');
+        const _form          = document.getElementById("newPriceForm");
+        const _formData      = new FormData(_form);
+        const _btnAddRate    = document.getElementById('btn_add_rate');
         _btnAddRate.disabled = true;
         _btnAddRate.textContent = "Enviando...";
 
@@ -193,7 +193,7 @@ document.addEventListener('click', function (event) {
         _formData.append('_method', 'PUT');
         const _btnUpdateRates   = document.querySelectorAll(".btnUpdateRates");
         _btnUpdateRates.forEach(_update => {
-            _update.disabled = true;
+            _update.disabled    = true;
             _update.textContent = "Actualizando...";
         });
 

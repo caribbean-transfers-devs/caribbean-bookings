@@ -52,7 +52,7 @@ let setup = {
       }).then((response) => {
           return response.json()
       }).then((data) => {
-          this.makeItems(data,element);
+          setup.makeItems(data,element);
       }).catch((error) => {
           console.error('Error:', error);
       });
@@ -148,13 +148,13 @@ let setup = {
             toLng[0].value = data.geo.lng;
     }
   },
-  saveHotel: function(element, data){
+  saveHotel: function(element, _data){
       let item = {
-        name: data.name,
-        address: data.address,
+        name: _data.name,
+        address: _data.address,
         start: {
-          lat: data.geo.lat,
-          lng: data.geo.lng,
+          lat: _data.geo.lat,
+          lng: _data.geo.lng,
         },
       };
 
@@ -166,7 +166,7 @@ let setup = {
           setup.loadingMessage(element);
         },
         success: function(resp) {
-          setup.setItem(element, data);          
+          setup.setItem(element, _data);
           alert("Hotel agregado con éxito...");
           const finalElement = document.getElementById(element);
           finalElement.innerHTML = '';          
@@ -175,20 +175,72 @@ let setup = {
       console.log(error);
     });
   },
+  resetServiceType: function(){
+    const _toggleServices = document.querySelectorAll('.aff-toggle-type');
+    _toggleServices.forEach(btn => {
+      btn.classList.remove('active');
+    });    
+  },
+  resetCurrency: function(){
+    const _toggleCurrencys = document.querySelectorAll('.aff-toggle-currency');
+    _toggleCurrencys.forEach(btn => {
+      btn.classList.remove('active');
+    });    
+  },
   getLoader: function() {
     return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
   },
+  setTotal: function(total){
+    const _total = document.getElementById('formTotal');
+    _total.value = total;
+    _total.removeAttribute('readonly');
+  },  
+  actionSite: function(__site){
+    const __reference = document.getElementById('formReference');
+    const selectedOption = __site.options[__site.selectedIndex];
+    if( selectedOption.getAttribute('data-type') == "AGENCY" ){
+      __reference.removeAttribute('readonly');
+    }else{
+      __reference.setAttribute('readonly', true);
+    }
+  }
 };
 
-const __uuid = document.getElementById('uuid');
+function affDelayAutocomplete(callback, ms) {
+  var timer = 0;
+  return function () {
+      var context = this,
+          args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+          callback.apply(context, args);
+      }, ms || 0);
+  };
+}
+
+const __uuid = document.getElementById('uuid') || { value: '' };
 var from_autocomplete = document.getElementById('aff-input-from');
 var to_autocomplete = document.getElementById('aff-input-to');
-const _form = document.getElementById('bookingboxForm');
+const _formQuotation = document.getElementById('formQuotation');
 
 document.addEventListener('DOMContentLoaded', function() {
   const fechaInput = document.getElementById('bookingPickupForm');
   const rangeCheckbox = document.getElementById('flexSwitchCheckDefault');
-  let pickerInit = flatpickr("#bookingPickupForm", {    
+
+  from_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
+    setup.autocomplete( e.target.value, 'aff-input-from-elements');
+  }, 500));
+  from_autocomplete.addEventListener('focus', (e) => {
+    setup.autocomplete( e.target.value, 'aff-input-from-elements');
+  });
+  to_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
+    setup.autocomplete( e.target.value, 'aff-input-to-elements');
+  }, 500));
+  to_autocomplete.addEventListener('focus', (e) => {
+    setup.autocomplete( e.target.value, 'aff-input-to-elements');
+  });  
+
+  let pickerInit = flatpickr("#bookingPickupForm", {
     mode: "single",
     dateFormat: "Y-m-d H:i",
     enableTime: true,
@@ -201,22 +253,58 @@ document.addEventListener('DOMContentLoaded', function() {
     minDate: "today"
   });  
 
-  // Función para actualizar el modo de Flatpickr
-  function updatePickerMode() {
-    var departureContainer = document.getElementById("departureContainer");
-    if (rangeCheckbox.checked) {
-      departureContainer.style.display = "block";
-    }else{
-      departureContainer.style.display = "none";
+  document.addEventListener('click', function (event) {
+    if (event.target && event.target.id === 'clearBooking') {
+      _formQuotation.reset();
     }
-  }
-  rangeCheckbox.addEventListener('change', updatePickerMode);
 
-  if( _form ){
-    _form.addEventListener('submit', function(event){
+    if ( event.target && event.target.classList.contains('aff-toggle-type') ) {
       event.preventDefault();
+      setup.resetServiceType();
+      const _service = document.getElementById('flexSwitchCheckDefault');
+      const _elements = document.querySelector('.elements');
+      const _round_trip_element = document.getElementById("departureContainer");
+
+      // Obtener datos del elemento clickeado
+      const { type } = event.target.dataset;
+
+      if(type == "RT"){
+        _elements.classList.add(type);
+        _round_trip_element.classList.remove("d-none");
+        _service.value = 1;
+      }else{
+        _elements.classList.remove('RT');
+        _round_trip_element.classList.add("d-none");
+        _service.value = 0;
+      }
+      event.target.classList.add('active');
+    }
+
+    if ( event.target && event.target.classList.contains('aff-toggle-currency') ) {
+      event.preventDefault();
+      setup.resetCurrency();
+      const _currency = document.getElementById('bookingCurrencyForm');
+
+      // Obtener datos del elemento clickeado
+      const { currency } = event.target.dataset;
+      _currency.value = currency;
+      event.target.classList.add('active');
+    }
+  })
+
+  document.addEventListener('change', function(event){
+    if( event.target && event.target.classList.contains('checkButton') ){
+      // Obtener datos del elemento clickeado
+      const { total } = event.target.dataset;
+      setup.setTotal(total);
+    }
+  });
+
+  document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'formQuotation') {
+      event.preventDefault();    
       const _loadContent = document.getElementById('loadContent');
-      const _formData     = new FormData(_form);
+      const _formData     = new FormData(_formQuotation);
       _formData.append('uuid', __uuid.value);
       const _sendQuote   = document.getElementById('btnQuote');
       _sendQuote.disabled = true;
@@ -253,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mostrar resultado
         loadContent.innerHTML = data;
         window.scrollTo({
-          top: loadContent.offsetTop,
+          top: _loadContent.offsetTop,
           behavior: 'smooth'
         });
     
@@ -280,94 +368,68 @@ document.addEventListener('DOMContentLoaded', function() {
         _sendQuote.disabled = false;
         _sendQuote.textContent = "Cotizar";
         _loadContent.innerHTML = "";
+      });      
+    }
+
+    if (event.target && event.target.id === 'formReservation') {
+      event.preventDefault();
+      const _formReservation = document.getElementById('formReservation');
+      const _formData     = new FormData(_formReservation);
+      _formData.append('uuid', __uuid.value);
+      const _sendReservation   = document.getElementById('sendReservation');
+      _sendReservation.disabled = true;
+      _sendReservation.textContent = "Enviando...";
+  
+      Swal.fire({
+        title: "Procesando solicitud...",
+        text: "Por favor, espera mientras se crea la reservación.",
+        allowOutsideClick: false,
+        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+        didOpen: () => {
+          Swal.showLoading();
+        }
       });
-    });
-  }  
+  
+      fetch('/tpv/create', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': csrfToken,
+          'Accept': 'application/json'
+        },
+        body: _formData
+      })
+      .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw err; });
+          }        
+          return response.json();
+      })
+      .then(data => {
+        Swal.close();      
+        window.location.replace(`/reservations/detail/${data.config.id}`);
+        _sendReservation.disabled = false;
+        _sendReservation.textContent = "Enviar";
+      })
+      .catch(error => {
+        Swal.fire(
+          '¡ERROR!',
+          error.message || 'Ocurrió un error',
+          'error'
+        );
+        _sendReservation.disabled = false;
+        _sendReservation.textContent = "Enviar";
+      });
+    }
+  }, true); // <- el `true` activa "capturing" y sí detecta el submit
 });
 
 function loaderSites(){
   const __site = document.getElementById('formSite');
   if( __site != null ){
-    actionSite(__site);
+    setup.actionSite(__site);
     __site.addEventListener('change', function(event){
       event.preventDefault();
-      actionSite(__site);    
+      setup.actionSite(__site);    
     });
-  }
-}
-
-function makeReservationButton(event){
-  event.preventDefault();
-  $("#btn_make_reservation").prop('disabled', true).text("Enviando...");
-  $.ajaxSetup({
-      headers: {
-          'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-      }
-  });
-
-  let frm_data = $("#formReservation").serializeArray();
-  frm_data.push({ name: 'uuid', value: __uuid.value });
-
-  $.ajax({
-      url: '/tpv/create',
-      type: 'POST',
-      data: frm_data,      
-      success: function(resp) {
-        window.location.replace(`/reservations/detail/${resp.config.id}`);        
-      },
-  }).fail(function(xhr, status, error) {
-      console.log(xhr);
-      Swal.fire(
-          '¡ERROR!',
-          xhr.responseJSON.message,
-          'error'
-      );
-      $("#btn_make_reservation").prop('disabled', false).text("Enviar");
-  });
-}
-
-function setTotal(total){
-  $("#formTotal").val(total);
-  $("#formTotal").attr("readonly", false);
-}
-
-function affDelayAutocomplete(callback, ms) {
-  var timer = 0;
-  return function () {
-      var context = this,
-          args = arguments;
-      clearTimeout(timer);
-      timer = setTimeout(function () {
-          callback.apply(context, args);
-      }, ms || 0);
-  };
-}
-
-from_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
-  setup.autocomplete( e.target.value, 'aff-input-from-elements');
-}, 500));
-from_autocomplete.addEventListener('focus', (e) => {
-  setup.autocomplete( e.target.value, 'aff-input-from-elements');
-});
-to_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
-  setup.autocomplete( e.target.value, 'aff-input-to-elements');
-}, 500));
-to_autocomplete.addEventListener('focus', (e) => {
-  setup.autocomplete( e.target.value, 'aff-input-to-elements');
-});
-
-$(document).on("change", "#formSite", function() {
-  var selectedValue = $(this).val();
-  $("#formTotal").attr("readonly", false);
-});
-
-function actionSite(__site){
-  const __reference = document.getElementById('formReference');
-  const selectedOption = __site.options[__site.selectedIndex];
-
-  if( selectedOption.getAttribute('data-type') == "AGENCY" ){
-    __reference.removeAttribute('readonly');
-  }else{
-    __reference.setAttribute('readonly', true);
   }
 }

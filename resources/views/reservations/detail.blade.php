@@ -271,7 +271,7 @@
                 @endif
 
                 {{-- NOS PERMITE ENVIAR UN MENSAJE --}}
-                @if ( ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && auth()->user()->hasPermission(21) )
+                {{-- @if ( ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" ) && auth()->user()->hasPermission(21) )
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             ENVIAR MENSAJE
@@ -281,7 +281,7 @@
                             <a class="dropdown-item" href="#">Whatsapp</a>
                         </div>
                     </div>
-                @endif                
+                @endif --}}
 
                 {{-- NOS PERMITE ENVIAR UNA INVITACIÓN DE PAGO AL CLIENTE CUANDO LA RESERVA SEA DIFERENTE DE CANCELADO O DUPLICADO --}}
                 @if ( ( $data['status'] != "CANCELLED" && $data['status'] != "DUPLICATED" ) && auth()->user()->hasPermission(22))

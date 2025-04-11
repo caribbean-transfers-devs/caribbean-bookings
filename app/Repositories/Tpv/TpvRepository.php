@@ -166,7 +166,7 @@ class TpvRepository
         ]);
     }
 
-    public function create($request){    
+    public function create($request){
         $data = [
             'service_token' => $request->service_token,
             'first_name' => $request->first_name,
