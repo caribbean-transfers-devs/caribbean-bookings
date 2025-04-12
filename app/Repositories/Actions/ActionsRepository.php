@@ -7,6 +7,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Dompdf\Dompdf;
 use Twilio\Rest\Client;
 
 //MODELS
@@ -118,36 +119,41 @@ class ActionsRepository
         }
 
         try {
-            $twilio = new Client(config('services.twilio.sid'), config('services.twilio.token'));
+            // $mensaje = ("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
+            $html = file_get_contents("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
+
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+            $pdfContent = $dompdf->output();
             
-            // // $mensaje = "https://api.caribbean-transfers.com/api/v1/reservation/viewQR?code={{$booking->items[0]->code}}&email={{$booking->client_email}}&language={{$booking->language}}";
-            $mensaje = urlencode("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
+            $filename = 'reserva_' . $booking->id . '.pdf';
+            $path = storage_path('app/public/pdf');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $path = storage_path('app/public/pdf/' . $filename);
+            file_put_contents($path, $pdfContent);
 
-            // 'whatsapp:+5219981499118 ⁠'.$booking->client_phone, // Número del destinatario
-            // $twilio->messages->create(
-            //     'whatsapp:+5219981499118', // Número del destinatario
-            //     [
-            //         'from' => config('services.twilio.phone'),
-            //         'body' => $mensaje
-            //     ]
-            // );
-            // $twilio->messages->create(
-            //     "whatsapp:+5219981499118", // To
-            //     [
-            //         "from" => "whatsapp:+14155238886", // From
-            //         "body" => "Hola desde Twilio por WhatsApp!"
-            //     ] 
-            // );           
+            // Link público
+            $pdfLink = asset('storage/' . $filename);
 
-            $telefono = $booking->client_phone; // Código de país + número sin espacios
-            $mensaje = urlencode("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
-            $linkWhatsapp = "https://wa.me/$telefono?text=$mensaje";
-            // $linkWhatsapp = "";
+            // Mensaje que se enviará por WhatsApp
+            $mensajeTexto = urlencode("¡Hola! Aquí tienes el resumen de tu reservación:\n$pdfLink");
+
+            // Enlace wa.me
+            $linkWhatsapp = "https://wa.me/{$booking->client_phone}?text={$mensajeTexto}";         
+
+            // $telefono = $booking->client_phone; // Código de país + número sin espacios
+            // $mensaje = urlencode("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
+            // $linkWhatsapp = "https://wa.me/$telefono?text=$mensaje";
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Mensaje enviado por WhatsApp con Twilio.',
-                'link' => $linkWhatsapp
+                'link' => $linkWhatsapp,
+                'pdf_url' => $pdfLink
             ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([

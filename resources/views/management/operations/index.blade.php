@@ -141,7 +141,7 @@
 
             @if ( auth()->user()->hasPermission(80) )
                 <button type="button" class="btn btn-primary" data-title="Agregar nuevo servicio" data-bs-toggle="modal" data-bs-target="#operationModal"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg> Agregar nuevo servicio</button>
-            @endif            
+            @endif
             @if ( auth()->user()->hasPermission(82) )
                 <button type="button" class="btn btn-primary" id="btn_preassignment"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Pre-asignación</button>
             @endif
@@ -323,8 +323,16 @@
                                     @endif
                                 </td>
                                 <td class="text-center">{{ $value->passengers }}</td>
-                                <td class="text-center" <?=auth()->user()->classCutOffZone($value)?>>{{ auth()->user()->setFrom($value, "name") }} {{ $value->operation_type == 'arrival' && !empty($value->flight_number) ? ' ('.$value->flight_number.')' : '' }}</td>
-                                <td class="text-center">{{ auth()->user()->setTo($value, "name") }}</td>
+                                <td class="text-center" <?=auth()->user()->classCutOffZone($value)?>>
+                                    {{ auth()->user()->setFrom($value, "name") }} {{ $value->operation_type == 'arrival' && !empty($value->flight_number) ? ' ('.$value->flight_number.')' : '' }}                                    
+                                    <br>
+                                    <span class="badge badge-info mt-1">{{ auth()->user()->setFrom($value, "destination") }}</span>
+                                </td>
+                                <td class="text-center">
+                                    {{ auth()->user()->setTo($value, "name") }}
+                                    <br>
+                                    <span class="badge badge-primary mt-1">{{ auth()->user()->setTo($value, "destination") }}</span>
+                                </td>
                                 <td class="text-center" style="{{ $color_agency }}">{{ $value->site_name }}</td>
                                 <td class="text-center" data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}" data-name="{{ auth()->user()->setOperationUnit($value) }}">
                                     @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
@@ -379,7 +387,8 @@
                                 </td>
                                 <td class="text-center" style="{{ ( $value->service_type_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_type_name }}</td>
                                 <td class="text-center" <?=auth()->user()->classStatusPayment($value)?>>{{ auth()->user()->statusPayment($value->payment_status) }}</td>
-                                <td class="text-center" >{{ number_format(( ( $value->pay_at_arrival == 1  && $value->payment_status == "PENDING" ) || ( $value->pay_at_arrival == 0 && $value->payment_status == "PENDING" ) ? $value->total_sales : 0 ),2) }}</td>
+                                {{-- <td class="text-center" >{{ number_format(( ( $value->pay_at_arrival == 1  && $value->payment_status == "PENDING" ) || ( $value->pay_at_arrival == 0 && $value->payment_status == "PENDING" ) ? $value->total_sales : 0 ),2) }}</td> --}}
+                                <td class="text-center" >{{ number_format($value->total_sales,2) }}</td>
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column gap-2">
