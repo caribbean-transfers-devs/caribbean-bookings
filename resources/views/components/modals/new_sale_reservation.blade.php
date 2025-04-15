@@ -2,7 +2,7 @@
     $typeSales = auth()->user()->TypeSales();
 @endphp
 <div class="modal fade" id="serviceSalesModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Agregar venta</h5>
@@ -11,7 +11,7 @@
             <div class="modal-body">
                 <form id="frm_new_sale">
                     <div class="row">
-                        <div class="col-sm-12 col-md-6">
+                        <div class="col-sm-12 col-md-4">
                             <label class="form-label" for="new_sale_type_id">Tipo</label>
                             <select class="form-select mb-2" id="new_sale_type_id" name="sale_type_id">
                                 @foreach($typeSales as $type)
@@ -19,15 +19,15 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-sm-12 col-md-6">
+                        <div class="col-sm-12 col-md-4">
                             <label class="form-label" for="new_sale_description">Descripción</label>
                             <input type="text" class="form-control mb-2" id="new_sale_description" name="description">
                         </div>
-                        <div class="col-sm-12 col-md-6">
+                        {{-- <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="new_sale_quantity">Cantidad</label>
                             <input type="number" class="form-control mb-2" id="new_sale_quantity" name="quantity">
-                        </div>
-                        <div class="col-sm-12 col-md-6">
+                        </div> --}}
+                        <div class="col-sm-12 col-md-4">
                             <label class="form-label" for="new_sale_total">Total</label>
                             <input type="number" class="form-control mb-2" id="new_sale_total" name="total">
                         </div>

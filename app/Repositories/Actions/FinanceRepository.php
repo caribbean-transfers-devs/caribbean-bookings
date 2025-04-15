@@ -55,7 +55,6 @@ class FinanceRepository
 
             if( $payment->save() ){
                 if( $request->category === 'REFUND' ){
-
                     // Obtener tipo de venta (validar existencia)
                     $saleType = SalesType::find(6);
                     $saleDescription = $saleType ? $saleType->name : 'Reembolso';
@@ -72,12 +71,10 @@ class FinanceRepository
                     // Registrar seguimientos
                     $this->create_followUps(
                         $request->reservation_id,
-                        "El usuario " . auth()->user()->name . " agregó una venta tipo: " . strtoupper($saleDescription) . 
-                        ", por un monto de: $total",
+                        "El usuario: " . auth()->user()->name . " agregó una venta tipo: (" . strtoupper($saleDescription) . "), por un monto de: (" . $total . ")",
                         'HISTORY',
                         'CREATE_SALE'
                     );
-                    
                 }
                 
                 $this->create_followUps(

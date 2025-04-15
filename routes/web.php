@@ -50,6 +50,7 @@ use App\Http\Controllers\Settings\ZonesController as                ZONES;
 use App\Http\Controllers\Settings\RatesController as                RATES;
 use App\Http\Controllers\Settings\RatesEnterpriseController as      RATES_ENTERPRISE;
 use App\Http\Controllers\Settings\TypesCancellationsController as   TYPES_CANCELLATIONS;
+use App\Http\Controllers\Settings\TypesSalesController as           TYPES_SALES;
 
 //DETAILS RESERVATION
 use App\Http\Controllers\Reservations\ReservationsController as     DETAILS_RESERVATION;
@@ -292,6 +293,14 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/config/types-cancellations/{cancellation}/edit', [TYPES_CANCELLATIONS::class, 'edit'])->name('config.types-cancellations.edit');
         Route::put('/config/types-cancellations/{cancellation}', [TYPES_CANCELLATIONS::class, 'update'])->name('config.types-cancellations.update');
         Route::delete('/config/types-cancellations/{cancellation}', [TYPES_CANCELLATIONS::class, 'destroy'])->name('config.types-cancellations.destroy');
+
+        //TYPES SALES
+        Route::match(['get', 'post'], '/types-sales', [TYPES_SALES::class, 'index'])->name('types.sales.index');
+        Route::get('/types-sales/create', [TYPES_SALES::class, 'create'])->name('types.sales.create');
+        Route::post('/types-sales/store', [TYPES_SALES::class, 'store'])->name('types.sales.store');
+        Route::get('/types-sales/{sale}/edit', [TYPES_SALES::class, 'edit'])->name('types.sales.edit');
+        Route::put('/types-sales/{sale}', [TYPES_SALES::class, 'update'])->name('types.sales.update');
+        Route::delete('/types-sales/{sale}', [TYPES_SALES::class, 'destroy'])->name('types.sales.destroy');
 
         Route::put('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'update'])->name('reservations.update');
         Route::delete('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA

@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
     dateFormat: "Y-m-d H:i",
     enableTime: true,
     minDate: "today"
-  });  
+  });
 
   document.addEventListener('click', function (event) {
     if (event.target && event.target.id === 'clearBooking') {
@@ -278,6 +278,11 @@ document.addEventListener('DOMContentLoaded', function() {
         _service.value = 0;
       }
       event.target.classList.add('active');
+      const form = document.getElementById('formReservation');
+      if (form) {
+       const btnQuote = document.getElementById('btnQuote');
+       btnQuote.click();
+      }
     }
 
     if ( event.target && event.target.classList.contains('aff-toggle-currency') ) {
@@ -289,6 +294,11 @@ document.addEventListener('DOMContentLoaded', function() {
       const { currency } = event.target.dataset;
       _currency.value = currency;
       event.target.classList.add('active');
+      const form = document.getElementById('formReservation');
+      if (form) {
+       const btnQuote = document.getElementById('btnQuote');
+       btnQuote.click();
+      }
     }
   })
 
@@ -368,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
         _sendQuote.disabled = false;
         _sendQuote.textContent = "Cotizar";
         _loadContent.innerHTML = "";
-      });      
+      });
     }
 
     if (event.target && event.target.id === 'formReservation') {

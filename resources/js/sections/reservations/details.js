@@ -539,71 +539,71 @@ if( markReservationDuplicate ){
 }
 
 //SECCION DE VENTAS, PARA AGREGAR Y EDITAR
-const _btnNewSale = document.getElementById('btn_new_sale');
-if( _btnNewSale ){
-    _btnNewSale.addEventListener('click', function(event){
-        event.preventDefault();
-        _btnNewSale.disabled = true;
-        _btnNewSale.textContent = "Enviando...";        
+// const _btnNewSale = document.getElementById('btn_new_sale');
+// if( _btnNewSale ){
+//     _btnNewSale.addEventListener('click', function(event){
+//         event.preventDefault();
+//         _btnNewSale.disabled = true;
+//         _btnNewSale.textContent = "Enviando...";        
 
-        Swal.fire({
-            html: '¿Está seguro de agregar la venta?',
-            icon: 'warning',    
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            allowOutsideClick: false,
-            allowEscapeKey: false, // Esta línea evita que se cierre con ESC      
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let __params = components.serialize(document.getElementById('frm_new_sale'),'object');
-                let __url = _LOCAL_URL + ( __type.value == 1 ? "/sales" : "/sales/" + __code.value );
+//         Swal.fire({
+//             html: '¿Está seguro de agregar la venta?',
+//             icon: 'warning',    
+//             showCancelButton: true,
+//             confirmButtonText: 'Aceptar',
+//             cancelButtonText: 'Cancelar',
+//             allowOutsideClick: false,
+//             allowEscapeKey: false, // Esta línea evita que se cierre con ESC      
+//         }).then((result) => {
+//             if (result.isConfirmed) {
+//                 let __params = components.serialize(document.getElementById('frm_new_sale'),'object');
+//                 let __url = _LOCAL_URL + ( __type.value == 1 ? "/sales" : "/sales/" + __code.value );
 
-                Swal.fire({
-                    title: "Procesando solicitud...",
-                    text: "Por favor, espera mientras se agrega la venta.",
-                    allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
+//                 Swal.fire({
+//                     title: "Procesando solicitud...",
+//                     text: "Por favor, espera mientras se agrega la venta.",
+//                     allowOutsideClick: false,
+//                     allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+//                     didOpen: () => {
+//                         Swal.showLoading();
+//                     }
+//                 });
     
-                fetch(__url, {
-                    method: ( __type.value == 1 ? 'POST' : 'PUT' ),
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },            
-                    body: JSON.stringify(__params)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw err; });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    Swal.fire({
-                        icon: data.status,
-                        html: data.message,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                    }).then(() => {
-                        location.reload();
-                    });
-                })
-                .catch(error => {
-                    Swal.fire(
-                        '¡ERROR!',
-                        error.message || 'Ocurrió un error',
-                        'error'
-                    );
-                });
-            }
-        });        
-    })
-}
+//                 fetch(__url, {
+//                     method: ( __type.value == 1 ? 'POST' : 'PUT' ),
+//                     headers: {
+//                         'Content-Type': 'application/json',
+//                         'X-CSRF-TOKEN': csrfToken
+//                     },            
+//                     body: JSON.stringify(__params)
+//                 })
+//                 .then(response => {
+//                     if (!response.ok) {
+//                         return response.json().then(err => { throw err; });
+//                     }
+//                     return response.json();
+//                 })
+//                 .then(data => {
+//                     Swal.fire({
+//                         icon: data.status,
+//                         html: data.message,
+//                         allowOutsideClick: false,
+//                         allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+//                     }).then(() => {
+//                         location.reload();
+//                     });
+//                 })
+//                 .catch(error => {
+//                     Swal.fire(
+//                         '¡ERROR!',
+//                         error.message || 'Ocurrió un error',
+//                         'error'
+//                     );
+//                 });
+//             }
+//         });        
+//     })
+// }
 
 //VALIDAMOS DOM
 document.addEventListener("DOMContentLoaded", function() {
@@ -807,7 +807,155 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
                 }
             });            
-        }            
+        }
+
+        //VENTAS, AGREGAR Y EDITAR
+        if (event.target && event.target.id === 'btn_new_sale') {
+            event.preventDefault();
+
+            const _btnNewSale = document.getElementById('btn_new_sale');
+            _btnNewSale.disabled = true;
+            _btnNewSale.textContent = "Enviando...";     
+    
+            Swal.fire({
+                html: '¿Está seguro de agregar la venta?',
+                icon: 'warning',    
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC      
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let __params = components.serialize(document.getElementById('frm_new_sale'),'object');
+                    let __url = _LOCAL_URL + ( __type.value == 1 ? "/sales" : "/sales/" + __code.value );
+    
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se agrega la venta.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+        
+                    fetch(__url, {
+                        method: ( __type.value == 1 ? 'POST' : 'PUT' ),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },            
+                        body: JSON.stringify(__params)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        _btnNewSale.disabled = false;
+                        _btnNewSale.textContent = "Guardar";                        
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                        _btnNewSale.disabled = false;
+                        _btnNewSale.textContent = "Guardar";
+                    });
+                }else{
+                    _btnNewSale.disabled = false;
+                    _btnNewSale.textContent = "Guardar";
+                }
+            });
+        }
+
+        //PAGOS, AGREGAR Y EDITAR
+        if (event.target && event.target.id === 'btn_new_payment') {
+            event.preventDefault();
+
+            const _btnNewPayment = document.getElementById('btn_new_payment');
+            _btnNewPayment.disabled = true;
+            _btnNewPayment.textContent = "Enviando...";        
+    
+            Swal.fire({
+                html: '¿Está seguro de agregar el pago?',
+                icon: 'warning',    
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC      
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let __params = components.serialize(document.getElementById('frm_new_payment'),'object');
+                    let __url = _LOCAL_URL + ( __type.value == 1 ? "/payments" : "/payments/" + __code_pay.value );
+    
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se agrega el pago.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+        
+                    fetch(__url, {
+                        method: ( __type.value == 1 ? 'POST' : 'PUT' ),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },            
+                        body: JSON.stringify(__params)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        _btnNewPayment.disabled = false;
+                        _btnNewPayment.textContent = "Guardar";                        
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                        _btnNewPayment.disabled = false;
+                        _btnNewPayment.textContent = "Guardar";
+                    });
+                }else{
+                    _btnNewPayment.disabled = false;
+                    _btnNewPayment.textContent = "Guardar";
+                }
+            });            
+        }
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
 });
 
@@ -1164,11 +1312,11 @@ if( __serviceDateForm != null ){
 }
 
 /* ===== Start Events Payments Settings ===== */
-$("#btn_new_payment").on('click', function(){
-    $("#btn_new_payment").prop('disabled', true);
-    let __params = components.serialize(document.getElementById('frm_new_payment'),'object');
-    components.request_exec_ajax( _LOCAL_URL + ( __type_pay.value == 1 ? "/payments" : "/payments/" + __code_pay.value ), ( __type_pay.value == 1 ? 'POST' : 'PUT' ), __params );
-});
+// $("#btn_new_payment").on('click', function(){
+//     $("#btn_new_payment").prop('disabled', true);
+//     let __params = components.serialize(document.getElementById('frm_new_payment'),'object');
+//     components.request_exec_ajax( _LOCAL_URL + ( __type_pay.value == 1 ? "/payments" : "/payments/" + __code_pay.value ), ( __type_pay.value == 1 ? 'POST' : 'PUT' ), __params );
+// });
 
 function getPayment(id){
     $("#btn_new_payment").prop('disabled', true);
