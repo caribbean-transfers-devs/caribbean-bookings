@@ -81,7 +81,7 @@ Route::post('/tpv2/quote', [APIQuote::class,'index']);
 Route::post('/tpv2/re-quote', [APIQuote::class,'checkout']);
 
 //TPV AND BOOKING DETAILS
-Route::middleware(['locale','ApiChecker'])->group(function () {
+Route::middleware(['locale','ApiChecker','Debug'])->group(function () {
     Route::get('/tpv2/book/{id}', [TpvController2::class, 'book'])->name('tpv.book');
     Route::post('/tpv2/book/{id}/make', [TpvController2::class, 'create'])->name('tpv.create.en');
 
@@ -89,7 +89,7 @@ Route::middleware(['locale','ApiChecker'])->group(function () {
     Route::get('/cancel', [TpvController2::class, 'cancel'])->name('process.cancel');
     Route::get('/my-reservation-detail', [BookingsController::class, 'ReservationDetail'])->name('reservation.detail');
 
-    Route::prefix('{locale}')->where(['locale' => '[a-zA-Z]{2}', 'ApiChecker'])->group(function () {
+    Route::prefix('{locale}')->where(['locale' => '[a-zA-Z]{2}', 'ApiChecker','Debug'])->group(function () {
         Route::get('/tpv2/book/{id}', [TpvController2::class, 'book'])->name('tpv.book.es');
         Route::post('/tpv2/book/{id}/make', [TpvController2::class, 'create'])->name('tpv.create.es');
 

@@ -15,7 +15,6 @@
                     'active' => request()->routeIs('dashboard'),
                 ];
             endif;
-
             // DASHBOARD AGENTE DE CALL CENTER
             if(auth()->user()->hasPermission(113) && auth()->user()->is_commission == 1 ):
                 $links_dashboard[] = [
