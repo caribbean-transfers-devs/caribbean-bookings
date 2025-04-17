@@ -120,40 +120,40 @@ class ActionsRepository
 
         try {
             // $mensaje = ("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
-            $html = file_get_contents("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
+            // $html = file_get_contents("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
 
-            $dompdf = new Dompdf();
-            $dompdf->loadHtml($html);
-            $dompdf->setPaper('A4', 'portrait');
-            $dompdf->render();
-            $pdfContent = $dompdf->output();
+            // $dompdf = new Dompdf();
+            // $dompdf->loadHtml($html);
+            // $dompdf->setPaper('A4', 'portrait');
+            // $dompdf->render();
+            // $pdfContent = $dompdf->output();
             
-            $filename = 'reserva_' . $booking->id . '.pdf';
-            $path = storage_path('app/public/pdf');
-            if (!file_exists($path)) {
-                mkdir($path, 0755, true);
-            }
-            $path = storage_path('app/public/pdf/' . $filename);
-            file_put_contents($path, $pdfContent);
+            // $filename = 'reserva_' . $booking->id . '.pdf';
+            // $path = storage_path('app/public/pdf');
+            // if (!file_exists($path)) {
+            //     mkdir($path, 0755, true);
+            // }
+            // $path = storage_path('app/public/pdf/' . $filename);
+            // file_put_contents($path, $pdfContent);
 
-            // Link público
-            $pdfLink = asset('storage/' . $filename);
+            // // Link público
+            // $pdfLink = asset('storage/' . $filename);
 
-            // Mensaje que se enviará por WhatsApp
-            $mensajeTexto = urlencode("¡Hola! Aquí tienes el resumen de tu reservación:\n$pdfLink");
+            // // Mensaje que se enviará por WhatsApp
+            // $mensajeTexto = urlencode("¡Hola! Aquí tienes el resumen de tu reservación:\n$pdfLink");
 
-            // Enlace wa.me
-            $linkWhatsapp = "https://wa.me/{$booking->client_phone}?text={$mensajeTexto}";         
+            // // Enlace wa.me
+            // $linkWhatsapp = "https://wa.me/{$booking->client_phone}?text={$mensajeTexto}";         
 
-            // $telefono = $booking->client_phone; // Código de país + número sin espacios
-            // $mensaje = urlencode("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
-            // $linkWhatsapp = "https://wa.me/$telefono?text=$mensaje";
+            $telefono = $booking->client_phone; // Código de país + número sin espacios
+            $mensaje = urlencode("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
+            $linkWhatsapp = "https://wa.me/$telefono?text=$mensaje";
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Mensaje enviado por WhatsApp con Twilio.',
                 'link' => $linkWhatsapp,
-                'pdf_url' => $pdfLink
+                // 'pdf_url' => $pdfLink
             ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([
