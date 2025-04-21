@@ -8,4 +8,8 @@ use Illuminate\Http\Request;
 class OperationManagementController extends Controller
 {
     //
+    public function index()
+    {
+        
+    }
 }
