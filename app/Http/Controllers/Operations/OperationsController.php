@@ -194,7 +194,7 @@ class OperationsController extends Controller
     public function closeOperation(Request $request){
         try {
 
-            if( !auth()->user()->hasPermission(81) ){
+            if( !auth()->user()->hasPermission(85) ){
                 return response()->json([
                     'errors' => [
                         'code' => 'NOT_PERMISSIONS',
@@ -230,7 +230,7 @@ class OperationsController extends Controller
                     if( $item->op_type == "TYPE_TWO" ){
                         $service->op_two_operation_close = 1;
                     }
-                    
+
                     $service->save();
                 endforeach;
             endif;

@@ -135,7 +135,7 @@
         endif;
 
         //GESTION
-        if(auth()->user()->hasPermission(39) || auth()->user()->hasPermission(47) || auth()->user()->hasPermission(10) || auth()->user()->hasPermission(76) || auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) ):
+        if(auth()->user()->hasPermission(39) || auth()->user()->hasPermission(47) || auth()->user()->hasPermission(10) || auth()->user()->hasPermission(76) ):
             // CONFIRMACIONES
             if(auth()->user()->hasPermission(39)):
                 $links_operations[] = [
