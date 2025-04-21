@@ -530,6 +530,20 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     }
 
+    //FUNCIONALIDAD DE CALENDARIO PARA FILTROS
+    let picker = flatpickr("#lookup_date", {
+        mode: "single",
+        dateFormat: "Y-m-d",
+        enableTime: false,
+    });
+
+    //FUNCIONALIDAD DE CALENDARIO PARA AGREGAR SERVICIO
+    let pickerInit = flatpickr("#departure_date", {
+        mode: "single",
+        dateFormat: "Y-m-d H:i",
+        enableTime: true,
+    });
+
     //FUNCIONALIDADES DE BARRA TOOLS, SON LOS BOTONES DE LA PARTE SUPERIOR
     if( btnDowloadOperation ){
         btnDowloadOperation.addEventListener('click', function(event){
@@ -721,7 +735,6 @@ document.addEventListener("DOMContentLoaded", function() {
     
     //EVENTOS DE BOTONES DEL DATATABLE
     document.addEventListener("change", debounce(function (event) {
-
         //* ===== SELECT VEHICLES ===== */
         if (event.target.classList.contains('vehicles')) {
             // Obtener datos del elemento clickeado
@@ -893,21 +906,362 @@ document.addEventListener("DOMContentLoaded", function() {
                 );
             });
         }
-
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
+
+    document.addEventListener("click", debounce(function (event) {
+        //* ===== SELECT VEHICLES ===== */
+        if (event.target.classList.contains('vehicles')) {
+            event.preventDefault();
+
+            // Obtener datos del elemento clickeado
+            const { id, item, service, type, service_id } = event.target.dataset;
+            let vehicle = event.target.value;
+        
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras validamos el costo operativo.",
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch("/operation/validateOperatingCosts", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ id : id, item_id : item, service_id : service_id })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                let codeRate      = data.codeRate;
+                let siteType      = data.siteType;
+                let operatingCost = data.value;
+                let date          = document.getElementById('lookup_date').value;
+                if( data.success && data.value != null ){
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se asigana la unidad.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch("/operation/vehicle/set", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({id : id, item_id : item, service : service, type : type, vehicle_id : vehicle, operating_cost : operatingCost, code_rate: codeRate, site_type : siteType, date : date })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if( data.success ){
+                            Swal.fire({
+                                icon: "success",
+                                text: data.message,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                willClose: () => {
+                                    socket.emit("setVehicleReservationServer", data.data);
+                                }
+                            });
+
+                            if( data.data2.value != null ){
+                                socket.emit("setDriverReservationServer", data.data2);
+                            }
+                        }                        
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }else{
+                    swal.fire({
+                        inputLabel: "Ingresa el costo operativo",
+                        inputPlaceholder: "Ingresa el costo operativo",
+                        input: "text",
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Aceptar',
+                        cancelButtonText: 'Cancelar',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        preConfirm: async (login) => {
+                            try {
+                                if (login == "") {
+                                    return Swal.showValidationMessage(`
+                                        "Por favor, ingresa el costo operativo"
+                                    `);
+                                }
+                            } catch (error) {
+                                Swal.showValidationMessage(`
+                                    Request failed: ${error}
+                                `);
+                            }
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            operatingCost = result.value;
+                            Swal.fire({
+                                title: "Procesando solicitud...",
+                                text: "Por favor, espera mientras se asigana la unidad.",
+                                allowOutsideClick: false,
+                                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+        
+                            fetch("/operation/vehicle/set", {
+                                method: "POST",
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken
+                                },
+                                body: JSON.stringify({id : id, item_id : item, service : service, type : type, vehicle_id : vehicle, operating_cost : operatingCost, code_rate: codeRate, site_type : siteType, date : date })
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    return response.json().then(err => { throw err; });
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if( data.success ){
+                                    Swal.fire({
+                                        icon: "success",
+                                        text: data.message,
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                        willClose: () => {
+                                            socket.emit("setVehicleReservationServer", data.data);
+                                        }
+                                    });
+
+                                    if( data.data2.value != null ){
+                                        socket.emit("setDriverReservationServer", data.data2);
+                                    }                                    
+                                }                        
+                            })
+                            .catch(error => {
+                                Swal.fire(
+                                    '¡ERROR!',
+                                    error.message || 'Ocurrió un error',
+                                    'error'
+                                );
+                            });
+                        }
+                    });                    
+                }
+            })
+            .catch(error => {
+                Swal.fire(
+                    '¡ERROR!',
+                    error.message || 'Ocurrió un error',
+                    'error'
+                );
+            });
+        }
+
+        //* ===== STATUS SERVICES ===== */
+        if (event.target.classList.contains('serviceStatusUpdate')) {
+            event.preventDefault();
+
+            // Obtener datos del elemento clickeado
+            const { reservation, item, service, status, type, key } = event.target.dataset;
+
+            (async () => {
+                // Crear un contenedor para Dropzone y el select                
+                const dropzoneContainer = document.createElement("div");
+                let HTML = "";
+                if( status == "CANCELLED" || status == "NOSHOW" ){
+                    HTML = `
+                        <label for="cancelReason">Selecciona el motivo de cancelación:</label>
+                        <select id="cancelReason" class="swal2-input">
+                            <option value="">Seleccione una opción</option>
+                            ${Object.entries(types_cancellations).map(([key, value]) => `<option value="${key}">${value}</option>`).join('')}
+                        </select>
+                        <label for="attachPicture">Debes adjuntar al menos una imagen:</label>
+                        <div id="dropzoneService" class="dropzone"></div>            
+                    `;
+                }
+                let selectedFiles = []; // Array para almacenar las imágenes seleccionadas
+                dropzoneContainer.classList.add('box_cancelation')        
+                dropzoneContainer.innerHTML = `
+                    <p>${ status == "CANCELLED" || status == "NOSHOW" ? '¿Está seguro de cancelar la reservación? <br>  Esta acción no se puede revertir' : '¿Está seguro de actualizar el estatus? <br> Esta acción no se puede revertir' }</p>
+                    ${HTML}
+                `;
+    
+                const { isConfirmed, value } = await swal.fire({
+                    html: dropzoneContainer,
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Aceptar",
+                    cancelButtonText: "Cancelar",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                    didOpen: () => {
+                        if( document.getElementById('dropzoneService') != null ){
+                            // Inicializar Dropzone
+                            new Dropzone("#dropzoneService", {
+                                url: "/reservations/upload", // No se enviarán archivos aquí, solo los almacenaremos en memoria
+                                maxFilesize: 5, // Tamaño máximo del archivo en MB
+                                maxFiles: 5,
+                                acceptedFiles: "image/*",
+                                dictDefaultMessage: "Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...",
+                                addRemoveLinks: true,
+                                dictRemoveFile: "Eliminar imagen",
+                                autoProcessQueue: false,
+                                init: function () {
+                                    let dz = this;
+                                    dz.on("addedfile", function (file) {
+                                        selectedFiles.push(file);
+                                    });
+                
+                                    dz.on("removedfile", function (file) {
+                                        selectedFiles = selectedFiles.filter(f => f !== file);
+                                    });
+                                }
+                            });
+                        }
+                    },
+                    preConfirm: (value) => {
+                        if( status == "CANCELLED" || status == "NOSHOW" ){
+                            const reason = document.getElementById("cancelReason").value;
+                            const dropzone = Dropzone.forElement("#dropzoneService");
+                
+                            if (!reason) {
+                                Swal.showValidationMessage("Debes seleccionar un motivo de cancelación.");
+                                return false;
+                            }
+                            if (dropzone.files.length === 0) {
+                                Swal.showValidationMessage("Debes subir al menos una imagen.");
+                                return false;
+                            }
+    
+                            return { reason, images: dropzone.files };
+                        }else{
+                            return value;
+                        }
+                    }            
+                });
+    
+                if (isConfirmed) {
+                    const { reason, images } = value;
+                    const __vehicle = document.getElementById('vehicle_id_' + key);
+                    const __driver = document.getElementById('driver_id_' + key);
+    
+                    if ( ( __vehicle.value == 0 && __driver.value == 0 ) || ( __vehicle.value == 0 ) || ( __driver.value == 0 ) ) {
+                        Swal.fire({
+                            text: 'Valida la selección de unidad y conductor.',
+                            icon: 'error',
+                            showConfirmButton: false,
+                            timer: 1500,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC                            
+                        });
+                    }else{
+                        if( status == "CANCELLED" || status == "NOSHOW" ){
+                            Swal.fire({
+                                title: "Subiendo imágenes...",
+                                text: "Por favor, espera mientras se cargan las imágenes.", //Realiza la function de HTML en el Swal
+                                allowOutsideClick: false,
+                                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+                
+                            try {
+                                const uploadedImages = await uploadImages(images, reservation, status);
+                    
+                                if (uploadedImages.length === images.length) {
+                                    // ✅ Todas las imágenes se subieron correctamente, ahora cancelar la reserva
+                                    Swal.fire({
+                                        title: "Confirmando cancelación...",
+                                        text: "Procesando la cancelación de la reservación.", //Realiza la function de HTML en el Swal
+                                        allowOutsideClick: false,
+                                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                                        didOpen: () => {
+                                            Swal.showLoading();
+                                        }
+                                    });
+                    
+                                    $.ajax({
+                                        url: _LOCAL_URL + '/action/updateServiceStatus',
+                                        type: 'PUT',
+                                        data: { item_id: item, service: service, status: status, type: type, type_cancel: reason, key: key },
+                                        success: function(resp) {
+                                            Swal.fire({
+                                                title: '¡Éxito!',
+                                                icon: 'success',
+                                                html: 'Servicio actualizado con éxito.',
+                                                showConfirmButton: false,
+                                                timer: 1500,
+                                                allowOutsideClick: false,
+                                                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                                                willClose: () => {
+                                                    socket.emit("updateStatusBookingServer", resp.data);
+                                                }
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    // Title, HTML, Icon
+                                    Swal.fire("Error en la subida", "Algunas imágenes no se pudieron subir. Intenta de nuevo.", "error");
+                                }
+                            } catch (error) {
+                                Swal.fire("Error", "Ocurrió un problema al subir las imágenes. Inténtalo nuevamente.", "error");
+                            }
+                        }else{
+                            $.ajax({
+                                url: _LOCAL_URL + '/action/updateServiceStatus',
+                                type: 'PUT',
+                                data: { item_id: item, service: service, status: status, type: type, type_cancel: reason, key: key },
+                                beforeSend: function() {
+                                    components.loadScreen();
+                                },
+                                success: function(resp) {
+                                    Swal.fire({
+                                        title: '¡Éxito!',
+                                        icon: 'success',
+                                        html: 'Servicio actualizado con éxito.',
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                        willClose: () => {
+                                            socket.emit("updateStatusBookingServer", resp.data);
+                                        }
+                                    });
+                                }
+                            });
+                        } 
+                    }
+                }
+            })();            
+        }
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo    
 });
 
-if ( document.getElementById('lookup_date') != null ) {
-    const picker = new easepick.create({
-        element: "#lookup_date",
-        css: [
-            'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-            'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-            'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-        ],
-        zIndex: 10,
-    });   
-}
 function history(){
     setup.bsTooltip();
     const __open_modal_historys = document.querySelectorAll('.__open_modal_history');
@@ -1004,12 +1358,6 @@ to_autocomplete.addEventListener('focus', (e) => {
     setup.autocomplete( e.target.value, 'to_name_elements');
 });
 
-//FUNCIONALIDAD DE CALENDARIO PARA AGREGAR SERVICIO
-let pickerInit = flatpickr("#departure_date", {
-    mode: "single",
-    dateFormat: "Y-m-d H:i",
-    enableTime: true,
-});
 
 //FUNCIONALIDAD DE CAMBIO DE MONEDA
 sold_in_currency_select.addEventListener('change', (e) => {
@@ -1365,169 +1713,7 @@ if (serviceStatusUpdates.length > 0) {
     serviceStatusUpdates.forEach(serviceStatusUpdate => {
         serviceStatusUpdate.addEventListener('click', function(event) {
         event.preventDefault();
-        (async () => {
-            // Crear un contenedor para Dropzone y el select
-            const { operation, service, type, status, item, booking, key } = this.dataset;
-            const dropzoneContainer = document.createElement("div");
-            let HTML = "";
-            if( status == "CANCELLED" || status == "NOSHOW" ){
-                HTML = `
-                    <label for="cancelReason">Selecciona el motivo de cancelación:</label>
-                    <select id="cancelReason" class="swal2-input">
-                        <option value="">Seleccione una opción</option>
-                        ${Object.entries(types_cancellations).map(([key, value]) => `<option value="${key}">${value}</option>`).join('')}
-                    </select>
-                    <label for="attachPicture">Debes adjuntar al menos una imagen:</label>
-                    <div id="dropzoneService" class="dropzone"></div>            
-                `;
-            }
-            let selectedFiles = []; // Array para almacenar las imágenes seleccionadas
-            dropzoneContainer.classList.add('box_cancelation')        
-            dropzoneContainer.innerHTML = `
-                <p>${ status == "CANCELLED" || status == "NOSHOW" ? '¿Está seguro de cancelar la reservación? <br>  Esta acción no se puede revertir' : '¿Está seguro de actualizar el estatus? <br> Esta acción no se puede revertir' }</p>
-                ${HTML}
-            `;
 
-            const { isConfirmed, value } = await swal.fire({
-                // title: "",
-                html: dropzoneContainer,
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Aceptar",
-                cancelButtonText: "Cancelar",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    if( document.getElementById('dropzoneService') != null ){
-                        // Inicializar Dropzone
-                        new Dropzone("#dropzoneService", {
-                            url: "/reservations/upload", // No se enviarán archivos aquí, solo los almacenaremos en memoria
-                            maxFilesize: 5, // Tamaño máximo del archivo en MB
-                            maxFiles: 5,
-                            acceptedFiles: "image/*",
-                            dictDefaultMessage: "Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...",
-                            addRemoveLinks: true,
-                            dictRemoveFile: "Eliminar imagen",
-                            autoProcessQueue: false,
-                            init: function () {
-                                let dz = this;
-                                dz.on("addedfile", function (file) {
-                                    selectedFiles.push(file);
-                                });
-            
-                                dz.on("removedfile", function (file) {
-                                    selectedFiles = selectedFiles.filter(f => f !== file);
-                                });
-                            }
-                        });
-                    }
-                },
-                preConfirm: (value) => {
-                    if( status == "CANCELLED" || status == "NOSHOW" ){
-                        const reason = document.getElementById("cancelReason").value;
-                        const dropzone = Dropzone.forElement("#dropzoneService");
-            
-                        if (!reason) {
-                            Swal.showValidationMessage("Debes seleccionar un motivo de cancelación.");
-                            return false;
-                        }
-                        if (dropzone.files.length === 0) {
-                            Swal.showValidationMessage("Debes subir al menos una imagen.");
-                            return false;
-                        }
-
-                        return { reason, images: dropzone.files };
-                    }else{
-                        return value;
-                    }
-                }            
-            });
-
-            if (isConfirmed) {
-                const { reason, images } = value;
-                const __vehicle = document.getElementById('vehicle_id_' + key);
-                const __driver = document.getElementById('driver_id_' + key);
-
-                if ( ( __vehicle.value == 0 && __driver.value == 0 ) || ( __vehicle.value == 0 ) || ( __driver.value == 0 ) ) {
-                    Swal.fire({
-                        text: 'Valida la selección de unidad y conductor.',
-                        icon: 'error',
-                        showConfirmButton: false,
-                        timer: 1500,
-                    });                    
-                }else{
-                    if( status == "CANCELLED" || status == "NOSHOW" ){
-                        Swal.fire({
-                            title: "Subiendo imágenes...",
-                            text: "Por favor, espera mientras se cargan las imágenes.", //Realiza la function de HTML en el Swal
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-            
-                        try {
-                            const uploadedImages = await uploadImages(images, booking, status);
-                
-                            if (uploadedImages.length === images.length) {
-                                // ✅ Todas las imágenes se subieron correctamente, ahora cancelar la reserva
-                                Swal.fire({
-                                    title: "Confirmando cancelación...",
-                                    text: "Procesando la cancelación de la reservación.", //Realiza la function de HTML en el Swal
-                                    allowOutsideClick: false,
-                                    didOpen: () => {
-                                        Swal.showLoading();
-                                    }
-                                });
-                
-                                $.ajax({
-                                    url: `/operation/status/booking`,
-                                    type: 'PUT',
-                                    data: { id: key, rez_id: booking, item_id: item, operation: operation, service: service, type: type, status: status },
-                                    success: function(resp) {
-                                        Swal.fire({
-                                            title: '¡Éxito!',
-                                            icon: 'success',
-                                            html: 'Servicio actualizado con éxito.',
-                                            showConfirmButton: false,
-                                            timer: 1500,
-                                            willClose: () => {
-                                                socket.emit("updateStatusBookingServer", resp.data);
-                                            }
-                                        });
-                                    }
-                                });
-                            } else {
-                                // Title, HTML, Icon
-                                Swal.fire("Error en la subida", "Algunas imágenes no se pudieron subir. Intenta de nuevo.", "error");
-                            }
-                        } catch (error) {
-                            Swal.fire("Error", "Ocurrió un problema al subir las imágenes. Inténtalo nuevamente.", "error");
-                        }
-                    }else{
-                        $.ajax({
-                            url: `/operation/status/booking`,
-                            type: 'PUT',
-                            data: { id: key, rez_id: booking, item_id: item, operation: operation, service: service, type: type, status: status },
-                            beforeSend: function() {
-                                components.loadScreen();
-                            },
-                            success: function(resp) {
-                                Swal.fire({
-                                    title: '¡Éxito!',
-                                    icon: 'success',
-                                    html: 'Servicio actualizado con éxito.',
-                                    showConfirmButton: false,
-                                    timer: 1500,
-                                    willClose: () => {
-                                        socket.emit("updateStatusBookingServer", resp.data);
-                                    }
-                                });
-                            }
-                        });
-                    } 
-                }
-            }
-        })();
     });
   });
 }
@@ -1993,8 +2179,8 @@ socket.on("addServiceClient", function(data){
     console.log(data);
     //DECLARACION DE VARIABLES
     const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
-    const __permission = document.getElementById('permission_reps');
-    if (__permission == null) {
+    // const __permission = document.getElementById('permission_reps');
+    // if (__permission == null) {
         if( data.success ){
             if( data.today ){
                 Swal.fire({
@@ -2020,5 +2206,5 @@ socket.on("addServiceClient", function(data){
                 });
             }
         }   
-    }
+    // }
 });

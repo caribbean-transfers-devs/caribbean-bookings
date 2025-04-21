@@ -538,11 +538,11 @@
                                                                 <div class="btn-group btn-group-sm">
                                                                     <button type="button" class="btn {{ $btn_op_one_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ auth()->user()->statusBooking($item->op_one_status) }}</button>
                                                                     <div class="dropdown-menu" style="">
-                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
-                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event,  'arrival', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
-                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
+                                                                        <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="PENDING" data-type="TYPE_ONE">Pendiente</a>
+                                                                        <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="COMPLETED" data-type="TYPE_ONE">Completado</a>
+                                                                        <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="NOSHOW" data-type="TYPE_ONE">No show</a>
                                                                         <hr>
-                                                                        <a class="dropdown-item" href="#" onclick="setStatus(event, 'arrival', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
+                                                                        <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="CANCELLED" data-type="TYPE_ONE">Cancelado</a>
                                                                     </div>
                                                                 </div>
                                                             @else
@@ -621,11 +621,11 @@
                                                                     <div class="btn-group btn-group-sm">
                                                                         <button type="button" class="btn {{ $btn_op_two_type }} dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">{{ auth()->user()->statusBooking($item->op_two_status) }}</button>
                                                                         <div class="dropdown-menu" style="">
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'PENDING', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Pendiente</a>
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event,  'departure', 'COMPLETED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Completado</a>
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'NOSHOW', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">No show</a>
+                                                                            <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="PENDING" data-type="TYPE_TWO">Pendiente</a>
+                                                                            <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="COMPLETED" data-type="TYPE_TWO">Completado</a>
+                                                                            <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="NOSHOW" data-type="TYPE_TWO">No show</a>
                                                                             <hr>
-                                                                            <a class="dropdown-item" href="#" onclick="setStatus(event, 'departure', 'CANCELLED', {{ $item->reservations_item_id }}, {{ $item->reservation_id }})">Cancelado</a>
+                                                                            <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="CANCELLED" data-type="TYPE_TWO">Cancelado</a>
                                                                         </div>
                                                                     </div>
                                                                 @else

@@ -86,18 +86,13 @@
 @endpush
 
 @push('Js')
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
     <script src="{{ mix('assets/js/sections/management/operations.min.js') }}"></script>
-    <script>
+    {{-- <script>
         document.getElementById('showLayer').addEventListener('click', function() {
             document.getElementById('layer').classList.add('active');
         });
@@ -105,7 +100,7 @@
         document.getElementById('closeLayer').addEventListener('click', function() {
             document.getElementById('layer').classList.remove('active');
         });
-    </script>
+    </script> --}}
 @endpush
 
 @section('content')
@@ -119,9 +114,9 @@
             }
         endif;
     @endphp
-    @if (auth()->user()->hasPermission(79))
+    {{-- @if (auth()->user()->hasPermission(79))
         <input type="hidden" class="" id="permission_reps" value="true" required>
-    @endif
+    @endif --}}
 
     @if ( sizeof($items) >= 1 )
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -137,7 +132,7 @@
         <div class="btn-group" role="group" aria-label="options">
             <button type="button" class="btn btn-primary" data-title="Filtros de operación" data-bs-toggle="modal" data-bs-target="#filterModal"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros</button>
             <button type="button" class="btn btn-primary __btn_columns" title="Administrar columnas" data-title="columnas de operaciones" data-bs-toggle="modal" data-bs-target="#columnsModal" data-table="bookings" data-container="columns"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas</button>
-            <button type="button" class="btn btn-primary" title="Ver graficas" id="showLayer"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas</button>
+            {{-- <button type="button" class="btn btn-primary" title="Ver graficas" id="showLayer"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Ver graficas</button> --}}
 
             @if ( auth()->user()->hasPermission(80) )
                 <button type="button" class="btn btn-primary" data-title="Agregar nuevo servicio" data-bs-toggle="modal" data-bs-target="#operationModal"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg> Agregar nuevo servicio</button>
@@ -222,58 +217,58 @@
                                 $close_operation = ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ? $value->op_one_operation_close : $value->op_two_operation_close );
 
                                 //LOGISTICA PARA GRAFICAS
-                                    // Obtener la hora formateada
-                                    $time = date("H:i", strtotime(auth()->user()->setDateTime($value, "null"))); //EXTRAEMOS LA HORA DE LA FECHA
-                                    $hour = date("H", strtotime(auth()->user()->setDateTime($value, "null"))); //EXTRAEMOS LA HORA                                
-                                    $minutes = date("i", strtotime(auth()->user()->setDateTime($value, "null"))); //EXTRAEMOS LOS SEGUNDOS
+                                    // // Obtener la hora formateada
+                                    // $time = date("H:i", strtotime(auth()->user()->setDateTime($value, "null"))); //EXTRAEMOS LA HORA DE LA FECHA
+                                    // $hour = date("H", strtotime(auth()->user()->setDateTime($value, "null"))); //EXTRAEMOS LA HORA                                
+                                    // $minutes = date("i", strtotime(auth()->user()->setDateTime($value, "null"))); //EXTRAEMOS LOS SEGUNDOS
 
-                                    // Agrupar por intervalo de 15 minutos
-                                    if ($minutes < 15) {
-                                        $index = $hour . ':00';
-                                    } elseif ($minutes < 30) {
-                                        $index = $hour . ':15';
-                                    } elseif ($minutes < 45) {
-                                        $index = $hour . ':30';
-                                    } else {
-                                        $index = $hour . ':45';
-                                    }
+                                    // // Agrupar por intervalo de 15 minutos
+                                    // if ($minutes < 15) {
+                                    //     $index = $hour . ':00';
+                                    // } elseif ($minutes < 30) {
+                                    //     $index = $hour . ':15';
+                                    // } elseif ($minutes < 45) {
+                                    //     $index = $hour . ':30';
+                                    // } else {
+                                    //     $index = $hour . ':45';
+                                    // }
 
-                                    // Agregar al arreglo agrupado
-                                    if( $value->final_service_type == "ARRIVAL" ){
-                                        if ( !isset($arrivalTimeGroup[$hour]) ) {
-                                            $arrivalTimeGroup[$hour] = [
-                                                'name' => $hour,
-                                                'quantity' => 0,  // Contador
-                                            ];
-                                        }
-                                        $arrivalTimeGroup[$hour]['quantity']++;                                        
-                                    }
-                                    if( $value->final_service_type == "DEPARTURE" || $value->final_service_type == "TRANSFER" ){
-                                        if ( !isset($departureTimeGroup[$hour]) ) {
-                                            $departureTimeGroup[$hour] = [
-                                                'name' => $hour,
-                                                'quantity' => 0,  // Contador
-                                            ];
-                                        }
-                                        $departureTimeGroup[$hour]['quantity']++;
-                                    }
-                                    if( $value->final_service_type == "ARRIVAL" || $value->final_service_type == "DEPARTURE" || $value->final_service_type == "TRANSFER" ){
-                                        // Inicializar el índice si no existe
-                                        if (!isset($generalTimeGroup[$hour])) {
-                                            $generalTimeGroup[$hour] = [
-                                                'name' => $hour,
-                                                'quantity' => 0,  // Contador
-                                            ];
-                                        }
-                                        $generalTimeGroup[$hour]['quantity']++;
-                                    }
+                                    // // Agregar al arreglo agrupado
+                                    // if( $value->final_service_type == "ARRIVAL" ){
+                                    //     if ( !isset($arrivalTimeGroup[$hour]) ) {
+                                    //         $arrivalTimeGroup[$hour] = [
+                                    //             'name' => $hour,
+                                    //             'quantity' => 0,  // Contador
+                                    //         ];
+                                    //     }
+                                    //     $arrivalTimeGroup[$hour]['quantity']++;                                        
+                                    // }
+                                    // if( $value->final_service_type == "DEPARTURE" || $value->final_service_type == "TRANSFER" ){
+                                    //     if ( !isset($departureTimeGroup[$hour]) ) {
+                                    //         $departureTimeGroup[$hour] = [
+                                    //             'name' => $hour,
+                                    //             'quantity' => 0,  // Contador
+                                    //         ];
+                                    //     }
+                                    //     $departureTimeGroup[$hour]['quantity']++;
+                                    // }
+                                    // if( $value->final_service_type == "ARRIVAL" || $value->final_service_type == "DEPARTURE" || $value->final_service_type == "TRANSFER" ){
+                                    //     // Inicializar el índice si no existe
+                                    //     if (!isset($generalTimeGroup[$hour])) {
+                                    //         $generalTimeGroup[$hour] = [
+                                    //             'name' => $hour,
+                                    //             'quantity' => 0,  // Contador
+                                    //         ];
+                                    //     }
+                                    //     $generalTimeGroup[$hour]['quantity']++;
+                                    // }
                             @endphp
                             <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
                                 <td class="text-center">
                                     @if ( $flag_preassignment )
-                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase {{ auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 ? 'disabled' : '' }}">{{ $preassignment }}</button>
+                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase">{{ $preassignment }}</button>
                                     @else
-                                        <button type="button" class="btn btn-danger text-uppercase btn_operations {{ auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 ? 'disabled' : 'add_preassignment' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
+                                        <button type="button" class="btn btn-danger text-uppercase btn_operations {{ auth()->user()->hasPermission(81) && $close_operation == 0 ? 'add_preassignment' : 'disabled' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
                                     @endif
                                 </td>
                                 <td class="text-center">
@@ -335,9 +330,7 @@
                                 </td>
                                 <td class="text-center" style="{{ $color_agency }}">{{ $value->site_name }}</td>
                                 <td class="text-center" data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}" data-name="{{ auth()->user()->setOperationUnit($value) }}">
-                                    @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
-                                        {{ auth()->user()->setOperationUnit($value) }}
-                                    @else
+                                    @if ( auth()->user()->hasPermission(86) && $close_operation == 0 )
                                         <select class="form-control vehicles selectpicker" data-live-search="true" id="vehicle_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-item="{{ $value->id }}" data-service="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}" data-service_id="{{ $value->service_type_id }}">
                                             <option value="0">Selecciona un vehículo</option>
                                             @if ( isset($units2) && count($units2) >= 1 )
@@ -346,12 +339,12 @@
                                                 @endforeach
                                             @endif
                                         </select>
+                                    @else
+                                        {{ auth()->user()->setOperationUnit($value) }}
                                     @endif
                                 </td>
                                 <td class="text-center" data-order="{{ ( $driver_d != NULL ) ? $driver_d : 0 }}" data-name="{{ auth()->user()->setOperationDriver($value) }}">
-                                    @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
-                                        {{  auth()->user()->setOperationDriver($value) }}
-                                    @else
+                                    @if ( auth()->user()->hasPermission(87) && $close_operation == 0 )                                        
                                         <select class="form-control drivers selectpicker" data-live-search="true" id="driver_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
                                             <option value="0">Selecciona un conductor</option>
                                             @if ( isset($drivers2) && count($drivers2) >= 1 )
@@ -360,22 +353,24 @@
                                                 @endforeach
                                             @endif
                                         </select>
+                                    @else
+                                        {{  auth()->user()->setOperationDriver($value) }}
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
-                                        <?=auth()->user()->renderOperationStatus($value)?>
-                                    @else
+                                    @if ( auth()->user()->hasPermission(88) && $close_operation == 0 )                                        
                                         <?=auth()->user()->renderOperationOptionsStatus($key,$value)?>
+                                    @else
+                                        <?=auth()->user()->renderOperationStatus($value)?>
                                     @endif
                                 </td>
                                 <td class="text-center"><?=auth()->user()->setOperationTime($value)?></td>
                                 <td class="text-center"><?=auth()->user()->setOperatingCost($value)?></td>
                                 <td class="text-center">
-                                    @if ( auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 )
-                                        <?=auth()->user()->renderServiceStatusOP($value)?>
-                                    @else
+                                    @if ( auth()->user()->hasPermission(89) && $close_operation == 0 )
                                         <?=auth()->user()->renderServiceOptionsStatus($key,$value)?>
+                                    @else
+                                        <?=auth()->user()->renderServiceStatusOP($value)?>
                                     @endif
                                 </td>
                                 <td class="text-center">
@@ -394,7 +389,7 @@
                                 <td class="text-center">{{ $value->currency }}</td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column gap-2">
-                                        <div class="btn btn-primary btn_operations {{ auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79) || $close_operation == 1 ? 'disabled' : '__open_modal_comment' }} bs-tooltip" title="{{ ( $flag_comment ) ? 'Modificar comentario' : 'Agregar comentario' }}" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-reservation="{{ $value->reservation_id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}">
+                                        <div class="btn btn-primary btn_operations {{ auth()->user()->hasPermission(90) && $close_operation == 0 ? '__open_modal_comment' : 'disabled' }} bs-tooltip" title="{{ ( $flag_comment ) ? 'Modificar comentario' : 'Agregar comentario' }}" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-reservation="{{ $value->reservation_id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                         </div>
                                         <div class="btn btn-primary btn_operations extract_whatsapp bs-tooltip" title="Ver información para enviar por whatsApp" id="extract_whatsapp{{ $key.$value->id }}" data-bs-toggle="modal" data-bs-target="#operationWhatsAppModal">
@@ -415,7 +410,7 @@
         </div>
     </div>
 
-    <div class="layer" id="layer">
+    {{-- <div class="layer" id="layer">
         <div class="header-chart d-flex justify-content-between">
             <div class="btn_close">                
                 <button class="btn btn-primary" id="closeLayer">Cerrar</button>
@@ -438,12 +433,12 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <x-modals.filters.bookings :data="$data" :websites="$websites" :units="$units" :drivers="$drivers" :reservationstatus="$reservation_status" />
     <x-modals.reports.columns />
 
-    <x-modals.management.operations.schedules />
+    {{-- <x-modals.management.operations.schedules /> --}}
 
     <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :vehicles="$vehicles" />
     <x-modals.reservations.comments /> <!-- MODAL PARA PODER AGREGAR COMENTARIO DE OPERACION Y IMAGENES -->

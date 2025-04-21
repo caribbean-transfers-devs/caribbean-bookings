@@ -538,73 +538,6 @@ if( markReservationDuplicate ){
     })
 }
 
-//SECCION DE VENTAS, PARA AGREGAR Y EDITAR
-// const _btnNewSale = document.getElementById('btn_new_sale');
-// if( _btnNewSale ){
-//     _btnNewSale.addEventListener('click', function(event){
-//         event.preventDefault();
-//         _btnNewSale.disabled = true;
-//         _btnNewSale.textContent = "Enviando...";        
-
-//         Swal.fire({
-//             html: '¿Está seguro de agregar la venta?',
-//             icon: 'warning',    
-//             showCancelButton: true,
-//             confirmButtonText: 'Aceptar',
-//             cancelButtonText: 'Cancelar',
-//             allowOutsideClick: false,
-//             allowEscapeKey: false, // Esta línea evita que se cierre con ESC      
-//         }).then((result) => {
-//             if (result.isConfirmed) {
-//                 let __params = components.serialize(document.getElementById('frm_new_sale'),'object');
-//                 let __url = _LOCAL_URL + ( __type.value == 1 ? "/sales" : "/sales/" + __code.value );
-
-//                 Swal.fire({
-//                     title: "Procesando solicitud...",
-//                     text: "Por favor, espera mientras se agrega la venta.",
-//                     allowOutsideClick: false,
-//                     allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-//                     didOpen: () => {
-//                         Swal.showLoading();
-//                     }
-//                 });
-    
-//                 fetch(__url, {
-//                     method: ( __type.value == 1 ? 'POST' : 'PUT' ),
-//                     headers: {
-//                         'Content-Type': 'application/json',
-//                         'X-CSRF-TOKEN': csrfToken
-//                     },            
-//                     body: JSON.stringify(__params)
-//                 })
-//                 .then(response => {
-//                     if (!response.ok) {
-//                         return response.json().then(err => { throw err; });
-//                     }
-//                     return response.json();
-//                 })
-//                 .then(data => {
-//                     Swal.fire({
-//                         icon: data.status,
-//                         html: data.message,
-//                         allowOutsideClick: false,
-//                         allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-//                     }).then(() => {
-//                         location.reload();
-//                     });
-//                 })
-//                 .catch(error => {
-//                     Swal.fire(
-//                         '¡ERROR!',
-//                         error.message || 'Ocurrió un error',
-//                         'error'
-//                     );
-//                 });
-//             }
-//         });        
-//     })
-// }
-
 //VALIDAMOS DOM
 document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("click", debounce(function (event) {
@@ -673,6 +606,150 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });            
         }
+
+        //ACTUALIZA EL ESTATUS DEL SERVICIO
+        if (event.target.classList.contains('serviceStatusUpdate')) {
+            event.preventDefault();
+
+            // Obtener datos del elemento clickeado
+            const { reservation, item, service, status, type } = event.target.dataset;
+       
+            (async () => {
+                // Crear un contenedor para Dropzone y el select
+                const dropzoneContainer = document.createElement("div");
+                let HTML = "";
+                if( status == "CANCELLED" || status == "NOSHOW" ){
+                    HTML = `
+                        <label for="cancelReason">Selecciona el motivo de cancelación:</label>
+                        <select id="cancelReason" class="swal2-input">
+                            <option value="">Seleccione una opción</option>
+                            ${Object.entries(types_cancellations).map(([key, value]) => `<option value="${key}">${value}</option>`).join('')}
+                        </select>
+                        <label for="attachPicture">Debes adjuntar al menos una imagen:</label>
+                        <div id="dropzoneService" class="dropzone"></div>            
+                    `;
+                }
+                let selectedFiles = []; // Array para almacenar las imágenes seleccionadas
+                dropzoneContainer.classList.add('box_cancelation')        
+                dropzoneContainer.innerHTML = `
+                    <p>${ status == "CANCELLED" || status == "NOSHOW" ? '¿Está seguro de cancelar la reservación? <br>  Esta acción no se puede revertir' : '¿Está seguro de actualizar el estatus? <br> Esta acción no se puede revertir' }</p>
+                    ${HTML}
+                `;
+        
+                const { isConfirmed, value } = await swal.fire({
+                    html: dropzoneContainer,
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Aceptar",
+                    cancelButtonText: "Cancelar",
+                    allowOutsideClick: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                    didOpen: () => {
+                        if( document.getElementById('dropzoneService') != null ){
+                            // Inicializar Dropzone
+                            new Dropzone("#dropzoneService", {
+                                url: "/reservations/upload", // No se enviarán archivos aquí, solo los almacenaremos en memoria
+                                maxFilesize: 5, // Tamaño máximo del archivo en MB
+                                maxFiles: 5,
+                                acceptedFiles: "image/*",
+                                dictDefaultMessage: "Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...",
+                                addRemoveLinks: true,
+                                dictRemoveFile: "Eliminar imagen",
+                                autoProcessQueue: false,
+                                init: function () {
+                                    let dz = this;
+                                    dz.on("addedfile", function (file) {
+                                        selectedFiles.push(file);
+                                    });
+                
+                                    dz.on("removedfile", function (file) {
+                                        selectedFiles = selectedFiles.filter(f => f !== file);
+                                    });
+                                }
+                            });
+                        }
+                    },
+                    preConfirm: (value) => {
+                        if( status == "CANCELLED" || status == "NOSHOW" ){
+                            const reason = document.getElementById("cancelReason").value;
+                            const dropzone = Dropzone.forElement("#dropzoneService");
+                
+                            if (!reason) {
+                                Swal.showValidationMessage("Debes seleccionar un motivo de cancelación.");
+                                return false;
+                            }
+                            if (dropzone.files.length === 0) {
+                                Swal.showValidationMessage("Debes subir al menos una imagen.");
+                                return false;
+                            }
+        
+                            return { reason, images: dropzone.files };
+                        }else{
+                            return value;
+                        }
+                    }            
+                });
+        
+                if (isConfirmed) {
+                    const { reason, images } = value;
+                    if( status == "CANCELLED" || status == "NOSHOW" ){
+                        Swal.fire({
+                            title: "Subiendo imágenes...",
+                            text: "Por favor, espera mientras se cargan las imágenes.", //Realiza la function de HTML en el Swal
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+            
+                        try {
+                            const uploadedImages = await uploadImages(images, reservation, status);
+                
+                            if (uploadedImages.length === images.length) {
+                                // ✅ Todas las imágenes se subieron correctamente, ahora cancelar la reserva
+                                Swal.fire({
+                                    title: "Confirmando cancelación...",
+                                    text: "Procesando la cancelación de la reservación.", //Realiza la function de HTML en el Swal
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                                    didOpen: () => {
+                                        Swal.showLoading();
+                                    }
+                                });
+                
+                                let __params = {};
+                                __params.loading = false;
+                                __params.item_id = item;
+                                __params.service = service;
+                                __params.status = status;
+                                __params.type = type;
+                                __params.type_cancel = reason;
+                
+                                // Enviar la solicitud AJAX para actualizar estatus del servicio
+                                await components.request_exec_ajax( _LOCAL_URL + "/action/updateServiceStatus", 'PUT', __params );
+                            } else {
+                                // Title, HTML, Icon
+                                Swal.fire("Error en la subida", "Algunas imágenes no se pudieron subir. Intenta de nuevo.", "error");
+                            }
+                        } catch (error) {
+                            Swal.fire("Error", "Ocurrió un problema al subir las imágenes. Inténtalo nuevamente.", "error");
+                        }
+                    }else{
+                        let __params = {};
+                        __params.item_id = item;
+                        __params.service = service;
+                        __params.status = status;
+                        __params.type = type;
+                        __params.type_cancel = value;
+                    
+                        // Enviar la solicitud AJAX para actualizar estatus del servicio
+                        components.request_exec_ajax( _LOCAL_URL + "/action/updateServiceStatus", 'PUT', __params );
+                    }            
+                }
+            })();            
+        }        
 
         //ACTUALIZA LA CONFIRMACIÓN DEL SERVICIO
         if (event.target.classList.contains('confirmService')) {
@@ -1312,12 +1389,6 @@ if( __serviceDateForm != null ){
 }
 
 /* ===== Start Events Payments Settings ===== */
-// $("#btn_new_payment").on('click', function(){
-//     $("#btn_new_payment").prop('disabled', true);
-//     let __params = components.serialize(document.getElementById('frm_new_payment'),'object');
-//     components.request_exec_ajax( _LOCAL_URL + ( __type_pay.value == 1 ? "/payments" : "/payments/" + __code_pay.value ), ( __type_pay.value == 1 ? 'POST' : 'PUT' ), __params );
-// });
-
 function getPayment(id){
     $("#btn_new_payment").prop('disabled', true);
     $("#type_form_pay").val(2);
@@ -1700,148 +1771,6 @@ $( document ).delegate( ".deleteMedia", "click", function(e) {
         }
     });
 });
-
-//PERMITE CAMBIAR EL ESTATUS DE LOS SERVICIOS
-function setStatus(event, type, status, item_id, rez_id){
-    event.preventDefault();
-    (async () => {
-        // Crear un contenedor para Dropzone y el select
-        const dropzoneContainer = document.createElement("div");
-        let HTML = "";
-        if( status == "CANCELLED" || status == "NOSHOW" ){
-            HTML = `
-                <label for="cancelReason">Selecciona el motivo de cancelación:</label>
-                <select id="cancelReason" class="swal2-input">
-                    <option value="">Seleccione una opción</option>
-                    ${Object.entries(types_cancellations).map(([key, value]) => `<option value="${key}">${value}</option>`).join('')}
-                </select>
-                <label for="attachPicture">Debes adjuntar al menos una imagen:</label>
-                <div id="dropzoneService" class="dropzone"></div>            
-            `;
-        }
-        let selectedFiles = []; // Array para almacenar las imágenes seleccionadas
-        dropzoneContainer.classList.add('box_cancelation')        
-        dropzoneContainer.innerHTML = `
-            <p>${ status == "CANCELLED" || status == "NOSHOW" ? '¿Está seguro de cancelar la reservación? <br>  Esta acción no se puede revertir' : '¿Está seguro de actualizar el estatus? <br> Esta acción no se puede revertir' }</p>
-            ${HTML}
-        `;        
-
-        const { isConfirmed, value } = await swal.fire({
-            // title: "",
-            html: dropzoneContainer,
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonText: "Aceptar",
-            cancelButtonText: "Cancelar",
-            allowOutsideClick: false,
-            allowOutsideClick: false,
-            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-            didOpen: () => {
-                if( document.getElementById('dropzoneService') != null ){
-                    // Inicializar Dropzone
-                    new Dropzone("#dropzoneService", {
-                        url: "/reservations/upload", // No se enviarán archivos aquí, solo los almacenaremos en memoria
-                        maxFilesize: 5, // Tamaño máximo del archivo en MB
-                        maxFiles: 5,
-                        acceptedFiles: "image/*",
-                        dictDefaultMessage: "Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...",
-                        addRemoveLinks: true,
-                        dictRemoveFile: "Eliminar imagen",
-                        autoProcessQueue: false,
-                        init: function () {
-                            let dz = this;
-                            dz.on("addedfile", function (file) {
-                                selectedFiles.push(file);
-                            });
-        
-                            dz.on("removedfile", function (file) {
-                                selectedFiles = selectedFiles.filter(f => f !== file);
-                            });
-                        }
-                    });
-                }
-            },
-            preConfirm: (value) => {
-                if( status == "CANCELLED" || status == "NOSHOW" ){
-                    const reason = document.getElementById("cancelReason").value;
-                    const dropzone = Dropzone.forElement("#dropzoneService");
-        
-                    if (!reason) {
-                        Swal.showValidationMessage("Debes seleccionar un motivo de cancelación.");
-                        return false;
-                    }
-                    if (dropzone.files.length === 0) {
-                        Swal.showValidationMessage("Debes subir al menos una imagen.");
-                        return false;
-                    }
-
-                    return { reason, images: dropzone.files };
-                }else{
-                    return value;
-                }
-            }            
-        });
-
-        if (isConfirmed) {
-            const { reason, images } = value;
-            if( status == "CANCELLED" || status == "NOSHOW" ){
-                Swal.fire({
-                    title: "Subiendo imágenes...",
-                    text: "Por favor, espera mientras se cargan las imágenes.", //Realiza la function de HTML en el Swal
-                    allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-    
-                try {
-                    const uploadedImages = await uploadImages(images, rez_id, status);
-        
-                    if (uploadedImages.length === images.length) {
-                        // ✅ Todas las imágenes se subieron correctamente, ahora cancelar la reserva
-                        Swal.fire({
-                            title: "Confirmando cancelación...",
-                            text: "Procesando la cancelación de la reservación.", //Realiza la function de HTML en el Swal
-                            allowOutsideClick: false,
-                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-        
-                        let __params = {};
-                        __params.loading = false;
-                        __params.rez_id = rez_id;
-                        __params.item_id = item_id;
-                        __params.type = type;
-                        __params.status = status;                        
-                        __params.type_cancel = reason;
-                        // console.log(__params);
-        
-                        // Enviar la solicitud AJAX para actualizar estatus del servicio
-                        await components.request_exec_ajax( _LOCAL_URL + "/action/updateServiceStatus", 'PUT', __params );
-                    } else {
-                        // Title, HTML, Icon
-                        Swal.fire("Error en la subida", "Algunas imágenes no se pudieron subir. Intenta de nuevo.", "error");
-                    }
-                } catch (error) {
-                    Swal.fire("Error", "Ocurrió un problema al subir las imágenes. Inténtalo nuevamente.", "error");
-                }
-            }else{
-                let __params = {};
-                __params.rez_id = rez_id;
-                __params.item_id = item_id;
-                __params.type = type;
-                __params.status = status;
-                __params.type_cancel = value;
-            
-                // Enviar la solicitud AJAX para actualizar estatus del servicio
-                components.request_exec_ajax( _LOCAL_URL + "/action/updateServiceStatus", 'PUT', __params );
-            }            
-        }
-    })();    
-}
 
 function copyPaymentLink(event, code, email, lang){
     event.preventDefault();

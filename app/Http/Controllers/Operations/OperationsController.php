@@ -193,10 +193,21 @@ class OperationsController extends Controller
 
     public function closeOperation(Request $request){
         try {
+
+            if( !auth()->user()->hasPermission(81) ){
+                return response()->json([
+                    'errors' => [
+                        'code' => 'NOT_PERMISSIONS',
+                        'message' => 'No cuenta con permisos para realizar esta acción.'
+                    ],
+                    'status' => 'error',
+                    'success' => false,
+                    'message' => 'No cuenta con permisos para realizar esta acción'
+                ], 403);                
+            }
+
             //DECLARAMOS VARIABLES
-            // rez.is_cancelled = 0 AND 
             $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
-            // rez.is_cancelled = 0 AND 
             $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
             $havingConditions = []; $queryHaving = "";
             $queryData = [
@@ -211,23 +222,15 @@ class OperationsController extends Controller
             if( sizeof($items)>=1 ):
                 foreach($items as $key => $item):
                     $service = ReservationsItem::find($item->id);
-                    if( $item->final_service_type == 'ARRIVAL' ){
+
+                    if( $item->op_type == "TYPE_ONE" ){
                         $service->op_one_operation_close = 1;
                     }
 
-                    if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
-                        $service->op_one_operation_close = 1;
-                    }
-                    if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
+                    if( $item->op_type == "TYPE_TWO" ){
                         $service->op_two_operation_close = 1;
                     }
-
-                    if( $item->final_service_type == 'DEPARTURE' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
-                        $service->op_one_operation_close = 1;
-                    }
-                    if( $item->final_service_type == 'DEPARTURE' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
-                        $service->op_two_operation_close = 1;
-                    }
+                    
                     $service->save();
                 endforeach;
             endif;
@@ -535,6 +538,18 @@ class OperationsController extends Controller
             ], Response::HTTP_NOT_FOUND);
         }
 
+        if( !auth()->user()->hasPermission(86) ){
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_PERMISSIONS',
+                    'message' => 'No cuenta con permisos para realizar esta acción.'
+                ],
+                'status' => 'error',
+                'success' => false,
+                'message' => 'No cuenta con permisos para realizar esta acción'
+            ], 403);                
+        }
+
         try {
             DB::beginTransaction();
             //OBTENEMOS INFORMACION
@@ -628,7 +643,20 @@ class OperationsController extends Controller
         }
     }
 
-    public function setDriver(Request $request){
+    public function setDriver(Request $request)
+    {
+        if( !auth()->user()->hasPermission(87) ){
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_PERMISSIONS',
+                    'message' => 'No cuenta con permisos para realizar esta acción.'
+                ],
+                'status' => 'error',
+                'success' => false,
+                'message' => 'No cuenta con permisos para realizar esta acción'
+            ], 403);                
+        }
+
         try {
             DB::beginTransaction();
             //OBTENEMOS INFORMACION
@@ -737,58 +765,6 @@ class OperationsController extends Controller
                     "value"  => $request->status,
                     "time"  => ( $request->time != "" ? date("H:i", strtotime($request->time)) : NULL ),
                     "message" => "Actualización de estatus y horario de operación (".$request->type.") por ".$request->status." y ".$request->time." al servicio: ".$service->id.", por ".auth()->user()->name
-                )
-            ], 200);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'errors' => [
-                    'code' => 'internal_server',
-                    'message' => $e->getMessage()
-                ],
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function updateStatusBooking(Request $request){
-
-        try {
-            DB::beginTransaction();
-            $service = ReservationsItem::find($request->item_id);
-
-            if( $request->operation == "ARRIVAL" && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ):
-                $service->op_one_status = $request->status;
-            endif;
-            if( $request->operation == "ARRIVAL" && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ):
-                $service->op_two_status = $request->status;
-            endif;            
-
-            if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
-                $service->op_one_status = $request->status;
-            }
-            if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ){
-                $service->op_two_status = $request->status;
-            }
-
-            if( $request->operation == "DEPARTURE" && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ):
-                $service->op_one_status = $request->status;
-            endif;
-            if( $request->operation == "DEPARTURE" && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ):
-                $service->op_two_status = $request->status;
-            endif;
-            $service->save();
-            
-            $this->create_followUps($service->reservation_id, "Actualización de estatus de reservación (".$request->operation.") por ".$request->status, 'HISTORY', auth()->user()->name);
-
-            DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'El Estatus de servicio, se actualizado con éxito',
-                'data' => array(
-                    "item"  => $request->id,
-                    "value"  => $request->status,
-                    "message" => "Actualización de estatus de reservación (".$request->type.") por ".$request->status." al servicio: ".$service->id.", por ".auth()->user()->name
                 )
             ], 200);
         } catch (Exception $e) {
@@ -1638,5 +1614,5 @@ class OperationsController extends Controller
         ])->find($id);
 
         return $reservation;
-    }    
+    }
 }

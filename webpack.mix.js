@@ -207,17 +207,11 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
 
             //OPERATIONS
             mix.combine([
-                // 'resources/plugins/table/datatable/datatables.js', 
-                // 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 
-                // 'resources/plugins/table/datatable/button-ext/jszip.min.js', 
-                // 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js',  
-                // 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 
                 'resources/plugins/table/datatable/datatables5.js', 
-                'resources/plugins/notification/snackbar/snackbar.min.js', 
+                'resources/plugins/notification/snackbar/snackbar.min.js',
                 'resources/plugins/flatpickr/flatpickr.js',
                 'resources/plugins/flatpickr/es.min.js',
                 'resources/plugins/bootstrap-select/select.js', 
-                'resources/plugins/flatpickr/flatpickr.js', 
                 'resources/js/sections/management/operations.js'
             ], data.assets + "js/sections/management/operations.min.js");
 

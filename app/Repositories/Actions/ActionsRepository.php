@@ -739,8 +739,7 @@ class ActionsRepository
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
-            // ESTATUS DE RESERVACIÓN
-            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la confirmación de: ". ( $confimrationOld == 0 ? '(No enviado)' : '(Enviado)' )." a ".( $request->status == 0 ? '(No enviado)' : '(Enviado)' ).", de la (".$request->service."), con ID: ".$item->id, 'HISTORY', "UPDATE_SERVICE_CONFIRMATION");
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo la confirmación de: ".( $confimrationOld == 0 ? '(No enviado)' : '(Enviado)' )." a ".( $request->status == 0 ? '(No enviado)' : '(Enviado)' ).", de la (".$request->service."), con ID: ".$item->id, 'HISTORY', "UPDATE_SERVICE_CONFIRMATION");
     
             DB::commit();
             return response()->json([
@@ -853,15 +852,11 @@ class ActionsRepository
     */
     public function updateServiceStatus($request)
     {
-        // __params.rez_id = rez_id;
-        // __params.item_id = item_id;
-        // __params.type = type;
-        // __params.status = status;
-        // __params.type_cancel = value;        
         $validator = Validator::make($request->all(), [
             'item_id' => 'required|integer',
-            // 'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
-            // 'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',
+            'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
+            'status' => 'required|string|in:PENDING,COMPLETED,NOSHOW,CANCELLED',
+            'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',
         ]);
 
         if ($validator->fails()) {
@@ -890,20 +885,23 @@ class ActionsRepository
         } 
 
         try {
-            DB::beginTransaction();           
+            DB::beginTransaction();
 
-            // ESTATUS DE RESERVACIÓN
-            $this->create_followUps($request->rez_id, "El usuario: ".auth()->user()->name.", actualizo el estatus del servicio de (".strtoupper($request->type).") de: ".( $request->type == "arrival" ? "(".$item->op_one_status.")" : "(".$item->op_two_status.")" ). " a (".$request->status.")", 'HISTORY', "UPDATE_SERVICE_STATUS");
-
-            if($request->type == "arrival"):
+            $statusOld = $request->type == "TYPE_ONE" ? $item->op_one_status : $item->op_two_status;
+            if($request->type == "TYPE_ONE"):
                 $item->op_one_status = $request->status;
                 $item->op_one_cancellation_type_id = ( is_numeric($request->type_cancel) ? $request->type_cancel : NULL );
             endif;
 
-            if($request->type == "departure"):
+            if($request->type == "TYPE_TWO"):
                 $item->op_two_status = $request->status;
                 $item->op_two_cancellation_type_id = ( is_numeric($request->type_cancel) ? $request->type_cancel : NULL );
             endif;
+
+            // $this->create_followUps($request->rez_id, "El usuario: ".auth()->user()->name.", actualizo el estatus del servicio de (".strtoupper($request->type).") de: ".( $request->type == "arrival" ? "(".$item->op_one_status.")" : "(".$item->op_two_status.")" )." a (".$request->status.")", 'HISTORY', "UPDATE_SERVICE_STATUS");
+            $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", actualizo el estatus del servicio de: (".($statusOld).") a (".$request->status."), de la (".$request->service."), con ID: ".$item->id, 'HISTORY', "UPDATE_SERVICE_STATUS");
+            //ESTE LOG ES EL QUE SE HACIA EN OPERATIONSCONTROLLER, QUE YA NO SE USARA
+            // $this->create_followUps($service->reservation_id, "Actualización de estatus de reservación (".$request->operation.") por ".$request->status, 'HISTORY', auth()->user()->name);
 
             // Guardar el cambio y verificar que se guardó correctamente
             if (!$item->save()) {
@@ -966,6 +964,11 @@ class ActionsRepository
             return response()->json([
                 'status' => 'success',
                 'message' => 'Estatus actualizado con éxito',
+                'data' => [
+                    'item' => ( isset($request->key) ? $request->key : 0 ),
+                    'value' => $request->status,
+                    "message" => "Actualización de estatus de reservación (".$request->type.") por ".$request->status." al servicio: ".$item->id.", por ".auth()->user()->name
+                ]
             ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();

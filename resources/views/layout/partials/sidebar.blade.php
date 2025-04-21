@@ -161,7 +161,7 @@
                 ];
             endif;
             // OPERACIONES
-            if(auth()->user()->hasPermission(76) || auth()->user()->hasPermission(78) || auth()->user()->hasPermission(79)):
+            if(auth()->user()->hasPermission(76)):
                 $links_operations[] = [
                     'name' => 'Operaciones',
                     'route' => route('operation.index'),
