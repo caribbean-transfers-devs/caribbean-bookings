@@ -20,13 +20,13 @@ use App\Http\Controllers\Finances\RefundsController as RefundsFinances;
 use App\Http\Controllers\Finances\SalesController as SaleFinance;
 
 //REPORTS
-use App\Http\Controllers\Reports\PaymentsController as PAYMENTS;
-use App\Http\Controllers\Reports\CashController as CASH;
-use App\Http\Controllers\Reports\CancellationsController as CANCELLATIONS;
-use App\Http\Controllers\Reports\CommissionsController as COMMISSIONS;
-use App\Http\Controllers\Reports\SalesController as SALES;
-use App\Http\Controllers\Reports\OperationsController as OPERATIONSS;
-use App\Http\Controllers\Reports\OperationsDataController as DATAOPERATION;
+use App\Http\Controllers\Reports\PaymentsController as             PAYMENTS;
+use App\Http\Controllers\Reports\CashController as                 CASH;
+use App\Http\Controllers\Reports\CancellationsController as        CANCELLATIONS;
+use App\Http\Controllers\Reports\CommissionsController as          COMMISSIONS;
+use App\Http\Controllers\Reports\SalesController as                SALES;
+use App\Http\Controllers\Reports\OperationsController as           OPERATIONSS;
+use App\Http\Controllers\Reports\OperationsDataController as       DATAOPERATION;
 
 //MANAGEMENT
 use App\Http\Controllers\Management\ConfirmationsController;
@@ -225,6 +225,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/operation/data/customer/get', [Operations::class, 'getDataCustomer'])->name('operation.data.customer.get');
         Route::post('/operation/preassignments', [Operations::class, 'preassignments'])->name('operation.preassignments');
         Route::post('/operation/closeOperation', [Operations::class, 'closeOperation'])->name('operation.close.operation');
+        Route::post('/operation/openOperation', [Operations::class, 'openOperation'])->name('operation.open.operation');
         Route::put('/operation/preassignment', [Operations::class, 'preassignment'])->name('operation.preassignment');
         Route::post('/operation/capture/service', [Operations::class, 'createService'])->name('operation.capture.service');
         Route::get('/operation/board/exportExcel', [Operations::class, 'exportExcelBoard'])->name('operation.board.exportExcel');
@@ -326,7 +327,10 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::match(['get', 'post'], '/action/getBasicInformationReservation', [FINANCE::class, 'getBasicInformationReservation'])->name('get.basic-information.reservation');
     Route::match(['get', 'post'], '/action/getPhotosReservation', [FINANCE::class, 'getPhotosReservation'])->name('get.photos.reservation');
     Route::match(['get', 'post'], '/action/getHistoryReservation', [FINANCE::class, 'getHistoryReservation'])->name('get.history.reservation');
-    Route::match(['get', 'post'], '/action/getPaymentsReservation', [FINANCE::class, 'getPaymentsReservation'])->name('get.payments.reservation');    
+    Route::match(['get', 'post'], '/action/getPaymentsReservation', [FINANCE::class, 'getPaymentsReservation'])->name('get.payments.reservation');
+
+    //ACCIONES UTILIZADAS EN REPORTES
+    Route::post('/action/cashConciliation', [FINANCE::class, 'cashConciliation'])->name('cash.payment.conciliation');
 
     //ACCIONES GENERALES DE DETALLES DE RESERVA
     Route::post('/action/deleteCommission', [ACTIONS_RESERVATION::class, 'deleteCommission'])->name('update.booking.delete.commission');

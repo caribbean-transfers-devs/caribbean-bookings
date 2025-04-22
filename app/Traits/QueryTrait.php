@@ -475,7 +475,7 @@ trait QueryTrait
                                 CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
 
                                 it_counter.quantity,
-                                GROUP_CONCAT(DISTINCT p.codes_payment ORDER BY p.codes_payment ASC SEPARATOR ',') AS codes_payment,
+                                -- GROUP_CONCAT(DISTINCT p.codes_payment ORDER BY p.codes_payment ASC SEPARATOR ',') AS codes_payment,
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE 
@@ -489,6 +489,7 @@ trait QueryTrait
                                 -- Nuevos campos para pagos en efectivo
                                 COALESCE(p.cash_amount, 0) AS cash_amount,
                                 COALESCE(p.cash_references) AS cash_references,
+                                COALESCE(p.cash_payment_ids) AS cash_payment_ids,
 
                                 COALESCE(SUM(s.total_sales), 0) as total_sales,
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
@@ -562,7 +563,7 @@ trait QueryTrait
                                 ) as s ON s.reservation_id = rez.id
                                 LEFT JOIN (
                                     SELECT 
-                                        CONCAT( '[',GROUP_CONCAT(DISTINCT id ORDER BY id ASC SEPARATOR ','),']' ) AS codes_payment,
+                                        -- CONCAT( '[',GROUP_CONCAT(DISTINCT id ORDER BY id ASC SEPARATOR ','),']' ) AS codes_payment,
                                         reservation_id,
                                         ROUND(SUM(CASE 
                                             WHEN operation = 'multiplication' THEN total * exchange_rate
@@ -602,13 +603,27 @@ trait QueryTrait
                                                 SEPARATOR ']\n['
                                             ),
                                             ']'
-                                        ) AS cash_references
+                                        ) AS cash_references,
+                                        -- Nuevo campo: solo IDs de pagos en efectivo concatenados
+                                        CONCAT(
+                                            '[',
+                                            GROUP_CONCAT(
+                                                DISTINCT 
+                                                CASE 
+                                                    WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN id
+                                                    ELSE NULL
+                                                END
+                                                ORDER BY id ASC
+                                                SEPARATOR ','
+                                            ),
+                                            ']'
+                                        ) AS cash_payment_ids                                        
                                     FROM payments
                                         WHERE deleted_at IS NULL
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryOne}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_payment_ids {$queryHaving}
 
                             UNION
 
@@ -734,7 +749,7 @@ trait QueryTrait
                                 CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
 
                                 it_counter.quantity,
-                                GROUP_CONCAT(DISTINCT p.codes_payment ORDER BY p.codes_payment ASC SEPARATOR ',') AS codes_payment,
+                                -- GROUP_CONCAT(DISTINCT p.codes_payment ORDER BY p.codes_payment ASC SEPARATOR ',') AS codes_payment,
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE
@@ -748,6 +763,7 @@ trait QueryTrait
                                 -- Nuevos campos para pagos en efectivo
                                 COALESCE(p.cash_amount, 0) AS cash_amount,
                                 COALESCE(p.cash_references) AS cash_references,
+                                COALESCE(p.cash_payment_ids) AS cash_payment_ids,
 
                                 COALESCE(SUM(s.total_sales), 0) as total_sales,
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
@@ -821,7 +837,7 @@ trait QueryTrait
                                 ) as s ON s.reservation_id = rez.id
                                 LEFT JOIN (
                                     SELECT 
-                                        CONCAT( '[',GROUP_CONCAT(DISTINCT id ORDER BY id ASC SEPARATOR ','),']' ) AS codes_payment,
+                                        -- CONCAT( '[',GROUP_CONCAT(DISTINCT id ORDER BY id ASC SEPARATOR ','),']' ) AS codes_payment,
                                         reservation_id,
                                         ROUND(SUM(CASE 
                                                     WHEN operation = 'multiplication' THEN total * exchange_rate
@@ -862,13 +878,27 @@ trait QueryTrait
                                                 SEPARATOR ']\n['
                                             ),
                                             ']'
-                                        ) AS cash_references
+                                        ) AS cash_references,
+                                        -- Nuevo campo: solo IDs de pagos en efectivo concatenados
+                                        CONCAT(
+                                            '[',
+                                            GROUP_CONCAT(
+                                                DISTINCT 
+                                                CASE 
+                                                    WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN id
+                                                    ELSE NULL
+                                                END
+                                                ORDER BY id ASC
+                                                SEPARATOR ','
+                                            ),
+                                            ']'
+                                        ) AS cash_payment_ids
                                     FROM payments
                                         WHERE deleted_at IS NULL
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryTwo}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_payment_ids {$queryHaving}
                             -- ) AS combined_results
                             ORDER BY filtered_date ASC ",[
                                 "init_date_one" => $queryData['init'],

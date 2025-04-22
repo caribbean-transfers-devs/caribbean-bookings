@@ -253,6 +253,68 @@ class OperationsController extends Controller
         }
     }
 
+    public function openOperation(Request $request){
+        try {
+
+            if( !auth()->user()->hasPermission(85) ){
+                return response()->json([
+                    'errors' => [
+                        'code' => 'NOT_PERMISSIONS',
+                        'message' => 'No cuenta con permisos para realizar esta acción.'
+                    ],
+                    'status' => 'error',
+                    'success' => false,
+                    'message' => 'No cuenta con permisos para realizar esta acción'
+                ], 403);                
+            }
+
+            //DECLARAMOS VARIABLES
+            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
+            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
+            $havingConditions = []; $queryHaving = "";
+            $queryData = [
+                'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 00:00:00",
+                'end' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 23:59:59",
+            ];
+    
+            //CONSULTAMOS SERVICIOS
+            $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
+    
+            //RECORREMOS LOS SERVICIOS PARA PODER REALISAR LA PREASIGNACION
+            if( sizeof($items)>=1 ):
+                foreach($items as $key => $item):
+                    $service = ReservationsItem::find($item->id);
+
+                    if( $item->op_type == "TYPE_ONE" ){
+                        $service->op_one_operation_close = 0;
+                    }
+
+                    if( $item->op_type == "TYPE_TWO" ){
+                        $service->op_two_operation_close = 0;
+                    }
+
+                    $service->save();
+                endforeach;
+            endif;
+
+            return response()->json([
+                'status' => 'success',
+                'success' => true,
+                'message' => 'Se abrio la operación correctamente',
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'internal_server',
+                    'message' => $e->getMessage()
+                ],
+                'status' => 'error',
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function preassignment(Request $request){
         try {
             DB::beginTransaction();

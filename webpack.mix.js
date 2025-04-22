@@ -117,8 +117,10 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
             
             //CASH
             mix.combine([
-                'resources/plugins/table/datatable/datatables5.js', 
-                'resources/plugins/bootstrap-select/select.js', 
+                'resources/plugins/table/datatable/datatables5.js',
+                'resources/plugins/flatpickr/flatpickr.js',
+                'resources/plugins/flatpickr/es.min.js',
+                'resources/plugins/bootstrap-select/select.js',
                 'resources/js/sections/components/filters.js', 
                 'resources/js/sections/reports/cash.js'
             ], data.assets + "js/sections/reports/cash.min.js");

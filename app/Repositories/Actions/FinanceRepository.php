@@ -19,10 +19,11 @@ use App\Models\Payment;
 
 //TRAITS
 use App\Traits\FollowUpTrait;
+use App\Traits\MethodsTrait;
 
 class FinanceRepository
 {
-    use FollowUpTrait;
+    use MethodsTrait, FollowUpTrait;
 
     /**
      * NOS AYUDA A PODER AGREGAR UN PAGO TIPO REEMBOLSO
@@ -116,8 +117,8 @@ class FinanceRepository
         }
     }
     
-        /**
-     * NOS AYUDA A PODER AGREGAR UN PAGO TIPO REEMBOLSO
+    /**
+     * NOS AYUDA A DECLINAR UN SOLICITUD TIPO REEMBOLSO
      * @param request :la información recibida en la solicitud
     */
     public function refundNotApplicable($request)
@@ -188,6 +189,120 @@ class FinanceRepository
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * NOS AYUDA A CONCILIAR UN PAGO EN EFECTIVO
+     * @param request :la información recibida en la solicitud
+    */
+    public function cashConciliation($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'codes' => 'required|string',
+            'status_conciliation' => 'required|integer|in:1,2',
+            'date_conciliation' => 'required|date',
+            'receives_money_conciliation' => 'required|string|in:carlos,margarita',
+            'response_message' => 'required|string'
+        ], [
+            'codes.required' => 'El campo de códigos es obligatorio.',
+            'codes.array' => 'Los códigos deben ser proporcionados como un arreglo.',
+            
+            'status_conciliation.required' => 'El estado de conciliación es requerido.',
+            'status_conciliation.integer' => 'El estado debe ser un valor numérico.',
+            'status_conciliation.in' => 'El estado solo puede ser 1 o 2.',
+            
+            'date_conciliation.required' => 'La fecha de conciliación es obligatoria.',
+            'date_conciliation.date' => 'El formato de fecha no es válido.',
+            
+            'receives_money_conciliation.required' => 'Debe especificar quién recibe el dinero.',
+            'receives_money_conciliation.in' => 'El receptor solo puede ser Carlos o Margarita.',
+            
+            'response_message.required' => 'El mensaje de respuesta es requerido.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        $codesArray = MethodsTrait::parseArray2($request->codes ?? '');
+
+        // Validar que tengamos códigos válidos
+        if (empty($codesArray)) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'No se encontraron los pagos'
+                ],
+                'message' => 'No se encontraron los pagos'
+            ], Response::HTTP_NOT_FOUND);
+        }        
+
+        // Buscar los pagos correspondientes a los códigos
+        $payments = Payment::whereIn('id', $codesArray)->get();
+
+        // // Validar que se encontraron todos los pagos
+        // if ($payments->count() !== count($request->codes)) {
+        //     $foundCodes = $payments->pluck('code')->toArray();
+        //     $missingCodes = array_diff($request->codes, $foundCodes);
+            
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Algunos pagos no fueron encontrados',
+        //         'missing_codes' => $missingCodes
+        //     ], 404);
+        // }
+
+        if (!$payments) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'No se encontraron los pagos'
+                ],
+                'status' => 'error',
+                'message' => 'No se encontraron los pagos'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        try {
+            DB::beginTransaction();
+            
+            foreach ($payments as $payment) {
+                $payment->update([
+                    'is_conciliated' => $request->status_conciliation,
+                    'is_conciliated_cash' => $request->receives_money_conciliation,
+                    'date_conciliation' => $request->date_conciliation,
+                    'deposit_date' => $request->date_conciliation,
+                    'total_fee' => 0,
+                    'total_net' => $payment->total,
+                    'conciliation_comment' => $request->response_message,
+                    // Agrega aquí otros campos que necesites actualizar
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Pagos actualizados correctamente',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
 
     public function getBasicInformationReservation($request)
     {

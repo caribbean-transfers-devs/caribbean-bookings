@@ -30,7 +30,12 @@ class FinanceController extends Controller
     public function refundNotApplicable(Request $request)
     {
         return $this->FinanceRepository->refundNotApplicable($request);
-    }    
+    }
+
+    public function cashConciliation(Request $request)
+    {
+        return $this->FinanceRepository->cashConciliation($request);
+    }
 
     public function getBasicInformationReservation(Request $request){
         return $this->FinanceRepository->getBasicInformationReservation($request);

@@ -678,12 +678,12 @@ class ReservationsRepository
         endif;
 
         $message = '';
-        if($destination_id == 1 && $lang == "en"):
-            $message = '<p>The Cancun airport recommends users to arrive three hours in advance for international flights and two hours in advance for domestic flights.</p>';
-        endif;
-        if($destination_id == 1 && $lang == "es"):
-            $message = '<p>El aeropuerto de Cancún recomienda a sus usuarios llegar con tres horas de anticipación en vuelos internacionales y dos horas en vuelos nacionales.</p>';
-        endif;
+        // if($destination_id == 1 && $lang == "en"):
+        //     $message = '<p>The Cancun airport recommends users to arrive three hours in advance for international flights and two hours in advance for domestic flights.</p>';
+        // endif;
+        // if($destination_id == 1 && $lang == "es"):
+        //     $message = '<p>El aeropuerto de Cancún recomienda a sus usuarios llegar con tres horas de anticipación en vuelos internacionales y dos horas en vuelos nacionales.</p>';
+        // endif;
 
         if($lang == "en"):
             return <<<EOF
@@ -824,51 +824,6 @@ class ReservationsRepository
         ];
 
         return 'https://api.caribbean-transfers.com/api/v1/reservation/payment/handler?'.http_build_query($data);        
-    }
-
-    // NOS PERMITE GENERAR EL LOG DE CADA UNO DE LOS CAMBIOS DE LA RESERVACIÓN
-    public function logBooking($request, $reservation){
-        if( $request->client_first_name != $reservation->client_first_name ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el nombre del cliente de: ".$reservation->client_first_name." a ".$request->client_first_name, 'HISTORY', 'EDICIÓN RESERVACIÓN');
-        }
-
-        if( $request->client_last_name != $reservation->client_last_name ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo los apellidos del cliente de: ".$reservation->client_last_name." a ".$request->client_last_name, 'HISTORY', 'EDICIÓN RESERVACIÓN');
-        }
-
-        if( $request->client_email != $reservation->client_email ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el correo del cliente de: ".$reservation->client_email." a ".$request->client_email, 'HISTORY', 'EDICIÓN RESERVACIÓN');
-        }
-
-        if( $request->client_phone != $reservation->client_phone ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el teléfono del cliente de: ".$reservation->client_phone." a ".$request->client_phone, 'HISTORY', 'EDICIÓN RESERVACIÓN');
-        }
-
-        if( $request->site_id != $reservation->site_id ){
-            $site_old = Site::find($reservation->site_id);
-            $site_new = Site::find($request->site_id);
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el sitio de: ".$site_old->name." a ".$site_new->name, 'HISTORY', 'EDICIÓN RESERVACIÓN');
-        }
-
-        if( isset($request->origin_sale_id) && $request->origin_sale_id != 0 && $request->origin_sale_id != $reservation->origin_sale_id ){
-            $origin_old = OriginSale::find($reservation->origin_sale_id);
-            $origin_new = OriginSale::find($request->origin_sale_id);
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el origen de venta de: ".( isset($origin_old->code) ? $origin_old->code : "NULL" )." a ".$origin_new->code, 'HISTORY', 'EDICIÓN RESERVACIÓN');
-        }
-
-        if( $request->reference != $reservation->reference ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la referencia de: ".$reservation->reference." a ".$request->reference, 'HISTORY', 'EDICIÓN RESERVACIÓN');
-        }
-
-        if( isset($request->origin_sale_id) && $request->origin_sale_id != 0 && $request->origin_sale_id != $reservation->origin_sale_id ){
-            $origin_old = OriginSale::find($reservation->origin_sale_id);
-            $origin_new = OriginSale::find($request->origin_sale_id);
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo el origen de venta de: ".( isset($origin_old->code) ? $origin_old->code : "NULL" )." a ".$origin_new->code, 'HISTORY', 'EDICIÓN RESERVACIÓN');
-        }        
-        
-        if( $request->currency != $reservation->currency ){
-            $this->create_followUps($reservation->id, "El usuario: ".auth()->user()->name.", actualizo la moneda de: ".$reservation->currency." a ".$request->currency, 'HISTORY', 'EDICIÓN RESERVACIÓN');
-        }
     }
 
     public function follow_ups($request){

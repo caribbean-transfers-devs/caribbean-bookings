@@ -25,6 +25,32 @@ trait MethodsTrait
         return $matches[1] ?? []; // Devuelve un array vacío si no hay coincidencias        
     }
 
+    public static function parseArray2($input): array
+    {
+        // Si ya es un array, lo devolvemos filtrado
+        if (is_array($input)) {
+            return array_filter($input, fn($value) => $value !== null);
+        }
+    
+        // Si es un string que parece array JSON
+        if (is_string($input) && preg_match('/^\[.*\]$/', $input)) {
+            try {
+                $decoded = json_decode($input, true, 512, JSON_THROW_ON_ERROR);
+                return is_array($decoded) ? array_filter($decoded, fn($v) => $v !== null) : [];
+            } catch (\JsonException $e) {
+                return [];
+            }
+        }
+    
+        // Si es un string con valores separados por comas (opcional)
+        if (is_string($input) && strpos($input, ',') !== false) {
+            return array_filter(explode(',', $input), fn($v) => trim($v) !== '');
+        }
+    
+        // Para cualquier otro caso (string simple, número, etc.)
+        return $input !== null && $input !== '' ? [$input] : [];
+    }    
+
     /**
      * Función para obtener la información de usuario o usuarios
      */

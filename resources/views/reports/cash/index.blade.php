@@ -17,11 +17,6 @@
 @endpush
 
 @push('Js')
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
     <script src="{{ mix('/assets/js/sections/reports/cash.min.js') }}"></script>
 @endpush
 
@@ -135,8 +130,8 @@
                                     <td class="text-center">{{ number_format(( $operation->cash_amount > 0 ? $operation->cash_amount : $operation->total_sales ),2) }}</td>
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     <td class="text-center" <?=auth()->user()->classStatusPayment($operation)?>>{{ auth()->user()->statusPayment($operation->payment_status) }}</td>
-                                    <td class="text-center" data-code="{{ $operation->codes_payment }}" style="background-color:#e7515a;color:#fff;">
-                                        <button class="btn btn-danger">Click para conciliar pago</button>
+                                    <td class="text-center cashConciliation" data-code="{{ $operation->cash_payment_ids }}" style="cursor: pointer;background-color:#e7515a;color:#fff;">
+                                        Click para conciliar pago
                                     </td>
                                 </tr>
                             @endforeach
@@ -145,9 +140,6 @@
                 </table>
                 <div class="mt-3 px-2">
                     <h5>Resumen por estatus</h5>
-                    @php
-                        // dump($resume);
-                    @endphp
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
@@ -179,5 +171,6 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :reservationstatus="$reservation_status" :serviceoperationstatus="$service_operation_status" />
+    <x-modals.filters.bookings :data="$data" :serviceoperationstatus="$service_operation_status" />
+    <x-modals.finances.cash_conciliation />
 @endsection

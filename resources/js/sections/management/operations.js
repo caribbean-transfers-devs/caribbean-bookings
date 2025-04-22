@@ -519,7 +519,8 @@ const socket = io( (window.location.hostname == '127.0.0.1' ) ? 'http://localhos
 const btnDowloadOperation = document.getElementById('btn_dowload_operation')              //* ===== BUTTON DOWLOAD OPERATION ===== */
 const btnDowloadOperationCommissions = document.getElementById('btn_dowload_operation_comission')   //* ===== BUTTON DOWLOAD COMMISSION OPERATION ===== */
 const _getSchedules = document.getElementById('getSchedules');
-const btnCloseOperation = document.getElementById('btn_close_operation')                            //* ===== BUTTON CLOSE OPERATION ===== */
+const btnCloseOperation = document.getElementById('btn_close_operation'); //* ===== BUTTON CLOSE OPERATION ===== */
+const btnOpenOperation = document.getElementById('btn_open_operation'); //* ===== BUTTON CLOSE OPERATION ===== */
 
 document.addEventListener("DOMContentLoaded", function() {
     function debounce(func, delay) {
@@ -700,6 +701,76 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     }
+
+    if( btnOpenOperation ){
+        btnOpenOperation.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            swal.fire({
+                text: '¿Está seguro que desea abrir la operación',
+                icon: 'warning',
+                inputLabel: "Selecciona la fecha de operación que desea cerrar",
+                input: "date",
+                inputValue: document.getElementById('lookup_date').value,
+                inputValidator: (result) => {
+                    return !result && "Selecciona un fecha";
+                },
+                didOpen: () => {
+                    const today = (new Date()).toISOString();
+                    Swal.getInput().min = today.split("T")[0];
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se realiza la apertura de la operación.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch("/operation/openOperation", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({ date: result.value })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        }).then(() => {
+                            location.reload();
+                        });                        
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }
+            });
+        });
+    }    
 
     document.addEventListener("change", debounce(async function (event) {
         if (event.target.classList.contains('change_schedule')) {
