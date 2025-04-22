@@ -41,6 +41,9 @@
         .item{
             &:first-child{
                 justify-content: end;
+                .box_input{
+                    width: 42%;
+                }
             }
 
             &:nth-child(2), &:nth-child(3){

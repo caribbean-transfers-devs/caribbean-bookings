@@ -490,6 +490,7 @@ trait QueryTrait
                                 COALESCE(p.cash_amount, 0) AS cash_amount,
                                 COALESCE(p.cash_references) AS cash_references,
                                 COALESCE(p.cash_payment_ids) AS cash_payment_ids,
+                                COALESCE(p.cash_is_conciliated) AS cash_is_conciliated,
 
                                 COALESCE(SUM(s.total_sales), 0) as total_sales,
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
@@ -617,13 +618,24 @@ trait QueryTrait
                                                 SEPARATOR ','
                                             ),
                                             ']'
-                                        ) AS cash_payment_ids                                        
+                                        ) AS cash_payment_ids,
+                                        -- Suma de estatus de conciliación (para determinar si todos están conciliados)
+                                        SUM(CASE 
+                                            WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                CASE WHEN is_conciliated = 1 THEN 1 ELSE 0 END
+                                            ELSE 0
+                                        END) AS cash_is_conciliated,
+                                        -- Contador de pagos en efectivo
+                                        SUM(CASE 
+                                            WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 1
+                                            ELSE 0
+                                        END) AS cash_payment_count                                                                       
                                     FROM payments
                                         WHERE deleted_at IS NULL
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryOne}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_payment_ids {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_payment_ids, p.cash_is_conciliated {$queryHaving}
 
                             UNION
 
@@ -764,6 +776,7 @@ trait QueryTrait
                                 COALESCE(p.cash_amount, 0) AS cash_amount,
                                 COALESCE(p.cash_references) AS cash_references,
                                 COALESCE(p.cash_payment_ids) AS cash_payment_ids,
+                                COALESCE(p.cash_is_conciliated) AS cash_is_conciliated,
 
                                 COALESCE(SUM(s.total_sales), 0) as total_sales,
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
@@ -892,13 +905,24 @@ trait QueryTrait
                                                 SEPARATOR ','
                                             ),
                                             ']'
-                                        ) AS cash_payment_ids
+                                        ) AS cash_payment_ids,
+                                        -- Suma de estatus de conciliación (para determinar si todos están conciliados)
+                                        SUM(CASE 
+                                            WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                CASE WHEN is_conciliated = 1 THEN 1 ELSE 0 END
+                                            ELSE 0
+                                        END) AS cash_is_conciliated,
+                                        -- Contador de pagos en efectivo
+                                        SUM(CASE 
+                                            WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 1
+                                            ELSE 0
+                                        END) AS cash_payment_count
                                     FROM payments
                                         WHERE deleted_at IS NULL
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryTwo}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_payment_ids {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_payment_ids, p.cash_is_conciliated {$queryHaving}
                             -- ) AS combined_results
                             ORDER BY filtered_date ASC ",[
                                 "init_date_one" => $queryData['init'],

@@ -595,8 +595,8 @@
                                     <td class="text-center">
                                         @if ( $item->has_refund_request )
                                             <button class="btn btn-{{ auth()->user()->classStatusRefund($item->refund_status) }} btn-sm">{{ auth()->user()->statusRefund($item->refund_status) }}</button>
-                                        @endif                                        
-                                    </td>                                    
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         @endif

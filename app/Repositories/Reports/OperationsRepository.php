@@ -27,7 +27,7 @@ class OperationsRepository
             "filter_text" => ( isset( $request->filter_text ) && !empty( $request->filter_text ) ? $request->filter_text : NULL ),
 
             "is_round_trip" => ( isset($request->is_round_trip) ? $request->is_round_trip : NULL ),
-            "currency" => ( isset($request->currency) ? $request->currency : 0 ),            
+            "currency" => ( isset($request->currency) ? $request->currency : 0 ),
             "site" => ( isset($request->site) ? $request->site : 0 ),
             "origin" => ( isset($request->origin) ? $request->origin : NULL ),
             "reservation_status" => ( isset($request->reservation_status) ? $request->reservation_status : 0 ),
@@ -207,6 +207,7 @@ class OperationsRepository
         }
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
+            $queryData = [];
             $queryOne  .= " AND (
                         ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
                         ( rez.client_phone like '%".$data['filter_text']."%') OR
@@ -224,11 +225,9 @@ class OperationsRepository
                     )";                    
         }        
 
-        //if( (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || isset( $request->service_operation ) && !empty( $request->service_operation ) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) ){
-            if( !empty($havingConditions) ){
-                $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
-            }
-        //}
+        if( !empty($havingConditions) ){
+            $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
+        }
 
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);

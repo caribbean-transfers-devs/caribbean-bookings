@@ -17,10 +17,11 @@ let filters = {
             allowInput: true,
             defaultDate: "today",
             minDate: "today",
-            plugins: [] // Aseguramos que sea un array
+            plugins: [], // Aseguramos que sea un array            
         };
     
         let config = { ...defaultConfig, ...options };
+        console.log(config);        
     
         if (typeof flatpickr !== "undefined") {
             const fp = flatpickr(selector, config);
@@ -59,6 +60,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     if( __lookup_date ){
-        filters.calendarFilter(__lookup_date, { mode: "range", minDate: null });
+        console.log(__lookup_date.value);
+        
+        filters.calendarFilter(__lookup_date, { mode: "range", defaultDate: __lookup_date.value ?? 'today', minDate: null });
     }    
 });

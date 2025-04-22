@@ -12,21 +12,28 @@ use App\Models\Reservation;
 use App\Models\ReservationFollowUp;
 
 //TRAIT
+use App\Traits\MethodsTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
 
 class CashRepository
 {
-    use FiltersTrait, QueryTrait;
+    use MethodsTrait, FiltersTrait, QueryTrait;
 
     public function index($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
         set_time_limit(120); // Aumenta el límite a 60 segundos
 
+        // Función auxiliar para obtener fechas seguras
+        $dates = MethodsTrait::parseDateRange($request->date ?? '');
+
         $data = [
-            "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
-            "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
+            "init" => $dates['init'],
+            "end" => $dates['end'],
+            "filter_text" => ( isset( $request->filter_text ) && !empty( $request->filter_text ) ? $request->filter_text : NULL ),
+
+            "currency" => ( isset($request->currency) ? $request->currency : 0 ),
             "service_operation_status" => ( isset($request->service_operation_status) ? $request->service_operation_status : 0 ),
         ];
 
@@ -34,10 +41,18 @@ class CashRepository
         $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
         $havingConditions = []; $queryHaving = "";
         $queryData = [
-            'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
-            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+            'init' => $dates['init'] . " 00:00:00",
+            'end' => $dates['end'] . " 23:59:59",
         ];
 
+        //MONEDA DE LA RESERVA
+        if(isset( $request->currency ) && !empty( $request->currency )){
+            $params = $this->parseArrayQuery($request->currency,"single");
+            $queryOne .= " AND rez.currency IN ($params) ";
+            $queryTwo .= " AND rez.currency IN ($params) ";
+        }
+
+        //ESTATUS DE RESERVACIÓN
         $params = $this->parseArrayQuery(['CREDIT','PENDING','PAY_AT_ARRIVAL','CONFIRMED'],"single");
         $havingConditions[] = " reservation_status IN (".$params.") ";
 
@@ -52,9 +67,29 @@ class CashRepository
             $queryTwo .= " AND it.op_two_status IN ($params) ";            
         }
 
+        //METODO DE PAGO
         $paramsPayment = "FIND_IN_SET('CASH', payment_type_name) > 0 OR ";
         $paramsPayment = rtrim($paramsPayment, ' OR ');
         $havingConditions[] = " (".$paramsPayment.") ";
+
+        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
+            $queryData = [];
+            $queryOne  .= " AND (
+                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
+                        ( rez.client_phone like '%".$data['filter_text']."%') OR
+                        ( rez.client_email like '%".$data['filter_text']."%') OR
+                        ( rez.reference like '%".$data['filter_text']."%') OR
+                        ( it.code like '%".$data['filter_text']."%' )
+                    )";
+
+            $queryTwo  .= " AND (
+                        ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
+                        ( rez.client_phone like '%".$data['filter_text']."%') OR
+                        ( rez.client_email like '%".$data['filter_text']."%') OR
+                        ( rez.reference like '%".$data['filter_text']."%') OR
+                        ( it.code like '%".$data['filter_text']."%' )
+                    )";                    
+        }
 
         if( !empty($havingConditions) ){
             $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
@@ -72,7 +107,7 @@ class CashRepository
                 ]
             ],
             'items' => $operations,
-            'data' => $data,            
+            'data' => $data,
         ]);
     }
 
