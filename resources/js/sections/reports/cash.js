@@ -15,6 +15,17 @@ document.addEventListener("DOMContentLoaded", function() {
         components.actionTable($('.table-rendering'), 'fixedheader');
     }
 
+    components.titleModalFilter();
+
+    let picker_flter = flatpickr("#lookup_date", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        enableTime: false,
+        locale: {
+            rangeSeparator: " - " // Cambia "to" por " - "
+        }
+    }); 
+
     //CALENDARIO MODAL
     let picker = flatpickr("#date_conciliation", {
         mode: "single",
@@ -106,17 +117,6 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     }, true); // <- el `true` activa "capturing" y sí detecta el submit        
 });
-
-//DECLARACION DE VARIABLES
-const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
-const __title_modal = document.getElementById('filterModalLabel');
-
-//ACCION PARA CREAR
-if( __create != null ){
-    __create.addEventListener('click', function () {
-        __title_modal.innerHTML = this.dataset.title;
-    });
-}
 
 function updateConfirmation(event, id, status){
     event.preventDefault();

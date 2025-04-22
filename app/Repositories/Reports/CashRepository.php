@@ -27,7 +27,6 @@ class CashRepository
         $data = [
             "init" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ),
             "end" => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ),
-            "reservation_status" => ( isset($request->reservation_status) ? $request->reservation_status : 0 ),
             "service_operation_status" => ( isset($request->service_operation_status) ? $request->service_operation_status : 0 ),
         ];
 
