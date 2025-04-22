@@ -1,6 +1,7 @@
 @php
     $reservation_status = auth()->user()->reservationStatus();
     $service_operation_status = auth()->user()->statusOperationService();
+    $currencies = auth()->user()->Currencies();
 
     $resume = [
         'BOOKINGS' => [],

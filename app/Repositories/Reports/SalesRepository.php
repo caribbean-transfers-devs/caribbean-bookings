@@ -226,11 +226,9 @@ class SalesRepository
                     )";
         }
 
-        // if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance )) || (isset( $request->is_today )) ){
-            if( !empty($havingConditions) ){
-                $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
-            }
-        // }
+        if( !empty($havingConditions) ){
+            $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
+        }
 
         // dd($query, $queryHaving, $queryData);
         $bookings = $this->queryBookings($query, $queryHaving, $queryData);

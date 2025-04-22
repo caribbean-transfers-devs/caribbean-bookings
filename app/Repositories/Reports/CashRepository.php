@@ -37,8 +37,11 @@ class CashRepository
             "service_operation_status" => ( isset($request->service_operation_status) ? $request->service_operation_status : 0 ),
         ];
 
-        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
-        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
+        $queryOneDate = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two ";
+        $queryTwoDate = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four ";
+
+        $queryOne = $queryOneDate . "  AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
+        $queryTwo = $queryTwoDate . "  AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
         $havingConditions = []; $queryHaving = "";
         $queryData = [
             'init' => $dates['init'] . " 00:00:00",
@@ -61,7 +64,9 @@ class CashRepository
             $params = $this->parseArrayQuery($request->service_operation_status,"single");
             $queryOne .= " AND it.op_one_status IN ($params) ";
             $queryTwo .= " AND it.op_two_status IN ($params) ";
-        }else{
+        }
+
+        if(!isset( $request->service_operation_status ) && empty( $request->service_operation_status )){
             $params = $this->parseArrayQuery(['COMPLETED'],"single");
             $queryOne .= " AND it.op_one_status IN ($params) ";
             $queryTwo .= " AND it.op_two_status IN ($params) ";            
@@ -73,7 +78,9 @@ class CashRepository
         $havingConditions[] = " (".$paramsPayment.") ";
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
-            $queryData = [];
+            // $queryData = [];
+            // $queryOneDate = "";
+            // $queryTwoDate = "";
             $queryOne  .= " AND (
                         ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
                         ( rez.client_phone like '%".$data['filter_text']."%') OR

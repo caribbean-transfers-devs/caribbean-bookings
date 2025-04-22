@@ -395,7 +395,7 @@ class ReservationsRepository
 
         // Manejo de solicitud especial
         if (!empty($data['special_request'])) {
-            $this->createFollowUp(
+            $this->create_followUps(
                 $reservation->id, 
                 $data['special_request'], 
                 'CLIENT', 

@@ -1,5 +1,6 @@
 @props(['data','users','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','rating','istoday','isbalance','isduplicated','isagency','wasIsQuotation','refundRequestCount','request'])
 @php
+    // dump($data);
     $date = "";
     if( isset($data) ){
         if( is_array($data) ){
@@ -168,7 +169,7 @@
 
                             {{-- ESTATUS DE SERVICIO --}}
                             @if ( isset($serviceoperationstatus) && !empty($serviceoperationstatus) )
-                                <select class="form-control selectpicker" title="Estatus de servicio" data-live-search="true" data-selected-text-format="count > 2" name="service_operation_status[]" id="service_operation_status" data-value="{{ json_encode($data['service_operation_status']) }}" multiple data-actions-box="true">
+                                <select class="form-control selectpicker" title="Estatus de servicio" data-live-search="true" data-selected-text-format="count > 2" name="service_operation_status[]" id="service_operation_status" data-value="{{ json_encode(( isset($data['service_operation_status']) ? $data['service_operation_status'] : array() )) }}" multiple data-actions-box="true">
                                     @foreach ($serviceoperationstatus as $key => $status)
                                         <option value="{{ $key }}">{{ $status }}</option>
                                     @endforeach

@@ -207,7 +207,7 @@ class OperationsRepository
         }
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
-            $queryData = [];
+            // $queryData = [];
             $queryOne  .= " AND (
                         ( CONCAT(rez.client_first_name,' ',rez.client_last_name) like '%".$data['filter_text']."%') OR
                         ( rez.client_phone like '%".$data['filter_text']."%') OR
