@@ -11,24 +11,39 @@
   background-color: #fff;
 }
 
-.scroll-hint {
+// .dt-container{
+//   position: relative;
+
+/* Contenedor principal (ajusta el height según necesites) */
+.scroll-wrapper {
   width: 100%;
   overflow-x: auto;
-  height: 15px;
-  margin-bottom: 5px;
-  background: transparent;
-  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch; /* Scroll suave en móviles */
+  margin: 10px 0;
 }
 
-.scroll-hint::-webkit-scrollbar {
+/* Contenedor interno (necesario para que el scroll funcione) */
+.scroll-inner {
+  min-width: max-content; /* Obliga al scroll si el contenido es más ancho */
+  width: 100%;
+}
+
+/* DataTables: asegura que la tabla pueda expandirse */
+.table-responsive {
+  min-width: 100%;
+  display: block;
+}
+
+/* Personalización de la barra de scroll (opcional) */
+.scroll-wrapper::-webkit-scrollbar {
   height: 8px;
   background: #f1f1f1;
 }
-
-.scroll-hint::-webkit-scrollbar-thumb {
+.scroll-wrapper::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 4px;
 }
+// }
 
 .dt--top-section {
   font-family: "Poppins", serif;  

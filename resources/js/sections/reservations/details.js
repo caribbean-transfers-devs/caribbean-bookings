@@ -979,7 +979,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }).then((result) => {
                 if (result.isConfirmed) {
                     let __params = components.serialize(document.getElementById('frm_new_payment'),'object');
-                    let __url = _LOCAL_URL + ( __type.value == 1 ? "/payments" : "/payments/" + __code_pay.value );
+                    let __url = _LOCAL_URL + ( __type_pay.value == 1 ? "/payments" : "/payments/" + __code_pay.value );
     
                     Swal.fire({
                         title: "Procesando solicitud...",
@@ -992,7 +992,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
         
                     fetch(__url, {
-                        method: ( __type.value == 1 ? 'POST' : 'PUT' ),
+                        method: ( __type_pay.value == 1 ? 'POST' : 'PUT' ),
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': csrfToken,

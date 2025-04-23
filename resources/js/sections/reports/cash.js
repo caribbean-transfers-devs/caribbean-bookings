@@ -17,16 +17,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     components.titleModalFilter();
 
-    // let picker_flter = flatpickr("#lookup_date", {
-    //     mode: "range",
-    //     dateFormat: "Y-m-d",
-    //     enableTime: false,
-    //     locale: {
-    //         rangeSeparator: " - " // Cambia "to" por " - "
-    //     },
-    //     defaultDate: document.getElementById('lookup_date').value ?? 'today',        
-    // });
-
     //CALENDARIO MODAL
     let picker = flatpickr("#date_conciliation", {
         mode: "single",

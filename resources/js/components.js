@@ -38,7 +38,7 @@ let components = {
         tb_var.on("change", "tbody tr .new-control", function() {
             $(this).parents("tr").toggleClass("active")
         })
-    },    
+    },
 
     /**
      * ===== Render Table Settings ===== *
@@ -88,7 +88,8 @@ let components = {
 
 
         _settings.dom = `<'dt--top-section'<''<'left'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center'B>><'right'f>>>
-                         <'scroll-hint'><'table-responsive'tr>
+                         <'scroll-wrapper'<'scroll-inner'>>
+                         <'table-responsive'tr>
                          <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
 
         _settings.deferRender = true;
@@ -102,7 +103,6 @@ let components = {
         }else{
             _settings.paging = false;
         }
-        // _settings.stateSave = false;
 
         if( action == "fixedheader" || action == "fixedheaderPagination" || action == "fixedheaderPaginationCheck" ){
             _settings.fixedHeader = true; // Deshabilita FixedHeader si estaba habilitado
@@ -653,28 +653,28 @@ window.addEventListener("DOMContentLoaded", function() {
     if (__table_render != null) {
         __table_render.columns.adjust();
         __table_render.columns.adjust().draw();
-        components.multiCheck(__table_render);
+        components.multiCheck(__table_render);   
 
-        const scrollHint = document.querySelector('.scroll-hint');
-        const tableResponsive = document.querySelector('.table-responsive');
+        // const scrollHint = document.querySelector('.scroll-hint');
+        // const tableResponsive = document.querySelector('.table-responsive');
     
-        // Crear un elemento fantasma para forzar el mismo ancho que la tabla
-        const ghostElement = document.createElement('div');
-        ghostElement.style.width = tableResponsive.scrollWidth + 'px';
-        ghostElement.style.height = '1px';
-        ghostElement.style.visibility = 'hidden';
-        scrollHint.appendChild(ghostElement);
+        // // Crear un elemento fantasma para forzar el mismo ancho que la tabla
+        // const ghostElement = document.createElement('div');
+        // ghostElement.style.width = tableResponsive.scrollWidth + 'px';
+        // ghostElement.style.height = '10px';
+        // ghostElement.style.visibility = 'hidden';
+        // scrollHint.appendChild(ghostElement);
     
-        // Sincronizar scroll
-        scrollHint.addEventListener('scroll', function() {
-            tableResponsive.scrollLeft = scrollHint.scrollLeft;
-        });
+        // // Sincronizar scroll
+        // scrollHint.addEventListener('scroll', function() {
+        //     tableResponsive.scrollLeft = scrollHint.scrollLeft;
+        // });
     
-        // Actualizar el ancho si la tabla cambia (opcional, para datatables dinámicas)
-        const observer = new MutationObserver(function() {
-            ghostElement.style.width = tableResponsive.scrollWidth + 'px';
-        });
-        observer.observe(tableResponsive, { childList: true, subtree: true });      
+        // // Actualizar el ancho si la tabla cambia (opcional, para datatables dinámicas)
+        // const observer = new MutationObserver(function() {
+        //     ghostElement.style.width = tableResponsive.scrollWidth + 'px';
+        // });
+        // observer.observe(tableResponsive, { childList: true, subtree: true });      
     }
 });
 
