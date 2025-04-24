@@ -8,6 +8,16 @@
                     </a>
                 </li>
             </ul>
+            <form class="search-animated toggle-search" action="{{ route('management.reservations') }}" method="POST" accept-charset="utf-8" enctype="multipart/form-data">
+                @csrf
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <div class="form-inline search-full form-inline search" role="search">
+                    <div class="search-bar">
+                        <input type="text" name="filter_text" value="{{ isset($data['filter_text']) ? $data['filter_text'] : '' }}" class="form-control search-form-control ml-lg-auto" placeholder="#/nombre/correo/telefono/Referencia">
+                    </div>
+                </div>
+                <button type="submit" class="badge badge-secondary border-0">Buscar</button>
+            </form>
             <ul class="navbar-item flex-row ms-auto action-area">
 
                 <li class="nav-item dropdown user-profile-dropdown  order-lg-0 order-1">

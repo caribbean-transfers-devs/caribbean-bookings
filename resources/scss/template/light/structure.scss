@@ -245,12 +245,14 @@ code {
     justify-content: space-between;
 
     .theme-logo {
-       a {
+      margin-right: 32px;
+
+      a {
         img {
           width: 34px;
           height: 34px;
         }
-       }
+      }
     }
     
   }
@@ -625,7 +627,7 @@ body {
       padding: 0px 4px 0px 40px;
       height: 36px;
       font-weight: 600;
-      width: 370px;
+      width: 420px;
     }
 
     display: inline-block;
