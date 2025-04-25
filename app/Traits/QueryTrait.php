@@ -242,11 +242,6 @@ trait QueryTrait
                                         WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
                                         WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
                                         WHEN rez.is_quotation = 1 THEN 'QUOTATION'
-                                        -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
-                                        -- WHEN site.is_cxc = 1 AND (
-                                        --     COALESCE(SUM(p.total_payments), 0) = 0
-                                        --     OR COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(p.total_sales), 0)
-                                        -- ) THEN 'CREDIT'
                                         WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
                                         WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
@@ -283,7 +278,7 @@ trait QueryTrait
                                         FROM reservations_refunds
                                         GROUP BY reservation_id
                                     ) as rr ON rr.reservation_id = rez.id
-
+                                    -- JOINs para tabla de ventas (sales)
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id, 
@@ -292,6 +287,7 @@ trait QueryTrait
                                             WHERE deleted_at IS NULL 
                                         GROUP BY reservation_id
                                     ) as s ON s.reservation_id = rez.id
+                                    -- JOINs para tabla de pagos (payments)
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id,
@@ -314,6 +310,7 @@ trait QueryTrait
                                             WHERE deleted_at IS NULL
                                         GROUP BY reservation_id, is_conciliated
                                     ) as p ON p.reservation_id = rez.id
+                                    -- JOINs para tabla de items de reservacion (reservations_items)
                                     LEFT JOIN (
                                         SELECT  
                                             it.reservation_id, 

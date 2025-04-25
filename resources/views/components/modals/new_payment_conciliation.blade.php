@@ -37,29 +37,30 @@
                             </select>
                         </div>
                         {{-- readonly --}}
-                        <div class="col-sm-12 col-md-6">
+                        <div class="col-sm-12 col-md-12">
                             <label class="form-label" for="servicePaymentsExchangeModal">Tipo de cambio</label>
                             <input type="number" class="form-control mb-2" id="servicePaymentsExchangeModal" name="exchange_rate" value="1.00">
                         </div>
-                        <div class="col-sm-12 col-md-6">
+                        <div class="col-sm-12 col-md-6 box_category_conciliation d-none">
                             <label class="form-label" for="servicePaymentsCategory">Tipo de pago</label>
                             <select class="form-select mb-2" id="servicePaymentsCategory" name="category">
                                 <option value="PAYOUT">PAGO</option>
-                                <option value="REFUND">REEMBOLSO</option>
+                                <option value="PAYOUT_CREDIT">PAGO DE CREDITO</option>
+                                <option value="REFUND">REEMBOLSO</option>                                
                             </select>                            
                         </div>
-                        <div class="col-sm-12 col-md-12">
+                        <div class="col-sm-12 col-md-12 box_link_conciliation">
                             <label class="form-label" for="servicePaymentsLinkRefund">Link del reembolso</label>
                             <input type="text" class="form-control mb-2" id="servicePaymentsLinkRefund" name="link_refund">
                         </div>                        
-                        <div class="col-sm-12 col-md-6 d-none">
+                        <div class="col-sm-12 col-md-6 box_status_conciliation d-none">
                             <label class="form-label" for="servicePaymentsConciliationModal">Conciliado</label>
                             <select class="form-select mb-2" id="servicePaymentsConciliationModal" name="is_conciliated">
                                 <option value="0">No</option>
                                 <option value="1">Sí</option>
                             </select>
                         </div>
-                        <div class="col-sm-12 col-md-12 box_comment d-none">
+                        <div class="col-sm-12 col-md-12 box_comment_conciliation d-none">
                             <label class="form-label" for="servicePaymentsMessageConciliationModal">Mensaje de conciliación</label>
                             <textarea class="form-control" id="servicePaymentsMessageConciliationModal" name="conciliation_comment" cols="5" rows="5"></textarea>
                         </div>

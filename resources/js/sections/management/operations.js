@@ -414,7 +414,7 @@ let setup = {
                 'error'
             );
         });
-    } 
+    }
 };
 
 if( document.querySelector('.table-rendering') != null ){
@@ -523,14 +523,6 @@ const btnCloseOperation = document.getElementById('btn_close_operation'); //* ==
 const btnOpenOperation = document.getElementById('btn_open_operation'); //* ===== BUTTON CLOSE OPERATION ===== */
 
 document.addEventListener("DOMContentLoaded", function() {
-    function debounce(func, delay) {
-        let timer;
-        return function(...args) {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
-
     //FUNCIONALIDAD DE CALENDARIO PARA FILTROS
     let picker = flatpickr("#lookup_date", {
         mode: "single",
@@ -772,7 +764,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }    
 
-    document.addEventListener("change", debounce(async function (event) {
+    document.addEventListener("change", components.debounce(async function (event) {
         if (event.target.classList.contains('change_schedule')) {
             event.preventDefault();
             
@@ -789,7 +781,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
     
-    document.addEventListener("input", debounce(async function (event) {
+    document.addEventListener("input", components.debounce(async function (event) {
         if (event.target.classList.contains('change_schedule')) {
             event.preventDefault();
             
@@ -805,7 +797,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
     
     //EVENTOS DE BOTONES DEL DATATABLE
-    document.addEventListener("change", debounce(function (event) {
+    document.addEventListener("change", components.debounce(function (event) {
         //* ===== SELECT VEHICLES ===== */
         if (event.target.classList.contains('vehicles')) {
             // Obtener datos del elemento clickeado
@@ -979,7 +971,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
 
-    document.addEventListener("click", debounce(function (event) {
+    document.addEventListener("click", components.debounce(function (event) {
         //* ===== SELECT VEHICLES ===== */
         if (event.target.classList.contains('vehicles')) {
             event.preventDefault();

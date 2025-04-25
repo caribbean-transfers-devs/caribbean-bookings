@@ -60,8 +60,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     if( __lookup_date ){
-        console.log(__lookup_date.value);
-        
         filters.calendarFilter(__lookup_date, { mode: "range", defaultDate: __lookup_date.value ?? 'today', minDate: null });
     }    
 });

@@ -37,6 +37,7 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
 
         // FINANCES
             mix.sass('resources/scss/sections/finances/_refunds.scss', data.assets + "css/sections/finances/refunds.min.css"); //REEMBOLSOS
+            mix.sass('resources/scss/sections/finances/_receivables.scss', data.assets + "css/sections/finances/receivables.min.css"); //CUENTAS POR COBRAR
 
         //STYLES REPORTS
             mix.sass('resources/scss/sections/reports/_payments.scss', data.assets + "css/sections/reports/payments.min.css"); //PAYMENTS
@@ -47,7 +48,6 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
             mix.sass('resources/scss/sections/reports/_sales.scss', data.assets + "css/sections/reports/sales.min.css"); //SALES
             mix.sass('resources/scss/sections/reports/_operations.scss', data.assets + "css/sections/reports/operations.min.css"); //OPERATIONS
             mix.sass('resources/scss/sections/reports/_conciliations.scss', data.assets + "css/sections/reports/conciliations.min.css"); //CONCILIATIONS
-            mix.sass('resources/scss/sections/reports/_receivables.scss', data.assets + "css/sections/reports/receivables.min.css"); //RECEIVABLES
 
         //STYLES MANAGEMENT            
             mix.sass('resources/scss/sections/management/_confirmations.scss', data.assets + "css/sections/management/confirmations.min.css"); //CONFIRMATIONS            
@@ -105,6 +105,16 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
                 'resources/plugins/lightbox/lightbox.js',
                 'resources/js/sections/finances/refunds.js'
             ], data.assets + "js/sections/finances/refunds.min.js");
+
+            //RECEIVABLES
+            mix.combine([
+                'resources/plugins/table/datatable/datatables5.js', 
+                'resources/plugins/flatpickr/flatpickr.js',
+                'resources/plugins/flatpickr/es.min.js',                
+                'resources/plugins/bootstrap-select/select.js', 
+                'resources/js/sections/components/filters.js',
+                'resources/js/sections/finances/receivables.js'
+            ], data.assets + "js/sections/finances/receivables.min.js");            
 
         //REPORTS
             //PAYMENTS
@@ -177,19 +187,13 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
                 'resources/js/sections/reports/conciliations.js'
             ], data.assets + "js/sections/reports/conciliations.min.js");
 
-            //RECEIVABLES
-            mix.combine([
-                'resources/plugins/table/datatable/datatables5.js', 
-                'resources/plugins/bootstrap-select/select.js', 
-                'resources/js/sections/components/filters.js', 
-                'resources/js/sections/components/charts.js', 
-                'resources/js/sections/reports/receivables.js'
-            ], data.assets + "js/sections/reports/receivables.min.js");
-
         //MANAGEMENT
             //CONDIRMATIONS
             mix.combine([
                 'resources/plugins/table/datatable/datatables5.js',
+                'resources/plugins/flatpickr/flatpickr.js',
+                'resources/plugins/flatpickr/es.min.js',
+                'resources/js/sections/components/filters.js',
                 'resources/js/sections/management/confirmations.js'
             ], data.assets + "js/sections/management/confirmations.min.js");
 

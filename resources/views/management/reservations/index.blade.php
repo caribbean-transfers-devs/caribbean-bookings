@@ -164,5 +164,4 @@
 
     <x-modals.filters.bookings :data="$data" :isSearch="1" :users="$users" :vehicles="$vehicles" :reservationstatus="$reservation_status" :paymentstatus="$payment_status" :methods="$methods" :websites="$websites" :origins="$origins" :ispayarrival="1" :rating="1" :istoday="1" />
     <x-modals.reports.columns />
-    <x-modals.reservations.payments />
 @endsection

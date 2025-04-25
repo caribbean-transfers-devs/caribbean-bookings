@@ -1,7 +1,4 @@
 @php
-    use Illuminate\Support\Str;
-    use Carbon\Carbon;
-
     $services = auth()->user()->Services();
     $websites = auth()->user()->Sites();
     $origins = auth()->user()->Origins();
@@ -22,13 +19,6 @@
 @endpush
 
 @push('Js')
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/datetime@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/base-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="{{ mix('assets/js/sections/finances/refunds.min.js') }}"></script>
 @endpush
 
@@ -93,7 +83,7 @@
                             <th class="text-center">ACCIONES</th>
                             <th class="text-center">MENSAJE DE REEMBOLSO</th>
                             <th class="text-center">MENSAJE DE RESPUESTA</th>
-                            <th class="text-center">TIPO DE SERVICIO</th>                            
+                            <th class="text-center">TIPO DE SERVICIO</th>
                             <th class="text-center">FECHA DE RESERVACIÓN</th>
                             <th class="text-center">ESTATUS DE RESERVACIÓN</th>
                             <th class="text-center">FECHA DE SERVICIO</th>
@@ -107,8 +97,8 @@
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $booking)
                                 <tr>
-                                    <td class="text-center">
-                                        <button type="button" class="btn w-100 mb-2 btn-{{ auth()->user()->classStatusRefund($booking->status) }} {{ $booking->status == "REFUND_REQUESTED" ? 'danger' : 'success' }}">{{ auth()->user()->statusRefund($booking->status) }}</button>                                        
+                                    <td class="text-center" style="background-color:{{ auth()->user()->colorStatusRefund($booking->status) }};color:#fff;">
+                                        {{ auth()->user()->statusRefund($booking->status) }}
                                     </td>
                                     <td class="text-center">
                                         @php
@@ -124,14 +114,17 @@
                                             <button type="button" class="btn btn-dark w-100 mb-2"><?=$codes_string?></button>
                                         @endif
                                         @if ( $booking->status == "REFUND_REQUESTED" )
-                                            <button type="button" class="btn btn-success __btn_refund w-100 mb-2" data-reservation="{{ $booking->reservation_id }}" data-refund="{{ $booking->id }}" data-type="APPLY_REFUND">Aplicar reembolso</button>
+                                            <button type="button" class="btn btn-success __btn_refund w-100 mb-2" data-reservation="{{ $booking->reservation_id }}" data-refund="{{ $booking->id }}" data-type="APPLY_REFUND">Click para aplicar reembolso</button>
                                             <button type="button" class="btn btn-danger __btn_refund w-100 mb-2" data-reservation="{{ $booking->reservation_id }}" data-refund="{{ $booking->id }}" data-type="DECLINE_REFUND">Declinar reembolso</button>
                                         @endif
                                         <button type="button" class="btn btn-primary __show_reservation w-100" data-reservation="{{ $booking->reservation_id }}" data-bs-toggle="modal" data-bs-target="#viewProofsModal">VER EVIDENCIA</button>
                                     </td>                                    
                                     <td class="text-center">{{ $booking->message_refund }}</td>
                                     <td class="text-center">{{ $booking->response_message }}</td>
-                                    <td class="text-center"><span class="badge badge-{{ $booking->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $booking->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
+                                    <td class="text-center">
+                                        <span class="badge badge-{{ $booking->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $booking->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span> <br>
+                                        [{{ $booking->reservation_id }}]
+                                    </td>
                                     <td class="text-center">{{ date("Y-m-d", strtotime($booking->created_at)) }}</td>
                                     <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($booking->reservation_status) }}">{{ auth()->user()->statusBooking($booking->reservation_status) }}</button></td>
                                     <td class="text-center">
@@ -181,7 +174,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :isSearch="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" />
     <x-modals.reports.columns />
     <x-modals.finances.proofs />
     <x-modals.finances.refund_not_applicable />

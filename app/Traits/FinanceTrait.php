@@ -25,6 +25,21 @@ trait FinanceTrait
         }
     }
 
+    public function colorStatusRefund($status = "REFUND_REQUESTED"){
+        switch ($status) {
+            case 'REFUND_MADE':
+            case 'REFUND_NOT_APPLICABLE':
+                return '#e2a03f';
+                break;
+            case 'REFUND_COMPLETED':
+                return '#00ab55';
+                break;        
+            default:
+                return '#e7515a';
+                break;
+        }
+    }    
+
     public function statusRefund($status = "REFUND_REQUESTED"){
         switch ($status) {
             case 'REFUND_MADE':

@@ -1,42 +1,15 @@
-if ( document.getElementById('lookup_date') != null ) {
-    const picker = new easepick.create({
-        element: "#lookup_date",
-        css: [
-            'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-            'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-            'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-        ],
-        zIndex: 10,
-    });   
-}
-
-if( document.querySelector('.table-rendering') != null ){
-    components.actionTable($('.table-rendering'), 'fixedheader');        
-}
-components.formReset();
-
-//DECLARACION DE VARIABLES
-const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
-const __title_modal = document.getElementById('filterModalLabel');
-
-//ACCION PARA CREAR
-if( __create != null ){
-    __create.addEventListener('click', function () {
-        __title_modal.innerHTML = this.dataset.title;
-    });
-}
-
-function debounce(func, delay) {
-    let timer;
-    return function(...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => func.apply(this, args), delay);
-    };
-}
-
 //VALIDAMOS DOM
 document.addEventListener("DOMContentLoaded", function() {
-    document.addEventListener("click", debounce(function (event) {
+    if( document.querySelector('.table-rendering') != null ){
+        components.actionTable($('.table-rendering'), 'fixedheader');        
+    }
+        
+    components.titleModalFilter();
+    components.formReset();
+
+    filters.calendarFilter(__lookup_date, { mode: "single", defaultDate: __lookup_date.value ?? 'today', minDate: null });
+
+    document.addEventListener("click", components.debounce(function (event) {
         //ACTUALIZA LA CONFIRMACIÓN DEL SERVICIO
         if (event.target.classList.contains('confirmService')) {
             event.preventDefault();

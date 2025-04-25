@@ -217,7 +217,6 @@
     <x-modals.filters.bookings :data="$data" :users="$users" />
     <x-modals.reports.columns />
     <x-modals.reports.commissions :users="$usersData" />
-    <x-modals.reservations.payments />
 @endsection
 
 @push('Js')

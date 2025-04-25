@@ -1,6 +1,3 @@
-if( document.querySelector('.table-rendering') != null ){
-    components.actionTable($('.table-rendering'), 'fixedheaderPagination');
-}
 let refunds = {
     reservation_id: 0,
     getLoader: function() {
@@ -104,6 +101,7 @@ let refunds = {
     },
 };
 
+//DECLARACION DE VARIABLES
 const __close_modals = document.querySelectorAll('.__close_modal');
 const __reservation_id = document.getElementById('reservation_id');
 const __reservation_id2 = document.getElementById('reservation_id2');
@@ -118,20 +116,16 @@ const __formRefundNotApplicable = document.getElementById('formRefundNotApplicab
 const __addPaymentRefund = document.getElementById('btn_new_payment'); //BOTON PARA PODER GUARDAR EL PAGO
 const __refundNotApplicable = document.getElementById('refundNotApplicable'); //BOTON PARA DECLINAR UN REEMBOLSO
 
+//VALIDAMOS DOM
 document.addEventListener("DOMContentLoaded", function() {
+    if( document.querySelector('.table-rendering') != null ){
+        components.actionTable($('.table-rendering'), 'fixedheaderPagination');
+    }
+
     components.titleModalFilter();
     components.formReset();
-
     components.renderCheckboxColumns('dataRefunds', 'columns');
-    components.setValueSelectpicker();
-
-    function debounce(func, delay) {
-        let timer;
-        return function(...args) {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
-    }    
+    components.setValueSelectpicker();    
 
     if( __close_modals.length > 0 ){
         __close_modals.forEach(__close_modal => {
@@ -145,7 +139,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
     
-    document.addEventListener("click", debounce(function (event) {
+    document.addEventListener("click", components.debounce(function (event) {
         if( event.target.classList.contains('__btn_refund') ){
             event.preventDefault();
             const { reservation, refund, type } = event.target.dataset;
@@ -154,9 +148,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 $("#addPaymentsModal").modal('show');
                 const __loading_container = document.getElementById('loading_container');
                 const __form_container = document.getElementById('form_container');
+                const __servicePaymentsCategory = document.getElementById('servicePaymentsCategory');
     
                 __loading_container.classList.remove('d-none');
                 __loading_container.innerHTML = '<div class="spinner-grow align-self-center">';
+                __servicePaymentsCategory.value = "REFUND";
     
                 setTimeout(() => {
                     __loading_container.classList.add('d-none');

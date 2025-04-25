@@ -441,6 +441,14 @@ let components = {
         }
     },
 
+    debounce: function(func, delay) {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    },
+
     titleModalFilter: function(){
         const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
         const __title_modal = document.getElementById('filterModalLabel');
