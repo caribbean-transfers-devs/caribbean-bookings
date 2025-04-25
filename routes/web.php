@@ -108,39 +108,7 @@ Route::middleware(['guest','Debug'])->group(function () {
 Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::post('/logout/other/{sessionId}', [LoginController::class, 'logoutOtherSession'])->name('logout.other');    
-    Route::post('/logout/all', [LoginController::class, 'logoutAllSessions'])->name('logout.all');
-
-    Route::get('/db-test', function() {
-        $start = microtime(true);
-        
-        // Test 1: Query simple
-        DB::select('SELECT 1');
-        $time1 = microtime(true) - $start;
-        
-        // Test 2: Tu query problemático
-        $start = microtime(true);
-        DB::select('SELECT * FROM users WHERE id = 1 LIMIT 1');
-        $time2 = microtime(true) - $start;
-        
-        return [
-            'simple_query' => $time1,
-            'problem_query' => $time2,
-            'server' => DB::select('SHOW VARIABLES LIKE "%version%"')
-        ];
-    });
-
-    Route::get('/db-indexes', function() {
-        $indexes = DB::select(
-            "SHOW INDEXES FROM users WHERE Key_name = 'PRIMARY' OR Column_name = 'id'"
-        );
-        
-        $tableStatus = DB::select("SHOW TABLE STATUS LIKE 'users'");
-        
-        return [
-            'indexes' => $indexes,
-            'table_status' => $tableStatus
-        ];
-    });    
+    Route::post('/logout/all', [LoginController::class, 'logoutAllSessions'])->name('logout.all');    
 
     //BOTS
         //SET RATES MASTER TOUR
