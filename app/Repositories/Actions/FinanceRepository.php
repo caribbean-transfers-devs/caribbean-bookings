@@ -119,7 +119,84 @@ class FinanceRepository
 
     public function addPaymentCredit($request)
     {
+        $validator = Validator::make($request->all(), [
+            'codes' => 'required|string',
+            'status_conciliation' => 'required|integer|in:1,2',
+            'date_conciliation' => 'required|date',
+            'receives_money_conciliation' => 'required|string|in:carlos,margarita',
+            'response_message' => 'required|string'
+        ], [
+            'codes.required' => 'El campo de códigos es obligatorio.',
+            'codes.array' => 'Los códigos deben ser proporcionados como un arreglo.',
+            
+            'status_conciliation.required' => 'El estado de conciliación es requerido.',
+            'status_conciliation.integer' => 'El estado debe ser un valor numérico.',
+            'status_conciliation.in' => 'El estado solo puede ser 1 o 2.',
+            
+            'date_conciliation.required' => 'La fecha de conciliación es obligatoria.',
+            'date_conciliation.date' => 'El formato de fecha no es válido.',
+            
+            'receives_money_conciliation.required' => 'Debe especificar quién recibe el dinero.',
+            'receives_money_conciliation.in' => 'El receptor solo puede ser Carlos o Margarita.',
+            
+            'response_message.required' => 'El mensaje de respuesta es requerido.'
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+                
+        try {
+            DB::beginTransaction();
+            
+            // Crear pago
+            $payment = new Payment();
+            $payment->description = 'Panel';
+            $payment->total = $total;
+            $payment->exchange_rate = $request->exchange_rate;
+            $payment->status = 1;
+            $payment->operation = $request->operation;
+            $payment->payment_method = $request->payment_method;
+            $payment->currency = $request->currency;
+            $payment->reservation_id = $request->reservation_id;
+            $payment->reference = $request->reference;
+            $payment->reservation_refund_id = $reservationRefundId;
+            $payment->user_id = auth()->user()->id;
+            $payment->category = $request->category;
+
+            if( $payment->save() ){                
+                $this->create_followUps(
+                    $request->reservation_id,
+                    "El usuario " . auth()->user()->name . " agregó un pago tipo: " . $request->payment_method . 
+                    ", por un monto de: $total " . $request->currency . ", Categoría: " . $request->category,
+                    'HISTORY',
+                    'CREATE_PAYMENT'
+                );
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se agrego el pago correctamente',
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
     
     /**
