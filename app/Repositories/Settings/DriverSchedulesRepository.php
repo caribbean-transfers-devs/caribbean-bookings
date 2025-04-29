@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 //TRAIT
+use App\Traits\MethodsTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
 
@@ -16,13 +17,41 @@ use App\Models\DriverSchedule;
 
 class DriverSchedulesRepository
 {
-    use FiltersTrait, QueryTrait;
+    use MethodsTrait, FiltersTrait, QueryTrait;
+
+    // CREATE INDEX date ON driver_schedules (date);
+    // CREATE INDEX check_in_time ON driver_schedules (check_in_time);
+    // CREATE INDEX check_out_time ON driver_schedules (check_out_time);
+    // CREATE INDEX end_check_out_time ON driver_schedules (end_check_out_time);
+    // CREATE INDEX extra_hours ON driver_schedules (extra_hours);
+    // CREATE INDEX vehicle_id ON driver_schedules (vehicle_id);
+    // CREATE INDEX driver_id ON driver_schedules (driver_id);
+    // CREATE INDEX status ON driver_schedules (status);
+    // CREATE INDEX status_unit ON driver_schedules (status_unit);
+    // CREATE INDEX check_in_time_fleetio ON driver_schedules (check_in_time_fleetio);
+    // CREATE INDEX check_out_time_fleetio ON driver_schedules (check_out_time_fleetio);
+    // CREATE INDEX is_open ON driver_schedules (is_open);
 
     public function index($request)
     {
-        $schedules = DriverSchedule::orderBy('date', 'ASC')
+        ini_set('memory_limit', '-1'); // Sin límite
+        set_time_limit(120); // Aumenta el límite a 60 segundos
+
+        // Función auxiliar para obtener fechas seguras
+        $dates = MethodsTrait::parseDateRange($request->date ?? '');
+
+        $data = [
+            "init" => $dates['init'],
+            "end" => $dates['end'],
+        ];
+
+        $schedules = DriverSchedule::with(['vehicle.destination_service', 'vehicle.enterprise', 'driver'])->whereBetween('date', [$dates['init'] . " 00:00:00", $dates['end'] . " 23:59:59"])
+                                    ->orderBy('date', 'ASC')
                                     ->orderBy('check_in_time', 'ASC')
                                     ->get();
+
+        // dd($schedules);
+
         return view('settings.schedules.index', [
             'breadcrumbs' => [
                 [
@@ -32,7 +61,7 @@ class DriverSchedulesRepository
                 ]
             ],
             'schedules' => $schedules,
-            'data' => [],
+            'data' => $data,
         ]);
     }
 

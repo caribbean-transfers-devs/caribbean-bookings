@@ -12,12 +12,21 @@
 @endpush
 
 @push('Js')
-    <script src="{{ mix('assets/js/sections/settings/types_cancellations.min.js') }}"></script>
+    <script src="{{ mix('assets/js/sections/settings/schedules.min.js') }}"></script>
 @endpush
 
 @section('content')
     @php
         $buttons = array(
+            array(  
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtrar',
+                'className' => 'btn btn-primary __btn_create',
+                'attr' => array(
+                    'data-title' =>  "Filtros de pagos horarios",
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#filterModal'
+                )
+            ),            
             array(  
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Agregar Horario de conductor',
                 'className' => 'btn btn-primary ',
@@ -126,4 +135,6 @@
             </div>   
         </div>
     </div>
+
+    <x-modals.filters.bookings :data="$data" />    
 @endsection

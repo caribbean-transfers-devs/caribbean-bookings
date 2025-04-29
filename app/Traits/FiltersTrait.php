@@ -50,7 +50,7 @@ trait FiltersTrait
         if ($report) {
             return $report->exchange; // Ejemplo: 25.50
         } else {
-            return 16.5;
+            return 18;
         }
     }
 
