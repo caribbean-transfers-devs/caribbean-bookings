@@ -14,21 +14,20 @@
                 <div class="form-inline search-full form-inline search" role="search">
                     <div class="search-bar">
                         <input type="text" name="filter_text" value="{{ isset($data['filter_text']) ? $data['filter_text'] : '' }}" class="form-control search-form-control ml-lg-auto" placeholder="#/nombre/correo/telefono/Referencia">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x search-close"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </div>
                 </div>
                 <button type="submit" class="badge badge-secondary border-0">Buscar</button>
             </form>
-            <ul class="navbar-item flex-row ms-auto action-area">
-
+            <ul class="navbar-item flex-row ms-lg-auto action-area">
                 <li class="nav-item dropdown user-profile-dropdown  order-lg-0 order-1">
                     <a href="javascript:void(0);" class="nav-link dropdown-toggle user" id="userProfileDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <div class="avatar-container">
                             <div class="avatar avatar-sm avatar-indicators avatar-online">
-                                <img alt="avatar" src="{{ asset('/assets/img/profile-default.svg') }}" class="rounded-circle">{{ auth()->user()->id }}
+                                <img alt="avatar" src="{{ asset('/assets/img/profile-default.svg') }}" class="rounded-circle">
                             </div>
                         </div>
                     </a>
-
                     <div class="dropdown-menu position-absolute" aria-labelledby="userProfileDropdown">
                         <div class="user-profile-section">
                             <div class="media mx-auto">
@@ -48,7 +47,6 @@
                             </a>
                         </div>
                     </div>
-                    
                 </li>
             </ul>
         </header>

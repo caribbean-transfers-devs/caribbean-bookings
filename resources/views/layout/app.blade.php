@@ -19,7 +19,7 @@
     <link href="{{ mix('/assets/css/panel/panel2.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/panel/panel2.min.css') }}" rel="stylesheet" >
     @stack('Css')
-</head> 
+</head>
 <body class="">
 
     @once
@@ -34,7 +34,7 @@
     <div class="main-container" id="container">
 
         <div class="overlay"></div>
-        {{-- <div class="search-overlay"></div> --}}
+        <div class="search-overlay"></div>
 
         @once
             @include('layout.partials.sidebar')

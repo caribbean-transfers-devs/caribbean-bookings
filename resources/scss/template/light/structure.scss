@@ -1831,14 +1831,12 @@ body {
             }
           }
           
-          form {
+          form, > div {
             &.form-inline {
               input {
                 display: none;
               }
-            }
-
-            
+            }            
           }
           
           .badge {

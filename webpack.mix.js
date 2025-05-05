@@ -38,6 +38,7 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
         // FINANCES
             mix.sass('resources/scss/sections/finances/_refunds.scss', data.assets + "css/sections/finances/refunds.min.css"); //REEMBOLSOS
             mix.sass('resources/scss/sections/finances/_receivables.scss', data.assets + "css/sections/finances/receivables.min.css"); //CUENTAS POR COBRAR
+            mix.sass('resources/scss/sections/finances/_conciliations.scss', data.assets + "css/sections/finances/conciliations.min.css"); //CONCILIATIONS
 
         //STYLES REPORTS
             mix.sass('resources/scss/sections/reports/_payments.scss', data.assets + "css/sections/reports/payments.min.css"); //PAYMENTS
@@ -47,7 +48,6 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
             mix.sass('resources/scss/sections/reports/_commissions2.scss', data.assets + "css/sections/reports/commissions2.min.css"); //COMMISSIONS2
             mix.sass('resources/scss/sections/reports/_sales.scss', data.assets + "css/sections/reports/sales.min.css"); //SALES
             mix.sass('resources/scss/sections/reports/_operations.scss', data.assets + "css/sections/reports/operations.min.css"); //OPERATIONS
-            mix.sass('resources/scss/sections/reports/_conciliations.scss', data.assets + "css/sections/reports/conciliations.min.css"); //CONCILIATIONS
 
         //STYLES MANAGEMENT            
             mix.sass('resources/scss/sections/management/_confirmations.scss', data.assets + "css/sections/management/confirmations.min.css"); //CONFIRMATIONS            
@@ -67,7 +67,6 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
             mix.sass('resources/scss/sections/settings/_rates.scss', data.assets + "css/sections/settings/rates.min.css"); //RATES
             mix.sass('resources/scss/sections/settings/_rates_enterprise.scss', data.assets + "css/sections/settings/rates_enterprise.min.css"); //RATES ENTERPRISE
             mix.sass('resources/scss/sections/settings/_types_cancellations.scss', data.assets + "css/sections/settings/types_cancellations.min.css"); //TYPES CANCELLATIONS
-
 
         mix.sass('resources/scss/sections/enterprise_forms.scss', data.assets + "css/sections/enterprise_forms.min.css");
         mix.sass('resources/scss/sections/vehicle_forms.scss', data.assets + "css/sections/vehicle_forms.min.css");
@@ -114,7 +113,15 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
                 'resources/plugins/bootstrap-select/select.js', 
                 'resources/js/sections/components/filters.js',
                 'resources/js/sections/finances/receivables.js'
-            ], data.assets + "js/sections/finances/receivables.min.js");            
+            ], data.assets + "js/sections/finances/receivables.min.js");
+            
+            //CONCILIATIONS
+            mix.combine([
+                'resources/plugins/table/datatable/datatables5.js', 
+                'resources/plugins/bootstrap-select/select.js', 
+                'resources/js/sections/components/filters.js', 
+                'resources/js/sections/finances/conciliations.js'
+            ], data.assets + "js/sections/finances/conciliations.min.js");            
 
         //REPORTS
             //PAYMENTS
@@ -178,14 +185,6 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
                 'resources/js/sections/components/charts.js', 
                 'resources/js/sections/reports/operations.js'
             ], data.assets + "js/sections/reports/operations.min.js");
-
-            //CONCILIATIONS
-            mix.combine([
-                'resources/plugins/table/datatable/datatables5.js', 
-                'resources/plugins/bootstrap-select/select.js', 
-                'resources/js/sections/components/filters.js', 
-                'resources/js/sections/reports/conciliations.js'
-            ], data.assets + "js/sections/reports/conciliations.min.js");
 
         //MANAGEMENT
             //CONDIRMATIONS

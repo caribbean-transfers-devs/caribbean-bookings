@@ -19,6 +19,7 @@ use App\Http\Controllers\Bookings\BookingsController;
 use App\Http\Controllers\Finances\RefundsController as             RefundsFinances;
 use App\Http\Controllers\Finances\SalesController as               SaleFinance;
 use App\Http\Controllers\Finances\ReceivablesController as         RECEIVABLES;
+use App\Http\Controllers\Finances\StripeController as              STRIPEFINANCE;
 
 //REPORTS
 use App\Http\Controllers\Reports\PaymentsController as             PAYMENTS;
@@ -146,6 +147,10 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS
         Route::match(['get', 'post'], '/finances/chargebacks', [RefundsFinances::class, 'index'])->name('finances.chargebacks'); //CONTRAGARGOS
         Route::match(['get', 'post'], '/finances/receivables', [RECEIVABLES::class, 'index'])->name('finances.receivables'); //CUENTAS POR COBRAR
+
+        Route::get('/finances/conciliation', [STRIPEFINANCE::class, 'index'])->name('finances.conciliation');
+        Route::post('/finances/conciliation', [STRIPEFINANCE::class, 'index'])->name('finances.conciliation.action');
+
         Route::match(['get', 'post'], '/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS
 
     //REPORTES
