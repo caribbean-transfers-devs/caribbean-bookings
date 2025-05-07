@@ -9,10 +9,11 @@ use App\Http\Controllers\Controller;
 class ZonesController extends Controller
 {   
     public function index(Request $request, ZonesRepository $zone){        
+        //dd($request);
         return $zone->index($request);        
     }
 
-    public function getZones(Request $request, ZonesRepository $zone){        
+    public function getZones(Request $request, ZonesRepository $zone, $id){
         if (!$request->id) {
             return response()->json([
                     'error' => [
@@ -22,7 +23,7 @@ class ZonesController extends Controller
                 ], Response::HTTP_BAD_REQUEST);
         }
 
-        return $zone->zones($request);       
+        return $zone->zones($id);       
     }
 
     public function getPoints(Request $request, ZonesRepository $zone){

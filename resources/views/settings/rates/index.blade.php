@@ -33,6 +33,7 @@
                                 <select name="destinationID" class="form-control" id="destinationID">
                                     <option value="0">Selecciona el destino</option>
                                     <option value="1">Cancún</option>
+                                    <option value="2">Los Cabos</option>
                                 </select>
                             </div>
                             <div class="two_">
