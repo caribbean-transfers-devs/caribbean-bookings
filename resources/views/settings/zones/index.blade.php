@@ -34,7 +34,8 @@
                             <div class="col-12 col-sm-5 mb-3 mb-lg-0">
                                 <label class="form-label" for="lookup_date">Selecciona una zona</label>
                                 <select name="destinationID" class="form-control" id="destinationID">
-                                    <option value="1">Cancún</option>
+                                    <option value="1" {{ request('id') == 1 ? 'selected' : '' }}>Cancún</option>
+                                    <option value="2" {{ request('id') == 2 ? 'selected' : '' }}>Los Cabos</option>
                                 </select>
                             </div>
                             <div class="col-12 col-sm-3 align-self-end">

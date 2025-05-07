@@ -21,8 +21,8 @@ class ZonesRepository{
         return view('settings.zones.index',compact('breadcrumbs'));
     }
     
-    public function zones($request){
-        $zones = Zones::all();
+    public function zones($id){        
+        $zones = Zones::where('destination_id',$id)->get();
         $breadcrumbs = array(
             array(
                 "route" => "",
