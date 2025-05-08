@@ -1,5 +1,5 @@
 @php
-    $units = auth()->user()->Units('active'); //LAS UNIDADES DADAS DE ALTA
+    $units = auth()->user()->Units(); //LAS UNIDADES DADAS DE ALTA
     $drivers = auth()->user()->Drivers('active');
 @endphp
 @extends('layout.app')

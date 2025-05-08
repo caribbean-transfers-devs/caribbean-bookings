@@ -305,7 +305,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     //ACCIONES UTILIZADAS EN FINANZAS
     Route::post('/action/addPaymentRefund', [FINANCE::class, 'addPaymentRefund'])->name('add.payment.refund');
     Route::post('/action/refundNotApplicable', [FINANCE::class, 'refundNotApplicable'])->name('add.not.applicable.refund');
-    Route::match(['get', 'post'], '/action/getInformationReservation', [FINANCE::class, 'getInformationReservation'])->name('get.information.reservation');
+    Route::match(['get', 'post'], '/action/getInformationReservation', [FINANCE::class, 'getInformationReservation'])->name('get.information.reservation')->withoutMiddleware(['auth']);
     Route::match(['get', 'post'], '/action/getBasicInformationReservation', [FINANCE::class, 'getBasicInformationReservation'])->name('get.basic-information.reservation');
     Route::match(['get', 'post'], '/action/getPhotosReservation', [FINANCE::class, 'getPhotosReservation'])->name('get.photos.reservation');
     Route::match(['get', 'post'], '/action/getHistoryReservation', [FINANCE::class, 'getHistoryReservation'])->name('get.history.reservation');

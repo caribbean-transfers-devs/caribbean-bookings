@@ -2,7 +2,7 @@
     use App\Traits\RoleTrait;
     use Carbon\Carbon;
     Carbon::setLocale('es');
-    $units = auth()->user()->Units('active'); //LAS UNIDADES DADAS DE ALTA
+    $units = auth()->user()->Units(); //LAS UNIDADES DADAS DE ALTA
     $drivers = auth()->user()->Drivers('active');
 @endphp
 <div class="table-responsive">
