@@ -420,7 +420,7 @@ class FinanceRepository
                 'status' => 'success', 
                 'message' => 'Se encontro correctamente la reservación',
                 'data' => $reservation
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'error', 

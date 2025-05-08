@@ -59,6 +59,11 @@ class ReservationsRepository
             'end' => ( isset($request->date) ? $request->date : date('Y-m-d') ) . " 23:59:59",
         ];
 
+        $queryDataOperation = [
+            'init' => ( isset($request->date) ? $request->date : date('Y-m-d') ) . " 00:00:00",
+            'end' => ( isset($request->date) ? $request->date : date('Y-m-d') ) . " 23:59:59",
+        ];
+
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
             $data['filter_text'] = $request->filter_text;
             $queryData = [];
@@ -234,9 +239,9 @@ class ReservationsRepository
         // dd($query, $queryHaving, $queryData);
         $bookings = $this->queryBookings($query, $queryHaving, $queryData);
         //arrivals
-        $arrivals = $this->queryOperations($queryOne, $queryTwo, $queryHavingA, $queryData);
+        $arrivals = $this->queryOperations($queryOne, $queryTwo, $queryHavingA, $queryDataOperation);
         //departures
-        $departures = $this->queryOperations($queryOne, $queryTwo, $queryHavingD, $queryData);        
+        $departures = $this->queryOperations($queryOne, $queryTwo, $queryHavingD, $queryDataOperation);        
         
         return view('management.reservations.index', [
             'breadcrumbs' => [

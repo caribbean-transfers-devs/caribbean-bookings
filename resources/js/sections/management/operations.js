@@ -421,7 +421,7 @@ if( document.querySelector('.table-rendering') != null ){
     setup.actionTable($('.table-rendering'));
 }
 components.setValueSelectpicker();
-components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
+// components.formReset();//RESETEA LOS VALORES DE UN FORMULARIO, EN UN MODAL
 
 //CONFIGURACION DE DROPZONE
 Dropzone.options.uploadForm = {
@@ -971,19 +971,19 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
 
+    // FUNCIONADA PARA EXTRACION DE INFORMACION DE DATOS PARA ENVIAR POR WHATSAPP
     document.addEventListener("click", components.debounce(function (event) {
         if(event.target.classList.contains('extract_whatsapp')){
             event.preventDefault();
 
             const { reservation, item, type } = event.target.dataset;
 
-            fetch("/action/getInformationReservation", {
+            fetch("/action/getInformationReservation?id=" + reservation + "&item_id?=" + item, {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({ id : reservation, item_id : item })
             })
             .then(response => {
                 if (!response.ok) {
@@ -992,6 +992,41 @@ document.addEventListener("DOMContentLoaded", function() {
                 return response.json();
             })
             .then(data => {
+                console.log(data);
+                if( data.status == "success" ){
+                    let fila = $(event.target).closest('tr');
+                    const info = data.data;
+                    const item = data.data.items[0];
+                    console.log(data, item);                
+                    // Extraer la información de las celdas de la fila
+                    var hora = fila.find('td').eq(1).text();
+                    var vehicle = ( fila.find('td').eq(8).find('button').length > 0 ? fila.find('td').eq(8).find('button .filter-option').text() : fila.find('td').eq(8).text() );
+                    var driver = ( fila.find('td').eq(9).find('button').length > 0 ? fila.find('td').eq(9).find('button .filter-option').text() : fila.find('td').eq(9).text() );
+                    var time_operation = fila.find('td').eq(11).text();
+                    var unit = fila.find('td').eq(14).text();
+                    var payment = fila.find('td').eq(15).text();
+                    let total = fila.find('td').eq(16).text();
+
+                let message =  '<p class="m-0">Número: ' + ( type == "TYPE_ONE" ? ( item.op_one_preassignment != null ? item.op_one_preassignment : 'NO DEFINIDO' ) : ( item.op_two_preassignment != null ? item.op_two_preassignment : 'NO DEFINIDO' ) ) + '</p> \n ' +
+                                '<p class="m-0">Código: ' + item.code + '</p> \n ' +
+                                '<p class="m-0">Hora: ' + hora + '</p> \n ' +
+                                '<p class="m-0">Cliente: ' + info.client_first_name + ' ' + info.client_last_name + '</p> \n ' +
+                                '<p class="m-0">Tipo de servicio: ' + ( type == "TYPE_ONE" ? item.final_service_type_one : item.final_service_type_two ) + '</p> \n ' +
+                                '<p class="m-0">Pax: ' + item.passengers + '</p> \n ' +
+                                '<p class="m-0">Origen: ' + item.from_name + '</p> \n ' +
+                                '<p class="m-0">Destino: ' + item.to_name + '</p> \n ' +
+                                '<p class="m-0">Agencia: ' + info.site.name + '</p> \n ' +
+                                '<p class="m-0">Unidad: ' + vehicle + '</p> \n ' +
+                                '<p class="m-0">Conductor: ' + driver + '</p> \n ' +
+                                '<p class="m-0">Estatus de operación: ' + ( type == "TYPE_ONE" ? item.op_one_status_operation : item.op_two_status_operation ) + '</p> \n ' +
+                                '<p class="m-0">Hora de operación: ' + time_operation + '</p> \n ' +
+                                '<p class="m-0">Estatus de reservación: ' + ( type == "TYPE_ONE" ? item.op_one_status : item.op_two_status ) + '</p> \n ' +
+                                '<p class="m-0">Vehículo: ' + unit + '</p> \n ' +
+                                '<p class="m-0">Pago: ' + payment + '</p> \n ' +
+                                '<p class="m-0">Total: ' + total;    
+
+                    document.getElementById('wrapper_whatsApp').innerHTML = message;
+                }
             })
             .catch(error => {
                 Swal.fire(
@@ -999,7 +1034,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     error.message || 'Ocurrió un error',
                     'error'
                 );
-            });            
+            });
         }
 
         //* ===== SELECT VEHICLES ===== */
@@ -1492,60 +1527,6 @@ form.addEventListener('submit', function (event) {
             }
         }
     });
-});
-
-//FUNCIONADA PARA EXTRACION DE INFORMACION DE DATOS PARA ENVIAR POR WHATSAPP
-$('#dataManagementOperations').on('click', '.extract_whatsapp', function() {
-    // Obtener la fila en la que se encuentra el botón
-    var fila = $(this).closest('tr');
-
-    // Extraer la información de las celdas de la fila
-    if( fila.find('td').eq(0).find('button').text() == "ADD" ){
-      var identificator = "NO DEFINIDO";
-    }else{
-      var identificator = fila.find('td').eq(0).find('button').text();
-    }    
-    var hora = fila.find('td').eq(2).text();
-    var cliente = fila.find('td').eq(3).find('span').text();
-    var tipo_servicio = fila.find('td').eq(4).text();
-    var pax = fila.find('td').eq(5).text();
-    var origin = fila.find('td').eq(6).text();
-    var destination = fila.find('td').eq(7).text();
-    var agency = fila.find('td').eq(8).text();
-    var vehicle = ( fila.find('td').eq(9).find('button').length > 0 ? fila.find('td').eq(9).find('button .filter-option .filter-option-inner .filter-option-inner-inner').text() : fila.find('td').eq(9).text() );
-    var driver = ( fila.find('td').eq(10).find('button').length > 0 ? fila.find('td').eq(10).find('button .filter-option .filter-option-inner .filter-option-inner-inner').text() : fila.find('td').eq(10).text() );
-    var status_operation = fila.find('td').eq(11).find('.btn-group button span').text();
-    var time_operation = fila.find('td').eq(12).text();
-    var status_booking = fila.find('td').eq(14).find('.btn-group button span').text();
-    if( fila.find('td').eq(15).find('a') ){
-      var code = fila.find('td').eq(15).find('a').text();
-    }else{
-      var code = fila.find('td').eq(15).text();
-    }
-    var unit = fila.find('td').eq(16).text();
-    var payment = fila.find('td').eq(17).text();
-    var total = fila.find('td').eq(18).text();
-    var currency = fila.find('td').eq(19).text();
-
-   let message =  '<p class="m-0">Número: ' + identificator + '</p> \n ' +
-                  '<p class="m-0">Código: ' + code + '</p> \n ' +
-                  '<p class="m-0">Hora: ' + hora + '</p> \n ' +
-                  '<p class="m-0">Cliente: ' + cliente + '</p> \n ' +
-                  '<p class="m-0">Tipo de servicio: ' + tipo_servicio + '</p> \n ' +
-                  '<p class="m-0">Pax: ' + pax + '</p> \n ' +
-                  '<p class="m-0">Origen: ' + origin + '</p> \n ' +
-                  '<p class="m-0">Destino: ' + destination + '</p> \n ' +
-                  '<p class="m-0">Agencia: ' + agency + '</p> \n ' +
-                  '<p class="m-0">Unidad: ' + vehicle + '</p> \n ' +
-                  '<p class="m-0">Conductor: ' + driver + '</p> \n ' +
-                  '<p class="m-0">Estatus de operación: ' + status_operation + '</p> \n ' +
-                  '<p class="m-0">Hora de operación: ' + time_operation + '</p> \n ' +
-                  '<p class="m-0">Estatus de reservación: ' + status_booking + '</p> \n ' +                  
-                  '<p class="m-0">Vehículo: ' + unit + '</p> \n ' +
-                  '<p class="m-0">Pago: ' + payment + '</p> \n ' +
-                  '<p class="m-0">Total: ' + total + ' ' + currency;    
-
-    document.getElementById('wrapper_whatsApp').innerHTML = message;
 });
 
 //FUNCIONADA PARA EXTRACION DE INFORMACION DE DATOS DE CONFIRMACION PARA ENVIAR POR WHATSAPP
