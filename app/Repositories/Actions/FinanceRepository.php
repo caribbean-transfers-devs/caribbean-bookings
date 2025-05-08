@@ -384,8 +384,55 @@ class FinanceRepository
                 'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * NOS AYUDA A OBTENER INFORMACIÓN COMPLETA DE RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
+    public function getInformationReservation($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',            
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+        try {
+            $reservation = $this->getReservation($request->id, $request->toArray());
+
+            // Si la reserva no existe, se retorna vacío
+            if (!$reservation) {
+                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.basic-information', ["reservation" => null]);
+            }
+            
+            // Retornar JSON
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Se encontro correctamente la reservación',
+                'data' => $reservation
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error', 
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }    
 
+    /**
+     * NOS AYUDA A OBTENER INFORMACIÓN BASICA DE RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
     public function getBasicInformationReservation($request)
     {
         $validator = Validator::make($request->all(), [
@@ -423,7 +470,7 @@ class FinanceRepository
     }
 
     /**
-     * NOS AYUDA A OBTENER LOS LOG DE LA RESERVACIÓN
+     * NOS AYUDA A OBTENER FOTOS DE RESERVACIÓN
      * @param request :la información recibida en la solicitud
     */
     public function getPhotosReservation($request)
@@ -536,11 +583,26 @@ class FinanceRepository
         }
     }
 
-    public function getReservation($id)
+    public function getReservation($id, array $request = []): object
     {
-        $reservation = Reservation::with([
-            'destination.destination_services',
-            'items' => function ($query) {
+        $itemId = $request['item_id'] ?? null;
+    
+        $reservation = Reservation::select(['id', 'client_first_name', 'client_last_name', 'client_email', 'client_phone', 'currency', 'is_cancelled', 'is_commissionable', 'is_advanced', 'pay_at_arrival', 'site_id', 'destination_id', 'reference', 'cancellation_type_id', 'is_duplicated', 'open_credit', 'origin_sale_id', 'is_quotation', 'was_is_quotation', 'expires_at', 'campaign', 'reserve_rating'])
+            ->with(['destination' => function($query) {
+                $query->select(['id', 'name']);
+            }])
+            ->with(['site' => function($query) {
+                $query->select(['id', 'name', 'type_site']);
+            }])
+            ->with(['sales' => function($query) {
+                $query->select(['id', 'sale_type_id', 'description', 'quantity', 'total', 'created_at']);
+            }])            
+            ->with([
+            // 'items' => function ($query) {
+            'items' => function ($query) use ($itemId) {                
+                if ($itemId) {
+                    $query->where('reservations_items.id', $itemId);
+                }                
                 $query->join('zones as zone_one', 'zone_one.id', '=', 'reservations_items.from_zone')
                         ->join('zones as zone_two', 'zone_two.id', '=', 'reservations_items.to_zone')
                         ->select(
@@ -569,8 +631,6 @@ class FinanceRepository
                             ")
                         );
             },
-            'site',
-            'sales',
             'payments',
             'refunds',
             'followUps',

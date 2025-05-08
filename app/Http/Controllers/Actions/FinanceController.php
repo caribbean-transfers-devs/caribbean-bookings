@@ -42,6 +42,10 @@ class FinanceController extends Controller
         return $this->FinanceRepository->cashConciliation($request);
     }
 
+    public function getInformationReservation(Request $request){
+        return $this->FinanceRepository->getInformationReservation($request);
+    }    
+
     public function getBasicInformationReservation(Request $request){
         return $this->FinanceRepository->getBasicInformationReservation($request);
     }

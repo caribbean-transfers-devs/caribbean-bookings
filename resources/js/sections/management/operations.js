@@ -972,6 +972,36 @@ document.addEventListener("DOMContentLoaded", function() {
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
 
     document.addEventListener("click", components.debounce(function (event) {
+        if(event.target.classList.contains('extract_whatsapp')){
+            event.preventDefault();
+
+            const { reservation, item, type } = event.target.dataset;
+
+            fetch("/action/getInformationReservation", {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ id : reservation, item_id : item })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+            })
+            .catch(error => {
+                Swal.fire(
+                    '¡ERROR!',
+                    error.message || 'Ocurrió un error',
+                    'error'
+                );
+            });            
+        }
+
         //* ===== SELECT VEHICLES ===== */
         if (event.target.classList.contains('vehicles')) {
             event.preventDefault();
@@ -1424,7 +1454,6 @@ to_autocomplete.addEventListener('focus', (e) => {
     setup.autocomplete( e.target.value, 'to_name_elements');
 });
 
-
 //FUNCIONALIDAD DE CAMBIO DE MONEDA
 sold_in_currency_select.addEventListener('change', (e) => {
     currency_span.innerText = `(${e.target.value})`;
@@ -1468,8 +1497,6 @@ form.addEventListener('submit', function (event) {
 //FUNCIONADA PARA EXTRACION DE INFORMACION DE DATOS PARA ENVIAR POR WHATSAPP
 $('#dataManagementOperations').on('click', '.extract_whatsapp', function() {
     // Obtener la fila en la que se encuentra el botón
-    console.log("hola");
-    
     var fila = $(this).closest('tr');
 
     // Extraer la información de las celdas de la fila
@@ -1500,43 +1527,6 @@ $('#dataManagementOperations').on('click', '.extract_whatsapp', function() {
     var total = fila.find('td').eq(18).text();
     var currency = fila.find('td').eq(19).text();
 
-    // Mostrar la información (puedes realizar otras acciones aquí)
-    // console.log('Número:', identificator);
-    // console.log('Hora:', hora);
-    // console.log('Cliente:', cliente);
-    // console.log('Tipo de servicio:', tipo_servicio);
-    // console.log('Pax:', pax);
-    // console.log('Origen:', origin);
-    // console.log('Destino:', destination);
-    // console.log('Agencia:', agency);
-    // console.log('Unidad:', vehicle);
-    // console.log('Conductor:', driver);
-    // console.log('Estatus de operación:', status_operation);
-    // console.log('Hora de operación:', time_operation);
-    // console.log('Estatus de reservación:', status_booking);
-    // console.log('Código:', code);
-    // console.log('Vehículo:', unit);
-    // console.log('Pago:', payment);
-    // console.log('Total:', total + ' ' + currency);
-
-    // let message = 'Número: ' + identificator + '</p> \n ' +
-    //               'Código: ' + code + '</p> \n ' +
-    //               'Hora: ' + hora + '</p> \n ' +
-    //               'Cliente: ' + cliente + '</p> \n ' +
-    //               'Tipo de servicio: ' + tipo_servicio + '</p> \n ' +
-    //               'Pax: ' + pax + '</p> \n ' +
-    //               'Origen: ' + origin + '</p> \n ' +
-    //               'Destino: ' + destination + '</p> \n ' +
-    //               'Agencia: ' + agency + '</p> \n ' +
-    //               'Unidad: ' + vehicle + '</p> \n ' +
-    //               'Conductor: ' + driver + '</p> \n ' +
-    //               'Estatus de operación: ' + status_operation + '</p> \n ' +
-    //               'Hora de operación: ' + time_operation + '</p> \n ' +
-    //               'Estatus de reservación: ' + status_booking + '</p> \n ' +                  
-    //               'Vehículo: ' + unit + '</p> \n ' +
-    //               'Pago: ' + payment + '</p> \n ' +
-    //               'Total: ' + total + ' ' + currency;
-
    let message =  '<p class="m-0">Número: ' + identificator + '</p> \n ' +
                   '<p class="m-0">Código: ' + code + '</p> \n ' +
                   '<p class="m-0">Hora: ' + hora + '</p> \n ' +
@@ -1556,9 +1546,6 @@ $('#dataManagementOperations').on('click', '.extract_whatsapp', function() {
                   '<p class="m-0">Total: ' + total + ' ' + currency;    
 
     document.getElementById('wrapper_whatsApp').innerHTML = message;
-
-    // let text = "https://api.whatsapp.com/send?phone=5219982127069&text=" + decodeURIComponent(message);
-    // window.location.href = text;
 });
 
 //FUNCIONADA PARA EXTRACION DE INFORMACION DE DATOS DE CONFIRMACION PARA ENVIAR POR WHATSAPP
