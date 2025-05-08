@@ -54,7 +54,7 @@ class DriverRepository
                     ]                    
                 ],
                 'enterprises' => $enterprises,
-                'units' => $this->Units('active'),
+                'units' => $this->Units(),
             ]);
         } catch (Exception $e) {
         }
@@ -103,7 +103,7 @@ class DriverRepository
                 ],
                 'enterprises' => $enterprises,
                 'driver' => $driver,
-                'units' => $this->Units('active'),
+                'units' => $this->Units(),
             ]);
         } catch (Exception $e) {
         }
