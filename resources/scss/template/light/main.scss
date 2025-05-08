@@ -10,7 +10,8 @@ body {
   background: #f1f2f3;
   overflow-x: hidden;
   overflow-y: auto;
-  font-family: 'Nunito', sans-serif;
+  // font-family: 'Nunito', sans-serif;
+  font-family: "Poppins", serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -29,7 +30,7 @@ a {
 p {
   margin-top: 0;
   margin-bottom: 0.625rem;
-  color: #515365;
+  color: #000;
 }
 
 hr {
@@ -237,11 +238,11 @@ blockquote {
 }
 
 a {
-  color: #515365;
+  color: #000;
   outline: none;
 
   &:hover {
-    color: #888ea8;
+    color: #000;
     text-decoration: none;
   }
 

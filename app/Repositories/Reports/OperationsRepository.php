@@ -109,7 +109,7 @@ class OperationsRepository
         if(isset( $request->service_operation ) && !empty( $request->service_operation )){
             $params = $this->parseArrayQuery($request->service_operation,"single");
             $havingConditions[] = " final_service_type IN (".$params.") ";
-        }        
+        }
 
         //TIPO DE VEHÍCULO
         if(isset( $request->product_type ) && !empty( $request->product_type )){

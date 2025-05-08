@@ -25,7 +25,7 @@ class SitesRepository
                         "active" => false
                     ],                    
                 ],
-                'sites' => Site::all()
+                'sites' => Site::with('enterprise')->get()
             ]);
         } catch (Exception $e) {
         }

@@ -69,7 +69,7 @@ class ActionsRepository
             return response()->json([
                 'status' => 'success',
                 'message' => 'Se elimino correctamente la comisión de lareservación',
-            ], Response::HTTP_OK);            
+            ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([

@@ -7,12 +7,13 @@
 
     $websites = auth()->user()->Sites();
     $reservation_status = auth()->user()->reservationStatus();
+    $services_operation = auth()->user()->servicesOperation();
     $vehicles = auth()->user()->Vehicles();
     $zones = auth()->user()->Zones();
-    $units = auth()->user()->Units(); //LAS UNIDADES DADAS DE ALTA
-    $units2 = auth()->user()->Units('active'); //LAS UNIDADES DADAS DE ALTA
+    $units = auth()->user()->Units([1,0]); //LAS UNIDADES DADAS DE ALTA
+    $units2 = auth()->user()->Units();
     $drivers = auth()->user()->Drivers();
-    $drivers2 = auth()->user()->Drivers('active');
+    // $drivers2 = auth()->user()->Drivers('active');
 @endphp
 @extends('layout.app')
 @section('title') Gestión De Operaciones @endsection
@@ -40,28 +41,8 @@
             height: 18px;
         }
 
-        /*ESTILOS PARA IDENTIFICAR LOS COLORES DE AGENCIAS ESPECIFICAS*/
-        /* .agency_29{
-            background-color: #FE7A1F !important;
-        }
-        .agency_30{
-            background-color: #00467e !important;
-        } */
-        /* .is_open{
-            background-color: #e2a03f !important;
-        } */
-
-        .agency_29 td,
-        .is_open td{
-            color: #000000 !important;
-        }
-        .agency_30 td{
-            color: #ffffff !important;
-        }
-
         /*ESTILO DE CAMPANA*/
         .bell-button {
-            /* font-size: 24px; */
             border: none;
             background: none;
             cursor: pointer;
@@ -146,7 +127,7 @@
             @if ( auth()->user()->hasPermission(84) )
                 <button type="button" class="btn btn-primary" id="btn_dowload_operation_comission"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Descargar comisiones de operación</button>
             @endif
-            <button type="button" class="btn btn-danger" id="getSchedules"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-watch"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path></svg> Ver horario de conductores</button>
+            {{-- <button type="button" class="btn btn-danger" id="getSchedules"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-watch"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path></svg> Ver horario de conductores</button> --}}
             @if ( auth()->user()->hasPermission(85) )
                 <button type="button" class="btn btn-danger" id="btn_close_operation"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Cerrar operación</button>                
             @endif
@@ -170,8 +151,7 @@
             <table id="dataManagementOperations" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                 <thead>
                     <tr>
-                        <th class="text-center">#</th>
-                        <th class="text-center">INDICADORES</th>
+                        <th class="text-center"># Y INDICADORES</th>
                         <th class="text-center">HORA</th>
                         <th class="text-center">CLIENTE</th>
                         <th class="text-center">TIPO DE SERVICIO</th>
@@ -185,12 +165,9 @@
                         <th class="text-center">HORA OPERACIÓN</th>
                         <th class="text-center">COSTO OPERATIVO</th>
                         <th class="text-center">ESTATUS DE SERVICIO</th>
-                        <th class="text-center">CÓDIGO</th>
                         <th class="text-center">VEHÍCULO</th>
                         <th class="text-center">PAGO</th>
                         <th class="text-center">TOTAL</th>
-                        <th class="text-center">MONEDA</th>
-                        <th class="text-center"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -201,10 +178,7 @@
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
                                 //SABER SI SON ARRIVAL, DEPARTURE O TRANSFER, MEDIANTE UN COLOR DE FONDO
                                 $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "f2eafa" : "dbe0f9" ) ).";";
-
                                 $color_agency = ( $value->type_site == "AGENCY" ? "background-color: ".$value->site_color.";color: #ffffff;" : '' )."";
-                                // $color = "color: #".( $value->site_code == 29 || $value->site_code == 30 ? "FFFFFF" : "515365" ).";";
-                                // $class_agency = ( $value->site_code == 29 || $value->site_code == 30 ? "agency_".$value->site_code : ( $value->is_open ? "is_open" : "" ) );
 
                                 //PREASIGNACION
                                 $flag_preassignment = ( ( ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && $value->op_type == "TYPE_ONE" && ( $value->is_round_trip == 0 || $value->is_round_trip == 1 ) ) ) && $value->op_one_preassignment != "" ? true : ( ( $value->final_service_type == 'ARRIVAL' || $value->final_service_type == 'TRANSFER' || $value->final_service_type == 'DEPARTURE' ) && ( $value->is_round_trip == 1 ) && $value->op_two_preassignment != "" ? true : false ) );
@@ -266,48 +240,76 @@
                             @endphp
                             <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
                                 <td class="text-center">
-                                    @if ( $flag_preassignment )
-                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations text-uppercase">{{ $preassignment }}</button>
+                                    {{-- MUESTRA CÓDIGO DE RESERVA --}}
+                                    @if (auth()->user()->hasPermission(61))
+                                        <a class="btn btn-dark w-100 mb-1" href="/reservations/detail/{{ $value->reservation_id }}">CÓDIGO: {{ $value->code }}</a>
                                     @else
-                                        <button type="button" class="btn btn-danger text-uppercase btn_operations {{ auth()->user()->hasPermission(81) && $close_operation == 0 ? 'add_preassignment' : 'disabled' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
+                                        <div class="btn btn-dark w-100 mb-1">CÓDIGO: {{ $value->code }}</div>                                        
                                     @endif
-                                </td>
-                                <td class="text-center">
-                                    <div class="d-flex flex-column gap-2 w-100">
-                                        <div class="d-flex flex-column gap-2 comment-default">
-                                            @if ( !empty($value->messages) )
-                                                <div class="btn btn-primary btn_operations __open_modal_history bs-tooltip w-100" title="Ver historial de reservación" data-type="history" data-code="{{ $value->reservation_id }}">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                                                </div>
-                                            @endif
-                                            <div class="btn btn-primary btn_operations __open_modal_customer bs-tooltip w-100" title="Ver datos del cliente" data-code="{{ $value->reservation_id }}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+
+                                    @if ( $flag_preassignment )
+                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations w-100 mb-1 text-uppercase">{{ $preassignment }}</button>
+                                    @else
+                                        <button type="button" class="btn btn-danger text-uppercase btn_operations w-100 mb-1 {{ auth()->user()->hasPermission(81) && $close_operation == 0 ? 'add_preassignment' : 'disabled' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
+                                    @endif
+
+                                    <div class="d-flex flex-column w-100">
+
+                                        {{-- NOS INDICA SI LA RESERVA TIENE COMENTARIOS Y NOS MUESTRA LOS COMENTARIOS EN UN MODAL --}}
+                                        @if ( !empty($value->messages) )
+                                            <div class="btn btn-secondary btn_operations __open_modal_history bs-tooltip w-100 mb-1" title="Ver historial de reservación" data-type="history" data-code="{{ $value->reservation_id }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                             </div>
-                                            @if ( $value->is_round_trip == 1 && $value->final_service_type == "DEPARTURE" && ( $value->one_service_status == "CANCELLED" || $value->one_service_status == "NOSHOW" ) )
-                                                <div class="btn btn-primary btn_operations active notifications bell-button bs-tooltip w-100" data-json="<?=json_encode($value)?>" onclick="notificationInfo({{ json_encode($value) }})" title="Por favor de confirmar el regreso con el cliente"> 
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>                                                    
-                                                </div>                                                
-                                            @endif
-                                        </div>
+                                        @endif
+
+                                        {{-- NOS MUESTRA LOS DATOS DEL CLIENTE EN UN MODAL --}}
+                                        {{-- <div class="btn btn-secondary btn_operations __open_modal_customer bs-tooltip w-100 mb-1" title="Ver datos del cliente" data-code="{{ $value->reservation_id }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        </div> --}}
+
+                                        @if ( $value->is_round_trip == 1 && $value->final_service_type == "DEPARTURE" && ( $value->one_service_status == "CANCELLED" || $value->one_service_status == "NOSHOW" ) )
+                                            <div class="btn btn-secondary btn_operations active notifications bell-button bs-tooltip w-100 mb-1" data-json="<?=json_encode($value)?>" onclick="notificationInfo({{ json_encode($value) }})" title="Por favor de confirmar el regreso con el cliente"> 
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>                                                    
+                                            </div>                                                
+                                        @endif
+
                                         <div class="comment_new" id="comment_new_{{ $key.$value->id }}">
                                             @if ( $flag_comment )
-                                                <div class="btn btn-primary btn_operations __open_modal_history bs-tooltip w-100" title="Ver mensaje de operaciones" data-type="comment" data-comment="{{ $comment }}">
+                                                <div class="btn btn-secondary btn_operations __open_modal_history bs-tooltip w-100 mb-1" title="Ver mensaje de operaciones" data-type="comment" data-comment="{{ $comment }}">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                                 </div>
                                             @endif
                                         </div>
+
                                         <div class="upload_new" id="upload_new_{{ $key.$value->id }}">
                                             @if ( !empty($value->pictures) )
-                                                <div class="btn btn-primary btn_operations __open_modal_media bs-tooltip w-100" title="Esta reservación tiene imagenes" data-code="{{ $value->reservation_id }}">
+                                                <div class="btn btn-secondary btn_operations __open_modal_media bs-tooltip w-100 mb-1" title="Esta reservación tiene imagenes" data-code="{{ $value->reservation_id }}">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                                 </div>
                                             @endif
                                         </div>                                        
                                     </div>
+
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="btn btn-secondary btn_operations {{ auth()->user()->hasPermission(90) && $close_operation == 0 ? '__open_modal_comment' : 'disabled' }} bs-tooltip" title="{{ ( $flag_comment ) ? 'Modificar comentario' : 'Agregar comentario' }}" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-reservation="{{ $value->reservation_id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                        </div>
+                                        <div class="btn btn-secondary btn_operations extract_whatsapp bs-tooltip" title="Ver información para enviar por whatsApp" id="extract_whatsapp{{ $key.$value->id }}" data-bs-toggle="modal" data-bs-target="#operationWhatsAppModal">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-navigation"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                                        </div>
+                                        @if ( $value->final_service_type == "ARRIVAL" )
+                                            {{-- <div class="btn btn-secondary btn_operations extract_confirmation bs-tooltip" title="Ver información de confirmación" id="extract_confirmation{{ $key.$value->id }}" data-bs-toggle="modal" data-language="{{ $value->language }}" data-bs-target="#confirmationModal">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-navigation"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                                            </div> --}}
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="text-center">{{ auth()->user()->setDateTime($value, "time") }}</td>
                                 <td class="text-center">
-                                    <span>{{ $value->full_name }}</span>
+                                    <p class="mb-0"><strong style="color: red;">Nombre:</strong> {{ $value->full_name }}</p>
+                                    <p class="mb-0"><strong style="color: red;">Correo:</strong> {{ $value->client_email }}</p>
+                                    <p class="mb-0"><strong style="color: red;">Teléfono:</strong> {{ $value->client_phone }}</p>
+
                                     @if(!empty($value->reference))
                                         [{{ $value->reference }}]
                                     @endif
@@ -320,8 +322,14 @@
                                 </td>
                                 <td class="text-center">{{ $value->passengers }}</td>
                                 <td class="text-center" <?=auth()->user()->classCutOffZone($value)?>>
-                                    {{ auth()->user()->setFrom($value, "name") }} {{ $value->operation_type == 'arrival' && !empty($value->flight_number) ? ' ('.$value->flight_number.')' : '' }}                                    
+                                    {{ auth()->user()->setFrom($value, "name") }}
                                     <br>
+
+                                    @if ( $value->final_service_type == "ARRIVAL" || $value->final_service_type == "DEPARTURE" )
+                                        <span class="badge badge-primary mt-1">{{ !empty($value->flight_number) ? ' ('.$value->flight_number.')' : '' }}</span>
+                                        <br>
+                                    @endif
+
                                     <span class="badge badge-info mt-1">{{ auth()->user()->setFrom($value, "destination") }}</span>
                                 </td>
                                 <td class="text-center">
@@ -346,16 +354,17 @@
                                 </td>
                                 <td class="text-center" data-order="{{ ( $driver_d != NULL ) ? $driver_d : 0 }}" data-name="{{ auth()->user()->setOperationDriver($value) }}">
                                     @if ( auth()->user()->hasPermission(87) && $close_operation == 0 )                                        
-                                        <select class="form-control drivers selectpicker" data-live-search="true" id="driver_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
+                                        {{-- <select class="form-control drivers selectpicker" data-live-search="true" id="driver_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">
                                             <option value="0">Selecciona un conductor</option>
                                             @if ( isset($drivers2) && count($drivers2) >= 1 )
                                                 @foreach ($drivers2 as $driver)
                                                     <option {{ ( $driver_d != NULL && $driver_d == $driver->id ) ? 'selected' : '' }} value="{{ $driver->id }}">{{ $driver->names }} {{ $driver->surnames }}</option>
                                                 @endforeach
                                             @endif
-                                        </select>
+                                        </select> --}}
+                                        {{ auth()->user()->setOperationDriver($value) }}
                                     @else
-                                        {{  auth()->user()->setOperationDriver($value) }}
+                                        {{ auth()->user()->setOperationDriver($value) }}
                                     @endif
                                 </td>
                                 <td class="text-center">
@@ -374,34 +383,10 @@
                                         <?=auth()->user()->renderServiceStatusOP($value)?>
                                     @endif
                                 </td>
-                                <td class="text-center">
-                                    @if (auth()->user()->hasPermission(61))
-                                        <a href="/reservations/detail/{{ $value->reservation_id }}">{{ $value->code }}</a>
-                                    @else
-                                        {{ $value->code }}
-                                    @endif
-                                </td>
                                 <td class="text-center" style="{{ ( $value->service_type_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_type_name }}</td>
                                 <td class="text-center" <?=auth()->user()->classStatusPayment($value)?>>{{ auth()->user()->statusPayment($value->payment_status) }}</td>
-                                {{-- <td class="text-center" >{{ number_format(( ( $value->pay_at_arrival == 1  && $value->payment_status == "PENDING" ) || ( $value->pay_at_arrival == 0 && $value->payment_status == "PENDING" ) ? $value->total_sales : 0 ),2) }}</td> --}}
                                 <td class="text-center" >
-                                    {{ number_format( ( $value->total_balance > 0 ? $value->total_balance : $value->total_sales ) ,2) }}
-                                </td>
-                                <td class="text-center">{{ $value->currency }}</td>
-                                <td class="text-center">
-                                    <div class="d-flex flex-column gap-2">
-                                        <div class="btn btn-primary btn_operations {{ auth()->user()->hasPermission(90) && $close_operation == 0 ? '__open_modal_comment' : 'disabled' }} bs-tooltip" title="{{ ( $flag_comment ) ? 'Modificar comentario' : 'Agregar comentario' }}" id="btn_add_modal_{{ $key.$value->id }}" data-status="{{ ( $flag_comment ) ? 1 : 0 }}" data-reservation="{{ $value->reservation_id }}" data-id="{{ $key.$value->id }}" data-code="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                        </div>
-                                        <div class="btn btn-primary btn_operations extract_whatsapp bs-tooltip" title="Ver información para enviar por whatsApp" id="extract_whatsapp{{ $key.$value->id }}" data-bs-toggle="modal" data-bs-target="#operationWhatsAppModal">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-navigation"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
-                                        </div>
-                                        @if ( $value->final_service_type == "ARRIVAL" )
-                                            <div class="btn btn-primary btn_operations extract_confirmation bs-tooltip" title="Ver información de confirmación" id="extract_confirmation{{ $key.$value->id }}" data-bs-toggle="modal" data-language="{{ $value->language }}" data-bs-target="#confirmationModal">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-navigation"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
-                                            </div>
-                                        @endif
-                                    </div>
+                                    {{ number_format( ( $value->total_balance > 0 ? $value->total_balance : $value->total_sales ) ,2) }} {{ $value->currency }}
                                 </td>
                             </tr>
                         @endforeach
@@ -436,7 +421,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :websites="$websites" :units="$units" :drivers="$drivers" :reservationstatus="$reservation_status" />
+    <x-modals.filters.bookings :data="$data" :websites="$websites" :units="$units" :drivers="$drivers" :reservationstatus="$reservation_status" :servicesoperation="$services_operation" />
     <x-modals.reports.columns />
 
     {{-- <x-modals.management.operations.schedules /> --}}
@@ -445,9 +430,9 @@
     <x-modals.reservations.comments /> <!-- MODAL PARA PODER AGREGAR COMENTARIO DE OPERACION Y IMAGENES -->
     <x-modals.reservations.operation_messages_history /> <!-- HISTORIAL DE MENSAJES DE LA RESERVACION -->
     <x-modals.reservations.operation_media_history /> <!-- HISTORIAL DE MEDIA DE LA RESERVACION -->
-    <x-modals.reservations.operation_data_customer /> <!-- INFORMACIÓN DEL CLIENTE -->
-    <x-modals.reservations.operation_confirmations />
-    <x-modals.reservations.operation_data_whatsapp />    
+    {{-- <x-modals.reservations.operation_data_customer /> <!-- INFORMACIÓN DEL CLIENTE -->     --}}
+    <x-modals.reservations.operation_data_whatsapp />
+    {{-- <x-modals.reservations.operation_confirmations /> --}}
 @endsection
 
 @push('Js')

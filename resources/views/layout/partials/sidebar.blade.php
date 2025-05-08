@@ -142,7 +142,13 @@
         endif;
 
         //GESTION
-        if(auth()->user()->hasPermission(39) || auth()->user()->hasPermission(47) || auth()->user()->hasPermission(10) || auth()->user()->hasPermission(76) ):
+        if( 
+            auth()->user()->hasPermission(39) || // CONFIRMACIONES
+            auth()->user()->hasPermission(47) || // POST VENTA
+            auth()->user()->hasPermission(10) || // RESERVACIONES
+            auth()->user()->hasPermission(76) || // OPERACIÓN
+            auth()->user()->hasPermission(123) // HOTELES
+        ):
             // CONFIRMACIONES
             if(auth()->user()->hasPermission(39)):
                 $links_operations[] = [
@@ -167,12 +173,20 @@
                     'active' => request()->routeIs('management.reservations'),
                 ];
             endif;
-            // OPERACIONES
+            // OPERACIÓN
             if(auth()->user()->hasPermission(76)):
                 $links_operations[] = [
                     'name' => 'Operaciones',
                     'route' => route('operation.index'),
                     'active' => request()->routeIs('operation.index','operation.index.search'),
+                ];
+            endif;
+            // HOTELES
+            if(auth()->user()->hasPermission(123)):
+                $links_operations[] = [
+                    'name' => 'Hoteles',
+                    'route' => route('management.hotels'),
+                    'active' => request()->routeIs('management.hotels'),
                 ];
             endif;
             array_push($links,[

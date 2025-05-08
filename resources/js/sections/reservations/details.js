@@ -1,33 +1,182 @@
 // DECLARACIÓN DE VARIABLES
-let types_cancellations = {};
-const __serviceDateForm = document.getElementById('serviceDateForm');
-const __serviceDateRoundForm = document.getElementById('serviceDateRoundForm');
-const __formConfirmation = document.getElementById('formConfirmation'); // DIV QUE TIENE EL FORMULARIO DE ENVIO DE CONFIRMACION
-const __btnSendArrivalConfirmation = document.getElementById('btnSendArrivalConfirmation'); //BOTON PARA ENVIAR EL EMAIL DE CONFIRMATION
-const __titleModal = document.getElementById('titleModal');
-const __closeModalHeader = document.getElementById('closeModalHeader');
-const __closeModalFooter = document.getElementById('closeModalFooter');
-const __serviceType = document.getElementById('serviceTypeForm');
+let types_cancellations                 = {};
+const __serviceDateForm                 = document.getElementById('serviceDateForm');
+const __serviceDateRoundForm            = document.getElementById('serviceDateRoundForm');
+const __formConfirmation                = document.getElementById('formConfirmation'); // DIV QUE TIENE EL FORMULARIO DE ENVIO DE CONFIRMACION
+const __btnSendArrivalConfirmation      = document.getElementById('btnSendArrivalConfirmation'); //BOTON PARA ENVIAR EL EMAIL DE CONFIRMATION
+const __titleModal                      = document.getElementById('titleModal');
+const __closeModalHeader                = document.getElementById('closeModalHeader');
+const __closeModalFooter                = document.getElementById('closeModalFooter');
+const __serviceType                     = document.getElementById('serviceTypeForm');
 
 //DECLARAMOS VARIABLES, PARA VENTAS Y PAGOS
-const __type = document.getElementById('type_form');
-const __code = document.getElementById('sale_id');
-const __type_pay = document.getElementById('type_form_pay');
-const __code_pay = document.getElementById('payment_id');
-
-const deleteCommission = document.querySelector('.deleteCommission');
+const __type                            = document.getElementById('type_form');
+const __code                            = document.getElementById('sale_id');
+const __type_pay                        = document.getElementById('type_form_pay');
+const __code_pay                        = document.getElementById('payment_id');
+const deleteCommission                  = document.querySelector('.deleteCommission');
 
 //DECLARAMOS VARIABLES PARA ACCIONES DE RESERVA
-const sendMessageWhatsApp = document.getElementById('sendMessageWhatsApp');
-const enablePayArrival = document.getElementById('enablePayArrival');
-const enablePlusService = document.getElementById('enablePlusService');
-const markReservationOpenCredit = document.getElementById('markReservationOpenCredit');
-const reactivateReservation = document.getElementById('reactivateReservation');
-const refundRequest = document.getElementById('refundRequest');
-const markReservationDuplicate = document.getElementById('markReservationDuplicate');
+const sendMessageWhatsApp               = document.getElementById('sendMessageWhatsApp');
+const enablePayArrival                  = document.getElementById('enablePayArrival');
+const enablePlusService                 = document.getElementById('enablePlusService');
+const markReservationOpenCredit         = document.getElementById('markReservationOpenCredit');
+const reactivateReservation             = document.getElementById('reactivateReservation');
+const refundRequest                     = document.getElementById('refundRequest');
+const markReservationDuplicate          = document.getElementById('markReservationDuplicate');
+
+//FUNCIONES ANONIMAS
+let details = {
+    /**
+     * 
+     * @param {*} item 
+     */
+    initMap: function(item) {
+        const _from_name = document.getElementById('origin_location');
+        const _to_name = document.getElementById('destination_location');
+        const _distance_time = document.getElementById('destination_time');
+        const _distance_km = document.getElementById('destination_kms');
+    
+        let from_lat = parseFloat(item.from_lat);
+        let from_lng = parseFloat(item.from_lng);
+        let to_lat = parseFloat(item.to_lat);
+        let to_lng = parseFloat(item.to_lng);
+    
+        const origin = { lat: from_lat, lng: from_lng };
+        const destination = { lat: to_lat, lng: to_lng };
+    
+        // Crear mapa
+        const map = new google.maps.Map(document.getElementById('services_map'), {
+            center: origin,
+            zoom: 15,
+            disableDefaultUI: false,
+            mapTypeControl: false,
+            scaleControl: false,
+            zoomControl: true,
+            streetViewControl: false,
+            fullscreenControl: false,
+        });
+    
+        // Crear marcadores
+        new google.maps.Marker({ position: origin, map, title: 'Origen' });
+        new google.maps.Marker({ position: destination, map, title: 'Destino' });
+    
+        // Mostrar nombres
+        _from_name.innerText = item.from_name;
+        _to_name.innerText = item.to_name;
+    
+        // Direcciones
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer({
+            map: map,
+            suppressMarkers: true
+        });
+    
+        directionsService.route({
+            origin: origin,
+            destination: destination,
+            travelMode: google.maps.TravelMode.DRIVING
+        }, function(response, status) {
+            if (status === google.maps.DirectionsStatus.OK) {
+                directionsRenderer.setDirections(response);
+    
+                const route = response.routes[0].legs[0];
+                // item.distance_time + '/' + 
+                _distance_time.innerText = route.duration.text;
+                // item.distance_km + '/' + 
+                _distance_km.innerText = route.distance.text;
+            } else {
+                console.error('Error obteniendo la ruta: ', status);
+            }
+        });
+    },
+    /**
+     * 
+     * @param {*} div 
+     */
+    initialize: function (div) {
+        const _input = document.getElementById(div);
+        if (!_input) {
+            console.warn('No se encontró el input con ID: ' + div);
+            return;
+        }
+        
+        const autocomplete = new google.maps.places.Autocomplete(_input);
+      
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+                console.warn('El lugar no tiene geometría (lat/lng):', place);
+                return;
+            }
+    
+            if (div === "serviceFromForm") {
+                const latInput = document.getElementById("from_lat_edit");
+                const lngInput = document.getElementById("from_lng_edit");
+                if (latInput && lngInput) {
+                    latInput.value = place.geometry.location.lat();
+                    lngInput.value = place.geometry.location.lng();
+                }
+            }
+    
+            if (div === "serviceToForm") {
+                const latInput = document.getElementById("to_lat_edit");
+                const lngInput = document.getElementById("to_lng_edit");
+                if (latInput && lngInput) {
+                    latInput.value = place.geometry.location.lat();
+                    lngInput.value = place.geometry.location.lng();
+                }
+            }
+        });
+    },
+    /**
+     * 
+     * @param {*} item 
+     */
+    itemInfo: function (item){
+        const __service_type = document.querySelector('.serviceTypeForm');    
+        $("#from_zone_id").val(item.from_zone);
+        $("#to_zone_id").val(item.to_zone);
+    
+        $("#item_id_edit").val(item.reservations_item_id);
+        $("#servicePaxForm").val(item.passengers);
+        $("#destination_serv").val(item.destination_service_id);
+        $("#serviceFromForm").val(item.from_name);
+        $("#serviceToForm").val(item.to_name);
+        $("#serviceFlightForm").val(item.flight_number);
+    
+        $("#from_lat_edit").val(item.from_lat);
+        $("#from_lng_edit").val(item.from_lng);
+        $("#to_lat_edit").val(item.to_lat);
+        $("#to_lng_edit").val(item.to_lng);
+    
+        __serviceDateForm.value = item.op_one_pickup,
+        __serviceDateForm.min = item.op_one_pickup;
+        if(item.op_one_status != 'PENDING'){
+            $("#serviceDateForm").prop('readonly', true);
+        }
+    
+        if(item.op_two_status != 'PENDING'){
+            $("#serviceDateRoundForm").prop('readonly', true);
+        }
+    
+        if(item.is_round_trip == 1){
+            __serviceDateRoundForm.value = item.op_two_pickup,
+            __serviceDateRoundForm.min = item.op_one_pickup;
+            $("#info_return").removeClass('d-none');
+            __service_type.classList.add('d-none');
+            __serviceType.removeAttribute('name');
+        }else{
+            __serviceDateRoundForm.value = "",
+            __serviceDateRoundForm.min = "";
+            $("#info_return").addClass('d-none');
+            __service_type.classList.remove('d-none');
+            __serviceType.setAttribute('name','serviceTypeForm');
+        }
+    },
+}
 
 //DECLARAMOS VARIABLES PARA ITEMS DE SERVICIOS
-
 function debounce(func, delay) {
     let timer;
     return function(...args) {
@@ -539,6 +688,10 @@ if( markReservationDuplicate ){
 }
 
 //VALIDAMOS DOM
+/*
+    se dispara cuando el documento HTML ha sido completamente cargado y parseado, 
+    sin esperar a que se carguen los estilos, imágenes u otros recursos externos.
+ */
 document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("click", debounce(function (event) {
         //PERMITE CALIFICAR LA RESERVACION        
@@ -1036,6 +1189,29 @@ document.addEventListener("DOMContentLoaded", function() {
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
 });
 
+/*
+    se dispara después de que todos los recursos (imágenes, hojas de estilo, etc.) se han cargado.
+ */
+window.addEventListener('load', function () {
+    // google.maps.event.addDomListener(window, 'load', details.initialize('serviceFromForm') );
+    // google.maps.event.addDomListener(window, 'load', details.initialize('serviceToForm') );
+    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+        if (document.getElementById('serviceFromForm')) {
+            details.initialize('serviceFromForm');
+        } else {
+            console.warn("No se encontró el input con ID 'serviceFromForm'");
+        }
+
+        if (document.getElementById('serviceToForm')) {
+            details.initialize('serviceToForm');
+        } else {
+            console.warn("No se encontró el input con ID 'serviceToForm'");
+        }
+    } else {
+        console.error("La API de Google Maps no está cargada aún.");
+    }
+});
+
 //ENVIAR CONFIRMACIÓN DE LLEGADA
 document.addEventListener("click", function (event) {
     if (event.target.classList.contains('arrivalConfirmation')) {
@@ -1083,34 +1259,6 @@ function typesCancellations() {
     }
 }
 typesCancellations();
-
-function initMap() {
-    var from_lat = parseFloat($('#from_lat').val());
-    var from_lng = parseFloat($('#from_lng').val());
-    var to_lat = parseFloat($('#to_lat').val());
-    var to_lng = parseFloat($('#to_lng').val());
-
-    var location1 = { lat: from_lat, lng: from_lng };
-    var location2 = { lat: to_lat, lng: to_lng };
-
-    // Create a map centered at one of the locations
-    var map = new google.maps.Map(document.getElementById('services_map'), {
-        center: location1, 
-        zoom: 10 
-    });
-
-    var marker1 = new google.maps.Marker({
-        position: location1,
-        map: map,
-        title: 'Origen'
-    });
-
-    var marker2 = new google.maps.Marker({
-        position: location2,
-        map: map,
-        title: 'Destino'
-    });
-}
 
 function sendMail(code,mail,languague){
     var url = "https://api.caribbean-transfers.com/api/v1/reservation/send?code="+code+"&email="+mail+"&language="+languague+"&type=new";
@@ -1320,57 +1468,6 @@ $("#btn_edit_res_details").on('click', function(){
     });
 });
 
-function serviceInfo(origin,destination,time,km){
-    $("#origin_location").html(origin);
-    $("#destination_location").html(destination);
-    $("#destination_time").html(time);
-    $("#destination_kms").html(km);
-}
-
-function itemInfo(item){
-    console.log(item);
-    const __service_type = document.querySelector('.serviceTypeForm');    
-
-    $("#from_zone_id").val(item.from_zone);
-    $("#to_zone_id").val(item.to_zone);
-
-    $("#item_id_edit").val(item.reservations_item_id);
-    $("#servicePaxForm").val(item.passengers);
-    $("#destination_serv").val(item.destination_service_id);
-    $("#serviceFromForm").val(item.from_name);
-    $("#serviceToForm").val(item.to_name);
-    $("#serviceFlightForm").val(item.flight_number);
-
-    $("#from_lat_edit").val(item.from_lat);
-    $("#from_lng_edit").val(item.from_lng);
-    $("#to_lat_edit").val(item.to_lat);
-    $("#to_lng_edit").val(item.to_lng);
-
-    __serviceDateForm.value = item.op_one_pickup,
-    __serviceDateForm.min = item.op_one_pickup;
-    if(item.op_one_status != 'PENDING'){
-        $("#serviceDateForm").prop('readonly', true);
-    }
-
-    if(item.op_two_status != 'PENDING'){
-        $("#serviceDateRoundForm").prop('readonly', true);
-    }
-
-    if(item.is_round_trip == 1){
-        __serviceDateRoundForm.value = item.op_two_pickup,
-        __serviceDateRoundForm.min = item.op_one_pickup;
-        $("#info_return").removeClass('d-none');
-        __service_type.classList.add('d-none');
-        __serviceType.removeAttribute('name');
-    }else{
-        __serviceDateRoundForm.value = "",
-        __serviceDateRoundForm.min = "";
-        $("#info_return").addClass('d-none');
-        __service_type.classList.remove('d-none');
-        __serviceType.setAttribute('name','serviceTypeForm');
-    }
-}
-
 if( __serviceType != null ){
     __serviceType.addEventListener('change', function(event){
         event.preventDefault();        
@@ -1499,35 +1596,6 @@ $("#btn_edit_item").on('click', function(){
         )
         $("#btn_edit_item").prop('disabled', false);
     });
-});
-
-function initialize(div) {
-    var input = document.getElementById(div);
-    var autocomplete = new google.maps.places.Autocomplete(input);
-  
-    autocomplete.addListener('place_changed', function() {
-        var place = autocomplete.getPlace();
-        if(div == "serviceFromForm"){        
-          var fromLat = document.getElementById("from_lat_edit");
-              fromLat.value = place.geometry.location.lat();
-  
-          var fromLng = document.getElementById("from_lng_edit");
-              fromLng.value = place.geometry.location.lng();
-        }
-        if(div == "serviceToForm"){
-          var toLat = document.getElementById("to_lat_edit");
-              toLat.value = place.geometry.location.lat();
-  
-          var toLng = document.getElementById("to_lng_edit");
-              toLng.value = place.geometry.location.lng();
-        }
-    });
-}
-
-$(function() {
-    google.maps.event.addDomListener(window, 'load', initialize('serviceFromForm') );
-    google.maps.event.addDomListener(window, 'load', initialize('serviceToForm') );
-    initMap();
 });
 
 function sendArrivalConfirmation() {

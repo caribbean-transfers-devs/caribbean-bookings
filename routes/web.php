@@ -38,6 +38,7 @@ use App\Http\Controllers\Management\PendingController as            PENDING;
 use App\Http\Controllers\Management\SpamController as               SPAM;
 use App\Http\Controllers\Management\ReservationsController as       RESERVATIONS;
 use App\Http\Controllers\Operations\OperationsController as         Operations;
+use App\Http\Controllers\Management\HotelsController as             HOTELS;
 
 //SETTINGS
 use App\Http\Controllers\Settings\RoleController as                 ROLES;
@@ -208,6 +209,10 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'], '/management/operation/schedules/get', [Operations::class, 'getSchedules'])->name('management.operation.schedules.get');
         Route::match(['post'], '/management/operation/schedules/update', [Operations::class, 'updateSchedules'])->name('management.operation.schedules.update');
 
+        //HOTELES
+        Route::match(['get', 'post'], '/management/hotels', [HOTELS::class, 'index'])->name('management.hotels');
+        Route::match(['post'], '/management/hotel/add', [HOTELS::class, 'hotelAdd'])->name('management.hotel.add');
+
     //CONFIGURACIONES
         Route::resource('/roles', ROLES::class);
         //USERS
@@ -286,6 +291,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
 
         Route::post('/reservations/confirmation/arrival', [DETAILS_RESERVATION::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
         Route::post('/reservations/confirmation/departure', [DETAILS_RESERVATION::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');
+        
         Route::post('/reservations/payment-request', [DETAILS_RESERVATION::class, 'paymentRequest'])->name('reservations.paymentRequest');
         Route::post('/reservations/upload', [DETAILS_RESERVATION::class, 'uploadMedia'])->name('reservations.upload');
         Route::get('/reservations/upload/{id}', [DETAILS_RESERVATION::class, 'getMedia'])->name('reservations.upload.getmedia');

@@ -66,49 +66,15 @@
     background-color: rgba(234, 241, 255, 0.74); /* Asegúrate de que el fondo sea blanco o del color de la tabla */
 }
 
-//TABLA DE HORARIOS
-.table.custom-table {
-
-    > {
-        tbody > tr > td {
-            .bootstrap-select{
-                &.btn-group{
-                    > .dropdown-toggle{
-                        font-family: "Poppins", serif;
-                        align-items: center;
-                        display: inline-flex;
-                        justify-content: space-between;
-                        position: relative;
-                        text-align: right;
-                        white-space: unset;
-                        width: 100%;
-                        font-size: 11px;
-                        height: calc(1.3em + 1.8rem + 2px);
-                        padding: 0.75rem 1.25rem;
-                        letter-spacing: 0;
-
-                        .filter-option{
-                            overflow: hidden;
-                            height: 100%;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
 //CUSTOMER BOOTSTRAP SELECT 
 .table.table-rendering {
     font-family: 'Nunito', sans-serif;
-    
     > {
 
         thead > tr > th,
         tfoot > tr > th {
             padding: 0;
-            font-size: 10px;          
+            font-size: 10px;
         }
 
         tbody > tr > td {
@@ -125,7 +91,8 @@
                         text-align: right;
                         white-space: unset;
                         width: 100%;
-                        font-size: .625rem;
+                        // font-size: .625rem;
+                        font-size: 0.688rem;
                         height: calc(1.3em + 1.3rem + 2px);
                         padding: 8px 14px;
                         letter-spacing: 0;
@@ -143,7 +110,7 @@
         }
     }
 
-    .badge, button{
-      font-size: 10px;
-    }
+    // .badge, button{
+    //   font-size: 10px;
+    // }
 }

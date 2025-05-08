@@ -1234,9 +1234,12 @@ document.addEventListener("DOMContentLoaded", function() {
                     const __vehicle = document.getElementById('vehicle_id_' + key);
                     const __driver = document.getElementById('driver_id_' + key);
     
-                    if ( ( __vehicle.value == 0 && __driver.value == 0 ) || ( __vehicle.value == 0 ) || ( __driver.value == 0 ) ) {
+                    // ( __vehicle.value == 0 && __driver.value == 0 ) || 
+                    // || ( __driver.value == 0 )
+                    // y conductor
+                    if ( ( __vehicle.value == 0 ) ) {
                         Swal.fire({
-                            text: 'Valida la selección de unidad y conductor.',
+                            text: 'Valida la selección de unidad.',
                             icon: 'error',
                             showConfirmButton: false,
                             timer: 1500,
@@ -1614,45 +1617,45 @@ if( __is_open != null ){
 
 if( __btn_preassignment != null ){
   __btn_preassignment.addEventListener('click', function() {
-      swal.fire({
-          text: '¿Está seguro de pre-asignar los servicios?',
-          icon: 'warning',
-          inputLabel: "Selecciona la fecha que pre-asignara",
-          input: "date",
-          inputValue: document.getElementById('lookup_date').value,
-          inputValidator: (result) => {
-              return !result && "Selecciona un fecha";
-          },
-          didOpen: () => {
-              const today = (new Date()).toISOString();
-              Swal.getInput().min = today.split("T")[0];
-          },
-          showCancelButton: true,
-          confirmButtonText: 'Aceptar',
-          cancelButtonText: 'Cancelar'
-      }).then((result) => {
-          if(result.isConfirmed == true){
-              $.ajax({
-                  type: "POST",
-                  url: _LOCAL_URL + "/operation/preassignments",
-                  data: JSON.stringify({ date: result.value }), // Datos a enviar al servidor
-                  dataType: "json",
-                  contentType: 'application/json; charset=utf-8',   
-                  beforeSend: function(){
-                      components.loadScreen();
-                  },
-                  success: function(response) {
-                      // Manejar la respuesta exitosa del servidor
-                      Swal.fire({
-                          icon: 'success',
-                          text: response.message,
-                          showConfirmButton: false,
-                          timer: 1500,
-                      });
-                  }
-              });
-          }
-      });
+        swal.fire({
+            text: '¿Está seguro de pre-asignar los servicios?',
+            icon: 'warning',
+            inputLabel: "Selecciona la fecha que pre-asignara",
+            input: "date",
+            inputValue: document.getElementById('lookup_date').value,
+            inputValidator: (result) => {
+                return !result && "Selecciona un fecha";
+            },
+            didOpen: () => {
+                const today = (new Date()).toISOString();
+                Swal.getInput().min = today.split("T")[0];
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if(result.isConfirmed == true){
+                $.ajax({
+                    type: "POST",
+                    url: _LOCAL_URL + "/operation/preassignments",
+                    data: JSON.stringify({ date: result.value }), // Datos a enviar al servidor
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',   
+                    beforeSend: function(){
+                        components.loadScreen();
+                    },
+                    success: function(response) {
+                        // Manejar la respuesta exitosa del servidor
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    }
+                });
+            }
+        });
   });
 }
 
@@ -2031,7 +2034,7 @@ if ( __send_confirmation_whatsapp != null ){
 }
 
 //FUNCIONALIDAD QUE RECARGA LA PAGINA, CUANDO ESTA DETACTA INACTIVIDAD POR 5 MINUTOS
-var inactivityTime = (5 * 60000); // 30 segundos en milisegundos
+var inactivityTime = (2 * 60000); // 30 segundos en milisegundos
 var timeoutId;
 
 function resetTimer() {
@@ -2079,7 +2082,7 @@ socket.on("addPreassignmentClient", function(data){
     console.log(data);
     //DECLARACION DE VARIABLES
     const __btn_preassignment = document.getElementById('btn_preassignment_' + data.item);
-    if( __btn_preassignment != null ){
+    if( __btn_preassignment ){
         const __Row = ( __btn_preassignment != null ? components.closest(__btn_preassignment, 'tr') : null );
         const __Cell = ( __Row != null ? __Row.querySelector('td:nth-child(1)') : "" );
         console.log(__btn_preassignment, __Row, __Cell);
@@ -2102,7 +2105,7 @@ socket.on("setVehicleReservationClient", function(data){
     console.log(data);
     //DECLARACION DE CONSTANTES
     const __Row = document.getElementById('item-' + data.item);//ROW ES EL TR, DONDE ESTAMOS TRABAJANDO CON EL SELECT DEL VEHICULO
-    const __CellVehicle = ( __Row != null ? __Row.querySelector('td:nth-child(10)') : null );//ES LA CELDA DONDE SETEAMOS O IMPRIMIMOS EL VALOR DE VEHICULO
+    const __CellVehicle = ( __Row != null ? __Row.querySelector('td:nth-child(9)') : null );//ES LA CELDA DONDE SETEAMOS O IMPRIMIMOS EL VALOR DE VEHICULO
     const __select_vehicle = document.getElementById('vehicle_id_' + data.item);
     const __CellCost = ( __Row != null ? __Row.querySelector('td:nth-child(14)') : null );//ES LA CELDA DONDE SETEAMOS O IMPRIMIMOS EL COSTO OPERATIVO
     
@@ -2130,13 +2133,12 @@ socket.on("setDriverReservationClient", function(data){
     console.log(data);
     //DECLARACION DE CONSTANTES
     const __Row = document.getElementById('item-' + data.item);//ROW ES EL TR, DONDE ESTAMOS TRABAJANDO CON EL SELECT DEL CONDUCTOR
-    const __CellDriver = ( __Row != null ? __Row.querySelector('td:nth-child(11)') : "" );
+    const __CellDriver = ( __Row != null ? __Row.querySelector('td:nth-child(10)') : "" );
     const __select_driver = document.getElementById('driver_id_' + data.item);
         
     ( __CellDriver != null ?  __CellDriver.dataset.order = data.value : "" );
     ( __CellDriver != null ?  __CellDriver.dataset.name = data.name : "" );
     ( __select_driver == null && __CellDriver != null ?  __CellDriver.innerHTML = data.name : "" );
-
     ( __select_driver != null ? __select_driver.value = data.value : "" );
     ( __select_driver != null ? $('#driver_id_' + data.item).selectpicker('val', data.value) : "" );
 
@@ -2155,7 +2157,7 @@ socket.on("updateStatusOperationClient", function(data){
     console.log(data);
     //DECLARACION DE CONSTANTES
     const __Row = document.getElementById('item-' + data.item);//ROW ES EL TR, DONDE ESTAMOS TRABAJANDO CON EL SELECT DEL ESTATUS DE OPERACIÓN
-    const __CellStatusOperation = ( __Row != null ? __Row.querySelector('td:nth-child(12)') : "" );
+    const __CellStatusOperation = ( __Row != null ? __Row.querySelector('td:nth-child(11)') : "" );
     const __status_operation = document.getElementById('optionsOperation' + data.item);
     const __CellTime = ( __Row != null ? __Row.querySelector('td:nth-child(13)') : "" );
             
@@ -2180,7 +2182,7 @@ socket.on("updateStatusBookingClient", function(data){
     console.log(data);
     //DECLARACION DE VARIABLES
     const __Row = document.getElementById('item-' + data.item);//ROW ES EL TR, DONDE ESTAMOS TRABAJANDO CON EL SELECT DEL ESTATUS DE RESERVACIÓN
-    const __CellStatusBooking = ( __Row != null ? __Row.querySelector('td:nth-child(15)') : "" );
+    const __CellStatusBooking = ( __Row != null ? __Row.querySelector('td:nth-child(14)') : "" );
     const __status_booking = document.getElementById('optionsBooking' + data.item);
         
     ( __status_booking != null ? __status_booking.classList.remove('btn-secondary', 'btn-success', 'btn-warning', 'btn-danger') : "" );
@@ -2205,7 +2207,7 @@ socket.on("addCommentClient", function(data){
     const __btn_comment = document.getElementById('btn_add_modal_' + data.item);
     ( __btn_comment != null ?  __btn_comment.dataset.status = data.status : "" );
     const __comment_new = document.getElementById('comment_new_' + data.item);
-    __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_history bs-tooltip w-100" title="Ver mensaje de operaciones" data-type="comment" data-comment="'+ data.value +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>'
+    __comment_new.innerHTML = '<div class="btn btn-secondary btn_operations __open_modal_history bs-tooltip w-100 mb-1" title="Ver mensaje de operaciones" data-type="comment" data-comment="'+ data.value +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>'
 
     history();
     setup.bsTooltip();
@@ -2224,7 +2226,7 @@ socket.on("uploadBookingClient", function(data){
 
     //DECLARACION DE VARIABLES
     const __comment_new = document.getElementById('upload_new_' + data.item);
-    __comment_new.innerHTML = '<div class="btn btn-primary btn_operations __open_modal_media bs-tooltip w-100" title="Esta reservación tiene imagenes" data-code="'+ data.reservation +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>'
+    __comment_new.innerHTML = '<div class="btn btn-secondary btn_operations __open_modal_media bs-tooltip w-100 mb-1" title="Esta reservación tiene imagenes" data-code="'+ data.reservation +'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>'
 
     mediaBooking();
     setup.bsTooltip();
@@ -2237,6 +2239,7 @@ socket.on("uploadBookingClient", function(data){
     });
 });
 
+//APLICA CUANDO SE AGREGA UN SERVICIO DESDE EL PANEL DE OPERACIONES
 socket.on("addServiceClient", function(data){
     console.log("nuevo servicio");
     console.log(data);

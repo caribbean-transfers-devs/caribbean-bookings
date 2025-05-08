@@ -11,9 +11,6 @@
   background-color: #fff;
 }
 
-// .dt-container{
-//   position: relative;
-
 /* Contenedor principal (ajusta el height según necesites) */
 .scroll-wrapper {
   width: 100%;
@@ -43,7 +40,6 @@
   background: #888;
   border-radius: 4px;
 }
-// }
 
 .dt--top-section {
   font-family: "Poppins", serif;  
@@ -146,12 +142,12 @@ table.dataTable {
   font-family: "Poppins", serif;
 
     > tbody tr {
-        border-radius: 4px;
-        border-bottom: 1px solid #CCD6EB;
+      border-radius: 4px;
+      border-bottom: 1px solid #CCD6EB;
     }
     
     &.table-hover tbody tr {
-        background-color: transparent;
+      background-color: transparent;
     }
 
     &.dt-table-hover tbody tr:hover {
@@ -159,11 +155,9 @@ table.dataTable {
     }    
 
     > {
-        thead{ color: #16161D; }
 
         thead > tr > th,
         tfoot > tr > th {
-          // background-color: rgba(234, 241, 255, 0.74) !important;
           font-size: 11px;
         }
 

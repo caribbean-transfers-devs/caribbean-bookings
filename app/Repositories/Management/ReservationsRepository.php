@@ -48,7 +48,12 @@ class ReservationsRepository
         ];
         
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end ';
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
+
         $havingConditions = []; $queryHaving = '';
+        $havingConditionsA = []; $queryHavingA = '';
+        $havingConditionsD = []; $queryHavingD = '';
         $queryData = [
             'init' => ( isset($request->date) ? $request->date : date('Y-m-d') ) . " 00:00:00",
             'end' => ( isset($request->date) ? $request->date : date('Y-m-d') ) . " 23:59:59",
@@ -127,6 +132,13 @@ class ReservationsRepository
             $params = $this->parseArrayQuery($request->reservation_status,"single");
             $havingConditions[] = " reservation_status IN (".$params.") ";
         }
+
+        //TIPO DE SERVICIO EN OPERACIÓN        
+        $paramsArrival = $this->parseArrayQuery(['ARRIVAL'],"single");
+        $havingConditionsA[] = " final_service_type IN (".$paramsArrival.") ";
+
+        $paramsDeperture = $this->parseArrayQuery(['DEPARTURE'],"single");
+        $havingConditionsD[] = " final_service_type IN (".$paramsDeperture.") ";        
 
         //TIPO DE VEHÍCULO
         if(isset( $request->product_type ) && !empty( $request->product_type )){
@@ -207,14 +219,24 @@ class ReservationsRepository
             $query .= " AND rez.pay_at_arrival = $params ";
         }
 
-        // if(  (isset( $request->reservation_status ) && !empty( $request->reservation_status )) || (isset( $request->payment_status ) && !empty( $request->payment_status )) || (isset( $request->payment_method ) && !empty( $request->payment_method )) || (isset( $request->is_balance )) || (isset( $request->is_today )) ){
-            if( !empty($havingConditions) ){
-                $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
-            }
-        // }
+        if( !empty($havingConditions) ){
+            $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
+        }
+
+        if( !empty($havingConditionsA) ){
+            $queryHavingA = " HAVING " . implode(' AND ', $havingConditionsA);
+        }
+
+        if( !empty($havingConditionsD) ){
+            $queryHavingD = " HAVING " . implode(' AND ', $havingConditionsD);
+        }
 
         // dd($query, $queryHaving, $queryData);
         $bookings = $this->queryBookings($query, $queryHaving, $queryData);
+        //arrivals
+        $arrivals = $this->queryOperations($queryOne, $queryTwo, $queryHavingA, $queryData);
+        //departures
+        $departures = $this->queryOperations($queryOne, $queryTwo, $queryHavingD, $queryData);        
         
         return view('management.reservations.index', [
             'breadcrumbs' => [
@@ -225,6 +247,8 @@ class ReservationsRepository
                 ]
             ],
             'bookings' => $bookings,
+            'arrivals' => $arrivals,
+            'departures' => $departures,
             'data' => $data,
         ]);
     }

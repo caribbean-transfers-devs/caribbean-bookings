@@ -1,9 +1,13 @@
 @import "../../../plugins/table/datatable/datatables5";
 @import "../../template/plugins/light/table/datatable/custom_dt";
 
+@import '../../template/light/components/accordions';
 @import '../../template/light/components/modal';
-@import '../../template/light/components/tabs';
 
 @import '../../components/fixedheader';
 @import '../../components/filters';
 @import '../../components/charts';
+
+div#serviceMapModal div#services_map {
+    height: 400px;
+}

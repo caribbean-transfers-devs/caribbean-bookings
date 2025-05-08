@@ -497,7 +497,19 @@ class ReservationsRepository
             return response()->json(['message' => 'Es necesario seleccionar un punto', 'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
         endif;
 
-        $item = DB::select("SELECT it.code, it.from_name, it.to_name, it.flight_number, it.passengers, it.op_one_pickup, it.op_two_pickup, rez.client_first_name, rez.client_email, sit.transactional_phone, rez.id as reservation_id
+        $item = DB::select("SELECT 
+                                    it.code, 
+                                    it.from_name, 
+                                    it.to_name, 
+                                    it.flight_number, 
+                                    it.passengers, 
+                                    it.op_one_pickup, 
+                                    it.op_two_pickup, 
+                                    rez.client_first_name, 
+                                    rez.client_email, 
+                                    sit.transactional_phone,
+                                    sit.transactional_phone_arrival,
+                                    rez.id as reservation_id
                                 FROM reservations_items as it
                                 INNER JOIN reservations as rez ON rez.id = it.reservation_id
                                 INNER JOIN sites as sit ON sit.id = rez.site_id
@@ -544,12 +556,10 @@ class ReservationsRepository
         if(isset($email_response['Messages'][0]['Status']) && $email_response['Messages'][0]['Status'] == "success"):
             $check = $this->create_followUps($item[0]->reservation_id, 'El usuario: '.auth()->user()->name.", a enviado E-mail (confirmación de llegada) para la reservación: ".$item[0]->reservation_id, 'INTERN', 'SISTEMA');
             // E-mail enviado (confirmación de llegada) por '.auth()->user()->name
-
             return response()->json(['status' => "success", "message" => $message], 200);
         else:
             $check = $this->create_followUps($item[0]->reservation_id, 'No fue posible enviar el e-mail de confirmación de llegada, por favor contactar a Desarrollo', 'INTERN', 'SISTEMA');
             // No fue posible enviar el e-mail de confirmación de llegada, por favor contactar a Desarrollo
-
             return response()->json([
                 'error' => [
                     'code' => 'mailing_system',
@@ -566,12 +576,12 @@ class ReservationsRepository
                     <p>Arrival confirmation</p>
                     <p>Before boarding, you will be asked to show photo identification of the cardholder of the card with which the payment was made.</p>
                     <p>This is your reservation voucher, please verify that the following information is correct.</p>
-                    <p>Dear $item->client_first_name | Reservation No: $item->code.</p>
+                    <p>Dear $item->client_first_name | Reservation No: <strong>$item->code</strong>.</p>
                     <p>Thank you for choosing Caribbean Transfers, we appreciate your confidence, the information below will facilitate your contact with our staff at the airport, flight $item->flight_number lands at $point->point_name on $arrival_date hrs therefore our representative will be waiting for you with a Caribbean Transfers identifier.</p>
                     <p>To facilitate contact, please turn on your cell phone as soon as you land, you can use the free WIFI network at the airport to contact us. Let us know when you are ready to board your unit (after clearing customs and collecting your bags), a representative will be ready to meet you and take you to your assigned unit.</p>
                     <p>Please confirm receipt</p>
                     <p>Thank you for your confidence, have a great trip.</p>
-                    <p>*In case you require additional assistance, please send a message to the number $item->transactional_phone</p>
+                    <p>*In case you require additional assistance, please send a message to the number: <strong>$item->transactional_phone_arrival</strong></p>
                     <p>Tips not included</p>
                     <p>All company personnel are identified with badges and uniforms, please do not pay attention to scam attempts as these payments will not be reimbursed</p>
                     <p>When you are ready, meet our uniformed Caribbean Transfers staff at the Airport. </p>
@@ -582,12 +592,12 @@ class ReservationsRepository
                 <p>Confirmación de llegada</p>
                 <p>Antes de abordar se le solicitará la identificación con fotografía del titular de la tarjeta con la que se realizó el pago</p>
                 <p>Este es su comprobante de reserva, verifique que la información detallada a continuación sea correcta.</p>
-                <p>Estimado/a $item->client_first_name | Reservación No: $item->code</p>                
+                <p>Estimado/a $item->client_first_name | Reservación No: <strong>$item->code</strong></p>                
                 <p>Gracias por elegir a Caribbean Transfers, agradecemos su confianza, la información escrita a continuación facilitará su contacto con nuestro staff en el Aeropuerto, el vuelo $item->flight_number aterriza en $point->point_name el día $arrival_date hrs por lo tanto nuestro representante lo estará esperando en $point->point_description con un identificador de Caribbean Transfers</p>
                 <p>Para facilitar el contacto encienda su celular tan pronto como aterrice, puede usar la red gratuita del WIFI en el aeropuerto para poder contactarnos. Avísenos cuando esté listo para abordar su unidad (después de pasar aduana y recolectar sus maletas), un representante estará listo para recibirle y acercarlo a la unidad asignada.</p>
                 <p>Por favor confirme de recibido</p>
                 <p>Gracias por su confianza, que tenga un excelente viaje</p>
-                <p>*En caso de requerir ayuda adicional, envíe un mensaje al número $item->transactional_phone</p>
+                <p>*En caso de requerir ayuda adicional, envíe un mensaje al número: <strong>$item->transactional_phone_arrival</strong></p>
                 <p>Propinas no incluidas</p>
                 <p>Todo el personal de la empresa está identificado con gafete y uniforme por favor no haga caso de intentos de estafa ya que estos pagos no serán reembolsados.</p>
                 <p>Cuando esté listo, localice a nuestro personal uniformado de Caribbean Transfers en el Aeropuerto. </p>
@@ -598,7 +608,19 @@ class ReservationsRepository
 
     function sendDepartureConfirmation($request){
         $lang = $request['lang'];
-        $item = DB::select("SELECT it.code, it.from_name, it.to_name, it.flight_number, it.passengers, it.op_one_pickup, it.op_two_pickup, rez.client_first_name, rez.client_email, sit.transactional_phone, rez.id as reservation_id
+        $item = DB::select("SELECT 
+                                    it.code, 
+                                    it.from_name, 
+                                    it.to_name, 
+                                    it.flight_number, 
+                                    it.passengers, 
+                                    it.op_one_pickup, 
+                                    it.op_two_pickup, 
+                                    rez.client_first_name, 
+                                    rez.client_email, 
+                                    sit.transactional_phone, 
+                                    sit.transactional_phone_departure, 
+                                    rez.id as reservation_id
                                 FROM reservations_items as it
                                 INNER JOIN reservations as rez ON rez.id = it.reservation_id
                                 INNER JOIN sites as sit ON sit.id = rez.site_id
@@ -688,19 +710,19 @@ class ReservationsRepository
         if($lang == "en"):
             return <<<EOF
                     <p>Departure confirmation</p>
-                    <p>Dear $item->client_first_name | Reservation Number: $item->code</p>
+                    <p>Dear $item->client_first_name | Reservation Number: <strong>$item->code</strong></p>
                     <p>Thank you for choosing Caribbean Transfers the reason for this email is to confirm your pick up time. The date indicated on your reservation is $departure_date hrs. We will be waiting for you in $destination at that time.</p>
                     $message
-                    <p>You can also confirm by phone: $item->transactional_phone</p>
+                    <p>You can also confirm by phone: <strong>$item->transactional_phone_departure</strong></p>
                     <p>Tips not included</p>
                 EOF; 
         else:
             return <<<EOF
                     <p>Confirmación de salida</p>
-                    <p>Estimado/a $item->client_first_name | Reservación No: $item->code</p>
+                    <p>Estimado/a $item->client_first_name | Reservación No: <strong>$item->code</strong></p>
                     <p>Gracias por elegir a Caribbean Transfers el motivo de este correo es confirmar su hora de recolección. La fecha indicada en su reserva es $departure_date hrs. Le estaremos esperando en $destination a esa hora.</p>
                     $message
-                    <p>También puedes confirmar por teléfono: $item->transactional_phone</p>
+                    <p>También puedes confirmar por teléfono: <strong>$item->transactional_phone_departure</strong></p>
                     <p>Propinas no incluidas</p>
                 EOF;           
         endif;

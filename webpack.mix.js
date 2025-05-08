@@ -54,6 +54,7 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
             mix.sass('resources/scss/sections/management/_aftersales.scss', data.assets + "css/sections/management/aftersales.min.css"); //AFTER SALES    
             mix.sass('resources/scss/sections/management/_reservations.scss', data.assets + "css/sections/management/reservations.min.css"); //RESERVATIONS
             mix.sass('resources/scss/sections/management/_operations.scss', data.assets + "css/sections/management/operations.min.css"); //OPERATIONS
+            mix.sass('resources/scss/sections/management/_hotels.scss', data.assets + "css/sections/management/hotels.min.css"); //HOTELS
 
         //STYLES SETTINGS
             mix.sass('resources/scss/sections/settings/_roles.scss', data.assets + "css/sections/settings/roles.min.css"); //ROLES
@@ -219,6 +220,15 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
                 'resources/plugins/bootstrap-select/select.js', 
                 'resources/js/sections/management/operations.js'
             ], data.assets + "js/sections/management/operations.min.js");
+
+            //OPERATIONS
+            mix.combine([
+                'resources/plugins/table/datatable/datatables5.js',
+                'resources/plugins/flatpickr/flatpickr.js',
+                'resources/plugins/flatpickr/es.min.js',
+                'resources/plugins/bootstrap-select/select.js', 
+                'resources/js/sections/management/hotels.js'
+            ], data.assets + "js/sections/management/hotels.min.js");            
 
         //RESERVATION DETAILS
         mix.combine(['resources/plugins/table/datatable/datatables.js', 'resources/plugins/table/datatable/button-ext/dataTables.buttons.min.js', 'resources/plugins/table/datatable/button-ext/jszip.min.js', 'resources/plugins/table/datatable/button-ext/buttons.html5.min.js', 'resources/plugins/table/datatable/button-ext/buttons.print.min.js', 'resources/js/sections/reservations/details.js'], data.assets + "js/sections/reservations/details.min.js");

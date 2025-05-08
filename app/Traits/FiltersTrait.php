@@ -176,7 +176,21 @@ trait FiltersTrait
      * Se optimizó la consulta con query() en lugar de if separado.
      * Se asegura de usar Eager Loading para relaciones.
      */
-    public function Units($action = "filters")
+    public function Units(array $status = []):object
+    {
+        $query = Vehicle::select(['id', 'enterprise_id', 'destination_service_id', 'destination_id', 'name', 'status'])
+            ->with([
+                'enterprise:id,names',
+                'destination_service:id,name',
+                'destination:id,name'
+            ]);
+    
+        $query->whereIn('status', $status ?: [1]);
+    
+        return $query->get();
+    }   
+
+    public function Units2($action = "filters")
     {
         $query = Vehicle::with(['enterprise', 'destination_service', 'destination']);
 
@@ -184,7 +198,7 @@ trait FiltersTrait
             $query->where('status', 1);
         }
     
-        return $query->get();            
+        return $query->get();
     }
 
     //CONDUCTOR
@@ -193,7 +207,7 @@ trait FiltersTrait
      */
     public function Drivers($action = "filters")
     {
-        $query = Driver::orderBy('names', 'ASC');
+        $query = Driver::with(['destination', 'enterprise'])->orderBy('names', 'ASC');
 
         if ($action !== "filters") {
             $query->where('status', 1);
