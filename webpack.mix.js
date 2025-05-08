@@ -51,7 +51,9 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
 
         //STYLES MANAGEMENT            
             mix.sass('resources/scss/sections/management/_confirmations.scss', data.assets + "css/sections/management/confirmations.min.css"); //CONFIRMATIONS            
-            mix.sass('resources/scss/sections/management/_aftersales.scss', data.assets + "css/sections/management/aftersales.min.css"); //AFTER SALES    
+            mix.sass('resources/scss/sections/management/_aftersales.scss', data.assets + "css/sections/management/aftersales.min.css"); //AFTER SALES
+            mix.sass('resources/scss/sections/management/_ccform.scss', data.assets + "css/sections/management/ccform.min.css"); //CCFORM
+
             mix.sass('resources/scss/sections/management/_reservations.scss', data.assets + "css/sections/management/reservations.min.css"); //RESERVATIONS
             mix.sass('resources/scss/sections/management/_operations.scss', data.assets + "css/sections/management/operations.min.css"); //OPERATIONS
             mix.sass('resources/scss/sections/management/_hotels.scss', data.assets + "css/sections/management/hotels.min.css"); //HOTELS

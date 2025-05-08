@@ -33,6 +33,7 @@ use App\Http\Controllers\Reports\OperationsDataController as       DATAOPERATION
 //MANAGEMENT
 use App\Http\Controllers\Management\ConfirmationsController;
 use App\Http\Controllers\Management\AfterSalesController;
+use App\Http\Controllers\Management\CCFormController as             CCFORM;
 use App\Http\Controllers\Management\QuotationController as          QUOTATION;
 use App\Http\Controllers\Management\PendingController as            PENDING;
 use App\Http\Controllers\Management\SpamController as               SPAM;
@@ -178,6 +179,10 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'], '/management/confirmations', [ConfirmationsController::class, 'index'])->name('management.confirmations'); //CONFIRMACIONES
         ////////////
         Route::match(['get', 'post'], '/management/aftersales', [AfterSalesController::class, 'index'])->name('management.after.sales'); //POST VENTA, MAENEJO DE SPAM Y RESERVAS PENDIENTES
+
+        Route::match(['get', 'post'], '/management/ccform',         [CCFORM::class, 'index'])->name('management.ccform');
+        Route::match(['get'],         '/reports/ccform/pdf',        [CCFORM::class, 'createPDF'])->name('management.ccform.createPDF');
+
         Route::match(['post'], '/management/quotation/get', [QUOTATION::class, 'get'])->name('management.quotation.get'); // TRAE LAS COTIZACIONES DE AGENTE DE CALL CENTER
         Route::match(['post'], '/management/pending/get', [PENDING::class, 'get'])->name('management.pending.get'); // TRAE LAS RESERVAS PENDIENTES
         Route::match(['post'], '/management/spam/get', [SPAM::class, 'get'])->name('management.spam.get');

@@ -145,6 +145,7 @@
         if( 
             auth()->user()->hasPermission(39) || // CONFIRMACIONES
             auth()->user()->hasPermission(47) || // POST VENTA
+            auth()->user()->hasPermission(126) || // CCFORM
             auth()->user()->hasPermission(10) || // RESERVACIONES
             auth()->user()->hasPermission(76) || // OPERACIÓN
             auth()->user()->hasPermission(123) // HOTELES
@@ -165,6 +166,14 @@
                     'active' => request()->routeIs('management.after.sales'),
                 ];
             endif;
+            // CCFORM
+            if(auth()->user()->hasPermission(126)):
+                $links_operations[] = [
+                    'name' => 'CCForm',
+                    'route' => route('management.ccform'),
+                    'active' => request()->routeIs('management.ccform'),
+                ];
+            endif;            
             // RESERVACIONES
             if(auth()->user()->hasPermission(10)):
                 $links_operations[] = [

@@ -2,7 +2,6 @@
 @import "../../template/plugins/light/table/datatable/custom_dt";
 
 @import '../../template/light/components/modal';
+@import '../../template/light/components/tabs';
 
-@import '../../components/fixedheader';
-@import '../../components/filters';
-@import '../../components/charts';
+@import '../../template/light/widgets/_widgets/widget-four';
