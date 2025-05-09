@@ -428,7 +428,9 @@
                                         </div>
                                         <div class="actions d-flex gap-2 mb-3">
                                             <div class="btn-group" role="group" aria-label="Opciones">
-                                                <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="details.initMap({{ $item }})">VER MAPA</button>
+                                                @if ( auth()->user()->hasPermission(127) )
+                                                    <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#serviceMapModal" onclick="details.initMap({{ $item }})">VER MAPA</button>
+                                                @endif
                                                 @if ( ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" ) && auth()->user()->hasPermission(13))
                                                     <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#serviceEditModal" onclick="details.itemInfo({{ $item }})">EDITAR SERVICIO</button>
                                                 @endif

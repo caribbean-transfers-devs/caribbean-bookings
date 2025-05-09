@@ -88,8 +88,7 @@ trait OperationTrait
             return ( $service->operation_type == 'arrival' ? $service->destination_name_from : $service->destination_name_to );
         }else{
             return ( $service->operation_type == 'arrival' ? $service->from_name : $service->to_name );
-        }
-        
+        }        
     }
 
     public function setTo($service, $type = "destination"){

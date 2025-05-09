@@ -1006,24 +1006,26 @@ document.addEventListener("DOMContentLoaded", function() {
                     var unit = fila.find('td').eq(14).text();
                     var payment = fila.find('td').eq(15).text();
                     let total = fila.find('td').eq(16).text();
+                    let final_service = ( type == "TYPE_ONE" ? item.final_service_type_one : item.final_service_type_two );
 
-                let message =  '<p class="m-0">Número: ' + ( type == "TYPE_ONE" ? ( item.op_one_preassignment != null ? item.op_one_preassignment : 'NO DEFINIDO' ) : ( item.op_two_preassignment != null ? item.op_two_preassignment : 'NO DEFINIDO' ) ) + '</p> \n ' +
-                                '<p class="m-0">Código: ' + item.code + '</p> \n ' +
-                                '<p class="m-0">Hora: ' + hora + '</p> \n ' +
-                                '<p class="m-0">Cliente: ' + info.client_first_name + ' ' + info.client_last_name + '</p> \n ' +
-                                '<p class="m-0">Tipo de servicio: ' + ( type == "TYPE_ONE" ? item.final_service_type_one : item.final_service_type_two ) + '</p> \n ' +
-                                '<p class="m-0">Pax: ' + item.passengers + '</p> \n ' +
-                                '<p class="m-0">Origen: ' + item.from_name + '</p> \n ' +
-                                '<p class="m-0">Destino: ' + item.to_name + '</p> \n ' +
-                                '<p class="m-0">Agencia: ' + info.site.name + '</p> \n ' +
-                                '<p class="m-0">Unidad: ' + vehicle + '</p> \n ' +
-                                '<p class="m-0">Conductor: ' + driver + '</p> \n ' +
-                                '<p class="m-0">Estatus de operación: ' + ( type == "TYPE_ONE" ? item.op_one_status_operation : item.op_two_status_operation ) + '</p> \n ' +
-                                '<p class="m-0">Hora de operación: ' + time_operation + '</p> \n ' +
-                                '<p class="m-0">Estatus de reservación: ' + ( type == "TYPE_ONE" ? item.op_one_status : item.op_two_status ) + '</p> \n ' +
-                                '<p class="m-0">Vehículo: ' + unit + '</p> \n ' +
-                                '<p class="m-0">Pago: ' + payment + '</p> \n ' +
-                                '<p class="m-0">Total: ' + total;    
+                    let message =   '<p class="m-0">Número: ' + ( type == "TYPE_ONE" ? ( item.op_one_preassignment != null ? item.op_one_preassignment : 'NO DEFINIDO' ) : ( item.op_two_preassignment != null ? item.op_two_preassignment : 'NO DEFINIDO' ) ) + '</p> \n ' +
+                                    '<p class="m-0">Código: ' + item.code + '</p> \n ' +
+                                    '<p class="m-0">Hora: ' + hora + '</p> \n ' +
+                                    '<p class="m-0">Cliente: ' + info.client_first_name + ' ' + info.client_last_name + '</p> \n ' +
+                                    '<p class="m-0">Tipo de servicio: ' + final_service + '</p> \n ' +
+                                    '<p class="m-0">Pax: ' + item.passengers + '</p> \n ' +
+                                    '<p class="m-0">Origen: ' + ( type == "TYPE_ONE" ? item.from_name : item.to_name ) + '</p> \n ' +
+                                    '<p class="m-0">Destino: ' + ( type == "TYPE_ONE" ? item.from_name : item.to_name ) + '</p> \n ' +
+                                    '<p class="m-0"># Vuelo: ' + ( final_service == "ARRIVAL" || final_service == "DEPARTURE" ? item.flight_number : 'NO DEFINIDO' ) + '</p> \n ' +
+                                    '<p class="m-0">Agencia: ' + info.site.name + '</p> \n ' +
+                                    '<p class="m-0">Unidad: ' + vehicle + '</p> \n ' +
+                                    '<p class="m-0">Conductor: ' + driver + '</p> \n ' +
+                                    '<p class="m-0">Estatus de operación: ' + ( type == "TYPE_ONE" ? item.op_one_status_operation : item.op_two_status_operation ) + '</p> \n ' +
+                                    '<p class="m-0">Hora de operación: ' + time_operation + '</p> \n ' +
+                                    '<p class="m-0">Estatus de reservación: ' + ( type == "TYPE_ONE" ? item.op_one_status : item.op_two_status ) + '</p> \n ' +
+                                    '<p class="m-0">Vehículo: ' + unit + '</p> \n ' +
+                                    '<p class="m-0">Pago: ' + payment + '</p> \n ' +
+                                    '<p class="m-0">Total: ' + total;
 
                     document.getElementById('wrapper_whatsApp').innerHTML = message;
                 }
@@ -2021,25 +2023,14 @@ resetTimer();
 
 window.addEventListener('scroll', function() {
   let __table_private = document.getElementById('dataManagementOperations');
-//   let __table_shared = document.getElementById('operation-shared');
-
   let __thead_private = __table_private.querySelector('thead');
   let __offset_private = __table_private.getBoundingClientRect().top;
-
-//   let __thead_shared = __table_shared.querySelector('thead');
-//   let __offset_shared = __table_shared.getBoundingClientRect().top;
 
   if (window.scrollY > __offset_private) {
     __thead_private.classList.add('fixed-header');
   } else {
     __thead_private.classList.remove('fixed-header');
   }
-
-//   if (window.scrollY > __offset_shared) {
-//     __thead_shared.classList.add('fixed-header');
-//   } else {
-//     __thead_shared.classList.remove('fixed-header');
-//   }
 });
 
 components.renderCheckboxColumns('dataManagementOperations', 'columns');

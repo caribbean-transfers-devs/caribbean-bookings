@@ -661,8 +661,7 @@ window.addEventListener("DOMContentLoaded", function() {
     if (__table_render != null) {
         __table_render.columns.adjust();
         __table_render.columns.adjust().draw();
-        components.multiCheck(__table_render);   
-
+        components.multiCheck(__table_render);
         // const scrollHint = document.querySelector('.scroll-hint');
         // const tableResponsive = document.querySelector('.table-responsive');
     
