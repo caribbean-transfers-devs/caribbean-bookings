@@ -558,7 +558,7 @@ class CCFormRepository
 
         
         $info['payment_type'] = "CARD";
-        $info['payment_amount'] = number_format($value->object['amount'] / 100, 2)." ".$value->currency;
+        $info['payment_amount'] = number_format(round($value->object['amount'] / 100), 2)." ".$value->currency;
         $info['card_holder_name'] = $value->object['billing_details']['name'];
         if( isset($value->object['payment_method_details']['card']) ){
             $info['card_number'] = $value->object['payment_method_details']['card']['last4'];
@@ -580,7 +580,7 @@ class CCFormRepository
         }
 
         $info['payment_type'] = "PAYPAL";
-        $info['payment_amount'] = number_format($value->object['mc_gross'] / 100, 2)." ".$value->currency;
+        $info['payment_amount'] = number_format(round($value->object['mc_gross']), 2)." ".$value->currency;
         $info['card_holder_name'] =  ucfirst(ucwords(trim($value->object['first_name']))). " " . ucfirst(ucwords(trim($value->object['last_name'])));        
         $info['payment_email'] = $value->object['payer_email'];
         $info['payment_invoice'] = $value->object['txn_id'];        

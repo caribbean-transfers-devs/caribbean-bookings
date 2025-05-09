@@ -32,6 +32,16 @@ class ReservationsItem extends Model
         return $this->belongsTo(Zones::class, 'to_zone', 'id');
     }
 
+    public function fromZone()
+    {
+        return $this->belongsTo(Zone::class, 'from_zone', 'id');
+    }
+    
+    public function toZone()
+    {
+        return $this->belongsTo(Zone::class, 'to_zone', 'id');
+    }    
+
     public function cancellationTypeOrigin(){
         return $this->belongsTo(CancellationTypes::class, 'op_one_cancellation_type_id', 'id');
     }

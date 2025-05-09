@@ -976,7 +976,10 @@ document.addEventListener("DOMContentLoaded", function() {
         if(event.target.classList.contains('extract_whatsapp')){
             event.preventDefault();
 
+            const container = document.getElementById('wrapper_whatsApp');
             const { reservation, item, type } = event.target.dataset;
+
+            container.innerHTML = "";
 
             fetch("/action/getInformationReservation?id=" + reservation + "&item_id?=" + item, {
                 method: "GET",
@@ -1015,7 +1018,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                     '<p class="m-0">Tipo de servicio: ' + final_service + '</p> \n ' +
                                     '<p class="m-0">Pax: ' + item.passengers + '</p> \n ' +
                                     '<p class="m-0">Origen: ' + ( type == "TYPE_ONE" ? item.from_name : item.to_name ) + '</p> \n ' +
-                                    '<p class="m-0">Destino: ' + ( type == "TYPE_ONE" ? item.from_name : item.to_name ) + '</p> \n ' +
+                                    '<p class="m-0">Destino: ' + ( type == "TYPE_ONE" ? item.to_name : item.from_name ) + '</p> \n ' +
                                     '<p class="m-0"># Vuelo: ' + ( final_service == "ARRIVAL" || final_service == "DEPARTURE" ? item.flight_number : 'NO DEFINIDO' ) + '</p> \n ' +
                                     '<p class="m-0">Agencia: ' + info.site.name + '</p> \n ' +
                                     '<p class="m-0">Unidad: ' + vehicle + '</p> \n ' +
@@ -1027,7 +1030,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                     '<p class="m-0">Pago: ' + payment + '</p> \n ' +
                                     '<p class="m-0">Total: ' + total;
 
-                    document.getElementById('wrapper_whatsApp').innerHTML = message;
+                    container.innerHTML = message;
                 }
             })
             .catch(error => {
