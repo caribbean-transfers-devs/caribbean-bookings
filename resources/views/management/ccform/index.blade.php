@@ -45,8 +45,7 @@
             iframe.style.border = '1px solid #ddd';
             iframe.src = '/reports/ccform/pdf?type=arrival&date='+date;
         
-            document.getElementById('iframeOneContainer').appendChild(iframe);
-            
+            document.getElementById('iframeOneContainer').appendChild(iframe);            
             
             $("#btnSearch").text("Buscar").attr("disabled", false);
             $('#filterModal').modal('hide');

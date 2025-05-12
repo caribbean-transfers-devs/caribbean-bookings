@@ -700,12 +700,20 @@ class ReservationsRepository
         endif;
 
         $message = '';
+        $message_departure = '';
         if($destination_id == 1 && $lang == "en" && ( $type == "departure" )):
             $message = '<p>The Cancun airport recommends users to arrive three hours in advance for international flights and two hours in advance for domestic flights.</p>';
         endif;
         if($destination_id == 1 && $lang == "es" && ( $type == "departure" )):
             $message = '<p>El aeropuerto de Cancún recomienda a sus usuarios llegar con tres horas de anticipación en vuelos internacionales y dos horas en vuelos nacionales.</p>';
         endif;
+
+        if($lang == "en" && ( $type == "departure" )):
+            $message_departure = '<p>Recuerde que no podemos esperar más de 15 minutos después de la hora asignada. Si se excede, se aplicarán cargos adicionales, según disponibilidad.</p>';
+        endif;
+        if($lang == "es" && ( $type == "departure" )):
+            $message_departure = '<p>Remember we cannot wait more than 15 minutes after the assigned time. If you you exceed it extras fees could apply subject under availability.</p>';
+        endif;        
 
         if($lang == "en"):
             return <<<EOF
@@ -715,6 +723,7 @@ class ReservationsRepository
                     $message
                     <p>You can also confirm by phone: <strong>$item->transactional_phone_departure</strong></p>
                     <p>Tips not included</p>
+                    $message_departure
                 EOF; 
         else:
             return <<<EOF
@@ -724,6 +733,7 @@ class ReservationsRepository
                     $message
                     <p>También puedes confirmar por teléfono: <strong>$item->transactional_phone_departure</strong></p>
                     <p>Propinas no incluidas</p>
+                    $message_departure
                 EOF;           
         endif;
     }

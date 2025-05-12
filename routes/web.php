@@ -149,10 +149,8 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS
         Route::match(['get', 'post'], '/finances/chargebacks', [RefundsFinances::class, 'index'])->name('finances.chargebacks'); //CONTRAGARGOS
         Route::match(['get', 'post'], '/finances/receivables', [RECEIVABLES::class, 'index'])->name('finances.receivables'); //CUENTAS POR COBRAR
-
         Route::get('/finances/conciliation', [STRIPEFINANCE::class, 'index'])->name('finances.conciliation');
         Route::post('/finances/conciliation', [STRIPEFINANCE::class, 'index'])->name('finances.conciliation.action');
-
         Route::match(['get', 'post'], '/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS
 
     //REPORTES
@@ -248,7 +246,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/config/destinations/{id}', [ZONES::class, 'getZones'])->name('config.zones.getZones');
         Route::get('/config/destinations/{id}/points', [ZONES::class, 'getPoints'])->name('config.getPoints');
         Route::put('/config/destinations/{id}/points', [ZONES::class, 'setPoints'])->name('config.setPoints');
-        //RATES        
+        //RATES
         Route::get('/config/rates/destination', [RATES::class, 'index'])->name('config.ratesDestination');
         Route::get('/config/rates/destination/{id}/get', [RATES::class, 'items'])->name('config.ratesZones');
         Route::post('/config/rates/get', [RATES::class, 'getRates'])->name('config.getRates');

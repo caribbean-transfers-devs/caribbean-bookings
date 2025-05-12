@@ -997,6 +997,7 @@ class OperationsController extends Controller
                 $item->is_open = $request->is_open;
                 $item->open_service_time = $request->open_service_time;
             }
+            $item->is_last_minute = 1;
             $item->created_at = Carbon::now();
             $item->updated_at = Carbon::now();
             $item->save();

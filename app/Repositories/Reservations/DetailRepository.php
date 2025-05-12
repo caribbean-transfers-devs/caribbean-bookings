@@ -53,6 +53,9 @@ class DetailRepository
                 
             // Calcular totales de ventas y pagos
             $this->calculateTotals($reservation, $reservationData);
+
+            // Verificar si hay llegada o salida
+            $reservationData['transfer_types'] = $this->detectArrivalDeparture($reservation);
             
             // Determinar el estado final de la reserva
             $reservationData['status'] = $this->determineReservationStatus($reservation, $reservationData);                        
@@ -162,6 +165,42 @@ class DetailRepository
             }
             return $carry;
         }, 0);
+    }
+
+    /**
+     * Detecta si hay ARRIVAL o DEPARTURE en los items
+     *
+     * @param Reservation $reservation
+     * @return array
+     */
+    protected function detectArrivalDeparture(Reservation $reservation): array
+    {
+        $hasArrival = false;
+        $hasDeparture = false;
+
+        foreach ($reservation->items as $item) {
+            if (
+                isset($item->final_service_type_one) && $item->final_service_type_one === 'ARRIVAL' ||
+                isset($item->final_service_type_two) && $item->final_service_type_two === 'ARRIVAL'
+            ) {
+                $hasArrival = true;
+            }
+
+            if (
+                isset($item->final_service_type_one) && $item->final_service_type_one === 'DEPARTURE' ||
+                isset($item->final_service_type_two) && $item->final_service_type_two === 'DEPARTURE'
+            ) {
+                $hasDeparture = true;
+            }
+
+            // Si ya tenemos ambos, salimos temprano
+            if ($hasArrival && $hasDeparture) break;
+        }
+
+        return [
+            'has_arrival' => $hasArrival,
+            'has_departure' => $hasDeparture
+        ];
     }
 
     /**

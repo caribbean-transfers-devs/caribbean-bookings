@@ -139,11 +139,8 @@ class ReservationsRepository
         }
 
         //TIPO DE SERVICIO EN OPERACIÓN        
-        $paramsArrival = $this->parseArrayQuery(['ARRIVAL'],"single");
+        $paramsArrival = $this->parseArrayQuery(['ARRIVAL','DEPARTURE'],"single");
         $havingConditionsA[] = " final_service_type IN (".$paramsArrival.") ";
-
-        $paramsDeperture = $this->parseArrayQuery(['DEPARTURE'],"single");
-        $havingConditionsD[] = " final_service_type IN (".$paramsDeperture.") ";        
 
         //TIPO DE VEHÍCULO
         if(isset( $request->product_type ) && !empty( $request->product_type )){
@@ -232,16 +229,17 @@ class ReservationsRepository
             $queryHavingA = " HAVING " . implode(' AND ', $havingConditionsA);
         }
 
-        if( !empty($havingConditionsD) ){
-            $queryHavingD = " HAVING " . implode(' AND ', $havingConditionsD);
-        }
-
         // dd($query, $queryHaving, $queryData);
         $bookings = $this->queryBookings($query, $queryHaving, $queryData);
-        //arrivals
-        $arrivals = $this->queryOperations($queryOne, $queryTwo, $queryHavingA, $queryDataOperation);
-        //departures
-        $departures = $this->queryOperations($queryOne, $queryTwo, $queryHavingD, $queryDataOperation);        
+        $items = $this->queryOperations($queryOne, $queryTwo, $queryHavingA, $queryDataOperation);
+
+        $arrivalItems = array_filter($items, function ($item) {
+            return isset($item->final_service_type) && $item->final_service_type === 'ARRIVAL';
+        });
+
+        $departureItems = array_filter($items, function ($item) {
+            return isset($item->final_service_type) && $item->final_service_type === 'DEPARTURE';
+        });        
         
         return view('management.reservations.index', [
             'breadcrumbs' => [
@@ -252,8 +250,8 @@ class ReservationsRepository
                 ]
             ],
             'bookings' => $bookings,
-            'arrivals' => $arrivals,
-            'departures' => $departures,
+            'arrivals' => $arrivalItems,
+            'departures' => $departureItems,
             'data' => $data,
         ]);
     }

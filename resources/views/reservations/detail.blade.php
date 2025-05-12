@@ -112,10 +112,37 @@
             iniciarContador(fechaVencimiento);
         </script>
     @endif
+    <script>
+        function searchOne(){
+            $("#iframeOneContainer").empty();
+
+            var iframe = document.createElement('iframe');
+            iframe.id = 'pdfIframe';
+            iframe.width = '100%';
+            iframe.height = '700px';
+            iframe.style.border = '1px solid #ddd';
+            iframe.src = '/reports/ccform/pdf?type=arrival&id='+rez_id;
+        
+            document.getElementById('iframeOneContainer').appendChild(iframe);
+        }
+
+        function searchTwo(){
+            $("#iframeTwoContainer").empty();
+
+            var iframe = document.createElement('iframe');
+            iframe.id = 'pdfIframe';
+            iframe.width = '100%';
+            iframe.height = '700px';
+            iframe.style.border = '1px solid #ddd';
+            iframe.src = '/reports/ccform/pdf?type=departure&id='+rez_id;
+        
+            document.getElementById('iframeTwoContainer').appendChild(iframe);
+        }        
+    </script>
 @endpush
 
 @section('content')
-    {{-- @dump($reservation->toArray()); --}}
+    {{-- @dump($reservation->toArray(), $data); --}}
     <div class="row layout-top-spacing">
         <div class="col-xxl-3 col-xl-4 col-12">
             <div class="card mb-2">
@@ -404,6 +431,23 @@
                                 Imagenes
                             </a>
                         </li>
+                    @endif
+
+                    @if ($data['transfer_types']['has_arrival'] && $data['status'] != "CANCELLED")
+                        <li class="nav-item">
+                            <a class="nav-link" href="#icon-tab-6" data-bs-toggle="tab" role="tab" onclick="searchOne()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                                CCform Llegada
+                            </a>
+                        </li>
+                    @endif
+                    @if ($data['transfer_types']['has_departure'] && $data['status'] != "CANCELLED")
+                        <li class="nav-item">
+                            <a class="nav-link" href="#icon-tab-7" data-bs-toggle="tab" role="tab" onclick="searchTwo()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                                CCform Salida
+                            </a>
+                        </li>                        
                     @endif
                 </ul>
                 <div class="tab-content">
@@ -850,6 +894,12 @@
                             @endif
                         </div>
                     @endif
+                    <div class="tab-pane" id="icon-tab-6" role="tabpanel">
+                        <div id="iframeOneContainer"></div>
+                    </div>
+                    <div class="tab-pane" id="icon-tab-7" role="tabpanel">
+                        <div id="iframeTwoContainer"></div>
+                    </div>
                 </div>
             </div>
         </div>
