@@ -372,6 +372,7 @@ trait QueryTrait
                                 rez.created_at,
                                 rez.campaign,
                                 rez.reserve_rating,
+                                rez.is_last_minute,
 
                                 us.id AS employee_code,
                                 us.status AS employee_status,
@@ -658,6 +659,7 @@ trait QueryTrait
                                 rez.created_at,
                                 rez.campaign,
                                 rez.reserve_rating,
+                                rez.is_last_minute,
 
                                 us.id AS employee_code,
                                 us.status AS employee_status,
