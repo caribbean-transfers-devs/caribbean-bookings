@@ -196,18 +196,28 @@ let setup = {
     _total.removeAttribute('readonly');
   },  
   actionSite: function(__site){
-    const __reference = document.getElementById('formReference');
-    const __email = document.getElementById('formEmail');
-    const __phone = document.getElementById('formPhone');
-    const selectedOption = __site.options[__site.selectedIndex];
-
-    __email.value = selectedOption.getAttribute('data-phone');
-    __phone.value = selectedOption.getAttribute('data-email');
+    const __reference       = document.getElementById('formReference');
+    const __email           = document.getElementById('formEmail');
+    const __phone           = document.getElementById('formPhone');
+    const __isQuotation     = document.getElementById('formIsQuotation');
+    const __paymentMethod   = document.getElementById('formPaymentMethod');
+    const __originSale      = document.getElementById('formOriginSale');
+    const selectedOption    = __site.options[__site.selectedIndex];
 
     if( selectedOption.getAttribute('data-type') == "AGENCY" ){
       __reference.removeAttribute('readonly');
+      __email.value           = selectedOption.getAttribute('data-email');
+      __phone.value           = selectedOption.getAttribute('data-phone');
+      __isQuotation.value     = 0;
+      __paymentMethod.value   = "CARD";
+      $("#formOriginSale").selectpicker('val', '5');
     }else{
       __reference.setAttribute('readonly', true);
+      __email.value           = "";
+      __phone.value           = "";
+      __isQuotation.value     = 0;
+      __paymentMethod.value   = "CASH";
+      $("#formOriginSale").selectpicker('val', '');
     }
   }
 };
