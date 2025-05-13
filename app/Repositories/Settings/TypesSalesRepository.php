@@ -60,6 +60,7 @@ class TypesSalesRepository
             $sale->public_rate = $request->public_rate;
             $sale->status = $request->status;
             $sale->blocked = ( $request->status == 'private' ? 1 : 0 );
+            $sale->type = $request->type;
             $sale->save();
 
             DB::commit();
@@ -105,6 +106,7 @@ class TypesSalesRepository
             $sale->public_rate = $request->public_rate;
             $sale->status = $request->status;
             $sale->blocked = ( $request->status == 'private' ? 1 : 0 );
+            $sale->type = $request->type;
             $sale->save();            
 
             DB::commit();

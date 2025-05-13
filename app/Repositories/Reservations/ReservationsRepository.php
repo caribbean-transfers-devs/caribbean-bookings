@@ -677,15 +677,21 @@ class ReservationsRepository
 
     public function departureMessage($lang = "en", $item = [], $destination_id = 0, $type = "departure"){
         $departure_date = NULL;
+        $departure_date_new = NULL;
+        $departure_time = NULL;
         $destination = NULL;     
         
         if($type == "transfer-pickup"):
             $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
+            $departure_date_new = date("Y-m-d", strtotime($item->op_one_pickup));
+            $departure_time = date("H:i", strtotime($item->op_one_pickup));
             $destination = $item->from_name;
         endif;
 
         if($type == "transfer-return"):
             $departure_date = date("Y-m-d H:i", strtotime($item->op_two_pickup));
+            $departure_date_new = date("Y-m-d", strtotime($item->op_two_pickup));
+            $departure_time = date("H:i", strtotime($item->op_two_pickup));
             $destination = $item->to_name;
         endif;
 
@@ -693,38 +699,52 @@ class ReservationsRepository
             if(empty( $item->op_two_pickup )):
                 $destination = $item->from_name;
                 $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
+                $departure_date_new = date("Y-m-d", strtotime($item->op_one_pickup));
+                $departure_time = date("H:i", strtotime($item->op_one_pickup));
             else:
                 $destination = $item->to_name;
-                $departure_date = date("Y-m-d H:i", strtotime($item->op_two_pickup));
+                $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
+                $departure_date_new = date("Y-m-d", strtotime($item->op_one_pickup));
+                $departure_time = date("H:i", strtotime($item->op_one_pickup));
             endif;
         endif;
 
         $message = '';
         $message_departure = '';
         if($destination_id == 1 && $lang == "en" && ( $type == "departure" )):
-            $message = '<p>The Cancun airport recommends users to arrive three hours in advance for international flights and two hours in advance for domestic flights.</p>';
+            $message = '<p><strong>The Cancun airport recommends users to arrive three hours in advance for international flights and two hours in advance for domestic flights.</strong></p>';
         endif;
         if($destination_id == 1 && $lang == "es" && ( $type == "departure" )):
-            $message = '<p>El aeropuerto de Cancún recomienda a sus usuarios llegar con tres horas de anticipación en vuelos internacionales y dos horas en vuelos nacionales.</p>';
+            $message = '<p><strong>El aeropuerto de Cancún recomienda a sus usuarios llegar con tres horas de anticipación en vuelos internacionales y dos horas en vuelos nacionales.</strong></p>';
         endif;
 
         if($lang == "en" && ( $type == "departure" )):
-            $message_departure = '<p>Recuerde que no podemos esperar más de 15 minutos después de la hora asignada. Si se excede, se aplicarán cargos adicionales, según disponibilidad.</p>';
+            $message_departure = '<p>Remember we cannot wait more than 15 minutes after the assigned time. If you you exceed it extras fees could apply subject under availability.</p>';            
         endif;
         if($lang == "es" && ( $type == "departure" )):
-            $message_departure = '<p>Remember we cannot wait more than 15 minutes after the assigned time. If you you exceed it extras fees could apply subject under availability.</p>';
+            $message_departure = '<p>Recuerde que no podemos esperar más de 15 minutos después de la hora asignada. Si se excede, se aplicarán cargos adicionales, según disponibilidad.</p>';            
         endif;        
 
         if($lang == "en"):
+            // return <<<EOF
+            //         <p>Departure confirmation</p>
+            //         <p>Dear $item->client_first_name | Reservation Number: <strong>$item->code</strong></p>
+            //         <p>Thank you for choosing Caribbean Transfers the reason for this email is to confirm your pick up time. The date indicated on your reservation is $departure_date hrs. We will be waiting for you in $destination at that time.</p>
+            //         $message
+            //         <p>You can also confirm by phone: <strong>$item->transactional_phone_departure</strong></p>
+            //         <p>Tips not included</p>
+            //         $message_departure
+            //     EOF;
+
             return <<<EOF
-                    <p>Departure confirmation</p>
-                    <p>Dear $item->client_first_name | Reservation Number: <strong>$item->code</strong></p>
-                    <p>Thank you for choosing Caribbean Transfers the reason for this email is to confirm your pick up time. The date indicated on your reservation is $departure_date hrs. We will be waiting for you in $destination at that time.</p>
-                    $message
-                    <p>You can also confirm by phone: <strong>$item->transactional_phone_departure</strong></p>
-                    <p>Tips not included</p>
-                    $message_departure
-                EOF; 
+                        <p>Departure confirmation</p>
+                        <p>Dear $item->client_first_name | Booking Number: <strong>$item->code</strong></p>
+                        <p>Thank you for choosing Caribbean Transfers. This is to confirm your departure transfer scheduled for <strong>$departure_date_new</strong>, at <strong>$departure_time</strong> hrs. Our driver will be waiting for you at the <strong>$destination</strong>.</p>
+                        $message
+                        <p><strong>Please note: we allow a 15-minute waiting period. After that, No Show or Waiting Time penalty may apply.</strong></p>
+                        <p>To confirm or make changes, call us at: <strong>$item->transactional_phone_departure</strong></p>
+                        <p>Important: Same-day changes may incur penalty fees. Please double-check that your transfer date and time are correct.</p>
+                    EOF;            
         else:
             return <<<EOF
                     <p>Confirmación de salida</p>
@@ -752,23 +772,41 @@ class ReservationsRepository
         $stripe_URL = $this->makePaymentURL( $request, $item, 'STRIPE' );
 
         if($lang == "en"):
-            $message = <<<EOF
-                    <p>Hello again!</p>
-                    <p>We have noticed that your reservation has not been confirmed yet, don't miss the opportunity to secure your transfer with us and enjoy our special online prices!</p>
-                    <p>Why pay now?</p>
-                    <ul>
-                        <li><strong>Guaranteed security:</strong> By pre-paying, you are assured to have your transportation ready and waiting for your arrival.</li>
-                        <li><strong>Time saving:</strong> Avoid long waits and complications at the airport.</li>
-                        <li><strong>Total peace of mind:</strong> Enjoy your trip knowing that everything is organized and worry-free.</li>
-                        <li><strong>Secure payment:</strong> We use HTTPS to guarantee the security of your data, and we work with the best payment platforms such as PayPal and Stripe.</li>
-                    </ul>
+            // $message = <<<EOF
+            //         <p>Hello again!</p>
+            //         <p>We have noticed that your reservation has not been confirmed yet, don't miss the opportunity to secure your transfer with us and enjoy our special online prices!</p>
+            //         <p>Why pay now?</p>
+            //         <ul>
+            //             <li><strong>Guaranteed security:</strong> By pre-paying, you are assured to have your transportation ready and waiting for your arrival.</li>
+            //             <li><strong>Time saving:</strong> Avoid long waits and complications at the airport.</li>
+            //             <li><strong>Total peace of mind:</strong> Enjoy your trip knowing that everything is organized and worry-free.</li>
+            //             <li><strong>Secure payment:</strong> We use HTTPS to guarantee the security of your data, and we work with the best payment platforms such as PayPal and Stripe.</li>
+            //         </ul>
                     
-                    <p>To pay with STRIPE, click <a href="$stripe_URL" title="Pay with Stripe">here</a></p>                    
-                    <p>To pay with PayPal, click <a href="$paypal_URL" title="Pay with PayPal">here</a></p>
+            //         <p>To pay with STRIPE, click <a href="$stripe_URL" title="Pay with Stripe">here</a></p>
+            //         <p>To pay with PayPal, click <a href="$paypal_URL" title="Pay with PayPal">here</a></p>
 
-                    <p>If you have any questions, our team is ready to assist you. Contact us at: $item->transactional_phone </p>
-                    <p><strong>Business hours:</strong> From 7:00 am to 11:00 pm.</p>
-                    <p>We look forward to seeing you soon and providing you with exceptional service</p>
+            //         <p>If you have any questions, our team is ready to assist you. Contact us at: $item->transactional_phone </p>
+            //         <p><strong>Business hours:</strong> From 7:00 am to 11:00 pm.</p>
+            //         <p>We look forward to seeing you soon and providing you with exceptional service</p>
+            //     EOF;
+
+            $message = <<<EOF
+                    <p>Complete Your Reservation</p>
+                    <p>Secure your transfer now at our special online rate:</p>
+
+                    <p><a href="$stripe_URL" title="Pay with Stripe">[Pay with Stripe]</a></p>
+                    <p><a href="$paypal_URL" title="Pay with PayPal">[Pay with PayPal]</a></p>
+
+                    <p>Hi again!</p>
+                    <p>We noticed your booking is still pending. Prepay now to</p>
+                    <p>confirm your transfer and avoid delays or last-minute fees.</p>
+
+                    <p>Once payment is received, you'll get a confirmation by email.</p>
+
+                    <p>Questions? Message us on WhatsApp: $item->transactional_phone </p>
+                    <p><strong>Hours:</strong> 7:00 am to 11:00 pm.</p>
+                    <p>We look forward to welcoming you soon!</p>
                 EOF;
         else:
             $message = <<<EOF

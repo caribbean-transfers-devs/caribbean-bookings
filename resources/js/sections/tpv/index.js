@@ -197,7 +197,13 @@ let setup = {
   },  
   actionSite: function(__site){
     const __reference = document.getElementById('formReference');
+    const __email = document.getElementById('formEmail');
+    const __phone = document.getElementById('formPhone');
     const selectedOption = __site.options[__site.selectedIndex];
+
+    __email.value = selectedOption.getAttribute('data-phone');
+    __phone.value = selectedOption.getAttribute('data-email');
+
     if( selectedOption.getAttribute('data-type') == "AGENCY" ){
       __reference.removeAttribute('readonly');
     }else{

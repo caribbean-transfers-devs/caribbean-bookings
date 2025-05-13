@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 //MODELS
 use App\Models\User;
+use App\Models\Site;
 use App\Models\OriginSale;
 use App\Models\Enterprise;
 use App\Models\Vehicle;
@@ -100,7 +101,11 @@ trait FiltersTrait
     //SITIOS O AGENCIAS
     public function Sites()
     {
-        return DB::select("SELECT id, name, type_site FROM sites ORDER BY name ASC");
+        // return DB::select("SELECT id, name, type_site FROM sites ORDER BY name ASC");
+        return Site::select('id', 'name', 'type_site', 'transactional_phone', 'transactional_email')
+                        ->orderByRaw("FIELD(name LIKE '%[CS]%', 1) DESC")
+                        ->orderBy('name')
+                        ->get();
     }
 
     public function Origins()

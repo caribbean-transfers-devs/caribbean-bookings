@@ -1,5 +1,7 @@
 @php
-    $users = auth()->user()->CallCenterAgent([1]);    
+    $sites = auth()->user()->Sites();
+    $origins = auth()->user()->Origins();
+    $users = auth()->user()->CallCenterAgent([1]);
 @endphp
 <form class="quote_container" id="formReservation">
     <div class="left_">
@@ -10,7 +12,7 @@
             @foreach ($quotation['items'] as $item)
                 @php
                     $service_counter++;
-                @endphp    
+                @endphp
                 <div class="item">
                     <div class="one_ one">
                         <h2>{{ $item['name'] }}</h2>
@@ -57,6 +59,16 @@
     <div class="right_">
         <div class="client_information">
             <h3>Información personal</h3>
+            <div class="two_ mb-3">
+                <label class="form-label" for="formSite">Sitio</label>
+                <select class="form-control selectpicker" data-live-search="true" id="formSite" name="site_id">
+                    @if (isset( $sites ) && sizeof($sites) >= 1)
+                        @foreach ($sites as $item)
+                            <option value="{{ $item->id }}" data-type="{{ $item->type_site }}" data-phone="{{ $item->transactional_phone }}" data-email="{{ $item->transactional_email }}">{{ $item->name }}</option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
             <div class="one_">
                 <div>
                     <label class="form-label" for="formName">Nombre</label>
@@ -107,23 +119,16 @@
                         <option value="PAYPAL">PayPal</option>
                     </select>
                 </div>                
-                <div>
-                    <label class="form-label" for="formSite">Sitio</label>
-                    <select class="form-control selectpicker" data-live-search="true" id="formSite" name="site_id">
-                        @if (isset( $sites ) && sizeof($sites) >= 1)
-                            @foreach ($sites as $item)
-                                <option value="{{ $item->id }}" data-type="{{ $item->type_site }}">{{ $item->name }}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                </div>
+                {{-- <div>
+
+                </div> --}}
                 <div>
                     <label class="form-label" for="formOriginSale">Origen de venta</label>
                     <select class="form-control selectpicker" data-live-search="true" id="formOriginSale" name="origin_sale_id">
                         <option value="">Selecciona un origen de venta</option>
-                        @if (isset( $origin_sales ) && sizeof($origin_sales) >= 1)
-                            @foreach ($origin_sales as $origin_sale)
-                                <option value="{{ $origin_sale->id }}">{{ $origin_sale->code }}</option>
+                        @if (isset( $origins ) && sizeof($origins) >= 1)
+                            @foreach ($origins as $origin)
+                                <option value="{{ $origin->id }}">{{ $origin->code }}</option>
                             @endforeach
                         @endif
                     </select>                    

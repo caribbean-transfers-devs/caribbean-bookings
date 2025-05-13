@@ -181,14 +181,14 @@ class DetailRepository
         foreach ($reservation->items as $item) {
             if (
                 isset($item->final_service_type_one) && $item->final_service_type_one === 'ARRIVAL' ||
-                isset($item->final_service_type_two) && $item->final_service_type_two === 'ARRIVAL'
+                (isset($item->final_service_type_two) && $item->final_service_type_two === 'ARRIVAL' && $item->is_round_trip == 1)
             ) {
                 $hasArrival = true;
             }
 
             if (
                 isset($item->final_service_type_one) && $item->final_service_type_one === 'DEPARTURE' ||
-                isset($item->final_service_type_two) && $item->final_service_type_two === 'DEPARTURE'
+                (isset($item->final_service_type_two) && $item->final_service_type_two === 'DEPARTURE' && $item->is_round_trip == 1)
             ) {
                 $hasDeparture = true;
             }

@@ -11,7 +11,6 @@ use App\Traits\ApiTrait;
 use App\Models\Site;
 use App\Models\UserRole;
 use App\Models\User;
-use App\Models\OriginSale;
 
 class TpvRepository
 {
@@ -160,9 +159,7 @@ class TpvRepository
         endif;
 
         return view('tpv.form', [
-            'quotation' => $quotation,
-            'sites' => Site::orderByRaw("FIELD(name LIKE '%[CS]%', 1) DESC")->orderBy('name')->get(),
-            'origin_sales' => OriginSale::where('status',1)->get()
+            'quotation' => $quotation
         ]);
     }
 

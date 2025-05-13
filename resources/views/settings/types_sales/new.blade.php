@@ -46,33 +46,43 @@
                                     @method('PUT')
                                 @endif
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="name">Nombre del tipo de venta</label>
                                             <input type="text" id="name" name="name" class="form-control mb-3" placeholder="Nombre" value="{{ ( isset($sale->name) ? $sale->name : '' ) }}">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="name">Tarifa a reportar</label>
                                             <input type="number" id="rate_report" name="rate_report" class="form-control mb-3" placeholder="Tarifa a reportar" value="{{ ( isset($sale->rate_report) ? $sale->rate_report : '' ) }}" value="1.00">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="name">Tarifa publica</label>
                                             <input type="number" id="public_rate" name="public_rate" class="form-control mb-3" placeholder="Tarifa publica" value="{{ ( isset($sale->public_rate) ? $sale->public_rate : '' ) }}" value="1.00">
                                         </div>
                                     </div>                                    
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="status">Selecciona tipo</label>
+                                            <label for="status">Selecciona status</label>
                                             <select id="status" name="status" class="form-control mb-3">
                                                 <option {{ ( isset($sale->status) && $sale->status == 'public' ) ? 'selected' : '' }} value="public">Publico</option>
                                                 <option {{ ( isset($sale->status) && $sale->status == 0 ) ? 'private' : '' }} value="private">Privado</option>
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="status">Selecciona tipo</label>
+                                            <select id="status" name="type" class="form-control mb-3">
+                                                <option {{ ( isset($sale->type) && $sale->type == 'default' ) ? 'selected' : '' }} value="default">Default</option>
+                                                <option {{ ( isset($sale->type) && $sale->type == 0 ) ? 'extra' : '' }} value="extra">Extra</option>
+                                                <option {{ ( isset($sale->type) && $sale->type == 0 ) ? 'finances' : '' }} value="finances">Finanzas</option>
+                                            </select>
+                                        </div>
+                                    </div>                                    
                                     <div class="col-12 d-flex justify-content-between">
                                         <a class="btn btn-danger" href="{{ route('types.sales.index') }}">Cancelar</a>
                                         <button type="submit" class="btn btn-primary">{{ ( isset($sale) ? 'Actualizar' : 'Guardar' ) }}</button>

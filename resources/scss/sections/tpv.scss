@@ -531,6 +531,7 @@ div#one{
                     font-weight: bold;
                 }
                 #sendReservation{
+                    width: 100%;
                     align-self: end;
                     align-items: center;
                     border-radius: 8px;
@@ -545,6 +546,11 @@ div#one{
                     transition: all 0.3s;
                     font-size: 0.938rem;                    
                 }
+
+                // Hacer que el último hijo del grid ocupe el 100%
+                > *:last-child {
+                    grid-column: 1 / -1;
+                }                
             }
         }
     }

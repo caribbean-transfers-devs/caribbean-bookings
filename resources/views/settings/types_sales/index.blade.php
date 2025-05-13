@@ -54,6 +54,8 @@
                             <th class="text-center">TARIFA A REPORTAR</th>
                             <th class="text-center">TARIFA A PUBLICA</th>
                             <th class="text-center">ESTATUS</th>
+                            <th class="text-center">TIPO</th>
+                            <th class="text-center">BLOQUEADO</th>
                             <th class="text-center">ACCIONES</th>
                         </tr>
                     </thead>
@@ -66,6 +68,10 @@
                                 <td class="text-center">
                                     <button class="btn btn-{{ ( $sale->status == 'public' ) ? 'success' : 'danger' }} mb-2">{{ ( $sale->status == 'public' ) ? 'PUBLICO' : 'PRIVADO' }}</button>
                                 </td>
+                                <td class="text-center">{{ $sale->type }}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-{{ ( $sale->blocked == 1 ) ? 'success' : 'danger' }} mb-2">{{ ( $sale->blocked == 1 ) ? 'SI' : 'NO' }}</button>
+                                </td>                                
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
                                         @if ( !$sale->blocked )
