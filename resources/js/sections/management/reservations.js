@@ -16,40 +16,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Elementos de la interfaz
     let notificacion;
     let contadorElement;
-    
-    if ( document.getElementById('lookup_date') != null ) {
-        const picker = new easepick.create({
-            element: "#lookup_date",
-            css: [
-                'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-                'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-                'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-            ],
-            zIndex: 10,
-        });
-    }
-
-    const tablesItem = document.querySelectorAll('.table-rendering');
-    // if( tablesItem.length > 0 ){
-        components.actionTable($('.table-bookings'), 'fixedheader');
-        components.actionTable($('.table-arrivals'), 'fixedheader');
-        components.actionTable($('.table-departures'), 'fixedheader');
-    // }
-    components.formReset();
-
-    components.titleModalFilter();
-    components.renderCheckboxColumns('dataBookings', 'columns');
-    components.setValueSelectpicker();
-
-    // Función para recargar la página
-    // function reloadPage() {
-    //     console.log('Recargando página...', new Date().toLocaleTimeString());
-    //     window.location.reload();
-    // }
-
-    // Configurar el intervalo
-    // console.log('Iniciando auto-recarga cada 2.5 minutos...');
-    // const intervaloId = setInterval(reloadPage, intervalo);
 
     function inicializarAutoRecarga() {
         console.log(`Iniciando auto-recarga cada ${config.intervaloReload/60000} minutos`);
@@ -158,7 +124,28 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log('Recargando página...', new Date().toLocaleTimeString());
         ocultarNotificacion();
         window.location.reload();
+    }    
+    
+    if ( document.getElementById('lookup_date') != null ) {
+        const picker = new easepick.create({
+            element: "#lookup_date",
+            css: [
+                'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+                'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+                'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
+            ],
+            zIndex: 10,
+        });
     }
+
+    components.actionTable($('.table-bookings'), 'fixedheader');
+    components.actionTable($('.table-arrivals'), 'fixedheader');
+    components.actionTable($('.table-departures'), 'fixedheader');    
+
+    components.titleModalFilter();
+    components.formReset();
+    components.renderCheckboxColumns('dataBookings', 'columns');
+    components.setValueSelectpicker();
     
     // Iniciar cuando el DOM esté listo
     inicializarAutoRecarga();
@@ -171,16 +158,70 @@ document.addEventListener("DOMContentLoaded", function() {
         recargaPendiente = false;
         console.log('Auto-recarga detenida');
     };
+
+    document.addEventListener("click", components.debounce(function (event) {
+        //ACTUALIZA LA CONFIRMACIÓN DEL SERVICIO
+        if (event.target.classList.contains('confirmService')) {
+            event.preventDefault();
+
+            // Definir parámetros de la petición
+            const target     = event.target;
+            const _params    = {
+                item_id: target.dataset.item || "",
+                service: target.dataset.service || "",
+                status: target.dataset.status || "",
+                type: target.dataset.type || "",
+            };
+            
+            Swal.fire({
+                html: '¿Está seguro de actualizar el estatus de confirmación del servicio?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se actualiza el estatus de confirmación.",
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
     
-    // Opcional: Detener la recarga automática bajo ciertas condiciones
-    // Ejemplo: si hay un formulario con cambios no guardados
-    // window.stopAutoRecharge = function() {
-    //     clearInterval(intervaloId);
-    //     console.log('Auto-recarga detenida');
-    // };
-    
-    // Opcional: Recargar inmediatamente si se necesita
-    // window.reloadNow = function() {
-    //     reloadPage();
-    // };    
+                    fetch('/action/confirmService', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },            
+                        body: JSON.stringify(_params)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }
+            });            
+        }
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
 });

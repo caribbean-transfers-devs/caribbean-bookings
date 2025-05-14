@@ -72,6 +72,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
                 }
             });            
-        }    
+        }
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
 });

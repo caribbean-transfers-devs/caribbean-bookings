@@ -626,7 +626,7 @@ class ReservationsRepository
                                 INNER JOIN sites as sit ON sit.id = rez.site_id
                                     WHERE it.id = :id", ['id' => $request['item_id'] ]);
         
-        $message = $this->departureMessage($lang, $item[0], $request['destination_id'], $request['type']);        
+        $message = $this->departureMessage($lang, $item[0], $request['destination_id'], $request['type'], $request['is_round_trip']);
 
         //Data to send in confirmation..
         $email_data = array(
@@ -675,7 +675,7 @@ class ReservationsRepository
         endif;
     }
 
-    public function departureMessage($lang = "en", $item = [], $destination_id = 0, $type = "departure"){
+    public function departureMessage($lang = "en", $item = [], $destination_id = 0, $type = "departure", $is_round_trip = "0"){
         $departure_date = NULL;
         $departure_date_new = NULL;
         $departure_time = NULL;
@@ -695,19 +695,24 @@ class ReservationsRepository
             $destination = $item->to_name;
         endif;
 
-        if($type == "departure"):
-            if(empty( $item->op_two_pickup )):
-                $destination = $item->from_name;
-                $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
-                $departure_date_new = date("Y-m-d", strtotime($item->op_one_pickup));
-                $departure_time = date("H:i", strtotime($item->op_one_pickup));
-            else:
-                $destination = $item->to_name;
-                $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
-                $departure_date_new = date("Y-m-d", strtotime($item->op_one_pickup));
-                $departure_time = date("H:i", strtotime($item->op_one_pickup));
-            endif;
+        if($type == "departure" && $is_round_trip == 0):            
+            $destination = $item->from_name;
+            $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
+            $departure_date_new = date("Y-m-d", strtotime($item->op_one_pickup));
+            $departure_time = date("H:i", strtotime($item->op_one_pickup));
         endif;
+
+        if($type == "departure" && $is_round_trip == 1):            
+            $destination = $item->to_name;
+            $departure_date = date("Y-m-d H:i", strtotime($item->op_two_pickup));
+            $departure_date_new = date("Y-m-d", strtotime($item->op_two_pickup));
+            $departure_time = date("H:i", strtotime($item->op_two_pickup));
+        endif;        
+
+        // $destination = $item->to_name;
+        // $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
+        // $departure_date_new = date("Y-m-d", strtotime($item->op_one_pickup));
+        // $departure_time = date("H:i", strtotime($item->op_one_pickup));
 
         $message = '';
         $message_departure = '';

@@ -1647,12 +1647,12 @@ function sendArrivalConfirmation() {
     });
 }
 
-function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', type = 'departure'){
+function sendDepartureConfirmation(event, item_id, destination_id, lang = 'en', type = 'departure', is_round_trip = '0'){
     event.preventDefault();
     $.ajax({
         url: '/reservations/confirmation/departure',
         type: 'POST',
-        data: { item_id:item_id, destination_id: destination_id, lang:lang, type:type },
+        data: { item_id:item_id, destination_id: destination_id, lang:lang, type:type, is_round_trip:is_round_trip },
         success: function(resp) {
             if (resp.status == 'success') {
                 Swal.fire({
