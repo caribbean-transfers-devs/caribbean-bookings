@@ -155,7 +155,6 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
 
     //REPORTES
         Route::match(['get', 'post'], '/reports/payments', [PAYMENTS::class, 'index'])->name('reports.payments'); //PAGOS
-        // Route::match(['post'], '/payments/conciliation', [PAYMENTS::class, 'conciliation'])->name('payments.conciliation');
         Route::match(['get', 'post'], '/reports/cash', [CASH::class, 'index'])->name('reports.cash'); //EFECTIVO
         Route::put('/reports/cash/update-status', [CASH::class, 'update'])->name('reports.cash.action.update'); //EFECTIVO
         ////////////
@@ -313,6 +312,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::match(['get', 'post'], '/action/getPhotosReservation', [FINANCE::class, 'getPhotosReservation'])->name('get.photos.reservation');
     Route::match(['get', 'post'], '/action/getHistoryReservation', [FINANCE::class, 'getHistoryReservation'])->name('get.history.reservation');
     Route::match(['get', 'post'], '/action/getPaymentsReservation', [FINANCE::class, 'getPaymentsReservation'])->name('get.payments.reservation');
+    Route::post('/action/addCreditPayment', [FINANCE::class, 'addCreditPayment'])->name('add.credit.payment');
 
     //ACCIONES UTILIZADAS EN REPORTES
     Route::post('/action/cashConciliation', [FINANCE::class, 'cashConciliation'])->name('cash.payment.conciliation');

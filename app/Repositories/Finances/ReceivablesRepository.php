@@ -49,7 +49,7 @@ class ReceivablesRepository
             "is_agency" => $request->is_agency ?? 0,
         ];
 
-        $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND site.is_cxc = 1 ';
+        $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.is_duplicated = 0  AND rez.is_cancelled = 0 AND site.is_cxc = 1 ';
         $havingConditions = [];
         $queryHaving = '';
         $queryData = [
@@ -86,15 +86,6 @@ class ReceivablesRepository
             ],
             'bookings' => $bookings,
             'services' => $this->Services(),
-            'websites' => $this->Sites(),
-            'origins' => $this->Origins(),
-            'reservation_status' => $this->reservationStatus(),
-            'vehicles' => $this->Vehicles(),
-            'zones' => $this->Zones(),
-            'payment_status' => $this->paymentStatus(),
-            'currencies' => $this->Currencies(),
-            'methods' => $this->Methods(),
-            'cancellations' => $this->CancellationTypes(),
             'exchange' => $this->Exchange(( date("Y-m-d", strtotime($data['init'])) ), ( date("Y-m-d", strtotime($data['end'])) )),
             'data' => $data,
         ]);        

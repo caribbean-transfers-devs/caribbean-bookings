@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
         mode: "single",
         dateFormat: "Y-m-d",
         enableTime: false,
-    });    
+    });
 
     document.addEventListener("click", debounce(function (event) {
         if (event.target && event.target.id === '__close_modal') {

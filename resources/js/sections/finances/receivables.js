@@ -102,14 +102,8 @@ let refunds = {
 };
 
 //DECLARACION DE VARIABLES
-const __close_modals = document.querySelectorAll('.__close_modal');
-const __reservation_id = document.getElementById('reservation_id');
-const __type_pay = document.getElementById('type_form_pay');
-const __code_pay = document.getElementById('payment_id');
-
-//ACCIONES
-const __formPayment = document.getElementById('frm_new_payment'); //FORMULARIO DEL PAGO
-const __addPaymentCredit = document.getElementById('btn_new_payment'); //BOTON PARA PODER GUARDAR EL PAGO
+const _actionType           = document.getElementById('actionType');
+const _reservationID        = document.getElementById('reservationID');
 
 //VALIDAMOS DOM
 document.addEventListener("DOMContentLoaded", function() {
@@ -122,159 +116,18 @@ document.addEventListener("DOMContentLoaded", function() {
     components.renderCheckboxColumns('dataReceivable', 'columns');
     components.setValueSelectpicker();
 
-    if( __close_modals.length > 0 ){
-        __close_modals.forEach(__close_modal => {
-            __close_modal.addEventListener('click', function(event){
-                event.preventDefault();
-                const __loading_container = document.getElementById('loading_container');
-                const __form_container = document.getElementById('form_container');
-
-                console.log(__box_comment_conciliation);
-                
-                __loading_container.classList.add('d-none');
-                __form_container.classList.add('d-none');
-            });
-        });
-    }
-
-    document.addEventListener("click", components.debounce(function (event) {
-        if( event.target.classList.contains('__btn_conciliation_credit') ){
-            event.preventDefault();
-            const { reservation } = event.target.dataset;
-
-            $("#addPaymentsModal").modal('show');
-            const __loading_container = document.getElementById('loading_container');
-            const __form_container = document.getElementById('form_container');
-
-            const __box_link_conciliation = document.querySelector('.box_link_conciliation');
-            const __box_comment_conciliation = document.querySelector('.box_comment_conciliation');
-            const __is_conciliated = document.getElementById('servicePaymentsConciliationModal');
-            const __servicePaymentsCategory = document.getElementById('servicePaymentsCategory');            
-
-            __loading_container.classList.remove('d-none');
-            __loading_container.innerHTML = '<div class="spinner-grow align-self-center">';
-
-            __box_link_conciliation.classList.add('d-none');
-            __box_comment_conciliation.classList.remove('d-none');
-            __is_conciliated.value = 1;
-            __servicePaymentsCategory.value = "PAYOUT_CREDIT";
-
-            setTimeout(() => {
-                __loading_container.classList.add('d-none');
-                __form_container.classList.remove('d-none');                
-            }, 500);
-            
-            __reservation_id.value = reservation;
-        }        
-
-        if ( event.target.classList.contains('__show_reservation') ) {
-            event.preventDefault();
-
-            // Definir parámetros de la petición
-            const target     = event.target;
-            refunds.reservation_id = target.dataset.reservation || 0,
-                        
-            $("#viewProofsModal").modal('show');
-            document.getElementById("pills-general-tab").click();
-        }
-    }, 300)); // 300ms de espera antes de ejecutar de nuevo
-
-    
-    // if( __is_conciliated != null ){
-    //     changeIsConciliation(__is_conciliated);
-    //     __is_conciliated.addEventListener('change', function(event){
-    //         event.preventDefault();
-    //         changeIsConciliation(this);
-    //     });
-    
-    //     function changeIsConciliation(DOM){
-    //         const __box_comment = document.querySelector('.box_comment');        
-    //         if( DOM.value == 1 ){
-    //             __box_comment.classList.remove('d-none');
-    //         }else{
-    //             __box_comment.classList.add('d-none');
-    //         }
-    //     }
-    // }
-    
-    $("#servicePaymentsCurrencyModal").on('change', function(){
-        let currency = $(this).val();
-        let reservation_id = $("#reserv_id_pay").val();
-        $.ajax({
-            url: '/GetExchange/'+reservation_id+'?currency='+currency,
-            type: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                $("#servicePaymentsExchangeModal").val(data.exchange_rate);
-                $("#operation_pay").val(data.operation);
-                $("#btn_new_payment").prop('disabled', false);
-            },
-        });
+    let pickerConciliation = flatpickr("#dateConciliation", {
+        mode: "single",
+        dateFormat: "Y-m-d",
+        enableTime: false,
     });
+    
+    let pickerDeposit = flatpickr("#depositDate", {
+        mode: "single",
+        dateFormat: "Y-m-d",
+        enableTime: false,
+    });    
 
-    if( __addPaymentCredit ){
-        __addPaymentCredit.addEventListener('click', function(event){
-            event.preventDefault();
-    
-            Swal.fire({
-                html: '¿Está seguro de aplicar el reembolso a la reservación?',
-                icon: 'warning', 
-                showCancelButton: true,
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let __params = components.serialize(__formPayment,'object');
-                    
-                    Swal.fire({
-                        title: "Procesando solicitud...",
-                        text: "Por favor, espera mientras se aplica reembolso de la reserva.",
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-                    console.log(__params);
-                    
-    
-                    // fetch('/action/addPaymentRefund', {
-                    //     method: 'POST',
-                    //     headers: {
-                    //         'Content-Type': 'application/json',
-                    //         'X-CSRF-TOKEN': csrfToken
-                    //     },            
-                    //     body: JSON.stringify(__params)
-                    // })
-                    // .then(response => {
-                    //     if (!response.ok) {
-                    //         return response.json().then(err => { throw err; });
-                    //     }
-                    //     return response.json();
-                    // })
-                    // .then(data => {
-                    //     if( data.status  == "success" ){                        
-                    //         $("#addPaymentsModal").modal('hide');
-                    //     }
-                    //     Swal.fire({
-                    //         icon: data.status,
-                    //         html: data.message,
-                    //         allowOutsideClick: false,
-                    //     }).then(() => {
-                    //         location.reload();
-                    //     });
-                    // })
-                    // .catch(error => {
-                    //     Swal.fire(
-                    //         '¡ERROR!',
-                    //         error.message || 'Ocurrió un error',
-                    //         'error'
-                    //     );
-                    // });
-                }
-            });       
-        })
-    }
-    
     document.getElementById('select-all').addEventListener('change', function () {
         const isChecked = this.checked;
         const checkboxes = document.querySelectorAll('.row-check');
@@ -292,49 +145,179 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('select-all').checked = allChecked;
         }
     });
-    
-    document.getElementById('processSelected').addEventListener('click', function () {
-        let selectedIds = [];
-        const checkboxes = document.querySelectorAll('.row-check:checked');
-    
-        checkboxes.forEach(function (checkbox) {
-            selectedIds.push(checkbox.value); // Obtén los IDs de las filas seleccionadas
-        });
-    
-        if (selectedIds.length === 0) {
-            components.proccessResponse({
-                status: "error",
-                message: "No hay reservas seleccionadas.",
-                reload: false
-            });
-            return;
+
+    document.addEventListener('change', components.debounce(function (event) {
+        if (event.target && event.target.id === 'optionConciliation') {
+            const boxMethodPayment              = document.getElementById('boxMethodPayment');
+            const boxReferenceInvoiceAgency     = document.getElementById('boxReferenceInvoiceAgency');
+            const boxPaymentCurrency            = document.getElementById('boxPaymentCurrency');
+            const boxCommentConciliation        = document.getElementById('boxCommentConciliation');
+            const boxdateConciliation           = document.getElementById('boxdateConciliation');
+            const boxDepositDate                = document.getElementById('boxDepositDate');
+            const boxReferencePayment           = document.getElementById('boxReferencePayment');
+
+            const target = event.target;
+
+            if( target.value == "" || target.value == 2 ){
+                boxReferenceInvoiceAgency.classList.remove('d-none');
+                boxPaymentCurrency.classList.remove('d-none');
+                boxdateConciliation.classList.remove('d-none');
+
+                boxMethodPayment.classList.add('d-none');
+                boxCommentConciliation.classList.add('d-none');
+                boxDepositDate.classList.add('d-none');
+                boxReferencePayment.classList.add('d-none');
+            }else{
+                boxReferenceInvoiceAgency.classList.add('d-none');
+                boxPaymentCurrency.classList.add('d-none');
+                boxdateConciliation.classList.add('d-none');
+                
+                boxMethodPayment.classList.remove('d-none');
+                boxCommentConciliation.classList.remove('d-none');
+                boxDepositDate.classList.remove('d-none');
+                boxReferencePayment.classList.remove('d-none');
+            }
         }
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
+
+    document.addEventListener("click", components.debounce(function (event) {
+        if (event.target && event.target.id === 'checkboxSelected') {
+            event.preventDefault();
+            
+            _actionType.value = "multiple";
+        }
+        
+        if( event.target.classList.contains('__btn_conciliation_credit') ){
+            event.preventDefault();
+            const { reservation, code }  = event.target.dataset;            
+                    
+            _actionType.value = "single";
+            if( code ){
+                _reservationID.value = code;
+            }else{
+                _reservationID.value = reservation;
+            }            
+            $("#ConciliationReservesCreditModal").modal('show');
+        }        
+
+        if ( event.target.classList.contains('__show_reservation') ) {
+            event.preventDefault();
+
+            // Definir parámetros de la petición
+            const target     = event.target;
+            refunds.reservation_id = target.dataset.reservation || 0,
+                        
+            $("#viewProofsModal").modal('show');
+            document.getElementById("pills-general-tab").click();
+        }
+
+        if ( event.target.classList.contains('__close_modal') ) {
+            event.preventDefault();
+
+            const _processSelected = document.getElementById('processSelected');
+            _processSelected.reset();
+            _actionType.value = "";
+            _reservationID.value = "";
+        }
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
+
+    document.addEventListener('submit', function(event) {
+        if (event.target && event.target.id === 'processSelected') {
+            event.preventDefault();    
+
+            let selectedIds        = [];
+            const checkboxes       = document.querySelectorAll('.row-check:checked');
+        
+            if( _actionType.value == "multiple" ){
+                checkboxes.forEach(function (checkbox) {
+                    selectedIds.push(checkbox.value); // Obtén los IDs de las filas seleccionadas
+                });
+            }else{
+                selectedIds.push(_reservationID.value); // Obtén los IDs de las filas seleccionadas
+            }
+        
+            if (selectedIds.length === 0) {
+                components.proccessResponse({
+                    status: "error",
+                    message: "No hay reservas seleccionadas.",
+                    reload: false
+                });
+                return;
+            }
+
+            // Aquí puedes procesar los IDs seleccionados
+            console.log('IDs seleccionados:', selectedIds);
+
+            const _processSelected = document.getElementById('processSelected');
+            const _formData     = new FormData(_processSelected);
+            _formData.append('codes', selectedIds);
+        
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se realiza concilian los pagos.",
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
     
-        // Aquí puedes procesar los IDs seleccionados
-        console.log('IDs seleccionados:', selectedIds);
+            fetch('/action/addCreditPayment', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: _formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }        
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                if (data.status == "success") {
+                    Swal.fire({
+                        icon: data.status,
+                        html: data.message,
+                        confirmButtonText: 'Aceptar',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                    }).then((result) => {
+                        location.reload();
+                    });
+                }else{
+                    Swal.fire(
+                    '¡ERROR!',
+                    data.message || 'Ocurrió un error',
+                    'error'
+                    );                    
+                }
+            })
+            .catch(error => {
+                Swal.fire(
+                '¡ERROR!',
+                error.message || 'Ocurrió un error',
+                'error'
+                );
+            });
+        }
+    }, true); // <- el `true` activa "capturing" y sí detecta el submit
     
-        let __params = {ids: selectedIds};
-        components.request_exec_ajax( _LOCAL_URL + "/payments/conciliation", 'POST', __params );
-    
-        // Ejemplo: enviar los datos mediante fetch
-        // fetch('/process-selected', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ ids: selectedIds }),
-        // })
-        // .then(response => {
-        //     if (response.ok) {
-        //         return response.json();
-        //     }
-        //     throw new Error('Error al procesar los datos.');
-        // })
-        // .then(data => {
-        //     alert('Datos procesados correctamente.');
-        // })
-        // .catch(error => {
-        //     alert(error.message);
-        // });
-    });    
+    $("#servicePaymentsCurrencyModal").on('change', function(){
+        let currency = $(this).val();
+        let reservation_id = $("#reserv_id_pay").val();
+        $.ajax({
+            url: '/GetExchange/'+reservation_id+'?currency='+currency,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                $("#servicePaymentsExchangeModal").val(data.exchange_rate);
+                $("#operation_pay").val(data.operation);
+                $("#btn_new_payment").prop('disabled', false);
+            },
+        });
+    });
 });

@@ -27,11 +27,6 @@ class FinanceController extends Controller
         return $this->FinanceRepository->addPaymentRefund($request);
     }
 
-    public function addPaymentCredit(Request $request)
-    {
-        return $this->FinanceRepository->addPaymentCredit($request);
-    }    
-
     public function refundNotApplicable(Request $request)
     {
         return $this->FinanceRepository->refundNotApplicable($request);
@@ -63,5 +58,9 @@ class FinanceController extends Controller
     public function getPaymentsReservation(Request $request)
     {
         return $this->FinanceRepository->getPaymentsReservation($request);
+    }
+
+    public function addCreditPayment(Request $request){
+        return $this->FinanceRepository->addCreditPayment($request);
     }
 }

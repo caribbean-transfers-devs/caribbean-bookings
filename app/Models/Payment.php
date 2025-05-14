@@ -21,7 +21,10 @@ class Payment extends Model
         'currency',
         'object',
         'reservation_id',
-        'reference',
+        'reference', //ES DONDE PONES LA REFERENCIA DEL PAGO (STRIPE, PAYPAL)
+        'reference_invoice', //ES DONDE PONES LA REFERENCIA DE LA FACTURA QUE PAGARA LA AGENCIA
+        'reference_conciliation', //ES DONDE PONES LA REFERENCIA DE PROCESADOR (STRIPE, PAYPAL)
+        'created_at',
         'is_conciliated',
         'is_conciliated_cash',
         'date_conciliation',

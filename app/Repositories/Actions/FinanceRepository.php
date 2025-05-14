@@ -641,4 +641,189 @@ class FinanceRepository
 
         return $reservation;
     }
+
+    public function addCreditPayment($request)
+    {
+        $rules = [
+            'codes' => 'required|string',
+            'option' => 'required|integer|in:1,2',
+            'currency' => 'required|string|in:USD,MXN',
+        ];
+
+        if (isset($request->option) && ( $request->option == 2 )) {
+            $rules['reference_invoice'] = 'required|string';
+            $rules['date_conciliation'] = 'required|date';
+        }
+
+        if (isset($request->option) && ( $request->option == 1 )) {
+            $rules['reference_payment'] = 'required|string';
+            $rules['deposit_date'] = 'required|date';
+        }
+
+        $validator = Validator::make($request->all(),$rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
+        }
+
+
+        $codesArray = MethodsTrait::parseArray2($request->codes ?? '');
+
+        // Validar que tengamos códigos válidos
+        if (empty($codesArray)) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'No se encontraron las reservaciones'
+                ],
+                'message' => 'No se encontraron las reservaciones'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        // Buscar los pagos correspondientes a los códigos
+        // $sales = Sale::with('reservation')
+        //             ->whereHas('reservation', function ($query) use ($codesArray) {
+        //                 $query->whereIn('id', $codesArray);
+        //             })->get();
+        if (isset($request->option) && ( $request->option == 2 )) {
+            $sales = Sale::with('reservation')
+                ->whereHas('reservation', function ($query) use ($codesArray) {
+                    $query->whereIn('id', $codesArray);
+                })
+                ->get()
+                ->map(function ($sale) {
+                    // Sumar el total de las sales asociadas a la misma reserva con sale_type_id = 1
+                    $filteredTotal = Sale::where('reservation_id', $sale->reservation_id)
+                        ->where('sale_type_id', 1)
+                        ->sum('total');
+
+                    // Añadir el campo calculado al objeto Sale
+                    $sale->filtered_total = $filteredTotal;
+
+                    return $sale;
+                });
+
+            if (!$sales) {
+                return response()->json([
+                    'errors' => [
+                        'code' => 'NOT_FOUND',
+                        'message' => 'No se encontraron los ventas'
+                    ],
+                    'status' => 'error',
+                    'message' => 'No se encontraron los ventas'
+                ], Response::HTTP_NOT_FOUND);
+            }
+        }
+
+        if (isset($request->option) && ( $request->option == 1 )) {
+            $payments = Payment::whereIn('id', $codesArray)->get();            
+
+            if (!$payments) {
+                return response()->json([
+                    'errors' => [
+                        'code' => 'NOT_FOUND',
+                        'message' => 'No se encontraron los pagos'
+                    ],
+                    'status' => 'error',
+                    'message' => 'No se encontraron los pagos'
+                ], Response::HTTP_NOT_FOUND);
+            }            
+        }
+                
+        try {
+            DB::beginTransaction();
+            
+            if( isset($sales) && !empty($sales) ){
+                foreach ($sales as $sale) {
+                        $dataPayment = Payment::where('reservation_id', $sale->reservation->id)
+                                                ->where('is_conciliated', 2)
+                                                ->get();
+                        
+                        if( $dataPayment->count() == 0 ){
+                            $currency = $request->currency;
+                            $to_currency = $sale->reservation->currency;
+                            $exchange = DB::table('payments_exchange_rate')->where('origin',$currency)->where('destination',$to_currency)->first();
+                            $total = round( ( $exchange->operation == "multiplication" ? ( $sale->filtered_total * $exchange->exchange_rate ) : (  $sale->filtered_total / $exchange->exchange_rate ) ) );
+
+                            // Crear pago                    
+                            $payment = new Payment();
+                            $payment->description = 'Panel';
+                            $payment->total = $total;
+                            $payment->exchange_rate = $exchange->exchange_rate;
+                            $payment->status = 1;
+                            $payment->operation = $exchange->operation;
+                            $payment->payment_method = 'CREDIT';
+                            $payment->currency = $sale->reservation->currency;
+                            $payment->reservation_id = $sale->reservation->id;
+                            $payment->reference_invoice = $request->reference_invoice ?? NULL;
+                            // $payment->user_id = auth()->user()->id;
+                            $payment->is_conciliated = $request->option;
+                            $payment->is_conciliated_cash = NULL;
+                            $payment->date_conciliation = $request->date_conciliation ?? NULL;
+                            // $payment->deposit_date = $request->deposit_date ?? NULL;
+                            $payment->total_fee = 0;
+                            $payment->total_net = $total;
+                            $payment->conciliation_comment = $request->conciliation_comment ?? NULL;
+                            $payment->category = "PAYOUT_CREDIT_PENDING";
+
+                            if( $payment->save() ){
+                                $this->create_followUps(
+                                    $sale->reservation->id,
+                                    "El usuario " . auth()->user()->name . " agregó un pago tipo: " . $request->payment_method . 
+                                    ", por un monto de: $total " . $request->currency . ", Categoría: PAYOUT_CREDIT_PENDING",
+                                    'HISTORY',
+                                    'CREATE_PAYMENT_CREDIT'
+                                );
+                            }
+                        }            
+                }
+            }
+
+            if( isset($payments) && !empty($payments) ){
+                foreach ($payments as $payment) {
+                        $payment->payment_method = $request->payment_method;
+                        $payment->is_conciliated = $request->option;
+                        $payment->reference = $request->reference_payment ?? NULL;
+                        // $payment->date_conciliation = $request->date_conciliation ?? NULL;
+                        $payment->deposit_date = $request->deposit_date ?? NULL;
+                        $payment->conciliation_comment = $request->conciliation_comment ?? NULL;
+                        $payment->category = "PAYOUT_CREDIT_PAID";
+                        $payment->save();
+                        // Agrega aquí otros campos que necesites actualizar
+
+                    $this->create_followUps(
+                        $payment->reservation_id,
+                        "El usuario " . auth()->user()->name . " agregó un pago tipo: " . $request->payment_method . 
+                        ", por un monto de: $payment->total " . $request->currency . ", Categoría: " . $request->payment_method,
+                        'HISTORY',
+                        'CREATE_PAYMENT'
+                    );   
+                }
+            }         
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se agrego el pago correctamente',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
 }

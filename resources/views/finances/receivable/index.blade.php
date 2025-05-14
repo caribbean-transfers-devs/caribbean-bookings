@@ -22,34 +22,36 @@
                     'data-bs-target' => '#filterModal',
                 )
             ),
-            array(
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
-                'titleAttr' => 'Administrar columnas',
-                'className' => 'btn btn-primary __btn_columns',
-                'attr' => array(
-                    'data-title' =>  "Administrar columnas",
-                    'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#columnsModal',
-                    'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
-                    'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
-                )                
-            ),
+            // array(
+            //     'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
+            //     'titleAttr' => 'Administrar columnas',
+            //     'className' => 'btn btn-primary __btn_columns',
+            //     'attr' => array(
+            //         'data-title' =>  "Administrar columnas",
+            //         'data-bs-toggle' => 'modal',
+            //         'data-bs-target' => '#columnsModal',
+            //         'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
+            //         'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
+            //     )                
+            // ),
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Conciliar Reservas',
                 'className' => 'btn btn-primary',
-                'attr' => array(
-                    'id' =>  "processSelected",
+                'attr' => array(     
+                    'id' => 'checkboxSelected',
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#ConciliationReservesCreditModal'
                 )
             ),
-            array(
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar Excel',
-                'extend' => 'excelHtml5',
-                'titleAttr' => 'Exportar Excel',
-                'className' => 'btn btn-primary',
-                'exportOptions' => [
-                    'columns' => ':visible'  // Solo exporta las columnas visibles   
-                ]
-            ),
+            // array(
+            //     'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar Excel',
+            //     'extend' => 'excelHtml5',
+            //     'titleAttr' => 'Exportar Excel',
+            //     'className' => 'btn btn-primary',
+            //     'exportOptions' => [
+            //         'columns' => ':visible'  // Solo exporta las columnas visibles   
+            //     ]
+            // ),
             array(
                 'text' => 'Tipo de cambio: '.$exchange,
                 'titleAttr' => 'Tipo de cambio',
@@ -92,20 +94,41 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- <button class="btn {{ $booking->is_conciliated == 0 && $booking->reservation_status == "CREDIT" ? 'btn-danger __btn_conciliation' : 'btn-success' }} mt-2" data-reservation="{{ $booking->reservation_id }}">{{ $booking->is_conciliated == 0 && $booking->reservation_status == "CREDIT" ? "CONCILIAR PAGO" : "PAGO CONCILIADO" }}</button> --}}
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $booking)
-                                <tr class="{{ ( $booking->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $booking->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$booking->reservation_id : '' ) }}" style="{{ ( $booking->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $booking->reservation_id }}" data-is_round_trip="{{ $booking->is_round_trip }}">
+                                {{-- @dump($booking); --}}
+                                @php
+                                    $color_status = '#e7515a';
+                                    $text_status = 'PENDIENTE DE CONCILIAR PAGO';
+                                    switch ($booking->credit_conciliation_status) {
+                                        case 'pre-reconciled':
+                                            $color_status = '#e2a03f';
+                                            $text_status = 'PRE CONCILIADO';
+                                            break;
+                                        case 'reconciled':
+                                            $color_status = '#00ab55';
+                                            $text_status = 'CONCILIADO';
+                                            break;
+                                        case 'cxc':
+                                            $color_status = '#805dca';
+                                            $text_status = 'CXC';
+                                            break;
+                                        default:
+                                            $color_status = '#e7515a';
+                                            $text_status = 'PENDIENTE DE CONCILIAR PAGO';
+                                            break;
+                                    }
+                                @endphp
+                                <tr class="{{ ( $booking->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $booking->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$booking->reservation_id : '' ) }}" style="{{ ( $booking->is_today != 0 ? 'background-color: #fcf5e9;' : '' ) }}" data-reservation="{{ $booking->reservation_id }}" data-is_round_trip="{{ $booking->is_round_trip }}" {{ $booking->credit_conciliation_status }}>                                    
                                     <td class="text-center">
-                                        @if ( $booking->is_conciliated == 0 && $booking->reservation_status == "CREDIT" )
+                                        @if ( $booking->credit_conciliation_status == null || $booking->credit_conciliation_status == "pre-reconciled" )
                                             <div class="form-check form-check-primary">
                                                 <input class="form-check-input chk-chk row-check" type="checkbox" value="{{ $booking->reservation_id }}">
                                             </div>
                                         @endif
                                     </td>
-                                    <td class="text-center" style="background-color:{{ $booking->is_conciliated == 0 && $booking->reservation_status == "CREDIT" ? '#e7515a' : '#00ab55' }};color:#fff;">
-                                        {{-- <button class="btn {{ $booking->is_conciliated == 0 && $booking->reservation_status == "CREDIT" ? 'btn-danger __btn_conciliation' : 'btn-success' }} mt-2" data-reservation="{{ $booking->reservation_id }}">{{ $booking->is_conciliated == 0 && $booking->reservation_status == "CREDIT" ? "CONCILIAR PAGO" : "PAGO CONCILIADO" }}</button> --}}
-                                        {{ $booking->is_conciliated == 0 && $booking->reservation_status == "CREDIT" ? "CONCILIAR PAGO" : "PAGO CONCILIADO" }}
+                                    <td class="text-center" style="background-color:{{ $color_status }}; color:#fff;">
+                                        {{ $text_status }}
                                     </td>
                                     <td class="text-center">
                                         @php
@@ -120,8 +143,8 @@
                                         @else
                                             <button type="button" class="btn btn-dark w-100 mb-2"><?=$codes_string?></button>
                                         @endif
-                                        @if ( $booking->is_conciliated == 0 && $booking->reservation_status == "CREDIT" )
-                                            <button type="button" class="btn btn-success __btn_conciliation_credit w-100 mb-2" data-reservation="{{ $booking->reservation_id }}">Click para conciliar pago</button>
+                                        @if ( $booking->credit_conciliation_status == null || $booking->credit_conciliation_status == "pre-reconciled" )
+                                            <button type="button" class="btn btn-success __btn_conciliation_credit w-100 mb-2" data-reservation="{{ $booking->reservation_id }}" data-code="{{ $booking->credit_payment_ids }}">Click para conciliar pago</button>
                                         @endif
                                         <button type="button" class="btn btn-primary __show_reservation w-100" data-reservation="{{ $booking->reservation_id }}" data-bs-toggle="modal" data-bs-target="#viewProofsModal">VER EVIDENCIA</button>                                       
                                     </td>
@@ -162,12 +185,18 @@
                                             <?=auth()->user()->renderServiceStatus($booking->two_service_status)?>
                                         @endif
                                     </td>
-                                    <td class="text-center" <?=auth()->user()->classStatusPayment($booking)?>>{{ number_format(($booking->total_sales),2) }} {{ $booking->currency }}</td>
+                                    <td class="text-center" <?=auth()->user()->classStatusPayment($booking)?>>{{ number_format(( $booking->total_payments_credit > 0 ? $booking->total_payments_credit : $booking->total_sales_credit ),2) }} {{ $booking->currency }}</td>
                                     <td class="text-center">{{ $booking->payment_type_name }}</td>
                                     <td class="text-center">
                                         @if ( !empty($booking->payment_details) )
                                             [{{ $booking->payment_details }}]
                                         @endif
+
+                                        <p><strong class="text-uppercase">Referencia de agencia:</strong> {{ $booking->credit_references_agency  }}</p>
+                                        <p><strong class="text-uppercase">Referencia de pago:</strong> {{ $booking->credit_references_payment  }}</p>
+                                        <p><strong class="text-uppercase">Fecha de pre-conciliacion:</strong> {{ $booking->credit_conciliation_dates  }}</p>
+                                        <p><strong class="text-uppercase">Comentarios de conciliación:</strong> {{ $booking->credit_comments  }}</p>
+                                        <p><strong class="text-uppercase">Fecha de conciliacion:</strong> {{ $booking->credit_deposit_dates  }}</p>
                                     </td>
                                 </tr>
                             @endforeach
@@ -181,5 +210,6 @@
     <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" />
     <x-modals.reports.columns />
     <x-modals.finances.proofs />
-    <x-modals.new_payment_conciliation />
+    <x-modals.finances.credit_conciliation />
+    {{-- <x-modals.new_payment_conciliation /> --}}
 @endsection

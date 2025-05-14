@@ -224,9 +224,19 @@ trait QueryTrait
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     SUM(it.is_round_trip) as is_round_trip,
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
+                                    COALESCE(SUM(s.total_sales_credit), 0) as total_sales_credit,
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                    COALESCE(SUM(p.total_payments_credit), 0) as total_payments_credit,
+                                    p.credit_conciliation_status as credit_conciliation_status,
+                                    COALESCE(p.credit_payment_ids) AS credit_payment_ids,
+
+                                    GROUP_CONCAT(DISTINCT p.credit_references_agency ORDER BY p.credit_references_agency ASC SEPARATOR ', ') AS credit_references_agency,
+                                    GROUP_CONCAT(DISTINCT p.credit_references_payment ORDER BY p.credit_references_payment ASC SEPARATOR ', ') AS credit_references_payment,
+                                    GROUP_CONCAT(DISTINCT p.credit_comments ORDER BY p.credit_comments ASC SEPARATOR ', ') AS credit_comments,
+                                    GROUP_CONCAT(DISTINCT p.credit_conciliation_dates ORDER BY p.credit_conciliation_dates ASC SEPARATOR ', ') AS credit_conciliation_dates,
+                                    GROUP_CONCAT(DISTINCT p.credit_deposit_dates ORDER BY p.credit_deposit_dates ASC SEPARATOR ', ') AS credit_deposit_dates,
+
                                     COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
-                                    SUM(p.is_conciliated) as is_conciliated,
 
                                     -- Información de reembolsos
                                     CASE WHEN rr.reservation_id IS NOT NULL THEN 1 ELSE 0 END as has_refund_request,
@@ -282,7 +292,8 @@ trait QueryTrait
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id, 
-                                            ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+                                            ROUND( COALESCE(SUM(total), 0), 2) as total_sales,
+                                            ROUND(COALESCE(SUM(CASE WHEN sale_type_id = 1 THEN total ELSE 0 END), 0), 2) AS total_sales_credit
                                         FROM sales
                                             WHERE deleted_at IS NULL 
                                         GROUP BY reservation_id
@@ -292,10 +303,59 @@ trait QueryTrait
                                         SELECT 
                                             reservation_id,
                                             is_conciliated,
-                                            ROUND(SUM(CASE 
-                                                WHEN operation = 'multiplication' THEN total * exchange_rate
-                                                WHEN operation = 'division' THEN total / exchange_rate
-                                                ELSE total END), 2) AS total_payments,
+                                            -- ROUND(SUM(CASE 
+                                            --     WHEN operation = 'multiplication' THEN total * exchange_rate
+                                            --     WHEN operation = 'division' THEN total / exchange_rate
+                                            --     ELSE total END), 2) AS total_payments,
+
+                                            ROUND(SUM(CASE
+                                                WHEN category IN ('PAYOUT', 'PAYOUT_CREDIT_PAID') THEN 
+                                                    CASE 
+                                                        WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                        WHEN operation = 'division' THEN total / exchange_rate
+                                                        ELSE total 
+                                                    END
+                                                ELSE 0
+                                            END), 2) AS total_payments,
+
+                                            ROUND(SUM(CASE
+                                                WHEN category IN ('PAYOUT_CREDIT_PENDING', 'PAYOUT_CREDIT_PAID') THEN 
+                                                    CASE 
+                                                        WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                        WHEN operation = 'division' THEN total / exchange_rate
+                                                        ELSE total 
+                                                    END
+                                                ELSE 0
+                                            END), 2) AS total_payments_credit,
+
+                                            CONCAT(
+                                                '[',
+                                                    GROUP_CONCAT(
+                                                        DISTINCT 
+                                                        CASE 
+                                                            WHEN payment_method = 'CREDIT' OR payment_method LIKE '%CREDIT%' THEN id
+                                                            ELSE NULL
+                                                        END
+                                                        ORDER BY id ASC
+                                                        SEPARATOR ','
+                                                    ),
+                                                ']'
+                                            ) AS credit_payment_ids,
+                                            -- Conciliación para créditos
+                                            CASE 
+                                                WHEN MAX(CASE WHEN category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN is_conciliated END) = 2 THEN 'pre-reconciled'
+                                                WHEN MAX(CASE WHEN category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN is_conciliated END) = 1 THEN 'reconciled'
+                                                WHEN MAX(CASE WHEN category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN is_conciliated END) = 3 THEN 'cxc'
+                                                ELSE NULL
+                                            END AS credit_conciliation_status,
+                                            -- NUEVOS CAMPOS desde categorías de crédito específico
+                                            GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN reference_invoice END SEPARATOR ', ') AS credit_references_agency,
+                                            GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN reference END SEPARATOR ', ') AS credit_references_payment,
+                                            GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN conciliation_comment END SEPARATOR ', ') AS credit_comments,
+                                            GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(date_conciliation, '%Y-%m-%d') END SEPARATOR ', ') AS credit_conciliation_dates,
+                                            GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(deposit_date, '%Y-%m-%d') END SEPARATOR ', ') AS credit_deposit_dates,
+                                            
+
                                             GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
                                             GROUP_CONCAT(
                                                 DISTINCT CONCAT(
@@ -339,7 +399,7 @@ trait QueryTrait
                                         GROUP BY it.reservation_id, it.is_round_trip
                                     ) as it ON it.reservation_id = rez.id
                                     WHERE 1=1 {$query}
-                                GROUP BY rez.id, site.id, site.type_site, site.name, site.is_cxc {$query2}",
+                                GROUP BY rez.id, site.id, site.type_site, site.name, site.is_cxc, p.credit_payment_ids, p.credit_conciliation_status {$query2}",
                                     $queryData);
 
         if(sizeof( $bookings ) > 0):
@@ -562,13 +622,23 @@ trait QueryTrait
                                 ) as s ON s.reservation_id = rez.id
                                 LEFT JOIN (
                                     SELECT 
-                                        -- CONCAT( '[',GROUP_CONCAT(DISTINCT id ORDER BY id ASC SEPARATOR ','),']' ) AS codes_payment,
                                         reservation_id,
-                                        ROUND(SUM(CASE 
-                                            WHEN operation = 'multiplication' THEN total * exchange_rate
-                                            WHEN operation = 'division' THEN total / exchange_rate
-                                            ELSE total END), 2) AS total_payments,
+                                        -- ROUND(SUM(CASE 
+                                        --     WHEN operation = 'multiplication' THEN total * exchange_rate
+                                        --     WHEN operation = 'division' THEN total / exchange_rate
+                                        --     ELSE total END), 2) AS total_payments,
+                                        ROUND(SUM(CASE
+                                            WHEN category IN ('PAYOUT', 'PAYOUT_CREDIT_PAID') THEN 
+                                                CASE 
+                                                    WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                    WHEN operation = 'division' THEN total / exchange_rate
+                                                    ELSE total 
+                                                END
+                                            ELSE 0
+                                        END), 2) AS total_payments,
+
                                         GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
+
                                         -- Monto en efectivo
                                         ROUND(SUM(CASE 
                                             WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
@@ -849,14 +919,24 @@ trait QueryTrait
                                 ) as s ON s.reservation_id = rez.id
                                 LEFT JOIN (
                                     SELECT 
-                                        -- CONCAT( '[',GROUP_CONCAT(DISTINCT id ORDER BY id ASC SEPARATOR ','),']' ) AS codes_payment,
                                         reservation_id,
-                                        ROUND(SUM(CASE 
+                                        -- ROUND(SUM(CASE 
+                                        --             WHEN operation = 'multiplication' THEN total * exchange_rate
+                                        --             WHEN operation = 'division' THEN total / exchange_rate
+                                        --             ELSE total 
+                                        --         END), 2) AS total_payments,
+                                        ROUND(SUM(CASE
+                                            WHEN category IN ('PAYOUT', 'PAYOUT_CREDIT_PAID') THEN 
+                                                CASE 
                                                     WHEN operation = 'multiplication' THEN total * exchange_rate
                                                     WHEN operation = 'division' THEN total / exchange_rate
                                                     ELSE total 
-                                                END), 2) AS total_payments,
+                                                END
+                                            ELSE 0
+                                        END), 2) AS total_payments,
+
                                         GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
+
                                         -- Monto en efectivo
                                         ROUND(SUM(CASE 
                                                     WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
