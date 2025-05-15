@@ -967,6 +967,8 @@ class OperationsController extends Controller
                 $reservation->is_last_minute = 1;
                 $reservation->save();
 
+                
+
                 // Creando follow_up
                 $this->create_followUps($reservation->id, 'SE CAPTURÓ LA VENTA CON ID: '.$reservation->id.', POR EL USUARIO: '.auth()->user()->name.', DESDE EL PANEL DE OPERACIONES', 'HISTORY', auth()->user()->name);
             //}
