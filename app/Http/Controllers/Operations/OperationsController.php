@@ -964,6 +964,7 @@ class OperationsController extends Controller
                 $reservation->updated_at = Carbon::now();
                 $reservation->comments = $request->comments;
                 $reservation->is_complete = ( $request->site_id == 11 || $request->site_id == 21 ? 0 : 1 );
+                $reservation->is_last_minute = 1;
                 $reservation->save();
 
                 // Creando follow_up
@@ -996,8 +997,7 @@ class OperationsController extends Controller
             if( isset($request->is_open) && $request->is_open == 1 ){
                 $item->is_open = $request->is_open;
                 $item->open_service_time = $request->open_service_time;
-            }
-            $item->is_last_minute = 1;
+            }            
             $item->created_at = Carbon::now();
             $item->updated_at = Carbon::now();
             $item->save();
@@ -1031,7 +1031,7 @@ class OperationsController extends Controller
                     'code' => 'internal_server',
                     'message' => $e->getMessage()
                 ],
-                'message' => 'Internal Server'
+                'message' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
