@@ -607,7 +607,7 @@
                                                                 <button <?=$tooltip?> type="button" class="btn {{ $btn_op_one_type }} btn-sm bs-tooltip">{{ auth()->user()->statusBooking($item->op_one_status) }}</button>                                
                                                             @endif
                                                         </td>
-                                                        <td>{{ isset($item->op_one_comments) ? $item->op_one_comments : 'NO DEFINIDO' }}</td>
+                                                        <td>{{ isset($item->op_one_comments) ? $item->op_one_comments : 'SIN COMENTARIOS' }}</td>
                                                         <td>
                                                             {{-- NOS PERMITE ACTUALIZAR Y ENVIAR LA CONFIRMACION DEL SERVICIO AL CLIENTE POR CORREO --}}
                                                             {{-- VER SI EL SERVICIO ESTA EN UNA OPERACION ABIERTA O CERRADA --}}
@@ -690,7 +690,7 @@
                                                                     <button <?=$tooltip?> type="button" class="btn {{ $btn_op_two_type }} btn-sm bs-tooltip">{{ auth()->user()->statusBooking($item->op_two_status) }}</button> 
                                                                 @endif
                                                             </td>
-                                                            <td>{{ isset($item->op_two_comments) ? $item->op_two_comments : 'NO DEFINIDO' }}</td>
+                                                            <td>{{ isset($item->op_two_comments) ? $item->op_two_comments : 'SIN COMENTARIOS' }}</td>
                                                             <td>
                                                                 {{-- NOS PERMITE ACTUALIZAR Y ENVIAR LA CONFIRMACION DEL SERVICIO AL CLIENTE POR CORREO --}}
                                                                 {{-- VER SI EL SERVICIO ESTA EN UNA OPERACION ABIERTA O CERRADA --}}
@@ -846,12 +846,12 @@
                                 <tbody>
                                     @foreach ($reservation->refunds as $refund)
                                         <tr>
-                                            <td>{{ isset($refund->user->name) ? $refund->user->name : 'NO DEFINIDO' }}</td>
+                                            <td>{{ isset($refund->user->name) ? $refund->user->name : 'SIN USUARIO QUE SOLICITO EL REEMBOLSO' }}</td>
                                             <td>
                                                 <button class="btn btn-{{ auth()->user()->classStatusRefund($refund->status) }} btn-sm">{{ auth()->user()->statusRefund($refund->status) }}</button>
                                             </td>
                                             <td>{{ $refund->message_refund }}</td>
-                                            <td>{{ $refund->response_message != NULL ? $refund->response_message : 'NO DEFINIDA' }}</td>
+                                            <td>{{ $refund->response_message != NULL ? $refund->response_message : 'SIN COMENTARIO DE RESPUESTA' }}</td>
                                             <td class="text-center">{{ date("Y-m-d", strtotime($refund->created_at)) }}</td>
                                             <td class="text-center">
                                                 @if ( $refund->status == "REFUND_NOT_APPLICABLE" )
@@ -860,7 +860,7 @@
                                                     @if ( $refund->end_at != null )
                                                         {{ date("Y-m-d", strtotime($refund->end_at)) }}
                                                     @else
-                                                        {{ 'NO DEFINIDO' }}
+                                                        {{ 'SIN FECHA DE APLICACIÓN DE REEMBOLSO' }}
                                                     @endif                                                    
                                                 @endif
                                             </td>
@@ -871,7 +871,7 @@
                                                     @if ( $refund->link_refund != null )
                                                         <a href="{{ $refund->link_refund }}" target="_black">click para ver</a>
                                                     @else
-                                                        {{ 'NO DEFINIDO' }}
+                                                        {{ 'SIN COMPROBANTE DE REEMBOLSO' }}
                                                     @endif                                                    
                                                 @endif
                                             </td>

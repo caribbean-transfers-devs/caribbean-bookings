@@ -122,7 +122,7 @@
 
                                     if( !isset($usersData[Str::slug($operation->employee)]) ):
                                         $usersData[Str::slug($operation->employee)] = [
-                                            'NAME' => ( !empty($operation->employee) ? $operation->employee : "NO DEFINIDO" ),
+                                            'NAME' => ( !empty($operation->employee) ? $operation->employee : "SIN NOMBRE DE ASESOR DE CALL CENTER" ),
                                             'TOTAL' => 0,
                                             'USD' => 0,
                                             'MXN' => 0,

@@ -965,6 +965,7 @@ class OperationsController extends Controller
                 $reservation->comments = $request->comments;
                 $reservation->is_complete = ( $request->site_id == 11 || $request->site_id == 21 ? 0 : 1 );
                 $reservation->is_last_minute = 1;
+                $reservation->origin_sale_id = $request->origin_sale_id;
                 $reservation->save();
 
                 

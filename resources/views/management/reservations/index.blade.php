@@ -20,6 +20,30 @@
 @push('Css')
     <link href="{{ mix('/assets/css/sections/management/reservations.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/management/reservations.min.css') }}" rel="stylesheet" >
+    <style>
+        .bell-button {
+            /* font-size: 24px; */
+            border: none;
+            background: none;
+            cursor: pointer;
+            position: relative;
+            /* animation: ring 1s infinite ease-in-out; */
+            transition: transform 0.3s;
+        }
+        .bell-button.active {
+            animation: ring 1s infinite ease-in-out;
+            box-shadow: 0 0 10px red, 0 0 20px red;
+        }
+        @keyframes ring {
+            0% { transform: rotate(0); }
+            15% { transform: rotate(-15deg); }
+            30% { transform: rotate(15deg); }
+            45% { transform: rotate(-10deg); }
+            60% { transform: rotate(10deg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0); }
+        }        
+    </style>
 @endpush
 
 @push('Js')
@@ -98,6 +122,8 @@
                             <thead>
                                 <tr>
                                     <th class="text-center">ID</th>
+                                    <th class="text-center">INDICADORES</th>
+                                    <th class="text-center">TIPO DE SERVICIO</th>
                                     <th class="text-center">CÓDIGO</th>
                                     <th class="text-center">REFERENCIA</th>
                                     <th class="text-center">VENDEDOR</th>
@@ -127,6 +153,14 @@
                                     @foreach ($bookings as $item)
                                         <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fb5607b8;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
                                             <td class="text-center">{{ $item->reservation_id }}</td>
+                                            <td class="text-center">
+                                                @if ($item->is_same_day_round_trip)                                                                                                
+                                                <button class="btn btn-warning active bell-button bs-tooltip" title="Servicion con misma fecha de llegada y salida"> 
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-truck"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                                </button>
+                                                @endif
+                                            </td>
+                                            <td class="text-center"><span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>                                            
                                             <td class="text-center">
                                                 @php
                                                     $codes_string = "";
@@ -186,7 +220,7 @@
                         <table id="dataArrivals" class="table table-arrivals dt-table-hover" style="width:100%" data-button='<?=json_encode([])?>'>
                             <thead>
                                 <tr>
-                                    <th class="text-center">ID</th>
+                                    <th class="text-center">ID</th>                                    
                                     <th class="text-center">ESTATUS DE CONFIRMACIÓN</th>
                                     <th class="text-center">TIPO DE SERVICIO</th>
                                     <th class="text-center">CÓDIGO</th>

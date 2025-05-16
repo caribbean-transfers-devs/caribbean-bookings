@@ -1069,7 +1069,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     let total = fila.find('td').eq(16).text();
                     let final_service = ( type == "TYPE_ONE" ? item.final_service_type_one : item.final_service_type_two );
 
-                    let message =   '<p class="m-0">Número: ' + ( type == "TYPE_ONE" ? ( item.op_one_preassignment != null ? item.op_one_preassignment : 'NO DEFINIDO' ) : ( item.op_two_preassignment != null ? item.op_two_preassignment : 'NO DEFINIDO' ) ) + '</p> \n ' +
+                    let message =   '<p class="m-0">Número: ' + ( type == "TYPE_ONE" ? ( item.op_one_preassignment != null ? item.op_one_preassignment : 'SIN PRE ASIGNACIÓN' ) : ( item.op_two_preassignment != null ? item.op_two_preassignment : 'SIN PRE ASIGNACIÓN' ) ) + '</p> \n ' +
                                     '<p class="m-0">Código: ' + item.code + '</p> \n ' +
                                     '<p class="m-0">Hora: ' + hora + '</p> \n ' +
                                     '<p class="m-0">Cliente: ' + info.client_first_name + ' ' + info.client_last_name + '</p> \n ' +
@@ -1077,7 +1077,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                     '<p class="m-0">Pax: ' + item.passengers + '</p> \n ' +
                                     '<p class="m-0">Origen: ' + ( type == "TYPE_ONE" ? item.from_name : item.to_name ) + '</p> \n ' +
                                     '<p class="m-0">Destino: ' + ( type == "TYPE_ONE" ? item.to_name : item.from_name ) + '</p> \n ' +
-                                    '<p class="m-0"># Vuelo: ' + ( final_service == "ARRIVAL" || final_service == "DEPARTURE" ? item.flight_number : 'NO DEFINIDO' ) + '</p> \n ' +
+                                    '<p class="m-0"># Vuelo: ' + ( final_service == "ARRIVAL" || final_service == "DEPARTURE" ? item.flight_number : 'SIN NUMERO DE VUELO' ) + '</p> \n ' +
                                     '<p class="m-0">Agencia: ' + info.site.name + '</p> \n ' +
                                     '<p class="m-0">Unidad: ' + vehicle + '</p> \n ' +
                                     '<p class="m-0">Conductor: ' + driver + '</p> \n ' +
@@ -1609,7 +1609,7 @@ $('#dataManagementOperations').on('click', '.extract_confirmation', function() {
     var fila = $(this).closest('tr');
 
     // Extraer la información de las celdas de la fila
-    let identificator = ( fila.find('td').eq(0).find('button').text() == "ADD" ? "NO DEFINIDO" : fila.find('td').eq(0).find('button').text() );
+    let identificator = ( fila.find('td').eq(0).find('button').text() == "ADD" ? "SIN PRE ASIGNACIÓN" : fila.find('td').eq(0).find('button').text() );
 
     __message_terminal1 += "<p>" + identificator + "</p>";
     __message_terminal2 += "<p>" + identificator + "</p>";

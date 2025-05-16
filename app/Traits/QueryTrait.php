@@ -223,6 +223,8 @@ trait QueryTrait
                                     SUM(it.passengers) as passengers,
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     SUM(it.is_round_trip) as is_round_trip,
+                                    MAX(it.is_same_day_round_trip) AS is_same_day_round_trip,
+
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
                                     COALESCE(SUM(s.total_sales_credit), 0) as total_sales_credit,
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
@@ -269,7 +271,7 @@ trait QueryTrait
                                             WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
                                             WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
                                             WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
-                                            ELSE 'NO DEFENIDO'
+                                            ELSE 'SIN METODO DE PAGO'
                                         END
                                     ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                     GROUP_CONCAT(DISTINCT p.payment_details ORDER BY p.payment_details ASC SEPARATOR ', ') AS payment_details
@@ -390,7 +392,9 @@ trait QueryTrait
                                             GROUP_CONCAT(DISTINCT it.op_one_status ORDER BY it.op_one_status ASC SEPARATOR ',') AS one_service_status,
                                             GROUP_CONCAT(DISTINCT it.op_two_status ORDER BY it.op_two_status ASC SEPARATOR ',') AS two_service_status,
                                             MAX(CASE WHEN DATE(it.op_one_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_one_pickup_today,
-                                            MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_two_pickup_today
+                                            MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_two_pickup_today,
+                                            -- Nueva condición para verificar si es round trip y las fechas son el mismo día
+                                            MAX(CASE WHEN it.is_round_trip = 1 AND DATE(it.op_one_pickup) = DATE(it.op_two_pickup) THEN 1 ELSE 0 END) AS is_same_day_round_trip
                                         FROM reservations_items as it
                                             INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
                                             INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
