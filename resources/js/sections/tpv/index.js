@@ -197,6 +197,8 @@ let setup = {
   },  
   actionSite: function(__site){
     const __reference       = document.getElementById('formReference');
+    const __name            = document.getElementById('formName');
+    const __lastname        = document.getElementById('formLastName');
     const __email           = document.getElementById('formEmail');
     const __phone           = document.getElementById('formPhone');
     const __isQuotation     = document.getElementById('formIsQuotation');
@@ -204,20 +206,53 @@ let setup = {
     const __originSale      = document.getElementById('formOriginSale');
     const selectedOption    = __site.options[__site.selectedIndex];
 
-    if( selectedOption.getAttribute('data-type') == "AGENCY" ){
-      __reference.removeAttribute('readonly');
+    if( selectedOption.getAttribute('data-type') == "AGENCY" || selectedOption.getAttribute('data-type') == "STAFF" ){
+      if( selectedOption.getAttribute('data-type') == "STAFF" ){
+        __name.value          = 'STAFF';
+        __lastname.value      = 'CT';
+      }
+
       __email.value           = selectedOption.getAttribute('data-email');
       __phone.value           = selectedOption.getAttribute('data-phone');
       __isQuotation.value     = 0;
       __paymentMethod.value   = "CARD";
-      $("#formOriginSale").selectpicker('val', '5');
+      $("#formOriginSale").selectpicker('val', ( selectedOption.getAttribute('data-type') == "AGENCY" ? '5' : '13' ));
+
+      if( selectedOption.getAttribute('data-type') == "AGENCY" ){
+        console.log("entre");
+        __reference.removeAttribute('readonly');
+      }
+
+      if( selectedOption.getAttribute('data-type') == "STAFF" ){
+        console.log("entre staff");
+        __reference.value     = "DIRECTO";
+      }
+
+      if( selectedOption.getAttribute('data-type') == "STAFF" ){
+        __name.setAttribute('readonly', true);
+        __lastname.setAttribute('readonly', true);
+      }
+      __email.setAttribute('readonly', true);
+      __phone.setAttribute('readonly', true);
+      __isQuotation.setAttribute('readonly', true);
+      __paymentMethod.setAttribute('readonly', true);
     }else{
-      __reference.setAttribute('readonly', true);
-      __email.value           = "";
-      __phone.value           = "";
+      __name.value            = '';
+      __lastname.value        = '';
+      __email.value           = '';
+      __phone.value           = '';
+      __reference.value       = '';
       __isQuotation.value     = 0;
       __paymentMethod.value   = "CASH";
       $("#formOriginSale").selectpicker('val', '');
+
+      __reference.setAttribute('readonly', true);
+      __name.removeAttribute('readonly');
+      __lastname.removeAttribute('readonly');
+      __email.removeAttribute('readonly');
+      __phone.removeAttribute('readonly');
+      __isQuotation.removeAttribute('readonly');
+      __paymentMethod.removeAttribute('readonly');
     }
   }
 };

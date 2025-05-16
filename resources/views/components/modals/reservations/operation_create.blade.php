@@ -26,19 +26,30 @@
                                         <option value="SHARED">Compartido</option>
                                     </select>
                                 </div> --}}
-                                <div class="col-12 col-lg-4">
-                                    <label class="form-label" for="reference">Referencia</label>
-                                    <input class="form-control" type="text" name="reference" id="reference">
+                                <div class="col-12 col-lg-6">
+                                    <label class="form-label" for="formReference">Referencia</label>
+                                    <input class="form-control" type="text" name="reference" id="formReference">
                                 </div>                                
-                                <div class="col-12 col-lg-4">
-                                    <label class="form-label" for="site_id">Agencia</label>
-                                    <select class="form-control mb-2" id="site_id" name="site_id">
+                                <div class="col-12 col-lg-6">
+                                    <label class="form-label" for="formSite">Agencia</label>
+                                    <select class="form-control mb-2" id="formSite" name="site_id">
                                         @foreach($websites as $website)
-                                            <option value="{{ $website->id }}">{{ $website->name }}</option>
+                                            <option value="{{ $website->id }}" data-type="{{ $website->type_site }}" data-phone="{{ $website->transactional_phone }}" data-email="{{ $website->transactional_email }}">{{ $website->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-12 col-lg-4">
+                                <div class="col-12 col-lg-6">
+                                    <label class="form-label" for="formOriginSale">Origen de venta</label>
+                                    <select class="form-control selectpicker" data-live-search="true" id="formOriginSale" name="origin_sale_id">
+                                        <option value="">Selecciona un origen de venta</option>
+                                        @if (isset( $origins ) && sizeof($origins) >= 1)
+                                            @foreach ($origins as $origin)
+                                                <option value="{{ $origin->id }}">{{ $origin->code }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>                    
+                                </div>                                
+                                <div class="col-12 col-lg-6">
                                     <label class="form-label" for="client_last_name">Idioma</label>
                                     <select class="form-control mb-2" id="language" name="language">
                                         <option value="es">Español</option>
@@ -63,19 +74,19 @@
                             <div class="row">
                                 <div class="col-12 col-lg-6">
                                     <label class="form-label" for="client_first_name">Nombre</label>
-                                    <input class="form-control" type="text" name="client_first_name" id="client_first_name">
+                                    <input class="form-control" type="text" name="client_first_name" id="formName">
                                 </div>
                                 <div class="col-12 col-lg-6">
                                     <label class="form-label" for="client_last_name">Apellidos</label>
-                                    <input class="form-control" type="text" name="client_last_name" id="client_last_name">
+                                    <input class="form-control" type="text" name="client_last_name" id="formLastName">
                                 </div>
                                 <div class="col-12 col-lg-6">
                                     <label class="form-label" for="client_phone">Teléfono (opcional)</label>
-                                    <input class="form-control" type="text" name="client_phone" id="client_phone">
+                                    <input class="form-control" type="text" name="client_phone" id="formPhone">
                                 </div>
                                 <div class="col-12 col-lg-6">
                                     <label class="form-label" for="client_email">E-mail (opcional)</label>
-                                    <input class="form-control" type="text" name="client_email" id="client_email">
+                                    <input class="form-control" type="text" name="client_email" id="formEmail">
                                 </div>
                             </div>
                         </div>

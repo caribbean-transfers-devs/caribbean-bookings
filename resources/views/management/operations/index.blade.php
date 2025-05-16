@@ -6,6 +6,7 @@
     $generalTimeGroup = []; // Arreglo para agrupar los datos
 
     $websites = auth()->user()->Sites();
+    $origins = auth()->user()->Origins();
     $reservation_status = auth()->user()->reservationStatus();
     $services_operation = auth()->user()->servicesOperation();
     $vehicles = auth()->user()->Vehicles();

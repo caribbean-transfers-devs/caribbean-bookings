@@ -414,7 +414,57 @@ let setup = {
                 'error'
             );
         });
-    }
+    },
+    actionSite: function(__site){
+        const __reference       = document.getElementById('formReference');
+        const __name            = document.getElementById('formName');
+        const __lastname        = document.getElementById('formLastName');
+        const __email           = document.getElementById('formEmail');
+        const __phone           = document.getElementById('formPhone');
+        const __originSale      = document.getElementById('formOriginSale');
+        const selectedOption    = __site.options[__site.selectedIndex];        
+
+        if( selectedOption.getAttribute('data-type') == "AGENCY" || selectedOption.getAttribute('data-type') == "STAFF" ){
+            if( selectedOption.getAttribute('data-type') == "STAFF" ){
+                __name.value          = 'STAFF';
+                __lastname.value      = 'CT';
+            }
+
+            __email.value           = selectedOption.getAttribute('data-email');
+            __phone.value           = selectedOption.getAttribute('data-phone');
+            $("#formOriginSale").selectpicker('val', ( selectedOption.getAttribute('data-type') == "AGENCY" ? '5' : '13' ));
+
+            if( selectedOption.getAttribute('data-type') == "AGENCY" ){
+                console.log("entre");
+                __reference.removeAttribute('readonly');
+            }
+
+            if( selectedOption.getAttribute('data-type') == "STAFF" ){
+                console.log("entre staff");
+                __reference.value     = "DIRECTO";
+            }
+
+            if( selectedOption.getAttribute('data-type') == "STAFF" ){
+                __name.setAttribute('readonly', true);
+                __lastname.setAttribute('readonly', true);
+            }
+            __email.setAttribute('readonly', true);
+            __phone.setAttribute('readonly', true);
+        }else{
+            __name.value            = '';
+            __lastname.value        = '';
+            __email.value           = '';
+            __phone.value           = '';
+            __reference.value       = '';
+            $("#formOriginSale").selectpicker('val', '');
+
+            __reference.setAttribute('readonly', true);
+            __name.removeAttribute('readonly');
+            __lastname.removeAttribute('readonly');
+            __email.removeAttribute('readonly');
+            __phone.removeAttribute('readonly');
+        }
+    }    
 };
 
 if( document.querySelector('.table-rendering') != null ){
@@ -523,6 +573,14 @@ const btnCloseOperation = document.getElementById('btn_close_operation'); //* ==
 const btnOpenOperation = document.getElementById('btn_open_operation'); //* ===== BUTTON CLOSE OPERATION ===== */
 
 document.addEventListener("DOMContentLoaded", function() {
+    const __site = document.getElementById('formSite');
+    if( __site ){
+        setup.actionSite(__site);
+        __site.addEventListener('change', function(event){
+            setup.actionSite(__site);
+        });
+    }
+
     //FUNCIONALIDAD DE CALENDARIO PARA FILTROS
     let picker = flatpickr("#lookup_date", {
         mode: "single",
