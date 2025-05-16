@@ -16,6 +16,11 @@ class SalesRepository
 {
     use FiltersTrait, QueryTrait;
 
+    private $months = [
+        1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril', 5 => 'mayo', 6 => 'junio',
+        7 => 'julio', 8 => 'agosto', 9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
+    ];    
+
     public function index($request)
     {
         ini_set('memory_limit', '-1'); // Sin límite
@@ -237,7 +242,7 @@ class SalesRepository
             'breadcrumbs' => [
                 [
                     "route" => "",
-                    "name" => "Reporte de ventas del <strong>" . date("Y-m-d", strtotime($data['init'])) . " al ". date("Y-m-d", strtotime($data['end'])) .  "</strong>",
+                    "name" => "Reporte de ventas del <strong>" . date("d", strtotime($data['init'])) . " al ". date("d", strtotime($data['end'])) .  " de " . $this->months[str_replace("0","",date("m", strtotime($data['init'])))] ."</strong>",
                     "active" => true
                 ]
             ],

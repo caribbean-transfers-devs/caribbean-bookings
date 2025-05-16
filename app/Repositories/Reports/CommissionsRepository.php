@@ -626,7 +626,7 @@ class CommissionsRepository
             return response()->json([
                 'success' => true,
                 'message' => 'se encontraron datos',
-                'date' => $datesMonth['initCarbon']->day . ' de ' . $this->months[$datesMonth['initCarbon']->month] . ' al ' . $datesMonth['endCarbon']->day . ' de ' . $this->months[$datesMonth['endCarbon']->month] . ' del ' . $datesMonth['initCarbon']->year,                
+                'date' => $datesMonth['initCarbon']->day . ' de ' . $this->months[$datesMonth['initCarbon']->month] . ' al ' . $datesMonth['endCarbon']->day . ' de ' . $this->months[$datesMonth['endCarbon']->month] . ' del ' . $datesMonth['initCarbon']->year,
                 'data' => $data,
             ], Response::HTTP_OK);
         } catch (Exception $e) {

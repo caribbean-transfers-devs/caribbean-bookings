@@ -608,13 +608,15 @@ document.addEventListener("DOMContentLoaded", function() {
             }            
 
             try {
-                const data = await commissions.fetchData(url);
+                const data = await commissions.fetchData(url);                
                 
                 // Validar que los elementos existen antes de modificar el contenido
                 await Promise.all([
                     elements.title.innerHTML = title.trim(),
                     elements.container.innerHTML = data.trim(),
                 ]);
+
+                components.actionTableChart($('.table-chart-general'), 'commissions');
             } catch (error) {
                 console.error("Error al obtener datos:", error);
                 Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar datos.</p>');

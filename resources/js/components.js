@@ -159,12 +159,12 @@ let components = {
         _settings.deferRender = true;
         _settings.responsive = false;
         if (section == "driver") {
-            _settings.order = [[3, 'desc']];
+            _settings.order = [[2, 'desc']];
             // _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
         }else if(section == "commissions"){
             _settings.order = [[1, 'desc']];
-        }else{
-            _settings.order = [[2, 'desc']];
+        }else if(section == "general"){
+            _settings.order = [[1, 'desc']];
         }
         _settings.paging = false; // Si no quieres paginación, puedes dejar esto en false
         _settings.oLanguage = {
