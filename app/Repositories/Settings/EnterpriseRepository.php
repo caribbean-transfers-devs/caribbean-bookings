@@ -90,7 +90,15 @@ class EnterpriseRepository
 
     public function edit($request, $id){
         try {
-            $enterprise = Enterprise::find($id);
+            $enterprise = Enterprise::select('id','names','address','phone','email','company_contact','credit_days','company_name_invoice','company_rfc_invoice','company_address_invoice','company_email_invoice','is_invoice_iva','is_rates_iva','is_foreign','currency','status','destination_id')
+                                    ->with(['destination' => function($query) {
+                                        $query->select(['id', 'name']);
+                                    }])
+                                    ->with(['sites' => function($query) {
+                                        $query->select(['id', 'name', 'color', 'transactional_email_send', 'is_commissionable', 'is_cxc', 'is_cxp', 'type_site', 'enterprise_id']);
+                                    }])
+                                    ->find($id);
+
             return view('settings.enterprises.new',[
                 'breadcrumbs' => [
                     [

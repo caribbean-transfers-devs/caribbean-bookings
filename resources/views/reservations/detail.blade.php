@@ -8,6 +8,8 @@
 
 @push('Css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/css/lightgallery-bundle.min.css" />
+
     <link href="{{ mix('/assets/css/sections/reservation_details.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/sections/reservation_details.min.css') }}" rel="stylesheet" >
     <style>
@@ -61,7 +63,7 @@
             font-size: 18px;
             font-weight: bold;
             color: #ff5757;
-        }  
+        }
     </style>
 @endpush
 
@@ -72,6 +74,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/lightgallery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/plugins/zoom/lg-zoom.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/relativeTime.min.js"></script>
@@ -137,7 +143,11 @@
             iframe.src = '/reports/ccform/pdf?type=departure&id='+rez_id;
         
             document.getElementById('iframeTwoContainer').appendChild(iframe);
-        }        
+        }
+
+        lightGallery(document.getElementById('media-listing'), {
+            thumbnail: true,
+        })        
     </script>
 @endpush
 

@@ -129,7 +129,6 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
 
     //DASHBOARD        
         Route::match(['get', 'post'], '/', [DashboardController::class, 'index'])->name('dashboard'); // GERENCIA
-        ////////////
         Route::match(['get', 'post'], '/callcenters', [CallCenterController::class, 'index'])->name('callcenters.index'); // AGENTES DE CALL CENTER
         Route::match(['post','get'], '/callcenters/sales/get', [CallCenterController::class, 'getSales'])->name('callcenters.sales.get');
         Route::match(['post','get'], '/callcenters/operations/get', [CallCenterController::class, 'getOperations'])->name('callcenters.operations.get');

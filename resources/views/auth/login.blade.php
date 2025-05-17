@@ -89,7 +89,7 @@
 											<label class="form-label">Email</label>
 											<input class="form-control" type="email" name="email" placeholder="Su email" value="{{ old('email') }}" autocomplete="username">
 										</div>
-									</div>			
+									</div>
 									<div class="col-12">
 										<div class="mb-4">
 											<label class="form-label">Contraseña</label>
@@ -105,7 +105,7 @@
 												</label>
 											</div>
 										</div>
-									</div>							
+									</div>
 									
 									<div class="col-12">
 										<div class="mb-4">
@@ -115,14 +115,12 @@
                                                 data-callback="onSubmit"
                                                 data-action = 'submit'>Iniciar Sesión</button>											
 										</div>
-									</div>                                                                
+									</div>
 								</form>
                             </div>
-                            
                         </div>
                     </div>
                 </div>
-                
             </div>            
         </div>
     </div>
