@@ -431,7 +431,7 @@
 
     {{-- <x-modals.management.operations.schedules /> --}}
 
-    <x-modals.reservations.operation_create :websites="$websites" :zones="$zones" :vehicles="$vehicles" />
+    <x-modals.reservations.operation_create :websites="$websites" :origins="$origins" :zones="$zones" :vehicles="$vehicles" />
     <x-modals.reservations.comments /> <!-- MODAL PARA PODER AGREGAR COMENTARIO DE OPERACION Y IMAGENES -->
     <x-modals.reservations.operation_messages_history /> <!-- HISTORIAL DE MENSAJES DE LA RESERVACION -->
     <x-modals.reservations.operation_media_history /> <!-- HISTORIAL DE MEDIA DE LA RESERVACION -->

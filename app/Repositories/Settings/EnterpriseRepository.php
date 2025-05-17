@@ -56,29 +56,33 @@ class EnterpriseRepository
             DB::beginTransaction();
 
             $enterprise = new Enterprise();
-            $enterprise->names = strtolower($request->names);
             $enterprise->is_external = $request->is_external;
+
+            $enterprise->names = strtolower($request->names);
+            $enterprise->address = strtolower($request->address);
+            $enterprise->phone = $request->phone;
+            $enterprise->email = strtolower($request->email);
+            $enterprise->company_contact = $request->company_contact ?? NULL;
+            $enterprise->credit_days = $request->credit_days ?? 0;
+
+            $enterprise->company_name_invoice = $request->company_name_invoice ?? NULL;
+            $enterprise->company_rfc_invoice = $request->company_rfc_invoice ?? NULL;
+            $enterprise->company_address_invoice = $request->company_address_invoice ?? NULL;
+            $enterprise->company_email_invoice = $request->company_email_invoice ?? NULL;
+            
+            $enterprise->is_invoice_iva = $request->is_invoice_iva ?? 0;
+            $enterprise->is_rates_iva = $request->is_rates_iva ?? 0;
+            $enterprise->is_foreign = $request->is_foreign ?? 0;
+            $enterprise->currency = $request->currency ?? 'MXN';
             $enterprise->status = $request->status;
             $enterprise->type_enterprise = $request->type_enterprise;
             $enterprise->save();
 
             DB::commit();
 
-            // return response()->json([
-            //     'success' => true, 
-            //     'message' => 'Usuario creado correctamente',
-            // ], Response::HTTP_CREATED);
-
             return redirect()->route('enterprises.index')->with('success', 'Empresa creada correctamente.');
-
         } catch (Exception $e) {
             DB::rollBack();
-
-            // return response()->json([
-            //     'success' => false,
-            //     'message' => 'Error al crear el usuario',
-            //     'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-            // ]);
 
             return redirect()->route('enterprises.create')->with('danger', 'Error al crear la empresa.');
         }
@@ -111,29 +115,33 @@ class EnterpriseRepository
             DB::beginTransaction();
 
             $enterprise = Enterprise::find($id);
-            $enterprise->names = strtolower($request->names);
             $enterprise->is_external = $request->is_external;
+
+            $enterprise->names = strtolower($request->names);
+            $enterprise->address = strtolower($request->address);
+            $enterprise->phone = $request->phone;
+            $enterprise->email = strtolower($request->email);
+            $enterprise->company_contact = $request->company_contact ?? NULL;
+            $enterprise->credit_days = $request->credit_days ?? 0;
+
+            $enterprise->company_name_invoice = $request->company_name_invoice ?? NULL;
+            $enterprise->company_rfc_invoice = $request->company_rfc_invoice ?? NULL;
+            $enterprise->company_address_invoice = $request->company_address_invoice ?? NULL;
+            $enterprise->company_email_invoice = $request->company_email_invoice ?? NULL;
+            
+            $enterprise->is_invoice_iva = $request->is_invoice_iva ?? 0;
+            $enterprise->is_rates_iva = $request->is_rates_iva ?? 0;
+            $enterprise->is_foreign = $request->is_foreign ?? 0;
+            $enterprise->currency = $request->currency ?? 'MXN';
             $enterprise->status = $request->status;
-            $enterprise->type_enterprise = $request->type_enterprise;            
+            $enterprise->type_enterprise = $request->type_enterprise;        
             $enterprise->save();
 
             DB::commit();
 
-            // return response()->json([
-            //     'success' => true, 
-            //     'message' => 'Usuario creado correctamente',
-            // ], Response::HTTP_CREATED);
-
             return redirect()->route('enterprises.index')->with('success', 'Empresa actualizada correctamente.');
-
         } catch (Exception $e) {
             DB::rollBack();
-
-            // return response()->json([
-            //     'success' => false,
-            //     'message' => 'Error al crear el usuario',
-            //     'status' => Response::HTTP_INTERNAL_SERVER_ERROR
-            // ]);
 
             return redirect()->route('enterprises.update', $id)->with('danger', 'Error al actualizar la empresa.');
         }

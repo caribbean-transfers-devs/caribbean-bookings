@@ -37,9 +37,7 @@
                                 <th class="text-center">TOTAL OPERADA</th>
                                 <th class="text-center">DESCUENTO POR INVERSION</th>
                                 <th class="text-center">TOTAL MENOS DESCUENTO</th>
-                                {{-- @if ( auth()->user()->hasPermission(96) ) --}}
-                                    <th class="text-center">COMISIÓN</th>
-                                {{-- @endif --}}
+                                <th class="text-center">COMISIÓN</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -76,9 +74,7 @@
                                         <td class="text-center">{{ number_format($user['TOTAL_COMPLETED'],2) }}</td>
                                         <td class="text-center">{{ number_format($TotalInvestmentDiscountOperated,2) }}</td>
                                         <td class="text-center">{{ number_format($TotalServicesOperatedInvestmentDiscount,2) }}</td>
-                                        {{-- @if ( auth()->user()->hasPermission(96) ) --}}
-                                            <td class="text-center">{{ number_format($TotalCommissionOperated,2) }}</td>                                                
-                                        {{-- @endif --}}
+                                        <td class="text-center">{{ number_format($TotalCommissionOperated,2) }}</td>
                                     </tr>
                                 @endforeach
                             @endif

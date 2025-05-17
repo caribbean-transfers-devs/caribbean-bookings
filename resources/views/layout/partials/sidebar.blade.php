@@ -80,7 +80,7 @@
         endif;
 
         //REPORTES
-        if(auth()->user()->hasPermission(43) || auth()->user()->hasPermission(45) || auth()->user()->hasPermission(50) || auth()->user()->hasPermission(71) || auth()->user()->hasPermission(97) || auth()->user()->hasPermission(98) || auth()->user()->hasPermission(99) || auth()->user()->hasPermission(101)):
+        if(auth()->user()->hasPermission(43) || auth()->user()->hasPermission(45) || auth()->user()->hasPermission(50) || auth()->user()->hasPermission(71) || auth()->user()->hasPermission(97) || auth()->user()->hasPermission(98)):
             if(auth()->user()->hasPermission(43)):
                 $links_reports[] = [
                     'name' => 'Pagos',
@@ -123,13 +123,6 @@
                     'active' => request()->routeIs('reports.operations'),
                 ];
             endif;
-            // if(auth()->user()->hasPermission(99)):
-            //     $links_reports[] = [
-            //         'name' => 'Conciliacion',
-            //         'route' => route('reports.conciliation'),
-            //         'active' => request()->routeIs('reports.conciliation','reports.conciliation.action'),
-            //     ];
-            // endif;
             array_push($links,[
                 'type' => 'multiple',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>',

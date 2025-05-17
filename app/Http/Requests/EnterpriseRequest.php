@@ -22,8 +22,23 @@ class EnterpriseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'names' => 'required|string|max:255',
             'is_external' => 'required|integer|in:1,0',
+            'names' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'phone' => 'required|integer',
+            'email' => 'required|email|max:255', // Validación de correo electrónico
+            'company_contact' => 'nullable|string',
+            'credit_days' => 'required|integer|min:1',
+
+            'company_name_invoice' => 'nullable|string',
+            'company_rfc_invoice' => 'nullable|string',
+            'company_address_invoice' => 'nullable|string',
+            'company_email_invoice' => 'nullable|email',            
+
+            'is_invoice_iva' => 'required|integer|in:1,0',
+            'is_rates_iva' => 'required|integer|in:1,0',
+            'is_foreign' => 'required|integer|in:1,0',
+            'currency' => 'required|string|in:MXN,USD',
             'status' => 'required|integer|in:1,0',
             'type_enterprise' => 'required|string|in:PROVIDER,CUSTOMER',
         ];
