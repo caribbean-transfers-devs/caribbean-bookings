@@ -66,16 +66,17 @@ trait QueryTrait
                                     SUM(it.passengers) as passengers,
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     SUM(it.is_round_trip) as is_round_trip,
+
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,                                    
-                                    COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+                                    COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance, -- si hay balance
                                     SUM(p.is_conciliated) as is_conciliated,
                                     CASE
-                                        WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
-                                        WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
-                                        WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
-                                        WHEN rez.is_quotation = 1 THEN 'QUOTATION'
-                                        -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                        WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+                                        WHEN rez.is_cancelled = 1   THEN 'CANCELLED'
+                                        WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+                                        WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+                                        WHEN rez.is_quotation = 1   THEN 'QUOTATION'
                                         WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
                                         WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
@@ -248,12 +249,12 @@ trait QueryTrait
                                         WHEN rr.pending_refund_count > 0 THEN 'REFUND_REQUESTED'
                                         ELSE 'REFUND_COMPLETED'
                                     END as refund_status,
-
                                     CASE
-                                        WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
-                                        WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
-                                        WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
-                                        WHEN rez.is_quotation = 1 THEN 'QUOTATION'
+                                        WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+                                        WHEN rez.is_cancelled = 1   THEN 'CANCELLED'
+                                        WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+                                        WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+                                        WHEN rez.is_quotation = 1   THEN 'QUOTATION'
                                         WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
                                         WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
@@ -462,10 +463,11 @@ trait QueryTrait
                                 END as refund_status,
 
                                 CASE
-                                    WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
-                                    WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
-                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
-                                    WHEN rez.is_quotation = 1 THEN 'QUOTATION'
+                                    WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+                                    WHEN rez.is_cancelled = 1   THEN 'CANCELLED'                                    
+                                    WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+                                    WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+                                    WHEN rez.is_quotation = 1   THEN 'QUOTATION'
                                     -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                     WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
                                     WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
@@ -759,10 +761,11 @@ trait QueryTrait
                                 END as refund_status,                                
 
                                 CASE
-                                    WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
-                                    WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
-                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
-                                    WHEN rez.is_quotation = 1 THEN 'QUOTATION'
+                                    WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+                                    WHEN rez.is_cancelled = 1   THEN 'CANCELLED'                                    
+                                    WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+                                    WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+                                    WHEN rez.is_quotation = 1   THEN 'QUOTATION'
                                     -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                     WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
                                     WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'

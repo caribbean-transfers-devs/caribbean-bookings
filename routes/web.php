@@ -127,7 +127,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/bot/conciliation/stripe', [ConciliationController::class, 'StripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
         Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
 
-    //DASHBOARD        
+    //DASHBOARD
         Route::match(['get', 'post'], '/', [DashboardController::class, 'index'])->name('dashboard'); // GERENCIA
         Route::match(['get', 'post'], '/callcenters', [CallCenterController::class, 'index'])->name('callcenters.index'); // AGENTES DE CALL CENTER
         Route::match(['post','get'], '/callcenters/sales/get', [CallCenterController::class, 'getSales'])->name('callcenters.sales.get');
@@ -148,6 +148,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS
         Route::match(['get', 'post'], '/finances/chargebacks', [RefundsFinances::class, 'index'])->name('finances.chargebacks'); //CONTRAGARGOS
         Route::match(['get', 'post'], '/finances/receivables', [RECEIVABLES::class, 'index'])->name('finances.receivables'); //CUENTAS POR COBRAR
+        
         Route::get('/finances/conciliation', [STRIPEFINANCE::class, 'index'])->name('finances.conciliation');
         Route::post('/finances/conciliation', [STRIPEFINANCE::class, 'index'])->name('finances.conciliation.action');
         Route::match(['get', 'post'], '/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS

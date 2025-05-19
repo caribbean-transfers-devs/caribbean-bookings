@@ -167,6 +167,7 @@
                         <th class="text-center">COSTO OPERATIVO</th>
                         <th class="text-center">ESTATUS DE SERVICIO</th>
                         <th class="text-center">VEHÍCULO</th>
+                        <th class="text-center">ESTATUS DE SERVICIO</th><!-- ESTATUS DE RESERVACION -->
                         <th class="text-center">PAGO</th>
                         <th class="text-center">TOTAL</th>
                     </tr>
@@ -389,6 +390,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center" style="{{ ( $value->service_type_name == "Suburban" ? 'background-color:#e2a03f;color:#fff;' : '' ) }}">{{ $value->service_type_name }}</td>
+                                <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($value->reservation_status) }}">{{ auth()->user()->statusBooking($value->reservation_status) }}</button></td>
                                 <td class="text-center" <?=auth()->user()->classStatusPayment($value)?>>{{ auth()->user()->statusPayment($value->payment_status) }}</td>
                                 <td class="text-center" >
                                     {{ number_format( ( $value->total_balance > 0 ? $value->total_balance : $value->total_sales ) ,2) }} {{ $value->currency }}

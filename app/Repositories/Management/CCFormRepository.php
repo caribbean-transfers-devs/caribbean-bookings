@@ -80,10 +80,11 @@ class CCFormRepository
             $value->payment_items = [];
             $ids[] = $value->reservation_id;
         endforeach;
-        
-        $ids = array_unique($ids);        
+                
+        $ids = array_unique($ids);
         
         //BUSCAMOS LO PAGOS DE LA RESERVACIÓN
+        if( !empty($ids) ){
         $payments = DB::select("SELECT 
                                     reservation_id, 
                                     payment_method, 
@@ -96,6 +97,7 @@ class CCFormRepository
                                 WHERE reservation_id IN (" . implode(',', $ids) . ") 
                                     AND payment_method IN('CARD','STRIPE','PAYPAL') 
                                     AND deleted_at IS NULL");
+        }
         
         //Listamos las reservaciones que tuvieron pago en Tarjeta o PayPal Pero que no tiene el objeto para parsear la información..
         if(sizeof($payments) >= 1):

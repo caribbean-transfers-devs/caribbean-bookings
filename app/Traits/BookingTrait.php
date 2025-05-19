@@ -35,7 +35,10 @@ trait BookingTrait
                 break;
             case 'QUOTATION':
                 return 'primary';
-                break;                
+                break;
+            case 'EXPIRED_QUOTATION':
+                return 'COTIZACIÓN VENCIDA';
+                break;
             default:
                 return 'success';
                 break;
@@ -123,7 +126,10 @@ trait BookingTrait
                 break;
             case 'QUOTATION':
                 return 'COTIZACIÓN';
-                break;                
+                break;
+            case 'EXPIRED_QUOTATION':
+                return 'COTIZACIÓN VENCIDA';
+                break;
             default:
                 return 'CONFIRMADO';
                 break;

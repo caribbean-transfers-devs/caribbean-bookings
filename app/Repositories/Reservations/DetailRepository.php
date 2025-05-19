@@ -177,6 +177,7 @@ class DetailRepository
     {
         $hasArrival = false;
         $hasDeparture = false;
+        $hasTransfer = false;
 
         foreach ($reservation->items as $item) {
             if (
@@ -187,19 +188,27 @@ class DetailRepository
             }
 
             if (
-                isset($item->final_service_type_one) && $item->final_service_type_one === 'DEPARTURE' ||
+                isset($item->final_service_type_one) && $item->final_service_type_one === 'DEPARTURE' ||                
                 (isset($item->final_service_type_two) && $item->final_service_type_two === 'DEPARTURE' && $item->is_round_trip == 1)
             ) {
                 $hasDeparture = true;
             }
 
+            if (
+                isset($item->final_service_type_one) && $item->final_service_type_one === 'TRANSFER' ||
+                isset($item->final_service_type_two) && $item->final_service_type_two === 'TRANSFER' 
+            ) {
+                $hasTransfer = true;
+            }            
+
             // Si ya tenemos ambos, salimos temprano
-            if ($hasArrival && $hasDeparture) break;
+            if ($hasArrival && $hasDeparture && $hasTransfer) break;
         }
 
         return [
             'has_arrival' => $hasArrival,
-            'has_departure' => $hasDeparture
+            'has_departure' => $hasDeparture,
+            'has_transfer' => $hasTransfer
         ];
     }
 
@@ -217,7 +226,8 @@ class DetailRepository
         $totalPayments = round($data['total_payments'], 2);
 
         // Condiciones especiales que tienen prioridad
-        if ($reservation->is_cancelled) return "CANCELLED";
+        if ($reservation->is_cancelled && $reservation->was_is_quotation == 1) return "CANCELLED";
+        if ($reservation->is_cancelled) return "CANCELLED";        
         if ($reservation->is_duplicated) return "DUPLICATED";
         if ($reservation->open_credit) return "OPENCREDIT";
         if ($reservation->is_quotation) return "QUOTATION";
