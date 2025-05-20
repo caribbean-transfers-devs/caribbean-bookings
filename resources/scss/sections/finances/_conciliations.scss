@@ -1,9 +1,22 @@
 @import "../../../plugins/table/datatable/datatables5";
+@import "../../../plugins/flatpickr/flatpickr";
+
 @import "../../template/plugins/light/table/datatable/custom_dt";
 
 @import '../../template/light/components/modal';
-@import '../../template/dark/components/modal';
 
-@import '../../components/fixedheader';
 @import '../../components/filters';
-@import '../../components/charts';
+@import '../../components/fixedheader';
+
+.container-loader{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-size: 40px;
+    padding: 16px; 
+}
+
+.table-details-booking > thead > tr > th,
+.table-details-booking > tbody > tr > td{
+    font-size: 14px;
+}

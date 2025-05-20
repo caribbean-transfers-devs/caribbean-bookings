@@ -1,254 +1,266 @@
-if ( document.getElementById('lookup_date') != null ) {
-    const picker = new easepick.create({
-        element: "#lookup_date",
-        css: [
-            'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-            'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-            'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
-        ],
-        zIndex: 10,
-        plugins: ['RangePlugin'],
-    });
+let stripe = {
+    getLoader: function() {
+        return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
+    },
+    /**
+     * 
+     * @param {*} url 
+     * @param {*} containerId 
+     * @param {*} params 
+     * @returns 
+     */
+    fetchData: async function(url, _params) {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(_params),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+    
+            return await response.text();
+        } catch (error) {
+            console.error("Error en la petición:", error);
+        }
+    },    
 }
-
-if( document.querySelector('.table-rendering') != null ){
-    components.actionTable($('.table-rendering'), 'fixedheader');
-}
-components.formReset();
 
 //DECLARACION DE VARIABLES
-const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
 const __btn_conciliation_paypal = document.querySelector('.__btn_conciliation_paypal');
 const __btn_conciliation_stripe = document.querySelector('.__btn_conciliation_stripe');
-const __title_modal = document.getElementById('filterModalLabel');
-const __btn_conciliations = document.querySelectorAll('.__btn_conciliation');
-const __close_modals = document.querySelectorAll('.__close_modal');
-const __type_pay = document.getElementById('type_form_pay');
-const __code_pay = document.getElementById('payment_id');
-const __is_conciliated = document.getElementById('servicePaymentsConciliationModal');
 
-//ACCION PARA CREAR
-if( __create != null ){
-    __create.addEventListener('click', function () {
-        __title_modal.innerHTML = this.dataset.title;
-    });
-}
-
-//PAYPAL
-if( __btn_conciliation_paypal != null ){
-    __btn_conciliation_paypal.addEventListener('click', function(event){
-        event.preventDefault();
-        swal.fire({
-            title: '¿Esta seguro de conciliar los pagos de PayPal?',
-            html: `
-                <div class="w-100 d-flex justify-content-between gap-3">
-                    <div class="w-50">
-                        <label for="startDate">Fecha Inicio:</label>
-                        <input id="startDate" type="date" class="form-control">
-                    </div>
-                    <div class="w-50">
-                        <label for="endDate">Fecha Fin:</label>
-                        <input id="endDate" type="date" class="form-control">
-                    </div>
-                </div>
-            `,            
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            preConfirm: () => {
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-        
-                if (!startDate || !endDate) {
-                    Swal.showValidationMessage('Por favor seleccione un rango de fechas válido.');
-                    return false;
-                }
-        
-                if (new Date(startDate) > new Date(endDate)) {
-                    Swal.showValidationMessage('La fecha de inicio no puede ser mayor que la fecha de fin.');
-                    return false;
-                }
-        
-                return { startDate, endDate };
-            }
-        }).then((result) => {
-            if(result.isConfirmed == true){
-                const { startDate, endDate } = result.value;
-                $.ajax({
-                    type: "GET",
-                    url: _LOCAL_URL + "/bot/conciliation/paypal",
-                    data: { startDate, endDate }, // Envío de fechas
-                    dataType: "json",
-                    beforeSend: function(){
-                        components.loadScreen();
-                    },
-                    success: function(response) {
-                        // Manejar la respuesta exitosa del servidor
-                        Swal.fire({
-                            icon: response.status,
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                    }
-                });
-            }
-        });
-    });
-}
-
-//STRIPE
-if( __btn_conciliation_stripe != null ){
-    __btn_conciliation_stripe.addEventListener('click', function(event){
-        event.preventDefault();
-        swal.fire({
-            title: '¿Esta seguro de conciliar los pagos de Stripe?',
-            html: `
-                <div class="w-100 d-flex justify-content-between gap-3">
-                    <div class="w-50">
-                        <label for="startDate">Fecha Inicio:</label>
-                        <input id="startDate" type="date" class="form-control">
-                    </div>
-                    <div class="w-50">
-                        <label for="endDate">Fecha Fin:</label>
-                        <input id="endDate" type="date" class="form-control">
-                    </div>
-                </div>
-            `,            
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar',
-            preConfirm: () => {
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-        
-                if (!startDate || !endDate) {
-                    Swal.showValidationMessage('Por favor seleccione un rango de fechas válido.');
-                    return false;
-                }
-        
-                if (new Date(startDate) > new Date(endDate)) {
-                    Swal.showValidationMessage('La fecha de inicio no puede ser mayor que la fecha de fin.');
-                    return false;
-                }
-        
-                return { startDate, endDate };
-            }
-        }).then((result) => {
-            if(result.isConfirmed == true){
-                const { startDate, endDate } = result.value;
-                $.ajax({
-                    type: "GET",
-                    url: _LOCAL_URL + "/bot/conciliation/stripe",
-                    data: { startDate, endDate }, // Envío de fechas
-                    dataType: "json",
-                    beforeSend: function(){
-                        components.loadScreen();
-                    },
-                    success: function(response) {
-                        // Manejar la respuesta exitosa del servidor
-                        Swal.fire({
-                            icon: response.status,
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                    }
-                });
-            }
-        });
-    });
-}
-
-if( __close_modals.length > 0 ){
-    __close_modals.forEach(__close_modal => {
-        __close_modal.addEventListener('click', function(event){
-            event.preventDefault();
-            const __loading_container = document.getElementById('loading_container');
-            const __form_container = document.getElementById('form_container');
-            __loading_container.classList.add('d-none');
-            __form_container.classList.add('d-none');
-        });
-    });
-}
-
-if( __btn_conciliations.length > 0 ){
-    __btn_conciliations.forEach(__btn_conciliation => {
-        __btn_conciliation.addEventListener('click', function(event){
-            event.preventDefault();
-            const { reservation, payment, currency } = this.dataset;
-            $("#addPaymentsModal").modal('show');
-            const __loading_container = document.getElementById('loading_container');
-            const __form_container = document.getElementById('form_container');
-            $.ajax({
-                url: '/payments/' + payment,
-                type: 'GET',
-                dataType: 'json',
-                beforeSend: function() {
-                    __loading_container.classList.remove('d-none');
-                    __loading_container.innerHTML = '<div class="spinner-grow align-self-center">';
-                },                
-                success: function (data) {
-                    __loading_container.classList.add('d-none');
-                    __form_container.classList.remove('d-none');
-                    $("#type_form_pay").val(2);
-                    $("#reserv_id_pay").val(reservation);
-                    $("#payment_id").val(payment);                
-                    $("#servicePaymentsTypeModal").val(data.payment_method);
-                    $("#servicePaymentsDescriptionModal").val(data.reference);
-                    $("#servicePaymentsTotalModal").val(data.total);
-                    $("#servicePaymentsCurrencyModal").val(data.currency);
-                    $("#servicePaymentsExchangeModal").val(data.exchange_rate);
-                    $("#servicePaymentsConciliationModal").val(data.is_conciliated);
-                    $("#servicePaymentsMessageConciliationModal").val(data.conciliation_comment);
-                    $("#btn_new_payment").prop('disabled', false);
-                },
-            });            
-        });
-    });
-}
-
-if( __is_conciliated != null ){
-    changeIsConciliation(__is_conciliated);
-    __is_conciliated.addEventListener('change', function(event){
-        event.preventDefault();
-        changeIsConciliation(this);
-    });
-
-    function changeIsConciliation(DOM){
-        console.log(DOM.value);
-        
-        const __box_comment = document.querySelector('.box_comment');        
-        if( DOM.value == 1 ){
-            __box_comment.classList.remove('d-none');
-        }else{
-            __box_comment.classList.add('d-none');
-        }
+//VALIDAMOS DOM
+document.addEventListener("DOMContentLoaded", function() {
+    if( document.querySelector('.table-rendering') != null ){
+        components.actionTable($('.table-rendering'), 'fixedheader');
     }
-}
 
-$("#servicePaymentsCurrencyModal").on('change', function(){
-    let currency = $(this).val();
-    let reservation_id = $("#reserv_id_pay").val();
-    $.ajax({
-        url: '/GetExchange/'+reservation_id+'?currency='+currency,
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            $("#servicePaymentsExchangeModal").val(data.exchange_rate);
-            $("#operation_pay").val(data.operation);
-            $("#btn_new_payment").prop('disabled', false);
-        },
-    });
+    components.titleModalFilter();
+    components.formReset();
+    components.renderCheckboxColumns('dataStripe', 'columns');
+    components.setValueSelectpicker();
+
+    document.addEventListener("click", components.debounce(async function (event) {
+        if ( event.target.classList.contains('chargeInformationStripe') ) {
+            event.preventDefault();
+
+            // Obtener datos del elemento clickeado
+            const { reference } = event.target.dataset;
+            const _params       = {
+                reference: reference
+            };            
+            
+            $("#chargeStripeModal").modal('show');
+            
+            // Elementos HTML
+            const elements = {
+                container: document.getElementById("bodyChargeStripe"),
+            };
+
+            // Validar que los elementos existen antes de usarlos
+            if (!elements.container) {
+                console.error("Error: No se encontraron los elementos del DOM necesarios.");
+                return;
+            }
+                        
+            // Actualizar resumen general, al mostrar el loader ANTES de la solicitud
+            Object.values(elements).forEach(el => el.innerHTML = stripe.getLoader().trim());
+
+            try {
+                const data = await stripe.fetchData("/action/getChargesStripe", _params);                
+                
+                // Validar que los elementos existen antes de modificar el contenido
+                await Promise.all([
+                    elements.container.innerHTML = data.trim(),
+                ]);
+            } catch (error) {
+                console.error("Error al obtener datos:", error);
+                Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar datos.</p>');
+            }
+        }
+
+        const btnConciliationStripe = event.target.closest('.btnConciliationStripe');
+        if ( btnConciliationStripe ) {
+            event.preventDefault();            
+
+            swal.fire({
+                title: '¿Esta seguro de conciliar los pagos de Stripe?',
+                html: `
+                    <div class="w-100 d-flex justify-content-between gap-3">
+                        <div class="w-50">
+                            <label for="startDate">Fecha Inicio:</label>
+                            <input id="startDate" type="date" class="form-control">
+                        </div>
+                        <div class="w-50">
+                            <label for="endDate">Fecha Fin:</label>
+                            <input id="endDate" type="date" class="form-control">
+                        </div>
+                    </div>
+                `,            
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                didOpen: () => {
+                    // Obtener fechas (ejemplo: primer día del mes actual y fecha actual)
+                    const today = new Date();
+                    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                    
+                    // Formatear fechas como YYYY-MM-DD
+                    const formatDate = (date) => date.toISOString().split('T')[0];
+
+                    // Inicializar Flatpickr después de que el modal se abre
+                    flatpickr("#startDate", {
+                        mode: "single",
+                        dateFormat: "Y-m-d",
+                        enableTime: false,
+                        defaultDate: formatDate(firstDayOfMonth), // Fecha inicial: primer día del mes
+                        locale: "es" // Opcional: para español
+                    });
+                    
+                    flatpickr("#endDate", {
+                        mode: "single",
+                        dateFormat: "Y-m-d",
+                        enableTime: false,
+                        defaultDate: formatDate(today), // Fecha final: hoy
+                        locale: "es" // Opcional: para español
+                    });
+                },                
+                preConfirm: () => {
+                    const startDate = document.getElementById('startDate').value;
+                    const endDate = document.getElementById('endDate').value;
+            
+                    if (!startDate || !endDate) {
+                        Swal.showValidationMessage('Por favor seleccione un rango de fechas válido.');
+                        return false;
+                    }
+            
+                    if (new Date(startDate) > new Date(endDate)) {
+                        Swal.showValidationMessage('La fecha de inicio no puede ser mayor que la fecha de fin.');
+                        return false;
+                    }
+            
+                    return { startDate, endDate };
+                }
+            }).then((result) => {
+                if(result.isConfirmed == true){
+                    const { startDate, endDate } = result.value;
+
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se concilian los pagos.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        didOpen: () => {
+                        Swal.showLoading();
+                        }
+                    });                    
+
+                    fetch(`${_LOCAL_URL}/bot/conciliation/stripe?startDate=${startDate}&endDate=${endDate}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        },
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error en la respuesta del servidor');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.status,
+                            text: data.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC                            
+                        }).then(() => {
+                            window.location.reload(); // Recargar después de cerrar
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ocurrió un problema al procesar la solicitud',
+                        });
+                    });
+                }
+            });
+        }        
+    }, 300)); // 300ms de espera antes de ejecutar de nuevo
 });
 
-$("#btn_new_payment").on('click', function(){
-    $("#btn_new_payment").prop('disabled', true);
-    let __params = components.serialize(document.getElementById('frm_new_payment'),'object');
-    components.request_exec_ajax( _LOCAL_URL + ( __type_pay.value == 1 ? "/payments" : "/payments/" + __code_pay.value ), ( __type_pay.value == 1 ? 'POST' : 'PUT' ), __params );
-});
+// //PAYPAL
+// if( __btn_conciliation_paypal != null ){
+//     __btn_conciliation_paypal.addEventListener('click', function(event){
+//         event.preventDefault();
+//         swal.fire({
+//             title: '¿Esta seguro de conciliar los pagos de PayPal?',
+//             html: `
+//                 <div class="w-100 d-flex justify-content-between gap-3">
+//                     <div class="w-50">
+//                         <label for="startDate">Fecha Inicio:</label>
+//                         <input id="startDate" type="date" class="form-control">
+//                     </div>
+//                     <div class="w-50">
+//                         <label for="endDate">Fecha Fin:</label>
+//                         <input id="endDate" type="date" class="form-control">
+//                     </div>
+//                 </div>
+//             `,            
+//             icon: 'info',
+//             showCancelButton: true,
+//             confirmButtonText: 'Aceptar',
+//             cancelButtonText: 'Cancelar',
+//             preConfirm: () => {
+//                 const startDate = document.getElementById('startDate').value;
+//                 const endDate = document.getElementById('endDate').value;
+        
+//                 if (!startDate || !endDate) {
+//                     Swal.showValidationMessage('Por favor seleccione un rango de fechas válido.');
+//                     return false;
+//                 }
+        
+//                 if (new Date(startDate) > new Date(endDate)) {
+//                     Swal.showValidationMessage('La fecha de inicio no puede ser mayor que la fecha de fin.');
+//                     return false;
+//                 }
+        
+//                 return { startDate, endDate };
+//             }
+//         }).then((result) => {
+//             if(result.isConfirmed == true){
+//                 const { startDate, endDate } = result.value;
+//                 $.ajax({
+//                     type: "GET",
+//                     url: _LOCAL_URL + "/bot/conciliation/paypal",
+//                     data: { startDate, endDate }, // Envío de fechas
+//                     dataType: "json",
+//                     beforeSend: function(){
+//                         components.loadScreen();
+//                     },
+//                     success: function(response) {
+//                         // Manejar la respuesta exitosa del servidor
+//                         Swal.fire({
+//                             icon: response.status,
+//                             text: response.message,
+//                             showConfirmButton: false,
+//                             timer: 1500,
+//                         });
+//                     }
+//                 });
+//             }
+//         });
+//     });
+// }
 
-components.renderCheckboxColumns('dataConciliation', 'columns');
-components.setValueSelectpicker();

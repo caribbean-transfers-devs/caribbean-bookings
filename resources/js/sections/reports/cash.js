@@ -1,11 +1,3 @@
-function debounce(func, delay) {
-    let timer;
-    return function(...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => func.apply(this, args), delay);
-    };
-}
-
 //VALIDAMOS DOM
 document.addEventListener("DOMContentLoaded", function() {
     //VARIABLES
@@ -24,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
         enableTime: false,
     });
 
-    document.addEventListener("click", debounce(function (event) {
+    document.addEventListener("click", components.debounce(function (event) {
         if (event.target && event.target.id === '__close_modal') {
             _formCashConciliation.reset();
         }

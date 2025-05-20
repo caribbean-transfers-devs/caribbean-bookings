@@ -28,5 +28,5 @@ class ReceivablesController extends Controller
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }        
         return $this->ReceivablesRepository->index($request);
-    }    
+    }
 }

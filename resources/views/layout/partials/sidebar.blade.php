@@ -64,8 +64,8 @@
             if(auth()->user()->hasPermission(121)):
                 $links_finances[] = [
                     'name' => 'Pagos Stripe',
-                    'route' => route('finances.conciliation'),
-                    'active' => request()->routeIs('finances.conciliation'),
+                    'route' => route('finances.stripe'),
+                    'active' => request()->routeIs('finances.stripe'),
                 ];
             endif;            
             array_push($links,[

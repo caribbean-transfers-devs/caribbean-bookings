@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function() {
     components.titleModalFilter();
     components.formReset();
     components.renderCheckboxColumns('dataRefunds', 'columns');
-    components.setValueSelectpicker();    
+    components.setValueSelectpicker();
 
     if( __close_modals.length > 0 ){
         __close_modals.forEach(__close_modal => {

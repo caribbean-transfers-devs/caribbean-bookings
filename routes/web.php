@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Bots\MasterToursController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Accounting\ConciliationController;
+use App\Http\Controllers\Accounting\ConciliationController as CONCILIATION;
 
 //DASHBOARD
 use App\Http\Controllers\Dashboard\DashboardController;
@@ -17,9 +17,9 @@ use App\Http\Controllers\Bookings\BookingsController;
 
 //FINANCES
 use App\Http\Controllers\Finances\RefundsController as             RefundsFinances;
-use App\Http\Controllers\Finances\SalesController as               SaleFinance;
 use App\Http\Controllers\Finances\ReceivablesController as         RECEIVABLES;
-use App\Http\Controllers\Finances\StripeController as              STRIPEFINANCE;
+use App\Http\Controllers\Finances\StripeController as              STRIPE;
+use App\Http\Controllers\Finances\SalesController as               SaleFinance;
 
 //REPORTS
 use App\Http\Controllers\Reports\PaymentsController as             PAYMENTS;
@@ -119,39 +119,39 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/set/rates/MasterTour', [MasterToursController::class, 'ListServicesMasterTour'])->name('list.services.master.tours')->withoutMiddleware(['auth']);
 
         //PAYPAL
-        Route::get('/bot/conciliation/paypal', [ConciliationController::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
-        Route::get('/conciliation/paypalOrders', [ConciliationController::class, 'PayPalPaymenOrders'])->name('bot.paypal.orders')->withoutMiddleware(['auth']);
-        Route::get('/conciliation/paypal/{reference}', [ConciliationController::class, 'PayPalPaymenReference'])->name('bot.paypal.reference')->withoutMiddleware(['auth']);
-        Route::get('/conciliation/paypalOrder/{id}', [ConciliationController::class, 'PayPalPaymenOrder'])->name('bot.paypal.order')->withoutMiddleware(['auth']);
+        Route::get('/bot/conciliation/paypal',                                                  [CONCILIATION::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
+        Route::get('/conciliation/paypalOrders',                                                [CONCILIATION::class, 'PayPalPaymenOrders'])->name('bot.paypal.orders')->withoutMiddleware(['auth']);
+        Route::get('/conciliation/paypal/{reference}',                                          [CONCILIATION::class, 'PayPalPaymenReference'])->name('bot.paypal.reference')->withoutMiddleware(['auth']);
+        Route::get('/conciliation/paypalOrder/{id}',                                            [CONCILIATION::class, 'PayPalPaymenOrder'])->name('bot.paypal.order')->withoutMiddleware(['auth']);
         //STRIPE
-        Route::get('/bot/conciliation/stripe', [ConciliationController::class, 'StripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
-        Route::get('/conciliation/stripe/{reference}', [ConciliationController::class, 'StripePaymentReference'])->name('bot.stripe.reference')->withoutMiddleware(['auth']);
+        Route::match(['get', 'post'],  '/bot/conciliation/stripe',                              [CONCILIATION::class, 'stripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
+        Route::match(['get', 'post'],  '/stripe/charges/{reference}',                           [CONCILIATION::class, 'stripeChargesReference'])->name('stripe.charges.reference')->withoutMiddleware(['auth']);
+        Route::match(['get', 'post'],  '/stripe/payment_intents/{reference}',                   [CONCILIATION::class, 'stripePaymentIntentsReference'])->name('stripe.payment_intents.reference')->withoutMiddleware(['auth']);
+        Route::match(['get', 'post'],  '/stripe/balance_transactions/{reference}',              [CONCILIATION::class, 'stripeBalanceTransactionsReference'])->name('stripe.balance_transactions.reference')->withoutMiddleware(['auth']);
 
     //DASHBOARD
-        Route::match(['get', 'post'], '/', [DashboardController::class, 'index'])->name('dashboard'); // GERENCIA
-        Route::match(['get', 'post'], '/callcenters', [CallCenterController::class, 'index'])->name('callcenters.index'); // AGENTES DE CALL CENTER
-        Route::match(['post','get'], '/callcenters/sales/get', [CallCenterController::class, 'getSales'])->name('callcenters.sales.get');
-        Route::match(['post','get'], '/callcenters/operations/get', [CallCenterController::class, 'getOperations'])->name('callcenters.operations.get');
-        Route::match(['post','get'], '/callcenters/stats/get', [CallCenterController::class, 'getStats'])->name('callcenters.stats.get');
-        Route::match(['post','get'], '/callcenters/stats/charts/sales', [CallCenterController::class, 'chartsSales'])->name('callcenters.charts.sales.get');
-        Route::match(['post','get'], '/callcenters/stats/charts/opertions', [CallCenterController::class, 'chartsOperations'])->name('callcenters.charts.operations.get');
-        Route::match(['post','get'], '/destinations/list', [CallCenterController::class, 'destinationsList'])->name('destinations.list');
+        Route::match(['get', 'post'], '/',                                                      [DashboardController::class, 'index'])->name('dashboard'); // GERENCIA
+        Route::match(['get', 'post'], '/callcenters',                                           [CallCenterController::class, 'index'])->name('callcenters.index'); // AGENTES DE CALL CENTER
+        Route::match(['post','get'], '/callcenters/sales/get',                                  [CallCenterController::class, 'getSales'])->name('callcenters.sales.get');
+        Route::match(['post','get'], '/callcenters/operations/get',                             [CallCenterController::class, 'getOperations'])->name('callcenters.operations.get');
+        Route::match(['post','get'], '/callcenters/stats/get',                                  [CallCenterController::class, 'getStats'])->name('callcenters.stats.get');
+        Route::match(['post','get'], '/callcenters/stats/charts/sales',                         [CallCenterController::class, 'chartsSales'])->name('callcenters.charts.sales.get');
+        Route::match(['post','get'], '/callcenters/stats/charts/opertions',                     [CallCenterController::class, 'chartsOperations'])->name('callcenters.charts.operations.get');
+        Route::match(['post','get'], '/destinations/list',                                      [CallCenterController::class, 'destinationsList'])->name('destinations.list');
 
     //TPV        
-        Route::get('/tpv/handler', [TPV::class, 'handler'])->name('tpv.handler');
-        Route::get('/tpv/edit/{code}', [TPV::class, 'index'])->name('tpv.new');
-        Route::POST('/tpv/quote', [TPV::class, 'quote'])->name('tpv.quote');
-        Route::post('/tpv/create', [TPV::class, 'create'])->name('tpv.create');
-        Route::get('/tpv/autocomplete/{keyword}', [TPV::class, 'autocomplete'])->name('tpv.autocomplete');
+        Route::get('/tpv/handler',                                                              [TPV::class, 'handler'])->name('tpv.handler');
+        Route::get('/tpv/edit/{code}',                                                          [TPV::class, 'index'])->name('tpv.new');
+        Route::POST('/tpv/quote',                                                               [TPV::class, 'quote'])->name('tpv.quote');
+        Route::post('/tpv/create',                                                              [TPV::class, 'create'])->name('tpv.create');
+        Route::get('/tpv/autocomplete/{keyword}',                                               [TPV::class, 'autocomplete'])->name('tpv.autocomplete');
 
     //FINANZAS         
-        Route::match(['get', 'post'], '/finances/refunds', [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS
-        Route::match(['get', 'post'], '/finances/chargebacks', [RefundsFinances::class, 'index'])->name('finances.chargebacks'); //CONTRAGARGOS
-        Route::match(['get', 'post'], '/finances/receivables', [RECEIVABLES::class, 'index'])->name('finances.receivables'); //CUENTAS POR COBRAR
-        
-        Route::get('/finances/conciliation', [STRIPEFINANCE::class, 'index'])->name('finances.conciliation');
-        Route::post('/finances/conciliation', [STRIPEFINANCE::class, 'index'])->name('finances.conciliation.action');
-        Route::match(['get', 'post'], '/finance/sales', [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS
+        Route::match(['get', 'post'], '/finances/refunds',                                      [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS
+        Route::match(['get', 'post'], '/finances/chargebacks',                                  [RefundsFinances::class, 'index'])->name('finances.chargebacks'); //CONTRAGARGOS
+        Route::match(['get', 'post'], '/finances/receivables',                                  [RECEIVABLES::class, 'index'])->name('finances.receivables'); //CUENTAS POR COBRAR
+        Route::match(['get', 'post'], '/finances/stripe',                                       [STRIPE::class, 'index'])->name('finances.stripe'); //CONCILIACION DE STRIPE
+        Route::match(['get', 'post'], '/finance/sales',                                         [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS
 
     //REPORTES
         Route::match(['get', 'post'], '/reports/payments', [PAYMENTS::class, 'index'])->name('reports.payments'); //PAGOS
@@ -305,17 +305,20 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::resource('/payments',PaymentsController::class);
 
     //ACCIONES UTILIZADAS EN FINANZAS
-    Route::post('/action/addPaymentRefund', [FINANCE::class, 'addPaymentRefund'])->name('add.payment.refund');
-    Route::post('/action/refundNotApplicable', [FINANCE::class, 'refundNotApplicable'])->name('add.not.applicable.refund');
-    Route::match(['get', 'post'], '/action/getInformationReservation', [FINANCE::class, 'getInformationReservation'])->name('get.information.reservation')->withoutMiddleware(['auth']);
-    Route::match(['get', 'post'], '/action/getBasicInformationReservation', [FINANCE::class, 'getBasicInformationReservation'])->name('get.basic-information.reservation');
-    Route::match(['get', 'post'], '/action/getPhotosReservation', [FINANCE::class, 'getPhotosReservation'])->name('get.photos.reservation');
-    Route::match(['get', 'post'], '/action/getHistoryReservation', [FINANCE::class, 'getHistoryReservation'])->name('get.history.reservation');
-    Route::match(['get', 'post'], '/action/getPaymentsReservation', [FINANCE::class, 'getPaymentsReservation'])->name('get.payments.reservation');
-    Route::post('/action/addCreditPayment', [FINANCE::class, 'addCreditPayment'])->name('add.credit.payment');
+        Route::post('/action/addPaymentRefund',                                     [FINANCE::class, 'addPaymentRefund'])->name('add.payment.refund');
+        Route::post('/action/refundNotApplicable',                                  [FINANCE::class, 'refundNotApplicable'])->name('add.not.applicable.refund');
+        Route::match(['get', 'post'], '/action/getInformationReservation',          [FINANCE::class, 'getInformationReservation'])->name('get.information.reservation')->withoutMiddleware(['auth']);
+        Route::match(['get', 'post'], '/action/getBasicInformationReservation',     [FINANCE::class, 'getBasicInformationReservation'])->name('get.basic-information.reservation');
+        Route::match(['get', 'post'], '/action/getPhotosReservation',               [FINANCE::class, 'getPhotosReservation'])->name('get.photos.reservation');
+        Route::match(['get', 'post'], '/action/getHistoryReservation',              [FINANCE::class, 'getHistoryReservation'])->name('get.history.reservation');
+        Route::match(['get', 'post'], '/action/getPaymentsReservation',             [FINANCE::class, 'getPaymentsReservation'])->name('get.payments.reservation');
+    //SE UTILIZA EN LA CONCILIACION DE STRIPE
+        Route::match(['get', 'post'], '/action/getChargesStripe',                   [FINANCE::class, 'getChargesStripe'])->name('get.charges.stripe');
+
+    Route::post('/action/addCreditPayment',                                     [FINANCE::class, 'addCreditPayment'])->name('add.credit.payment');
 
     //ACCIONES UTILIZADAS EN REPORTES
-    Route::post('/action/cashConciliation', [FINANCE::class, 'cashConciliation'])->name('cash.payment.conciliation');
+    Route::post('/action/cashConciliation',                                     [FINANCE::class, 'cashConciliation'])->name('cash.payment.conciliation');
 
     //ACCIONES GENERALES DE DETALLES DE RESERVA
     Route::post('/action/deleteCommission', [ACTIONS_RESERVATION::class, 'deleteCommission'])->name('update.booking.delete.commission');

@@ -27,11 +27,6 @@ class ConciliationController extends Controller
         return $this->ConciliationRepository->PayPalPayments($request);
     }
 
-    public function StripePayments(Request $request)
-    {
-        return $this->ConciliationRepository->StripePayments($request);
-    }
-
     public function PayPalPaymenReference(Request $request, $reference){
         return $this->ConciliationRepository->PayPalPaymenReference($request, $reference);
     }
@@ -44,7 +39,22 @@ class ConciliationController extends Controller
         return $this->ConciliationRepository->PayPalPaymenOrders($request);
     }
 
-    public function StripePaymentReference(Request $request, $reference){
-        return $this->ConciliationRepository->StripePaymentReference($request, $reference);
+    //STRIPE 
+
+    //ESTE METODO ES EL QUE UTIIZA EL BOT PARA CONCILIAR VARIOS PAGOS AL MISMO TIEMPO
+    //ESTE METODO ES UTILIZADO PARA CONCILIAR VARIOS PAGOS AL MISMO TIEMPO MEDIANTE UN RANGO DE FECHAS ESPECIFICADOS    
+    public function StripePayments(Request $request)
+    {
+        return $this->ConciliationRepository->StripePayments($request);
     }    
+
+    public function stripeChargesReference(Request $request, $reference)
+    {
+        return $this->ConciliationRepository->stripeChargesReference($request, $reference);
+    }
+
+    public function stripePaymentIntentsReference(Request $request, $reference)
+    {
+        return $this->ConciliationRepository->stripePaymentIntentsReference($request, $reference);
+    }
 }

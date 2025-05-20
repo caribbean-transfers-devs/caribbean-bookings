@@ -60,6 +60,11 @@ class FinanceController extends Controller
         return $this->FinanceRepository->getPaymentsReservation($request);
     }
 
+    public function getChargesStripe(Request $request)
+    {
+        return $this->FinanceRepository->getChargesStripe($request);
+    }
+
     public function addCreditPayment(Request $request){
         return $this->FinanceRepository->addCreditPayment($request);
     }

@@ -96,45 +96,194 @@ class ConciliationRepository
         ini_set('memory_limit', '-1'); // Sin límite
         set_time_limit(120); // Aumenta el límite a 60 segundos
 
+        $succesPayment = array();
+        $errorPayment = array();
         $init = ( isset($request->startDate) ? $request->startDate." 00:00:00" : "" );
         $end = ( isset($request->endDate) ? $request->endDate." 23:59:59" : "" );
+        //CONSULTAMOS LOS PAGOS
         $payments = $this->getPaymentsConciliation("STRIPE", $init, $end);
 
-        $data2 = array();
-        if( !empty($payments) ){
-            foreach ($payments as $key => $payment) {
-                $date_payment = Carbon::parse($payment->created_at)->format('Y-m-d');
-                $charge = ( $date_payment > "2024-12-17" ? $this->getPaymentInfoV2($payment->reference) : $this->getPaymentInfoV1($payment->reference) );
-                if( !empty($charge) && isset($charge->original['status']) && $charge->original['status'] == "succeeded" ){
-                    $this->processStripe($charge->original, Payment::find($payment->id), ( $date_payment > "2024-12-17" ? 1 : 0 ), array());
-                    array_push($data2, Payment::find($payment->id));
+        if (empty($payments)) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => "No se encontro ningun pago para conciliar"
+                ],
+                'message' => "No se encontro ningun pago para conciliar"
+            ], Response::HTTP_NOT_FOUND);
+        }
+        
+        foreach ($payments as $key => $payment) {
+            $reference = $payment->reference;
+            $date_payment = Carbon::parse($payment->created_at)->format('Y-m-d');
+
+            if( explode('_',$reference)[0] == "pi" ){
+                $intent = ( $date_payment > "2024-12-17" ? $this->getPaymentIntentsV2($reference) : $this->getPaymentIntentsV1($reference) );
+                $intentData = $intent->getData(true);
+                if( $intentData['status'] == "succeeded" ){
+                    $reference  = ( isset($intentData['latest_charge']) ? $intentData['latest_charge'] : "" );
                 }
             }
+
+            // $data[]['expand[]'] = "refunds";
+            $data = ['expand' => ['refunds']];
+            $charge = ( $date_payment > "2024-12-17" ? $this->getChargesV2($reference, $data) : $this->getChargesV1($reference, $data) );
+            $chargeData = $charge->getData(true);
+            
+            if( $chargeData['status'] == "succeeded" ){
+                $newPayment = Payment::find($payment->id);
+                $balance = ( $date_payment > "2024-12-17" ? $this->getBalanceInfoV2($chargeData['balance_transaction']) : $this->getBalanceInfoV1($chargeData['balance_transaction']) );
+                $balanceData = $balance->getData(true);
+                if ( isset($balanceData['object']) && $balanceData['object'] == "balance_transaction" ) {
+                    $chargeData['balance_transaction'] = $balanceData;
+                }
+
+                if( isset($chargeData['balance_transaction']['status']) && $chargeData['balance_transaction']['status'] == "available" ){                
+                    $newPayment->is_refund = ( isset($chargeData['refunds']['data']) && count($chargeData['refunds']['data']) > 0 ? 1 : 0 );
+                    $newPayment->date_conciliation = Carbon::parse($chargeData['balance_transaction']['available_on'])->format('Y-m-d H:i:s');
+                    $newPayment->amount = ($chargeData['balance_transaction']['amount']/100);
+                    $newPayment->total_fee = ($chargeData['balance_transaction']['fee']/100);
+                    $newPayment->total_net = ($chargeData['balance_transaction']['net']/100);
+                    
+                    if( $newPayment->save() ){
+                        array_push($succesPayment, $newPayment);
+                    }
+
+                    array_push($errorPayment, $newPayment);                    
+                }
+            }
+
+            array_push($errorPayment, $payment);
         }
 
         return response()->json([
-            'message' => ( empty($payments) ? "No hay pagos para conciliar" : "Se conciliaron los pagos correctamente" ),
-            'status' => ( empty($payments) ? "info" : "success" )
+            'status' => 'success',
+            'message' => ( count($succesPayment) == count($payment) ? 'Se conciliaron todos los pagos' : 'Solo se pudieron conciliar '.count($succesPayment).' pagos' ),
+            'data' => $succesPayment
         ], Response::HTTP_OK);
     }
 
-    public function StripePaymentReference($request, $reference)
+    public function stripeChargesReference($request, $reference)
     {
-        $response = $this->getPaymentInfoV1($reference);
-        if(  isset($response->original['id']) ){
-            return $response;
-        }else{
-            return $this->getPaymentInfoV2($reference);
+        // Validar que la referencia no esté vacía
+        if (empty($reference)) {
+            return response()->json([
+                'status'   => 'error',
+                'message'  => 'Payment reference is required',
+                'code'     => 400 // Bad Request
+            ], 400);
         }
-    }    
 
+        if( !isset($request->notPayment) ){ 
+            $payment = Payment::where('reference', $reference)->first();
+
+            if (empty($payment)) {
+                return response()->json([
+                    'status'   => 'error',
+                    'message'  => 'Payment not found',
+                    'code'     => 404 // Not found
+                ], 404);
+            }
+        }
+
+        try {
+            //Validaremos la fecha del pago para saber a que api consultar            
+            $date_payment = Carbon::parse(( isset($payment->created_at) ? $payment->created_at : $request->created_at ))->format('Y-m-d');
+            $v2 = ( $date_payment > "2024-12-17" ? true : false );
+            // $data[]['expand[]'] = "refunds";
+            $data = ['expand' => ['refunds']];
+            $charge = ( $v2 ? $this->getChargesV2($reference, $data) : $this->getChargesV1($reference, $data) );
+            $chargeData = $charge->getData(true);
+
+            if (empty($chargeData) || ( isset($chargeData['status']) && $chargeData['status'] == "error" )) {
+                return response()->json([
+                    'status'   => 'error',
+                    'message'  => ( isset($chargeData['status']) && $chargeData['status'] == "error" ? $chargeData['message'] : 'Payment not found' ),
+                    'code'     => 404 // Not found
+                ], 404);
+            }
+
+            $balance = ( $v2 ? $this->getBalanceInfoV2($chargeData['balance_transaction']) : $this->getBalanceInfoV1($chargeData['balance_transaction']) );
+            $balanceData = $balance->getData(true);
+            if ( isset($balanceData['object']) && $balanceData['object'] == "balance_transaction" ) {
+                $chargeData['balance_transaction'] = $balanceData;
+            }
+
+            return response()->json([
+                'status'   => 'success',
+                'message'  => 'Payment ok',
+                'code'     => 200, // ok
+                'data'     => $chargeData
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status'   => 'error',
+                'message'  => $e->getMessage(),
+                'code'     => 500 // Bad Request
+            ], 500);
+        }
+    }
+    
+    public function stripePaymentIntentsReference($request, $reference)
+    {
+        // Validar que la referencia no esté vacía
+        if (empty($reference)) {
+            return response()->json([
+                'status'   => 'error',
+                'message'  => 'Payment reference is required',
+                'code'     => 400 // Bad Request
+            ], 400);
+        }
+
+        $payment = Payment::where('reference', $reference)->first();
+
+        if (empty($payment)) {
+            return response()->json([
+                'status'   => 'error',
+                'message'  => 'Payment not found',
+                'code'     => 404 // Not found
+            ], 404);
+        }
+
+        try {
+            //Validaremos la fecha del pago para saber a que api consultar
+            $date_payment = Carbon::parse($payment->created_at)->format('Y-m-d');
+            $v2 = ( $date_payment > "2024-12-17" ? true : false );
+            $intents = ( $v2 ? $this->getPaymentIntentsV2($reference) : $this->getPaymentIntentsV1($reference) );
+            $intentsData = $intents->getData(true);
+
+            if (empty($intentsData) || ( isset($intentsData['status']) && $intentsData['status'] == "error" )) {
+                return response()->json([
+                    'status'   => 'error',
+                    'message'  => ( isset($intentsData['status']) && $intentsData['status'] == "error" ? $intentsData['message'] : 'Payment not found' ),
+                    'code'     => 404 // Not found
+                ], 404);
+            }
+
+            return response()->json([
+                'status'   => 'success',
+                'message'  => 'Payment ok',
+                'code'     => 200, // ok
+                'data'     => $intentsData
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status'   => 'error',
+                'message'  => $e->getMessage(),
+                'code'     => 500 // Bad Request
+            ], 500);
+        }
+    }
+
+    //UTILIZADO EN EL PAYMENT REPOSITORI
     public function conciliationStripePayment($request, $payment)
     {
-        $date_payment = Carbon::parse($payment->created_at)->format('Y-m-d');
-        $charge = ( $date_payment > "2024-12-17" ? $this->getPaymentInfoV2($payment->reference) : $this->getPaymentInfoV1($payment->reference) );
-        if( !empty($charge) && isset($charge->original['status']) && $charge->original['status'] == "succeeded" ){
-            $this->processStripe($charge->original, $payment, ( $date_payment > "2024-12-17" ? 1 : 0 ), $request);
-        }        
+        // $date_payment = Carbon::parse($payment->created_at)->format('Y-m-d');
+        // $charge = ( $date_payment > "2024-12-17" ? $this->getPaymentInfoV2($payment->reference) : $this->getPaymentInfoV1($payment->reference) );
+        // if( !empty($charge) && isset($charge->original['status']) && $charge->original['status'] == "succeeded" ){
+        //     $this->processStripe($charge->original, $payment, ( $date_payment > "2024-12-17" ? 1 : 0 ), $request);
+        // }
     }
 
     /**
@@ -146,7 +295,7 @@ class ConciliationRepository
     {
         //DECALARACION DE VARIABLES
         $total = 0; $fee = 0; $net = 0;
-        $refunds = ( isset($charge['refunds']['data']) ? $charge['refunds']['data'] : array() );        
+        $refunds = ( isset($charge['refunds']['data']) ? $charge['refunds']['data'] : array() );
         $balanceTransaction = ( $status_date == 1 ? $this->getBalanceInfoV2($charge['balance_transaction']) : $this->getBalanceInfoV1($charge['balance_transaction']) );
         // Calcular el porcentaje cobrado        
         // Tarifa cobrada por Stripe // Total cobrado

@@ -4,10 +4,10 @@ namespace App\Repositories\Reports;
 
 use Exception;
 use Illuminate\Http\Response;
-
-//FACADES
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
+//MODELS
 use App\Models\Reservation;
 use App\Models\ReservationFollowUp;
 

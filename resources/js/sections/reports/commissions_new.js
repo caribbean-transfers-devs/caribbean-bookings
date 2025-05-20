@@ -557,15 +557,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    function debounce(func, delay) {
-        let timer;
-        return function(...args) {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
-
-    document.addEventListener("click", debounce(async function (event) {
+    document.addEventListener("click", components.debounce(async function (event) {
         if (event.target.classList.contains('getData')) {
             event.preventDefault();
             

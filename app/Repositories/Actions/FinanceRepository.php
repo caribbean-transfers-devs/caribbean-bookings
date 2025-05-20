@@ -17,13 +17,16 @@ use App\Models\Sale;
 use App\Models\SalesType;
 use App\Models\Payment;
 
+//REPOSITORY
+use App\Repositories\Accounting\ConciliationRepository;
+
 //TRAITS
 use App\Traits\FollowUpTrait;
 use App\Traits\MethodsTrait;
 
 class FinanceRepository
 {
-    use MethodsTrait, FollowUpTrait;
+    use MethodsTrait, FollowUpTrait;    
 
     /**
      * NOS AYUDA A PODER AGREGAR UN PAGO TIPO REEMBOLSO
@@ -581,6 +584,63 @@ class FinanceRepository
             // Retorno de error dependiendo del tipo de solicitud
             return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.payments', ["payments" => null]);
         }
+    }
+
+    public function getChargesStripe($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reference' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all()
+                ],
+                'status' => 'error',
+                "message" => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            $conciliation = new ConciliationRepository();
+            $reference = $request->reference;
+            $payment = Payment::where('reference', $reference)->first();
+            $date_payment = Carbon::parse($payment->created_at)->format('Y-m-d');
+
+            if( explode('_',$reference)[0] == "pi" ){
+                $intent = $conciliation->stripePaymentIntentsReference($request, $request->reference);
+                $intentData = $intent->getData(true);
+                $intentInfo = (isset($intentData['status']) && $intentData['status'] === 'success' ? $intentData['data'] :  [] );
+                $reference  = ( isset($intentInfo['latest_charge']) ? $intentInfo['latest_charge'] : "" );
+                $request['created_at'] = $date_payment;
+                $request['notPayment'] = true;
+            }
+            
+            $charge = $conciliation->stripeChargesReference($request, $reference);
+            // dd($request->all());
+
+            // Para obtener los datos como arreglo
+            $chargeData = $charge->getData(true);
+
+            // Si necesitas trabajar con los datos:
+            $chargeInfo = (isset($chargeData['status']) && $chargeData['status'] === 'success' ? $chargeData['data'] :  [] );
+
+            // Si la reserva no existe, se retorna vacío
+            if (!$chargeInfo) {
+                return $request->expectsJson() ? response()->json([]) : response()->view('components.html.finances.charges', ["charge" => null]);
+            }
+            
+            // Retornar la vista
+            return view('components.html.finances.charges', ["charge" => $chargeInfo]);
+        } catch (Exception $e) {
+            // Log del error para depuración
+            Log::error("Error en StripeChargesReference: " . $e->getMessage());
+
+            // Retorno de error dependiendo del tipo de solicitud
+            return $request->expectsJson() ? response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR) : response()->view('components.html.finances.charges', ["charge" => null]);
+        }        
     }
 
     public function getReservation($id, array $request = []): object

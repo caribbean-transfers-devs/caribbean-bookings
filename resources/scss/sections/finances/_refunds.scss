@@ -4,7 +4,7 @@
 @import "../../template/plugins/light/table/datatable/custom_dt";
 
 @import '../../template/light/components/modal';
-@import '../../template/light/components/tabs.scss';
+@import '../../template/light/components/tabs';
 
 @import '../../components/filters'; //ESTILOS PARA EL MODAL DE FILTROS
 @import '../../components/fixedheader'; //ESTILOS PARA PONER FIXED LOS HEADER DE LA TABLA DATA TABLE
@@ -18,4 +18,9 @@
     justify-content: center;
     font-size: 40px;
     padding: 16px; 
+}
+
+.table-details-booking > thead > tr > th,
+.table-details-booking > tbody > tr > td{
+    font-size: 14px;
 }
