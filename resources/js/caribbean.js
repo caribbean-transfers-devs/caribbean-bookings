@@ -13,6 +13,9 @@ var App = function() {
         class: {
             navbar: document.querySelector(".navbar"),
             overlay: document.querySelector('.overlay'),
+            search: document.querySelector('.toggle-search'),
+            searchOverlay: document.querySelector('.search-overlay'),
+            searchForm: document.querySelector('.search-form-control'),
             mainContainer: document.querySelector('.main-container'),
             mainHeader: document.querySelector('.header.navbar')
         }
@@ -72,28 +75,28 @@ var App = function() {
         onToggleSidebarSubmenu: function() {
             ['mouseenter', 'mouseleave'].forEach(function(e){
                 document.querySelector('.sidebar-wrapper').addEventListener(e, function() {
-                    // if (document.querySelector('body').classList.contains('alt-menu')) {
-                    //     if (document.querySelector('.main-container').classList.contains('sidebar-closed')) {
-                    //         if (e === 'mouseenter') {
-                    //             document.querySelector('li.menu .submenu').classList.remove('show');
-                    //             document.querySelector('li.menu.active .submenu').classList.add('recent-submenu');
-                    //             document.querySelector('li.menu.active').querySelector('.collapse.submenu.recent-submenu').classList.add('show');
-                    //             document.querySelector('.collapse.submenu.recent-submenu').parentNode.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'true');
-                    //         } else if (e === 'mouseleave') {
-                    //             getMenuList = document.querySelectorAll('li.menu');
-                    //             getMenuList.forEach(element => {
-                    //                 var submenuShowEle = element.querySelector('.collapse.submenu.show');
-                    //                 if (submenuShowEle) {
-                    //                     submenuShowEle.classList.remove('show');
-                    //                 }
-                    //                 var submenuExpandedToggleEle = element.querySelector('.dropdown-toggle[aria-expanded="true"]');
-                    //                 if (submenuExpandedToggleEle) {
-                    //                     submenuExpandedToggleEle.setAttribute('aria-expanded', 'false');
-                    //                 }
-                    //             });
-                    //         }
-                    //     }
-                    // } else {
+                    if (document.querySelector('body').classList.contains('alt-menu')) {
+                        if (document.querySelector('.main-container').classList.contains('sidebar-closed')) {
+                            if (e === 'mouseenter') {
+                                document.querySelector('li.menu .submenu').classList.remove('show');
+                                document.querySelector('li.menu.active .submenu').classList.add('recent-submenu');
+                                document.querySelector('li.menu.active').querySelector('.collapse.submenu.recent-submenu').classList.add('show');
+                                document.querySelector('.collapse.submenu.recent-submenu').parentNode.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'true');
+                            } else if (e === 'mouseleave') {
+                                getMenuList = document.querySelectorAll('li.menu');
+                                getMenuList.forEach(element => {
+                                    var submenuShowEle = element.querySelector('.collapse.submenu.show');
+                                    if (submenuShowEle) {
+                                        submenuShowEle.classList.remove('show');
+                                    }
+                                    var submenuExpandedToggleEle = element.querySelector('.dropdown-toggle[aria-expanded="true"]');
+                                    if (submenuExpandedToggleEle) {
+                                        submenuExpandedToggleEle.setAttribute('aria-expanded', 'false');
+                                    }
+                                });
+                            }
+                        }
+                    } else {
                         if (document.querySelector('.main-container').classList.contains('sidebar-closed')) {
                             if (e === 'mouseenter') {
                                 document.querySelector('li.menu .submenu').classList.remove('show');
@@ -124,13 +127,13 @@ var App = function() {
                                 });
                             }
                         }
-                    // }                    
+                    }                    
                 });
             });
 
         },
         offToggleSidebarSubmenu: function () {
-            // $('.sidebar-wrapper').off('mouseenter mouseleave');
+            $('.sidebar-wrapper').off('mouseenter mouseleave');
         },
         overlay: function() {
             document.querySelector('#dismiss, .overlay').addEventListener('click', function () {
@@ -142,6 +145,32 @@ var App = function() {
                 Dom.main.classList.remove('sidebar-noneoverflow');
             });            
         },
+        search: function() {
+
+            if (Dom.class.search) {
+                
+                Dom.class.search.addEventListener('click', function(event) {
+                    this.classList.add('show-search');
+                    Dom.class.searchOverlay.classList.add('show');
+                    document.querySelector('body').classList.add('search-active');
+                });
+                
+                Dom.class.searchOverlay.addEventListener('click', function(event) {
+                    this.classList.remove('show');
+                    Dom.class.search.classList.remove('show-search');
+                    document.querySelector('body').classList.remove('search-active');
+                });
+                
+                document.querySelector('.search-close').addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    Dom.class.searchOverlay.classList.remove('show');
+                    Dom.class.search.classList.remove('show-search');
+                    document.querySelector('body').classList.remove('search-active');
+                    document.querySelector('.search-form-control').value = ''
+                });
+            }
+
+        },        
     }
 
     var inBuiltfunctionality = {
@@ -176,6 +205,19 @@ var App = function() {
                 preventScroll.addEventListener('DOMMouseScroll', preventScrolling);
                 
             });
+        },
+        searchKeyBind: function() {
+
+            if (Dom.class.search) {
+                Mousetrap.bind('ctrl+/', function() {
+                    document.body.classList.add('search-active');
+                    Dom.class.search.classList.add('show-search');
+                    Dom.class.searchOverlay.classList.add('show');
+                    Dom.class.searchForm.focus();
+                    return false;
+                });                
+            }
+            
         },
         bsTooltip: function() {
             var bsTooltip = document.querySelectorAll('.bs-tooltip')
@@ -331,6 +373,7 @@ var App = function() {
     return {
         init: function(Layout) {
             toggleFunction.overlay();
+            toggleFunction.search();
             
             /*
                 Desktop Resoltion fn
@@ -351,6 +394,7 @@ var App = function() {
             */
             inBuiltfunctionality.mainCatActivateScroll();
             inBuiltfunctionality.preventScrollBody();
+            inBuiltfunctionality.searchKeyBind();
             inBuiltfunctionality.bsTooltip();
             inBuiltfunctionality.bsPopover();
             inBuiltfunctionality.onCheckandChangeSidebarActiveClass();
@@ -359,7 +403,6 @@ var App = function() {
             inBuiltfunctionality.EnableNavBarPopper();
         }
     }
-
 }();
 
 window.addEventListener('load', function() {

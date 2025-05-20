@@ -53,7 +53,7 @@
                                             <label for="enterprise_id">Seleccione una empresa</label>
                                             <select name="enterprise_id" id="enterprise_id" class="form-control mb-3">
                                                 @foreach ($enterprises as $enterprise_v)
-                                                    <option value="{{ $enterprise_v->id }}">{{ $enterprise_v->names }}</option>
+                                                    <option  {{ isset($site->enterprise_id) && $site->enterprise_id == $enterprise_v->id ? 'selected' : '' }} value="{{ $enterprise_v->id }}">{{ $enterprise_v->names }}</option>
                                                 @endforeach
                                             </select>
                                         </div>

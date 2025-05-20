@@ -17,4 +17,8 @@ class Autocomplete extends Model
         return $this->belongsTo(Zones::class, 'zone_id', 'id');
     }
 
+    public function zone()
+    {
+        return $this->belongsTo(Zones::class, 'zone_id', 'id');
+    }
 }

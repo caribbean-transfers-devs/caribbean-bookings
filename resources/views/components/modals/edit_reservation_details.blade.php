@@ -1,4 +1,7 @@
-
+@php
+    $sites = auth()->user()->Sites();
+    $origins = auth()->user()->Origins();
+@endphp
 <div class="modal fade" id="serviceClientModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -29,9 +32,11 @@
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceSiteReference">Sitio</label>
                             <select class="form-select mb-2" id="serviceSiteReference" name="site_id" readonly>
-                                @foreach($sites as $key => $value)
-                                    <option value="{{ $value->id }}" {{ $reservation->site_id == $value->id ? 'selected' : '' }}>{{ $value->name }}</option>
-                                @endforeach
+                                @if (isset( $sites ) && sizeof($sites) >= 1)
+                                    @foreach($sites as $key => $value)
+                                        <option data-type="{{ $value->type_site }}" value="{{ $value->id }}" {{ $reservation->site_id == $value->id ? 'selected' : '' }}>{{ $value->name }}</option>
+                                    @endforeach                                    
+                                @endif
                             </select>
                         </div>
                         <div class="col-sm-12 col-md-6">
@@ -41,7 +46,7 @@
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="originSale">Origen de venta</label>
                             <select class="form-select mb-2" id="originSale" name="origin_sale_id">
-                                <option value="0">Selecciona una opción</option>
+                                <option value="">Selecciona una opción</option>
                                 @foreach($origins as $key => $origin)
                                     <option value="{{ $origin->id }}" {{ $reservation->origin_sale_id == $origin->id ? 'selected' : '' }}>{{ $origin->code }}</option>
                                 @endforeach

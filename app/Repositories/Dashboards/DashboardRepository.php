@@ -132,7 +132,7 @@ class DashboardRepository
             endforeach;
         }
 
-        return view('dashboard.sales', [
+        return view('dashboard.management', [
             'bookings_month' => $bookings_month,
             'bookings_sites_month' => $bookings_sites_month,
             'bookings_destinations_month' => $bookings_destinations_month,
@@ -144,48 +144,6 @@ class DashboardRepository
                 ]
             ],
         ]);
-    }
-
-    public function admin(){
-        
-        $bookings_month = [];
-        $queryData = [
-            "init" => date("Y-m-d", strtotime("first day of this month")) . " 00:00:00",
-            "end" => date("Y-m-d", strtotime("last day of this month")) . " 23:59:59",
-        ];
-        
-        //Query DB
-        $query = ' AND rez.created_at BETWEEN :init AND :end AND rez.is_cancelled <> 1 AND rez.is_duplicated <> 1 ';
-
-        // Recorre desde el primer día hasta el último día del mes
-        for ($fecha = date("Y-m-d", strtotime("first day of this month")); $fecha <= date("Y-m-d", strtotime("last day of this month")); $fecha = date("Y-m-d", strtotime($fecha . " +1 day"))) {
-            $bookings_month[$fecha] = [
-                "items" => [],
-                "counter" => 0,
-                "USD" => 0,
-                "MXN" => 0,
-            ];
-        }
-
-        $bookings_data_month = $this->dataBooking($query, $queryData);
-
-        if(sizeof( $bookings_data_month ) >= 1){
-            foreach($bookings_data_month as $value):                
-                $date_ = date("Y-m-d", strtotime( $value->created_at ));
-                if( isset( $bookings_month[ $date_ ] ) ){
-                    $bookings_month[ $date_ ]['items'][] = $value;
-                    $bookings_month[ $date_ ]['counter']++;
-                    if( $value->currency == "USD" ):
-                        $bookings_month[ $date_ ]['USD'] += $value->total_sales;
-                    endif;
-                    if( $value->currency == "MXN" ):
-                        $bookings_month[ $date_ ]['MXN'] += $value->total_sales;
-                    endif;                   
-                }
-            endforeach;
-        }
-        
-        return view('dashboard.admin', ['items' => $bookings_month]);
     }
 
     public function dataBooking($query, $queryData){

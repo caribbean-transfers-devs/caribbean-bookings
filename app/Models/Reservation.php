@@ -11,20 +11,28 @@ class Reservation extends Model
 
     public $timestamps = false;
 
+    protected $fillable = [
+        'client_first_name',
+        'client_last_name',
+        'client_email',
+        'client_phone',
+        'site_id',
+        'reference',
+        'origin_sale_id',
+        'currency'
+    ];    
+
     /**
      * Relations
      */
     public function destination()
     {
         return $this->belongsTo(Destination::class, 'destination_id', 'id');
-    }
+    } 
 
     public function items()
     {
-        //return $this->hasMany(ReservationsItem::class, 'reservation_id', 'id');
-        return $this->hasMany(ReservationsItem::class, 'reservation_id', 'id')
-        ->join('zones', 'zones.id', '=', 'reservations_items.from_zone')
-        ->select('reservations_items.*', 'reservations_items.id as reservations_item_id', 'zones.*');
+        return $this->hasMany(ReservationsItem::class, 'reservation_id', 'id');
     }
 
     public function payments()
@@ -34,8 +42,12 @@ class Reservation extends Model
 
     public function sales()
     {
-        // return $this->hasMany(Sale::class, 'reservation_id', 'id');
         return $this->hasMany(Sale::class, 'reservation_id', 'id')->whereNull('deleted_at');
+    }
+
+    public function refunds()
+    {
+        return $this->hasMany(ReservationsRefund::class, 'reservation_id', 'id')->orderBy('created_at', 'desc');
     }
 
     public function callCenterAgent()
@@ -47,6 +59,11 @@ class Reservation extends Model
     // {
     //     return $this->hasOneThrough(User::class, Sale::class, 'reservation_id', 'id', 'id', 'call_center_agent_id');
     // }
+
+    public function photos()
+    {
+        return $this->hasMany(ReservationsMedia::class, 'reservation_id', 'id');
+    }    
 
     public function followUps()
     {

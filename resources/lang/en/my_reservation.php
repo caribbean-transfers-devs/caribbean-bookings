@@ -1,0 +1,23 @@
+<?php
+return [
+    'title' => 'My booking!',
+    'hi' => 'Hi',
+    'phone' => 'Phone',
+    'travel_information' => 'Travel information',
+    'reservation_code' => 'Reservation code',
+    'type_of_service' => 'Type of service',
+    'one_way' => 'One Way',
+    'round_trip' => 'Round Trip',
+    'passengers' => 'Passengers',
+    'time' => 'Time',
+    'leaving_from' => 'Leaving from',
+    'going_to' => 'Going to',
+    'flight_number' => 'Arrival flight number',
+    'pickup' => 'Pickup',
+    'departure' => 'Departure',
+    'logout' => 'Logout',
+    'print' => 'Print',
+    'card' => 'Credit / Debit Card',
+    'link' => "share payment link",
+    'payment_method' => "Select payment method",
+];

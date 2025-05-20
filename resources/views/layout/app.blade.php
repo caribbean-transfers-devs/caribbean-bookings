@@ -9,38 +9,45 @@
     <title>@yield('title') | Bookings</title>
 	<meta name="description" content="Caribbean Transfers | Bookings">
     <link rel="preconnect" href="https://fonts.gstatic.com">
-	<link rel="shortcut icon" href="/assets/img/icons/icon-48x48.png">
+    <link rel="shortcut icon" href="/assets/img/icons/favicon.ico">
 
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <link href="{{ mix('/assets/css/core/core.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/core/core.min.css') }}" rel="stylesheet" >
     <link href="{{ mix('/assets/css/panel/panel2.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/panel/panel2.min.css') }}" rel="stylesheet" >
-    <link href="{{ mix('/assets/css/panel/panel.min.css') }}"rel="preload" as="style" >
-    <link href="{{ mix('/assets/css/panel/panel.min.css') }}"rel="stylesheet" >
-
     @stack('Css')
-</head> 
+</head>
 <body class="">
 
-    @include('layout.partials.loader')
+    @once
+        @include('layout.partials.loader')
+    @endonce
 
-    @include('layout.partials.header')
+    @once
+        @include('layout.partials.header')
+    @endonce
 
     <!--  BEGIN MAIN CONTAINER  -->
     <div class="main-container" id="container">
 
         <div class="overlay"></div>
-        {{-- <div class="search-overlay"></div> --}}
+        <div class="search-overlay"></div>
 
-        @include('layout.partials.sidebar')
+        @once
+            @include('layout.partials.sidebar')
+        @endonce
 
         <!--  BEGIN CONTENT AREA  -->
         <div id="content" class="main-content">
             <div class="layout-px-spacing">
                 <div class="middle-content p-0">
 
-                    @include('layout.partials.breadcrumbs')
+                    @once
+                        @include('layout.partials.breadcrumbs')
+                    @endonce
                     
                     {{-- <div class="row layout-top-spacing"> --}}
 
@@ -50,7 +57,11 @@
 
                 </div>
             </div>
-            @include('layout.partials.footer')
+
+            @once
+                @include('layout.partials.footer')
+            @endonce
+
         </div>
         <!--  END CONTENT AREA  -->
 

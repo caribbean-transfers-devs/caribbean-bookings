@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 //MODELS
 use App\Models\Reservation;
 use App\Models\Sale;
+use App\Models\SalesType;
 
 //TRAIS
 use App\Traits\FollowUpTrait;
@@ -26,20 +27,25 @@ class SaleRepository
             $sale->reservation_id = $request->reservation_id;
             $sale->sale_type_id = $request->sale_type_id;
             $sale->description = $request->description;
-            $sale->quantity = $request->quantity;
+            // $sale->quantity = $request->quantity;
             $sale->total = $request->total;
-
-            $sale->created_at = date('Y-m-d H:m:s');
-            $sale->updated_at = date('Y-m-d H:m:s');
-
-            // $sale->call_center_agent_id = $request->call_center_agent_id;
+            $sale->call_center_agent_id = auth()->user()->id;
             $sale->save();
 
-            $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', agrego una venta tipo: '.$request->sale_type_id.', por un monto de: '.$request->total, 'HISTORY', 'CREATE_SALE');
+            // Obtener tipo de venta (validar existencia)
+            $saleType = SalesType::find($request->sale_type_id);
+            $saleDescription = $saleType ? $saleType->name : 'Reembolso';
+
+            // Registrar seguimientos
+            $this->create_followUps(
+                $request->reservation_id,
+                "El usuario: " . auth()->user()->name . " agregó una venta tipo: (" . strtoupper($saleDescription) . "), por un monto de: (" . $request->total . ")",
+                'HISTORY', 
+                'CREATE_SALE'
+            );
 
             DB::commit();
 
-            // Sale created successfully
             return response()->json([
                 'status' => 'success',
                 'message' => 'La venta se creo correctamente',                
@@ -48,25 +54,40 @@ class SaleRepository
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error al crear la venta, contacte a soporte',                
+                'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     public function update($request,$sale){
         try {
-            DB::beginTransaction();
+            DB::beginTransaction();            
 
-            $this->create_followUps($request->reservation_id, 'El usuario: '.auth()->user()->name.', actualizo la venta con ID: '.$sale->id.' de ( tipo: '.$sale->sale_type_id.', por un monto de: '.$sale->total.' ) a ( tipo: '.$request->sale_type_id.', por un monto de: '.$request->total.' )', 'HISTORY', 'UPDATE_SALE');
+            $saleTypeIdOld = $sale->sale_type_id;
+            $saleTotalOld = $sale->total;
 
             $sale->reservation_id = $request->reservation_id;
             $sale->sale_type_id = $request->sale_type_id;
             $sale->description = $request->description;
-            $sale->quantity = $request->quantity;
+            // $sale->quantity = $request->quantity;
             $sale->total = $request->total;
-            $sale->updated_at = date('Y-m-d H:m:s');
-            // $sale->call_center_agent_id = $request->call_center_agent_id;
+            $sale->updated_at = date('Y-m-d H:m:s');            
             $sale->save();
+
+            // Obtener tipo de venta (validar existencia)
+            $saleTypeOld = SalesType::find($saleTypeIdOld);
+            $saleDescriptionOld = $saleTypeOld ? $saleTypeOld->name : 'Reembolso';
+
+            $saleType = SalesType::find($request->sale_type_id);
+            $saleDescription = $saleType ? $saleType->name : 'Reembolso';
+
+            // Registrar seguimientos
+            $this->create_followUps(
+                $request->reservation_id, 
+                'El usuario: '.auth()->user()->name.', actualizo la venta con ID: '.$sale->id.' de ( tipo: '.strtoupper($saleDescriptionOld).', por un monto de: '.$saleTotalOld.' ) a ( tipo: '.strtoupper($saleDescription).', por un monto de: '.$request->total.' )', 
+                'HISTORY', 
+                'UPDATE_SALE'
+            );
 
             DB::commit();
             

@@ -12,12 +12,53 @@
 	<meta name='robots' content='noindex,follow' />
 
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     <link href="{{ mix('/assets/css/core/core.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/core/core.min.css') }}" rel="stylesheet" >
     <link href="{{ mix('/assets/css/panel/panel2.min.css') }}" rel="preload" as="style" >
     <link href="{{ mix('/assets/css/panel/panel2.min.css') }}" rel="stylesheet" >
     <link href="{{ mix('/assets/css/panel/panel.min.css') }}"rel="preload" as="style" >
     <link href="{{ mix('/assets/css/panel/panel.min.css') }}"rel="stylesheet" >	
+	<style>
+		body{
+			background-color: #16161d;
+			color: #ffffff;			
+		}
+
+		.auth-container{
+			height: 100vh;
+		}
+
+		.card{
+			background: #16161d;
+			border-radius: 8px;
+			display: grid;
+			gap: 20px;
+			grid-template-columns: 1fr;
+			max-width: 570px;
+			padding: 20px;
+			width: 100%;
+			border: 0;
+			color: #ffffff;	
+		}
+		.card-body {
+			padding: 0
+		}
+
+		.form-control{
+			color: #000000;
+		}
+		.form-group label, label{
+			color: #ffffff;
+		}
+		.btn, .btn:hover{
+			font-size: 14px;
+			background-color: #fb5607b8;
+			border-color: #fb5607b8;
+			box-shadow: none;
+		}
+	</style>
 </head>
 <body data-theme="default" data-layout="fluid" data-sidebar-position="left" data-sidebar-layout="default">
 
@@ -29,14 +70,9 @@
                     <div class="card mt-3 mb-3">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    
-                                    <h2>¡Bienvenido!</h2>
-                                    <p>Inicie sesión en su cuenta para continuar</p>
-                                    
-                                </div>
 								<div class="text-center">
-									<img src="/assets/img/logos/brand.svg" alt="Caribbean Transfers" class="img-fluid" width="132" height="132">
+									{{-- <img src="/assets/img/logos/brand.svg" alt="Caribbean Transfers" class="img-fluid" width="132" height="132"> --}}
+									<img src="https://caribbean-transfers.com/assets/img/logo.svg" width="200" height="100" loading="lazy" alt="Logo | Caribbean Transfers" title="Logo | Caribbean Transfers">
 								</div>
 								@if ($errors->any())
 									<div class="alert alert-danger mt-3" role="alert">
@@ -51,13 +87,13 @@
 									<div class="col-md-12">
 										<div class="mb-3">
 											<label class="form-label">Email</label>
-											<input class="form-control form-control-lg" type="email" name="email" placeholder="Su email" value="{{ old('email') }}" autocomplete="username">
+											<input class="form-control" type="email" name="email" placeholder="Su email" value="{{ old('email') }}" autocomplete="username">
 										</div>
-									</div>			
+									</div>
 									<div class="col-12">
 										<div class="mb-4">
 											<label class="form-label">Contraseña</label>
-											<input type="password" class="form-control form-control-lg" name="password" placeholder="Su contraseña" autocomplete="current-password">
+											<input type="password" class="form-control" name="password" placeholder="Su contraseña" autocomplete="current-password">
 										</div>
 									</div>
 									<div class="col-12">
@@ -69,7 +105,7 @@
 												</label>
 											</div>
 										</div>
-									</div>							
+									</div>
 									
 									<div class="col-12">
 										<div class="mb-4">
@@ -79,14 +115,12 @@
                                                 data-callback="onSubmit"
                                                 data-action = 'submit'>Iniciar Sesión</button>											
 										</div>
-									</div>                                                                
+									</div>
 								</form>
                             </div>
-                            
                         </div>
                     </div>
                 </div>
-                
             </div>            
         </div>
     </div>

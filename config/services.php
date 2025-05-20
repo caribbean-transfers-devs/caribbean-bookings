@@ -60,4 +60,9 @@ return [
         'secret' => env('DO_SPACES_SECRET'),
         'bucket' => env('DO_SPACES_BUCKET'),
     ],
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_AUTH_TOKEN'),
+        'phone' => env('TWILIO_WHATSAPP_NUMBER'),
+    ],    
 ];

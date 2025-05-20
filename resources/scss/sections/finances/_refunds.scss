@@ -1,0 +1,26 @@
+
+@import "../../../plugins/table/datatable/datatables5";
+@import "../../../plugins/lightbox/lightbox";
+@import "../../template/plugins/light/table/datatable/custom_dt";
+
+@import '../../template/light/components/modal';
+@import '../../template/light/components/tabs';
+
+@import '../../components/filters'; //ESTILOS PARA EL MODAL DE FILTROS
+@import '../../components/fixedheader'; //ESTILOS PARA PONER FIXED LOS HEADER DE LA TABLA DATA TABLE
+@import '../../components/table'; //ESTILOS PARA TABLAS ESPECIALES
+@import '../../components/logs'; //ESTILOS PARA LOGS, DETALLES RESERVA
+@import '../../components/gallery'; //ESTILOS PARA GALERIA, DETALLES RESERVA
+
+.container-loader{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-size: 40px;
+    padding: 16px; 
+}
+
+.table-details-booking > thead > tr > th,
+.table-details-booking > tbody > tr > td{
+    font-size: 14px;
+}

@@ -32,7 +32,7 @@ class TpvRequest extends FormRequest
             'language' => 'required|in:en,es',
             'passengers' => 'required|integer|min:1|max:200',
             'currency' => 'required|in:USD,MXN',
-            'rate_group' => 'required|max:10',
+            // 'rate_group' => 'required|max:10',
             'pickup' => 'required|date_format:Y-m-d H:i',
             'pickup_departure' => [
                 'required_if:round_trip,true|date_format:Y-m-d H:i',

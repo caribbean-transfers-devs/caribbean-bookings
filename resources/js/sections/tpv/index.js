@@ -1,7 +1,3 @@
-const __uuid = document.getElementById('uuid');
-var from_autocomplete = document.getElementById('aff-input-from');
-var to_autocomplete = document.getElementById('aff-input-to');
-
 let setup = {
   lang: 'es',
   currency: 'USD',
@@ -56,7 +52,7 @@ let setup = {
       }).then((response) => {
           return response.json()
       }).then((data) => {
-          this.makeItems(data,element);
+          setup.makeItems(data,element);
       }).catch((error) => {
           console.error('Error:', error);
       });
@@ -152,13 +148,13 @@ let setup = {
             toLng[0].value = data.geo.lng;
     }
   },
-  saveHotel: function(element, data){
+  saveHotel: function(element, _data){
       let item = {
-        name: data.name,
-        address: data.address,
+        name: _data.name,
+        address: _data.address,
         start: {
-          lat: data.geo.lat,
-          lng: data.geo.lng,
+          lat: _data.geo.lat,
+          lng: _data.geo.lng,
         },
       };
 
@@ -170,7 +166,7 @@ let setup = {
           setup.loadingMessage(element);
         },
         success: function(resp) {
-          setup.setItem(element, data);          
+          setup.setItem(element, _data);
           alert("Hotel agregado con éxito...");
           const finalElement = document.getElementById(element);
           finalElement.innerHTML = '';          
@@ -179,117 +175,87 @@ let setup = {
       console.log(error);
     });
   },
-};
+  resetServiceType: function(){
+    const _toggleServices = document.querySelectorAll('.aff-toggle-type');
+    _toggleServices.forEach(btn => {
+      btn.classList.remove('active');
+    });    
+  },
+  resetCurrency: function(){
+    const _toggleCurrencys = document.querySelectorAll('.aff-toggle-currency');
+    _toggleCurrencys.forEach(btn => {
+      btn.classList.remove('active');
+    });    
+  },
+  getLoader: function() {
+    return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
+  },
+  setTotal: function(total){
+    const _total = document.getElementById('formTotal');
+    _total.value = total;
+    _total.removeAttribute('readonly');
+  },  
+  actionSite: function(__site){
+    const __reference       = document.getElementById('formReference');
+    const __name            = document.getElementById('formName');
+    const __lastname        = document.getElementById('formLastName');
+    const __email           = document.getElementById('formEmail');
+    const __phone           = document.getElementById('formPhone');
+    const __isQuotation     = document.getElementById('formIsQuotation');
+    const __paymentMethod   = document.getElementById('formPaymentMethod');
+    const __originSale      = document.getElementById('formOriginSale');
+    const selectedOption    = __site.options[__site.selectedIndex];
 
-document.addEventListener('DOMContentLoaded', function() {
-  const fechaInput = document.getElementById('bookingPickupForm');
-  const rangeCheckbox = document.getElementById('flexSwitchCheckDefault');
-  let pickerInit = flatpickr("#bookingPickupForm", {    
-    mode: "single",
-    dateFormat: "Y-m-d H:i",
-    enableTime: true,
-    minDate: "today"
-  });
-  let pickerEnd = flatpickr("#bookingDepartureForm", {
-    mode: "single",
-    dateFormat: "Y-m-d H:i",
-    enableTime: true,
-    minDate: "today"
-  });  
+    if( selectedOption.getAttribute('data-type') == "AGENCY" || selectedOption.getAttribute('data-type') == "STAFF" ){
+      if( selectedOption.getAttribute('data-type') == "STAFF" ){
+        __name.value          = 'STAFF';
+        __lastname.value      = 'CT';
+      }
 
-  // Función para actualizar el modo de Flatpickr
-  function updatePickerMode() {
-    var departureContainer = document.getElementById("departureContainer");
-    if (rangeCheckbox.checked) {
-      departureContainer.style.display = "block";
+      __email.value           = selectedOption.getAttribute('data-email');
+      __phone.value           = selectedOption.getAttribute('data-phone');
+      __isQuotation.value     = 0;
+      __paymentMethod.value   = "CARD";
+      $("#formOriginSale").selectpicker('val', ( selectedOption.getAttribute('data-type') == "AGENCY" ? '5' : '13' ));
+
+      if( selectedOption.getAttribute('data-type') == "AGENCY" ){
+        console.log("entre");
+        __reference.removeAttribute('readonly');
+      }
+
+      if( selectedOption.getAttribute('data-type') == "STAFF" ){
+        console.log("entre staff");
+        __reference.value     = "DIRECTO";
+      }
+
+      if( selectedOption.getAttribute('data-type') == "STAFF" ){
+        __name.setAttribute('readonly', true);
+        __lastname.setAttribute('readonly', true);
+      }
+      __email.setAttribute('readonly', true);
+      __phone.setAttribute('readonly', true);
+      __isQuotation.setAttribute('readonly', true);
+      __paymentMethod.setAttribute('readonly', true);
     }else{
-      departureContainer.style.display = "none";
+      __name.value            = '';
+      __lastname.value        = '';
+      __email.value           = '';
+      __phone.value           = '';
+      __reference.value       = '';
+      __isQuotation.value     = 0;
+      __paymentMethod.value   = "CASH";
+      $("#formOriginSale").selectpicker('val', '');
+
+      __reference.setAttribute('readonly', true);
+      __name.removeAttribute('readonly');
+      __lastname.removeAttribute('readonly');
+      __email.removeAttribute('readonly');
+      __phone.removeAttribute('readonly');
+      __isQuotation.removeAttribute('readonly');
+      __paymentMethod.removeAttribute('readonly');
     }
   }
-  rangeCheckbox.addEventListener('change', updatePickerMode);
-});
-
-function loaderSites(){
-  const __site = document.getElementById('formSite');
-  if( __site != null ){
-    actionSite(__site);
-    __site.addEventListener('change', function(event){
-      event.preventDefault();
-      actionSite(__site);    
-    });
-  }
-}
-
-function saveQuote(event){
-  event.preventDefault();
-  $("#btn_quote").prop('disabled', true);
-  $.ajaxSetup({
-      headers: {
-          'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-      }
-  });
-  let frm_data = $("#bookingboxForm").serializeArray();
-  frm_data.push({ name: 'uuid', value: __uuid.value });
-  
-  $.ajax({
-      url: '/tpv/quote',
-      type: 'POST',
-      data: frm_data,
-      beforeSend: function() {
-        $("#loadContent").html('<div class="loading"><span class="loader"></span></div>');
-      },
-      success: function(resp) {
-        $("html, body").animate({ scrollTop: $("#loadContent").offset().top }, 300);
-        $("#loadContent").html(resp);
-        loaderSites();
-        $("#btn_quote").prop('disabled', false);
-      },
-  }).fail(function(xhr, status, error) {
-      console.log(xhr);
-      Swal.fire(
-          '¡ERROR!',
-          xhr.responseJSON.message,
-          'error'
-      )
-      $("#loadContent").html("");
-      $("#btn_quote").prop('disabled', false);
-  });
-}
-
-function makeReservationButton(event){
-  event.preventDefault();
-  $("#btn_make_reservation").prop('disabled', true).text("Enviando...");
-  $.ajaxSetup({
-      headers: {
-          'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
-      }
-  });
-
-  let frm_data = $("#formReservation").serializeArray();
-  frm_data.push({ name: 'uuid', value: __uuid.value });
-
-  $.ajax({
-      url: '/tpv/create',
-      type: 'POST',
-      data: frm_data,      
-      success: function(resp) {
-        window.location.replace(`/reservations/detail/${resp.config.id}`);        
-      },
-  }).fail(function(xhr, status, error) {
-      console.log(xhr);
-      Swal.fire(
-          '¡ERROR!',
-          xhr.responseJSON.message,
-          'error'
-      );
-      $("#btn_make_reservation").prop('disabled', false).text("Enviar");
-  });
-}
-
-function setTotal(total){
-  $("#formTotal").val(total);
-  $("#formTotal").attr("readonly", false);
-}
+};
 
 function affDelayAutocomplete(callback, ms) {
   var timer = 0;
@@ -303,38 +269,228 @@ function affDelayAutocomplete(callback, ms) {
   };
 }
 
-from_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
-  setup.autocomplete( e.target.value, 'aff-input-from-elements');
-}, 500));
-from_autocomplete.addEventListener('focus', (e) => {
-  setup.autocomplete( e.target.value, 'aff-input-from-elements');
-});
-to_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
-  setup.autocomplete( e.target.value, 'aff-input-to-elements');
-}, 500));
-to_autocomplete.addEventListener('focus', (e) => {
-  setup.autocomplete( e.target.value, 'aff-input-to-elements');
+const __uuid = document.getElementById('uuid') || { value: '' };
+var from_autocomplete = document.getElementById('aff-input-from');
+var to_autocomplete = document.getElementById('aff-input-to');
+const _formQuotation = document.getElementById('formQuotation');
+
+document.addEventListener('DOMContentLoaded', function() {
+  const fechaInput = document.getElementById('bookingPickupForm');
+  const rangeCheckbox = document.getElementById('flexSwitchCheckDefault');
+
+  from_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
+    setup.autocomplete( e.target.value, 'aff-input-from-elements');
+  }, 500));
+  from_autocomplete.addEventListener('focus', (e) => {
+    setup.autocomplete( e.target.value, 'aff-input-from-elements');
+  });
+  to_autocomplete.addEventListener('keydown', affDelayAutocomplete(function (e) {
+    setup.autocomplete( e.target.value, 'aff-input-to-elements');
+  }, 500));
+  to_autocomplete.addEventListener('focus', (e) => {
+    setup.autocomplete( e.target.value, 'aff-input-to-elements');
+  });  
+
+  let pickerInit = flatpickr("#bookingPickupForm", {
+    mode: "single",
+    dateFormat: "Y-m-d H:i",
+    enableTime: true,
+    minDate: "today"
+  });
+  let pickerEnd = flatpickr("#bookingDepartureForm", {
+    mode: "single",
+    dateFormat: "Y-m-d H:i",
+    enableTime: true,
+    minDate: "today"
+  });
+
+  document.addEventListener('click', function (event) {
+    if (event.target && event.target.id === 'clearBooking') {
+      _formQuotation.reset();
+    }
+
+    if ( event.target && event.target.classList.contains('aff-toggle-type') ) {
+      event.preventDefault();
+      setup.resetServiceType();
+      const _service = document.getElementById('flexSwitchCheckDefault');
+      const _elements = document.querySelector('.elements');
+      const _round_trip_element = document.getElementById("departureContainer");
+
+      // Obtener datos del elemento clickeado
+      const { type } = event.target.dataset;
+
+      if(type == "RT"){
+        _elements.classList.add(type);
+        _round_trip_element.classList.remove("d-none");
+        _service.value = 1;
+      }else{
+        _elements.classList.remove('RT');
+        _round_trip_element.classList.add("d-none");
+        _service.value = 0;
+      }
+      event.target.classList.add('active');
+      const form = document.getElementById('formReservation');
+      if (form) {
+       const btnQuote = document.getElementById('btnQuote');
+       btnQuote.click();
+      }
+    }
+
+    if ( event.target && event.target.classList.contains('aff-toggle-currency') ) {
+      event.preventDefault();
+      setup.resetCurrency();
+      const _currency = document.getElementById('bookingCurrencyForm');
+
+      // Obtener datos del elemento clickeado
+      const { currency } = event.target.dataset;
+      _currency.value = currency;
+      event.target.classList.add('active');
+      const form = document.getElementById('formReservation');
+      if (form) {
+       const btnQuote = document.getElementById('btnQuote');
+       btnQuote.click();
+      }
+    }
+  })
+
+  document.addEventListener('change', function(event){
+    if( event.target && event.target.classList.contains('checkButton') ){
+      // Obtener datos del elemento clickeado
+      const { total } = event.target.dataset;
+      setup.setTotal(total);
+    }
+  });
+
+  document.addEventListener('submit', function(event) {
+    if (event.target && event.target.id === 'formQuotation') {
+      event.preventDefault();    
+      const _loadContent = document.getElementById('loadContent');
+      const _formData     = new FormData(_formQuotation);
+      _formData.append('uuid', __uuid.value);
+      const _sendQuote   = document.getElementById('btnQuote');
+      _sendQuote.disabled = true;
+      _sendQuote.textContent = "Cotizando...";
+      _loadContent.innerHTML = setup.getLoader();
+      
+      Swal.fire({
+        title: "Procesando solicitud...",
+        text: "Por favor, espera mientras se realiza la cotización.",
+        allowOutsideClick: false,
+        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+  
+      fetch('/tpv/quote', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': csrfToken,
+          'Accept': 'application/json'
+        },
+        body: _formData
+      })
+      .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw err; });
+          }        
+          return response.text();
+      })
+      .then(data => {
+        Swal.close();
+        
+        // Mostrar resultado
+        loadContent.innerHTML = data;
+        window.scrollTo({
+          top: _loadContent.offsetTop,
+          behavior: 'smooth'
+        });
+    
+        // Ejecutar función adicional si existe
+        if (typeof loaderSites === 'function') {
+          loaderSites();
+        }
+
+        $('.selectpicker').selectpicker({
+          liveSearch: true,
+          liveSearchNormalize: true,
+          size: 'integer'
+        });
+    
+        _sendQuote.disabled = false;
+        _sendQuote.textContent = "Cotizar";
+      })
+      .catch(error => {
+        Swal.fire(
+          '¡ERROR!',
+          error.message || 'Ocurrió un error',
+          'error'
+        );
+        _sendQuote.disabled = false;
+        _sendQuote.textContent = "Cotizar";
+        _loadContent.innerHTML = "";
+      });
+    }
+
+    if (event.target && event.target.id === 'formReservation') {
+      event.preventDefault();
+      const _formReservation = document.getElementById('formReservation');
+      const _formData     = new FormData(_formReservation);
+      _formData.append('uuid', __uuid.value);
+      const _sendReservation   = document.getElementById('sendReservation');
+      _sendReservation.disabled = true;
+      _sendReservation.textContent = "Enviando...";
+  
+      Swal.fire({
+        title: "Procesando solicitud...",
+        text: "Por favor, espera mientras se crea la reservación.",
+        allowOutsideClick: false,
+        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+  
+      fetch('/tpv/create', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': csrfToken,
+          'Accept': 'application/json'
+        },
+        body: _formData
+      })
+      .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw err; });
+          }        
+          return response.json();
+      })
+      .then(data => {
+        Swal.close();      
+        window.location.replace(`/reservations/detail/${data.config.id}`);
+        _sendReservation.disabled = false;
+        _sendReservation.textContent = "Enviar";
+      })
+      .catch(error => {
+        Swal.fire(
+          '¡ERROR!',
+          error.message || 'Ocurrió un error',
+          'error'
+        );
+        _sendReservation.disabled = false;
+        _sendReservation.textContent = "Enviar";
+      });
+    }
+  }, true); // <- el `true` activa "capturing" y sí detecta el submit
 });
 
-$(document).on("change", "#formSite", function() {
-  var selectedValue = $(this).val();
-  //$("#formTotal").attr("readonly", true);
-  
-  if(selectedValue == 2 || selectedValue == 4 || selectedValue == 5){
-    //$("#formTotal").attr("readonly", false);
-  }
-  $("#formTotal").attr("readonly", false);
-});
-
-function actionSite(__site){
-  const __reference = document.getElementById('formReference');
-  const selectedOption = __site.options[__site.selectedIndex];
-  // console.log(__site, selectedOption.getAttribute('data-type'));
-  
-  // if( __site.value == "9" || __site.value == "14" || __site.value == "16" ){
-  if( selectedOption.getAttribute('data-type') == "AGENCY" ){
-    __reference.removeAttribute('readonly');
-  }else{
-    __reference.setAttribute('readonly', true);
+function loaderSites(){
+  const __site = document.getElementById('formSite');
+  if( __site != null ){
+    setup.actionSite(__site);
+    __site.addEventListener('change', function(event){
+      event.preventDefault();
+      setup.actionSite(__site);    
+    });
   }
 }

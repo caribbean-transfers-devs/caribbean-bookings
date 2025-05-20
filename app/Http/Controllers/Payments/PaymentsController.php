@@ -11,9 +11,11 @@ use App\Traits\RoleTrait;
 
 class PaymentsController extends Controller
 {
+    use RoleTrait;
+
     public function store(PaymentRequest $request, PaymentRepository $paymentRepository)
     {
-        if(RoleTrait::hasPermission(14)){
+        if($this->hasPermission(14)){
             return $paymentRepository->store($request);
         }
     }
@@ -25,14 +27,14 @@ class PaymentsController extends Controller
 
     public function update(PaymentRequest $request, PaymentRepository $paymentRepository,Payment $payment)
     {
-        if(RoleTrait::hasPermission(15)){
+        if($this->hasPermission(15)){
             return $paymentRepository->update($request,$payment);
         }
     }
 
     public function destroy(Request $request, PaymentRepository $paymentRepository,Payment $payment)
     {
-        if(RoleTrait::hasPermission(16)){
+        if($this->hasPermission(16)){
             return $paymentRepository->destroy($request,$payment);
         }
     }

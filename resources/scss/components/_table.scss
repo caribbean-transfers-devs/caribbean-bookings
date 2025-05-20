@@ -1,0 +1,64 @@
+.table-responsive {
+    border-radius: 8px; 
+}  
+
+table.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: "Poppins", serif;
+    border-radius: 5px;
+    margin: 0;
+    overflow: hidden; // Asegura que el borde redondeado aplique a la tabla
+
+    thead, tfoot {
+        tr{
+            th {
+                background-color: rgba(251, 86, 7, 0.72) !important; // Fondo azul claro
+                padding: 0.5rem; /*8px*/
+                font-size: 0.688rem; /*11px*/
+                color: #16161D;
+                text-align: left;
+                border: 1px solid #CCD6EB; // Bordes claros
+
+                &:first-child {
+                    font-weight: 600; // Estatus en negrita
+                }
+            }
+        }
+    }
+
+    tbody {
+        tr {
+            th, td {
+            padding: 0.5rem;
+            font-size: 0.688rem;
+            color: #425466;
+            text-align: left;
+            border: 1px solid #CCD6EB; // Bordes sutiles
+
+            > a, > a p{
+                font-size: 0.688rem;
+                font-weight: 400;
+                color: #425466;
+                text-align: left;
+                margin: 0 !important;
+            }
+
+            &:first-child {
+                font-weight: 400;
+            }
+            }
+        }
+    }
+
+    tfoot {
+        tr {
+            th, td {
+            background-color: rgba(218, 218, 218, 1) !important; // Fondo verde claro para el total
+                &:first-child {
+                    font-weight: 400;
+                }
+            }
+        }
+    }
+}

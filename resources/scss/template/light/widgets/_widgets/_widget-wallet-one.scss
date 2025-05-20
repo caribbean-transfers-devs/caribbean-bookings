@@ -4,30 +4,31 @@
           Account Info
       =====================
   */
-  body.dark {
+  // body.dark {
     .widget {
       &.widget-wallet-one {
         .wallet-title {
           letter-spacing: 0px;
           font-size: 18px;
           display: block;
-          color: #e0e6ed;
+          color: #0e1726;
           font-weight: 600;
           margin-bottom: 0;
         }
       
         .total-amount {
           font-size: 38px;
-          color: #888ea8;
+          color: #191e3a;
           font-weight: 600;
         }
       
         .wallet-text {
-          color: #d3d3d3;
-          letter-spacing: 2px;
+          color: #506690;
+          letter-spacing: 1px;
+          font-weight: 700;
       
           &:hover {
-            color: #22c7d5;
+            color: $primary;
           }
       
           svg {
@@ -52,7 +53,7 @@
           }
       
           &.list-group-media .list-group-item .media .media-body h6 {
-            color: #e0e6ed;
+            color: #0e1726;
             font-weight: 500;
           }
       
@@ -64,4 +65,4 @@
         }
       }
     }
-  }
+  // }

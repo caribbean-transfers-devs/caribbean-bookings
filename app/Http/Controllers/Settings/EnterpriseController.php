@@ -16,6 +16,8 @@ use App\Traits\RoleTrait;
 
 class EnterpriseController extends Controller
 {
+    use RoleTrait;
+    
     private $EnterpriseRepository;
 
     public function __construct(EnterpriseRepository $EnterpriseRepository)
@@ -25,7 +27,7 @@ class EnterpriseController extends Controller
 
     public function index(Request $request)
     {
-        if(RoleTrait::hasPermission(73)){
+        if($this->hasPermission(73)){
             return $this->EnterpriseRepository->index($request);
         }
     }

@@ -1,4 +1,4 @@
-const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 const language = document.documentElement.lang;
 const _LOCAL_URL = window.location.origin;
 const __loading = document.getElementById('content');
@@ -38,7 +38,7 @@ let components = {
         tb_var.on("change", "tbody tr .new-control", function() {
             $(this).parents("tr").toggleClass("active")
         })
-    },    
+    },
 
     /**
      * ===== Render Table Settings ===== *
@@ -82,9 +82,16 @@ let components = {
             }];
         }
 
-        _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-12 col-lg-8 d-flex flex-column flex-sm-row justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3 ms-lg-3'B>><'col-12 col-sm-12 col-lg-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
-                        <'table-responsive'tr>
-                        <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;                        
+        // _settings.dom = `<'dt--top-section'<'row'<'col-12 col-sm-12 col-lg-8 d-flex flex-column flex-sm-row justify-content-sm-start justify-content-center'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center ms-3 ms-lg-3'B>><'col-12 col-sm-12 col-lg-4 d-flex justify-content-sm-end justify-content-center mt-sm-0 mt-3'f>>>
+        //                 <'table-responsive'tr>
+        //                 <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+
+
+        _settings.dom = `<'dt--top-section'<''<'left'l<'dt--pages-count align-self-center'i><'dt-action-buttons align-self-center'B>><'right'f>>>
+                         <'scroll-wrapper'<'scroll-inner'>>
+                         <'table-responsive'tr>
+                         <'dt--bottom-section d-sm-flex justify-content-sm-between text-center'<'dt--pagination'p>>`;
+
         _settings.deferRender = true;
         _settings.responsive = false; // La tabla sigue siendo responsive
         _settings.buttons =  _buttons;
@@ -96,7 +103,6 @@ let components = {
         }else{
             _settings.paging = false;
         }
-        // _settings.stateSave = false;
 
         if( action == "fixedheader" || action == "fixedheaderPagination" || action == "fixedheaderPaginationCheck" ){
             _settings.fixedHeader = true; // Deshabilita FixedHeader si estaba habilitado
@@ -143,7 +149,7 @@ let components = {
             table.on('draw', function () {
                 __table_render.columns.adjust();
             });
-        }    
+        }       
     },
 
     actionTableChart: function(table, section = "general"){
@@ -153,12 +159,12 @@ let components = {
         _settings.deferRender = true;
         _settings.responsive = false;
         if (section == "driver") {
-            _settings.order = [[3, 'desc']];
+            _settings.order = [[2, 'desc']];
             // _settings.scrollX = true;     // Mantén el scroll horizontal si es necesario
         }else if(section == "commissions"){
             _settings.order = [[1, 'desc']];
-        }else{
-            _settings.order = [[2, 'desc']];
+        }else if(section == "general"){
+            _settings.order = [[1, 'desc']];
         }
         _settings.paging = false; // Si no quieres paginación, puedes dejar esto en false
         _settings.oLanguage = {
@@ -426,20 +432,61 @@ let components = {
     },
 
     loadScreen: function(){
-        // let __body = document.querySelector('body');
-        // let __div = document.createElement("div");
-        // __div.setAttribute('id', 'load_screen');
-        // __div.innerHTML = '<div class="loader"> <div class="loader-content"><img src="/assets/img/logos/brand_white.png" alt="loading" class="img-fluid" width="220"><img src="/assets/img/loader.gif" alt="loading"><p class="text-white mb-0" style="font-size: 16px;">' + this.getTranslation('loading.message') + '</p></div></div>';
-        // __body.insertBefore(__div, __body.firstChild);
         __load_screen.classList.remove('d-none');
     },
 
     removeLoadScreen(){
-        // let __load_screen = document.getElementById("load_screen");
         if( __load_screen != null ){
-            // document.body.removeChild(load_screen);
             __load_screen.classList.add('d-none');
         }
+    },
+
+    debounce: function(func, delay) {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    },
+
+    titleModalFilter: function(){
+        const __create = document.querySelector('.__btn_create'); //* ===== BUTTON TO CREATE ===== */
+        const __title_modal = document.getElementById('filterModalLabel');
+
+        if( __create != null ){
+            __create.addEventListener('click', function () {
+                __title_modal.innerHTML = this.dataset.title;
+            });
+        }
+    },
+
+    titleModalCharts: function(){
+        const __titleModalCharts = document.getElementById('chartsModalLabel');
+        const __breadcrumItem = document.querySelector('.breadcrumb-item strong');
+        __titleModalCharts.innerHTML = __breadcrumItem.textContent;
+    },
+
+    calendarFilter: function(){
+        if ( document.getElementById('lookup_date') ) {
+            const picker = new easepick.create({
+                element: "#lookup_date",
+                css: [
+                    'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+                    'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+                    'https://cdn.jsdelivr.net/npm/@easepick/range-plugin@1.2.1/dist/index.css',
+                ],
+                zIndex: 10,
+                plugins: ['RangePlugin'],
+            });
+
+            // Obtener el input y verificar si tiene valor
+            const input = document.getElementById('lookup_date');
+            if (!input.value) {
+                const today = new Date().toISOString().split('T')[0]; // Fecha en formato YYYY-MM-DD
+                picker.setDate(today); // Asigna la fecha al picker
+                input.value = today + ' - ' + today; // Asigna la fecha al input
+            }
+        }       
     },
 
     actionButtonColumns: function(){
@@ -615,7 +662,27 @@ window.addEventListener("DOMContentLoaded", function() {
         __table_render.columns.adjust();
         __table_render.columns.adjust().draw();
         components.multiCheck(__table_render);
-    }    
+        // const scrollHint = document.querySelector('.scroll-hint');
+        // const tableResponsive = document.querySelector('.table-responsive');
+    
+        // // Crear un elemento fantasma para forzar el mismo ancho que la tabla
+        // const ghostElement = document.createElement('div');
+        // ghostElement.style.width = tableResponsive.scrollWidth + 'px';
+        // ghostElement.style.height = '10px';
+        // ghostElement.style.visibility = 'hidden';
+        // scrollHint.appendChild(ghostElement);
+    
+        // // Sincronizar scroll
+        // scrollHint.addEventListener('scroll', function() {
+        //     tableResponsive.scrollLeft = scrollHint.scrollLeft;
+        // });
+    
+        // // Actualizar el ancho si la tabla cambia (opcional, para datatables dinámicas)
+        // const observer = new MutationObserver(function() {
+        //     ghostElement.style.width = tableResponsive.scrollWidth + 'px';
+        // });
+        // observer.observe(tableResponsive, { childList: true, subtree: true });      
+    }
 });
 
 window.addEventListener('resize', function() {

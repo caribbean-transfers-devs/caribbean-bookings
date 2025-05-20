@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 //MODELS
 use App\Models\User;
+use App\Models\Site;
 use App\Models\OriginSale;
 use App\Models\Enterprise;
 use App\Models\Vehicle;
@@ -16,10 +17,16 @@ use App\Models\Zones;
 use App\Models\DestinationService;
 use App\Models\CancellationTypes;
 use App\Models\ExchangeRateReport;
+use App\Models\ExchangeRateCommission;
+use App\Models\SalesType;
+use App\Models\ContactPoints;
 
 trait FiltersTrait
 {
-    public function Exchange($in, $end){
+
+    //NOS TRAE EL TIPO DE CAMBIO DEPENDIENDO DE LA FECHA, PARA LOS REPORTES
+    public function Exchange($in, $end)
+    {
         $in = ( isset($in) ? $in : date('Y-m-d') );
         $end = ( isset($in) ? $in : date('Y-m-d') );
         $report = ExchangeRateReport::where('status', 1)->where('date_init', '<=', $in)
@@ -33,16 +40,58 @@ trait FiltersTrait
         }
     }
 
-    public function Users(){
+    public function ExchangeCommission($in, $end)
+    {
+        $in = ( isset($in) ? $in : date('Y-m-d') );
+        $end = ( isset($in) ? $in : date('Y-m-d') );
+        $report = ExchangeRateCommission::where('status', 1)->where('date_init', '<=', $in)
+                                ->where('date_end', '>=', $end)
+                                ->first();
+
+        if ($report) {
+            return $report->exchange; // Ejemplo: 25.50
+        } else {
+            return 18;
+        }
+    }
+
+    public function PercentageCommissionInvestment()
+    {
+        return 20; // Ejemplo: 20.00
+    }
+
+    public function Users()
+    {
         return User::where('status', 1)->get();
     }
 
-    public function Enterprises(){
+    //NOS TRAE LOS AGENTES DE CALL CENTER
+    public function CallCenterAgent(array $status = [])
+    {
+        $status = array_filter($status, fn($id) => is_numeric($id) && ctype_digit((string) $id));
+
+        // Base de la consulta
+        $query = User::where('is_commission', 1)->with('target');
+
+        // Si hay usuarios filtrados, aplicar whereIn
+        if (!empty($status)) {
+            $query->whereIn('status', $status);
+        }
+
+        return $query->get()->prepend((object)[
+            "id" => 0,
+            "name" => "System"
+        ]);
+    }
+
+    public function Enterprises()
+    {
         return Enterprise::all();
     }
 
     //TIPO DE SERVICIO
-    public function Services(){
+    public function Services()
+    {
         return array(
             "0" => "One Way",
             "1" => "Round Trip",
@@ -50,40 +99,41 @@ trait FiltersTrait
     }
 
     //SITIOS O AGENCIAS
-    public function Sites(){
-        return DB::select("SELECT id, name as site_name FROM sites ORDER BY site_name ASC");
+    public function Sites()
+    {
+        // return DB::select("SELECT id, name, type_site FROM sites ORDER BY name ASC");
+        return Site::select('id', 'name', 'type_site', 'transactional_phone', 'transactional_email')
+                        ->orderByRaw("FIELD(name LIKE '%[CS]%', 1) DESC")
+                        ->orderBy('name')
+                        ->get();
     }
 
-    public function Origins(){
-        $origins[] = (object) array(
+    public function Origins()
+    {
+        return OriginSale::select('id', 'code')->get()->prepend((object)[
             "id" => 0,
             "code" => "PAGINA WEB"
-        );        
-        $data = OriginSale::All();
-        if( !empty($data) ){
-            foreach ($data as $key => $value) {
-                $origins[] = $value;
-            }
-        }
-        
-        // dd($origins);        
-        return $origins;
+        ]);
     }
 
     //ESTATUS DE RESERVACIÓN
-    public function reservationStatus(){
+    public function reservationStatus()
+    {
         return array(
             "CONFIRMED" => "Confirmado",
+            "PAY_AT_ARRIVAL" => "Pago a la llegada",
             "PENDING" => "Pendiente",
             "CREDIT" => "Crédito",
             "OPENCREDIT" => "Credito abierto",
             "CANCELLED" => "Cancelado",
             "DUPLICATED" => "Duplicado",
+            "QUOTATION" => "Cotización",
         );
     }
 
     //TIPO DE SERVICIO EN OPERACIÓN
-    public function servicesOperation(){
+    public function servicesOperation()
+    {
         return array(
             "ARRIVAL" => "Llegada",
             "DEPARTURE" => "Salida",
@@ -92,17 +142,30 @@ trait FiltersTrait
     }
 
     //TIPO DE VEHÍCULO
-    public function Vehicles(){
-        return DestinationService::all();
+    public function Vehicles()
+    {
+        return DestinationService::get();
     }
 
     //ZONAS DE ORIGEN Y DESTINO
-    public function Zones(){
-        return Zones::all();;
+    /**
+     * Se evita llamar Zones::all() cuando hay un filtro.
+     * Se usa query() para construir dinámicamente la consulta.
+     */
+    public function Zones($destination_id = NULL)
+    {
+        $query = Zones::query();
+
+        if ($destination_id) {
+            $query->where('destination_id', $destination_id);
+        }
+    
+        return $query->get();
     }
 
     //ESTATUS DE SERVICIO
-    public function statusOperationService(){
+    public function statusOperationService()
+    {
         return array(
             "PENDING" => "Pendiente",
             "COMPLETED" => "Completado",
@@ -111,26 +174,56 @@ trait FiltersTrait
         );
     }
 
-    //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADO COMO LOS VEHICULOS QUE TENEMOS
-    public function Units($action = "filters"){
-        if( $action == "filters" ){
-            return Vehicle::all();
-        }else{
-            return Vehicle::where('status',1)->get();
+    //SON LA UNIDADES QUE SE ASIGNAN EN LA OPERACIÓN, PERO QUE SON CONSIDERADOS COMO LOS VEHICULOS QUE TENEMOS
+    // SI LE MANDAMOS EL PARAMERO ACTION COMO FILTERS, NOS TRAE TODAS LAS UNIDADES SI IMPORTAR QUE ESTEN INACTIVAS
+    // SI LE MANDAMOS EL PARAMERO ACTION COMO DIFERENTE DE FILTERS, NOS TRAE TODAS LAS UNIDADES QUE SOLO ESTEN ACTIVAS
+    /**
+     * Se optimizó la consulta con query() en lugar de if separado.
+     * Se asegura de usar Eager Loading para relaciones.
+     */
+    public function Units(array $status = []):object
+    {
+        $query = Vehicle::select(['id', 'enterprise_id', 'destination_service_id', 'destination_id', 'name', 'status'])
+            ->with([
+                'enterprise:id,names',
+                'destination_service:id,name',
+                'destination:id,name'
+            ]);
+    
+        $query->whereIn('status', $status ?: [1]);
+    
+        return $query->get();
+    }   
+
+    public function Units2($action = "filters")
+    {
+        $query = Vehicle::with(['enterprise', 'destination_service', 'destination']);
+
+        if ($action !== "filters") {
+            $query->where('status', 1);
         }
+    
+        return $query->get();
     }
 
     //CONDUCTOR
-    public function Drivers($action = "filters"){
-        if( $action == "filters" ){
-            return Driver::orderBy('names','ASC')->get();
-        }else{
-            return Driver::where('status',1)->orderBy('names','ASC')->get();
+    /**
+     * Se usa query() para construir la consulta más eficiente.
+     */
+    public function Drivers($action = "filters")
+    {
+        $query = Driver::with(['destination', 'enterprise'])->orderBy('names', 'ASC');
+
+        if ($action !== "filters") {
+            $query->where('status', 1);
         }
+    
+        return $query->get();
     }
 
     //ESTATUS DE OPERACIÓN
-    public function statusOperation(){
+    public function statusOperation()
+    {
         return array(
             "PENDING" => "Pendiente",
             "E" => "E",
@@ -140,15 +233,18 @@ trait FiltersTrait
     }    
     
     //ESTATUS DE PAGO DE RESERVACIÓN
-    public function paymentStatus(){
+    public function paymentStatus()
+    {
         return array(
             "PAID" => "Pagado",
+            "CREDIT" => "Crédito",
             "PENDING" => "Pendiente",
         );
     }
 
     //MONEDA DE RESERVACIÓN
-    public function Currencies(){
+    public function Currencies()
+    {
         return array(
             "USD" => "USD",
             "MXN" => "MXN",
@@ -156,9 +252,12 @@ trait FiltersTrait
     }
     
     //METODO DE PAGO DE RESERVACIÓN
-    public function Methods(){
+    public function Methods()
+    {
         return array(
-            "CASH" => "CASH",
+            "CREDIT" => "CREDITO",
+            "CASH" => "EFECTIVO",
+            "SANTANDER" => "SANTANDER",
             "STRIPE" => "STRIPE",
             "PAYPAL" => "PAYPAL",
             "MIFEL" => "MIFEL",
@@ -166,8 +265,28 @@ trait FiltersTrait
     }
 
     //MOTIVOS DE CANCELACIÓN
-    public function CancellationTypes(){
+    public function CancellationTypes()
+    {
         return CancellationTypes::where('status',1)->get();
+    }
+
+    public function TypeSales()
+    {
+        return SalesType::all();
+    }
+
+    /**
+     * Se evita llamar where() si $destination_id es NULL.
+     * Se usa query() para construir dinámicamente la consulta.
+     */
+    public function ContactPoints($destination_id = NULL){
+        $query = ContactPoints::query();
+
+        if ($destination_id) {
+            $query->where('destination_id', $destination_id);
+        }
+    
+        return $query->get();
     }
 
     public function parseArrayQuery($data, $marks = NULL){

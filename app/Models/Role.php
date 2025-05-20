@@ -11,6 +11,8 @@ class Role extends Model
 
     public $timestamps = false;
 
+    protected $fillable = ['role']; // Agrega aquí los campos que deseas permitir
+
     /**
      * Relations
      */

@@ -1,0 +1,95 @@
+@import "../../../plugins/table/datatable/datatables5";
+@import "../../../plugins/apex/apexcharts.scss";
+// @import "../../template/plugins/light/table/datatable/custom_dt";
+
+@import '../../template/light/widgets/_widgets/reset-analytics';
+@import '../../template/light/widgets/_widgets/widget-card-four';
+@import '../../template/light/widgets/_widgets/widget-card-five';
+
+@import '../../template/light/widgets/_widgets/reset-sales';
+@import '../../template/light/widgets/_widgets/widget-wallet-one';
+@import '../../template/light/widgets/_widgets/widget-chart-one';
+
+@import '../../template/light/components/modal';
+
+@import '../../components/filters';
+@import '../../components/charts_new2';
+@import '../../components/table';
+@import '../../components/loaders';
+
+//LLAMAMOS ESTILOS DE OTRA VISTA
+@import '../../sections/management/aftersales';
+
+.items-button{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+  row-gap: 16px;
+
+  > button{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    font-size: 0.875rem;
+    @media (min-width: 992px) {
+      flex-direction: column;
+    }
+    @media (min-width: 1200px) {
+      flex-direction: row;
+    }
+  }
+  @media (min-width: 992px) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+.card .card-title{
+  font-size: 18px;
+}
+
+.container-loader{
+  text-align: center;
+  color: #000;
+}
+
+#revenueMonthly{
+  font-size: 40px;
+}
+
+.callcenter-container{ font-family: "Poppins", serif; }
+
+.callcenter-container{ 
+  p.value .container-loader, .w-progress-stats .container-loader, .list-group-media .container-loader{
+    font-size: 25px !important;
+  }
+
+  .widget.widget-wallet-one{
+    .list-group{
+      display: flex;
+
+      .list-group-item{
+        border: 1px solid #000;
+        padding: 0.5rem;
+        color: #000;
+
+        p, h6{
+          color: #000;
+          margin: 0;
+        }
+        .tx-inverse{
+          font-size: 0.875rem; /*14*/
+        }      
+        p.amount{
+          top: 8%;
+          right: 3%;
+          font-size: 1rem;
+        }
+
+        &.active{
+          p, h6{
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+}

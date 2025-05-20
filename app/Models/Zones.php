@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Zones extends Model
 {
     use HasFactory;
+
+    public function destination()
+    {
+        return $this->belongsTo(Destination::class, 'destination_id', 'id');
+    }    
 }

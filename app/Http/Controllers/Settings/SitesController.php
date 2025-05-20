@@ -11,12 +11,16 @@ use App\Http\Requests\SiteRequest;
 //REPOSITORY
 use App\Repositories\Settings\SitesRepository;
 
-
 //TRAITS
 use App\Traits\RoleTrait;
 
+//MODELS
+use App\Models\Site;
+
 class SitesController extends Controller
 {
+    use RoleTrait;
+    
     private $SitesRepository;
 
     public function __construct(SitesRepository $SitesRepository)
@@ -26,7 +30,7 @@ class SitesController extends Controller
 
     public function index(Request $request)
     {
-        if(RoleTrait::hasPermission(102)){
+        if($this->hasPermission(102)){
             return $this->SitesRepository->index($request);
         }
     }

@@ -1,5 +1,8 @@
+@php
+    $typeSales = auth()->user()->TypeSales();
+@endphp
 <div class="modal fade" id="serviceSalesModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Agregar venta</h5>
@@ -8,34 +11,26 @@
             <div class="modal-body">
                 <form id="frm_new_sale">
                     <div class="row">
-                        <div class="col-sm-12 col-md-6">
+                        <div class="col-sm-12 col-md-4">
                             <label class="form-label" for="new_sale_type_id">Tipo</label>
                             <select class="form-select mb-2" id="new_sale_type_id" name="sale_type_id">
-                                @foreach($types as $type)
+                                @foreach($typeSales as $type)
                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-sm-12 col-md-6">
+                        <div class="col-sm-12 col-md-4">
                             <label class="form-label" for="new_sale_description">Descripción</label>
                             <input type="text" class="form-control mb-2" id="new_sale_description" name="description">
                         </div>
-                        <div class="col-sm-12 col-md-6">
+                        {{-- <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="new_sale_quantity">Cantidad</label>
                             <input type="number" class="form-control mb-2" id="new_sale_quantity" name="quantity">
-                        </div>
-                        <div class="col-sm-12 col-md-6">
+                        </div> --}}
+                        <div class="col-sm-12 col-md-4">
                             <label class="form-label" for="new_sale_total">Total</label>
                             <input type="number" class="form-control mb-2" id="new_sale_total" name="total">
                         </div>
-                        {{-- <div class="col-sm-12 col-md-12">
-                            <label class="form-label" for="new_sale_agent_id">Agente</label>
-                            <select class="form-select mb-2" id="new_sale_agent_id" name="call_center_agent_id"> 
-                                @foreach($sellers as $agent)
-                                    <option value="{{ $agent->id }}">{{ $agent->name }}</option>
-                                @endforeach
-                            </select>
-                        </div> --}}
                     </div>
                     <input type="hidden" name="reservation_id" value="{{ $reservation_id }}">
                 </form>
@@ -44,7 +39,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="btn_new_sale" onclick="saveSale()">Guardar</button>
+                <button type="button" class="btn btn-primary" id="btn_new_sale">Guardar</button>
             </div>
         </div>
     </div>

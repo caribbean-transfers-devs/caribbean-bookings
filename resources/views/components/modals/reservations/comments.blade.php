@@ -20,7 +20,7 @@
                                 Agregar o editar comentario
                             </a>
                         </li>
-                        @if (RoleTrait::hasPermission(64))
+                        @if (auth()->user()->hasPermission(64))
                             <li class="nav-item">
                                 <a class="nav-link" style="display:flex; align-items:center; gap:5px;" href="#icon-tab-2" data-bs-toggle="tab" role="tab">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
@@ -47,9 +47,9 @@
                                 </div>
                             </form>                        
                         </div>
-                        @if (RoleTrait::hasPermission(64))
+                        @if (auth()->user()->hasPermission(64))
                             <div class="tab-pane" id="icon-tab-2" role="tabpanel">
-                                @if (RoleTrait::hasPermission(64))
+                                @if (auth()->user()->hasPermission(64))
                                     <form id="upload-form" class="dropzone" action="/reservations/upload">
                                         @csrf
                                         <input type="hidden" name="type_action" id="type_action" value="upload">

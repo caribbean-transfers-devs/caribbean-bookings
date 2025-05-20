@@ -25,7 +25,7 @@ class SitesRepository
                         "active" => false
                     ],                    
                 ],
-                'sites' => Site::all()
+                'sites' => Site::with('enterprise')->get()
             ]);
         } catch (Exception $e) {
         }
@@ -40,7 +40,7 @@ class SitesRepository
                         "route" => route('sites.index'),
                         "name" => "Listado de sitios",
                         "active" => true
-                    ],                    
+                    ],
                     [
                         "route" => "",
                         "name" => "Crear un nuevo sitio",

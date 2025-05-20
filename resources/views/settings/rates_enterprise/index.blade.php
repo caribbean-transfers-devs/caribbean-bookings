@@ -2,8 +2,8 @@
 @section('title') Tarifas @endsection
 
 @push('Css')
-    <link href="{{ mix('/assets/css/sections/settings_rates_enterprise.min.css') }}" rel="preload" as="style">
-    <link href="{{ mix('/assets/css/sections/settings_rates_enterprise.min.css') }}" rel="stylesheet">
+    <link href="{{ mix('/assets/css/sections/settings/rates_enterprise.min.css') }}" rel="preload" as="style">
+    <link href="{{ mix('/assets/css/sections/settings/rates_enterprise.min.css') }}" rel="stylesheet">
 @endpush
 
 @push('Js')    

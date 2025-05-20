@@ -7,11 +7,20 @@ use Illuminate\Support\Facades\DB;
 
 trait QueryTrait
 {
-
-    // pay_at_arrival: INDICA PAGO A LA LLEGADA PORQUE ELIGIO LA OPCION DE PAGO EN EFECTIVO
-    public function queryBookings($query, $query2, $queryData){
+    /**
+     * UTILIZADO EN SECCION DE FINANZAS
+     */
+    public function queryRefunds($query, $query2, $queryData){
         $bookings = DB::select("SELECT 
-                                    rez.id AS reservation_id, 
+                                    refund.id,
+                                    refund.message_refund,
+                                    refund.response_message,
+                                    refund.status,
+                                    refund.end_at,
+                                    refund.link_refund,
+
+                                    rez.id AS reservation_id,
+                                    rez.categories,
                                     CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name,
                                     rez.client_email,
                                     rez.client_phone,
@@ -28,6 +37,15 @@ trait QueryTrait
                                     rez.open_credit,
                                     rez.is_complete,
                                     rez.created_at,
+                                    rez.is_quotation,
+                                    rez.was_is_quotation,
+                                    rez.campaign,
+                                    
+                                    us.id AS employee_code,
+                                    us.status AS employee_status,
+                                    us.name AS employee,
+                                    
+                                    site.id as site_code,
                                     site.type_site AS type_site,
                                     site.name AS site_name,
                                     origin.code AS origin_code,
@@ -48,20 +66,25 @@ trait QueryTrait
                                     SUM(it.passengers) as passengers,
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     SUM(it.is_round_trip) as is_round_trip,
+
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,                                    
-                                    COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+                                    COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance, -- si hay balance
                                     SUM(p.is_conciliated) as is_conciliated,
                                     CASE
-                                        WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
-                                        WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
-                                        WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
-                                        WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                        WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+                                        WHEN rez.is_cancelled = 1   THEN 'CANCELLED'
+                                        WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+                                        WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+                                        WHEN rez.is_quotation = 1   THEN 'QUOTATION'
+                                        WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
+                                        WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                         ELSE 'UNKNOWN'
                                     END AS reservation_status,
                                     CASE
+                                        WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                         WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
                                         ELSE 'PENDING'
                                     END AS payment_status,
@@ -69,19 +92,22 @@ trait QueryTrait
                                         DISTINCT 
                                         CASE
                                             WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
-                                            WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
-                                            ELSE 'CASH'
+                                            WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+                                            WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+                                            ELSE 'NO DEFENIDO'
                                         END
                                     ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                     GROUP_CONCAT(DISTINCT p.payment_details ORDER BY p.payment_details ASC SEPARATOR ', ') AS payment_details
-                                FROM reservations as rez
+                                FROM reservations_refunds as refund
+                                    INNER JOIN reservations as rez ON rez.id = refund.reservation_id
                                     INNER JOIN sites as site ON site.id = rez.site_id
+                                    LEFT OUTER JOIN users as us ON us.id = rez.call_center_agent_id
                                     LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
                                     LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id, 
-                                            ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+                                            ROUND(COALESCE(SUM(total), 0), 2) as total_sales
                                         FROM sales
                                             WHERE deleted_at IS NULL 
                                         GROUP BY reservation_id
@@ -105,6 +131,7 @@ trait QueryTrait
                                                     reference
                                             ) ORDER BY payment_method ASC SEPARATOR ', ') AS payment_details
                                         FROM payments
+                                            WHERE deleted_at IS NULL
                                         GROUP BY reservation_id, is_conciliated
                                     ) as p ON p.reservation_id = rez.id
                                     LEFT JOIN (
@@ -135,7 +162,249 @@ trait QueryTrait
                                         GROUP BY it.reservation_id, it.is_round_trip
                                     ) as it ON it.reservation_id = rez.id
                                     WHERE 1=1 {$query}
-                                GROUP BY rez.id, site.type_site, site.name, site.is_cxc {$query2}",
+                                GROUP BY refund.id, refund.message_refund, refund.status, refund.end_at, refund.link_refund, rez.id, site.id, site.type_site, site.name, site.is_cxc {$query2}",
+                                    $queryData);
+
+                                    //, site.is_cxc
+
+        if(sizeof( $bookings ) > 0):
+            usort($bookings, array($this, 'orderByDateTime'));
+        endif;
+
+        return $bookings;
+    }    
+
+    // pay_at_arrival: INDICA PAGO A LA LLEGADA PORQUE ELIGIO LA OPCION DE PAGO EN EFECTIVO
+    public function queryBookings($query, $query2, $queryData){
+        $bookings = DB::select("SELECT 
+                                    rez.id AS reservation_id, 
+                                    CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name,
+                                    rez.client_email,
+                                    rez.client_phone,
+                                    rez.currency,
+                                    rez.is_cancelled,
+                                    rez.is_commissionable,                                    
+                                    rez.site_id,
+                                    rez.pay_at_arrival,
+                                    rez.reference,
+                                    rez.affiliate_id,
+                                    rez.terminal,
+                                    rez.comments,
+                                    rez.is_duplicated,
+                                    rez.open_credit,
+                                    rez.is_complete,
+                                    rez.created_at,
+                                    rez.is_quotation,
+                                    rez.was_is_quotation,
+                                    rez.campaign,
+                                    rez.reserve_rating,
+                                    
+                                    us.id AS employee_code,
+                                    us.status AS employee_status,
+                                    us.name AS employee,
+
+                                    site.id as site_code,
+                                    site.type_site AS type_site,
+                                    site.name AS site_name,
+                                    origin.code AS origin_code,
+                                    tc.name_es AS cancellation_reason,
+                                    GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
+                                    GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
+                                    GROUP_CONCAT(DISTINCT it.zone_one_id ORDER BY it.zone_one_id ASC SEPARATOR ',') AS zone_one_id,
+                                    GROUP_CONCAT(DISTINCT it.from_name SEPARATOR ',') AS from_name,
+                                    GROUP_CONCAT(DISTINCT it.zone_two_name ORDER BY it.zone_two_name ASC SEPARATOR ',') AS destination_name_to,
+                                    GROUP_CONCAT(DISTINCT it.zone_two_id ORDER BY it.zone_two_id ASC SEPARATOR ',') AS zone_two_id,
+                                    GROUP_CONCAT(DISTINCT it.to_name SEPARATOR ',') AS to_name,
+                                    GROUP_CONCAT(DISTINCT it.service_type_id ORDER BY it.service_type_id ASC SEPARATOR ',') AS service_type_id,
+                                    GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
+                                    GROUP_CONCAT(DISTINCT it.pickup_from ORDER BY it.pickup_from ASC SEPARATOR ',') AS pickup_from,
+                                    GROUP_CONCAT(DISTINCT it.pickup_to ORDER BY it.pickup_to ASC SEPARATOR ',') AS pickup_to,
+                                    GROUP_CONCAT(DISTINCT it.one_service_status ORDER BY it.one_service_status ASC SEPARATOR ',') AS one_service_status,
+                                    GROUP_CONCAT(DISTINCT it.two_service_status ORDER BY it.two_service_status ASC SEPARATOR ',') AS two_service_status,
+                                    SUM(it.passengers) as passengers,
+                                    COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
+                                    SUM(it.is_round_trip) as is_round_trip,
+                                    MAX(it.is_same_day_round_trip) AS is_same_day_round_trip,
+
+                                    COALESCE(SUM(s.total_sales), 0) as total_sales,
+                                    COALESCE(SUM(s.total_sales_credit), 0) as total_sales_credit,
+                                    COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                    COALESCE(SUM(p.total_payments_credit), 0) as total_payments_credit,
+                                    p.credit_conciliation_status as credit_conciliation_status,
+                                    COALESCE(p.credit_payment_ids) AS credit_payment_ids,
+
+                                    GROUP_CONCAT(DISTINCT p.credit_references_agency ORDER BY p.credit_references_agency ASC SEPARATOR ', ') AS credit_references_agency,
+                                    GROUP_CONCAT(DISTINCT p.credit_references_payment ORDER BY p.credit_references_payment ASC SEPARATOR ', ') AS credit_references_payment,
+                                    GROUP_CONCAT(DISTINCT p.credit_comments ORDER BY p.credit_comments ASC SEPARATOR ', ') AS credit_comments,
+                                    GROUP_CONCAT(DISTINCT p.credit_conciliation_dates ORDER BY p.credit_conciliation_dates ASC SEPARATOR ', ') AS credit_conciliation_dates,
+                                    GROUP_CONCAT(DISTINCT p.credit_deposit_dates ORDER BY p.credit_deposit_dates ASC SEPARATOR ', ') AS credit_deposit_dates,
+
+                                    COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+
+                                    -- Información de reembolsos
+                                    CASE WHEN rr.reservation_id IS NOT NULL THEN 1 ELSE 0 END as has_refund_request,
+                                    COALESCE(rr.refund_count, 0) as refund_request_count,
+                                    CASE 
+                                        WHEN rr.reservation_id IS NULL THEN 'NO_REFUND'
+                                        WHEN rr.pending_refund_count > 0 THEN 'REFUND_REQUESTED'
+                                        ELSE 'REFUND_COMPLETED'
+                                    END as refund_status,
+                                    CASE
+                                        WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+                                        WHEN rez.is_cancelled = 1   THEN 'CANCELLED'
+                                        WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+                                        WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+                                        WHEN rez.is_quotation = 1   THEN 'QUOTATION'
+                                        WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
+                                        WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
+                                        ELSE 'UNKNOWN'
+                                    END AS reservation_status,
+                                    CASE
+                                        WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
+                                        ELSE 'PENDING'
+                                    END AS payment_status,
+                                    GROUP_CONCAT(
+                                        DISTINCT 
+                                        CASE
+                                            WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
+                                            WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+                                            WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+                                            ELSE 'SIN METODO DE PAGO'
+                                        END
+                                    ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                    GROUP_CONCAT(DISTINCT p.payment_details ORDER BY p.payment_details ASC SEPARATOR ', ') AS payment_details
+                                FROM reservations as rez
+                                    INNER JOIN sites as site ON site.id = rez.site_id
+                                    LEFT OUTER JOIN users as us ON us.id = rez.call_center_agent_id
+                                    LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
+                                    LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
+                                    
+                                    -- Nuevos JOINs para la tabla de reembolsos
+                                    LEFT OUTER JOIN (
+                                        SELECT 
+                                            reservation_id,
+                                            COUNT(*) as refund_count,
+                                            SUM(CASE WHEN status != 'REFUND_COMPLETED' THEN 1 ELSE 0 END) as pending_refund_count
+                                        FROM reservations_refunds
+                                        GROUP BY reservation_id
+                                    ) as rr ON rr.reservation_id = rez.id
+                                    -- JOINs para tabla de ventas (sales)
+                                    LEFT JOIN (
+                                        SELECT 
+                                            reservation_id, 
+                                            ROUND( COALESCE(SUM(total), 0), 2) as total_sales,
+                                            ROUND(COALESCE(SUM(CASE WHEN sale_type_id = 1 THEN total ELSE 0 END), 0), 2) AS total_sales_credit
+                                        FROM sales
+                                            WHERE deleted_at IS NULL 
+                                        GROUP BY reservation_id
+                                    ) as s ON s.reservation_id = rez.id
+                                    -- JOINs para tabla de pagos (payments)
+                                    LEFT JOIN (
+                                        SELECT 
+                                            reservation_id,
+                                            is_conciliated,
+                                            -- ROUND(SUM(CASE 
+                                            --     WHEN operation = 'multiplication' THEN total * exchange_rate
+                                            --     WHEN operation = 'division' THEN total / exchange_rate
+                                            --     ELSE total END), 2) AS total_payments,
+
+                                            ROUND(SUM(CASE
+                                                WHEN category IN ('PAYOUT', 'PAYOUT_CREDIT_PAID') THEN 
+                                                    CASE 
+                                                        WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                        WHEN operation = 'division' THEN total / exchange_rate
+                                                        ELSE total 
+                                                    END
+                                                ELSE 0
+                                            END), 2) AS total_payments,
+
+                                            ROUND(SUM(CASE
+                                                WHEN category IN ('PAYOUT_CREDIT_PENDING', 'PAYOUT_CREDIT_PAID') THEN 
+                                                    CASE 
+                                                        WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                        WHEN operation = 'division' THEN total / exchange_rate
+                                                        ELSE total 
+                                                    END
+                                                ELSE 0
+                                            END), 2) AS total_payments_credit,
+
+                                            CONCAT(
+                                                '[',
+                                                    GROUP_CONCAT(
+                                                        DISTINCT 
+                                                        CASE 
+                                                            WHEN payment_method = 'CREDIT' OR payment_method LIKE '%CREDIT%' THEN id
+                                                            ELSE NULL
+                                                        END
+                                                        ORDER BY id ASC
+                                                        SEPARATOR ','
+                                                    ),
+                                                ']'
+                                            ) AS credit_payment_ids,
+                                            -- Conciliación para créditos
+                                            CASE 
+                                                WHEN MAX(CASE WHEN category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN is_conciliated END) = 2 THEN 'pre-reconciled'
+                                                WHEN MAX(CASE WHEN category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN is_conciliated END) = 1 THEN 'reconciled'
+                                                WHEN MAX(CASE WHEN category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN is_conciliated END) = 3 THEN 'cxc'
+                                                ELSE NULL
+                                            END AS credit_conciliation_status,
+                                            -- NUEVOS CAMPOS desde categorías de crédito específico
+                                            GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN reference_invoice END SEPARATOR ', ') AS credit_references_agency,
+                                            GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN reference END SEPARATOR ', ') AS credit_references_payment,
+                                            GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN conciliation_comment END SEPARATOR ', ') AS credit_comments,
+                                            GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(date_conciliation, '%Y-%m-%d') END SEPARATOR ', ') AS credit_conciliation_dates,
+                                            GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(deposit_date, '%Y-%m-%d') END SEPARATOR ', ') AS credit_deposit_dates,
+                                            
+
+                                            GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
+                                            GROUP_CONCAT(
+                                                DISTINCT CONCAT(
+                                                    payment_method, ' | ', 
+                                                    ROUND(CASE 
+                                                        WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                        WHEN operation = 'division' THEN total / exchange_rate
+                                                        ELSE total END, 2), ' | ', 
+                                                    reference
+                                            ) ORDER BY payment_method ASC SEPARATOR ', ') AS payment_details
+                                        FROM payments
+                                            WHERE deleted_at IS NULL
+                                        GROUP BY reservation_id, is_conciliated
+                                    ) as p ON p.reservation_id = rez.id
+                                    -- JOINs para tabla de items de reservacion (reservations_items)
+                                    LEFT JOIN (
+                                        SELECT  
+                                            it.reservation_id, 
+                                            it.is_round_trip,
+                                            SUM(it.passengers) as passengers,
+                                            GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS code,
+                                            GROUP_CONCAT(DISTINCT zone_one.name ORDER BY zone_one.name ASC SEPARATOR ',') AS zone_one_name,
+                                            GROUP_CONCAT(DISTINCT zone_one.id ORDER BY zone_one.id ASC SEPARATOR ',') AS zone_one_id,
+                                            GROUP_CONCAT(DISTINCT it.from_name SEPARATOR ',') AS from_name,
+                                            GROUP_CONCAT(DISTINCT zone_two.name ORDER BY zone_two.name ASC SEPARATOR ',') AS zone_two_name, 
+                                            GROUP_CONCAT(DISTINCT zone_two.id ORDER BY zone_two.id ASC SEPARATOR ',') AS zone_two_id,
+                                            GROUP_CONCAT(DISTINCT it.to_name SEPARATOR ',') AS to_name,
+                                            GROUP_CONCAT(DISTINCT dest.id ORDER BY dest.id ASC SEPARATOR ',') AS service_type_id,
+                                            GROUP_CONCAT(DISTINCT dest.name ORDER BY dest.name ASC SEPARATOR ',') AS service_type_name,
+                                            GROUP_CONCAT(DISTINCT it.op_one_pickup ORDER BY it.op_one_pickup ASC SEPARATOR ',') AS pickup_from,
+                                            GROUP_CONCAT(DISTINCT it.op_two_pickup ORDER BY it.op_two_pickup ASC SEPARATOR ',') AS pickup_to,
+                                            GROUP_CONCAT(DISTINCT it.op_one_status ORDER BY it.op_one_status ASC SEPARATOR ',') AS one_service_status,
+                                            GROUP_CONCAT(DISTINCT it.op_two_status ORDER BY it.op_two_status ASC SEPARATOR ',') AS two_service_status,
+                                            MAX(CASE WHEN DATE(it.op_one_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_one_pickup_today,
+                                            MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_two_pickup_today,
+                                            -- Nueva condición para verificar si es round trip y las fechas son el mismo día
+                                            MAX(CASE WHEN it.is_round_trip = 1 AND DATE(it.op_one_pickup) = DATE(it.op_two_pickup) THEN 1 ELSE 0 END) AS is_same_day_round_trip
+                                        FROM reservations_items as it
+                                            INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
+                                            INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
+                                            INNER JOIN destination_services as dest ON dest.id = it.destination_service_id
+                                            INNER JOIN reservations as rez ON rez.id = it.reservation_id
+                                        GROUP BY it.reservation_id, it.is_round_trip
+                                    ) as it ON it.reservation_id = rez.id
+                                    WHERE 1=1 {$query}
+                                GROUP BY rez.id, site.id, site.type_site, site.name, site.is_cxc, p.credit_payment_ids, p.credit_conciliation_status {$query2}",
                                     $queryData);
 
         if(sizeof( $bookings ) > 0):
@@ -148,6 +417,7 @@ trait QueryTrait
     public function queryOperations($queryOne, $queryTwo, $queryHaving, $queryData){
         return  DB::select("SELECT 
                                 rez.id as reservation_id,
+                                rez.categories,
                                 CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
                                 rez.client_email,
                                 rez.client_phone,
@@ -165,20 +435,42 @@ trait QueryTrait
                                 rez.open_credit,
                                 rez.is_complete,
                                 rez.created_at,
+                                rez.campaign,
+                                rez.reserve_rating,
+                                rez.is_last_minute,
+
+                                us.id AS employee_code,
                                 us.status AS employee_status,
                                 us.name AS employee,
+
                                 site.id as site_code,
                                 site.type_site AS type_site,
+                                site.color as site_color,
                                 site.name as site_name,
+
                                 origin.code AS origin_code,
                                 tc.name_es AS cancellation_reason,
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                 CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
 
+                                -- Información de reembolsos
+                                CASE WHEN rr.reservation_id IS NOT NULL THEN 1 ELSE 0 END as has_refund_request,
+                                COALESCE(rr.refund_count, 0) as refund_request_count,
+                                CASE 
+                                    WHEN rr.reservation_id IS NULL THEN 'NO_REFUND'
+                                    WHEN rr.pending_refund_count > 0 THEN 'REFUND_REQUESTED'
+                                    ELSE 'REFUND_COMPLETED'
+                                END as refund_status,
+
                                 CASE
-                                    WHEN rez.is_cancelled = 1 THEN 'CANCELLED'
-                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
-                                    WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                    WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+                                    WHEN rez.is_cancelled = 1   THEN 'CANCELLED'                                    
+                                    WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+                                    WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+                                    WHEN rez.is_quotation = 1   THEN 'QUOTATION'
+                                    -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                    WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
+                                    WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                     ELSE 'UNKNOWN'
@@ -228,6 +520,8 @@ trait QueryTrait
                                 it.driver_id_two,
                                 it.is_open,
                                 it.open_service_time,
+                                tc_one.name_es AS cancellation_reason_one,
+                                tc_two.name_es AS cancellation_reason_two,
 
                                 CASE 
                                     WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
@@ -245,18 +539,28 @@ trait QueryTrait
                                 CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
 
                                 it_counter.quantity,
+                                -- GROUP_CONCAT(DISTINCT p.codes_payment ORDER BY p.codes_payment ASC SEPARATOR ',') AS codes_payment,
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE 
-                                        WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
-                                        ELSE 'CASH'
+                                        WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
+                                        WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+                                        WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+                                        ELSE 'NO DEFENIDO'
                                     END
                                 ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-                                COALESCE(SUM(s.total_sales), 0) as total_sales, 
+
+                                -- Nuevos campos para pagos en efectivo
+                                COALESCE(p.cash_amount, 0) AS cash_amount,
+                                COALESCE(p.cash_references) AS cash_references,
+                                COALESCE(p.cash_payment_ids) AS cash_payment_ids,
+                                COALESCE(p.cash_is_conciliated) AS cash_is_conciliated,
+
+                                COALESCE(SUM(s.total_sales), 0) as total_sales,
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                 CASE
-                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAID'
+                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
                                     ELSE 'PENDING'
                                 END AS payment_status,
@@ -284,6 +588,9 @@ trait QueryTrait
                                 LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                 LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
 
+                                LEFT OUTER JOIN types_cancellations as tc_one ON tc_one.id = it.op_one_cancellation_type_id
+                                LEFT OUTER JOIN types_cancellations as tc_two ON tc_two.id = it.op_two_cancellation_type_id
+
                                 LEFT OUTER JOIN (
                                     SELECT DISTINCT reservation_id
                                     FROM reservations_media
@@ -292,7 +599,18 @@ trait QueryTrait
                                     SELECT DISTINCT reservation_id
                                     FROM reservations_follow_up
                                     WHERE type IN ('CLIENT', 'OPERATION')
-                                ) as rfu ON rfu.reservation_id = rez.id                                
+                                ) as rfu ON rfu.reservation_id = rez.id
+
+                                -- Nuevos JOINs para la tabla de reembolsos
+                                LEFT OUTER JOIN (
+                                    SELECT 
+                                        reservation_id,
+                                        COUNT(*) as refund_count,
+                                        SUM(CASE WHEN status != 'REFUND_COMPLETED' THEN 1 ELSE 0 END) as pending_refund_count
+                                    FROM reservations_refunds
+                                    GROUP BY reservation_id
+                                ) as rr ON rr.reservation_id = rez.id
+
                                 LEFT JOIN (
                                         SELECT
                                             it.reservation_id,
@@ -311,21 +629,93 @@ trait QueryTrait
                                 LEFT JOIN (
                                     SELECT 
                                         reservation_id,
+                                        -- ROUND(SUM(CASE 
+                                        --     WHEN operation = 'multiplication' THEN total * exchange_rate
+                                        --     WHEN operation = 'division' THEN total / exchange_rate
+                                        --     ELSE total END), 2) AS total_payments,
+                                        ROUND(SUM(CASE
+                                            WHEN category IN ('PAYOUT', 'PAYOUT_CREDIT_PAID') THEN 
+                                                CASE 
+                                                    WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                    WHEN operation = 'division' THEN total / exchange_rate
+                                                    ELSE total 
+                                                END
+                                            ELSE 0
+                                        END), 2) AS total_payments,
+
+                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
+
+                                        -- Monto en efectivo
                                         ROUND(SUM(CASE 
-                                            WHEN operation = 'multiplication' THEN total * exchange_rate
-                                            WHEN operation = 'division' THEN total / exchange_rate
-                                            ELSE total END), 2) AS total_payments,
-                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
+                                            WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                CASE 
+                                                    WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                    WHEN operation = 'division' THEN total / exchange_rate
+                                                    ELSE total 
+                                                END
+                                            ELSE 0 
+                                        END), 2) AS cash_amount,                                        
+                                        -- Referencias de pagos en efectivo concatenadas
+                                        CONCAT(
+                                            '[',
+                                            GROUP_CONCAT(
+                                                DISTINCT 
+                                                CASE 
+                                                    WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                        CONCAT(
+                                                            'Referencia: ', IFNULL(reference, 'SIN REFERENCIA'), 
+                                                            ' - Monto: ', 
+                                                            ROUND(
+                                                                CASE 
+                                                                    WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                                    WHEN operation = 'division' THEN total / exchange_rate
+                                                                    ELSE total 
+                                                                END, 2
+                                                            )
+                                                        )
+                                                    ELSE NULL
+                                                END
+                                                SEPARATOR ']\n['
+                                            ),
+                                            ']'
+                                        ) AS cash_references,
+                                        -- Nuevo campo: solo IDs de pagos en efectivo concatenados
+                                        CONCAT(
+                                            '[',
+                                            GROUP_CONCAT(
+                                                DISTINCT 
+                                                CASE 
+                                                    WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN id
+                                                    ELSE NULL
+                                                END
+                                                ORDER BY id ASC
+                                                SEPARATOR ','
+                                            ),
+                                            ']'
+                                        ) AS cash_payment_ids,
+                                        -- Suma de estatus de conciliación (para determinar si todos están conciliados)
+                                        SUM(CASE 
+                                            WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                CASE WHEN is_conciliated = 1 THEN 1 ELSE 0 END
+                                            ELSE 0
+                                        END) AS cash_is_conciliated,
+                                        -- Contador de pagos en efectivo
+                                        SUM(CASE 
+                                            WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 1
+                                            ELSE 0
+                                        END) AS cash_payment_count                                                                       
                                     FROM payments
+                                        WHERE deleted_at IS NULL
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryOne}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_payment_ids, p.cash_is_conciliated {$queryHaving}
 
                             UNION
 
                             SELECT 
                                 rez.id as reservation_id,
+                                rez.categories,
                                 CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
                                 rez.client_email,
                                 rez.client_phone,
@@ -343,26 +733,48 @@ trait QueryTrait
                                 rez.open_credit,
                                 rez.is_complete,
                                 rez.created_at,
+                                rez.campaign,
+                                rez.reserve_rating,
+                                rez.is_last_minute,
+
+                                us.id AS employee_code,
                                 us.status AS employee_status,
                                 us.name AS employee,
+
                                 site.id as site_code,
                                 site.type_site AS type_site,
+                                site.color as site_color,
                                 site.name as site_name,
+
                                 origin.code AS origin_code,
                                 tc.name_es AS cancellation_reason,
                                 CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
                                 CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
 
+                                -- Información de reembolsos
+                                CASE WHEN rr.reservation_id IS NOT NULL THEN 1 ELSE 0 END as has_refund_request,
+                                COALESCE(rr.refund_count, 0) as refund_request_count,
+                                CASE 
+                                    WHEN rr.reservation_id IS NULL THEN 'NO_REFUND'
+                                    WHEN rr.pending_refund_count > 0 THEN 'REFUND_REQUESTED'
+                                    ELSE 'REFUND_COMPLETED'
+                                END as refund_status,                                
+
                                 CASE
-                                    WHEN (rez.is_cancelled = 1) THEN 'CANCELLED'
-                                    WHEN rez.open_credit = 1 THEN 'OPENCREDIT'
-                                    WHEN rez.is_duplicated = 1 THEN 'DUPLICATED'
+                                    WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+                                    WHEN rez.is_cancelled = 1   THEN 'CANCELLED'                                    
+                                    WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+                                    WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+                                    WHEN rez.is_quotation = 1   THEN 'QUOTATION'
+                                    -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                    WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
+                                    WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
                                     ELSE 'UNKNOWN'
                                 END AS reservation_status,
 
-                                'departure' as operation_type,                                  
+                                'departure' as operation_type,
                                 'TYPE_TWO' as op_type,
                                 it.id,
                                 it.code,
@@ -406,6 +818,8 @@ trait QueryTrait
                                 it.driver_id_two,
                                 it.is_open,
                                 it.open_service_time,
+                                tc_one.name_es AS cancellation_reason_one,
+                                tc_two.name_es AS cancellation_reason_two,
 
                                 CASE
                                     WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
@@ -423,18 +837,28 @@ trait QueryTrait
                                 CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
 
                                 it_counter.quantity,
+                                -- GROUP_CONCAT(DISTINCT p.codes_payment ORDER BY p.codes_payment ASC SEPARATOR ',') AS codes_payment,
                                 GROUP_CONCAT(
                                     DISTINCT 
                                     CASE
-                                        WHEN p.payment_type_name IS NOT NULL AND ( rez.pay_at_arrival = 0 OR rez.pay_at_arrival = 1 ) THEN p.payment_type_name
-                                        ELSE 'CASH'
+                                        WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
+                                        WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+                                        WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+                                        ELSE 'NO DEFENIDO'                                        
                                     END
                                 ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
-                                COALESCE(SUM(s.total_sales), 0) as total_sales, 
+
+                                -- Nuevos campos para pagos en efectivo
+                                COALESCE(p.cash_amount, 0) AS cash_amount,
+                                COALESCE(p.cash_references) AS cash_references,
+                                COALESCE(p.cash_payment_ids) AS cash_payment_ids,
+                                COALESCE(p.cash_is_conciliated) AS cash_is_conciliated,
+
+                                COALESCE(SUM(s.total_sales), 0) as total_sales,
                                 COALESCE(SUM(p.total_payments), 0) as total_payments,
                                 COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
                                 CASE
-                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAID'
+                                    WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
                                     WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
                                     ELSE 'PENDING'
                                 END AS payment_status,
@@ -462,6 +886,9 @@ trait QueryTrait
                                 LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
                                 LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
 
+                                LEFT OUTER JOIN types_cancellations as tc_one ON tc_one.id = it.op_one_cancellation_type_id
+                                LEFT OUTER JOIN types_cancellations as tc_two ON tc_two.id = it.op_two_cancellation_type_id                                
+
                                 LEFT OUTER JOIN (
                                     SELECT DISTINCT reservation_id
                                     FROM reservations_media
@@ -471,6 +898,17 @@ trait QueryTrait
                                     FROM reservations_follow_up
                                     WHERE type IN ('CLIENT', 'OPERATION')
                                 ) as rfu ON rfu.reservation_id = rez.id
+
+                                -- Nuevos JOINs para la tabla de reembolsos
+                                LEFT OUTER JOIN (
+                                    SELECT 
+                                        reservation_id,
+                                        COUNT(*) as refund_count,
+                                        SUM(CASE WHEN status != 'REFUND_COMPLETED' THEN 1 ELSE 0 END) as pending_refund_count
+                                    FROM reservations_refunds
+                                    GROUP BY reservation_id
+                                ) as rr ON rr.reservation_id = rez.id
+
                                 LEFT JOIN (
                                         SELECT
                                             it.reservation_id,
@@ -481,7 +919,7 @@ trait QueryTrait
                                 LEFT JOIN (
                                     SELECT 
                                         reservation_id,  
-                                        ROUND( COALESCE(SUM(total), 0), 2) as total_sales                                            
+                                        ROUND( COALESCE(SUM(total), 0), 2) as total_sales
                                     FROM sales
                                         WHERE deleted_at IS NULL
                                     GROUP BY reservation_id
@@ -489,15 +927,89 @@ trait QueryTrait
                                 LEFT JOIN (
                                     SELECT 
                                         reservation_id,
-                                        ROUND(SUM(CASE WHEN operation = 'multiplication' THEN total * exchange_rate
-                                                WHEN operation = 'division' THEN total / exchange_rate
-                                                ELSE total END), 2) AS total_payments,
-                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name
+                                        -- ROUND(SUM(CASE 
+                                        --             WHEN operation = 'multiplication' THEN total * exchange_rate
+                                        --             WHEN operation = 'division' THEN total / exchange_rate
+                                        --             ELSE total 
+                                        --         END), 2) AS total_payments,
+                                        ROUND(SUM(CASE
+                                            WHEN category IN ('PAYOUT', 'PAYOUT_CREDIT_PAID') THEN 
+                                                CASE 
+                                                    WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                    WHEN operation = 'division' THEN total / exchange_rate
+                                                    ELSE total 
+                                                END
+                                            ELSE 0
+                                        END), 2) AS total_payments,
+
+                                        GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
+
+                                        -- Monto en efectivo
+                                        ROUND(SUM(CASE 
+                                                    WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                    CASE 
+                                                        WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                        WHEN operation = 'division' THEN total / exchange_rate
+                                                        ELSE total 
+                                                    END
+                                                ELSE 0 
+                                        END), 2) AS cash_amount,
+                                        -- Referencias de pagos en efectivo concatenadas
+                                        CONCAT(
+                                            '[',
+                                            GROUP_CONCAT(
+                                                DISTINCT 
+                                                CASE 
+                                                    WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                        CONCAT(
+                                                            'Referencia: ', IFNULL(reference, 'SIN REFERENCIA'), 
+                                                            ' - Monto: ', 
+                                                            ROUND(
+                                                                CASE 
+                                                                    WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                                    WHEN operation = 'division' THEN total / exchange_rate
+                                                                    ELSE total 
+                                                                END, 2
+                                                            )
+                                                        )
+                                                    ELSE NULL
+                                                END
+                                                SEPARATOR ']\n['
+                                            ),
+                                            ']'
+                                        ) AS cash_references,
+                                        -- Nuevo campo: solo IDs de pagos en efectivo concatenados
+                                        CONCAT(
+                                            '[',
+                                            GROUP_CONCAT(
+                                                DISTINCT 
+                                                CASE 
+                                                    WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN id
+                                                    ELSE NULL
+                                                END
+                                                ORDER BY id ASC
+                                                SEPARATOR ','
+                                            ),
+                                            ']'
+                                        ) AS cash_payment_ids,
+                                        -- Suma de estatus de conciliación (para determinar si todos están conciliados)
+                                        SUM(CASE 
+                                            WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+                                                CASE WHEN is_conciliated = 1 THEN 1 ELSE 0 END
+                                            ELSE 0
+                                        END) AS cash_is_conciliated,
+                                        -- Contador de pagos en efectivo
+                                        SUM(CASE 
+                                            WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 1
+                                            ELSE 0
+                                        END) AS cash_payment_count
                                     FROM payments
-                                        GROUP BY reservation_id
+                                        WHERE deleted_at IS NULL
+                                    GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryTwo}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_payment_ids, p.cash_is_conciliated {$queryHaving}
+                            -- ) AS combined_results
                             ORDER BY filtered_date ASC ",[
                                 "init_date_one" => $queryData['init'],
                                 "init_date_two" => $queryData['end'],
@@ -505,6 +1017,207 @@ trait QueryTrait
                                 "init_date_four" => $queryData['end'],
                             ]);
     }
+
+    public function queryConciliationStripe($query, $query2, $queryData){
+        $bookings = DB::select("SELECT 
+                                    rez.id AS reservation_id, 
+                                    CONCAT(rez.client_first_name,' ',rez.client_last_name) as full_name,
+                                    rez.client_email,
+                                    rez.client_phone,
+                                    rez.currency,
+                                    rez.is_cancelled,
+                                    rez.is_commissionable,                                    
+                                    rez.site_id,
+                                    rez.pay_at_arrival,
+                                    rez.reference,
+                                    rez.affiliate_id,
+                                    rez.terminal,
+                                    rez.comments,
+                                    rez.is_duplicated,
+                                    rez.open_credit,
+                                    rez.is_complete,
+                                    rez.created_at,
+                                    rez.is_quotation,
+                                    rez.was_is_quotation,
+                                    rez.campaign,
+                                    rez.reserve_rating,
+                                    
+                                    us.id AS employee_code,
+                                    us.status AS employee_status,
+                                    us.name AS employee,
+
+                                    site.id as site_code,
+                                    site.type_site AS type_site,
+                                    site.name AS site_name,
+
+                                    origin.code AS origin_code,
+                                    tc.name_es AS cancellation_reason,
+                                    GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS reservation_codes,
+                                    GROUP_CONCAT(DISTINCT it.zone_one_name ORDER BY it.zone_one_name ASC SEPARATOR ',') AS destination_name_from,
+                                    GROUP_CONCAT(DISTINCT it.zone_one_id ORDER BY it.zone_one_id ASC SEPARATOR ',') AS zone_one_id,
+                                    GROUP_CONCAT(DISTINCT it.from_name SEPARATOR ',') AS from_name,
+                                    GROUP_CONCAT(DISTINCT it.zone_two_name ORDER BY it.zone_two_name ASC SEPARATOR ',') AS destination_name_to,
+                                    GROUP_CONCAT(DISTINCT it.zone_two_id ORDER BY it.zone_two_id ASC SEPARATOR ',') AS zone_two_id,
+                                    GROUP_CONCAT(DISTINCT it.to_name SEPARATOR ',') AS to_name,
+                                    GROUP_CONCAT(DISTINCT it.service_type_id ORDER BY it.service_type_id ASC SEPARATOR ',') AS service_type_id,
+                                    GROUP_CONCAT(DISTINCT it.service_type_name ORDER BY it.service_type_name ASC SEPARATOR ',') AS service_type_name,
+                                    GROUP_CONCAT(DISTINCT it.pickup_from ORDER BY it.pickup_from ASC SEPARATOR ',') AS pickup_from,
+                                    GROUP_CONCAT(DISTINCT it.pickup_to ORDER BY it.pickup_to ASC SEPARATOR ',') AS pickup_to,
+                                    GROUP_CONCAT(DISTINCT it.one_service_status ORDER BY it.one_service_status ASC SEPARATOR ',') AS one_service_status,
+                                    GROUP_CONCAT(DISTINCT it.two_service_status ORDER BY it.two_service_status ASC SEPARATOR ',') AS two_service_status,
+                                    SUM(it.passengers) as passengers,
+                                    COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
+                                    SUM(it.is_round_trip) as is_round_trip,
+                                    MAX(it.is_same_day_round_trip) AS is_same_day_round_trip,
+                                    COALESCE(SUM(s.total_sales), 0) as total_sales,
+                                    COALESCE(SUM(p.total_payments), 0) as total_payments,
+                                    COALESCE(SUM(p.total_payments_stripe), 0) as total_payments_stripe,                                    
+                                    COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+                                    COALESCE(p.stripe_payment_ids) AS stripe_payment_ids,                                    
+                                    CASE
+                                        WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+                                        WHEN rez.is_cancelled = 1   THEN 'CANCELLED'
+                                        WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+                                        WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+                                        WHEN rez.is_quotation = 1   THEN 'QUOTATION'
+                                        WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
+                                        WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
+                                        ELSE 'UNKNOWN'
+                                    END AS reservation_status,
+                                    CASE
+                                        WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+                                        WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
+                                        ELSE 'PENDING'
+                                    END AS payment_status,
+                                    GROUP_CONCAT(
+                                        DISTINCT 
+                                        CASE
+                                            WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
+                                            WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+                                            WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+                                            ELSE 'SIN METODO DE PAGO'
+                                        END
+                                    ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+                                    GROUP_CONCAT(DISTINCT p.reference_stripe ORDER BY p.reference_stripe ASC SEPARATOR ', ') AS reference_stripe,
+                                    SUM(p.is_charged) as is_charged,
+                                    SUM(p.is_refund) as is_refund,
+                                    GROUP_CONCAT(DISTINCT p.date_conciliation ORDER BY p.date_conciliation ASC SEPARATOR ', ') AS date_conciliation,
+                                    COALESCE(SUM(p.amount), 0) as amount,
+                                    COALESCE(SUM(p.total_net), 0) as total_net,
+                                    COALESCE(SUM(p.total_fee), 0) as total_fee,
+                                    GROUP_CONCAT(DISTINCT p.deposit_date ORDER BY p.deposit_date ASC SEPARATOR ', ') AS deposit_date
+                                FROM reservations as rez
+                                    INNER JOIN sites as site ON site.id = rez.site_id
+                                    LEFT OUTER JOIN users as us ON us.id = rez.call_center_agent_id
+                                    LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
+                                    LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
+                                    -- JOINs para tabla de ventas (sales)
+                                    LEFT JOIN (
+                                        SELECT 
+                                            reservation_id, 
+                                            ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+                                        FROM sales
+                                            WHERE deleted_at IS NULL 
+                                        GROUP BY reservation_id
+                                    ) as s ON s.reservation_id = rez.id
+                                    -- JOINs para tabla de pagos (payments)
+                                    LEFT JOIN (
+                                        SELECT 
+                                            reservation_id,
+                                            ROUND(SUM(CASE 
+                                                WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                WHEN operation = 'division' THEN total / exchange_rate
+                                                ELSE total END
+                                                ), 2
+                                            ) AS total_payments,
+                                            ROUND(SUM(CASE
+                                                WHEN category = 'PAYOUT' AND payment_method = 'STRIPE' THEN 
+                                                    CASE 
+                                                        WHEN operation = 'multiplication' THEN total * exchange_rate
+                                                        WHEN operation = 'division' THEN total / exchange_rate
+                                                        ELSE total 
+                                                    END
+                                                    ELSE 0
+                                                END), 2
+                                            ) AS total_payments_stripe,
+                                            CONCAT(
+                                                '[',
+                                                    GROUP_CONCAT(
+                                                        DISTINCT 
+                                                        CASE 
+                                                            WHEN payment_method = 'STRIPE' OR payment_method LIKE '%STRIPE%' THEN id
+                                                            ELSE NULL
+                                                        END
+                                                        ORDER BY id ASC
+                                                        SEPARATOR ','
+                                                    ),
+                                                ']'
+                                            ) AS stripe_payment_ids,
+                                            GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
+                                            -- Y para payment_details:
+                                            GROUP_CONCAT(
+                                                DISTINCT CASE
+                                                    WHEN category = 'PAYOUT' AND payment_method = 'STRIPE' THEN
+                                                        CONCAT(
+                                                            reference
+                                                        )
+                                                    ELSE NULL
+                                                END
+                                                ORDER BY payment_method ASC SEPARATOR ', '
+                                            ) AS reference_stripe,
+                                            SUM(is_conciliated) as is_charged,
+                                            SUM(is_refund) as is_refund,
+                                            GROUP_CONCAT(DISTINCT date_conciliation ORDER BY date_conciliation ASC SEPARATOR ',') AS date_conciliation,
+                                            ROUND(SUM(amount), 2) AS amount,
+                                            ROUND(SUM(total_net), 2) AS total_net,
+                                            ROUND(SUM(total_fee), 2) AS total_fee,
+                                            GROUP_CONCAT(DISTINCT deposit_date ORDER BY deposit_date ASC SEPARATOR ',') AS deposit_date
+                                        FROM payments
+                                            WHERE deleted_at IS NULL
+                                        GROUP BY reservation_id, is_conciliated
+                                    ) as p ON p.reservation_id = rez.id
+                                    -- JOINs para tabla de items de reservacion (reservations_items)
+                                    LEFT JOIN (
+                                        SELECT  
+                                            it.reservation_id, 
+                                            it.is_round_trip,
+                                            SUM(it.passengers) as passengers,
+                                            GROUP_CONCAT(DISTINCT it.code ORDER BY it.code ASC SEPARATOR ',') AS code,
+                                            GROUP_CONCAT(DISTINCT zone_one.name ORDER BY zone_one.name ASC SEPARATOR ',') AS zone_one_name,
+                                            GROUP_CONCAT(DISTINCT zone_one.id ORDER BY zone_one.id ASC SEPARATOR ',') AS zone_one_id,
+                                            GROUP_CONCAT(DISTINCT it.from_name SEPARATOR ',') AS from_name,
+                                            GROUP_CONCAT(DISTINCT zone_two.name ORDER BY zone_two.name ASC SEPARATOR ',') AS zone_two_name, 
+                                            GROUP_CONCAT(DISTINCT zone_two.id ORDER BY zone_two.id ASC SEPARATOR ',') AS zone_two_id,
+                                            GROUP_CONCAT(DISTINCT it.to_name SEPARATOR ',') AS to_name,
+                                            GROUP_CONCAT(DISTINCT dest.id ORDER BY dest.id ASC SEPARATOR ',') AS service_type_id,
+                                            GROUP_CONCAT(DISTINCT dest.name ORDER BY dest.name ASC SEPARATOR ',') AS service_type_name,
+                                            GROUP_CONCAT(DISTINCT it.op_one_pickup ORDER BY it.op_one_pickup ASC SEPARATOR ',') AS pickup_from,
+                                            GROUP_CONCAT(DISTINCT it.op_two_pickup ORDER BY it.op_two_pickup ASC SEPARATOR ',') AS pickup_to,
+                                            GROUP_CONCAT(DISTINCT it.op_one_status ORDER BY it.op_one_status ASC SEPARATOR ',') AS one_service_status,
+                                            GROUP_CONCAT(DISTINCT it.op_two_status ORDER BY it.op_two_status ASC SEPARATOR ',') AS two_service_status,
+                                            MAX(CASE WHEN DATE(it.op_one_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_one_pickup_today,
+                                            MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_two_pickup_today,
+                                            -- Nueva condición para verificar si es round trip y las fechas son el mismo día
+                                            MAX(CASE WHEN it.is_round_trip = 1 AND DATE(it.op_one_pickup) = DATE(it.op_two_pickup) THEN 1 ELSE 0 END) AS is_same_day_round_trip
+                                        FROM reservations_items as it
+                                            INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
+                                            INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
+                                            INNER JOIN destination_services as dest ON dest.id = it.destination_service_id
+                                            INNER JOIN reservations as rez ON rez.id = it.reservation_id
+                                        GROUP BY it.reservation_id, it.is_round_trip
+                                    ) as it ON it.reservation_id = rez.id
+                                    WHERE 1=1 {$query}
+                                GROUP BY rez.id, site.id, site.type_site, site.name, site.is_cxc, p.stripe_payment_ids {$query2}",
+                                    $queryData);
+
+        if(sizeof( $bookings ) > 0):
+            usort($bookings, array($this, 'orderByDateTime'));
+        endif;
+
+        return $bookings;
+    }    
 
     public function queryConciliation($query, $query2, $queryData){
         $payments = DB::select("SELECT 
@@ -571,7 +1284,7 @@ trait QueryTrait
 
     //TRAEREMOS PAGOS DE PAYPAL QUE TENGA FECHA DE AGREGACIÓN Y NO AYAN SIDO ELIMINADOS
     public function getPaymentsConciliation($method = "", $init = "", $end = ""){
-        $query = ( $init != "" && $end != "" ? ' AND p.created_at BETWEEN "'.$init.'" AND "'.$end.'" ' : "" );
+        $query = ( $init != "" && $end != "" ? ' AND rez.created_at BETWEEN "'.$init.'" AND "'.$end.'" ' : "" );
        return DB::select("SELECT 
                                     p.*,
                                     rez.id AS reservation_id,
@@ -580,12 +1293,15 @@ trait QueryTrait
                                 FROM payments AS p
                                     INNER JOIN reservations AS rez ON p.reservation_id = rez.id
                                 WHERE 
-                                    p.payment_method = :method AND
-                                    p.created_at IS NOT NULL AND
-                                    p.deleted_at IS NULL AND
-                                    p.is_conciliated = 0 AND
-                                    rez.is_cancelled = 0 AND
-                                    rez.is_duplicated = 0 ".$query." ", ['method' => $method]);
+                                    p.payment_method = :method 
+                                    AND p.created_at IS NOT NULL /** LA FECHA DE PAGO NO ES NULO */ 
+                                    AND p.deleted_at IS NULL
+                                    AND p.date_conciliation IS NULL /** LA FECHA DE CONCILIACION ES NULO */ 
+                                    AND (p.reference IS NOT NULL AND p.reference != '')
+                                    AND rez.is_cancelled = 0 
+                                    AND rez.is_duplicated = 0 ".$query." ", [
+                                        'method' => $method
+                                    ]);
     }
 
     private function orderByDateTime($a, $b) {

@@ -25,7 +25,7 @@ class SaleRequest extends FormRequest
             'reservation_id' => 'required|exists:reservations,id',
             'sale_type_id' => 'required|exists:sales_types,id',
             'description' => 'required|string|max:255',
-            'quantity' => 'required|numeric',
+            // 'quantity' => 'required|numeric',
             'total' => 'required|numeric',
             //'call_center_agent_id' => 'required|exists:users,id'
         ];
@@ -43,8 +43,8 @@ class SaleRequest extends FormRequest
             'sale_type_id.exists' => 'El tipo de venta no existe',
             'description.required' => 'La descripción es requerida',
             'description.max' => 'La descripción no puede ser mayor a 255 caracteres',
-            'quantity.required' => 'La cantidad es requerida',
-            'quantity.numeric' => 'La cantidad debe ser un número',
+            // 'quantity.required' => 'La cantidad es requerida',
+            // 'quantity.numeric' => 'La cantidad debe ser un número',
             'total.required' => 'El total es requerido',
             'total.numeric' => 'El total debe ser un número',
             // 'call_center_agent_id.required' => 'El agente es requerido',

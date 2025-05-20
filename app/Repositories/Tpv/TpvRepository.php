@@ -11,13 +11,13 @@ use App\Traits\ApiTrait;
 use App\Models\Site;
 use App\Models\UserRole;
 use App\Models\User;
-use App\Models\OriginSale;
 
 class TpvRepository
 {
     use ApiTrait;
 
-    public function handler($request){
+    public function handler($request)
+    {
         // Session::forget('tpv');
         // $uuid = Str::uuid()->toString();
 
@@ -114,8 +114,7 @@ class TpvRepository
         ]);
     }
 
-    public function quote($request){
-        
+    public function quote($request){        
         $tpv = Session::get('tpv');
         if(!isset( $tpv[ $request->code ] )):
             return response()->json([
@@ -128,7 +127,8 @@ class TpvRepository
             ], Response::HTTP_BAD_REQUEST);
         endif;
             
-        $tpv[ $request->code ]['type'] = ((isset($request->is_round_trip))? 'round-trip' : 'one-way' );
+        $type = ( isset($request->is_round_trip) && $request->is_round_trip == 1 ? 'round-trip' : 'one-way' );
+        $tpv[ $request->code ]['type'] = $type;
         $tpv[ $request->code ]['start']['place'] = $request->from_name;
         $tpv[ $request->code ]['start']['lat'] = $request->from_lat;
         $tpv[ $request->code ]['start']['lng'] = $request->from_lng;
@@ -140,7 +140,7 @@ class TpvRepository
         $tpv[ $request->code ]['language'] = $request->language;
         $tpv[ $request->code ]['passengers'] = $request->passengers;
         $tpv[ $request->code ]['currency'] = $request->currency;
-        $tpv[ $request->code ]['rate_group'] = $request->rate_group;
+        $tpv[ $request->code ]['rate_group'] = 'xLjDl18';
         $tpv[ $request->code ]['lastminute'] = 1;
 
         Session::put('tpv', $tpv);
@@ -158,19 +158,12 @@ class TpvRepository
             ], Response::HTTP_BAD_REQUEST);
         endif;
 
-        // $sites = Site::all();
-        $sites = Site::orderByRaw("FIELD(name LIKE '%[CS]%', 1) DESC")
-                ->orderBy('name')
-                ->get();        
-        $origin_sales = OriginSale::where('status',1)->get();
-
-        $users_ids = UserRole::where('role_id', 3)->orWhere('role_id',4)->pluck('user_id');
-        $agents = User::whereIn('id', $users_ids)->get();        
-
-        return view('tpv.form', compact('quotation','sites','origin_sales','agents'));
+        return view('tpv.form', [
+            'quotation' => $quotation
+        ]);
     }
 
-    public function create($request){    
+    public function create($request){
         $data = [
             'service_token' => $request->service_token,
             'first_name' => $request->first_name,
@@ -192,6 +185,10 @@ class TpvRepository
         
         if($request->payment_method == "CASH"):
             $data['pay_at_arrival'] = 1;
+        endif;
+
+        if(!empty($request->is_quotation)):
+            $data['is_quotation'] = 1;
         endif;
         
         $rez = $this->makeReservation($data, $request->uuid);

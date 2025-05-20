@@ -1,18 +1,15 @@
-@php
-    use App\Traits\BookingTrait;
-@endphp
-@props(['bookingsStatus','dataMethodPayments','dataCurrency','dataSites','dataOriginSale','dataVehicles','dataDestinations','dataUnit','dataDriver','dataServiceTypeOperation'])
+@props(['bookingsStatus','dataMethodPayments','dataCurrency','dataVehicles','dataServiceType','dataServiceTypeOperation','dataSites','dataDriver','dataDestinations','dataUnit','dataOriginSale'])
 <!-- Modal -->
 <div class="modal fade" id="chartsModal2" tabindex="-1" role="dialog" aria-labelledby="chartsModalLabel2" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="chartsModalLabel2"></h5>
+                <h5 class="modal-title" id="chartsModalLabel"></h5>
                 <div class="items_status">
                     @if ( isset($bookingsStatus) )
                         @foreach ($bookingsStatus['data'] as $key => $status)
-                        <div class="btn btn-{{ BookingTrait::classStatusBooking($key) }}">
-                            <span><strong>Total {{ ucfirst(strtolower($status['name'])) }}:</strong> $ {{ number_format($status['gran_total'],2) }}</span>
+                        <div class="btn btn-{{ auth()->user()->classStatusBooking($key, $bookingsStatus['type']) }}">
+                            <strong>Total {{ ucfirst(strtolower($status['name'])) }}:</strong> $ {{ number_format($status['gran_total'],2) }}
                         </div>
                         @endforeach
                     @endif
@@ -21,7 +18,7 @@
                     <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body charts-double">
                 @if ( isset($bookingsStatus) )
                     <input type="hidden" id="bookingsStatus" value='@json(( isset($bookingsStatus['data']) ? $bookingsStatus['data'] : [] ))'>
                 @endif
@@ -34,6 +31,9 @@
                 @if ( isset($dataVehicles) )
                     <input type="hidden" id="dataVehicles" value='@json(( isset($dataVehicles['data']) ? $dataVehicles['data'] : [] ))'>
                 @endif
+                @if ( isset($dataServiceType) )
+                    <input type="hidden" id="dataServiceType" value='@json(( isset($dataServiceType['data']) ? $dataServiceType['data'] : [] ))'>
+                @endif                
                 @if ( isset($dataServiceTypeOperation) )
                     <input type="hidden" id="dataServiceTypeOperation" value='@json(( isset($dataServiceTypeOperation['data']) ? $dataServiceTypeOperation['data'] : [] ))'>
                 @endif
@@ -63,7 +63,7 @@
                                 <div>
                                     <h6>Por Estatus</h6>
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Estatus</th>                                                    
@@ -108,7 +108,7 @@
                                 <div>
                                     <h6>Por Metodo De Pago</h6>                                
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Metodo De Pago</th>                                                    
@@ -153,7 +153,7 @@
                                 <div>
                                     <h6>Por Moneda</h6>                                
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Moneda</th>                                                    
@@ -195,7 +195,7 @@
                                 <div>
                                     <h6>Por Vehículo</h6>                                
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Vehículo</th>
@@ -231,8 +231,8 @@
                             </div>
                         </div>
                     @endif
-                    @if ( isset($dataServiceTypeOperation) )
-                        <div id="chartServiceType">                            
+                    @if ( isset($dataServiceType) )
+                        <div id="chartServiceType">
                             <div>
                                 <div class="chart-container">
                                     <canvas class="chartSale" id="chartSaleServiceType2" ></canvas>
@@ -240,7 +240,52 @@
                                 <div>
                                     <h6>Por Tipo De Servicio</h6>                                
                                     <div class="table-responsive">
-                                        <table class="table table-chart table-chart-general mb-0">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Tipo De Servicio</th>
+                                                    <th class="text-center">Cantidad</th>
+                                                    <th class="text-center">Pesos</th>
+                                                    <th class="text-center">Dolares</th>
+                                                    <th class="text-center">Gran Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($dataServiceType['data'] as $keyTypeOperation => $typeoperation )
+                                                    <tr>
+                                                        <th>{{ ucfirst(strtolower($typeoperation['name'])) }}</th>
+                                                        <td class="text-center">{{ $typeoperation['counter'] }}</td>
+                                                        <td class="text-center">{{ number_format($typeoperation['MXN']['total'],2) }}</td>
+                                                        <td class="text-center">{{ number_format($typeoperation['USD']['total'],2) }}</td>
+                                                        <td class="text-center">{{ number_format($typeoperation['gran_total'],2) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th>Total</th>
+                                                    <th class="text-center">{{ $dataServiceType['counter'] }}</th>
+                                                    <th class="text-center">{{ number_format($dataServiceType['MXN']['total'],2) }}</th>
+                                                    <th class="text-center">{{ number_format($dataServiceType['USD']['total'],2) }}</th>
+                                                    <th class="text-center">{{ number_format($dataServiceType['gran_total'],2) }}</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif                    
+                    @if ( isset($dataServiceTypeOperation) )
+                        <div id="chartServiceTypeOperation">
+                            <div>
+                                <div class="chart-container">
+                                    <canvas class="chartSale" id="chartSaleServiceTypeOperation2" ></canvas>
+                                </div>
+                                <div>
+                                    <h6>Por Tipo De Servicio De Operación</h6>                                
+                                    <div class="table-responsive">
+                                        <table class="table custom-table table-chart table-chart-general mb-0">
                                             <thead>
                                                 <tr>
                                                     <th>Tipo De Servicio</th>
@@ -282,7 +327,7 @@
                         <div id="chartSites">
                             <h6>Por Sitio</h6>
                             <div class="table-responsive">
-                                <table class="table table-chart table-chart-general mb-0">
+                                <table class="table custom-table table-chart table-chart-general mb-0">
                                     <thead>
                                         <tr>
                                             <th>Sitio</th>
@@ -320,7 +365,7 @@
                         <div id="chartDestination">
                             <h6>Por Destino</h6>
                             <div class="table-responsive">
-                                <table class="table table-chart table-chart-general mb-0">
+                                <table class="table custom-table table-chart table-chart-general mb-0">
                                     <thead>
                                         <tr>
                                             <th>Destino</th>
@@ -358,7 +403,7 @@
                         <div id="chartDrivers">
                             <h6>Por Conductor</h6>
                             <div class="table-responsive">
-                                <table class="table table-chart table-chart-driver mb-0">
+                                <table class="table custom-table table-chart table-chart-driver mb-0">
                                     <thead>
                                         <tr>
                                             <th>Conductor</th>
@@ -403,9 +448,9 @@
                     @endif
                     @if ( isset($dataUnit) )
                         <div id="chartUnits">
-                            <h6>Por Conductor</h6>
+                            <h6>Por Unidad</h6>
                             <div class="table-responsive">
-                                <table class="table table-chart table-chart-general mb-0">
+                                <table class="table custom-table table-chart table-chart-general mb-0">
                                     <thead>
                                         <tr>
                                             <th>Unidad</th>
@@ -446,7 +491,7 @@
                         <div id="chartOriginSale">
                             <h6>Por Origen De Venta</h6>
                             <div class="table-responsive">
-                                <table class="table table-chart table-chart-general mb-0">
+                                <table class="table custom-table table-chart table-chart-general mb-0">
                                     <thead>
                                         <tr>
                                             <th>Origen</th>

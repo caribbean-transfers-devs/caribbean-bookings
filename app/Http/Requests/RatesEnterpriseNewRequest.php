@@ -32,16 +32,16 @@ class RatesEnterpriseNewRequest extends FormRequest
 
         if ($this->input('destination_service_type') === 'vehicle' || $this->input('destination_service_type') === 'shared') {
             $rules['one_way'] = 'required|numeric|min:1';
-            $rules['round_trip'] = 'required|numeric|min:1';
+            // $rules['round_trip'] = 'required|numeric|min:1';
         }
 
         if ($this->input('destination_service_type') === 'passenger') {
             $rules['ow_12'] = 'required|numeric|min:1';
-            $rules['rt_12'] = 'required|numeric|min:1';
+            // $rules['rt_12'] = 'required|numeric|min:1';
             $rules['ow_37'] = 'required|numeric|min:1';
-            $rules['rt_37'] = 'required|numeric|min:1';
+            // $rules['rt_37'] = 'required|numeric|min:1';
             $rules['up_8_ow'] = 'required|numeric|min:1';
-            $rules['up_8_rt'] = 'required|numeric|min:1';
+            // $rules['up_8_rt'] = 'required|numeric|min:1';
             $rules['operating_cost'] = 'required|numeric|min:1';
         }
 

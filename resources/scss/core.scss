@@ -4,6 +4,43 @@
 @import "./template/plugins/light/perfect-scrollbar/perfect-scrollbar";
 @import "./template/light/structure";
 
-@import "./template/dark/main";
-@import "./template/plugins/dark/perfect-scrollbar/perfect-scrollbar";
-@import "./template/dark/structure";
+/*
+    =============
+        Sidebar
+    =============
+*/
+
+.main-container:not(.sbar-open) .sidebar-wrapper {
+    width: 0;
+    left: -52px;
+}
+
+.main-container {
+    padding: 0;
+}
+
+#sidebar ul.menu-categories.ps {
+    height: calc(100vh - 1px) !important;
+    padding-left: 16px;
+}
+
+.sidebar-wrapper {
+    top: 0;
+    bottom: 0;
+    z-index: 9999;
+    border-radius: 0;
+    left: 0;
+    width: 255px;
+    background: #f1f2f3;
+}
+
+.sidebar-noneoverflow {
+    overflow: hidden;
+}
+
+#sidebar {
+    height: 100vh !important;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+}

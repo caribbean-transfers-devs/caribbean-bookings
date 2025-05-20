@@ -1,0 +1,163 @@
+@import "../base/variables";
+@import "../header/checkout";
+@import "../components/bookingbox/index.scss";
+@import "../footer/index";
+
+div.booking-information{
+    width: 30%;
+    border-radius: 16px;
+    background: #FFF;
+    box-shadow: 0px 0px 32px 0px rgba(145, 161, 180, 0.25);
+    margin-top: 35px;
+    margin-bottom: 35px;    
+    display: flex;
+    flex-direction: column;
+    gap: 15px;    
+    
+    > div.top{
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+        padding: 24px 24px 0px 24px;
+        > h1{
+            color: #0059A7;
+            font-weight: normal;
+            font-size: 20pt;
+            width: 80%;
+            margin: 0 auto;
+        }
+        > p{
+            margin: 0px;
+            > span{
+                color: #0059A7;
+            }
+        }
+    }
+    > div.banner{
+        > img{
+            width: 100%;
+        }
+    }
+
+    > div.alert{
+        display: flex;
+        padding: 24px;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        border-radius: 15px;
+        background: #16161D;
+        color: white;
+        width: 120%;
+        margin-left: -45px;
+        p{
+            margin: 0px;
+        }
+        > h2{
+            width: 80%;
+            font-size: 20pt;
+            text-align: center;
+            font-weight: normal;
+        }
+        > div{
+            display: flex;
+            gap: 15px;
+            a{
+                cursor: pointer;
+                color: white;
+                &:nth-child(1){
+                    display: flex;                
+                    padding: 17px 16px;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px;
+                    border-radius: 8px;
+                    background: #D01317;
+                }
+                &:nth-child(2){
+                    display: flex;                
+                    padding: 17px 16px;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px;
+                    border-radius: 8px;
+                    border: 1px solid white;
+                }
+            }            
+        }
+        @media (max-width: 550px) {
+            width: 100%;
+            margin-left: 0px;
+        }
+    }
+
+    > div.resume-items{
+        display: flex;
+        padding: 10px;
+        flex-direction: column;
+        gap: 25px;
+
+        > div.one{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+            > h2{
+                font-weight: normal;
+            }
+            > div{
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                gap: 15px;
+                p{
+                    border-right: 1px solid #DDE5FD;
+                    margin: 0px;
+                    padding-right: 15px;
+                    a{
+                        color: #425466;
+                        &.blue{
+                            color: #0059A7;
+                        }                        
+                    }
+                    &:last-child{
+                        border-right: 0px;
+                    }
+                    @media (max-width: 550px) {
+                        border-right: 0px;
+                    }
+                }
+                @media (max-width: 550px) {
+                    flex-direction: column;
+                }
+            }
+        }
+        > div.five{
+            padding-top: 15px;
+            border-top: 1px solid #DDE5FD;
+        }
+    }
+
+    &.cancel{
+        border: 1px solid #D01317;
+        > div.top{
+            > h1{
+                color: #D01317;
+            }
+        }
+    }
+    
+    @media (max-width: 1800px) {
+        width: 40%;
+    }
+    @media (max-width: 1300px) {
+        width: 50%;
+    }
+    @media (max-width: 1100px) {
+        width: 70%;
+    }
+    @media (max-width: 767px) {
+        width: 95%;
+    }
+}

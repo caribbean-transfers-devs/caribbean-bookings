@@ -28,14 +28,10 @@
                             <input type="number" class="form-control mb-2" id="servicePaymentsTotalModal" name="total">
                         </div>
                         <div class="col-sm-12 col-md-6">
-                            <label class="form-label" for="servicePaymentsCurrencyModal">Moneda</label>
-                            <select class="form-select mb-2" id="servicePaymentsCurrencyModal" name="currency">
-                                <option value="USD" @if ($currency == 'USD')
-                                    selected
-                                @endif>USD</option>
-                                <option value="MXN" @if ($currency == 'MXN')
-                                selected
-                                @endif>MXN</option>                            
+                            <label class="form-label" for="servicePaymentsCurrencyModalPayment">Moneda</label>
+                            <select class="form-select mb-2" id="servicePaymentsCurrencyModalPayment" name="currency">
+                                <option value="USD" @if ($currency == 'USD') selected @endif>USD</option>
+                                <option value="MXN" @if ($currency == 'MXN') selected @endif>MXN</option>
                             </select>
                         </div>
                         <div class="col-sm-12 col-md-6">

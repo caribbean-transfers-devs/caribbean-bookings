@@ -1,3 +1,6 @@
+@php
+    $zones = auth()->user()->Zones($reservation->destination->id);
+@endphp
 <div class="modal fade" id="serviceEditModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -12,7 +15,7 @@
                         <div class="col-sm-12 col-md-12 serviceTypeForm d-none">
                             <label class="form-label" for="serviceTypeForm">Tipo de servicio</label>
                             <select class="form-control mb-2" id="serviceTypeForm">
-                                <option value="0">Selecciona una opción</option>
+                                <option value="">Selecciona una opción</option>
                                 <option value="1">Round Trip</option>
                             </select>
                         </div>
@@ -20,9 +23,11 @@
                         <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="destinationTypeForm">Tipo</label>
                             <select class="form-control mb-2" id="destination_serv" name="destination_service_id">
-                                @foreach ($services as $service)
-                                    <option value="{{ $service->id }}">{{ $service->name }}</option>
-                                @endforeach                            
+                                @if ( !empty($reservation->destination->destination_services) )
+                                    @foreach ($reservation->destination->destination_services as $service)
+                                        <option value="{{ $service->id }}">{{ $service->name }}</option>
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
                         <div class="col-sm-12 col-md-6">
@@ -33,8 +38,10 @@
                             <label class="form-label" for="serviceFlightForm">Numéro de Vuelo</label>
                             <input type="text" class="form-control mb-2" id="serviceFlightForm" name="flight_number">
                         </div>
+
                         <div class="col-sm-12 col-md-12"><hr></div>
-                        <div class="col-sm-12 col-md-12">
+
+                        <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceFromForm">Desde (Zona)</label>
                             <select class="form-control" id="from_zone_id" name="from_zone_id" style="margin-bottom:5px;">
                                 @foreach($zones as $key => $value)
@@ -42,12 +49,14 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-sm-12 col-md-12">
+                        <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceFromForm">Desde</label>
                             <input type="text" class="form-control mb-2" id="serviceFromForm" name="from_name">
                         </div>
+
                         <div class="col-sm-12 col-md-12"><hr></div>
-                        <div class="col-sm-12 col-md-12">
+
+                        <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceFromForm">Hacia (Zona)</label>
                             <select class="form-control" id="to_zone_id" name="to_zone_id" style="margin-bottom:5px;">
                                 @foreach($zones as $key => $value)
@@ -55,7 +64,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-sm-12 col-md-12">
+                        <div class="col-sm-12 col-md-6">
                             <label class="form-label" for="serviceToForm">Hacia</label>
                             <div style="position:relative;">
                                 <input type="text" class="form-control mb-2" id="serviceToForm" name="to_name">

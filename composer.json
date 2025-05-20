@@ -8,15 +8,22 @@
         "php": "^8.1",
         "aws/aws-sdk-php": "^3.307",
         "codedge/laravel-fpdf": "^1.12",
+        "dompdf/dompdf": "^3.1",
+        "endroid/qr-code": "^5.1",
         "guzzlehttp/guzzle": "^7.2",
+        "itsgoingd/clockwork": "^5.3",
+        "jenssegers/agent": "^2.6",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
+        "laravel/telescope": "^5.6",
         "laravel/tinker": "^2.8",
         "nesbot/carbon": "^2.72",
         "phpoffice/phpspreadsheet": "^2.1",
-        "stripe/stripe-php": "^16.4"
+        "stripe/stripe-php": "^16.4",
+        "twilio/sdk": "^8.5"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.15",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",

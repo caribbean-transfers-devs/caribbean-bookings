@@ -1,5 +1,9 @@
-
-<form class="col-xl-12 quote_container" id="formReservation">
+@php
+    $sites = auth()->user()->Sites();
+    $origins = auth()->user()->Origins();
+    $users = auth()->user()->CallCenterAgent([1]);
+@endphp
+<form class="quote_container" id="formReservation">
     <div class="left_">
         @if (isset( $quotation['items'] ))
             @php
@@ -8,29 +12,43 @@
             @foreach ($quotation['items'] as $item)
                 @php
                     $service_counter++;
-                @endphp    
+                @endphp
                 <div class="item">
-                    <div class="one_">
-                        <img src="{{ $item['image'] }}">
-                    </div>
-                    <div class="two_">
+                    <div class="one_ one">
                         <h2>{{ $item['name'] }}</h2>
+                        <div class="stars">5/5</div>
+                        <img src="{{ $item['image'] }}" alt="" title="" width="" height="" loading="lazy">
+                        <div class="badges">
+                            <span>Impuestos incluidos</span>
+                            <span>Seguro de viaje</span>
+                        </div>
+                    </div>
+                    <div class="two_ two">
+                        <h3>Características</h3>
+                        <ul class="inline">
+                            <li><img src="/assets/img/svg/pax.svg"> Max {{ $item['passengers'] }} pasajeros</li>
+                            <li><img src="/assets/img/svg/luggage.svg"> Max {{ $item['luggage'] }} maletas</li>
+                        </ul>
+                        <h3>¿Qué incluye mi reserva?</h3>
                         <ul>
-                            <li>Cancelación gratuita</li>
-                            <li>Hasta {{ $item['passengers'] }} Pax</li>
-                            <li>Meet & greet</li>
-                            <li>{{ $item['luggage'] }} Maletas</li>
+                            {{-- <li>Cancelación gratuita</li> --}}
+                            {{-- <li>Meet & greet</li> --}}
+                            <li>Aire acondicionado</li>
+                            <li>Encuentro y bienvenida</li>
+                            {{-- <li>@lang('search.bilingual_drivers')</li> --}}
+                            <li>Parada de cortesía en la tienda</li>
                         </ul>
                     </div>
-                    <div class="three_">
-                        <div>
+                    <div class="three_ three">
+                        <div class="one">
+                            <p>Precio desde</p>
                             <p>${{ $item['price'] }} {{ $item['currency'] }}</p>
                             <p>Veículos ({{ $item['vehicles'] }})</p>
                         </div>
-                        <div>
-                            <input type="radio" class="checkButton" id="serviceButton-{{$service_counter}}" name="service_token" value="{{ $item['token'] }}" onclick="setTotal('{{ $item['price'] }}')">
+                        <div class="two">
+                            <input type="radio" class="checkButton" id="serviceButton-{{$service_counter}}" name="service_token" value="{{ $item['token'] }}" data-total="{{ $item['price'] }}">
                             <label for="serviceButton-{{$service_counter}}" class="btn custom-button">
-                                Reservar
+                                Seleccionar
                             </label>
                         </div>
                     </div>
@@ -39,9 +57,18 @@
         @endif
     </div>
     <div class="right_">
-
         <div class="client_information">
             <h3>Información personal</h3>
+            <div class="two_ mb-3">
+                <label class="form-label" for="formSite">Sitio</label>
+                <select class="form-control selectpicker" data-live-search="true" id="formSite" name="site_id">
+                    @if (isset( $sites ) && sizeof($sites) >= 1)
+                        @foreach ($sites as $item)
+                            <option value="{{ $item->id }}" data-type="{{ $item->type_site }}" data-phone="{{ $item->transactional_phone }}" data-email="{{ $item->transactional_email }}">{{ $item->name }}</option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
             <div class="one_">
                 <div>
                     <label class="form-label" for="formName">Nombre</label>
@@ -71,14 +98,6 @@
                     <label class="form-label" for="formSpecialRequest">Solicitudes especiales</label>
                     <textarea class="form-control" name="special_request" id="formSpecialRequest"></textarea>                    
                 </div>
-                <div>
-                    <label class="form-label" for="formPaymentMethod">Método de pago</label>
-                    <select class="form-control" id="formPaymentMethod" name="payment_method">
-                        <option value="CASH">Efectivo</option>
-                        <option value="CARD">Tarjeta de crédito / Débito</option>
-                        <option value="PAYPAL">PayPal</option>
-                    </select>
-                </div>
             </div>
         </div>
         
@@ -86,22 +105,30 @@
             <h3>Información adicional</h3>
             <div class="one_">
                 <div>
-                    <label class="form-label" for="formSite">Sitio</label>
-                    <select class="form-control" id="formSite" name="site_id">
-                        @if (isset( $sites ) && sizeof($sites) >= 1)
-                            @foreach ($sites as $item)
-                                <option value="{{ $item->id }}" data-type="{{ $item->type_site }}">{{ $item->name }}</option>
-                            @endforeach
-                        @endif
+                    <label class="form-label" for="formPaymentMethod">Es una cotización</label>
+                    <select class="form-control" id="formIsQuotation" name="is_quotation">
+                        <option value="0">No</option>
+                        <option value="1">Sí</option>
                     </select>
-                </div>
+                </div>                
+                <div>
+                    <label class="form-label" for="formPaymentMethod">Método de pago</label>
+                    <select class="form-control" id="formPaymentMethod" name="payment_method">
+                        <option value="CASH">Efectivo</option>
+                        <option value="CARD">Tarjeta de crédito / Débito</option>
+                        <option value="PAYPAL">PayPal</option>
+                    </select>
+                </div>                
+                {{-- <div>
+
+                </div> --}}
                 <div>
                     <label class="form-label" for="formOriginSale">Origen de venta</label>
-                    <select class="form-control" id="formOriginSale" name="origin_sale_id">
+                    <select class="form-control selectpicker" data-live-search="true" id="formOriginSale" name="origin_sale_id">
                         <option value="">Selecciona un origen de venta</option>
-                        @if (isset( $origin_sales ) && sizeof($origin_sales) >= 1)
-                            @foreach ($origin_sales as $origin_sale)
-                                <option value="{{ $origin_sale->id }}">{{ $origin_sale->code }}</option>
+                        @if (isset( $origins ) && sizeof($origins) >= 1)
+                            @foreach ($origins as $origin)
+                                <option value="{{ $origin->id }}">{{ $origin->code }}</option>
                             @endforeach
                         @endif
                     </select>                    
@@ -112,9 +139,9 @@
                 </div>
                 <div>
                     <label class="form-label" for="formAgent">Agente</label>
-                    <select class="form-control" id="formAgent" name="call_center_agent">
-                        @if (isset( $agents ) && sizeof($agents) >= 1)
-                            @foreach ($agents as $item)
+                    <select class="form-control selectpicker" data-live-search="true" id="formAgent" name="call_center_agent">
+                        @if (isset( $users ) && $users)
+                            @foreach ($users as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                             @endforeach
                         @endif
@@ -122,11 +149,10 @@
                 </div>
                 <div>
                     <label class="form-label" for="formTotal">Total</label>
-                    <input class="form-control" type="number" name="data[callcenter][total]" id="formTotal" autocomplete="off" value="0" readonly>
+                    <input class="form-control" type="tel" name="data[callcenter][total]" id="formTotal" autocomplete="off" value="0" readonly>
                 </div>
-                <button type="button" class="btn btn-success" onclick="makeReservationButton(event)" id="btn_make_reservation">Enviar</button>
+                <button type="submit" class="btn" id="sendReservation">Enviar</button>
             </div>
         </div>
-
     </div>
 </form>

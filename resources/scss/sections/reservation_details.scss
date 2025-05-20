@@ -1,19 +1,16 @@
 @import "../../plugins/flatpickr/flatpickr";
-@import "../../plugins/bootstrap-select/select";
-// @import "../../plugins/table/datatable/datatables";
-// @import "../template/plugins/light/table/datatable/dt-global_style";
-// @import "../template/plugins/dark/table/datatable/dt-global_style";
 
 @import '../template/light/components/modal';
-@import '../template/dark/components/modal';
 @import '../template/light/components/tabs';
-@import '../template/dark/components/tabs';
-
-// @import '../template/light/components/timeline';
-// @import '../template/dark/components/timeline';
 
 @import '../components/gallery';
 @import '../components/cancelled';
+@import '../components/logs'; //ESTILOS PARA LOGS, DETALLES RESERVA
+
+.main-content{
+    background-color: #ffffff;
+    font-family: "Poppins", serif;
+}
 
 .nav-link {
     display: flex;
@@ -29,15 +26,6 @@
     }
 }
 
-.tab {
-    .tab-content{
-        background: #fff;
-        padding: 1.25rem;
-        box-shadow: 0 .1rem .2rem rgba(0, 0, 0, .05);
-        border-radius: 0 0 .2rem .2rem;
-    }
-}
-
 .btn svg.feather-check-circle,
 .btn svg.feather-unlock,
 .btn svg.feather-lock,
@@ -45,65 +33,6 @@
     width: 15px;
     height: 15px;
     color: #fff !important;
-}
-
-.timeline-item:before, .timeline:before {
-    content: " ";
-    display: inline-block;
-    position: absolute;
-    z-index: 1;
-}
-
-.timeline {
-    list-style-type: none;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    height: 300px;
-    overflow: hidden;
-    overflow-y: scroll;
-
-    .timeline-item{
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 8px;
-
-        /* Elemento marcador */
-        &::before{
-            background: #fff;
-            border-radius: 50%;
-            border: 3px solid #3b7ddd;
-            left: 0;
-            width: 20px;
-            height: 20px;            
-        }
-
-        /* Línea de conexión entre los elementos */
-        &::after {
-            content: "";
-            position: absolute;
-            background: #3b7ddd;
-            width: 2px;
-            left: 9px; /* Centrado con el círculo */
-            top: 20px; /* Ajustado para empezar desde el centro del círculo */
-            height: var(--timeline-height); /* Ajustado para llegar hasta el final del item */
-            z-index: 0;
-        }
-    
-        &:last-child::after {
-            display: none; /* Oculta la línea en el último elemento */
-        }
-    }
-    
-    // &::before{
-    //     background: #000;
-    //     left: 9px;
-    //     width: 2px;
-    //     height: 100%;
-    // }
 }
 
 *>.callcenter-x:nth-child(1) {
@@ -175,16 +104,31 @@ div.box{
 }
 
 div.controls{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    column-gap: 8px;
+    row-gap: 8px;
     margin-bottom: 15px;
+
+    > button{
+        padding: 16px 14px;
+
+        &.social-button{
+            background: transparent;
+            align-items: center;
+            border: 1px solid #16161d;
+            border-radius: 8px;
+            color: #16161d;
+            display: flex;
+            gap: 16px;
+            justify-content: center;       
+        }
+    }
 }
+
 .services-container{
     padding: 15px;
     background-color: #dde9fa;
-    margin-top: 15px;
     border-radius: 8px;
     position: relative;
     >.check-bubble {
@@ -257,6 +201,65 @@ div#serviceMapModal{
     }
 }
 
-.pac-container{
-    z-index: 9999;
+.table-container, .table-responsive {
+  
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    //   overflow: hidden; // Asegura que el borde redondeado aplique a la tabla
+  
+      thead, tfoot {
+        tr{
+          th {
+            background-color: rgba(251, 86, 7, 0.72) !important; // Fondo azul claro
+            padding: 0.5rem; /*8px*/
+            font-size: 0.75rem; /*12px*/
+            color: #16161D;
+            text-align: left;
+            border: 1px solid #CCD6EB;
+
+            &:first-child {
+              font-weight: 600;
+            }                      
+          }
+        }
+      }
+  
+      tbody {
+        tr {
+          th, td {
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            color: #425466;
+            text-align: left;
+            border: 1px solid #CCD6EB; // Bordes sutiles
+
+            &:first-child {                
+                background-color: #f1f2f3 !important; // Fondo azul claro
+                color: #16161D;
+                font-weight: 500;
+            }                           
+          }
+        }
+      }
+  
+      tfoot {
+        tr {                        
+          th, td {
+            background-color: rgba(218, 218, 218, 1) !important; // Fondo verde claro para el total
+            &:first-child {
+              font-weight: 400;
+            }
+          }
+        }
+      }
+    }
+
+    &:not(.table-details-booking){
+        border-radius: 8px;
+
+        table{
+            border-radius: 5px;
+        }
+    }    
 }
