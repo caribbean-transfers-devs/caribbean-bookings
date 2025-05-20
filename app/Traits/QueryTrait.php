@@ -1102,6 +1102,7 @@ trait QueryTrait
                                     ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
                                     GROUP_CONCAT(DISTINCT p.reference_stripe ORDER BY p.reference_stripe ASC SEPARATOR ', ') AS reference_stripe,
                                     SUM(p.is_charged) as is_charged,
+                                    SUM(p.is_refund) as is_refund,
                                     GROUP_CONCAT(DISTINCT p.date_conciliation ORDER BY p.date_conciliation ASC SEPARATOR ', ') AS date_conciliation,
                                     COALESCE(SUM(p.amount), 0) as amount,
                                     COALESCE(SUM(p.total_net), 0) as total_net,
@@ -1167,6 +1168,7 @@ trait QueryTrait
                                                 ORDER BY payment_method ASC SEPARATOR ', '
                                             ) AS reference_stripe,
                                             SUM(is_conciliated) as is_charged,
+                                            SUM(is_refund) as is_refund,
                                             GROUP_CONCAT(DISTINCT date_conciliation ORDER BY date_conciliation ASC SEPARATOR ',') AS date_conciliation,
                                             ROUND(SUM(amount), 2) AS amount,
                                             ROUND(SUM(total_net), 2) AS total_net,

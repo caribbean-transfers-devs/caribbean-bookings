@@ -140,7 +140,14 @@ class ConciliationRepository
                 }
 
                 if( isset($chargeData['balance_transaction']['status']) && $chargeData['balance_transaction']['status'] == "available" ){                
-                    $newPayment->is_refund = ( isset($chargeData['refunds']['data']) && count($chargeData['refunds']['data']) > 0 ? 1 : 0 );
+                    // Corrección para el error count() - convertir a array si es necesario
+                    $refundsData = $chargeData['refunds']['data'] ?? [];
+                    if (is_object($refundsData)) {
+                        $refundsData = (array)$refundsData;
+                    }
+                    $newPayment->is_refund = (!empty($refundsData) ? 1 : 0);                    
+                    // $newPayment->is_refund = ( isset($chargeData['refunds']['data']) && count($chargeData['refunds']['data']) > 0 ? 1 : 0 );
+
                     $newPayment->date_conciliation = Carbon::parse($chargeData['balance_transaction']['available_on'])->format('Y-m-d H:i:s');
                     $newPayment->amount = ($chargeData['balance_transaction']['amount']/100);
                     $newPayment->total_fee = ($chargeData['balance_transaction']['fee']/100);
@@ -159,7 +166,7 @@ class ConciliationRepository
 
         return response()->json([
             'status' => 'success',
-            'message' => ( count($succesPayment) == count($payment) ? 'Se conciliaron todos los pagos' : 'Solo se pudieron conciliar '.count($succesPayment).' pagos' ),
+            'message' => ( count($succesPayment) == count($payments) ? 'Se conciliaron todos los pagos' : 'Solo se pudieron conciliar '.count($succesPayment).' pagos' ),
             'data' => $succesPayment
         ], Response::HTTP_OK);
     }
