@@ -150,7 +150,8 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'], '/finances/refunds',                                      [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS
         Route::match(['get', 'post'], '/finances/chargebacks',                                  [RefundsFinances::class, 'index'])->name('finances.chargebacks'); //CONTRAGARGOS
         Route::match(['get', 'post'], '/finances/receivables',                                  [RECEIVABLES::class, 'index'])->name('finances.receivables'); //CUENTAS POR COBRAR
-        Route::match(['get', 'post'], '/finances/stripe',                                       [STRIPE::class, 'index'])->name('finances.stripe'); //CONCILIACION DE STRIPE
+        Route::match(['get', 'post'], '/finances/stripe',                                       [STRIPE::class, 'index2'])->name('finances.stripe'); //CONCILIACION DE STRIPE
+        // Route::match(['get', 'post'], '/finances/stripe2',                                       [STRIPE::class, 'index2'])->name('finances.stripe2'); //CONCILIACION DE STRIPE
         Route::match(['get', 'post'], '/finance/sales',                                         [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS
 
     //REPORTES

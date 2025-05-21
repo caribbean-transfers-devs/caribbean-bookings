@@ -25,4 +25,8 @@ class StripeController extends Controller
     public function index(Request $request){
         return $this->StripeRepository->index($request);
     }
+
+    public function index2(Request $request){
+        return $this->StripeRepository->index2($request);
+    }    
 }

@@ -1,6 +1,5 @@
-@props(['data','users','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','rating','istoday','isbalance','isduplicated','isagency','wasIsQuotation','refundRequestCount','request'])
+@props(['data','users','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','rating','istoday','isbalance','isduplicated','isagency','wasIsQuotation','refundRequestCount'])
 @php
-    // dump($data);
     $date = "";
     if( isset($data) ){
         if( is_array($data) ){

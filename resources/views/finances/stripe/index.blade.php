@@ -213,7 +213,7 @@
                     </tbody>
                 </table>
                 <div class="mt-3 px-2">
-                    <h5>Resumen por estatus</h5>
+                    <h6 class="text-uppercase">Resumen</h6>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
