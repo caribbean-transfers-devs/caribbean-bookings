@@ -47,6 +47,34 @@ document.addEventListener("DOMContentLoaded", function() {
     components.setValueSelectpicker();
 
     document.addEventListener("click", components.debounce(async function (event) {
+        if (event.target && event.target.id === 'conciliationActionBtn') {
+            event.preventDefault();
+            console.log("hola");
+            
+
+            const selectedOption = document.getElementById('conciliationSelect').value;
+            console.log(selectedOption);
+            
+            if (!selectedOption || selectedOption == "null") {
+                alert('Por favor seleccione una opción para conciliar');
+                return;
+            }
+            
+            // Aquí puedes agregar la lógica para cada tipo de conciliación
+            switch(selectedOption) {
+                case 'pending':
+                    console.log('Conciliando pendientes de pago');
+                    // Abrir modal específico o ejecutar acción
+                    break;
+                case 'charged':
+                    console.log('Conciliando cobrados no pagados');
+                    break;
+                case 'disputed':
+                    console.log('Conciliando disputas/reembolsos');
+                    break;
+            }            
+        }
+
         if ( event.target.classList.contains('chargeInformationStripe') ) {
             event.preventDefault();
 

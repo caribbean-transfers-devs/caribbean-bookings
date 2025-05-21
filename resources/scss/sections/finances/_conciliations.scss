@@ -8,6 +8,153 @@
 @import '../../components/filters';
 @import '../../components/fixedheader';
 
+/* Dashboard Cards */
+.card.h-100 {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    transition: all 0.3s;
+}
+
+.card.h-100:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2);
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+/* Text colors */
+.text-success {
+    color: #1cc88a !important;
+}
+
+.text-info {
+    color: #36b9cc !important;
+}
+
+.text-warning {
+    color: #f6c23e !important;
+}
+
+.text-danger {
+    color: #e74a3b !important;
+}
+
+.text-primary {
+    color: #4e73df !important;
+}
+
+/* Icons */
+.fa-2x {
+    font-size: 2em;
+}
+
+
+/* Barra de Acciones */
+.card-header-tools {
+    border-radius: 10px;
+    border-bottom: 1px solid #e3e6f0;
+    /* Botones */
+    .btn-outline-primary, .btn-outline-secondary, .btn-outline-dark {
+        transition: all 0.3s ease;
+        border-width: 1.5px;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #4e73df;
+        color: white !important;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #858796;
+        color: white !important;
+    }
+
+    .btn-outline-dark:hover {
+        background-color: #5a5c69;
+        color: white !important;
+    }
+
+    .btn-success {
+        background-color: #1cc88a;
+        border-color: #1cc88a;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background-color: #17a673;
+        border-color: #17a673;
+        transform: translateY(-1px);
+    }
+
+    /* Select personalizado */
+    #conciliationSelect {
+        border-radius: 0.35rem 0 0 0.35rem !important;
+        border-right: none;
+    }
+
+    #conciliationActionBtn {
+        border-radius: 0 0.35rem 0.35rem 0 !important;
+        white-space: nowrap;
+    }
+
+    /* Efectos hover para los botones */
+    .btn {
+        padding: 13px 30px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+
+        .fas{
+            font-size: 20px;
+        }
+    }
+
+    .tool-form{
+        width: 50%;
+    }
+
+    .btn:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .tool-form{
+            width: 100%;
+        }
+
+        .input-group {
+            width: 100% !important;
+        }
+        
+        .d-flex.flex-wrap {
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        // .btn {
+        //     padding: 0.375rem 0.75rem;
+        // }
+    }    
+}
+
 .container-loader{
     width: 100%;
     display: flex;
