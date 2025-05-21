@@ -160,7 +160,7 @@ class StripeRepository
                 $resume['status']['charged']['amount'] += $item->amount;
                 $resume['status']['charged']['count']++;
             } else {
-                $resume['status']['pending_charge']['amount'] += $item->amount;
+                $resume['status']['pending_charge']['amount'] += $item->total_payments_stripe;
                 $resume['status']['pending_charge']['count']++;
             }
             
