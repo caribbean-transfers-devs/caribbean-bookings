@@ -48,6 +48,11 @@ class ConciliationController extends Controller
         return $this->ConciliationRepository->StripePayments($request);
     }    
 
+    public function stripePayouts(Request $request)
+    {
+        return $this->ConciliationRepository->stripePayouts($request);        
+    }
+
     public function stripeChargesReference(Request $request, $reference)
     {
         return $this->ConciliationRepository->stripeChargesReference($request, $reference);

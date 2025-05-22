@@ -14,7 +14,7 @@ class ZonesRepository{
         $breadcrumbs = array(
             array(
                 "route" => "",
-                "name" => "Zonas",
+                "name" => "Zonas de agencias",
                 "active" => true
             ),
         );

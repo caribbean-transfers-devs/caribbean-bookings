@@ -1,28 +1,3 @@
-@php
-    use Illuminate\Support\Str;
-    use Carbon\Carbon;
-    $resume = [
-        'BOOKINGS' => [],
-        'USD' => [
-            'TOTAL' => 0,
-            'QUANTITY' => 0
-        ],
-        'MXN' => [
-            'TOTAL' => 0,
-            'QUANTITY' => 0
-        ],
-        'CHARGED' => [
-            'TOTAL' => 0,
-            'QUANTITY' => 0            
-        ],
-        'PAID' => [
-            'TOTAL' => 0,
-            'QUANTITY' => 0            
-        ],        
-        // 'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-        // 'PAID' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
-    ];
-@endphp
 @extends('layout.app')
 @section('title') Conciliación Stripe @endsection
 
@@ -38,28 +13,6 @@
 @section('content')
     @php
         $buttons = array(
-            array(  
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Ayuda',
-                'className' => 'btn btn-primary __btn_create',
-                'attr' => array(
-                    'data-title' =>  "Ayuda de Stripe",
-                    'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#helpStripeModal'
-                )
-            ),            
-            array(  
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtros',
-                'className' => 'btn btn-primary __btn_create',
-                'attr' => array(
-                    'data-title' =>  "Filtro de reservaciones",
-                    'data-bs-toggle' => 'modal',
-                    'data-bs-target' => '#filterModal'
-                )
-            ),
-            array(  
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Conciliar Stripe',
-                'className' => 'btn btn-primary btnConciliationStripe',
-            ),
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
                 'titleAttr' => 'Administrar columnas',
@@ -81,14 +34,189 @@
                     'columns' => ':visible'  // Solo exporta las columnas visibles   
                 ]
             ),
-            array(
-                'text' => 'Tipo de cambio: '.$exchange,
-                'titleAttr' => 'Tipo de cambio',
-                'className' => 'btn btn-warning',
-            ),
+            // array(
+            //     'text' => 'Tipo de cambio: '.$exchange,
+            //     'titleAttr' => 'Tipo de cambio',
+            //     'className' => 'btn btn-warning',
+            // ),
         );
     @endphp
     <div class="row layout-top-spacing">
+        <div class="row layout-spacing">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-tools bg-white p-2 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                        <!-- Título y Select -->
+                        <div class="tool-form w-md-50 d-flex align-items-center mb-2 mb-md-0">
+                            <!-- Select para conciliación -->
+                            <div class="input-group">
+                                <select class="form-select" id="conciliationSelect">
+                                    <option value="null" selected disabled>Seleccione una opción...</option>
+                                    <option value="pending">Pendientes de pago</option>
+                                    <option value="charged">Cobrados no pagados</option>
+                                    <option value="disputed">Disputas/Reembolsos</option>
+                                </select>
+                                <button class="btn btn-primary" type="button" id="conciliationActionBtn">
+                                    <i class="fas fa-hand-holding-usd me-2"></i>Conciliar Pago
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Botones de Acción -->
+                        <div class="d-flex flex-wrap gap-2">
+                            <!-- Botón de Ayuda -->
+                            <button class="btn btn-outline-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#helpStripeModal">
+                                <i class="fas fa-question-circle me-2"></i>Ayuda
+                            </button>
+                            
+                            <!-- Botón de Filtros -->
+                            <button class="btn btn-outline-secondary d-flex align-items-center __btn_create" data-title="Filtro de conciliación" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                <i class="fas fa-filter me-2"></i>Filtros
+                            </button>
+                            
+                            <!-- Botón de Conciliar Stripe -->
+                            <button class="btn btn-success d-flex align-items-center btnConciliationStripe">
+                                <i class="fas fa-exchange-alt me-2"></i>Conciliar Cobros Stripe
+                            </button>                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row layout-spacing">
+            <!-- Resumen por moneda -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-white p-2">
+                        <h5 class="mb-0">Resumen por Moneda</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="row">
+                            @foreach($resume['total'] as $key => $currency)
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-left-{{ $currency['color'] }} shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-{{ $currency['color'] }} text-uppercase mb-1">
+                                                        Total en {{ $key }}
+                                                    </div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        ${{ number_format($currency['amount'], 2) }}
+                                                    </div>
+                                                    <small class="text-muted">{{ $currency['count'] }} transacciones</small>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-{{ $currency['icon'] }} fa-2x text-{{ $currency['color'] }}"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estado de transacciones -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-white p-2">
+                        <h5 class="mb-0">Estado de Transacciones</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="row">
+                            @foreach($resume['status'] as $key => $status)
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-left-{{ $status['color'] }} shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-{{ $status['color'] }} text-uppercase mb-1">
+                                                        {{ $status['label'] }}
+                                                    </div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        ${{ number_format($status['amount'], 2) }}
+                                                    </div>
+                                                    <small class="text-muted">{{ $status['count'] }} transacciones</small>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-{{ $key === 'charged' || $key === 'paid' ? 'check-circle' : 'clock' }} fa-2x text-{{ $status['color'] }}"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row layout-spacing">
+            <!-- Comisiones y Neto -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-white p-2">
+                        <h5 class="mb-0">Comisiones Stripe</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Total Comisiones
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            ${{ number_format($resume['fees']['amount'], 2) }}
+                                        </div>
+                                        <small class="text-muted">{{ $resume['fees']['count'] }} transacciones</small>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-percentage fa-2x text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reembolsos -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-white p-2">
+                        <h5 class="mb-0">Reembolsos</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="card border-left-danger shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                            Total Reembolsos
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            ${{ number_format($resume['refunds']['amount'], 2) }}
+                                        </div>
+                                        <small class="text-muted">{{ $resume['refunds']['count'] }} transacciones</small>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-exchange-alt fa-2x text-danger"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- listado de pagos de stripe --}}
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
                 @if ($errors->any())
@@ -114,7 +242,8 @@
                             <th class="text-center">SERVICIO</th>
                             <th class="text-center">PAX</th>
                             <th class="text-center">DESTINO</th>
-                            <th class="text-center">IMPORTE</th>
+                            <th class="text-center">IMPORTE DE VENTA</th>
+                            <th class="text-center">IMPORTE COBRADO</th>
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">METODO DE PAGO</th>
                             <th class="text-center">IMPORTE PESOS</th>
@@ -126,31 +255,14 @@
                             <th class="text-center">FECHA DE PAGO STRIPE</th>
                             <th class="text-center">ESTATUS DE PAGO STRIPE</th>
                             <th class="text-center">TOTAL PAGADO POR STRIPE</th>
+                            <th class="text-center">REFERENCIA DE PAGADO POR STRIPE</th>
                             <th class="text-center">TIENE REEMBOLSO</th>
+                            <th class="text-center">TIENE DISPUTA</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if(sizeof($conciliations)>=1)
                             @foreach($conciliations as $key => $item)
-                                @php
-                                    if( isset( $resume[ $item->currency ] ) ):
-                                        $resume[ $item->currency ]['TOTAL'] += $item->total_payments_stripe;
-                                        $resume[ $item->currency ]['QUANTITY']++;
-                                    endif;
-
-                                    if( $item->date_conciliation != NULL && isset( $resume[ 'CHARGED' ] ) ){
-                                        $resume[ 'CHARGED' ]['TOTAL'] += $item->amount;
-                                        $resume[ 'CHARGED' ]['QUANTITY']++;
-                                    }
-
-                                    if( $item->deposit_date != NULL && isset( $resume[ 'PAID' ] ) ){
-                                        $resume[ 'PAID' ]['TOTAL'] += $item->amount;
-                                        $resume[ 'PAID' ]['QUANTITY']++;
-                                    }                                    
-                                @endphp
-                                {{-- @if ($item->reservation_id == 53769)
-                                    @dump($item)
-                                @endif --}}
                                 <tr>
                                     <td class="text-center">{{ $item->reservation_id }}</td>
                                     <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
@@ -174,10 +286,11 @@
                                     <td class="text-center">{{ $item->service_type_name }}</td>
                                     <td class="text-center">{{ $item->passengers }}</td>
                                     <td class="text-center">{{ $item->to_name }}</td>
-                                    <td class="text-center">$ {{ number_format($item->total_payments_stripe, 2) }}</td>
+                                    <td class="text-center">{{ $item->total_sales }}</td>
+                                    <td class="text-center">$ {{ number_format($item->total_payments, 2) }}</td>
                                     <td class="text-center">{{ $item->currency }}</td>
                                     <td class="text-center">{{ $item->payment_type_name }}</td>
-                                    <td class="text-center">$ {{ number_format(( $item->currency == "MXN" ? $item->total_payments_stripe : ( $item->total_payments_stripe * $exchange ) ), 2) }}</td>
+                                    <td class="text-center">$ {{ number_format(round($item->total_payments_stripe), 2) }}</td>
                                     <td class="text-center">
                                         @if ( !empty($item->reference_stripe) )
                                             <a href="javascript:void(0)" class="chargeInformationStripe" data-reference="{{ $item->reference_stripe }}">{{ $item->reference_stripe }}</a>
@@ -202,55 +315,153 @@
                                         @endif
                                     </td>
                                     <td class="text-center">$ {{ number_format(( $item->total_net ), 2) }}</td>
+                                    <td class="text-center"></td>
                                     <td class="text-center">
-                                        @if ( $item->is_refund > 0 )
+                                        @if ( $item->refunded > 0 )
                                             <button class="btn btn-success">Sí</button>
                                         @endif
                                     </td>
+                                    <td class="text-center">
+                                        @if ( $item->disputed > 0 )
+                                            <button class="btn btn-success">Sí</button>
+                                        @endif
+                                    </td>                                    
                                 </tr>
                             @endforeach
                         @endif
                     </tbody>
                 </table>
-                <div class="mt-3 px-2">
-                    <h6 class="text-uppercase">Resumen</h6>
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"></th>
-                                    <th class="text-center">CANTIDAD</th>
-                                    <th class="text-center">MONTO</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>TOTAL EN DOLARES</td>
-                                    <td class="text-center">{{ $resume['USD']['QUANTITY'] }}</td>
-                                    <td class="text-center">{{ number_format($resume['USD']['TOTAL'],2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>TOTAL EN PESOS</td>
-                                    <td class="text-center">{{ $resume['MXN']['QUANTITY'] }}</td>
-                                    <td class="text-center">{{ number_format($resume['MXN']['TOTAL'],2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>TOTAL COBRADO EN STRIPE</td>
-                                    <td class="text-center">{{ $resume['CHARGED']['QUANTITY'] }}</td>
-                                    <td class="text-center">{{ number_format($resume['CHARGED']['TOTAL'],2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>TOTAL PAGADO EN STRIPE</td>
-                                    <td class="text-center">{{ $resume['PAID']['QUANTITY'] }}</td>
-                                    <td class="text-center">{{ number_format($resume['PAID']['TOTAL'],2) }}</td>
-                                </tr>                                
-                            </tbody>
-                        </table>
-                    </div>
-                </div>                
+            </div>
+        </div>
+
+        {{-- listado de pagos de stripe pero sin codigo de referencia validos --}}
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+            <div class="widget-content widget-content-area br-8">
+                <div class="table-responsive">
+                    <table id="dataOthersReferences" class="table dt-table-hover" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="text-center">ID</th>
+                                <th class="text-center">FECHA</th>
+                                <th class="text-center">SITIO</th>
+                                <th class="text-center">CÓDIGO</th>
+                                <th class="text-center">ESTATUS</th>
+                                <th class="text-center">CLIENTE</th>
+                                <th class="text-center">SERVICIO</th>
+                                <th class="text-center">PAX</th>
+                                <th class="text-center">DESTINO</th>
+                                <th class="text-center">IMPORTE DE VENTA</th>
+                                <th class="text-center">IMPORTE COBRADO</th>
+                                <th class="text-center">MONEDA</th>
+                                <th class="text-center">METODO DE PAGO</th>
+                                <th class="text-center">IMPORTE PESOS</th>
+                                <th class="text-center">ID STRIPE / REFERENCIA</th>
+                                <th class="text-center">FECHA DE COBRO STRIPE</th>
+                                <th class="text-center">ESTATUS DE COBRO STRIPE</th>
+                                <th class="text-center">TOTAL COBRADO EN STRIPE</th>
+                                <th class="text-center">COMISIÓN DE STRIPE</th>
+                                <th class="text-center">FECHA DE PAGO STRIPE</th>
+                                <th class="text-center">ESTATUS DE PAGO STRIPE</th>
+                                <th class="text-center">TOTAL PAGADO POR STRIPE</th>
+                                <th class="text-center">REFERENCIA DE PAGADO POR STRIPE</th>
+                                <th class="text-center">TIENE REEMBOLSO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(sizeof($otherReferences)>=1)
+                                @foreach($otherReferences as $key => $item)
+                                    @php
+                                        // Inicialización con punto y coma
+                                        $total_payments = 0;
+
+                                        // Verificar si $item tiene las propiedades necesarias
+                                        if (isset($item->operation, $item->total_payments_stripe)) {
+                                            switch ($item->operation) {
+                                                case "multiplication":
+                                                    $total_payments = round($item->total_payments_stripe * ($item->exchange_rate ?? 1));
+                                                    break;
+                                                case "division":
+                                                    $total_payments = round($item->total_payments_stripe / ($item->exchange_rate ?? 1));
+                                                    break;
+                                                default:
+                                                    $total_payments = round($item->total_payments_stripe);
+                                            }
+                                        }
+
+                                        // Verificar y actualizar resumen por moneda
+                                        if (isset($item->currency, $resume[$item->currency])) {
+                                            $resume[$item->currency]['TOTAL'] += $item->total_payments_stripe ?? 0;
+                                            $resume[$item->currency]['QUANTITY']++;
+                                        }
+                                    @endphp
+                                    <tr>
+                                        <td class="text-center">{{ $item->reservation_id }}</td>
+                                        <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
+                                        <td class="text-center">{{ $item->site_name }}</td>
+                                        <td class="text-center">
+                                            @php
+                                                $codes_string = "";
+                                                $codes = explode(",",$item->reservation_codes);
+                                                foreach ($codes as $key => $code) {
+                                                    $codes_string .= '<p class="mb-1">'.$code.'</p>';
+                                                }
+                                            @endphp
+                                            @if (auth()->user()->hasPermission(61))
+                                                <a href="/reservations/detail/{{ $item->reservation_id }}"><?=$codes_string?></a>
+                                            @else
+                                                <?=$codes_string?>
+                                            @endif
+                                        </td>
+                                        <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($item->reservation_status) }}">{{ auth()->user()->statusBooking($item->reservation_status) }}</button></td>
+                                        <td class="text-center">{{ $item->full_name }}</td>
+                                        <td class="text-center">{{ $item->service_type_name }}</td>
+                                        <td class="text-center">{{ $item->passengers }}</td>
+                                        <td class="text-center">{{ $item->to_name }}</td>
+                                        <td class="text-center">{{ $item->total_sales }}</td>
+                                        <td class="text-center">$ {{ number_format($total_payments, 2) }}</td>
+                                        <td class="text-center">{{ $item->currency }}</td>
+                                        <td class="text-center">{{ $item->payment_type_name }}</td>
+                                        <td class="text-center">$ {{ number_format(( $item->currency == "MXN" ? $total_payments : ( $total_payments * $item->exchange_rate ) ), 2) }}</td>
+                                        <td class="text-center">
+                                            @if ( !empty($item->reference_stripe) )
+                                                <a href="javascript:void(0)" class="chargeInformationStripe" data-reference="{{ $item->reference_stripe }}">{{ $item->reference_stripe }}</a>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">{{ $item->date_conciliation != NULL ? date("Y-m-d", strtotime($item->date_conciliation)) : "SIN FECHA DE COBRO" }}</td>
+                                        <td class="text-center" style="color:#fff;background-color:#{{ $item->date_conciliation != NULL ? '00ab55' : 'e7515a' }};">
+                                            @if ($item->date_conciliation != NULL)
+                                                COBRADO
+                                            @else
+                                                PENDIENTE DE COBRAR
+                                            @endif
+                                        </td>
+                                        <td class="text-center">$ {{ number_format($item->amount, 2) }}</td>
+                                        <td class="text-center">$ {{ number_format($item->total_fee, 2) }}</td>
+                                        <td class="text-center">{{ $item->deposit_date != NULL ? date("Y-m-d", strtotime($item->deposit_date)) : "SIN FECHA DE PAGO " }}</td>
+                                        <td class="text-center" style="color:#fff;background-color:#{{ $item->deposit_date != NULL ? '00ab55' : 'e7515a' }};">
+                                            @if ($item->deposit_date != NULL)
+                                                PAGADO
+                                            @else
+                                                PENDIENTE DE PAGO
+                                            @endif
+                                        </td>
+                                        <td class="text-center">$ {{ number_format(( $item->total_net ), 2) }}</td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center">
+                                            @if ( $item->is_refund > 0 )
+                                                <button class="btn btn-success">Sí</button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
 
     <x-modals.filters.bookings :data="$data" :currencies="$currencies" />
     <x-modals.reports.columns />

@@ -121,48 +121,36 @@ class ConciliationRepository
             if( explode('_',$reference)[0] == "pi" ){
                 $intent = ( $date_payment > "2024-12-17" ? $this->getPaymentIntentsV2($reference) : $this->getPaymentIntentsV1($reference) );
                 $intentData = $intent->getData(true);
-                if( $intentData['status'] == "succeeded" ){
+                if(!empty($intentData) && isset($intentData['status']) && $intentData['status'] == "succeeded" ){
                     $reference  = ( isset($intentData['latest_charge']) ? $intentData['latest_charge'] : "" );
                 }
             }
 
             // $data[]['expand[]'] = "refunds";
-            $data = ['expand' => ['refunds']];
+            $data = ['expand' => ['balance_transaction','payment_intent','refunds']];
             $charge = ( $date_payment > "2024-12-17" ? $this->getChargesV2($reference, $data) : $this->getChargesV1($reference, $data) );
             $chargeData = $charge->getData(true);
             
-            if( $chargeData['status'] == "succeeded" ){
+            if(!empty($chargeData) && isset($chargeData['status']) && $chargeData['status'] == "succeeded" ){
                 $newPayment = Payment::find($payment->id);
-                $balance = ( $date_payment > "2024-12-17" ? $this->getBalanceInfoV2($chargeData['balance_transaction']) : $this->getBalanceInfoV1($chargeData['balance_transaction']) );
-                $balanceData = $balance->getData(true);
-                if ( isset($balanceData['object']) && $balanceData['object'] == "balance_transaction" ) {
-                    $chargeData['balance_transaction'] = $balanceData;
-                }
-
                 // if( isset($chargeData['balance_transaction']['status']) && $chargeData['balance_transaction']['status'] == "available" ){
-                    // Corrección para el error count() - convertir a array si es necesario
-                    $refundsData = $chargeData['refunds']['data'] ?? [];
-                    if (is_object($refundsData)) {
-                        $refundsData = (array)$refundsData;
-                    }
-                    $newPayment->is_refund = (!empty($refundsData) ? 1 : 0);
-                    // $newPayment->is_refund = ( isset($chargeData['refunds']['data']) && count($chargeData['refunds']['data']) > 0 ? 1 : 0 );
-                    // $newPayment->date_conciliation = Carbon::parse($chargeData['balance_transaction']['available_on'])->format('Y-m-d H:i:s');
-                    // $newPayment->amount = ($chargeData['balance_transaction']['amount']/100);
-                    // $newPayment->total_fee = ($chargeData['balance_transaction']['fee']/100);
-                    // $newPayment->total_net = ($chargeData['balance_transaction']['net']/100);
+                $newPayment->refunded = $chargeData['refunded'];
+                $newPayment->disputed = $chargeData['disputed'];
 
-                    $newPayment->date_conciliation = Carbon::parse($chargeData['created'] ?? null)->format('Y-m-d H:i:s') ?? null;
-                    $newPayment->amount = ($chargeData['balance_transaction']['amount'] ?? 0) / 100;
-                    $newPayment->total_fee = ($chargeData['balance_transaction']['fee'] ?? 0) / 100;
-                    $newPayment->total_net = ($chargeData['balance_transaction']['net'] ?? 0) / 100;                    
-                    
-                    if( $newPayment->save() ){
-                        array_push($succesPayment, $newPayment);
-                    }
+                // $newPayment->is_refund = ( isset($chargeData['refunds']['data']) && count($chargeData['refunds']['data']) > 0 ? 1 : 0 );
+                // $newPayment->date_conciliation = Carbon::parse($chargeData['balance_transaction']['available_on'])->format('Y-m-d H:i:s');
+                // $newPayment->amount = ($chargeData['balance_transaction']['amount']/100);
+                // $newPayment->total_fee = ($chargeData['balance_transaction']['fee']/100);
+                // $newPayment->total_net = ($chargeData['balance_transaction']['net']/100);
 
-                    array_push($errorPayment, $newPayment);                    
-                // }
+                $newPayment->date_conciliation = Carbon::parse($chargeData['created'] ?? null)->format('Y-m-d H:i:s') ?? null;
+                $newPayment->amount = ($chargeData['balance_transaction']['amount'] ?? 0) / 100;
+                $newPayment->total_fee = ($chargeData['balance_transaction']['fee'] ?? 0) / 100;
+                $newPayment->total_net = ($chargeData['balance_transaction']['net'] ?? 0) / 100;
+                if( $newPayment->save() ){
+                    array_push($succesPayment, $newPayment);
+                }
+                array_push($errorPayment, $newPayment);
             }
 
             array_push($errorPayment, $payment);
@@ -173,6 +161,21 @@ class ConciliationRepository
             'message' => ( count($succesPayment) == count($payments) ? 'Se conciliaron todos los pagos' : 'Solo se pudieron conciliar '.count($succesPayment).' pagos' ),
             'data' => $succesPayment
         ], Response::HTTP_OK);
+    }
+
+    public function stripePayouts($request)
+    {
+        try {
+            $payoutsV1 = $this->getPayoutsV1($request);
+            $payoutsDataV1 = ( !isset($payoutsV1->getData(true)['status']) ? $payoutsV1->getData(true)['data'] : [] );
+            dd($payoutsV1->getData(true)['data']);
+        } catch (Exception $e) {
+            return response()->json([
+                'status'   => 'error',
+                'message'  => $e->getMessage(),
+                'code'     => 500 // Bad Request
+            ], 500);
+        }
     }
 
     public function stripeChargesReference($request, $reference)
@@ -203,7 +206,7 @@ class ConciliationRepository
             $date_payment = Carbon::parse(( isset($payment->created_at) ? $payment->created_at : $request->created_at ))->format('Y-m-d');
             $v2 = ( $date_payment > "2024-12-17" ? true : false );
             // $data[]['expand[]'] = "refunds";
-            $data = ['expand' => ['refunds']];
+            $data = ['expand' => ['balance_transaction','payment_intent','refunds']];
             $charge = ( $v2 ? $this->getChargesV2($reference, $data) : $this->getChargesV1($reference, $data) );
             $chargeData = $charge->getData(true);
 
@@ -215,11 +218,11 @@ class ConciliationRepository
                 ], 404);
             }
 
-            $balance = ( $v2 ? $this->getBalanceInfoV2($chargeData['balance_transaction']) : $this->getBalanceInfoV1($chargeData['balance_transaction']) );
-            $balanceData = $balance->getData(true);
-            if ( isset($balanceData['object']) && $balanceData['object'] == "balance_transaction" ) {
-                $chargeData['balance_transaction'] = $balanceData;
-            }
+            // $balance = ( $v2 ? $this->getBalanceInfoV2($chargeData['balance_transaction']) : $this->getBalanceInfoV1($chargeData['balance_transaction']) );
+            // $balanceData = $balance->getData(true);
+            // if ( isset($balanceData['object']) && $balanceData['object'] == "balance_transaction" ) {
+            //     $chargeData['balance_transaction'] = $balanceData;
+            // }
 
             return response()->json([
                 'status'   => 'success',

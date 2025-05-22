@@ -1280,6 +1280,8 @@ trait QueryTrait
                                         p.reference_conciliation,
                                         p.is_conciliated,
                                         p.is_refund,
+                                        p.refunded,
+                                        p.disputed,
                                         p.date_conciliation,
                                         p.deposit_date,
                                         p.amount,
@@ -1366,7 +1368,8 @@ trait QueryTrait
                                     AND p.deleted_at IS NULL
                                     AND p.date_conciliation IS NULL /** LA FECHA DE CONCILIACION ES NULO */ 
                                     AND (p.reference IS NOT NULL AND p.reference != '')
-                                    AND rez.is_cancelled = 0 
+                                    AND (p.reference LIKE 'pi\_%' OR p.reference LIKE 'py\_%' OR p.reference LIKE 'ch\_%')
+                                    -- AND rez.is_cancelled = 0 
                                     AND rez.is_duplicated = 0 ".$query." ", [
                                         'method' => $method
                                     ]);

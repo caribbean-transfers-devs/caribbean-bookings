@@ -64,6 +64,60 @@ trait StripeTrait
             'status' => $httpCode,
             'body' => json_decode($response, true) ?: $response
         ];
+    }
+
+    /*********************************************************************/
+    /****************************** PAYOUTS ******************************/
+    /*********************************************************************/
+    
+    // Método para buscar los pagos
+    public function getPayoutsV1($balanceTransaction)
+    {
+        try {
+            $url = $this->apiUrlStripe . "/v1/payouts?expand[]=data.balance_transaction&expand[]=data.destination&limit=100";
+            $response = $this->makeCurlRequest($url, $this->clientSecretStripeS);
+            
+            if ($response['status'] >= 200 && $response['status'] < 300) {
+                return response()->json($response['body']);
+            } else {
+                $errorMsg = $response['body']['error']['message'] ?? 'Failed to retrieve balance';
+                return response()->json([
+                    'status' => 'error',
+                    'error' => $errorMsg,
+                    'message' => $errorMsg,
+                ], $response['status']);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Método para buscar los pagos
+    public function getPayoutsV2($balanceTransaction)
+    {
+        try {
+            $url = $this->apiUrlStripe . "/v1/payouts?expand[]=data.balance_transaction&expand[]=data.destination";
+            $response = $this->makeCurlRequest($url, $this->clientSecretStripeP);
+            
+            if ($response['status'] >= 200 && $response['status'] < 300) {
+                return response()->json($response['body']);
+            } else {
+                $errorMsg = $response['body']['error']['message'] ?? 'Failed to retrieve balance';
+                return response()->json([
+                    'status' => 'error',
+                    'error' => $errorMsg,
+                    'message' => $errorMsg,
+                ], $response['status']);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }    
 
     /*********************************************************************/

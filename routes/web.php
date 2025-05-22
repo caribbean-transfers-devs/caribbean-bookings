@@ -19,7 +19,6 @@ use App\Http\Controllers\Bookings\BookingsController;
 use App\Http\Controllers\Finances\RefundsController as             RefundsFinances;
 use App\Http\Controllers\Finances\ReceivablesController as         RECEIVABLES;
 use App\Http\Controllers\Finances\StripeController as              STRIPE;
-use App\Http\Controllers\Finances\SalesController as               SaleFinance;
 
 //REPORTS
 use App\Http\Controllers\Reports\PaymentsController as             PAYMENTS;
@@ -125,6 +124,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/conciliation/paypalOrder/{id}',                                            [CONCILIATION::class, 'PayPalPaymenOrder'])->name('bot.paypal.order')->withoutMiddleware(['auth']);
         //STRIPE
         Route::match(['get', 'post'],  '/bot/conciliation/stripe',                              [CONCILIATION::class, 'stripePayments'])->name('bot.stripe')->withoutMiddleware(['auth']);
+        Route::match(['get', 'post'],  '/stripe/payouts',                                       [CONCILIATION::class, 'stripePayouts'])->name('stripe.payouts')->withoutMiddleware(['auth']);
         Route::match(['get', 'post'],  '/stripe/charges/{reference}',                           [CONCILIATION::class, 'stripeChargesReference'])->name('stripe.charges.reference')->withoutMiddleware(['auth']);
         Route::match(['get', 'post'],  '/stripe/payment_intents/{reference}',                   [CONCILIATION::class, 'stripePaymentIntentsReference'])->name('stripe.payment_intents.reference')->withoutMiddleware(['auth']);
         Route::match(['get', 'post'],  '/stripe/balance_transactions/{reference}',              [CONCILIATION::class, 'stripeBalanceTransactionsReference'])->name('stripe.balance_transactions.reference')->withoutMiddleware(['auth']);
@@ -150,9 +150,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'], '/finances/refunds',                                      [RefundsFinances::class, 'index'])->name('finances.refunds'); //REEMBOLSOS
         Route::match(['get', 'post'], '/finances/chargebacks',                                  [RefundsFinances::class, 'index'])->name('finances.chargebacks'); //CONTRAGARGOS
         Route::match(['get', 'post'], '/finances/receivables',                                  [RECEIVABLES::class, 'index'])->name('finances.receivables'); //CUENTAS POR COBRAR
-        Route::match(['get', 'post'], '/finances/stripe',                                       [STRIPE::class, 'index2'])->name('finances.stripe'); //CONCILIACION DE STRIPE
-        // Route::match(['get', 'post'], '/finances/stripe2',                                       [STRIPE::class, 'index2'])->name('finances.stripe2'); //CONCILIACION DE STRIPE
-        Route::match(['get', 'post'], '/finance/sales',                                         [SaleFinance::class, 'index'])->name('finance.sales'); //PAGOS
+        Route::match(['get', 'post'], '/finances/stripe',                                       [STRIPE::class, 'index'])->name('finances.stripe'); //CONCILIACION DE STRIPE
 
     //REPORTES
         Route::match(['get', 'post'], '/reports/payments', [PAYMENTS::class, 'index'])->name('reports.payments'); //PAGOS
