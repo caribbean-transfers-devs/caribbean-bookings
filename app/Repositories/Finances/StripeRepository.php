@@ -89,47 +89,50 @@ class StripeRepository
         // Procesar los datos
         foreach ($conciliations as $item) {
             // Calcular montos según la operación
-            $amount = $this->calculateAmount($item);
-            
+            $amount = $this->calculateAmount($item);            
             $item->total_payments = $amount;
+            $prefix = substr($item->reference_stripe, 0, 3);
 
-            // Totales por moneda
-            if (isset($resume['total'][$item->currency])) {
-                $resume['total'][$item->currency]['amount'] += $amount;
-                $resume['total'][$item->currency]['count']++;
-            }
-            
-            // Estado de cobro
-            if (!empty($item->date_conciliation)) {
-                $resume['status']['charged']['amount'] += $item->amount;
-                $resume['status']['charged']['count']++;
-            } else {
-                $resume['status']['pending_charge']['amount'] += $item->total_payments_stripe;
-                $resume['status']['pending_charge']['count']++;
-            }
-            
-            // Estado de pago
-            if (!empty($item->deposit_date)) {
-                $resume['status']['paid']['amount'] += $item->total_net ?? 0;
-                $resume['status']['paid']['count']++;
-            } else {
-                $resume['status']['pending_payment']['amount'] += $item->total_net ?? 0;
-                $resume['status']['pending_payment']['count']++;
-            }
-            
-            // Comisiones 
-            if ($item->total_fee) {
-                $resume['fees']['count']++;
-            }            
-            $resume['fees']['amount'] += $item->total_fee ?? 0;
-            
-            // Reembolsos
-            if ($item->is_refund > 0) {
-                $resume['refunds']['count']++;
+            if( in_array($prefix, ['pi_', 'py_', 'ch_']) ){
+                // Totales por moneda
+                if (isset($resume['total'][$item->currency])) {
+                    $resume['total'][$item->currency]['amount'] += $amount;
+                    $resume['total'][$item->currency]['count']++;
+                }
+                
+                // Estado de cobro
+                if (!empty($item->date_conciliation)) {
+                    $resume['status']['charged']['amount'] += $item->amount;
+                    $resume['status']['charged']['count']++;
+                } else {
+                    $resume['status']['pending_charge']['amount'] += $item->total_payments_stripe;
+                    $resume['status']['pending_charge']['count']++;
+                }
+                
+                // Estado de pago
+                if (!empty($item->deposit_date)) {
+                    $resume['status']['paid']['amount'] += $item->total_net ?? 0;
+                    $resume['status']['paid']['count']++;
+                } else {
+                    $resume['status']['pending_payment']['amount'] += $item->total_net ?? 0;
+                    $resume['status']['pending_payment']['count']++;
+                }
+                
+                // Comisiones 
+                if ($item->total_fee) {
+                    $resume['fees']['count']++;
+                }            
+                $resume['fees']['amount'] += $item->total_fee ?? 0;
+                
+                // Reembolsos
+                if ($item->is_refund > 0) {
+                    $resume['refunds']['count']++;
+                }
             }
         }
 
         $filteredConciliations = collect($conciliations)->filter(function ($item) {
+        // $filteredConciliations = collect($conciliations)->filter(function ($item) use (&$resume) {
             if (empty($item->reference_stripe)) return true;
                         
             $prefix = substr($item->reference_stripe, 0, 3);
@@ -137,6 +140,7 @@ class StripeRepository
         });
 
         $otherReferences = collect($conciliations)->reject(function ($item) {
+        // $otherReferences = collect($conciliations)->filter(function ($item) use (&$resume) {
             if (empty($item->reference_stripe)) return false;
 
             $prefix = substr($item->reference_stripe, 0, 3);

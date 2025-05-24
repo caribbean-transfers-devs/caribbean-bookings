@@ -46,11 +46,6 @@ class ConciliationController extends Controller
     public function StripePayments(Request $request)
     {
         return $this->ConciliationRepository->StripePayments($request);
-    }    
-
-    public function stripePayouts(Request $request)
-    {
-        return $this->ConciliationRepository->stripePayouts($request);        
     }
 
     public function stripeChargesReference(Request $request, $reference)
@@ -62,4 +57,14 @@ class ConciliationController extends Controller
     {
         return $this->ConciliationRepository->stripePaymentIntentsReference($request, $reference);
     }
+
+    public function stripePayoutsReference(Request $request, $reference)
+    {
+        return $this->ConciliationRepository->stripePayoutsReference($request, $reference);
+    }
+
+    public function stripeInternalPayouts(Request $request)
+    {
+        return $this->ConciliationRepository->stripeInternalPayouts($request);
+    }    
 }

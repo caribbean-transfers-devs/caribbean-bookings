@@ -128,6 +128,8 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['get', 'post'],  '/stripe/charges/{reference}',                           [CONCILIATION::class, 'stripeChargesReference'])->name('stripe.charges.reference')->withoutMiddleware(['auth']);
         Route::match(['get', 'post'],  '/stripe/payment_intents/{reference}',                   [CONCILIATION::class, 'stripePaymentIntentsReference'])->name('stripe.payment_intents.reference')->withoutMiddleware(['auth']);
         Route::match(['get', 'post'],  '/stripe/balance_transactions/{reference}',              [CONCILIATION::class, 'stripeBalanceTransactionsReference'])->name('stripe.balance_transactions.reference')->withoutMiddleware(['auth']);
+        Route::match(['get', 'post'],  '/stripe/payouts/{reference}',                           [CONCILIATION::class, 'stripePayoutsReference'])->name('stripe.payouts.reference')->withoutMiddleware(['auth']);
+        Route::match(['get', 'post'],  '/stripeInternal/payouts',                               [CONCILIATION::class, 'stripeInternalPayouts'])->name('stripe.internal.payouts')->withoutMiddleware(['auth']);
 
     //DASHBOARD
         Route::match(['get', 'post'], '/',                                                      [DashboardController::class, 'index'])->name('dashboard'); // GERENCIA

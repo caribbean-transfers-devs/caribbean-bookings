@@ -2,6 +2,15 @@ let stripe = {
     getLoader: function() {
         return '<span class="container-loader"><i class="fa-solid fa-spinner fa-spin-pulse"></i></span>';
     },
+    cleanNumber: function(value) {
+        if (!value) return 0;
+        return Number(value.toString().replace(/[^0-9.-]+/g, ""));
+    },
+    formatCurrency: function(value, asNumber = false) {
+        let cleanedValue = this.cleanNumber(value);
+        return asNumber ? cleanedValue.toFixed(2) : 
+            new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(cleanedValue);
+    },    
     /**
      * 
      * @param {*} url 
@@ -28,7 +37,7 @@ let stripe = {
         } catch (error) {
             console.error("Error en la petición:", error);
         }
-    },    
+    },
 }
 
 //DECLARACION DE VARIABLES
@@ -48,31 +57,132 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.addEventListener("click", components.debounce(async function (event) {
         if (event.target && event.target.id === 'conciliationActionBtn') {
-            event.preventDefault();
-            console.log("hola");
-            
+            event.preventDefault();            
 
             const selectedOption = document.getElementById('conciliationSelect').value;
-            console.log(selectedOption);
             
             if (!selectedOption || selectedOption == "null") {
-                alert('Por favor seleccione una opción para conciliar');
+                alert('Por favor ingrese un código para conciliar');
                 return;
             }
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se consulta la información del pago.",
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             
             // Aquí puedes agregar la lógica para cada tipo de conciliación
-            switch(selectedOption) {
-                case 'pending':
-                    console.log('Conciliando pendientes de pago');
-                    // Abrir modal específico o ejecutar acción
-                    break;
-                case 'charged':
-                    console.log('Conciliando cobrados no pagados');
-                    break;
-                case 'disputed':
-                    console.log('Conciliando disputas/reembolsos');
-                    break;
-            }            
+            // switch(selectedOption) {
+            //     case 'pending':
+            //         console.log('Conciliando pendientes de pago');
+            //         // Abrir modal específico o ejecutar acción
+            //         break;
+            //     case 'charged':
+            //         console.log('Conciliando cobrados no pagados');
+            //         break;
+            //     case 'disputed':
+            //         console.log('Conciliando disputas/reembolsos');
+            //         break;
+            // } 
+            fetch('/stripe/payouts/' + selectedOption, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }        
+                return response.json();
+            })
+            .then(data => {
+                // Swal.close();      
+                // console.log(data);
+                if( data.data.status == "paid" && data.data.reconciliation_status == "completed" ){
+                    Swal.fire({
+                        text: "Este pago es una transferencia " + ( data.data.automatic ? "automática" : "manual" ) + " por "+ stripe.formatCurrency(data.data.amount) +" " + data.data.currency.toUpperCase() + " a una cuenta de " + data.data.destination.bank_name +" (últimos 4 dígitos: " + data.data.destination.last4 + "), generada desde fondos de pagos con "+ ( data.data.source_type == "card" ? "tarjeta" : "otros" ) +", esta completado con fecha de llegada al banco: " + data.data.arrival_date,
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar para conciliar stripe vs bancos (sistema)',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            console.log(JSON.stringify({ reference: selectedOption, version: data.data.version }));
+                            
+                            Swal.fire({
+                                title: "Procesando solicitud...",
+                                text: "Por favor, espera mientras se consulta concilia el pago.",
+                                allowOutsideClick: false,
+                                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            fetch('/stripeInternal/payouts', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken,
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({ reference: selectedOption, version: data.data.version })
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    return response.json().then(err => { throw err; });
+                                }        
+                                return response.json();
+                            })
+                            .then(data => {
+                                Swal.fire({
+                                    text: data.message,
+                                    icon: data.status,
+                                    confirmButtonText: 'Aceptar',
+                                    allowOutsideClick: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        location.reload();
+                                    }
+                                });
+                            })
+                            .catch(error => {
+                                Swal.fire(
+                                '¡ERROR!',
+                                error.message || 'Ocurrió un error',
+                                'error'
+                                );
+                            });
+                        }
+                    });
+                }else{
+                    Swal.fire({
+                        text: "Este pago por "+ stripe.formatCurrency(data.data.amount) +" " + data.data.currency.toUpperCase() + " a una cuenta de " + data.data.destination.bank_name +" (últimos 4 dígitos: " + data.data.destination.last4 + "), generada desde fondos de pagos con "+ ( data.data.source_type == "card" ? "tarjeta" : "otros" ) +", se encuentra pendiente con fecha de llegada al banco: " + data.data.arrival_date,
+                        icon: 'warning',
+                        confirmButtonText: 'Aceptar',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // El usuario hizo click en "Aceptar"
+                            Swal.close();
+                            document.getElementById('conciliationSelect').value = "";
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire(
+                '¡ERROR!',
+                error.message || 'Ocurrió un error',
+                'error'
+                );
+            });                       
         }
 
         if ( event.target.classList.contains('chargeInformationStripe') ) {

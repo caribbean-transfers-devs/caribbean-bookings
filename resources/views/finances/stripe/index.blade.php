@@ -50,15 +50,19 @@
                         <div class="tool-form w-md-50 d-flex align-items-center mb-2 mb-md-0">
                             <!-- Select para conciliación -->
                             <div class="input-group">
-                                <select class="form-select" id="conciliationSelect">
+                                {{-- <select class="form-select" id="conciliationSelect">
                                     <option value="null" selected disabled>Seleccione una opción...</option>
                                     <option value="pending">Pendientes de pago</option>
                                     <option value="charged">Cobrados no pagados</option>
                                     <option value="disputed">Disputas/Reembolsos</option>
-                                </select>
-                                <button class="btn btn-primary" type="button" id="conciliationActionBtn">
+                                </select> --}}
+                                <input type="text" name="payment" id="conciliationSelect" class="form-control">
+                                <button class="btn btn-primary rounded-0" type="button" id="conciliationActionBtn">
                                     <i class="fas fa-hand-holding-usd me-2"></i>Conciliar Pago
                                 </button>
+                                <button class="btn btn-primary" type="button" id="conciliationSearchBtn">
+                                    <i class="fas fa-hand-holding-usd me-2"></i>Buscar conciliación
+                                </button>                                
                             </div>
                         </div>
                         
@@ -252,10 +256,12 @@
                             <th class="text-center">ESTATUS DE COBRO STRIPE</th>
                             <th class="text-center">TOTAL COBRADO EN STRIPE</th>
                             <th class="text-center">COMISIÓN DE STRIPE</th>
+                            <th class="text-center">TOTAL A PAGAR POR STRIPE</th>
                             <th class="text-center">FECHA DE PAGO STRIPE</th>
                             <th class="text-center">ESTATUS DE PAGO STRIPE</th>
                             <th class="text-center">TOTAL PAGADO POR STRIPE</th>
                             <th class="text-center">REFERENCIA DE PAGADO POR STRIPE</th>
+                            <th class="text-center">BANCO</th>
                             <th class="text-center">TIENE REEMBOLSO</th>
                             <th class="text-center">TIENE DISPUTA</th>
                         </tr>
@@ -306,6 +312,7 @@
                                     </td>
                                     <td class="text-center">$ {{ number_format($item->amount, 2) }}</td>
                                     <td class="text-center">$ {{ number_format($item->total_fee, 2) }}</td>
+                                    <td class="text-center">$ {{ number_format($item->total_net, 2) }}</td>
                                     <td class="text-center">{{ $item->deposit_date != NULL ? date("Y-m-d", strtotime($item->deposit_date)) : "SIN FECHA DE PAGO " }}</td>
                                     <td class="text-center" style="color:#fff;background-color:#{{ $item->deposit_date != NULL ? '00ab55' : 'e7515a' }};">
                                         @if ($item->deposit_date != NULL)
@@ -314,8 +321,9 @@
                                             PENDIENTE DE PAGO
                                         @endif
                                     </td>
-                                    <td class="text-center">$ {{ number_format(( $item->total_net ), 2) }}</td>
-                                    <td class="text-center"></td>
+                                    <td class="text-center">$ {{ number_format(( $item->total_final_net ), 2) }}</td>
+                                    <td class="text-center">{{ $item->reference_conciliation }}</td>
+                                    <td class="text-center">{{ $item->bank_name }}</td>
                                     <td class="text-center">
                                         @if ( $item->refunded > 0 )
                                             <button class="btn btn-success">Sí</button>
@@ -337,8 +345,8 @@
         {{-- listado de pagos de stripe pero sin codigo de referencia validos --}}
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
-                <div class="table-responsive">
-                    <table id="dataOthersReferences" class="table dt-table-hover" style="width:100%">
+                {{-- <div class="table-responsive"> --}}
+                    <table id="dataOthersReferences" class="table table-rendering dt-table-hover" style="width:100%">
                         <thead>
                             <tr>
                                 <th class="text-center">ID</th>
@@ -360,11 +368,14 @@
                                 <th class="text-center">ESTATUS DE COBRO STRIPE</th>
                                 <th class="text-center">TOTAL COBRADO EN STRIPE</th>
                                 <th class="text-center">COMISIÓN DE STRIPE</th>
+                                <th class="text-center">TOTAL A PAGAR POR STRIPE</th>
                                 <th class="text-center">FECHA DE PAGO STRIPE</th>
                                 <th class="text-center">ESTATUS DE PAGO STRIPE</th>
                                 <th class="text-center">TOTAL PAGADO POR STRIPE</th>
                                 <th class="text-center">REFERENCIA DE PAGADO POR STRIPE</th>
+                                <th class="text-center">BANCO</th>
                                 <th class="text-center">TIENE REEMBOLSO</th>
+                                <th class="text-center">TIENE DISPUTA</th>                                
                             </tr>
                         </thead>
                         <tbody>
@@ -437,6 +448,7 @@
                                         </td>
                                         <td class="text-center">$ {{ number_format($item->amount, 2) }}</td>
                                         <td class="text-center">$ {{ number_format($item->total_fee, 2) }}</td>
+                                        <td class="text-center">$ {{ number_format($item->total_net, 2) }}</td>
                                         <td class="text-center">{{ $item->deposit_date != NULL ? date("Y-m-d", strtotime($item->deposit_date)) : "SIN FECHA DE PAGO " }}</td>
                                         <td class="text-center" style="color:#fff;background-color:#{{ $item->deposit_date != NULL ? '00ab55' : 'e7515a' }};">
                                             @if ($item->deposit_date != NULL)
@@ -445,10 +457,16 @@
                                                 PENDIENTE DE PAGO
                                             @endif
                                         </td>
-                                        <td class="text-center">$ {{ number_format(( $item->total_net ), 2) }}</td>
-                                        <td class="text-center"></td>
+                                        <td class="text-center">$ {{ number_format(( $item->total_final_net ), 2) }}</td>
+                                        <td class="text-center">{{ $item->reference_conciliation }}</td>
+                                        <td class="text-center">{{ $item->bank_name }}</td>
                                         <td class="text-center">
-                                            @if ( $item->is_refund > 0 )
+                                            @if ( $item->refunded > 0 )
+                                                <button class="btn btn-success">Sí</button>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if ( $item->disputed > 0 )
                                                 <button class="btn btn-success">Sí</button>
                                             @endif
                                         </td>
@@ -457,7 +475,7 @@
                             @endif
                         </tbody>
                     </table>
-                </div>
+                {{-- </div> --}}
             </div>
         </div>
     </div>

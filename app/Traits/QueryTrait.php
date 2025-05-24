@@ -1219,6 +1219,7 @@ trait QueryTrait
         return $bookings;
     }    
 
+    //EL QUERY QUE UTILIZO PARA STRIPE, YA QUE LO REALIZA POR PAGOS
     public function queryConciliation($query, $query2, $queryData){
         $payments = DB::select("SELECT
                                         rez.id AS reservation_id, 
@@ -1287,6 +1288,8 @@ trait QueryTrait
                                         p.amount,
                                         p.total_fee,
                                         p.total_net,
+                                        p.total_final_net,
+                                        p.bank_name,
                                         p.created_at As created_payment,
                                         p.updated_at AS updated_payment,
 

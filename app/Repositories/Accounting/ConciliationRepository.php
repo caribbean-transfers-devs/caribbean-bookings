@@ -5,10 +5,12 @@ namespace App\Repositories\Accounting;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
 //MODELS
 use App\Models\Payment;
+use App\Models\StripePayments;
 
 //TRAITS
 use App\Traits\QueryTrait;
@@ -163,21 +165,6 @@ class ConciliationRepository
         ], Response::HTTP_OK);
     }
 
-    public function stripePayouts($request)
-    {
-        try {
-            $payoutsV1 = $this->getPayoutsV1($request);
-            $payoutsDataV1 = ( !isset($payoutsV1->getData(true)['status']) ? $payoutsV1->getData(true)['data'] : [] );
-            dd($payoutsV1->getData(true)['data']);
-        } catch (Exception $e) {
-            return response()->json([
-                'status'   => 'error',
-                'message'  => $e->getMessage(),
-                'code'     => 500 // Bad Request
-            ], 500);
-        }
-    }
-
     public function stripeChargesReference($request, $reference)
     {
         // Validar que la referencia no esté vacía
@@ -287,6 +274,133 @@ class ConciliationRepository
                 'message'  => $e->getMessage(),
                 'code'     => 500 // Bad Request
             ], 500);
+        }
+    }
+
+    public function stripePayoutsReference($request, $reference)
+    {
+        // Validar que la referencia no esté vacía
+        if (empty($reference)) {
+            return response()->json([
+                'status'   => 'error',
+                'message'  => 'Payment reference is required',
+                'code'     => 400 // Bad Request
+            ], 400);
+        }
+        
+        try {
+            $version = "v1";
+            $payoutsV1 = $this->getPayoutV1($reference);
+            $payoutData = $payoutsV1->getData(true);
+            if( isset($payoutData['status']) && $payoutData['status'] == "error" ){
+                $payoutsV2 = $this->getPayoutV2($reference);
+                $payoutData = $payoutsV2->getData(true);
+                $version = "v2";
+            }
+
+            if (empty($payoutData) || ( isset($payoutData['status']) && $payoutData['status'] == "error" )) {
+                return response()->json([
+                    'status'   => 'error',
+                    'message'  => ( isset($chargeData['status']) && $chargeData['status'] == "error" ? $chargeData['message'] : 'Payment not found' ),
+                    'code'     => 404 // Not found
+                ], 404);
+            }
+
+            $payoutData['amount']       = ($payoutData['amount']/100);
+            $payoutData['arrival_date'] = Carbon::parse($payoutData['arrival_date'] ?? null)->format('Y-m-d');
+            $payoutData['created']      = Carbon::parse($payoutData['created'] ?? null)->format('Y-m-d');
+            $payoutData['version']      = $version;
+
+            return response()->json([
+                'status'   => 'success',
+                'message'  => 'Payment ok',
+                'code'     => 200, // ok
+                'data'     => $payoutData
+            ], 200);            
+        } catch (Exception $e) {
+            return response()->json([
+                'status'   => 'error',
+                'message'  => $e->getMessage(),
+                'code'     => 500 // Bad Request
+            ], 500);
+        }
+    }
+    
+    public function stripeInternalPayouts($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reference' => 'required|string',
+            'version' => 'required|string|in:v1,v2',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'    => 'error',
+                "message"   => $validator->errors()->all(),
+                "code"      => 422
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $stripePayout = StripePayments::where('code', $request->reference)->first();
+
+        if( $stripePayout ){
+            return response()->json([
+                'status'    => 'warning',
+                "message"   => "Ya se concilio este pago",
+                "code"      => 200
+            ], Response::HTTP_OK);
+        }
+
+        try {
+            $payout = ( $request->version == "v2" ? $this->getPayoutV2($request->reference) : $this->getPayoutV1($request->reference) );
+            $payoutData = $payout->getData(true);
+
+            $conciliation = ( $request->version == "v2" ? $this->getBalancePayoutV2($request->reference) : $this->getBalancePayoutV1($request->reference) );
+            $conciliationData = $conciliation->getData(true);
+            
+            if( isset($conciliationData['data']) && empty($conciliationData['data']) ){
+                return response()->json([
+                    'status'    => 'error',
+                    "message"   => "not found data",
+                    "code"      => 404
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            DB::beginTransaction();
+
+            foreach ($conciliationData['data'] as $key => $value) {
+                if (in_array($value['type'], ['payment', 'charge'])) {
+                    $payment = Payment::where("payment_method", "STRIPE")
+                                        ->where("reference", $value['source']['id'])
+                                        ->first();
+
+                    if( $payment ){
+                        $payment->reference_conciliation    = $request->reference;
+                        $payment->deposit_date              = Carbon::parse($value['available_on'] ?? null)->format('Y-m-d H:i:s');
+                        $payment->total_final_net           = ($value['net']/100);
+                        $payment->bank_name                 = $payoutData['destination']['bank_name'];
+                        $payment->save();
+                    }
+                }
+            }
+
+            $newPayout          = new StripePayments();
+            $newPayout->code    = $request->reference;
+            $newPayout->object = $payoutData;
+            $newPayout->save();
+
+            DB::commit();
+            return response()->json([
+                'status'   => 'success',
+                'message'  => 'Conciliation ok',
+                'code'     => 200, // ok
+            ], Response::HTTP_OK);            
+        } catch (Exception $e) {
+            return response()->json([
+                'status'   => 'error',
+                'message'  => $e->getMessage(),
+                'code'     => 500 // Bad Request
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

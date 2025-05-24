@@ -95,11 +95,107 @@ trait StripeTrait
         }
     }
 
+    public function getPayoutV1($paymentReference)
+    {
+        try {
+            $url = $this->apiUrlStripe . "/v1/payouts/" . $paymentReference . "?expand[]=balance_transaction&expand[]=destination";
+            $response = $this->makeCurlRequest($url, $this->clientSecretStripeS);
+            
+            if ($response['status'] >= 200 && $response['status'] < 300) {
+                return response()->json($response['body']);
+            } else {
+                $errorMsg = $response['body']['error']['message'] ?? 'Failed to retrieve balance';
+                return response()->json([
+                    'status' => 'error',
+                    'error' => $errorMsg,
+                    'message' => $errorMsg,
+                ], $response['status']);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getBalancePayoutV1($paymentReference)
+    {
+        try {
+            $url = $this->apiUrlStripe . "/v1/balance_transactions?payout=". $paymentReference ."&expand[]=data.source&expand[]=data.source.balance_transaction&limit=2000";
+            $response = $this->makeCurlRequest($url, $this->clientSecretStripeS);
+            
+            if ($response['status'] >= 200 && $response['status'] < 300) {
+                return response()->json($response['body']);
+            } else {
+                $errorMsg = $response['body']['error']['message'] ?? 'Failed to retrieve balance';
+                return response()->json([
+                    'status' => 'error',
+                    'error' => $errorMsg,
+                    'message' => $errorMsg,
+                ], $response['status']);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }    
+
     // Método para buscar los pagos
     public function getPayoutsV2($balanceTransaction)
     {
         try {
             $url = $this->apiUrlStripe . "/v1/payouts?expand[]=data.balance_transaction&expand[]=data.destination";
+            $response = $this->makeCurlRequest($url, $this->clientSecretStripeP);
+            
+            if ($response['status'] >= 200 && $response['status'] < 300) {
+                return response()->json($response['body']);
+            } else {
+                $errorMsg = $response['body']['error']['message'] ?? 'Failed to retrieve balance';
+                return response()->json([
+                    'status' => 'error',
+                    'error' => $errorMsg,
+                    'message' => $errorMsg,
+                ], $response['status']);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    
+    public function getPayoutV2($paymentReference)
+    {
+        try {
+            $url = $this->apiUrlStripe . "/v1/payouts/" . $paymentReference . "?expand[]=balance_transaction&expand[]=destination";
+            $response = $this->makeCurlRequest($url, $this->clientSecretStripeP);
+            
+            if ($response['status'] >= 200 && $response['status'] < 300) {
+                return response()->json($response['body']);
+            } else {
+                $errorMsg = $response['body']['error']['message'] ?? 'Failed to retrieve balance';
+                return response()->json([
+                    'status' => 'error',
+                    'error' => $errorMsg,
+                    'message' => $errorMsg,
+                ], $response['status']);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getBalancePayoutV2($paymentReference)
+    {
+        try {
+            $url = $this->apiUrlStripe . "/v1/balance_transactions?payout=". $paymentReference ."&expand[]=data.source&expand[]=data.source.balance_transaction&limit=2000";
             $response = $this->makeCurlRequest($url, $this->clientSecretStripeP);
             
             if ($response['status'] >= 200 && $response['status'] < 300) {

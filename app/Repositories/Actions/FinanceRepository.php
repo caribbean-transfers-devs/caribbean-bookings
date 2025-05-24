@@ -261,7 +261,7 @@ class FinanceRepository
             return response()->json([
                 'status' => 'success',
                 'message' => 'Se actualizo reembolso correctamente',
-            ], Response::HTTP_OK);            
+            ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
