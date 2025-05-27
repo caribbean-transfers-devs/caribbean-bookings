@@ -176,7 +176,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3 d-none">
+                                            <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="is_external">Selecciona tipo de empresa</label>
                                                     <select id="is_external" name="type_enterprise" class="form-control mb-3">

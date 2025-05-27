@@ -58,6 +58,7 @@
                             <th class="text-center">EXTRANJERO</th>
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">ESTATUS</th>
+                            <th class="text-center">TIPO</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -69,7 +70,6 @@
                                     <p class="mb-1"><strong>Dirección:</strong> {{ $enterprise->address ? $enterprise->address : 'SIN DIRECCIÓN' }}</p>
                                     <p class="mb-1"><strong>Teléfono:</strong> {{ $enterprise->phone ? $enterprise->phone : 'SIN TELÉFONO' }}</p>
                                     <p class="mb-3"><strong>Correo:</strong> {{ $enterprise->email ? $enterprise->email : 'SIN CORREO' }}</p>
-
                                     <p class="mb-1"><strong>Contacto de agencia:</strong> {{ $enterprise->company_contact ? $enterprise->company_contact : 'SIN CONTACTO' }}</p>
                                 </td>
                                 <td class="text-left">
@@ -100,9 +100,9 @@
                                 {{-- <td class="text-center">
                                     <button class="btn btn-{{ ( $enterprise->is_external == 0 ) ? 'success' : 'danger' }} mb-2">{{ ( $enterprise->is_external == 0 ) ? 'Interno' : 'Externo' }}</button>
                                 </td> --}}
-                                {{-- <td class="text-center">
+                                <td class="text-center">
                                     <button class="btn btn-{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'success' : 'primary' }} mb-2">{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'Proveedor' : 'Cliente' }}</button>
-                                </td> --}}
+                                </td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
                                         <a class="btn btn-primary" href="{{ route('enterprises.edit', [$enterprise->id]) }}">Editar</a>
