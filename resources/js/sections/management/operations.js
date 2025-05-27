@@ -1039,7 +1039,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             container.innerHTML = "";
 
-            fetch("/action/getInformationReservation?id=" + reservation + "&item_id?=" + item, {
+            fetch("/action/getInformationReservation?id=" + reservation + "&item_id=" + item, {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',
