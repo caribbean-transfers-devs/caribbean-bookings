@@ -34,11 +34,6 @@
                     'columns' => ':visible'  // Solo exporta las columnas visibles   
                 ]
             ),
-            // array(
-            //     'text' => 'Tipo de cambio: '.$exchange,
-            //     'titleAttr' => 'Tipo de cambio',
-            //     'className' => 'btn btn-warning',
-            // ),
         );
     @endphp
     <div class="row layout-top-spacing">
@@ -49,21 +44,18 @@
                         <!-- Título y Select -->
                         <div class="tool-form w-md-50 d-flex align-items-center mb-2 mb-md-0">
                             <!-- Select para conciliación -->
-                            <div class="input-group">
-                                {{-- <select class="form-select" id="conciliationSelect">
-                                    <option value="null" selected disabled>Seleccione una opción...</option>
-                                    <option value="pending">Pendientes de pago</option>
-                                    <option value="charged">Cobrados no pagados</option>
-                                    <option value="disputed">Disputas/Reembolsos</option>
-                                </select> --}}
-                                <input type="text" name="payment" id="conciliationSelect" class="form-control">
-                                <button class="btn btn-primary rounded-0" type="button" id="conciliationActionBtn">
-                                    <i class="fas fa-hand-holding-usd me-2"></i>Conciliar Pago
-                                </button>
-                                <button class="btn btn-primary" type="button" id="conciliationSearchBtn">
-                                    <i class="fas fa-hand-holding-usd me-2"></i>Buscar conciliación
-                                </button>                                
-                            </div>
+                            <form class="form w-100" action="" method="POST" id="formSearch">
+                                @csrf
+                                <div class="input-group">
+                                    <input type="text" name="payment_stripe" id="conciliationSelect" value="{{ isset($data['payment_stripe']) ? $data['payment_stripe'] : '' }}" class="form-control">
+                                    <button class="btn btn-primary rounded-0" type="button" id="conciliationActionBtn">
+                                        <i class="fas fa-hand-holding-usd me-2"></i>Conciliar Pago
+                                    </button>
+                                    <button class="btn btn-primary" type="submit" id="conciliationSearchBtn">
+                                        <i class="fas fa-hand-holding-usd me-2"></i>Buscar conciliación
+                                    </button>                                
+                                </div>
+                            </form>
                         </div>
                         
                         <!-- Botones de Acción -->
@@ -481,7 +473,7 @@
     </div>
 
 
-    <x-modals.filters.bookings :data="$data" :currencies="$currencies" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1"  :currencies="$currencies" />
     <x-modals.reports.columns />
     <x-modals.finances.charge_stripe />
     <x-modals.finances.help_stripe />

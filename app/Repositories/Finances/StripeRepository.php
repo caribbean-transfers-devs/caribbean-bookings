@@ -57,27 +57,40 @@ class StripeRepository
         $dates = MethodsTrait::parseDateRange($request->date ?? '');
 
         $data = [
-            "init" => $dates['init'],
-            "end" => $dates['end'],
-            "currency" => ( isset($request->currency) ? $request->currency : 0 ),
-            "payment_status" => ( isset( $request->payment_status ) && !empty( $request->payment_status ) ? $request->payment_status : 0 ),
-            "payment_method" => ( isset( $request->payment_method ) && !empty( $request->payment_method ) ? $request->payment_method : 0 ),
+            "init"              =>  $dates['init'],
+            "end"               =>  $dates['end'],
+            "filter_text"       =>  $request->filter_text ?? NULL,
+            "payment_stripe"    =>  $request->payment_stripe ?? NULL,
+            "currency"          =>  $request->currency ?? 0,
         ];
 
-        // rez.is_cancelled = 0 AND 
-        $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.is_duplicated = 0 AND p.payment_method = :method AND p.created_at IS NOT NULL AND p.deleted_at IS NULL AND (p.reference IS NOT NULL AND p.reference != "") ';
+        $queryData = ['method' => 'STRIPE'];
+        $queryDate = '';
+
+        if (empty($request->filter_text) && empty($request->payment_stripe)) {
+            $queryDate = ' AND rez.created_at BETWEEN :init AND :end ';
+            $queryData['init'] = $dates['init'] . " 00:00:00";
+            $queryData['end'] = $dates['end'] . " 23:59:59";
+        }
+        
+        $query = $queryDate . ' AND rez.site_id NOT IN(21,11) AND rez.is_duplicated = 0 AND p.payment_method = :method AND p.created_at IS NOT NULL AND p.deleted_at IS NULL AND (p.reference IS NOT NULL AND p.reference != "") ';
         $havingConditions = []; $queryHaving = '';
-        $queryData = [
-            'init' => $dates['init'] . " 00:00:00",
-            'end' => $dates['end'] . " 23:59:59",
-            'method' => "STRIPE"
-        ];
 
         //MONEDA DE LA RESERVA
         if(isset( $request->currency ) && !empty( $request->currency )){
             $params = $this->parseArrayQuery($request->currency,"single");
             $query .= " AND rez.currency IN ($params) ";
         }
+
+        if(isset( $request->filter_text ) && !empty( $request->filter_text )){
+            $query .= " AND p.reference LIKE :filter_text ";
+            $queryData['filter_text'] = "%" . $request->filter_text . "%";
+        }        
+
+        if(isset( $request->payment_stripe ) && !empty( $request->payment_stripe )){
+            $query .= " AND p.reference_conciliation LIKE :payment_stripe ";
+            $queryData['payment_stripe'] = "%" . $request->payment_stripe . "%";
+        }        
 
         if( !empty($havingConditions) ){
             $queryHaving = " HAVING " . implode(' AND ', $havingConditions);
@@ -101,7 +114,7 @@ class StripeRepository
                 }
                 
                 // Estado de cobro
-                if (!empty($item->date_conciliation)) {
+                if ($item->date_conciliation) {
                     $resume['status']['charged']['amount'] += $item->amount;
                     $resume['status']['charged']['count']++;
                 } else {
@@ -110,7 +123,7 @@ class StripeRepository
                 }
                 
                 // Estado de pago
-                if (!empty($item->deposit_date)) {
+                if ($item->deposit_date) {
                     $resume['status']['paid']['amount'] += $item->total_net ?? 0;
                     $resume['status']['paid']['count']++;
                 } else {
@@ -132,7 +145,6 @@ class StripeRepository
         }
 
         $filteredConciliations = collect($conciliations)->filter(function ($item) {
-        // $filteredConciliations = collect($conciliations)->filter(function ($item) use (&$resume) {
             if (empty($item->reference_stripe)) return true;
                         
             $prefix = substr($item->reference_stripe, 0, 3);
@@ -140,7 +152,6 @@ class StripeRepository
         });
 
         $otherReferences = collect($conciliations)->reject(function ($item) {
-        // $otherReferences = collect($conciliations)->filter(function ($item) use (&$resume) {
             if (empty($item->reference_stripe)) return false;
 
             $prefix = substr($item->reference_stripe, 0, 3);
