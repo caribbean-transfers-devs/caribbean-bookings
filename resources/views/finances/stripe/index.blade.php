@@ -60,7 +60,7 @@
                                 <button class="btn btn-primary rounded-0" type="button" id="conciliationActionBtn">
                                     <i class="fas fa-hand-holding-usd me-2"></i>Conciliar Pago
                                 </button>
-                                <button class="btn btn-primary" type="button" id="conciliationSearchBtn">
+                                <button class="btn btn-primary" type="submit" id="conciliationSearchBtn">
                                     <i class="fas fa-hand-holding-usd me-2"></i>Buscar conciliación
                                 </button>                                
                             </div>

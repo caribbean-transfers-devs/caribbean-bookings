@@ -77,7 +77,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group mb-3">
                                             <label for="companyEmail">Correo de la empresa</label>
-                                            <input type="email" name="email" id="companyEmail" class="form-control" placeholder="Correo de la empres" value="{{ ( isset($enterprise->email) ? $enterprise->email : '' ) }}">
+                                            <input type="email" name="email" id="companyEmail" class="form-control" placeholder="Correo de la empresa" value="{{ ( isset($enterprise->email) ? $enterprise->email : '' ) }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">

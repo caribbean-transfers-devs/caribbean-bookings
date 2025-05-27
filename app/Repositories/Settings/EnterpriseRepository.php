@@ -3,56 +3,52 @@
 namespace App\Repositories\Settings;
 
 use Exception;
-use Illuminate\Http\Response;
-
-//MODELS
-use App\Models\Enterprise;
-
-//FACADES
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use App\Models\Enterprise;
 
 class EnterpriseRepository
 {
-    public function index($request)
+    public function index()
     {
         try {
-            $enterprises = Enterprise::all();
+            $enterprises = Enterprise::query()
+                ->select()
+                ->latest()
+                ->get();
+
             return view('settings.enterprises.index', [
                 'breadcrumbs' => [
-                    [
-                        "route" => "",
-                        "name" => "Listado de empresas",
-                        "active" => true
-                    ]
+                    ["name" => "Listado de empresas", "active" => true]
                 ],
                 'enterprises' => $enterprises
             ]);
         } catch (Exception $e) {
+            return back()->with('danger', 'Error al cargar el listado de empresas');
         }
     }
 
-    public function create($request){
+    public function create()
+    {
         try {
-            return view('settings.enterprises.new',[
+            return view('settings.enterprises.new', [
                 'breadcrumbs' => [
-                    [
-                        "route" => route('enterprises.index'),
-                        "name" => "Listado de empresas",
-                        "active" => false
-                    ],
-                    [
-                        "route" => "",
-                        "name" => "Nueva empresa",
-                        "active" => true
-                    ]
-                ],                
+                    ["route" => route('enterprises.index'), "name" => "Listado de empresas", "active" => false],
+                    ["name" => "Nueva empresa", "active" => true]
+                ],
+                'enterprise' => null
             ]);
         } catch (Exception $e) {
+            return redirect()->route('enterprises.index')
+                ->with('danger', 'Error al cargar el formulario de creación');
         }
     }
 
-    public function store($request){
+    public function store($request): RedirectResponse
+    {
         try {
+            $data = $request->validated();
+            
             DB::beginTransaction();
 
             $enterprise = new Enterprise();
@@ -74,52 +70,45 @@ class EnterpriseRepository
             $enterprise->is_rates_iva = $request->is_rates_iva ?? 0;
             $enterprise->is_foreign = $request->is_foreign ?? 0;
             $enterprise->currency = $request->currency ?? 'MXN';
-            $enterprise->status = $request->status;
-            $enterprise->type_enterprise = $request->type_enterprise;
+            $enterprise->status = $request->status ?? 1;
+            $enterprise->type_enterprise = $request->type_enterprise ?? 'PROVIDER';
             $enterprise->save();
 
             DB::commit();
 
-            return redirect()->route('enterprises.index')->with('success', 'Empresa creada correctamente.');
+            return redirect()->route('enterprises.index')
+                ->with('success', 'Empresa creada correctamente.');
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('enterprises.create')->with('danger', 'Error al crear la empresa.');
+            return back()->withInput()
+                ->with('danger', 'Error al crear la empresa: ' . $e->getMessage());
         }
     }
 
-    public function edit($request, $id){
+    public function edit($request, $id)
+    {
         try {
-            $enterprise = Enterprise::select('id','names','address','phone','email','company_contact','credit_days','company_name_invoice','company_rfc_invoice','company_address_invoice','company_email_invoice','is_invoice_iva','is_rates_iva','is_foreign','currency','status','destination_id')
-                                    ->with(['destination' => function($query) {
-                                        $query->select(['id', 'name']);
-                                    }])
-                                    ->with(['sites' => function($query) {
-                                        $query->select(['id', 'name', 'color', 'transactional_email_send', 'is_commissionable', 'is_cxc', 'is_cxp', 'type_site', 'enterprise_id']);
-                                    }])
-                                    ->find($id);
+            $enterprise = Enterprise::findOrFail($id);
 
-            return view('settings.enterprises.new',[
+            return view('settings.enterprises.new', [
                 'breadcrumbs' => [
-                    [
-                        "route" => route('enterprises.index'),
-                        "name" => "Listado de empresas",
-                        "active" => false
-                    ],
-                    [
-                        "route" => "",
-                        "name" => "Editar la empresa: ".$enterprise->names,
-                        "active" => true
-                    ]
+                    ["route" => route('enterprises.index'), "name" => "Listado de empresas", "active" => false],
+                    ["name" => "Editar: " . $enterprise->names, "active" => true]
                 ],
-                'enterprise' => $enterprise,
+                'enterprise' => $enterprise
             ]);
         } catch (Exception $e) {
+            return redirect()->route('enterprises.index')
+                ->with('danger', 'Empresa no encontrada');
         }
     }
 
-    public function update($request, $id){
+    public function update($request, $id): RedirectResponse
+    {
         try {
+            $data = $request->validated();
+            
             DB::beginTransaction();
 
             $enterprise = Enterprise::find($id);
@@ -141,26 +130,32 @@ class EnterpriseRepository
             $enterprise->is_rates_iva = $request->is_rates_iva ?? 0;
             $enterprise->is_foreign = $request->is_foreign ?? 0;
             $enterprise->currency = $request->currency ?? 'MXN';
-            $enterprise->status = $request->status;
-            $enterprise->type_enterprise = $request->type_enterprise;        
+            $enterprise->status = $request->status ?? 1;
+            $enterprise->type_enterprise = $request->type_enterprise ?? 'PROVIDER';
             $enterprise->save();
 
             DB::commit();
 
-            return redirect()->route('enterprises.index')->with('success', 'Empresa actualizada correctamente.');
+            return redirect()->route('enterprises.index')
+                ->with('success', 'Empresa actualizada correctamente.');
         } catch (Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('enterprises.update', $id)->with('danger', 'Error al actualizar la empresa.');
+            return back()->withInput()
+                ->with('danger', 'Error al actualizar la empresa: ' . $e->getMessage());
         }
     }
 
-    public function destroy($request, $id){
+    public function destroy($id)
+    {
         try {
-            $enterprise = Enterprise::find($id);
+            $enterprise = Enterprise::findOrFail($id);
             $enterprise->delete();
-            return redirect()->route('enterprises.index')->with('success', 'Se elimimo correctamente la empresa.');
+
+            return redirect()->route('enterprises.index')
+                ->with('success', 'Empresa eliminada correctamente.');
         } catch (Exception $e) {
+            return back()->with('danger', 'Error al eliminar la empresa');
         }
     }
 }
