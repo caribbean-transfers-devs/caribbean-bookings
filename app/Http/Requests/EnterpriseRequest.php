@@ -20,7 +20,7 @@ class EnterpriseRequest extends FormRequest
             'phone' => 'required|numeric|digits_between:6,15',
             'email' => 'required|email|max:255',
             'company_contact' => 'nullable|string|max:255',
-            'credit_days' => 'required|integer|min:0|max:10000',
+            'credit_days' => 'required|integer|min:1|max:10000',
 
             // Datos fiscales
             'company_name_invoice' => 'nullable|string|max:255',

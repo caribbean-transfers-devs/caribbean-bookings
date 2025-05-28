@@ -45,6 +45,8 @@ use App\Http\Controllers\Settings\RoleController as                 ROLES;
 use App\Http\Controllers\Settings\UserController as                 USERS;
 use App\Http\Controllers\Settings\EnterpriseController as           ENTERPRISES;
 use App\Http\Controllers\Settings\SitesController as                SITES;
+use App\Http\Controllers\Settings\ZonesEnterpriseController as      ZONES_ENTERPRISE;
+
 use App\Http\Controllers\Settings\VehicleController as              VEHICLES;
 use App\Http\Controllers\Settings\DriverController as               DRIVERS;
 use App\Http\Controllers\Settings\DriverSchedulesController as      SCHEDULES;
@@ -219,86 +221,99 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     //CONFIGURACIONES
         Route::resource('/roles', ROLES::class);
         //USERS
-        Route::resource('/users', USERS::class);
-        Route::put('/ChangePass/{user}', [USERS::class, 'change_pass'])->name('users.change_pass');
-        Route::put('/ChangeStatus/{user}', [USERS::class, 'change_status'])->name('users.change_status');
-        Route::post('/StoreIP', [USERS::class, 'store_ips'])->name('users.store_ips');
-        Route::delete('/DeleteIPs/{ip}', [USERS::class, 'delete_ips'])->name('users.delete_ips');
+        Route::resource('/users',                                                       USERS::class);
+        Route::put('/ChangePass/{user}',                                                [USERS::class, 'change_pass'])->name('users.change_pass');
+        Route::put('/ChangeStatus/{user}',                                              [USERS::class, 'change_status'])->name('users.change_status');
+        Route::post('/StoreIP',                                                         [USERS::class, 'store_ips'])->name('users.store_ips');
+        Route::delete('/DeleteIPs/{ip}',                                                [USERS::class, 'delete_ips'])->name('users.delete_ips');
         //EMPRESAS
-        Route::resource('/enterprises', ENTERPRISES::class);
-        //SITIOS
-        Route::resource('/sites', SITES::class);
+        Route::resource('/enterprises',                                                 ENTERPRISES::class);        
+        //SITIOS DE EMPRESA
+        Route::match(['GET', 'POST'], '/enterprises/sites/{enterprise}',                [SITES::class, 'index'])->name('enterprises.sites.index');
+        Route::match(['GET'],         '/enterprises/sites/{enterprise}/create',         [SITES::class, 'create'])->name('enterprises.sites.create');
+        Route::match(['POST'],        '/enterprises/sites/{enterprise}/store',          [SITES::class, 'store'])->name('enterprises.sites.store');
+        Route::match(['GET'],         '/enterprises/sites/{enterprise}/edit',           [SITES::class, 'edit'])->name('enterprises.sites.edit');
+        Route::match(['PUT'],         '/enterprises/sites/{enterprise}',                [SITES::class, 'update'])->name('enterprises.sites.update');
+        Route::match(['DELETE'],      '/enterprises/sites/{enterprise}',                [SITES::class, 'destroy'])->name('enterprises.sites.destroy');
+        //ZONAS DE EMPRESA
+        Route::match(['GET', 'POST'], '/enterprises/zones/{enterprise}',                [ZONES_ENTERPRISE::class, 'index'])->name('enterprises.zones.index');
+        Route::match(['GET'],         '/enterprises/zones/{enterprise}/create',         [ZONES_ENTERPRISE::class, 'create'])->name('enterprises.zones.create');
+        Route::match(['POST'],        '/enterprises/zones/{enterprise}/store',          [ZONES_ENTERPRISE::class, 'store'])->name('enterprises.zones.store');
+        Route::match(['GET'],         '/enterprises/zones/{enterprise}/edit',           [ZONES_ENTERPRISE::class, 'edit'])->name('enterprises.zones.edit');
+        Route::match(['PUT'],         '/enterprises/zones/{enterprise}',                [ZONES_ENTERPRISE::class, 'update'])->name('enterprises.zones.update');
+        // Route::match(['DELETE'],      '/enterprises/zones/{enterprise}',                [ZONES_ENTERPRISE::class, 'destroy'])->name('enterprises.zones.destroy');
+        // Route::resource('/sites', SITES::class);        
         //VEHICULOS
-        Route::resource('/vehicles', VEHICLES::class);
+        Route::resource('/vehicles',                                                    VEHICLES::class);
         //CONDUCTORES
-        Route::resource('/drivers', DRIVERS::class);
+        Route::resource('/drivers',                                                     DRIVERS::class);
 
         //HORARIO DE CONDUCTORES
-        Route::match(['get', 'post'], '/schedules', [SCHEDULES::class, 'index'])->name('schedules.index');
-        Route::get('/schedules/create', [SCHEDULES::class, 'create'])->name('schedules.create');
-        Route::post('/schedules/store', [SCHEDULES::class, 'store'])->name('schedules.store');
-        Route::get('/schedules/{schedule}/edit', [SCHEDULES::class, 'edit'])->name('schedules.edit');
-        Route::put('/schedules/{schedule}', [SCHEDULES::class, 'update'])->name('schedules.update');
-        Route::delete('/schedules/{schedule}', [SCHEDULES::class, 'destroy'])->name('schedules.destroy');
+        Route::match(['get', 'post'], '/schedules',                                     [SCHEDULES::class, 'index'])->name('schedules.index');
+        Route::get('/schedules/create',                                                 [SCHEDULES::class, 'create'])->name('schedules.create');
+        Route::post('/schedules/store',                                                 [SCHEDULES::class, 'store'])->name('schedules.store');
+        Route::get('/schedules/{schedule}/edit',                                        [SCHEDULES::class, 'edit'])->name('schedules.edit');
+        Route::put('/schedules/{schedule}',                                             [SCHEDULES::class, 'update'])->name('schedules.update');
+        Route::delete('/schedules/{schedule}',                                          [SCHEDULES::class, 'destroy'])->name('schedules.destroy');
 
         //ZONES
-        Route::get('/config/destinations', [ZONES::class, 'index'])->name('config.zones');
-        Route::get('/config/destinations/{id}', [ZONES::class, 'getZones'])->name('config.zones.getZones');
-        Route::get('/config/destinations/{id}/points', [ZONES::class, 'getPoints'])->name('config.getPoints');
-        Route::put('/config/destinations/{id}/points', [ZONES::class, 'setPoints'])->name('config.setPoints');
+        Route::get('/config/destinations',                                              [ZONES::class, 'index'])->name('config.zones');
+        Route::get('/config/destinations/{id}',                                         [ZONES::class, 'getZones'])->name('config.zones.getZones');
+        Route::get('/config/destinations/{id}/points',                                  [ZONES::class, 'getPoints'])->name('config.getPoints');
+        Route::put('/config/destinations/{id}/points',                                  [ZONES::class, 'setPoints'])->name('config.setPoints');
         //RATES
-        Route::get('/config/rates/destination', [RATES::class, 'index'])->name('config.ratesDestination');
-        Route::get('/config/rates/destination/{id}/get', [RATES::class, 'items'])->name('config.ratesZones');
-        Route::post('/config/rates/get', [RATES::class, 'getRates'])->name('config.getRates');
-        Route::post('/config/rates/new', [RATES::class, 'newRates'])->name('config.newRates');
-        Route::delete('/config/rates/delete', [RATES::class, 'deleteRates'])->name('config.deleteRates');
-        Route::put('/config/rates/update', [RATES::class, 'updateRates'])->name('config.updateRates');
+        Route::get('/config/rates/destination',                                         [RATES::class, 'index'])->name('config.ratesDestination');
+        Route::get('/config/rates/destination/{id}/get',                                [RATES::class, 'items'])->name('config.ratesZones');
+        Route::post('/config/rates/get',                                                [RATES::class, 'getRates'])->name('config.getRates');
+        Route::post('/config/rates/new',                                                [RATES::class, 'newRates'])->name('config.newRates');
+        Route::delete('/config/rates/delete',                                           [RATES::class, 'deleteRates'])->name('config.deleteRates');
+        Route::put('/config/rates/update',                                              [RATES::class, 'updateRates'])->name('config.updateRates');
         //RATES ENTERPRISES
-        Route::get('/config/rates/enterprise', [RATES_ENTERPRISE::class, 'index'])->name('config.ratesEnterprise');
-        Route::get('/config/rates/enterprise/destination/{id}/get', [RATES_ENTERPRISE::class, 'items'])->name('config.ratesEnterpriseZones');
-        Route::post('/config/rates/enterprise/get', [RATES_ENTERPRISE::class, 'getRatesEnterprise'])->name('config.getRatesEnterprise');
-        Route::post('/config/rates/enterprise/new', [RATES_ENTERPRISE::class, 'newRates'])->name('config.newRatesEnterprise');
-        Route::delete('/config/rates/enterprise/delete', [RATES_ENTERPRISE::class, 'deleteRates'])->name('config.deleteRatesEnterprise');
-        Route::put('/config/rates/enterprise/update', [RATES_ENTERPRISE::class, 'updateRates'])->name('config.updateRatesEnterprise');
+        Route::get('/config/rates/enterprise',                                          [RATES_ENTERPRISE::class, 'index'])->name('config.ratesEnterprise');
+        Route::get('/config/rates/enterprise/destination/{id}/get',                     [RATES_ENTERPRISE::class, 'items'])->name('config.ratesEnterpriseZones');
+        Route::post('/config/rates/enterprise/get',                                     [RATES_ENTERPRISE::class, 'getRatesEnterprise'])->name('config.getRatesEnterprise');
+        Route::post('/config/rates/enterprise/new',                                     [RATES_ENTERPRISE::class, 'newRates'])->name('config.newRatesEnterprise');
+        Route::delete('/config/rates/enterprise/delete',                                [RATES_ENTERPRISE::class, 'deleteRates'])->name('config.deleteRatesEnterprise');
+        Route::put('/config/rates/enterprise/update',                                   [RATES_ENTERPRISE::class, 'updateRates'])->name('config.updateRatesEnterprise');
 
         //TIPO DE CAMBIO PARA REPORTES
-        Route::get('/config/exchange-reports', [EXCHANGE_REPORTS::class, 'index'])->name('exchanges.index');
-        Route::get('/config/exchange-reports/create', [EXCHANGE_REPORTS::class, 'create'])->name('exchanges.create');
-        Route::post('/config/exchange-reports/store', [EXCHANGE_REPORTS::class, 'store'])->name('exchanges.store');
-        Route::get('/config/exchange-reports/{exchage}/edit', [EXCHANGE_REPORTS::class, 'edit'])->name('exchanges.edit');
-        Route::put('/config/exchange-reports/{exchage}', [EXCHANGE_REPORTS::class, 'update'])->name('exchanges.update');
-        Route::delete('/config/exchange-reports/{exchage}', [EXCHANGE_REPORTS::class, 'destroy'])->name('exchanges.destroy');
+        Route::get('/config/exchange-reports',                                          [EXCHANGE_REPORTS::class, 'index'])->name('exchanges.index');
+        Route::get('/config/exchange-reports/create',                                   [EXCHANGE_REPORTS::class, 'create'])->name('exchanges.create');
+        Route::post('/config/exchange-reports/store',                                   [EXCHANGE_REPORTS::class, 'store'])->name('exchanges.store');
+        Route::get('/config/exchange-reports/{exchage}/edit',                           [EXCHANGE_REPORTS::class, 'edit'])->name('exchanges.edit');
+        Route::put('/config/exchange-reports/{exchage}',                                [EXCHANGE_REPORTS::class, 'update'])->name('exchanges.update');
+        Route::delete('/config/exchange-reports/{exchage}',                             [EXCHANGE_REPORTS::class, 'destroy'])->name('exchanges.destroy');
 
         //TYPES CANCELLATIONS
-        Route::get('/config/types-cancellations', [TYPES_CANCELLATIONS::class, 'index'])->name('config.types-cancellations.index');
-        Route::get('/config/types-cancellations/create', [TYPES_CANCELLATIONS::class, 'create'])->name('config.types-cancellations.create');
-        Route::post('/config/types-cancellations', [TYPES_CANCELLATIONS::class, 'store'])->name('config.types-cancellations.store');
-        Route::get('/config/types-cancellations/{cancellation}/edit', [TYPES_CANCELLATIONS::class, 'edit'])->name('config.types-cancellations.edit');
-        Route::put('/config/types-cancellations/{cancellation}', [TYPES_CANCELLATIONS::class, 'update'])->name('config.types-cancellations.update');
-        Route::delete('/config/types-cancellations/{cancellation}', [TYPES_CANCELLATIONS::class, 'destroy'])->name('config.types-cancellations.destroy');
+        Route::get('/config/types-cancellations',                                       [TYPES_CANCELLATIONS::class, 'index'])->name('config.types-cancellations.index');
+        Route::get('/config/types-cancellations/create',                                [TYPES_CANCELLATIONS::class, 'create'])->name('config.types-cancellations.create');
+        Route::post('/config/types-cancellations',                                      [TYPES_CANCELLATIONS::class, 'store'])->name('config.types-cancellations.store');
+        Route::get('/config/types-cancellations/{cancellation}/edit',                   [TYPES_CANCELLATIONS::class, 'edit'])->name('config.types-cancellations.edit');
+        Route::put('/config/types-cancellations/{cancellation}',                        [TYPES_CANCELLATIONS::class, 'update'])->name('config.types-cancellations.update');
+        Route::delete('/config/types-cancellations/{cancellation}',                     [TYPES_CANCELLATIONS::class, 'destroy'])->name('config.types-cancellations.destroy');
 
         //TYPES SALES
-        Route::match(['get', 'post'], '/types-sales', [TYPES_SALES::class, 'index'])->name('types.sales.index');
-        Route::get('/types-sales/create', [TYPES_SALES::class, 'create'])->name('types.sales.create');
-        Route::post('/types-sales/store', [TYPES_SALES::class, 'store'])->name('types.sales.store');
-        Route::get('/types-sales/{sale}/edit', [TYPES_SALES::class, 'edit'])->name('types.sales.edit');
-        Route::put('/types-sales/{sale}', [TYPES_SALES::class, 'update'])->name('types.sales.update');
-        Route::delete('/types-sales/{sale}', [TYPES_SALES::class, 'destroy'])->name('types.sales.destroy');
+        Route::match(['get', 'post'], '/types-sales',                                   [TYPES_SALES::class, 'index'])->name('types.sales.index');
+        Route::get('/types-sales/create',                                               [TYPES_SALES::class, 'create'])->name('types.sales.create');
+        Route::post('/types-sales/store',                                               [TYPES_SALES::class, 'store'])->name('types.sales.store');
+        Route::get('/types-sales/{sale}/edit',                                          [TYPES_SALES::class, 'edit'])->name('types.sales.edit');
+        Route::put('/types-sales/{sale}',                                               [TYPES_SALES::class, 'update'])->name('types.sales.update');
+        Route::delete('/types-sales/{sale}',                                            [TYPES_SALES::class, 'destroy'])->name('types.sales.destroy');
 
-        Route::put('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'update'])->name('reservations.update');
-        Route::delete('/reservations/{reservation}', [DETAILS_RESERVATION::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA
-        Route::get('/reservations/detail/{id}', [DETAILS_RESERVATION::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');
-        Route::get('/GetExchange/{reservation}', [DETAILS_RESERVATION::class, 'get_exchange'])->name('reservations.get_exchange');
-        Route::post('/reservationsfollowups', [DETAILS_RESERVATION::class, 'followups'])->name('reservations.followups');
-        Route::put('/editreservitem/{item}', [DETAILS_RESERVATION::class, 'editreservitem'])->name('reservations.editreservitem');
+        Route::put('/reservations/{reservation}',                                       [DETAILS_RESERVATION::class, 'update'])->name('reservations.update');
+        Route::delete('/reservations/{reservation}',                                    [DETAILS_RESERVATION::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA
+        Route::get('/reservations/detail/{id}',                                         [DETAILS_RESERVATION::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');
+        Route::get('/GetExchange/{reservation}',                                        [DETAILS_RESERVATION::class, 'get_exchange'])->name('reservations.get_exchange');
+        Route::post('/reservationsfollowups',                                           [DETAILS_RESERVATION::class, 'followups'])->name('reservations.followups');
+        Route::put('/editreservitem/{item}',                                            [DETAILS_RESERVATION::class, 'editreservitem'])->name('reservations.editreservitem');
 
-        Route::post('/reservations/confirmation/arrival', [DETAILS_RESERVATION::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
-        Route::post('/reservations/confirmation/departure', [DETAILS_RESERVATION::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');
+        Route::post('/reservations/confirmation/arrival',                               [DETAILS_RESERVATION::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
+        Route::post('/reservations/confirmation/departure',                             [DETAILS_RESERVATION::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');
         
-        Route::post('/reservations/payment-request', [DETAILS_RESERVATION::class, 'paymentRequest'])->name('reservations.paymentRequest');
-        Route::post('/reservations/upload', [DETAILS_RESERVATION::class, 'uploadMedia'])->name('reservations.upload');
-        Route::get('/reservations/upload/{id}', [DETAILS_RESERVATION::class, 'getMedia'])->name('reservations.upload.getmedia');
-        Route::delete('/reservations/upload/{id}', [DETAILS_RESERVATION::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
+        Route::post('/reservations/payment-request',                                    [DETAILS_RESERVATION::class, 'paymentRequest'])->name('reservations.paymentRequest');
+        Route::post('/reservations/upload',                                             [DETAILS_RESERVATION::class, 'uploadMedia'])->name('reservations.upload');
+        Route::get('/reservations/upload/{id}',                                         [DETAILS_RESERVATION::class, 'getMedia'])->name('reservations.upload.getmedia');
+        Route::delete('/reservations/upload/{id}',                                      [DETAILS_RESERVATION::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
 
 
     //ACCIONES GENRALES UTILIZADAS EN DETALLE DE RESERVACION

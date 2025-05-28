@@ -82,35 +82,39 @@
                                     {{ $enterprise->credit_days }}
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-{{ ( $enterprise->is_invoice_iva == 1 ) ? 'success' : 'danger' }} mb-2">{{ ( $enterprise->is_invoice_iva == 1 ) ? 'CON IVA' : 'SIN IVA' }}</button>
+                                    <button class="btn btn-{{ ( $enterprise->is_invoice_iva == 1 ) ? 'success' : 'danger' }}" style="font-size: 13px;">{{ ( $enterprise->is_invoice_iva == 1 ) ? 'Con I.V.A' : 'Sin I.V.A' }}</button>
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-{{ ( $enterprise->is_rates_iva == 1 ) ? 'success' : 'danger' }} mb-2">{{ ( $enterprise->is_rates_iva == 1 ) ? 'CON IVA' : 'SIN IVA' }}</button>
+                                    <button class="btn btn-{{ ( $enterprise->is_rates_iva == 1 ) ? 'success' : 'danger' }}" style="font-size: 13px;">{{ ( $enterprise->is_rates_iva == 1 ) ? 'Con I.V.A' : 'Sin I.V.A' }}</button>
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-{{ ( $enterprise->is_foreign == 1 ) ? 'success' : 'danger' }} mb-2">{{ ( $enterprise->is_foreign == 1 ) ? 'SÍ' : 'NO' }}</button>
+                                    <button class="btn btn-{{ ( $enterprise->is_foreign == 1 ) ? 'success' : 'danger' }}" style="font-size: 13px;">{{ ( $enterprise->is_foreign == 1 ) ? 'Sí' : 'No' }}</button>
                                 </td>
                                 <td class="text-center">
                                     {{ $enterprise->currency }}
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-{{ ( $enterprise->status == 1 ) ? 'success' : 'danger' }} mb-2">{{ ( $enterprise->status == 1 ) ? 'ACTIVO' : 'INACTIVO' }}</button>
-                                </td>
-
-                                {{-- <td class="text-center">
-                                    <button class="btn btn-{{ ( $enterprise->is_external == 0 ) ? 'success' : 'danger' }} mb-2">{{ ( $enterprise->is_external == 0 ) ? 'Interno' : 'Externo' }}</button>
-                                </td> --}}
-                                <td class="text-center">
-                                    <button class="btn btn-{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'success' : 'primary' }} mb-2">{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'Proveedor' : 'Cliente' }}</button>
+                                    <button class="btn btn-{{ ( $enterprise->status == 1 ) ? 'success' : 'danger' }}" style="font-size: 13px;">{{ ( $enterprise->status == 1 ) ? 'activo' : 'Inactivo' }}</button>
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex gap-3">
-                                        <a class="btn btn-primary" href="{{ route('enterprises.edit', [$enterprise->id]) }}">Editar</a>
-                                        {{-- <form action="{{ route('enterprises.destroy', $enterprise->id) }}" method="POST">
+                                    <button class="btn btn-{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'success' : 'primary' }}" style="font-size: 13px;">{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'Proveedor' : 'Cliente' }}</button>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column gap-2">
+                                        @if (auth()->user()->hasPermission(102))
+                                            <a class="btn btn-primary" href="{{ route('enterprises.sites.index', [$enterprise->id]) }}" style="font-size: 13px;">Sitios</a>    
+                                        @endif
+                                        
+                                        @if ( $enterprise->type_enterprise == "CUSTOMER" )
+                                            <a class="btn btn-secondary" href="{{ route('enterprises.zones.index', [$enterprise->id]) }}" style="font-size: 13px;">Zonas</a>
+                                        @endif                                        
+                                        
+                                        <a class="btn btn-primary" href="{{ route('enterprises.edit', [$enterprise->id]) }}" style="font-size: 13px;">Editar</a>
+                                        <form action="{{ route('enterprises.destroy', $enterprise->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                                        </form> --}}
+                                            <button type="submit" class="btn btn-danger" style="font-size: 13px;">Eliminar</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>                                        

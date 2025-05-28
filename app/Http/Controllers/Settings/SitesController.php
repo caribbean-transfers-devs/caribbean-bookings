@@ -15,7 +15,6 @@ use App\Repositories\Settings\SitesRepository;
 use App\Traits\RoleTrait;
 
 //MODELS
-use App\Models\Site;
 
 class SitesController extends Controller
 {
@@ -28,35 +27,35 @@ class SitesController extends Controller
         $this->SitesRepository = $SitesRepository;
     }
 
-    public function index(Request $request)
+    public function index(Request $request, $id)
     {
         if($this->hasPermission(102)){
-            return $this->SitesRepository->index($request);
+            return $this->SitesRepository->index($request, $id);
         }
     }
 
-    public function create(Request $request)
+    public function create(Request $request, $id)
     {
-        return $this->SitesRepository->create($request);
+        return $this->SitesRepository->create($request, $id);
     }
 
-    public function store(SiteRequest $request)
+    public function store(SiteRequest $request, $id)
     {
-        return $this->SitesRepository->store($request);
+        return $this->SitesRepository->store($request, $id);
     }
 
-    public function edit(Request $request, Site $Site)
+    public function edit(Request $request, $id)
     {
-        return $this->SitesRepository->edit($request, $Site);
+        return $this->SitesRepository->edit($request, $id);
     }
 
-    public function update(SiteRequest $request, Site $Site)
+    public function update(SiteRequest $request, $id)
     {
-        return $this->SitesRepository->update($request, $Site);
+        return $this->SitesRepository->update($request, $id);
     }
 
-    public function destroy(Request $request, Site $Site)
+    public function destroy(Request $request, $id)
     {
-        return $this->SitesRepository->destroy($request, $Site);
+        return $this->SitesRepository->destroy($request, $id);
     }
 }

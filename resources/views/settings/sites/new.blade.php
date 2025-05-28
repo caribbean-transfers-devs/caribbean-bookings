@@ -1,6 +1,3 @@
-@php
-    use App\Traits\RoleTrait;
-@endphp
 @extends('layout.app')
 @section('title') Editar sitio @endsection
 
@@ -41,74 +38,64 @@
                                 </div>
                             @endif
 
-                            <form action="{{ !isset($site) ? route('sites.store') : route('sites.update', $site->id) }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ !isset($site) ? route('enterprises.sites.store', [( isset($enterprise->id) ? $enterprise->id : 0 )]) : route('enterprises.sites.update', [( isset($site->id) ? $site->id : 0 )]) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @if ( isset($site) )
                                     @method('PUT')
                                 @endif
 
                                 <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label for="enterprise_id">Seleccione una empresa</label>
-                                            <select name="enterprise_id" id="enterprise_id" class="form-control mb-3">
-                                                @foreach ($enterprises as $enterprise_v)
-                                                    <option  {{ isset($site->enterprise_id) && $site->enterprise_id == $enterprise_v->id ? 'selected' : '' }} value="{{ $enterprise_v->id }}">{{ $enterprise_v->names }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="name">Nombre del sitio</label>
-                                            <input type="text" id="name" name="name" class="form-control mb-3" placeholder="Nombre del sitio" value="{{ ( isset($site->name) ? $site->name : '' ) }}">
+                                            <input type="text" id="name" name="name" class="form-control mb-3" placeholder="Nombre del sitio" value="{{ old('name', $site->name ?? '') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="logo">Url de logo</label>
-                                            <input type="url" id="logo" name="logo" class="form-control mb-3" placeholder="Url de logo" value="{{ ( isset($site->logo) ? $site->logo : '' ) }}">
+                                            <input type="url" id="logo" name="logo" class="form-control mb-3" placeholder="Url de logo" value="{{ old('logo', $site->logo ?? '') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="payment_domain">Dominio</label>
-                                            <input type="url" id="payment_domain" name="payment_domain" class="form-control mb-3" placeholder="Dominio" value="{{ ( isset($site->payment_domain) ? $site->payment_domain : '' ) }}">
+                                            <input type="url" id="payment_domain" name="payment_domain" class="form-control mb-3" placeholder="Dominio" value="{{ old('payment_domain', $site->payment_domain ?? '') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="color">Color</label>
-                                            <input type="color" id="color" name="color" class="form-control mb-3" placeholder="color" value="{{ ( isset($site->color) ? $site->color : '' ) }}">
+                                            <input type="color" id="color" name="color" class="form-control mb-3" placeholder="color" value="{{ old('color', $site->color ?? '') }}">
                                         </div>
                                     </div>                                    
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="transactional_email">Correo</label>
-                                            <input type="email" id="transactional_email" name="transactional_email" class="form-control mb-3" placeholder="Correo" value="{{ ( isset($site->transactional_email) ? $site->transactional_email : '' ) }}">
+                                            <input type="email" id="transactional_email" name="transactional_email" class="form-control mb-3" placeholder="Correo" value="{{ old('transactional_email', $site->transactional_email ?? '') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="transactional_email_send">Permitir envio de correo</label>
                                             <select name="transactional_email_send" id="transactional_email_send" class="form-control mb-3">
-                                                <option value="1">Sí</option>
-                                                <option value="0">No</option>
+                                                <option {{ old('transactional_email_send', $site->transactional_email_send ?? '') == '1' ? 'selected' : '' }} value="1">Sí</option>
+                                                <option {{ old('transactional_email_send', $site->transactional_email_send ?? '') == '0' ? 'selected' : '' }} value="0">No</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="transactional_phone">Teléfono</label>
-                                            <input type="tel" id="transactional_phone" name="transactional_phone" class="form-control mb-3" placeholder="Teléfono" value="{{ ( isset($site->transactional_phone) ? $site->transactional_phone : '' ) }}">
+                                            <input type="tel" id="transactional_phone" name="transactional_phone" class="form-control mb-3" placeholder="Teléfono" value="{{ old('transactional_phone', $site->transactional_phone ?? '') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="is_commissionable">Es comisionable</label>
                                             <select name="is_commissionable" id="is_commissionable" class="form-control mb-3">
-                                                <option {{ ( isset($site->is_commissionable) && $site->is_commissionable == 0 ) ? 'selected' : '' }} value="0">No</option>
-                                                <option {{ ( isset($site->is_commissionable) && $site->is_commissionable == 1 ) ? 'selected' : '' }} value="1">Sí</option>
+                                                <option {{ old('is_commissionable', $site->is_commissionable ?? '') == '0' ? 'selected' : '' }} value="0">No</option>
+                                                <option {{ old('is_commissionable', $site->is_commissionable ?? '') == '1' ? 'selected' : '' }} value="1">Sí</option>
                                             </select>
                                         </div>
                                     </div>
@@ -116,8 +103,8 @@
                                         <div class="form-group">
                                             <label for="is_cxc">CxC (Cuentas por cobrar)</label>
                                             <select name="is_cxc" id="is_cxc" class="form-control mb-3">
-                                                <option {{ ( isset($site->is_cxc) && $site->is_cxc == 0 ) ? 'selected' : '' }} value="0">No</option>
-                                                <option {{ ( isset($site->is_cxc) && $site->is_cxc == 1 ) ? 'selected' : '' }} value="1">Sí</option>
+                                                <option {{ old('is_cxc', $site->is_cxc ?? '') == '0' ? 'selected' : '' }} value="0">No</option>
+                                                <option {{ old('is_cxc', $site->is_cxc ?? '') == '1' ? 'selected' : '' }} value="1">Sí</option>
                                             </select>
                                         </div>
                                     </div>
@@ -125,36 +112,36 @@
                                         <div class="form-group">
                                             <label for="is_cxp">CxP (Cuentas por pagar)</label>
                                             <select name="is_cxp" id="is_cxp" class="form-control mb-3">
-                                                <option {{ ( isset($site->is_cxp) && $site->is_cxp == 0 ) ? 'selected' : '' }} value="0">No</option>
-                                                <option {{ ( isset($site->is_cxp) && $site->is_cxp == 1 ) ? 'selected' : '' }} value="1">Sí</option>
+                                                <option {{ old('is_cxp', $site->is_cxp ?? '') == '0' ? 'selected' : '' }} value="0">No</option>
+                                                <option {{ old('is_cxp', $site->is_cxp ?? '') == '1' ? 'selected' : '' }} value="1">Sí</option>
                                             </select>
                                         </div>
                                     </div>                                    
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="success_payment_url">Url de pago satisfactorio</label>
-                                            <input type="text" id="success_payment_url" name="success_payment_url" class="form-control mb-3" placeholder="Url de pago satisfactorio" value="{{ ( isset($site->success_payment_url) ? $site->success_payment_url : '' ) }}">
+                                            <input type="text" id="success_payment_url" name="success_payment_url" class="form-control mb-3" placeholder="Url de pago satisfactorio" value="{{ old('success_payment_url', $site->success_payment_url ?? '') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="cancel_payment_url">Url de pago cancelado</label>
-                                            <input type="text" id="cancel_payment_url" name="cancel_payment_url" class="form-control mb-3" placeholder="Url de pago cancelado" value="{{ ( isset($site->cancel_payment_url) ? $site->cancel_payment_url : '' ) }}">
+                                            <input type="text" id="cancel_payment_url" name="cancel_payment_url" class="form-control mb-3" placeholder="Url de pago cancelado" value="{{ old('cancel_payment_url', $site->cancel_payment_url ?? '') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="type_site">Tipo de sitio</label>
                                             <select id="type_site" name="type_site" class="form-control mb-3">
-                                                <option {{ ( isset($site->type_site) && $site->type_site == "PLATFORM" ) ? 'selected' : '' }} value="PLATFORM">PLATFORM</option>
-                                                <option {{ ( isset($site->type_site) && $site->type_site == "CALLCENTER" ) ? 'selected' : '' }} value="CALLCENTER">CALLCENTER</option>
-                                                <option {{ ( isset($site->type_site) && $site->type_site == "AGENCY" ) ? 'selected' : '' }} value="AGENCY">AGENCY</option>
-                                                <option {{ ( isset($site->type_site) && $site->type_site == "TICKETOFFICE" ) ? 'selected' : '' }} value="TICKETOFFICE">TICKETOFFICE</option>
+                                                <option {{ old('type_site', $site->type_site ?? '') == 'PLATFORM' ? 'selected' : '' }}      value="PLATFORM">PLATFORM</option>
+                                                <option {{ old('type_site', $site->type_site ?? '') == 'CALLCENTER' ? 'selected' : '' }}    value="CALLCENTER">CALLCENTER</option>
+                                                <option {{ old('type_site', $site->type_site ?? '') == 'AGENCY' ? 'selected' : '' }}        value="AGENCY">AGENCY</option>
+                                                <option {{ old('type_site', $site->type_site ?? '') == 'TICKETOFFICE' ? 'selected' : '' }}  value="TICKETOFFICE">TICKETOFFICE</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">
-                                        <a class="btn btn-danger" href="{{ route('sites.index') }}">Cancelar</a>
+                                        <a class="btn btn-danger" href="{{ route('enterprises.sites.index', [( isset($enterprise->id) ? $enterprise->id : $site->enterprise_id )]) }}">Cancelar</a>
                                         <button type="submit" class="btn btn-primary">{{ ( !isset($site) ? 'Guardar' : 'Actualizar' ) }}</button>
                                     </div>
                                 </div>

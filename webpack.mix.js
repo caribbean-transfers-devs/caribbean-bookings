@@ -296,6 +296,12 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
                 'resources/js/sections/settings/zones.js'
             ], data.assets + "js/sections/settings/zones.min.js");
 
+            //ZONES
+            mix.combine([
+                'resources/plugins/table/datatable/datatables5.js', 
+                'resources/js/sections/settings/zones_enterprise.js'
+            ], data.assets + "js/sections/settings/zones_enterprise.min.js");            
+
             //RATES
             mix.combine([
                 'resources/plugins/table/datatable/datatables5.js', 

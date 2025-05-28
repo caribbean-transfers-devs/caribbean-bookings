@@ -30,4 +30,8 @@ class Enterprise extends Model
     public function sites(){
         return $this->hasMany(Site::class, 'enterprise_id', 'id');
     }
+
+    public function zones_enterprises(){
+        return $this->hasMany(ZonesEnterprise::class, 'enterprise_id', 'id');
+    }    
 }

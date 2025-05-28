@@ -229,13 +229,13 @@
                 ];
             endif;
             //SITIOS
-            if(auth()->user()->hasPermission(102)):
-                $links_settings[] = [
-                    'name' => 'Sitios',
-                    'route' => route('sites.index'),
-                    'active' => request()->routeIs('sites.*'),
-                ];
-            endif;
+            // if(auth()->user()->hasPermission(102)):
+            //     $links_settings[] = [
+            //         'name' => 'Sitios',
+            //         'route' => route('sites.index'),
+            //         'active' => request()->routeIs('sites.*'),
+            //     ];
+            // endif;
             //VEHÍCULOS
             if(auth()->user()->hasPermission(74)):
                 $links_settings[] = [
