@@ -9,14 +9,14 @@ const _container        = document.getElementById('rates-container');
 
 //FUNCIONES ANONIMAS
 let rates = {
-    getInputs: function(destinationID){
+    getInputs: function(destinationID, enterpriseID){
         // Configurar beforeSend
         _btnQuoteRate.setAttribute('disabled', true);
         _zoneOne.innerHTML = '<option>Buscando...</option>';
         _zoneTwo.innerHTML = '<option>Buscando...</option>';
         _service.innerHTML = '<option>Buscando...</option>';
 
-        fetch(`/config/rates/enterprise/destination/${destinationID}/get`)
+        fetch(`/config/rates/enterprise/destination/${destinationID}/get?enterprise=${enterpriseID}`)
         .then(response => {
             if (!response.ok) {
                 return response.json().then(err => { throw err; });
@@ -34,8 +34,8 @@ let rates = {
                         data.forEach(item => {
                             xHTML += `<option value="${item.id}">${item.name}</option>`;
                         });
-                        _zoneOne.innerHTML = xHTML;
-                        _zoneTwo.innerHTML = xHTML;
+                        _zoneOne.innerHTML = ( xHTML != "" ? xHTML : `<option>Sin resultados</option>` );
+                        _zoneTwo.innerHTML = ( xHTML != "" ? xHTML : `<option>Sin resultados</option>` );;
                     }
         
                     if (key == "services") {
@@ -63,7 +63,7 @@ if( _destination != null ){
             _service.innerHTML    = '<option value="0">[TODOS]</option>';
             return false;
         }
-        rates.getInputs(this.value);
+        rates.getInputs(this.value, _enterprise.value);
     })
 }
 

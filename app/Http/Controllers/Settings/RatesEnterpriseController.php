@@ -21,49 +21,49 @@ class RatesEnterpriseController extends Controller
 {
     use RoleTrait;
 
-    private $RatesEnterpriseRepository;
+    private $rates;
 
     public function __construct(RatesEnterpriseRepository $RatesEnterpriseRepository)
     {
-        $this->RatesEnterpriseRepository = $RatesEnterpriseRepository;
+        $this->rates = $RatesEnterpriseRepository;
     }
 
-    public function index(Request $request){
+    public function index(Request $request, $id){
         if(!$this->hasPermission(103)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
-        return $this->RatesEnterpriseRepository->index($request);
+        return $this->rates->index($request, $id);
     }
 
     public function items(Request $request){
-        return $this->RatesEnterpriseRepository->items($request);
+        return $this->rates->items($request);
     }
 
     public function getRatesEnterprise(RatesEnterpriseRequest $request){
         if(!$this->hasPermission(103)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
-        return $this->RatesEnterpriseRepository->getRatesEnterprise($request);
+        return $this->rates->getRatesEnterprise($request);
     }
 
     public function newRates(RatesEnterpriseNewRequest $request){
         if(!$this->hasPermission(105)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
-        return $this->RatesEnterpriseRepository->newRates($request);
+        return $this->rates->newRates($request);
     }
 
     public function deleteRates(RatesEnterpriseDeleteRequest $request){
         if(!$this->hasPermission(107)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
-        return $this->RatesEnterpriseRepository->deleteRates($request);
+        return $this->rates->deleteRates($request);
     }
 
     public function updateRates(RatesEnterpriseUpdateRequest $request){
         if(!$this->hasPermission(106)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }    
-        return $this->RatesEnterpriseRepository->updateRates($request);
+        return $this->rates->updateRates($request);
     }
 }

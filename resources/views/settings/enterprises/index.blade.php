@@ -101,13 +101,17 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column gap-2">
-                                        @if (auth()->user()->hasPermission(102))
+                                        @if ( auth()->user()->hasPermission(102) )
                                             <a class="btn btn-primary" href="{{ route('enterprises.sites.index', [$enterprise->id]) }}" style="font-size: 13px;">Sitios</a>    
                                         @endif
                                         
                                         @if ( $enterprise->type_enterprise == "CUSTOMER" )
-                                            <a class="btn btn-secondary" href="{{ route('enterprises.zones.index', [$enterprise->id]) }}" style="font-size: 13px;">Zonas</a>
-                                        @endif                                        
+                                            <a class="btn btn-secondary" href="{{ route('enterprises.zones.index', [$enterprise->id]) }}" style="font-size: 13px;">Zonas</a>                                            
+                                        @endif
+
+                                        @if ( auth()->user()->hasPermission(104) && $enterprise->type_enterprise == "CUSTOMER" )
+                                            <a class="btn btn-success" href="{{ route('enterprises.rates.index', [$enterprise->id]) }}" style="font-size: 13px;">Tarifas</a>
+                                        @endif
                                         
                                         <a class="btn btn-primary" href="{{ route('enterprises.edit', [$enterprise->id]) }}" style="font-size: 13px;">Editar</a>
                                         <form action="{{ route('enterprises.destroy', $enterprise->id) }}" method="POST">

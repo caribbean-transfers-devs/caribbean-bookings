@@ -203,7 +203,9 @@
         endif;        
 
         //CONFIGURACIONES
-        if(auth()->user()->hasPermission(6) || auth()->user()->hasPermission(1) || auth()->user()->hasPermission(73) || auth()->user()->hasPermission(74) || auth()->user()->hasPermission(75) || auth()->user()->hasPermission(28) || auth()->user()->hasPermission(32) || auth()->user()->hasPermission(102) || auth()->user()->hasPermission(103) || auth()->user()->hasPermission(104) || auth()->user()->hasPermission(108) || auth()->user()->hasPermission(115)):
+        // auth()->user()->hasPermission(102)
+        // auth()->user()->hasPermission(104)
+        if(auth()->user()->hasPermission(6) || auth()->user()->hasPermission(1) || auth()->user()->hasPermission(73) || auth()->user()->hasPermission(74) || auth()->user()->hasPermission(75) || auth()->user()->hasPermission(28) || auth()->user()->hasPermission(32) || auth()->user()->hasPermission(103) || auth()->user()->hasPermission(108) || auth()->user()->hasPermission(115)):
             //ROLES
             if(auth()->user()->hasPermission(6)):
                 $links_settings[] = [
@@ -276,13 +278,13 @@
                 ];
             endif;
             //TARIFAS PARA EMPRESAS
-            if(auth()->user()->hasPermission(104)):
-                $links_settings[] = [
-                    'name' => 'Tarifas de empresas',
-                    'route' => route('config.ratesEnterprise'),
-                    'active' => request()->routeIs('config.ratesEnterprise'),
-                ];
-            endif;
+            // if(auth()->user()->hasPermission(104)):
+            //     $links_settings[] = [
+            //         'name' => 'Tarifas de empresas',
+            //         'route' => route('config.ratesEnterprise'),
+            //         'active' => request()->routeIs('config.ratesEnterprise'),
+            //     ];
+            // endif;
             //TIPO DE CAMBIO PARA REPORTES
             if(auth()->user()->hasPermission(103)):
                 $links_settings[] = [

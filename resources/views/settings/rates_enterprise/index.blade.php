@@ -13,6 +13,8 @@
 @section('content')
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+            <p class="text-danger">{{ $enterprise->is_rates_iva == 1 ? "La tarifas incluyen I.V.A" : "Las tarifas no incluyen I.V.A" }}</p>
+            <p class="text-danger">{{ $enterprise->currency == "MXN" ? "Cargar tarifa y costo operativo en MXN" : "Cargar tarifa y costo operativo en USD" }}</p>
             <div id="filters" class="accordion">
                 <div class="card">
                 <div class="card-header" id="headingOne1">
@@ -25,20 +27,24 @@
                 <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
                     <div class="card-body">
                         <form action="" class="search-container" method="GET" id="zoneForm">
-                            <div>
+                            <div class="d-none">
                                 <select name="enterpriseID" class="form-control" id="enterpriseID">
                                     <option value="0">Seleccione una empresa empresa</option>
                                     @if(sizeof($enterprises) >= 1)
-                                        @foreach ($enterprises as $enterprise)
-                                            <option value="{{ $enterprise->id }}">{{ $enterprise->names }}</option>
+                                        @foreach ($enterprises as $location)
+                                            <option {{ isset($enterprise->id) && $enterprise->id == $location->id ? 'selected' : '' }} value="{{ $location->id }}">{{ $location->names }}</option>
                                         @endforeach
                                     @endif
                                 </select>
-                            </div>                            
+                            </div>
                             <div>
                                 <select name="destinationID" class="form-control" id="destinationID">
                                     <option value="0">Selecciona el destino</option>
-                                    <option value="1">Cancún</option>
+                                    @if (sizeof($destinations) >= 1)
+                                        @foreach ($destinations as $destination)
+                                            <option {{ isset($_REQUEST['destination_id']) && $_REQUEST['destination_id'] == $destination->id ? 'selected' : '' }} value="{{ $destination->id }}">{{ $destination->name }}</option>
+                                        @endforeach                                        
+                                    @endif
                                 </select>
                             </div>
                             <div class="two_">

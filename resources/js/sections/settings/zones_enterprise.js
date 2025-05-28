@@ -11,53 +11,45 @@ if( document.querySelector('.table-rendering') != null ){
 
 function getPoints(event, destination_id, zone_id){
     event.preventDefault();
-    $("#zonesModal").modal("show");    
+    $("#zonesModal").modal("show");
+    $.ajax({
+        url: `/enterprises/destinations/${destination_id}/points`,
+        type: 'GET',
+        data: { zone_id: zone_id },
+        beforeSend: function() {        
+            $("#zone_map_container").empty().html(`<div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div>`)
+        },
+        success: function(resp) {
+            initMap();
+            for (const key in resp) {
+                if (resp.hasOwnProperty(key)) {
+                    let polygonCoords = [];
+                    const location = resp[key];
+                    location.points.forEach(point => {
+                        polygonCoords.push( { lat: Number(point.lat), lng: Number(point.lng) } );
+                    });
+                    var polygonData = new google.maps.Polygon({
+                        paths: polygonCoords,
+                        strokeColor: (( zone_id == location.id )?'#1cbb8c':'#FF0000'),
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: (( zone_id == location.id )?'#1cbb8c':'#FF0000'),
+                        fillOpacity: 0.35
+                    });
+                    polygonData.setMap(map);                    
+                }
+            }
+            initDraw(zone_id);
 
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    }); 
-
-    // $.ajax({
-    //     url: `/config/destinations/${destination_id}/points`,
-    //     type: 'GET',
-    //     data: { zone_id: zone_id },
-    //     beforeSend: function() {        
-    //         $("#zone_map_container").empty().html(`<div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div>`)
-    //     },
-    //     success: function(resp) {
-    //         initMap();
-    //         for (const key in resp) {
-    //             if (resp.hasOwnProperty(key)) {
-
-    //                 let polygonCoords = [];
-    //                 const location = resp[key];
-    //                 location.points.forEach(point => {
-    //                     polygonCoords.push( { lat: Number(point.lat), lng: Number(point.lng) } );
-    //                 });
-    //                 var polygonData = new google.maps.Polygon({
-    //                     paths: polygonCoords,
-    //                     strokeColor: (( zone_id == location.id )?'#1cbb8c':'#FF0000'),
-    //                     strokeOpacity: 0.8,
-    //                     strokeWeight: 2,
-    //                     fillColor: (( zone_id == location.id )?'#1cbb8c':'#FF0000'),
-    //                     fillOpacity: 0.35
-    //                 });
-    //                 polygonData.setMap(map);                    
-    //             }
-    //         }
-    //         initDraw(zone_id);
-
-    //     },
-    // }).fail(function(xhr, status, error) {
-    //     console.log(xhr);
-    //     Swal.fire(
-    //         '¡ERROR!',
-    //         xhr.responseJSON.message,
-    //         'error'
-    //     );
-    // });
+        },
+    }).fail(function(xhr, status, error) {
+        console.log(xhr);
+        Swal.fire(
+            '¡ERROR!',
+            xhr.responseJSON.message,
+            'error'
+        );
+    });
 }
 
 function initMap(){
@@ -100,54 +92,45 @@ function initDraw(zone_id) {
             confirmButtonText: 'Aceptar',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
-            if(result.isConfirmed == true){
-
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            if(result.isConfirmed == true){              
+                $.ajax({
+                    url: `/enterprises/destinations/${zone_id}/points`,
+                    type: 'PUT',
+                    data: { coordinates },
+                    beforeSend: function() {        
+                        $("#zone_map_container").empty().html(`<div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div>`);
+                    },
+                    success: function(resp) {                        
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            icon: 'success',
+                            html: 'Geocerca actualizada con éxito. Será redirigido en <b></b>',
+                            timer: 2500,
+                            timerProgressBar: true,
+                            didOpen: () => {
+                                Swal.showLoading()
+                                const b = Swal.getHtmlContainer().querySelector('b')
+                                timerInterval = setInterval(() => {
+                                    b.textContent = (Swal.getTimerLeft() / 1000)
+                                        .toFixed(0)
+                                }, 100)
+                            },
+                            willClose: () => {
+                                clearInterval(timerInterval)
+                            }
+                        }).then((result) => {
+                            location.reload();
+                        })
                     }
-                });                
-                // $.ajax({
-                //     url: `/config/destinations/${zone_id}/points`,
-                //     type: 'PUT',
-                //     data: { coordinates },
-                //     beforeSend: function() {        
-                //         $("#zone_map_container").empty().html(`<div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div>`);
-                //     },
-                //     success: function(resp) {
-                        
-                //         Swal.fire({
-                //             title: '¡Éxito!',
-                //             icon: 'success',
-                //             html: 'Geocerca actualizada con éxito. Será redirigido en <b></b>',
-                //             timer: 2500,
-                //             timerProgressBar: true,
-                //             didOpen: () => {
-                //                 Swal.showLoading()
-                //                 const b = Swal.getHtmlContainer().querySelector('b')
-                //                 timerInterval = setInterval(() => {
-                //                     b.textContent = (Swal.getTimerLeft() / 1000)
-                //                         .toFixed(0)
-                //                 }, 100)
-                //             },
-                //             willClose: () => {
-                //                 clearInterval(timerInterval)
-                //             }
-                //         }).then((result) => {
-                //             location.reload();
-                //         })
-
-                //     }
-                // }).fail(function(xhr, status, error) {
-                //         console.log(xhr);
-                //         Swal.fire(
-                //             '¡ERROR!',
-                //             xhr.responseJSON.message,
-                //             'error'
-                //         );
-                //         $("#zonesModal").modal("hide");
-                // });
-
+                }).fail(function(xhr, status, error) {
+                        console.log(xhr);
+                        Swal.fire(
+                            '¡ERROR!',
+                            xhr.responseJSON.message,
+                            'error'
+                        );
+                        $("#zonesModal").modal("hide");
+                });
                 console.log( coordinates );
             }else{                
                 clearPolygon();

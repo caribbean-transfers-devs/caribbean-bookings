@@ -5,22 +5,40 @@ namespace App\Repositories\Settings;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use App\Models\Enterprise;
-use App\Models\Zones;
-use App\Models\DestinationService;
-use App\Models\RatesEnterprise;
 
-class RatesEnterpriseRepository{
-    public function index($request){ 
+use App\Models\Enterprise;
+use App\Models\ZonesEnterprise;
+use App\Models\RatesEnterprise;
+use App\Models\Destination;
+use App\Models\DestinationService;
+
+class RatesEnterpriseRepository
+{
+
+    public function index($request, $id = 0)
+    { 
+        $enterprise = Enterprise::select(['id', 'names', 'is_rates_iva', 'currency'])
+                            ->with(['zones_enterprises' => function($query) {
+                                $query->select(['id', 'name']);
+                            }])        
+                            ->find($id);
+
         return view('settings.rates_enterprise.index', [
             'breadcrumbs' => [
                 [
-                    "route" => route('config.ratesEnterprise'),
-                    "name" => "Tarifas de empresas",
-                    "active" => true                    
+                    "route" => route('enterprises.index'),
+                    "name" => "Listado de empresas",
+                    "active" => false
+                ],
+                [
+                    "route" => '',
+                    "name" => "Sitios de la empresa: ".( isset($enterprise->names) ? $enterprise->names : 'NO DEFINIDO' ),
+                    "active" => true
                 ]
             ],
-            'enterprises' => Enterprise::where('is_external', 1)->whereNull('deleted_at')->get(),
+            'enterprise'  => $enterprise,
+            'destinations' => Destination::all(),
+            'enterprises' => Enterprise::where('type_enterprise', "CUSTOMER")->whereNull('deleted_at')->get(),
         ]);
     }
 
@@ -39,7 +57,7 @@ class RatesEnterpriseRepository{
                 ], Response::HTTP_BAD_REQUEST);
         }
         
-        $data['zones'] = Zones::where('destination_id', $request->id)->get();
+        $data['zones'] = ZonesEnterprise::where('enterprise_id', $request->enterprise)->where('destination_id', $request->id)->get();
         $data['services'] = DestinationService::select('id', 'name')->where('destination_id', $request->id)->get();
 
         return response()->json($data, Response::HTTP_OK);        
@@ -72,8 +90,8 @@ class RatesEnterpriseRepository{
                                 FROM rates_enterprises as rt
                                     LEFT JOIN destination_services as ds ON ds.id = rt.destination_service_id
                                     LEFT JOIN enterprises as e ON e.id = rt.enterprise_id
-                                    LEFT JOIN zones as zoneOne ON zoneOne.id = rt.zone_one
-                                    LEFT JOIN zones as zoneTwo ON zoneTwo.id = rt.zone_two
+                                    LEFT JOIN zones_enterprises as zoneOne ON zoneOne.id = rt.zone_one
+                                    LEFT JOIN zones_enterprises as zoneTwo ON zoneTwo.id = rt.zone_two
                                 WHERE rt.destination_id = :destination_id
                                 AND ( (rt.zone_one = :zone_one AND rt.zone_two = :zone_two) OR ( rt.zone_one = :zone_three AND rt.zone_two = :zone_four )  ) 
                                 AND e.id = :enterprise_id

@@ -24,7 +24,7 @@
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][round_trip]" value="{{ $value->round_trip }}">
                             </div> --}}
                             <div>
-                                <p>Costo operativo (USD)</p>
+                                <p>Costo operativo</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][operating_cost]" value="{{ $value->operating_cost }}">
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][up_8_rt]" value="{{ $value->up_8_rt }}">
                             </div> --}}
                             <div>                                    
-                                <p>Costo operativo (USD)</p>
+                                <p>Costo operativo</p>
                                 <input type="text" class="form-control" name="price[{{ $value->id }}][operating_cost]" value="{{ $value->operating_cost }}">
                             </div>
                         </div>
@@ -106,7 +106,7 @@
                         <input type="text" class="form-control" value="0.00" name="round_trip">
                     </div> --}}
                     <div>
-                        <p>Costo operativo (USD)</p>
+                        <p>Costo operativo</p>
                         <input type="text" class="form-control" value="0.00" name="operating_cost">
                     </div>
                 </div>
@@ -144,7 +144,7 @@
                         <input type="text" class="form-control" value="0.00" name="up_8_rt">
                     </div> --}}
                     <div>                                    
-                        <p>Costo operativo (USD)</p>
+                        <p>Costo operativo</p>
                         <input type="text" class="form-control" value="0.00" name="operating_cost">
                     </div>
                 </div>

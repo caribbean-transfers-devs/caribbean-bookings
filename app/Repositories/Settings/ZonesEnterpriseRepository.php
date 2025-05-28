@@ -200,6 +200,7 @@ class ZonesEnterpriseRepository{
                                     [
                                         'destination_id' => $request->id,
                                 ]);
+                                
         if(sizeof($data) <= 0):
             return response()->json([], 200);
         endif;
