@@ -227,14 +227,16 @@
                                 </div>
                             </div>                            
                         </div>
-                        <div class="tab-pane" id="icon-tab-5" role="tabpanel">
-                            <form id="upload-form" class="dropzone" action="/enterprises/upload">
-                                @csrf
-                                <input type="hidden" name="folder" value="{{ $enterprise->id }}">
-                            </form>
-                            
-                            <div class="image-listing" id="media-listing"></div>                            
-                        </div>                        
+                        @if (isset($enterprise))                                                    
+                            <div class="tab-pane" id="icon-tab-5" role="tabpanel">
+                                <form id="upload-form" class="dropzone" action="/enterprises/upload">
+                                    @csrf
+                                    <input type="hidden" name="folder" value="{{ $enterprise->id }}">
+                                </form>
+                                
+                                <div class="image-listing" id="media-listing"></div>                            
+                            </div>
+                        @endif                     
                     </div>
                 </div>
             </div>
