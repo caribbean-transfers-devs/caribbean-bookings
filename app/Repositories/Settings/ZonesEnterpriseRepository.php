@@ -13,14 +13,11 @@ use App\Models\ZonesPointsEnterprise;
 
 class ZonesEnterpriseRepository{
 
-    public function index($request, $id)
+    public function index($request, $id = 0)
     {
         $zones = Enterprise::select(['id', 'names'])
                             ->with(['zones_enterprises' => function($query) use ($request) {
                                 $query->select(['id', 'enterprise_id', 'destination_id', 'name', 'is_primary', 'status', 'iata_code', 'cut_off', 'cut_off_operation', 'distance', 'time'])
-                                        // ->when($request->has('destination_id'), function($q) use ($request) {
-                                        //     $q->where('destination_id', $request->destination_id);
-                                        // })
                                         ->when($request->filled('destination_id'), function($q) use ($request) {
                                             $q->where('destination_id', $request->destination_id);
                                         })                                        
@@ -70,7 +67,7 @@ class ZonesEnterpriseRepository{
                     ],
                     [
                         "route" => "",
-                        "name" => "Crear un nuevo zona",
+                        "name" => "Crear nueva zona",
                         "active" => true
                     ]
                 ],
@@ -196,9 +193,8 @@ class ZonesEnterpriseRepository{
                                 zp.longitude
                             FROM zones_enterprises as zon
                                 INNER JOIN zones_points_enterprises as zp ON zp.zone_id = zon.id
-                                WHERE zon.destination_id = :destination_id",
-                                    [
-                                        'destination_id' => $request->id,
+                                WHERE zon.destination_id = :destination_id",[
+                                    'destination_id' => $request->id,
                                 ]);
                                 
         if(sizeof($data) <= 0):

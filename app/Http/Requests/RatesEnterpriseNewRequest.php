@@ -41,9 +41,10 @@ class RatesEnterpriseNewRequest extends FormRequest
             $rules['ow_37'] = 'required|numeric|min:1';
             // $rules['rt_37'] = 'required|numeric|min:1';
             $rules['up_8_ow'] = 'required|numeric|min:1';
-            // $rules['up_8_rt'] = 'required|numeric|min:1';
-            $rules['operating_cost'] = 'required|numeric|min:1';
+            // $rules['up_8_rt'] = 'required|numeric|min:1';            
         }
+
+        $rules['operating_cost'] = 'required|numeric|min:1';
 
         return $rules;
     }

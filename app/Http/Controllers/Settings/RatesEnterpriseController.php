@@ -28,19 +28,56 @@ class RatesEnterpriseController extends Controller
         $this->rates = $RatesEnterpriseRepository;
     }
 
-    public function index(Request $request, $id){
-        if(!$this->hasPermission(103)){
+    public function index(Request $request, $id = 0){
+        if(!$this->hasPermission(104)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $this->rates->index($request, $id);
     }
+
+    public function create(Request $request, $id = 0)
+    {
+        if(!$this->hasPermission(105)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+        return $this->rates->create($request, $id);
+    }
+
+    public function store(RatesEnterpriseNewRequest $request, $id = 0)
+    {
+        if(!$this->hasPermission(105)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }        
+        return $this->rates->store($request, $id);
+    }
+
+    public function edit(Request $request, $id = 0)
+    {
+        if(!$this->hasPermission(106)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }        
+        return $this->rates->edit($request, $id);
+    }
+
+    public function update(RatesEnterpriseNewRequest $request, $id = 0)
+    {
+        if(!$this->hasPermission(106)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }        
+        return $this->rates->update($request, $id);
+    }
+
+
+
+
+
 
     public function items(Request $request){
         return $this->rates->items($request);
     }
 
     public function getRatesEnterprise(RatesEnterpriseRequest $request){
-        if(!$this->hasPermission(103)){
+        if(!$this->hasPermission(104)){
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
         return $this->rates->getRatesEnterprise($request);

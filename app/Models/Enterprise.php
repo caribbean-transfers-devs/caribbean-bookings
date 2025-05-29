@@ -33,5 +33,9 @@ class Enterprise extends Model
 
     public function zones_enterprises(){
         return $this->hasMany(ZonesEnterprise::class, 'enterprise_id', 'id');
+    }
+
+    public function rates_enterprises(){
+        return $this->hasMany(RatesEnterprise::class, 'enterprise_id', 'id');
     }    
 }

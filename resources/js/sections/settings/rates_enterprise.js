@@ -11,7 +11,7 @@ const _container        = document.getElementById('rates-container');
 let rates = {
     getInputs: function(destinationID, enterpriseID){
         // Configurar beforeSend
-        _btnQuoteRate.setAttribute('disabled', true);
+        // _btnQuoteRate.setAttribute('disabled', true);
         _zoneOne.innerHTML = '<option>Buscando...</option>';
         _zoneTwo.innerHTML = '<option>Buscando...</option>';
         _service.innerHTML = '<option>Buscando...</option>';
@@ -24,8 +24,7 @@ let rates = {
             return response.json();
         })
         .then(resp => {
-            _btnQuoteRate.removeAttribute('disabled');
-            
+            // _btnQuoteRate.removeAttribute('disabled');            
             for (const key in resp) {
                 if (resp.hasOwnProperty(key)) {
                     const data = resp[key];    
@@ -35,37 +34,94 @@ let rates = {
                             xHTML += `<option value="${item.id}">${item.name}</option>`;
                         });
                         _zoneOne.innerHTML = ( xHTML != "" ? xHTML : `<option>Sin resultados</option>` );
-                        _zoneTwo.innerHTML = ( xHTML != "" ? xHTML : `<option>Sin resultados</option>` );;
+                        _zoneTwo.innerHTML = ( xHTML != "" ? xHTML : `<option>Sin resultados</option>` );
+
+                        if( _zoneOne.dataset.code ){
+                            _zoneOne.value = _zoneOne.dataset.code;
+                        }
+
+                        if( _zoneTwo.dataset.code ){
+                            _zoneTwo.value = _zoneTwo.dataset.code;
+                        }
                     }
         
                     if (key == "services") {
-                        let xHTML = `<option value="0">[TODOS]</option>`;
+                        let xHTML = `<option value="">[TODOS]</option>`;
                         data.forEach(item => {
-                            xHTML += `<option value="${item.id}">${item.name}</option>`;
+                            xHTML += `<option data-type="${item.price_type}" value="${item.id}">${item.name}</option>`;
                         });
                         _service.innerHTML = xHTML;
+
+                        if( _service.dataset.code ){
+                            _service.value = _service.dataset.code;
+                        }
+
+                        rates.changeService(_service);                        
                     }
                 }
             }
         })
         .catch(error => {
-            _btnQuoteRate.removeAttribute('disabled');
+            // _btnQuoteRate.removeAttribute('disabled');
             console.error('Hubo un problema con la operación fetch:', error);
         });
+    },
+    changeDestination: function(value){
+        if (value == 0) {
+            _zoneOne.innerHTML  = '<option value="">Zona de origen</option>';
+            _zoneTwo.innerHTML  = '<option value="">Zona de destino</option>';
+            _service.innerHTML    = '<option value="">[TODOS]</option>';
+            return false;            
+        }
+        rates.getInputs(value, _enterprise.value);
+    },
+    changeService: function(target) {
+        const selectElement = target;
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const optionType = selectedOption.dataset.type ? selectedOption.dataset.type.trim().toLowerCase() : null;
+        const single = document.querySelector('.single_');
+        const multiple = document.querySelector('.multiple_');
+        const costOperative = document.querySelector('.costOperative');
+        const destinationServiceType = document.getElementById('destinationServiceType');
+        if(destinationServiceType){
+            destinationServiceType.value = optionType;
+        }
+        
+        // Asegurarnos de que los elementos existen antes de manipularlos
+        if (!single || !multiple) return;
+
+        // Resetear clases primero
+        single.classList.add('d-none');
+        multiple.classList.add('d-none');
+        (costOperative ? costOperative.classList.add('d-none') : '' );
+
+        // Validar el tipo de opción
+        if (optionType === "vehicle" || optionType === "shared") {
+            single.classList.remove('d-none');
+            (costOperative ? costOperative.classList.remove('d-none') : '' );
+        } 
+        else if (optionType === "passenger") {  // Asegúrate que coincide exactamente con tu HTML
+            multiple.classList.remove('d-none');
+            (costOperative ? costOperative.classList.remove('d-none') : '' );
+        }
+        
+        console.log("Tipo seleccionado:", optionType); // Para depuración
     }
 };
 
-if( _destination != null ){
-    _destination.addEventListener('change', function(){
-        if(this.value == 0){
-            _zoneOne.innerHTML  = '<option value="0">Zona de origen</option>';
-            _zoneTwo.innerHTML  = '<option value="0">Zona de destino</option>';
-            _service.innerHTML    = '<option value="0">[TODOS]</option>';
-            return false;
-        }
-        rates.getInputs(this.value, _enterprise.value);
-    })
+if (_destination) {
+    rates.changeDestination(_destination.value);
 }
+
+document.addEventListener('change', function (event) {
+    if (event.target && event.target.id === 'destinationID') {
+        rates.changeDestination(event.target.value)
+    }
+
+    if (event.target && event.target.id === 'rateServicesID') {
+        rates.changeService(event.target);
+    }
+});
 
 document.addEventListener('click', function (event) {
     if (event.target && event.target.id === 'btnGetRates') {
@@ -246,8 +302,8 @@ document.addEventListener('click', function (event) {
 
 function deleteItem(id){
     Swal.fire({
-        title: '¿Está seguro de eliminar la tarifa?',
-        text: 'Esta acción no se puede revertir',
+        // title: '¿Está seguro de eliminar la tarifa?',
+        text: '¿Está seguro de eliminar la tarifa?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
@@ -286,13 +342,14 @@ function deleteItem(id){
             })
             .then(data => {
                 Swal.fire({
-                    title: 'Tarifa eliminada',
+                    // title: 'Tarifa eliminada',
                     icon: 'success',
-                    html: 'La tarifa ha sido eliminada con éxito.',
+                    text: 'La tarifa se ha eliminado con éxito.',
                     allowOutsideClick: false,
                 }).then(() => {
                     Swal.close(); // Cierra el Swal al recibir respuesta
-                    _btnQuoteRate.click();
+                    window.location.reload();
+                    // _btnQuoteRate.click();
                 });
             })
             .catch(error => {

@@ -19,28 +19,200 @@ class RatesEnterpriseRepository
     { 
         $enterprise = Enterprise::select(['id', 'names', 'is_rates_iva', 'currency'])
                             ->with(['zones_enterprises' => function($query) {
-                                $query->select(['id', 'name']);
-                            }])        
-                            ->find($id);
-
-        return view('settings.rates_enterprise.index', [
-            'breadcrumbs' => [
-                [
-                    "route" => route('enterprises.index'),
-                    "name" => "Listado de empresas",
-                    "active" => false
+                                $query->select(['id', 'enterprise_id', 'destination_id', 'name', 'is_primary', 'status', 'iata_code', 'cut_off', 'cut_off_operation', 'distance', 'time']);
+                            }])
+                            ->with(['rates_enterprises' => function($query) use ($request) {
+                                $query->select()
+                                    ->when($request->filled('enterprise_id'), function($q) use ($request) {
+                                        $q->where('enterprise_id', $request->enterprise_id);
+                                    })
+                                    ->when($request->filled('destination_id'), function($q) use ($request) {
+                                        $q->where('destination_id', $request->destination_id);
+                                    })
+                                    ->when($request->filled('destination_service_id'), function($q) use ($request) {
+                                        $q->where('destination_service_id', $request->destination_service_id);
+                                    })
+                                    ->when($request->filled('zone_one'), function($q) use ($request) {
+                                        $q->where('zone_one', $request->zone_one);
+                                    })
+                                    ->when($request->filled('zone_two'), function($q) use ($request) {
+                                        $q->where('zone_two', $request->zone_two);
+                                    })
+                                    ->with(['enterprise' => function($q) {
+                                        $q->select(['id', 'names']);
+                                    }])
+                                    ->with(['destination' => function($q) {
+                                        $q->select(['id', 'name']);
+                                    }])
+                                    ->with(['destination_service' => function($q) {
+                                        $q->select(['id', 'name', 'price_type']);
+                                    }])
+                                    ->with(['zoneOne' => function($q) {
+                                        $q->select(['id', 'name']);
+                                    }])
+                                    ->with(['zoneTwo' => function($q) {
+                                        $q->select(['id', 'name']);
+                                    }]);                                    
+                            }])                            
+                            ->find($id);                    
+        
+        try {
+            return view('settings.rates_enterprise.index', [
+                'breadcrumbs' => [
+                    [
+                        "route" => route('enterprises.index'),
+                        "name" => "Listado de empresas",
+                        "active" => false
+                    ],
+                    [
+                        "route" => '',
+                        "name" => "Tarifas de la empresa: ".( isset($enterprise->names) ? $enterprise->names : 'NO DEFINIDO' ),
+                        "active" => true
+                    ]
                 ],
-                [
-                    "route" => '',
-                    "name" => "Sitios de la empresa: ".( isset($enterprise->names) ? $enterprise->names : 'NO DEFINIDO' ),
-                    "active" => true
-                ]
-            ],
-            'enterprise'  => $enterprise,
-            'destinations' => Destination::all(),
-            'enterprises' => Enterprise::where('type_enterprise', "CUSTOMER")->whereNull('deleted_at')->get(),
-        ]);
+                'enterprise'  => $enterprise,
+                'destinations' => Destination::all(),
+                'enterprises' => Enterprise::where('type_enterprise', "CUSTOMER")->whereNull('deleted_at')->get(),
+            ]);
+        } catch (Exception $e) {
+        }
     }
+
+    public function create($request, $id = 0)
+    {
+        $enterprise = Enterprise::select(['id', 'names'])->find($id);
+
+        try {
+            return view('settings.rates_enterprise.new', [
+                'breadcrumbs' => [
+                    [
+                        "route" => route('enterprises.index'),
+                        "name" => "Listado de empresas",
+                        "active" => false
+                    ],                    
+                    [
+                        "route" => route('enterprises.rates.index', [( isset($enterprise->id) ? $enterprise->id : 0 )]),
+                        "name" => "Tarifa de la empresa: ".( isset($enterprise->names) ? $enterprise->names : 'NO DEFINIDO' ),
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Crear nueva tarifa",
+                        "active" => true
+                    ]
+                ],
+                "enterprise" => $enterprise,
+                'destinations' => Destination::select(['id', 'name'])->get(),
+            ]);
+        } catch (Exception $e) {
+        }
+    }
+
+    public function store($request, $id = 0)
+    {
+        try {
+            DB::beginTransaction();
+
+            $rate = new RatesEnterprise();
+            $rate->enterprise_id = $request->enterprise_id;
+            $rate->destination_service_id = $request->destination_service_id;
+            $rate->destination_id = $request->destination_id;
+            $rate->zone_one = $request->zone_one;
+            $rate->zone_two = $request->zone_two;
+            $rate->one_way = isset($request->one_way) ? $request->one_way : '0.00';
+            // $rate->round_trip = isset($request->round_trip) ? $request->round_trip : '0.00';
+            $rate->ow_12 = isset($request->ow_12) ? $request->ow_12 : '0.00';
+            // $rate->rt_12 = isset($request->rt_12) ? $request->rt_12 : '0.00';
+            $rate->ow_37 = isset($request->ow_37) ? $request->ow_37 : '0.00';
+            // $rate->rt_37 = isset($request->rt_37) ? $request->rt_37 : '0.00';
+            $rate->up_8_ow = isset($request->up_8_ow) ? $request->up_8_ow : '0.00';
+            // $rate->up_8_rt = isset($request->up_8_rt) ? $request->up_8_rt : '0.00';
+            $rate->operating_cost = isset($request->operating_cost) ? $request->operating_cost : '0.00';
+            $rate->save();
+
+            DB::commit();
+
+            return redirect()->route('enterprises.rates.index', [$rate->enterprise_id])
+                ->with('success', 'Tarifa creada correctamente.');
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return back()->withInput()
+                ->with('danger', 'Error al crear la tarifa: ' . $e->getMessage());
+        }
+    }
+
+    public function edit($request, $id = 0)
+    {
+        $rate = RatesEnterprise::select()
+                        ->with(['enterprise' => function($query) {
+                            $query->select(['id', 'names']);
+                        }])
+                        ->find($id);
+
+        try {
+            return view('settings.rates_enterprise.new',[
+                'breadcrumbs' => [
+                    [
+                        "route" => route('enterprises.index'),
+                        "name" => "Listado de empresas",
+                        "active" => false
+                    ],
+                    [
+                        "route" => route('enterprises.rates.index', [( isset($rate->enterprise->id) ? $rate->enterprise->id : 0 )]),
+                        "name" => "Sitios de la empresa: ".( isset($rate->enterprise->names) ? $rate->enterprise->names : 'NO DEFINIDO' ),
+                        "active" => false
+                    ],
+                    [
+                        "route" => "",
+                        "name" => "Actualizar tarfia",
+                        "active" => true
+                    ]
+                ],                
+                'rate' => $rate,
+                'destinations' => Destination::all()
+            ]);
+        } catch (Exception $e) {
+        }
+    }
+
+    public function update($request, $id = 0)
+    {
+        try {
+            DB::beginTransaction();
+
+            $rate = RatesEnterprise::find($id);
+            // $rate->enterprise_id = $request->enterprise_id;
+            $rate->destination_service_id = $request->destination_service_id;
+            $rate->destination_id = $request->destination_id;
+            $rate->zone_one = $request->zone_one;
+            $rate->zone_two = $request->zone_two;
+            $rate->one_way = isset($request->one_way) ? $request->one_way : '0.00';
+            // $rate->round_trip = isset($request->round_trip) ? $request->round_trip : '0.00';
+            $rate->ow_12 = isset($request->ow_12) ? $request->ow_12 : '0.00';
+            // $rate->rt_12 = isset($request->rt_12) ? $request->rt_12 : '0.00';
+            $rate->ow_37 = isset($request->ow_37) ? $request->ow_37 : '0.00';
+            // $rate->rt_37 = isset($request->rt_37) ? $request->rt_37 : '0.00';
+            $rate->up_8_ow = isset($request->up_8_ow) ? $request->up_8_ow : '0.00';
+            // $rate->up_8_rt = isset($request->up_8_rt) ? $request->up_8_rt : '0.00';
+            $rate->operating_cost = isset($request->operating_cost) ? $request->operating_cost : '0.00';
+            $rate->save();
+
+            DB::commit();
+
+            return redirect()->route('enterprises.rates.index', [$rate->enterprise_id])
+                ->with('success', 'Tarifa actualizada correctamente.');
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return back()->withInput()
+                ->with('danger', 'Error al actualizar la tarifa: ' . $e->getMessage());
+        }
+    }    
+
+
+
+
 
     public function items($request){
         $data = [
@@ -58,7 +230,7 @@ class RatesEnterpriseRepository
         }
         
         $data['zones'] = ZonesEnterprise::where('enterprise_id', $request->enterprise)->where('destination_id', $request->id)->get();
-        $data['services'] = DestinationService::select('id', 'name')->where('destination_id', $request->id)->get();
+        $data['services'] = DestinationService::select('id', 'name', 'price_type')->where('destination_id', $request->id)->get();
 
         return response()->json($data, Response::HTTP_OK);        
     }
@@ -105,8 +277,8 @@ class RatesEnterpriseRepository
         ];
         
         if(sizeof($rates) <= 0 && $request->service_id != 0):                       
-            $data['from_data'] = Zones::find($request->from_id)->toArray();
-            $data['to_data'] = Zones::find($request->to_id)->toArray();
+            $data['from_data'] = ZonesEnterprise::find($request->from_id)->toArray();
+            $data['to_data'] = ZonesEnterprise::find($request->to_id)->toArray();
             $data['enterprise_data'] = Enterprise::find($request->enterprise_id)->toArray();
             $data['service_data'] = DestinationService::find($request->service_id)->toArray();
         endif;

@@ -45,14 +45,14 @@ use App\Http\Controllers\Settings\RoleController as                 ROLES;
 use App\Http\Controllers\Settings\UserController as                 USERS;
 use App\Http\Controllers\Settings\EnterpriseController as           ENTERPRISES;
 use App\Http\Controllers\Settings\SitesController as                SITES;
+use App\Http\Controllers\Settings\ZonesController as                ZONES_WEB;
 use App\Http\Controllers\Settings\ZonesEnterpriseController as      ZONES_ENTERPRISE;
 
 use App\Http\Controllers\Settings\VehicleController as              VEHICLES;
 use App\Http\Controllers\Settings\DriverController as               DRIVERS;
 use App\Http\Controllers\Settings\DriverSchedulesController as      SCHEDULES;
 use App\Http\Controllers\Settings\ExchangeReportsController as      EXCHANGE_REPORTS;
-use App\Http\Controllers\Settings\ZonesController as                ZONES;
-use App\Http\Controllers\Settings\RatesController as                RATES;
+use App\Http\Controllers\Settings\RatesController as                RATES_WEB;
 use App\Http\Controllers\Settings\RatesEnterpriseController as      RATES_ENTERPRISE;
 use App\Http\Controllers\Settings\TypesCancellationsController as   TYPES_CANCELLATIONS;
 use App\Http\Controllers\Settings\TypesSalesController as           TYPES_SALES;
@@ -236,6 +236,33 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['GET'],         '/enterprises/sites/{enterprise}/edit',           [SITES::class, 'edit'])->name('enterprises.sites.edit');
         Route::match(['PUT'],         '/enterprises/sites/{enterprise}',                [SITES::class, 'update'])->name('enterprises.sites.update');
         Route::match(['DELETE'],      '/enterprises/sites/{enterprise}',                [SITES::class, 'destroy'])->name('enterprises.sites.destroy');
+
+        Route::match(['POST'],        '/enterprises/upload',                            [ENTERPRISES::class, 'uploadMedia'])->name('enterprises.upload');
+        Route::match(['GET'],         '/enterprises/upload/{id}',                       [ENTERPRISES::class, 'getMedia'])->name('enterprises.upload.getmedia');
+        Route::match(['DELETE'],      '/enterprises/upload/{id}',                       [ENTERPRISES::class, 'deleteMedia'])->name('enterprises.upload.deleteMedia');        
+
+        //ZONAS WEB
+        Route::match(['GET', 'POST'], '/enterprises/zones/web/{enterprise}',            [ZONES_WEB::class, 'index'])->name('enterprises.zones.web.index');
+        Route::match(['GET'],         '/enterprises/zones/web/{enterprise}/create',     [ZONES_WEB::class, 'create'])->name('enterprises.zones.web.create');
+        Route::match(['POST'],        '/enterprises/zones/web/{enterprise}/store',      [ZONES_WEB::class, 'store'])->name('enterprises.zones.web.store');
+        Route::match(['GET'],         '/enterprises/zones/web/{enterprise}/edit',       [ZONES_WEB::class, 'edit'])->name('enterprises.zones.web.edit');
+        Route::match(['PUT'],         '/enterprises/zones/web/{enterprise}',            [ZONES_WEB::class, 'update'])->name('enterprises.zones.web.update');
+        // Route::match(['DELETE'],      '/enterprises/zones/web/{enterprise}',         [ZONES_WEB::class, 'destroy'])->name('enterprises.zones.web.destroy');
+        Route::match(['GET'],         '/enterprises/destinations/web/{id}/points',      [ZONES_WEB::class, 'getPoints'])->name('enterprises.destinations.web.getPoints');
+        Route::match(['PUT'],         '/enterprises/destinations/web/{id}/points',      [ZONES_WEB::class, 'setPoints'])->name('enterprises.destinations.web.setPoints');
+
+        Route::match(['GET', 'POST'], '/enterprises/rates/web/{enterprise}',            [RATES_WEB::class, 'index'])->name('enterprises.rates.web.index');
+        Route::match(['GET'],         '/enterprises/rates/web/{enterprise}/create',     [RATES_WEB::class, 'create'])->name('enterprises.rates.web.create');
+        Route::match(['POST'],        '/enterprises/rates/web/{enterprise}/store',      [RATES_WEB::class, 'store'])->name('enterprises.rates.web.store');
+        Route::match(['GET'],         '/enterprises/rates/web/{enterprise}/edit',       [RATES_WEB::class, 'edit'])->name('enterprises.rates.web.edit');
+        Route::match(['PUT'],         '/enterprises/rates/web/{enterprise}',            [RATES_WEB::class, 'update'])->name('enterprises.rates.web.update');
+
+        Route::match(['GET'],          '/config/rates/destination/{id}/get',            [RATES_WEB::class, 'items'])->name('config.ratesZones');
+        Route::match(['POST'],         '/config/rates/get',                             [RATES_WEB::class, 'getRates'])->name('config.getRates');
+        Route::match(['POST'],         '/config/rates/new',                             [RATES_WEB::class, 'newRates'])->name('config.newRates');
+        Route::match(['DELETE'],       '/config/rates/delete',                          [RATES_WEB::class, 'deleteRates'])->name('config.deleteRates');
+        Route::match(['PUT'],          '/config/rates/update',                          [RATES_WEB::class, 'updateRates'])->name('config.updateRates');        
+
         //ZONAS DE EMPRESA
         Route::match(['GET', 'POST'], '/enterprises/zones/{enterprise}',                [ZONES_ENTERPRISE::class, 'index'])->name('enterprises.zones.index');
         Route::match(['GET'],         '/enterprises/zones/{enterprise}/create',         [ZONES_ENTERPRISE::class, 'create'])->name('enterprises.zones.create');
@@ -244,9 +271,15 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['PUT'],         '/enterprises/zones/{enterprise}',                [ZONES_ENTERPRISE::class, 'update'])->name('enterprises.zones.update');
         // Route::match(['DELETE'],      '/enterprises/zones/{enterprise}',             [ZONES_ENTERPRISE::class, 'destroy'])->name('enterprises.zones.destroy');
         Route::match(['GET'],         '/enterprises/destinations/{id}/points',          [ZONES_ENTERPRISE::class, 'getPoints'])->name('enterprises.destinations.getPoints');
-        Route::match(['PUT'],         '/enterprises/destinations/{id}/points',          [ZONES_ENTERPRISE::class, 'setPoints'])->name('enterprises.destinations.setPoints');        
-        //RATES ENTERPRISES
-        Route::match(['GET'],         '/enterprises/rates/{enterprise}',                [RATES_ENTERPRISE::class, 'index'])->name('enterprises.rates.index');
+        Route::match(['PUT'],         '/enterprises/destinations/{id}/points',          [ZONES_ENTERPRISE::class, 'setPoints'])->name('enterprises.destinations.setPoints');
+
+        //TARIFAS DE EMPRESA
+        Route::match(['GET', 'POST'], '/enterprises/rates/{enterprise}',                [RATES_ENTERPRISE::class, 'index'])->name('enterprises.rates.index');
+        Route::match(['GET'],         '/enterprises/rates/{enterprise}/create',         [RATES_ENTERPRISE::class, 'create'])->name('enterprises.rates.create');
+        Route::match(['POST'],        '/enterprises/rates/{enterprise}/store',          [RATES_ENTERPRISE::class, 'store'])->name('enterprises.rates.store');
+        Route::match(['GET'],         '/enterprises/rates/{enterprise}/edit',           [RATES_ENTERPRISE::class, 'edit'])->name('enterprises.rates.edit');
+        Route::match(['PUT'],         '/enterprises/rates/{enterprise}',                [RATES_ENTERPRISE::class, 'update'])->name('enterprises.rates.update');
+
         Route::match(['GET'],         '/config/rates/enterprise/destination/{id}/get',  [RATES_ENTERPRISE::class, 'items'])->name('config.ratesEnterpriseZones');
         Route::match(['POST'],        '/config/rates/enterprise/get',                   [RATES_ENTERPRISE::class, 'getRatesEnterprise'])->name('config.getRatesEnterprise');
         Route::match(['POST'],        '/config/rates/enterprise/new',                   [RATES_ENTERPRISE::class, 'newRates'])->name('config.newRatesEnterprise');
@@ -264,19 +297,6 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/schedules/{schedule}/edit',                                        [SCHEDULES::class, 'edit'])->name('schedules.edit');
         Route::put('/schedules/{schedule}',                                             [SCHEDULES::class, 'update'])->name('schedules.update');
         Route::delete('/schedules/{schedule}',                                          [SCHEDULES::class, 'destroy'])->name('schedules.destroy');
-
-        //ZONES
-        Route::get('/config/destinations',                                              [ZONES::class, 'index'])->name('config.zones');
-        Route::get('/config/destinations/{id}',                                         [ZONES::class, 'getZones'])->name('config.zones.getZones');
-        Route::get('/config/destinations/{id}/points',                                  [ZONES::class, 'getPoints'])->name('config.getPoints');
-        Route::put('/config/destinations/{id}/points',                                  [ZONES::class, 'setPoints'])->name('config.setPoints');
-        //RATES
-        Route::get('/config/rates/destination',                                         [RATES::class, 'index'])->name('config.ratesDestination');
-        Route::get('/config/rates/destination/{id}/get',                                [RATES::class, 'items'])->name('config.ratesZones');
-        Route::post('/config/rates/get',                                                [RATES::class, 'getRates'])->name('config.getRates');
-        Route::post('/config/rates/new',                                                [RATES::class, 'newRates'])->name('config.newRates');
-        Route::delete('/config/rates/delete',                                           [RATES::class, 'deleteRates'])->name('config.deleteRates');
-        Route::put('/config/rates/update',                                              [RATES::class, 'updateRates'])->name('config.updateRates');
 
         //TIPO DE CAMBIO PARA REPORTES
         Route::get('/config/exchange-reports',                                          [EXCHANGE_REPORTS::class, 'index'])->name('exchanges.index');

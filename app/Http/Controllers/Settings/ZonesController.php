@@ -1,32 +1,63 @@
 <?php
 namespace App\Http\Controllers\Settings;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+
+//REQUEST
+use App\Http\Requests\ZoneRequest;
+
+//REPOSITORY
 use App\Repositories\Settings\ZonesRepository;
-use App\Http\Controllers\Controller;
+
+//TRAITS
+use App\Traits\RoleTrait;
+
+//MODELS
 
 class ZonesController extends Controller
 {   
-    public function index(Request $request, ZonesRepository $zone){        
-        //dd($request);
-        return $zone->index($request);        
+    use RoleTrait;
+    
+    private $zone;
+
+    public function __construct(ZonesRepository $ZonesRepository)
+    {
+        $this->zone = $ZonesRepository;
     }
 
-    public function getZones(Request $request, ZonesRepository $zone, $id){
-        if (!$request->id) {
-            return response()->json([
-                    'error' => [
-                        'code' => 'required_params', 
-                        'message' =>  'id is required'
-                    ]
-                ], Response::HTTP_BAD_REQUEST);
-        }
-
-        return $zone->zones($id);       
+    public function index(Request $request, $id)
+    {
+        return $this->zone->index($request, $id);
     }
 
-    public function getPoints(Request $request, ZonesRepository $zone){
+    public function create(Request $request, $id)
+    {
+        return $this->zone->create($request, $id);
+    }
+
+    public function store(ZoneRequest $request, $id)
+    {
+        return $this->zone->store($request, $id);
+    }
+
+    public function edit(Request $request, $id)
+    {
+        return $this->zone->edit($request, $id);
+    }
+
+    public function update(ZoneRequest $request, $id)
+    {
+        return $this->zone->update($request, $id);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        return $this->zone->destroy($request, $id);
+    }
+
+    public function getPoints(Request $request){
         if (!$request->id) {
             return response()->json([
                     'error' => [
@@ -45,10 +76,10 @@ class ZonesController extends Controller
                 ], Response::HTTP_BAD_REQUEST);
         }
 
-        return $zone->points($request);
+        return $this->zone->points($request);
     }
 
-    public function setPoints(Request $request, ZonesRepository $zone){
+    public function setPoints(Request $request){
         if (!$request->id) {
             return response()->json([
                     'error' => [
@@ -57,6 +88,6 @@ class ZonesController extends Controller
                     ]
                 ], Response::HTTP_BAD_REQUEST);
         }
-        return $zone->setpoints($request);
+        return $this->zone->setpoints($request);
     }
 }

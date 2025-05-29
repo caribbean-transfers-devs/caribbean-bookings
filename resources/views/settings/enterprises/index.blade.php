@@ -102,22 +102,32 @@
                                 <td class="text-center">
                                     <div class="d-flex flex-column gap-2">
                                         @if ( auth()->user()->hasPermission(102) )
-                                            <a class="btn btn-primary" href="{{ route('enterprises.sites.index', [$enterprise->id]) }}" style="font-size: 13px;">Sitios</a>    
+                                            <a class="btn btn-primary w-100" href="{{ route('enterprises.sites.index', [$enterprise->id]) }}" style="font-size: 13px;">Sitios</a>    
+                                        @endif  
+
+                                        {{-- ZONAS DE PAGINA WEB --}}
+                                        @if ( $enterprise->is_external == 0 && auth()->user()->hasPermission(28) )
+                                            <a class="btn btn-secondary w-100" href="{{ route('enterprises.zones.web.index', [$enterprise->id]) }}" style="font-size: 13px;">Zonas Web</a>                                            
                                         @endif
-                                        
-                                        @if ( $enterprise->type_enterprise == "CUSTOMER" )
-                                            <a class="btn btn-secondary" href="{{ route('enterprises.zones.index', [$enterprise->id]) }}" style="font-size: 13px;">Zonas</a>                                            
+                                        {{-- ZONAS DE AGENCIA --}}                              
+                                        @if ( $enterprise->is_external == 1 )
+                                            <a class="btn btn-secondary w-100" href="{{ route('enterprises.zones.index',     [$enterprise->id]) }}" style="font-size: 13px;">Zonas</a>                                            
                                         @endif
 
-                                        @if ( auth()->user()->hasPermission(104) && $enterprise->type_enterprise == "CUSTOMER" )
-                                            <a class="btn btn-success" href="{{ route('enterprises.rates.index', [$enterprise->id]) }}" style="font-size: 13px;">Tarifas</a>
+                                        {{-- TARIFA DE PAGINA WEB --}}
+                                        @if ( $enterprise->is_external == 0 && auth()->user()->hasPermission(32) )
+                                            <a class="btn btn-success w-100" href="{{ route('enterprises.rates.web.index',    [$enterprise->id]) }}" style="font-size: 13px;">Tarifas Web</a>
+                                        @endif
+                                        {{-- TARIFA DE AGENCIA --}}
+                                        @if ( $enterprise->is_external == 1 && auth()->user()->hasPermission(104) )
+                                            <a class="btn btn-success w-100" href="{{ route('enterprises.rates.index',        [$enterprise->id]) }}" style="font-size: 13px;">Tarifas</a>
                                         @endif
                                         
-                                        <a class="btn btn-primary" href="{{ route('enterprises.edit', [$enterprise->id]) }}" style="font-size: 13px;">Editar</a>
+                                        <a class="btn btn-primary w-100" href="{{ route('enterprises.edit', [$enterprise->id]) }}" style="font-size: 13px;">Editar</a>
                                         <form action="{{ route('enterprises.destroy', $enterprise->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger" style="font-size: 13px;">Eliminar</button>
+                                            <button type="submit" class="btn btn-danger w-100" style="font-size: 13px;">Eliminar</button>
                                         </form>
                                     </div>
                                 </td>

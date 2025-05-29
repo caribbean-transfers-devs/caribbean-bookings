@@ -18,8 +18,18 @@ class UploadRepository
         return $this->uploadMedia($request);
     }
 
+    public function addEnterprise($request)
+    {        
+        return $this->uploadMediaEnterprise($request);
+    }
+
     public function delete($request)
     {        
         return $this->deleteMedia($request);
     }
+
+    public function deleteEnterprise($request)
+    {        
+        return $this->deleteMediaEnterprise($request);
+    }    
 }

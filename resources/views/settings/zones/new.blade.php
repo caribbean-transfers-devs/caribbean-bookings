@@ -38,7 +38,7 @@
                                 </div>
                             @endif
 
-                            <form action="{{ !isset($zone) ? route('enterprises.zones.store', [( isset($enterprise->id) ? $enterprise->id : 0 )]) : route('enterprises.zones.update', [( isset($zone->id) ? $zone->id : 0 )]) }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ !isset($zone) ? route('enterprises.zones.web.store', [( isset($enterprise->id) ? $enterprise->id : 0 )]) : route('enterprises.zones.web.update', [( isset($zone->id) ? $zone->id : 0 )]) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @if ( isset($zone) )
                                     @method('PUT')
@@ -109,7 +109,7 @@
                                         </div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">
-                                        <a class="btn btn-danger" href="{{ route('enterprises.zones.index', [( isset($enterprise->id) ? $enterprise->id : $zone->enterprise_id )]) }}">Cancelar</a>
+                                        <a class="btn btn-danger" href="{{ route('enterprises.zones.web.index', [( isset($enterprise->id) ? $enterprise->id : 2 )]) }}">Cancelar</a>
                                         <button type="submit" class="btn btn-primary">{{ ( !isset($zone) ? 'Guardar' : 'Actualizar' ) }}</button>
                                     </div>
                                 </div>

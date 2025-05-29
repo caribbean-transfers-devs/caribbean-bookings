@@ -205,7 +205,9 @@
         //CONFIGURACIONES
         // auth()->user()->hasPermission(102)
         // auth()->user()->hasPermission(104)
-        if(auth()->user()->hasPermission(6) || auth()->user()->hasPermission(1) || auth()->user()->hasPermission(73) || auth()->user()->hasPermission(74) || auth()->user()->hasPermission(75) || auth()->user()->hasPermission(28) || auth()->user()->hasPermission(32) || auth()->user()->hasPermission(103) || auth()->user()->hasPermission(108) || auth()->user()->hasPermission(115)):
+        // auth()->user()->hasPermission(28)
+        // auth()->user()->hasPermission(32)
+        if(auth()->user()->hasPermission(6) || auth()->user()->hasPermission(1) || auth()->user()->hasPermission(73) || auth()->user()->hasPermission(74) || auth()->user()->hasPermission(75) || auth()->user()->hasPermission(103) || auth()->user()->hasPermission(108) || auth()->user()->hasPermission(115)):
             //ROLES
             if(auth()->user()->hasPermission(6)):
                 $links_settings[] = [
@@ -262,21 +264,21 @@
                 ];
             // endif;
             //ZONAS
-            if(auth()->user()->hasPermission(28)):
-                $links_settings[] = [
-                    'name' => 'Zonas',
-                    'route' => route('config.zones'),
-                    'active' => request()->routeIs('config.zones','config.zones.getZones'),
-                ];
-            endif;
+            // if(auth()->user()->hasPermission(28)):
+            //     $links_settings[] = [
+            //         'name' => 'Zonas',
+            //         'route' => route('config.zones'),
+            //         'active' => request()->routeIs('config.zones','config.zones.getZones'),
+            //     ];
+            // endif;
             //TARIFAS
-            if(auth()->user()->hasPermission(32)):
-                $links_settings[] = [
-                    'name' => 'Tarifas de paginas web',
-                    'route' => route('config.ratesDestination'),
-                    'active' => request()->routeIs('config.ratesDestination','config.ratesZones'),
-                ];
-            endif;
+            // if(auth()->user()->hasPermission(32)):
+            //     $links_settings[] = [
+            //         'name' => 'Tarifas de paginas web',
+            //         'route' => route('config.ratesDestination'),
+            //         'active' => request()->routeIs('config.ratesDestination','config.ratesZones'),
+            //     ];
+            // endif;
             //TARIFAS PARA EMPRESAS
             // if(auth()->user()->hasPermission(104)):
             //     $links_settings[] = [

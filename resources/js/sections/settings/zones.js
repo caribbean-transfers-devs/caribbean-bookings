@@ -8,25 +8,12 @@ let polygon;
 if( document.querySelector('.table-rendering') != null ){
     components.actionTable($('.table-rendering'));
 }
-components.formReset();
-
-$('#btnSendZone').on('click', function (e) {        
-    var destinationID = $("#destinationID").find("option:selected").val();
-    window.location.href = '/config/destinations/' + destinationID;
-});
 
 function getPoints(event, destination_id, zone_id){
     event.preventDefault();
-    $("#zonesModal").modal("show");    
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    }); 
-
+    $("#zonesModal").modal("show");
     $.ajax({
-        url: `/config/destinations/${destination_id}/points`,
+        url: `/enterprises/destinations/web/${destination_id}/points`,
         type: 'GET',
         data: { zone_id: zone_id },
         beforeSend: function() {        
@@ -108,22 +95,15 @@ function initDraw(zone_id) {
             confirmButtonText: 'Aceptar',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
-            if(result.isConfirmed == true){
-
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });                
+            if(result.isConfirmed == true){              
                 $.ajax({
-                    url: `/config/destinations/${zone_id}/points`,
+                    url: `/enterprises/destinations/web/${zone_id}/points`,
                     type: 'PUT',
                     data: { coordinates },
                     beforeSend: function() {        
                         $("#zone_map_container").empty().html(`<div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div>`);
                     },
-                    success: function(resp) {
-                        
+                    success: function(resp) {                        
                         Swal.fire({
                             title: '¡Éxito!',
                             icon: 'success',
@@ -155,7 +135,6 @@ function initDraw(zone_id) {
                         );
                         $("#zonesModal").modal("hide");
                 });
-
                 console.log( coordinates );
             }else{                
                 clearPolygon();

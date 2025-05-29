@@ -5,7 +5,9 @@ namespace App\Repositories\Settings;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+
 use App\Models\Enterprise;
+use App\Models\EnterprisesMedia;
 
 class EnterpriseRepository
 {
@@ -14,7 +16,7 @@ class EnterpriseRepository
         try {
             $enterprises = Enterprise::query()
                 ->select()
-                ->latest()
+                ->orderBy('is_external', 'ASC')
                 ->get();
 
             return view('settings.enterprises.index', [
@@ -52,7 +54,7 @@ class EnterpriseRepository
             DB::beginTransaction();
 
             $enterprise = new Enterprise();
-            $enterprise->is_external = $request->is_external;
+            // $enterprise->is_external = $request->is_external;
 
             $enterprise->names = strtolower($request->names);
             $enterprise->address = strtolower($request->address);
@@ -112,7 +114,7 @@ class EnterpriseRepository
             DB::beginTransaction();
 
             $enterprise = Enterprise::find($id);
-            $enterprise->is_external = $request->is_external;
+            // $enterprise->is_external = $request->is_external;
 
             $enterprise->names = strtolower($request->names);
             $enterprise->address = strtolower($request->address);
@@ -158,4 +160,19 @@ class EnterpriseRepository
             return back()->with('danger', 'Error al eliminar la empresa');
         }
     }
+
+    /**
+     * Obtiene los medios asociados a una reservación
+     *
+     * @param mixed $request
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function getMedia($request)
+    {
+        $query = EnterprisesMedia::where('enterprise_id', $request->id)
+            ->orderBy('id', 'desc');
+
+        $media = $query->get();
+        return view('settings.enterprises.media', compact('media'));
+    }    
 }

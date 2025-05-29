@@ -70,8 +70,7 @@
                             <button class="btn btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar</button>
                         @endif
                     </div>
-                @endif
-                
+                @endif                
             </div>
         @endforeach
         @if (auth()->user()->hasPermission(106))
@@ -86,12 +85,12 @@
         <input type="hidden" name="destination_service_type" value="{{ $data['service_data']['price_type'] }}"/>
         <input type="hidden" name="destination_id" value="{{ $data['destination_data'] }}"/>
         <input type="hidden" name="zone_one" value="{{ $data['from_data']['id'] }}"/>
-        <input type="hidden" name="zone_two" value="{{ $data['to_data']['id'] }}"/>        
+        <input type="hidden" name="zone_two" value="{{ $data['to_data']['id'] }}"/>
 
         <div class="top_">
             <p><strong>Desde:</strong> {{ $data['from_data']['name'] }}</p>
             <p><strong>Hacia:</strong> {{ $data['to_data']['name'] }}</p>
-            <p><strong>Servicio:</strong> {{ $data['service_data']['name'] }}</p>                    
+            <p><strong>Servicio:</strong> {{ $data['service_data']['name'] }}</p>
             <p><strong>Empresa:</strong> ({{ $data['enterprise_data']['id'] }}) {{ $data['enterprise_data']['names'] }}</p>
         </div>
         @if($data['service_data']['price_type'] == "vehicle" || $data['service_data']['price_type'] == "shared")

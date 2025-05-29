@@ -1,5 +1,5 @@
 @extends('layout.app')
-@section('title') Tarifas @endsection
+@section('title') Tarifas De Agencia @endsection
 
 @push('Css')
     <link href="{{ mix('/assets/css/sections/settings/rates_enterprise.min.css') }}" rel="preload" as="style">
@@ -26,7 +26,8 @@
                 </div>
                 <div id="defaultAccordionOne" class="collapse show" aria-labelledby="headingOne1" data-bs-parent="#filters">
                     <div class="card-body">
-                        <form action="" class="search-container" method="GET" id="zoneForm">
+                        <form action="" class="search-container" method="POST" id="zoneForm">
+                            @csrf
                             <div class="d-none">
                                 <select name="enterpriseID" class="form-control" id="enterpriseID">
                                     <option value="0">Seleccione una empresa empresa</option>
@@ -38,8 +39,8 @@
                                 </select>
                             </div>
                             <div>
-                                <select name="destinationID" class="form-control" id="destinationID">
-                                    <option value="0">Selecciona el destino</option>
+                                <select name="destination_id" class="form-control" id="destinationID">
+                                    <option value="">Selecciona el destino</option>
                                     @if (sizeof($destinations) >= 1)
                                         @foreach ($destinations as $destination)
                                             <option {{ isset($_REQUEST['destination_id']) && $_REQUEST['destination_id'] == $destination->id ? 'selected' : '' }} value="{{ $destination->id }}">{{ $destination->name }}</option>
@@ -49,24 +50,28 @@
                             </div>
                             <div class="two_">
                                 <div>
-                                    <select name="rateZoneOneId" class="form-control" id="rateZoneOneId">
-                                        <option value="0">Zona de origen</option>
+                                    <select name="zone_one" class="form-control" id="rateZoneOneId" data-code="{{ isset($_REQUEST['zone_one']) ? $_REQUEST['zone_one'] : '' }}">
+                                        <option value="">Zona de origen</option>
                                     </select>
                                 </div>
                                 <div class="label_">a</div>
                                 <div>
-                                    <select name="rateZoneTwoId" class="form-control" id="rateZoneTwoId">
-                                        <option value="0">Zona de destino</option>
+                                    <select name="zone_two" class="form-control" id="rateZoneTwoId" data-code="{{ isset($_REQUEST['zone_two']) ? $_REQUEST['zone_two'] : '' }}">
+                                        <option value="">Zona de destino</option>
                                     </select>
                                 </div>
                             </div>
                             <div>
-                                <select name="rateServicesID" class="form-control" id="rateServicesID">
-                                    <option value="0">Selecciona el servicio</option>
+                                <select name="destination_service_id" class="form-control" id="rateServicesID" data-code="{{ isset($_REQUEST['destination_service_id']) ? $_REQUEST['destination_service_id'] : '' }}">
+                                    <option value="">Selecciona el servicio</option>
                                 </select>
                             </div>
                             <div>
-                                <button type="button" class="btn btn-primary btn-lg w-100" id="btnGetRates">Buscar</button>
+                                {{-- id="btnGetRates" --}}
+                                <button type="submit" class="btn btn-primary" style="padding: 12px 20px;">Buscar</button>
+                                @if (auth()->user()->hasPermission(105))
+                                    <a href="{{ route('enterprises.rates.create', [( isset($enterprise->id) ? $enterprise->id : 0 )]) }}" class="btn btn-success" style="padding: 12px 20px;">Agregar tarifa</a>                                    
+                                @endif
                             </div>
                         </form>
                     </div>
@@ -77,7 +82,75 @@
     
         <div class="col-12 col-sm-12">
             <div class="card">
-                <div class="card-body" id="rates-container"></div>
+                <div class="card-body" id="rates-container">
+                    @foreach ($enterprise->rates_enterprises as $key => $value)
+                        <div class="item">                            
+                            @if ($value->id == 129)
+                                {{-- @dump($value->toArray()) --}}
+                            @endif
+                            <div class="top_">
+                                <p><strong>Desde:</strong> {{ isset($value->zoneOne->name) ? $value->zoneOne->name." (".$value->zoneOne->id.") " : 'Zona no encontrada' }}</p>
+                                <p><strong>Hacia:</strong> {{ isset($value->zoneTwo->name) ? $value->zoneTwo->name." (".$value->zoneTwo->id.") " : 'Zona no encontrada' }}</p>
+                                <p><strong>Servicio:</strong> {{ isset($value->destination_service->name) ? $value->destination_service->name : 'Tipo de unidad no encontrada' }}</p>
+                                <p><strong>Empresa:</strong> {{ isset($value->enterprise->names) ? $value->enterprise->names." (".$value->enterprise->id.") " : 'Empresa no encontrada' }}</p>
+                            </div>
+
+                            @if($value->destination_service->price_type == "vehicle" || $value->destination_service->price_type == "shared")
+                                <div class="bottom_">
+                                    <div class="single_2">
+                                        <div>
+                                            <p style="font-size: 14px;"><strong style="font-size: 14px;">One way:</strong> $ {{ number_format($value->one_way,2) }}</p>
+                                        </div>
+                                        {{-- <div>
+                                            <p style="font-size: 14px;"><strong style="font-size: 14px;">Round Trip:</strong> $ {{ number_format($value->round_trip,2) }}</p>
+                                        </div> --}}
+                                        <div>
+                                            <p style="font-size: 14px;"><strong style="font-size: 14px;">Costo operativo:</strong> $ {{ number_format($value->operating_cost,2) }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if($value->destination_service->price_type == "passenger")
+                                <div class="bottom_">
+                                    <div class="multiple_2">
+                                        <div>
+                                            <p style="font-size: 14px;"><strong style="font-size: 14px;">One Way (1-2):</strong> $ {{ number_format($value->ow_12,2) }}</p>
+                                        </div>
+                                        {{-- <div>
+                                            <p style="font-size: 14px;"><strong style="font-size: 14px;">Round Trip (1-2):</strong> $ {{ number_format($value->rt_12,2) }}</p>
+                                        </div> --}}
+                                        <div>
+                                            <p style="font-size: 14px;"><strong style="font-size: 14px;">One Way (3-7):</strong> $ {{ number_format($value->ow_37,2) }}</p>
+                                        </div>
+                                        {{-- <div>
+                                            <p style="font-size: 14px;"><strong style="font-size: 14px;">Round Trip (3-7):</strong> $ {{ number_format($value->rt_37,2) }}</p>
+                                        </div> --}}
+                                        <div>
+                                            <p style="font-size: 14px;"><strong style="font-size: 14px;">Up OW (> 8):</strong> $ {{ number_format($value->up_8_ow,2) }}</p>
+                                        </div>
+                                        {{-- <div>
+                                            <p style="font-size: 14px;"><strong style="font-size: 14px;">Up RT (>8):</strong> $ {{ number_format($value->up_8_rt,2) }}</p>
+                                        </div> --}}
+                                        <div>
+                                            <p style="font-size: 14px;"><strong style="font-size: 14px;">Costo operativo:</strong> $ {{ number_format($value->operating_cost,2) }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- justify-content-between --}}
+                            <div class="d-flex  gap-3">
+                                @if (auth()->user()->hasPermission(106))
+                                    <a class="btn btn-success" href="{{ route('enterprises.rates.edit', [$value->id]) }}">Editar tarifa</a>
+                                @endif                            
+                                @if (auth()->user()->hasPermission(107))
+                                    <button class="btn btn-danger" type="button" onclick="deleteItem({{ $value->id }})" data-id="{{ $value->id }}">Eliminar tarifa</button>
+                                @endif
+                            </div>                            
+                        </div>                        
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>

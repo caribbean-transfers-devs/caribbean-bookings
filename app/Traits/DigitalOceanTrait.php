@@ -5,6 +5,7 @@ use Aws\S3\S3Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ReservationsMedia;
+use App\Models\EnterprisesMedia;
 
 //TRAIS
 use App\Traits\FollowUpTrait;
@@ -93,6 +94,56 @@ trait DigitalOceanTrait
         }
     }
 
+    public function uploadMediaEnterprise($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'folder' => 'required|string',            
+            'file' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:5120',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => [
+                    'code' => 'required_params',
+                    'message' =>  $validator->errors()->all()
+                ]
+            ], 404);
+        }
+
+        $client = $this->getS3Client();
+        $file = $request->file('file');
+        $filePath = $request->input('folder') . '/' . strtotime(date("Y-m-d H:i:s")). "-" .$file->getClientOriginalName();
+        $mimeType = mime_content_type($file->getPathname());
+
+        try {
+            $result = $client->putObject([
+                'Bucket' => config('services.digital_ocean.bucket'),
+                'Key'    => $filePath,
+                'SourceFile' => $file->getPathname(),
+                'ContentType' => $mimeType,
+                'ACL'    => 'public-read',
+            ]);
+
+            $media = new EnterprisesMedia();
+            $media->enterprise_id = $request->input('folder');
+            $media->path = $filePath;
+            $media->url = $result['ObjectURL'];            
+            $media->save();
+        
+            return response()->json([
+                'status' => "success",
+                'message' => 'Imagen cargada exitosamente', 
+                'url' => $result['ObjectURL']
+            ]);
+        } catch (Aws\Exception\AwsException $e) {
+            return response()->json([
+                'status' => "error",
+                // 'message' => "Error al cargar la imagen",
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }    
+
     public function deleteMedia($request){
 
         $validator = Validator::make($request->all(), [
@@ -133,4 +184,41 @@ trait DigitalOceanTrait
         
     }
 
+    public function deleteMediaEnterprise($request){
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|int',
+            'name' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                    'error' => [
+                        'code' => 'required_params',
+                        'message' =>  $validator->errors()->all() 
+                    ]
+                ], 404);
+        }
+
+        $media = EnterprisesMedia::find( $request->id ); 
+        if($media):
+
+            $client = $this->getS3Client();
+            try {
+                $client->deleteObject([
+                    'Bucket' => config('services.digital_ocean.bucket'),
+                    'Key'    => $media->path,
+                ]);            
+                
+                $media->delete();
+
+                return response()->json(['message' => 'Image deleted successfully']);
+            } catch (Aws\Exception\AwsException $e) {
+                return response()->json(['error' => $e->getMessage()], 500);
+            }
+        else:
+            return response()->json(['error' => 'Media ID not found...'], 500);
+        endif;
+        
+    }    
 }
