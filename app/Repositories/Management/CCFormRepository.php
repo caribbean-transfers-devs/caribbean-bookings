@@ -474,7 +474,6 @@ class CCFormRepository
         if(isset($value->object['payment_method_details']['card']) && $value->object['payment_method_details']['card']['brand'] == "amex"):
             $card_type = "AMEX";
         endif;
-
         if(isset($value->object['payment_method_details']['type']) && $value->object['payment_method_details']['type'] == "link"):
             $card_type = "LINK DE PAGO";
         endif;        
@@ -482,7 +481,8 @@ class CCFormRepository
         
         $info['payment_type'] = "CARD";
         $info['payment_amount'] = number_format(round($value->object['amount'] / 100), 2)." ".$value->currency;
-        $info['card_holder_name'] = $value->object['billing_details']['name'];
+        $full_name = $value->rezervation->client_first_name." ".$value->rezervation->client_last_name;
+        $info['card_holder_name'] = ucfirst(ucwords(trim(( isset($value->object['billing_details']['name']) ? $value->object['billing_details']['name'] : $full_name ))));
         if( isset($value->object['payment_method_details']['card']) ){
             $info['card_number'] = $value->object['payment_method_details']['card']['last4'];
             $info['card_expiration_date'] = $value->object['payment_method_details']['card']['exp_month']."/".$value->object['payment_method_details']['card']['exp_year'];
@@ -495,8 +495,8 @@ class CCFormRepository
         return $info;
     }
 
-    public function PayPal($value, $info){
-
+    public function PayPal($value, $info)
+    {
         $value->object = json_decode($value->object, true);
         if ($value->object === null && json_last_error() !== JSON_ERROR_NONE) {            
             return false;
@@ -504,7 +504,7 @@ class CCFormRepository
 
         $info['payment_type'] = "PAYPAL";
         $info['payment_amount'] = number_format(round($value->object['mc_gross']), 2)." ".$value->currency;
-        $info['card_holder_name'] =  ucfirst(ucwords(trim($value->object['first_name']))). " " . ucfirst(ucwords(trim($value->object['last_name'])));        
+        $info['card_holder_name'] = ucfirst(ucwords(trim(( isset($value->object['first_name']) ? $value->object['first_name'] : $value->rezervation->client_first_name )))). " " . ucfirst(ucwords(trim(( isset($value->object['last_name']) ? $value->object['last_name'] : $value->rezervation->client_last_name ))));
         $info['payment_email'] = $value->object['payer_email'];
         $info['payment_invoice'] = $value->object['txn_id'];        
         
