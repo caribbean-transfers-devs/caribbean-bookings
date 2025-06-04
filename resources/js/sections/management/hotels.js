@@ -18,7 +18,7 @@ let hotels = {
         _btnAdd.setAttribute('disabled', true);
         _zone.innerHTML = '<option>Buscando...</option>';
 
-        fetch(`/config/rates/enterprise/destination/${destinationID}/get`)
+        fetch(`/config/rates/destination/${destinationID}/get`)
         .then(response => {
             if (!response.ok) {
                 return response.json().then(err => { throw err; });

@@ -731,6 +731,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         return response.json();
                     })
                     .then(data => {
+                        console.log(data);
                         Swal.fire({
                             icon: data.status,
                             html: data.message,
@@ -741,6 +742,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         });                        
                     })
                     .catch(error => {
+                        console.log(data);                        
                         Swal.fire(
                             '¡ERROR!',
                             error.message || 'Ocurrió un error',

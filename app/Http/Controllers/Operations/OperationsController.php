@@ -203,6 +203,8 @@ class OperationsController extends Controller
 
     public function closeOperation(Request $request){
         try {
+            ini_set('memory_limit', '-1'); // Sin límite
+            set_time_limit(120); // Aumenta el límite a 60 segundos
 
             if( !auth()->user()->hasPermission(85) ){
                 return response()->json([
@@ -227,30 +229,59 @@ class OperationsController extends Controller
     
             //CONSULTAMOS SERVICIOS
             $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
+            $errors = [];
     
+            DB::beginTransaction();
+
             //RECORREMOS LOS SERVICIOS PARA PODER REALISAR LA PREASIGNACION
             if( sizeof($items)>=1 ):
                 foreach($items as $key => $item):
                     $service = ReservationsItem::find($item->id);
 
+                    if( $item->op_type == "TYPE_ONE" && ( $item->one_service_status == "PENDING" || ( $item->one_service_status == "COMPLETED" && $item->one_service_operation_status != "OK" ) ) ){
+                        array_push($errors, $item->code);
+                    }
+
+                    if( $item->op_type == "TYPE_TWO" && ( $item->two_service_status == "PENDING" || ( $item->two_service_status == "COMPLETED" && $item->two_service_operation_status != "OK" ) ) ){
+                        array_push($errors, $item->code);
+                    }
+                    
                     if( $item->op_type == "TYPE_ONE" ){
                         $service->op_one_operation_close = 1;
                     }
 
                     if( $item->op_type == "TYPE_TWO" ){
                         $service->op_two_operation_close = 1;
-                    }
+                    }                    
 
                     $service->save();
                 endforeach;
             endif;
 
+            if( $errors ){
+                return response()->json([
+                    'errors' => [
+                        'code'      => 'internal_server',
+                        'message'   => "No se pudo cerrar operación hay servicios mal calificados"
+                    ],
+                    'status'        => 'error',
+                    'success'       => false,
+                    'message'       => "No se pudo cerrar operación hay servicios mal calificados",
+                    'data'          => $errors
+                ], 500);                
+            }
+
+            DB::commit();
+
             return response()->json([
-                'status' => 'success',
-                'success' => true,
-                'message' => 'Se cerro la operación correctamente',
+                'status'    => 'success',
+                'success'   => true,
+                'message'   => 'Se cerro la operación correctamente',
+                'data'      => []
             ], 200);
         } catch (Exception $e) {
+            DB::rollBack();
+
             return response()->json([
                 'errors' => [
                     'code' => 'internal_server',
@@ -1095,7 +1126,8 @@ class OperationsController extends Controller
         }
     }
 
-    public function getComment(Request $request){
+    public function getComment(Request $request)
+    {
         try {
             //DECLARACION DE VARIABLES
             $message = "";
@@ -1197,7 +1229,8 @@ class OperationsController extends Controller
         // }
     }
 
-    public function getDataCustomer(Request $request){
+    public function getDataCustomer(Request $request)
+    {
         try {
             //DECLARACION DE VARIABLES
             $booking = Reservation::where('id',$request->code)->first();
@@ -1217,7 +1250,8 @@ class OperationsController extends Controller
         }
     }
 
-    private function timeToSeconds($time) {
+    private function timeToSeconds($time)
+    {
         $parts = explode(' ', $time);
         
         $hours = 0;
@@ -1236,7 +1270,8 @@ class OperationsController extends Controller
         return $seconds;
     }
 
-    private function getLatLngByZoneId($zone_id) {
+    private function getLatLngByZoneId($zone_id)
+    {
         $equivalences = [
             1 => [
                 'lat' => 21.0442754,
@@ -1340,7 +1375,8 @@ class OperationsController extends Controller
         return ['lat' => $lat, 'lng' => $lng];
     }
 
-    public function getMessages($id){
+    public function getMessages($id)
+    {
         $xHTML  = '';
 
         $messages = DB::select("SELECT fup.id, fup.text, fup.type FROM reservations_follow_up as fup
@@ -1357,7 +1393,8 @@ class OperationsController extends Controller
         return $xHTML;
     }
 
-    public function exportExcelBoard(Request $request){
+    public function exportExcelBoard(Request $request)
+    {
         $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
         $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
         $havingConditions = []; $queryHaving = "";
@@ -1461,7 +1498,8 @@ class OperationsController extends Controller
         return ResponseFile::download($temp_file, $fileName)->deleteFileAfterSend(true);        
     }
 
-    public function exportExcelBoardCommision(Request $request){
+    public function exportExcelBoardCommision(Request $request)
+    {
         $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
         $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
         $havingConditions = []; $queryHaving = "";
