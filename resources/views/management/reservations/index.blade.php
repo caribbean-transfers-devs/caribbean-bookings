@@ -151,7 +151,17 @@
                             <tbody>
                                 @if(sizeof($bookings) >= 1)
                                     @foreach ($bookings as $item)
-                                        <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ ( $item->is_today != 0 ? 'background-color: #fb5607b8;' : '' ) }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
+                                        @php
+                                            $background_identifier = "";
+                                            if( $item->is_today != 0 ){
+                                                $background_identifier = "background-color: #fb5607b8;";
+                                            }
+
+                                            if( $item->is_tomorrow != 0 ){
+                                                $background_identifier = "background-color: #009688;";
+                                            }                                            
+                                        @endphp
+                                        <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ $background_identifier }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
                                             <td class="text-center">{{ $item->reservation_id }}</td>
                                             <td class="text-center">
                                                 @if ($item->is_same_day_round_trip)                                                                                                
@@ -160,7 +170,13 @@
                                                 </button>
                                                 @endif
                                             </td>
-                                            <td class="text-center"><span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>                                            
+                                            <td class="text-center">
+                                                <span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
+
+                                                @if ($item->is_last_minute == 1)
+                                                    <span class="badge badge-secondary text-lowercase mt-1">Reserva de ultimo minuto</span>
+                                                @endif
+                                            </td>                                            
                                             <td class="text-center">
                                                 @php
                                                     $codes_string = "";
@@ -275,7 +291,12 @@
                                                     <?=auth()->user()->renderStatusConfirmation($arrival)?>
                                                 @endif
                                             </td>
-                                            <td class="text-center"><span class="badge badge-{{ $arrival->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $arrival->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
+                                            <td class="text-center">
+                                                <span class="badge badge-{{ $arrival->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $arrival->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
+                                                @if ($arrival->is_last_minute == 1)
+                                                    <span class="badge badge-secondary text-lowercase mt-1">Reserva de ultimo minuto</span>
+                                                @endif
+                                            </td>
                                             <td class="text-center">
                                                 @if (auth()->user()->hasPermission(61))
                                                     <a href="/reservations/detail/{{ $arrival->reservation_id }}"><p class="mb-1">{{ $arrival->code }}</p></a>
@@ -411,7 +432,12 @@
                                                     <?=auth()->user()->renderStatusConfirmation($departure)?>
                                                 @endif
                                             </td>                                            
-                                            <td class="text-center"><span class="badge badge-{{ $departure->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $departure->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
+                                            <td class="text-center">
+                                                <span class="badge badge-{{ $departure->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $departure->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
+                                                @if ($departure->is_last_minute == 1)
+                                                    <span class="badge badge-secondary text-lowercase mt-1">Reserva de ultimo minuto</span>
+                                                @endif
+                                            </td>
                                             <td class="text-center">
                                                 @if (auth()->user()->hasPermission(61))
                                                     <a href="/reservations/detail/{{ $departure->reservation_id }}"><p class="mb-1">{{ $departure->code }}</p></a>

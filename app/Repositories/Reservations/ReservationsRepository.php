@@ -814,25 +814,42 @@ class ReservationsRepository
                     <p>We look forward to welcoming you soon!</p>
                 EOF;
         else:
-            $message = <<<EOF
-                    <p>¡Hola de nuevo!</p>
-                    <p>Hemos notado que su reservación aún no ha sido confirmada. ¡No pierda la oportunidad de asegurar su traslado con nosotros y disfrutar de nuestros precios especiales en línea!</p>
-                    <p>¿Por qué pagar ahora?</p>
-                    <ul>
-                        <li><strong>Seguridad garantizada:</strong> Al pre-pagar, se asegura de tener su transporte listo y esperando a su llegada.</li>
-                        <li><strong>Ahorro de tiempo:</strong> Evite largas esperas y complicaciones en el aeropuerto.</li>
-                        <li><strong>Tranquilidad total:</strong> Disfrute de su viaje sabiendo que todo está organizado y sin preocupaciones.</li>
-                        <li><strong>Pago seguro:</strong> Utilizamos HTTPS para garantizar la seguridad de sus datos, y trabajamos con las mejores plataformas de pago como PayPal y Stripe.</li>
-                    </ul>
+            // $message = <<<EOF
+            //         <p>¡Hola de nuevo!</p>
+            //         <p>Hemos notado que su reservación aún no ha sido confirmada. ¡No pierda la oportunidad de asegurar su traslado con nosotros y disfrutar de nuestros precios especiales en línea!</p>
+            //         <p>¿Por qué pagar ahora?</p>
+            //         <ul>
+            //             <li><strong>Seguridad garantizada:</strong> Al pre-pagar, se asegura de tener su transporte listo y esperando a su llegada.</li>
+            //             <li><strong>Ahorro de tiempo:</strong> Evite largas esperas y complicaciones en el aeropuerto.</li>
+            //             <li><strong>Tranquilidad total:</strong> Disfrute de su viaje sabiendo que todo está organizado y sin preocupaciones.</li>
+            //             <li><strong>Pago seguro:</strong> Utilizamos HTTPS para garantizar la seguridad de sus datos, y trabajamos con las mejores plataformas de pago como PayPal y Stripe.</li>
+            //         </ul>
                     
-                    <p>Para pagar con STRIPE, de click <a href="$stripe_URL" title="Paga con Stripe">aquí</a></p>                    
-                    <p>Para pagar con PayPal, de click <a href="$paypal_URL" title="Paga con PayPal">aquí</a></p>
+            //         <p>Para pagar con STRIPE, de click <a href="$stripe_URL" title="Paga con Stripe">aquí</a></p>                    
+            //         <p>Para pagar con PayPal, de click <a href="$paypal_URL" title="Paga con PayPal">aquí</a></p>
 
-                    <p>Si tiene alguna pregunta, nuestro equipo está listo para asistirle. Contáctenos al: $item->transactional_phone </p>
-                    <p><strong>Horario de atención:</strong> De 7:00 a 23:00 h.</p>
-                    <p>Esperamos verle pronto y brindarle un servicio excepcional.</p>
-                EOF;
-        endif;        
+            //         <p>Si tiene alguna pregunta, nuestro equipo está listo para asistirle. Contáctenos al: $item->transactional_phone </p>
+            //         <p><strong>Horario de atención:</strong> De 7:00 a 23:00 h.</p>
+            //         <p>Esperamos verle pronto y brindarle un servicio excepcional.</p>
+            //     EOF;
+            
+            $message = <<<EOF
+                    <p>Complete su reserva</p>
+                    <p>Asegura tu traslado ahora con nuestra tarifa especial online:</p>
+
+                    <p><a href="$stripe_URL" title="Pagar con Stripe">[Pagar con Stripe]</a></p>
+                    <p><a href="$paypal_URL" title="Pagar con PayPal">[Pagar con PayPal]</a></p>
+
+                    <p>¡Hola de nuevo!</p>
+                    <p>Nos hemos dado cuenta de que tu reserva sigue pendiente. Paga por adelantado ahora para confirmar tu traslado y evitar retrasos o cargos de última hora.</p>
+
+                    <p>Una vez recibido el pago, recibirás una confirmación por correo electrónico.</p>
+
+                    <p>¿Tienes preguntas? Envíanos un mensaje por WhatsApp: $item->transactional_phone </p>
+                    <p><strong>Horario:</strong> 7:00 am - 11:00 pm</p>
+                    <p>¡Esperamos darte la bienvenida pronto! </p>
+                EOF;            
+        endif;  
 
         //Data to send in confirmation..
         $email_data = array(

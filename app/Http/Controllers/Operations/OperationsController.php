@@ -856,7 +856,7 @@ class OperationsController extends Controller
             DB::beginTransaction();
 
             $errors = [
-                'reference' => 'required|string|max:255',
+                'reference' => 'nullable|string|max:255',
                 'site_id' => 'required|integer|exists:sites,id',
                 'language' => 'required|in:en,es',
 
@@ -895,6 +895,7 @@ class OperationsController extends Controller
 
             //VALIDAMOS SI LA REFERENCIA YA EXISTE
             // if( $request->type_service == "PRIVATE" ){
+            if( $request->reference ){
                 $duplicated_reservation = Reservation::where('reference', $request->reference)->count();
                 if( $duplicated_reservation ) {
                     return response()->json([
@@ -904,6 +905,7 @@ class OperationsController extends Controller
                         'message' => 'Ese folio ya ha sido registrado',
                     ], Response::HTTP_BAD_REQUEST); 
                 }
+            }
             // }
 
             // if( $request->type_service == "SHARED" ){

@@ -317,13 +317,13 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    {{ $value->final_service_type }}
+                                    <span class="mb-1">{{ $value->final_service_type }}</span> <br>
                                     @if ( $value->final_service_type == "ARRIVAL" )
-                                        <span class="badge badge-{{ $value->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $value->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
+                                        <span class="badge badge-{{ $value->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase mb-1">{{ $value->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
                                     @endif
 
                                     @if ($value->is_last_minute == 1)
-                                        <span class="badge badge-info text-lowercase">Reserva de ultimo minuto</span>
+                                        <span class="badge badge-secondary text-lowercase">Reserva de ultimo minuto</span>
                                     @endif
                                 </td>
                                 <td class="text-center">{{ $value->passengers }}</td>
