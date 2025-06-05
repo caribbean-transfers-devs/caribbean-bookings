@@ -30,7 +30,7 @@ class SiteRequest extends FormRequest
             'success_payment_url'       => 'required|string|max:255',
             'cancel_payment_url'        => 'required|string|max:255',
             'type_site'                 => 'required|string|in:PLATFORM,CALLCENTER,AGENCY,TICKETOFFICE',
-            'enterprise_id'             => 'required|integer|exists:enterprises,id',
+            // 'enterprise_id'             => 'required|integer|exists:enterprises,id',
         ];
     }
 
@@ -69,7 +69,7 @@ class SiteRequest extends FormRequest
             'cancel_payment_url.required' => 'Por favor, ingresa la URL para pagos cancelados',
             'cancel_payment_url.starts_with' => 'La URL de pago cancelado debe ser segura (https://)',
             'type_site.required' => 'Por favor, selecciona el tipo de sitio',
-            'enterprise_id.required' => 'Por favor, selecciona una empresa asociada',
+            // 'enterprise_id.required' => 'Por favor, selecciona una empresa asociada',
         ];
     }
 
@@ -89,7 +89,7 @@ class SiteRequest extends FormRequest
             'success_payment_url' => 'URL de pago exitoso',
             'cancel_payment_url' => 'URL de pago cancelado',
             'type_site' => 'tipo de sitio',
-            'enterprise_id' => 'empresa',
+            // 'enterprise_id' => 'empresa',
         ];
     }
 }
