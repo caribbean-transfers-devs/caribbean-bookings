@@ -15,7 +15,7 @@
     @php
         $buttons = array();
     @endphp
-    <div class="row layout-top-spacing">
+    <div class="row layout-top-spacing">        
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div id="filters" class="accordion">
                 <div class="card">
@@ -55,6 +55,16 @@
         </div>
 
         <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
+            <div class="alert alert-icon-left alert-light-warning alert-dismissible fade show mb-4" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <strong>Información:</strong> Tomar en cuenta que una zona, es <strong>primario</strong> solo cuando es aereopuerto.
+            </div>
+
+            <div class="alert alert-icon-left alert-light-danger alert-dismissible fade show mb-4" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <strong>Importante:</strong> cuando se crea una zona es <strong>necesario dar click</strong> al icono de mapa, para poder trazar las geocerca, si no causara problemas en las tarifas.
+            </div>
+
             <div class="widget-content widget-content-area br-8">
                 @if ($errors->any())
                     <div class="alert alert-light-primary alert-dismissible fade show border-0 mb-4" role="alert">

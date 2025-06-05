@@ -15,6 +15,11 @@
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <p class="text-danger">{{ $enterprise->is_rates_iva == 1 ? "La tarifas incluyen I.V.A" : "Las tarifas no incluyen I.V.A" }}</p>
             <p class="text-danger">{{ $enterprise->currency == "MXN" ? "Cargar tarifa y costo operativo en MXN" : "Cargar tarifa y costo operativo en USD" }}</p>
+
+            <div class="alert alert-icon-left alert-light-info alert-dismissible fade show mb-4" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <strong>Información:</strong> Tomar en cuenta que las tarifas se deben cargar conforme a la moneda seleccionada al dar de alta la empresa, <strong>esta empresa tiene seleccionado la moneda: {{ $enterprise->currency }}</strong>
+            </div>            
             <div id="filters" class="accordion">
                 <div class="card">
                 <div class="card-header" id="headingOne1">

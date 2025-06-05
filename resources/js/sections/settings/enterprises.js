@@ -1,9 +1,61 @@
-function loadContent() {
-    $('#media-listing').load('/enterprises/upload/' + enterprise_id, function(response, status, xhr) {
-        if (status == "error") {
-            $('#media-listing').html('Error al cargar el contenido');
-        }
-    });
+let enterprises = {
+    loadContent: function(){
+        $('#media-listing').load('/enterprises/upload/' + enterprise_id, function(response, status, xhr) {
+            if (status == "error") {
+                $('#media-listing').html('Error al cargar el contenido');
+            }
+        });
+    },
+    initializeDropzone: function(){
+        Dropzone.options.uploadForm = {
+            maxFilesize: 5, // Tamaño máximo del archivo en MB
+            acceptedFiles: 'image/*,.pdf', // Solo permitir imágenes y archivos PDF
+            dictDefaultMessage: 'Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...',
+            addRemoveLinks: false,
+            autoProcessQueue: false, // Desactivar procesamiento automático para usar SweetAlert
+            uploadMultiple: false,
+            init: function() {
+                const dropzone = this;
+                let selectedOption = null; // Variable para almacenar la opción seleccionada            
+
+                // Interceptar el evento "addedfile"
+                this.on("addedfile", function(file) {
+                    Swal.fire({
+                        title: "Subiendo imágen...",
+                        text: "Por favor, espera mientras se cargan la imágen.", //Realiza la function de HTML en el Swal
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Si el usuario confirma, enviar el archivo
+                    // Procesar el archivo
+                    dropzone.processFile(file);
+
+                    // Si el usuario cancela, eliminar el archivo
+                    // dropzone.removeFile(file);
+                });
+
+                // Añadir el valor seleccionado a los datos enviados
+                this.on("sending", function(file, xhr, formData) {
+                });
+
+                this.on("success", function(file, response) {
+                    components.removeLoadScreen();
+                    // Limpiar el área de Dropzone
+                    this.removeAllFiles(true); // 'true' evita que se activen eventos adicionales, y elimina el archivo
+                    loadContent();
+                    location.reload();
+                });
+                this.on("error", function(file, errorMessage) {
+                    this.removeAllFiles(true); // 'true' evita que se activen eventos adicionales, y elimina el archivo
+                    components.proccessResponse(errorMessage);
+                });
+            }
+        };
+    }
 }
 
 //VALIDAMOS DOM
@@ -16,56 +68,16 @@ document.addEventListener("DOMContentLoaded", function() {
         components.actionTable($('.table-rendering'));
     }
 
-    loadContent();
+    if(typeof enterprise_id !== 'undefined'){
+        enterprises.loadContent();
+    }    
 
-    Dropzone.options.uploadForm = {
-        maxFilesize: 5, // Tamaño máximo del archivo en MB
-        acceptedFiles: 'image/*,.pdf', // Solo permitir imágenes y archivos PDF
-        dictDefaultMessage: 'Arrastra el archivo aquí o haz clic para subirlo (Imágenes/PDF)...',
-        addRemoveLinks: false,
-        autoProcessQueue: false, // Desactivar procesamiento automático para usar SweetAlert
-        uploadMultiple: false,
-        init: function() {
-            const dropzone = this;
-            let selectedOption = null; // Variable para almacenar la opción seleccionada            
+    if (typeof Dropzone !== 'undefined') {
+        enterprises.initializeDropzone(); // Ya está cargado, inicializa
+    } else {
+        console.warn("Dropzone no está cargado. Intentando cargarlo dinámicamente...");
+    }    
 
-            // Interceptar el evento "addedfile"
-            this.on("addedfile", function(file) {
-                Swal.fire({
-                    title: "Subiendo imágen...",
-                    text: "Por favor, espera mientras se cargan la imágen.", //Realiza la function de HTML en el Swal
-                    allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                // Si el usuario confirma, enviar el archivo
-                // Procesar el archivo
-                dropzone.processFile(file);
-
-                // Si el usuario cancela, eliminar el archivo
-                // dropzone.removeFile(file);
-            });
-
-            // Añadir el valor seleccionado a los datos enviados
-            this.on("sending", function(file, xhr, formData) {
-            });
-
-            this.on("success", function(file, response) {
-                components.removeLoadScreen();
-                // Limpiar el área de Dropzone
-                this.removeAllFiles(true); // 'true' evita que se activen eventos adicionales, y elimina el archivo
-                loadContent();
-                location.reload();
-            });
-            this.on("error", function(file, errorMessage) {
-                this.removeAllFiles(true); // 'true' evita que se activen eventos adicionales, y elimina el archivo
-                components.proccessResponse(errorMessage);
-            });
-        }
-    };
 
 $( document ).delegate( ".deleteMedia", "click", function(e) {
     e.preventDefault();

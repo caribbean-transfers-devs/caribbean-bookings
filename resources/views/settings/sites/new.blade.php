@@ -120,13 +120,13 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="success_payment_url">Url de pago satisfactorio</label>
-                                            <input type="text" id="success_payment_url" name="success_payment_url" class="form-control mb-3" placeholder="Url de pago satisfactorio" value="{{ old('success_payment_url', $site->success_payment_url ?? '') }}">
+                                            <input type="text" id="success_payment_url" name="success_payment_url" class="form-control mb-3" placeholder="Url de pago satisfactorio" value="{{ old('success_payment_url', $site->success_payment_url ?? '/thank-you') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="cancel_payment_url">Url de pago cancelado</label>
-                                            <input type="text" id="cancel_payment_url" name="cancel_payment_url" class="form-control mb-3" placeholder="Url de pago cancelado" value="{{ old('cancel_payment_url', $site->cancel_payment_url ?? '') }}">
+                                            <input type="text" id="cancel_payment_url" name="cancel_payment_url" class="form-control mb-3" placeholder="Url de pago cancelado" value="{{ old('cancel_payment_url', $site->cancel_payment_url ?? '/cancel') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">

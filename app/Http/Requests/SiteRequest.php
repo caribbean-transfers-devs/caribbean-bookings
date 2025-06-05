@@ -14,20 +14,23 @@ class SiteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:100',
-            'logo' => 'required|url|max:255|starts_with:https://',
-            'payment_domain' => 'required|url|max:255|starts_with:https://',
-            'color' => ['required', 'string', 'regex:/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/'],
-            'transactional_email' => 'required|email:rfc,dns|max:100',
-            'transactional_email_send' => 'required|boolean',
-            'transactional_phone' => 'required|string|max:20|regex:/^[\d\s\-\+\(\)]{10,20}$/',
-            'is_commissionable' => 'required|boolean',
-            'is_cxc' => 'required|boolean',
-            'is_cxp' => 'required|boolean',
-            'success_payment_url' => 'required|url|max:255|starts_with:https://',
-            'cancel_payment_url' => 'required|url|max:255|starts_with:https://',
-            'type_site' => 'required|string|in:PLATFORM,CALLCENTER,AGENCY,TICKETOFFICE',
-            'enterprise_id' => 'required|integer|exists:enterprises,id',
+            'name'                      => 'required|string|max:100',
+            'logo'                      => 'required|url|max:255|starts_with:https://',
+            'payment_domain'            => 'required|url|max:255|starts_with:https://',
+            'color'                     => ['required', 'string', 'regex:/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/'],
+            'transactional_email'       => 'required|email:rfc,dns|max:100',
+            'transactional_email_send'  => 'required|boolean',
+            'transactional_phone'       => 'required|string|max:20|regex:/^[\d\s\-\+\(\)]{10,20}$/',
+            'is_commissionable'         => 'required|boolean',
+            'is_cxc'                    => 'required|boolean',
+            'is_cxp'                    => 'required|boolean',
+            // 'success_payment_url'    => 'required|url|max:255|starts_with:https://',
+            // 'cancel_payment_url'     => 'required|url|max:255|starts_with:https://',
+                    
+            'success_payment_url'       => 'required|string|max:255',
+            'cancel_payment_url'        => 'required|string|max:255',
+            'type_site'                 => 'required|string|in:PLATFORM,CALLCENTER,AGENCY,TICKETOFFICE',
+            'enterprise_id'             => 'required|integer|exists:enterprises,id',
         ];
     }
 

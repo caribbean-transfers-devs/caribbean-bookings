@@ -11,10 +11,6 @@ class Enterprise extends Model
     use HasFactory,SoftDeletes;
 
     /**
-     * Relations
-    */
-
-    /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
@@ -23,6 +19,9 @@ class Enterprise extends Model
         'destination_id',
     ];
 
+    /**
+     * Relations
+    */
     public function destination(){
         return $this->belongsTo(Destination::class, 'destination_id', 'id');
     }

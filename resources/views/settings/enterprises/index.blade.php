@@ -24,7 +24,17 @@
         );
     @endphp
     <div class="row layout-top-spacing">
-        <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
+        <div class="col-xl-12 col-lg-12 col-sm-12 layout-spacing">
+            <div class="alert alert-icon-left alert-light-primary alert-dismissible fade show mb-4" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <strong>Información</strong> Solo las empresas que sean de tipo <strong>"CLIENTE"</strong>, tienen permitido tener sitios, ya que son los que se muestran en el listado del <strong>TPV</strong>, a excepción de las empresas <strong>"Caribbean Transfers, Caribbean Taxi"</strong>, que están como "PROVEEDORES".
+            </div>
+
+            <div class="alert alert-icon-left alert-light-primary alert-dismissible fade show mb-4" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <strong>Información</strong> Se agregaron identificadores en los botones de sitios, zonas y tarifas, para que sea mas facil identificar si ya se le cargo la información, sobre este identificador no aplica para las empresas <strong>"Caribbean Transfers, Caribbean Taxi"</strong>, ya que esta ya cuenta con esta información.
+            </div>
+
             <div class="widget-content widget-content-area br-8">
                 @if ($errors->any())
                     <div class="alert alert-light-primary alert-dismissible fade show border-0 mb-4" role="alert">
@@ -101,9 +111,14 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column gap-2">
-                                        @if ( auth()->user()->hasPermission(102) )
-                                            <a class="btn btn-primary w-100" href="{{ route('enterprises.sites.index', [$enterprise->id]) }}" style="font-size: 13px;">Sitios</a>    
-                                        @endif  
+                                        @if ( ( ($enterprise->type_enterprise == "CUSTOMER") || ( ($enterprise->type_enterprise == "CUSTOMER" || $enterprise->type_enterprise == "PROVIDER") && $enterprise->is_external == 0 ) ) && auth()->user()->hasPermission(102) )
+                                            <a class="btn btn-primary w-100 position-relative overflow-visible" href="{{ route('enterprises.sites.index', [$enterprise->id]) }}" style="font-size: 13px;">                                                
+                                                <span class="btn-text-inner">Sitios</span>
+                                                @if ($enterprise->is_external == 1)
+                                                    <span class="badge badge-danger counter">{{ $enterprise->sites_count }}</span>
+                                                @endif                                                
+                                            </a>
+                                        @endif
 
                                         {{-- ZONAS DE PAGINA WEB --}}
                                         @if ( $enterprise->is_external == 0 && auth()->user()->hasPermission(28) )
@@ -111,7 +126,10 @@
                                         @endif
                                         {{-- ZONAS DE AGENCIA --}}                              
                                         @if ( $enterprise->is_external == 1 )
-                                            <a class="btn btn-secondary w-100" href="{{ route('enterprises.zones.index',     [$enterprise->id]) }}" style="font-size: 13px;">Zonas</a>                                            
+                                            <a class="btn btn-secondary w-100 position-relative overflow-visible" href="{{ route('enterprises.zones.index',     [$enterprise->id]) }}" style="font-size: 13px;">                                                
+                                                <span class="btn-text-inner">Zonas</span>
+                                                <span class="badge badge-danger counter">{{ $enterprise->zones_enterprises_count }}</span>
+                                            </a>
                                         @endif
 
                                         {{-- TARIFA DE PAGINA WEB --}}
@@ -120,15 +138,21 @@
                                         @endif
                                         {{-- TARIFA DE AGENCIA --}}
                                         @if ( $enterprise->is_external == 1 && auth()->user()->hasPermission(104) )
-                                            <a class="btn btn-success w-100" href="{{ route('enterprises.rates.index',        [$enterprise->id]) }}" style="font-size: 13px;">Tarifas</a>
+                                            <a class="btn btn-success w-100 position-relative overflow-visible" href="{{ route('enterprises.rates.index',        [$enterprise->id]) }}" style="font-size: 13px;">                                            
+                                                <span class="btn-text-inner">Tarifas</span>
+                                                <span class="badge badge-danger counter">{{ $enterprise->rates_enterprises_count }}</span>
+                                            </a>
                                         @endif
                                         
-                                        <a class="btn btn-primary w-100" href="{{ route('enterprises.edit', [$enterprise->id]) }}" style="font-size: 13px;">Editar</a>
-                                        <form action="{{ route('enterprises.destroy', $enterprise->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger w-100" style="font-size: 13px;">Eliminar</button>
-                                        </form>
+                                        {{-- SOLO PERMITE EDITAR A EMPRESA EXTERNAS --}}
+                                        @if ( $enterprise->is_external == 1 )
+                                            <a class="btn btn-primary w-100" href="{{ route('enterprises.edit', [$enterprise->id]) }}" style="font-size: 13px;">Editar</a>
+                                            <form action="{{ route('enterprises.destroy', $enterprise->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger w-100" style="font-size: 13px;">Eliminar</button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>                                        

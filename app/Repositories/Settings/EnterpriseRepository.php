@@ -16,8 +16,15 @@ class EnterpriseRepository
         try {
             $enterprises = Enterprise::query()
                 ->select()
+                ->withCount([
+                    'sites',
+                    'zones_enterprises',
+                    'rates_enterprises'
+                ])                
                 ->orderBy('is_external', 'ASC')
                 ->get();
+
+            // dd($enterprises->toArray());
 
             return view('settings.enterprises.index', [
                 'breadcrumbs' => [
@@ -42,7 +49,7 @@ class EnterpriseRepository
             ]);
         } catch (Exception $e) {
             return redirect()->route('enterprises.index')
-                ->with('danger', 'Error al cargar el formulario de creación');
+                    ->with('danger', 'Error al cargar el formulario de creación');
         }
     }
 
@@ -139,25 +146,30 @@ class EnterpriseRepository
             DB::commit();
 
             return redirect()->route('enterprises.index')
-                ->with('success', 'Empresa actualizada correctamente.');
+                    ->with('success', 'Empresa actualizada correctamente.');
         } catch (Exception $e) {
             DB::rollBack();
 
             return back()->withInput()
-                ->with('danger', 'Error al actualizar la empresa: ' . $e->getMessage());
+                    ->with('danger', 'Error al actualizar la empresa: ' . $e->getMessage());
         }
     }
 
-    public function destroy($id)
+    public function destroy($request, $id = 0): RedirectResponse
     {
         try {
-            $enterprise = Enterprise::findOrFail($id);
+            $enterprise = Enterprise::withTrashed()->find($id);
+            if (!$enterprise) {
+                return back()->withInput()
+                        ->with('danger', 'La empresa no existe.');
+            }
             $enterprise->delete();
 
             return redirect()->route('enterprises.index')
                 ->with('success', 'Empresa eliminada correctamente.');
         } catch (Exception $e) {
-            return back()->with('danger', 'Error al eliminar la empresa');
+            return back()->withInput()
+                    ->with('danger', 'Error al eliminar la empresa: ' . $e->getMessage());
         }
     }
 
@@ -174,5 +186,5 @@ class EnterpriseRepository
 
         $media = $query->get();
         return view('settings.enterprises.media', compact('media'));
-    }    
+    }
 }
