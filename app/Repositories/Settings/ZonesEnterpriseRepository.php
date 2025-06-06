@@ -187,8 +187,9 @@ class ZonesEnterpriseRepository{
     public function points($request)
     {
         $data = DB::select("SELECT 
-                                zon.id, 
+                                zon.id,
                                 zon.name, 
+                                zp.id as point_id,
                                 zp.latitude, 
                                 zp.longitude
                             FROM zones_enterprises as zon
@@ -212,8 +213,9 @@ class ZonesEnterpriseRepository{
             endif;
 
             $items[ $value->id ]['points'][] = [
+                "point_id" => $value->point_id,
                 "lat" => $value->latitude,
-                "lng" => $value->longitude,
+                "lng" => $value->longitude,                
             ];
         endforeach;
 
@@ -250,4 +252,26 @@ class ZonesEnterpriseRepository{
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }        
     }
+
+    public function deletepoints($request)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $delete = ZonesPointsEnterprise::where('id', $request->id)->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Geocerca eliminada con éxito',
+                'success' => true
+            ], Response::HTTP_CREATED);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Hubo un error, contacte a soporte',
+                'success' => false
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }        
+    }    
 }

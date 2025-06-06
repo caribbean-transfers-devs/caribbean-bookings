@@ -231,8 +231,10 @@ trait QueryTrait
 
                                     COALESCE(SUM(s.total_sales), 0) as total_sales,
                                     COALESCE(SUM(s.total_sales_credit), 0) as total_sales_credit,
+
                                     COALESCE(SUM(p.total_payments), 0) as total_payments,
                                     COALESCE(SUM(p.total_payments_credit), 0) as total_payments_credit,
+                                    
                                     p.credit_conciliation_status as credit_conciliation_status,
                                     COALESCE(p.credit_payment_ids) AS credit_payment_ids,
 

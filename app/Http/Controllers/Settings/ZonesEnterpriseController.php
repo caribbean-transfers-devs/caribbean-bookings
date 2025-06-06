@@ -90,4 +90,17 @@ class ZonesEnterpriseController extends Controller
         }
         return $this->zone->setpoints($request);
     }
+
+    public function deletepoints(Request $request)
+    {
+        if (!$request->id) {
+            return response()->json([
+                    'error' => [
+                        'code' => 'required_params', 
+                        'message' =>  'id is required'
+                    ]
+                ], Response::HTTP_BAD_REQUEST);
+        }
+        return $this->zone->deletepoints($request);
+    }
 }

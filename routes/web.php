@@ -249,7 +249,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['PUT'],         '/enterprises/zones/web/{enterprise}',            [ZONES_WEB::class, 'update'])->name('enterprises.zones.web.update');
         // Route::match(['DELETE'],      '/enterprises/zones/web/{enterprise}',         [ZONES_WEB::class, 'destroy'])->name('enterprises.zones.web.destroy');
         Route::match(['GET'],         '/enterprises/destinations/web/{id}/points',      [ZONES_WEB::class, 'getPoints'])->name('enterprises.destinations.web.getPoints');
-        Route::match(['PUT'],         '/enterprises/destinations/web/{id}/points',      [ZONES_WEB::class, 'setPoints'])->name('enterprises.destinations.web.setPoints');
+        Route::match(['PUT'],         '/enterprises/destinations/web/{id}/points',      [ZONES_WEB::class, 'setPoints'])->name('enterprises.destinations.web.setPoints');    
 
         Route::match(['GET', 'POST'], '/enterprises/rates/web/{enterprise}',            [RATES_WEB::class, 'index'])->name('enterprises.rates.web.index');
         Route::match(['GET'],         '/enterprises/rates/web/{enterprise}/create',     [RATES_WEB::class, 'create'])->name('enterprises.rates.web.create');
@@ -272,6 +272,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         // Route::match(['DELETE'],      '/enterprises/zones/{enterprise}',             [ZONES_ENTERPRISE::class, 'destroy'])->name('enterprises.zones.destroy');
         Route::match(['GET'],         '/enterprises/destinations/{id}/points',          [ZONES_ENTERPRISE::class, 'getPoints'])->name('enterprises.destinations.getPoints');
         Route::match(['PUT'],         '/enterprises/destinations/{id}/points',          [ZONES_ENTERPRISE::class, 'setPoints'])->name('enterprises.destinations.setPoints');
+        Route::match(['DELETE'],      '/enterprises/destinations/{id}/points',          [ZONES_ENTERPRISE::class, 'deletePoints'])->name('enterprises.destinations.deletePoints');
 
         //TARIFAS DE EMPRESA
         Route::match(['GET', 'POST'], '/enterprises/rates/{enterprise}',                [RATES_ENTERPRISE::class, 'index'])->name('enterprises.rates.index');
