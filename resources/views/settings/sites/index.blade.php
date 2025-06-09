@@ -63,6 +63,7 @@
                             <th class="text-center">Url de pago correcto</th>
                             <th class="text-center">Url de pago cancelado</th>
                             <th class="text-center">Tipo de sitio</th>
+                            <th class="text-center">Estatus</th>
                             <th class="text-center"></th>
                         </tr>
                     </thead>
@@ -94,6 +95,9 @@
                                 <td class="text-center">{{ $site->success_payment_url }}</td>
                                 <td class="text-center">{{ $site->cancel_payment_url }}</td>
                                 <td class="text-center">{{ $site->type_site }}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-{{ ( $site->status == 1 ) ? 'success' : 'danger' }}" style="font-size: 13px;">{{ ( $site->status == 1 ) ? 'activo' : 'Inactivo' }}</button>
+                                </td>                                
                                 <td class="text-center">
                                     <div class="d-flex flex-column gap-2">
                                         <a class="btn btn-primary" href="{{ route('enterprises.sites.edit', [$site->id]) }}" style="font-size: 13px;">Editar</a>

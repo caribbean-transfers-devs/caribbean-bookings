@@ -108,6 +108,23 @@ trait FiltersTrait
                         ->get();
     }
 
+    public function SitesTpv():object
+    {
+        $query = Site::select(['id', 'name', 'type_site', 'transactional_phone', 'transactional_email'])
+                        ->with(['enterprise' => function($query) {
+                            $query->select(['id', 'names']);
+                        }])
+                        ->whereHas('enterprise', function($query) {
+                            $query->whereNull('deleted_at'); // Solo con empresas no eliminadas
+                        })
+                        ->orderByRaw("FIELD(name LIKE '%[CS]%', 1) DESC")
+                        ->orderBy('name')
+                        ->whereNull('deleted_at')
+                        ->where('status', 1);
+
+        return $query->get();
+    }    
+
     public function Origins()
     {
         return OriginSale::select('id', 'code')->get()->prepend((object)[
@@ -184,16 +201,41 @@ trait FiltersTrait
     public function Units(array $status = []):object
     {
         $query = Vehicle::select(['id', 'enterprise_id', 'destination_service_id', 'destination_id', 'name', 'status'])
-            ->with([
-                'enterprise:id,names',
-                'destination_service:id,name',
-                'destination:id,name'
-            ]);
+                            ->with(['enterprise' => function($query) {
+                                $query->select(['id', 'names']);
+                            }])
+                            ->with(['destination_service' => function($query) {
+                                $query->select(['id', 'name']);
+                            }])
+                            ->with(['destination' => function($query) {
+                                $query->select(['id', 'name']);
+                            }]);
     
         $query->whereIn('status', $status ?: [1]);
     
         return $query->get();
-    }   
+    }
+
+    public function UnitsSchedules():object
+    {
+        $query = Vehicle::select(['id', 'enterprise_id', 'destination_service_id', 'destination_id', 'name', 'status'])
+                            ->with(['enterprise' => function($query) {
+                                $query->select(['id', 'names']);
+                            }])
+                            ->with(['destination_service' => function($query) {
+                                $query->select(['id', 'name']);
+                            }])
+                            ->with(['destination' => function($query) {
+                                $query->select(['id', 'name']);
+                            }])
+                            ->whereHas('enterprise', function($query) {
+                                $query->whereNull('deleted_at'); // Solo con empresas no eliminadas
+                            })
+                            ->whereNull('deleted_at')
+                            ->where('status', 1);
+
+        return $query->get();
+    }
 
     public function Units2($action = "filters")
     {
@@ -220,6 +262,25 @@ trait FiltersTrait
     
         return $query->get();
     }
+
+    public function DriversSchedules()
+    {
+        $query = Driver::select(['id', 'enterprise_id', 'destination_id', 'names', 'surnames'])
+                            ->with(['enterprise' => function($query) {
+                                $query->select(['id', 'names']);
+                            }])
+                            ->with(['destination' => function($query) {
+                                $query->select(['id', 'name']);
+                            }])
+                            ->whereHas('enterprise', function($query) {
+                                $query->whereNull('deleted_at'); // Solo con empresas no eliminadas
+                            })
+                            ->whereNull('deleted_at')
+                            ->where('status', 1)
+                            ->orderBy('names', 'ASC');
+    
+        return $query->get();
+    }    
 
     //ESTATUS DE OPERACIÓN
     public function statusOperation()

@@ -35,8 +35,6 @@ class VehicleRepository
 
     public function create($request){
         try {
-            $enterprises = Enterprise::all();
-            $services = DestinationService::all();
             return view('settings.vehicles.new', [
                 'breadcrumbs' => [
                     [
@@ -50,8 +48,8 @@ class VehicleRepository
                         "active" => true
                     ]                    
                 ],
-                'enterprises' => $enterprises,
-                'services' => $services
+                'enterprises' => Enterprise::where('type_enterprise', 'PROVIDER')->get(),
+                'services' => DestinationService::all()
             ]);
         } catch (Exception $e) {
         }
@@ -83,9 +81,6 @@ class VehicleRepository
 
     public function edit($request, $id){
         try {
-            $enterprises = Enterprise::all();           
-            $services = DestinationService::all();            
-            $vehicle = Vehicle::find($id);
             return view('settings.vehicles.new', [
                 'breadcrumbs' => [
                     [
@@ -99,9 +94,9 @@ class VehicleRepository
                         "active" => true
                     ]                    
                 ],
-                'enterprises' => $enterprises,
-                'services' => $services,
-                'vehicle' => $vehicle,
+                'enterprises' => Enterprise::where('type_enterprise', 'PROVIDER')->get(),
+                'services' => DestinationService::all(),
+                'vehicle' => Vehicle::find($id),
             ]);
         } catch (Exception $e) {
         }

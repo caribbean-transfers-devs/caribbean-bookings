@@ -1,6 +1,6 @@
 @php
-    $units = auth()->user()->Units(); //LAS UNIDADES DADAS DE ALTA
-    $drivers = auth()->user()->Drivers('active');
+    $units = auth()->user()->UnitsSchedules(); //LAS UNIDADES DADAS DE ALTA
+    $drivers = auth()->user()->DriversSchedules();
 @endphp
 @extends('layout.app')
 @section('title') Vehiculos @endsection

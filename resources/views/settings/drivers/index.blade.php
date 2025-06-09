@@ -55,7 +55,6 @@
                             <th class="text-center">Nombres</th>
                             <th class="text-center">Apellido</th>
                             <th class="text-center">Teléfono</th>
-                            <th class="text-center">Vehículo</th>
                             <th class="text-center">Estatus</th>
                             <th class="text-center"></th>
                         </tr>
@@ -68,7 +67,6 @@
                                 <td class="text-center">{{ $driver->names }}</td>
                                 <td class="text-center">{{ $driver->surnames }}</td>
                                 <td class="text-center">{{ $driver->phone }}</td>
-                                <td class="text-center">{{ isset($driver->vehicle->name) ? $driver->vehicle->name : 'Ninguno' }}</td>
                                 <td class="text-center"><button class="btn btn-{{ $driver->status == 1 ? 'success' : 'warning' }}">{{ $driver->status == 1 ? 'Activo' : 'inactivo' }}</button></td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">

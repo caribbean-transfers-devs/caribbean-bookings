@@ -140,6 +140,15 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="form-group">
+                                            <label for="status">Estatus*</label>
+                                            <select id="status" name="status" class="form-control">
+                                                <option {{ old('status', $site->status ?? '') == 1 ? 'selected' : '' }} value="1">Activo</option>
+                                                <option {{ old('status', $site->status ?? '') == 0 ? 'selected' : '' }} value="0">Inactivo</option>
+                                            </select>
+                                        </div>
+                                    </div>                                    
                                     <div class="col-12 d-flex justify-content-between">
                                         <a class="btn btn-danger" href="{{ route('enterprises.sites.index', [( isset($enterprise->id) ? $enterprise->id : $site->enterprise_id )]) }}">Cancelar</a>
                                         <button type="submit" class="btn btn-primary">{{ ( !isset($site) ? 'Guardar' : 'Actualizar' ) }}</button>

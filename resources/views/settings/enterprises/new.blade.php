@@ -190,8 +190,8 @@
                                                     </div>
                                                     <div class="col-md-3 mb-3">
                                                         <div class="form-group">
-                                                            <label for="is_external">Moneda*</label>
-                                                            <select id="is_external" name="currency" class="form-control">
+                                                            <label for="currency">Moneda*</label>
+                                                            <select id="currency" name="currency" class="form-control">
                                                                 <option {{ old('currency', $enterprise->currency ?? 'MXN') == 'MXN' ? 'selected' : '' }} value="MXN">MXN</option>
                                                                 <option {{ old('currency', $enterprise->currency ?? 'MXN') == 'USD' ? 'selected' : '' }} value="USD">USD</option>
                                                             </select>
@@ -199,8 +199,8 @@
                                                     </div>                                            
                                                     <div class="col-md-3 mb-3">
                                                         <div class="form-group">
-                                                            <label for="is_external">Estatus*</label>
-                                                            <select id="is_external" name="status" class="form-control">
+                                                            <label for="status">Estatus*</label>
+                                                            <select id="status" name="status" class="form-control">
                                                                 <option {{ old('status', $enterprise->status ?? 1) == 1 ? 'selected' : '' }} value="1">Activo</option>
                                                                 <option {{ old('status', $enterprise->status ?? 1) == 0 ? 'selected' : '' }} value="0">Inactivo</option>
                                                             </select>
@@ -208,8 +208,8 @@
                                                     </div>
                                                     <div class="col-md-3">
                                                         <div class="form-group">
-                                                            <label for="is_external">Tipo de empresa</label>
-                                                            <select id="is_external" name="type_enterprise" class="form-control mb-3">
+                                                            <label for="type_enterprise">Tipo de empresa</label>
+                                                            <select id="type_enterprise" name="type_enterprise" class="form-control mb-3">
                                                                 <option {{ old('type_enterprise', $enterprise->type_enterprise ?? '') == 'PROVIDER' ? 'selected' : '' }} value="PROVIDER">Proveedor</option>
                                                                 <option {{ old('type_enterprise', $enterprise->type_enterprise ?? '') == 'CUSTOMER' ? 'selected' : '' }} value="CUSTOMER">Cliente</option>
                                                             </select>

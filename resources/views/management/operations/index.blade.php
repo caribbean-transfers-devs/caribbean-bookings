@@ -12,7 +12,7 @@
     $vehicles = auth()->user()->Vehicles();
     $zones = auth()->user()->Zones();
     $units = auth()->user()->Units([1,0]); //LAS UNIDADES DADAS DE ALTA
-    $units2 = auth()->user()->Units();
+    $units2 = auth()->user()->UnitsSchedules();
     $drivers = auth()->user()->Drivers();
     // $drivers2 = auth()->user()->Drivers('active');
 @endphp

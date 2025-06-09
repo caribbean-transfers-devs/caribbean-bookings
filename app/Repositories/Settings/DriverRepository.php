@@ -21,8 +21,8 @@ class DriverRepository
 
     public function index($request)
     {
-        try {
-            $drivers = Driver::with('enterprise','destination','vehicle')->get();
+        try {           
+            $drivers = Driver::with('enterprise','destination')->get();
             return view('settings.drivers.index', [
                 'breadcrumbs' => [
                     [
@@ -39,7 +39,6 @@ class DriverRepository
 
     public function create($request){
         try {
-            $enterprises = Enterprise::all();
             return view('settings.drivers.new', [
                 'breadcrumbs' => [
                     [
@@ -53,7 +52,7 @@ class DriverRepository
                         "active" => true
                     ]                    
                 ],
-                'enterprises' => $enterprises,
+                'enterprises' => Enterprise::where('type_enterprise', 'PROVIDER')->get(),
                 'units' => $this->Units(),
             ]);
         } catch (Exception $e) {
@@ -86,7 +85,6 @@ class DriverRepository
 
     public function edit($request, $id){
         try {
-            $enterprises = Enterprise::all();
             $driver = Driver::find($id);
             return view('settings.drivers.new', [
                 'breadcrumbs' => [
@@ -101,7 +99,7 @@ class DriverRepository
                         "active" => true
                     ]                    
                 ],
-                'enterprises' => $enterprises,
+                'enterprises' => Enterprise::where('type_enterprise', 'PROVIDER')->get(),
                 'driver' => $driver,
                 'units' => $this->Units(),
             ]);

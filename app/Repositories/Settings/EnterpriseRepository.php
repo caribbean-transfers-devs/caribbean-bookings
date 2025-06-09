@@ -19,7 +19,9 @@ class EnterpriseRepository
                 ->withCount([
                     'sites',
                     'zones_enterprises',
-                    'rates_enterprises'
+                    'rates_enterprises',
+                    'vehicles',
+                    'drivers',
                 ])                
                 ->orderBy('is_external', 'ASC')
                 ->get();
@@ -157,17 +159,29 @@ class EnterpriseRepository
 
     public function destroy($request, $id = 0): RedirectResponse
     {
+        DB::beginTransaction();
         try {
             $enterprise = Enterprise::withTrashed()->find($id);
             if (!$enterprise) {
                 return back()->withInput()
                         ->with('danger', 'La empresa no existe.');
             }
+
+            // Actualizar estados antes de eliminar
+            $enterprise->sites()->update(['status' => 0]); // Desactivar sitios
+            $enterprise->vehicles()->update(['status' => 0]); // Desactivar vehículos
+            $enterprise->drivers()->update(['status' => 0]); // Desactivar conductores
+            
+            // Eliminar la empresa (soft delete)            
             $enterprise->delete();
 
+            DB::commit();
+            
             return redirect()->route('enterprises.index')
                 ->with('success', 'Empresa eliminada correctamente.');
         } catch (Exception $e) {
+            DB::rollBack();
+
             return back()->withInput()
                     ->with('danger', 'Error al eliminar la empresa: ' . $e->getMessage());
         }
@@ -182,7 +196,7 @@ class EnterpriseRepository
     public function getMedia($request)
     {
         $query = EnterprisesMedia::where('enterprise_id', $request->id)
-            ->orderBy('id', 'desc');
+                                    ->orderBy('id', 'desc');
 
         $media = $query->get();
         return view('settings.enterprises.media', compact('media'));

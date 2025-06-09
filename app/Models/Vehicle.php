@@ -14,8 +14,8 @@ class Vehicle extends Model
      * Relations
      */
     public function enterprise(){
-        return $this->belongsTo(Enterprise::class, 'enterprise_id', 'id');
-    }    
+        return $this->belongsTo(Enterprise::class, 'enterprise_id', 'id')->withTrashed();
+    }
 
     public function destination_service(){
         return $this->belongsTo(DestinationService::class, 'destination_service_id', 'id');

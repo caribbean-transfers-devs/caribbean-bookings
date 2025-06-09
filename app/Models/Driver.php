@@ -14,14 +14,10 @@ class Driver extends Model
      * Relations
      */    
     public function enterprise(){
-        return $this->belongsTo(Enterprise::class, 'enterprise_id', 'id');
+        return $this->belongsTo(Enterprise::class, 'enterprise_id', 'id')->withTrashed();
     }
 
     public function destination(){
         return $this->belongsTo(Destination::class, 'destination_id', 'id');
     }
-
-    public function vehicle(){
-        return $this->belongsTo(Vehicle::class, 'vehicle_id', 'id');
-    }    
 }

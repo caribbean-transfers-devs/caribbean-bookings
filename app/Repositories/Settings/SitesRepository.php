@@ -16,9 +16,10 @@ class SitesRepository
 {
     public function index($request, $id)
     {
-        $sites = Enterprise::select(['id', 'names'])
+        $sites = Enterprise::withTrashed() // Incluye empresas eliminadas (soft delete)
+                            ->select(['id', 'names'])
                             ->with(['sites' => function($query) {
-                                $query->select(['id', 'name', 'logo', 'payment_domain', 'color', 'transactional_email', 'transactional_email_send', 'transactional_phone', 'is_commissionable', 'is_cxc', 'is_cxp', 'success_payment_url', 'cancel_payment_url', 'type_site', 'enterprise_id']);
+                                $query->select(['id', 'name', 'logo', 'payment_domain', 'color', 'transactional_email', 'transactional_email_send', 'transactional_phone', 'is_commissionable', 'is_cxc', 'is_cxp', 'success_payment_url', 'cancel_payment_url', 'status', 'type_site', 'enterprise_id']);
                             }])
                             ->find($id);
 
@@ -89,6 +90,7 @@ class SitesRepository
             $site->is_cxp = $request->is_cxp;
             $site->success_payment_url = $request->success_payment_url;
             $site->cancel_payment_url = $request->cancel_payment_url;
+            $site->status = $request->status;
             $site->type_site = $request->type_site;
             $site->enterprise_id = $id;
             $site->save();
@@ -107,7 +109,7 @@ class SitesRepository
 
     public function edit($request, $id = 0)
     {
-        $site = Site::select(['id', 'name', 'logo', 'payment_domain', 'color', 'transactional_email', 'transactional_email_send', 'transactional_phone', 'is_commissionable', 'is_cxc', 'is_cxp', 'success_payment_url', 'cancel_payment_url', 'type_site', 'enterprise_id'])
+        $site = Site::select(['id', 'name', 'logo', 'payment_domain', 'color', 'transactional_email', 'transactional_email_send', 'transactional_phone', 'is_commissionable', 'is_cxc', 'is_cxp', 'success_payment_url', 'cancel_payment_url', 'status', 'type_site', 'enterprise_id'])
                         ->with(['enterprise' => function($query) {
                             $query->select(['id', 'names']);
                         }])
@@ -156,6 +158,7 @@ class SitesRepository
             $site->is_cxp = $request->is_cxp;
             $site->success_payment_url = $request->success_payment_url;
             $site->cancel_payment_url = $request->cancel_payment_url;
+            $site->status = $request->status;
             $site->type_site = $request->type_site;
             $site->save();
 

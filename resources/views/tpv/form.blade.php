@@ -1,5 +1,5 @@
 @php
-    $sites = auth()->user()->Sites();
+    $sites = auth()->user()->SitesTpv();
     $origins = auth()->user()->Origins();
     $users = auth()->user()->CallCenterAgent([1]);
 @endphp

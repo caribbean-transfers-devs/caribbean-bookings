@@ -36,5 +36,13 @@ class Enterprise extends Model
 
     public function rates_enterprises(){
         return $this->hasMany(RatesEnterprise::class, 'enterprise_id', 'id');
-    }    
+    }
+
+    public function vehicles(){
+        return $this->hasMany(Vehicle::class, 'enterprise_id', 'id');
+    }
+    
+    public function drivers(){
+        return $this->hasMany(Driver::class, 'enterprise_id', 'id');
+    }
 }
