@@ -310,7 +310,7 @@ trait QueryTrait
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id,
-                                            is_conciliated,
+                                            -- is_conciliated,
                                             -- ROUND(SUM(CASE 
                                             --     WHEN operation = 'multiplication' THEN total * exchange_rate
                                             --     WHEN operation = 'division' THEN total / exchange_rate
@@ -376,8 +376,9 @@ trait QueryTrait
                                             ) ORDER BY payment_method ASC SEPARATOR ', ') AS payment_details
                                         FROM payments
                                             WHERE deleted_at IS NULL
-                                        GROUP BY reservation_id, is_conciliated
+                                        GROUP BY reservation_id
                                     ) as p ON p.reservation_id = rez.id
+                                    -- , is_conciliated
                                     -- JOINs para tabla de items de reservacion (reservations_items)
                                     LEFT JOIN (
                                         SELECT  
