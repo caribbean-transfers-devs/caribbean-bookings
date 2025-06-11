@@ -489,6 +489,7 @@
                                     if( $item->is_tomorrow != 0 ){
                                         $background_identifier = "background-color: #009688;";
                                     }
+                                    // dump($item);
                                 @endphp
                                 <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ $background_identifier }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
                                     <td class="text-center">{{ $item->reservation_id }}</td>

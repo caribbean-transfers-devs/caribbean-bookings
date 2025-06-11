@@ -401,8 +401,11 @@ trait QueryTrait
                                             MAX(CASE WHEN DATE(it.op_one_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_one_pickup_today,
                                             MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_two_pickup_today,
 
-                                            MAX(CASE WHEN DATE(it.op_one_pickup) = DATE(DATE_ADD(CURDATE(), INTERVAL 1 DAY)) THEN 1 ELSE 0 END) AS op_one_pickup_tomorrow,
-                                            MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(DATE_ADD(CURDATE(), INTERVAL 1 DAY)) THEN 1 ELSE 0 END) AS op_two_pickup_tomorrow,
+                                            -- MAX(CASE WHEN DATE(it.op_one_pickup) = DATE(DATE_ADD(CURDATE(), INTERVAL 1 DAY)) THEN 1 ELSE 0 END) AS op_one_pickup_tomorrow,
+                                            -- MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(DATE_ADD(CURDATE(), INTERVAL 1 DAY)) THEN 1 ELSE 0 END) AS op_two_pickup_tomorrow,
+
+                                            MAX(CASE WHEN DATE(it.op_one_pickup) = DATE(DATE_ADD(rez.created_at, INTERVAL 1 DAY)) THEN 1 ELSE 0 END) AS op_one_pickup_tomorrow,
+                                            MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(DATE_ADD(rez.created_at, INTERVAL 1 DAY)) THEN 1 ELSE 0 END) AS op_two_pickup_tomorrow,                                            
 
                                             -- Nueva condición para verificar si es round trip y las fechas son el mismo día
                                             MAX(CASE WHEN it.is_round_trip = 1 AND DATE(it.op_one_pickup) = DATE(it.op_two_pickup) THEN 1 ELSE 0 END) AS is_same_day_round_trip
