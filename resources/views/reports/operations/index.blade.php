@@ -364,7 +364,7 @@
                                             "counter" => 0,                                            
                                         ];
                                     }
-                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
+                                    if( (auth()->user()->serviceStatus($operation) == "COMPLETADO" || auth()->user()->serviceStatus($operation) == "PENDIENTE") && (auth()->user()->operationStatus($operation) == "OK" || auth()->user()->operationStatus($operation) == "PENDIENTE") ){
                                         $dataMethodPayments['total'] += $operation->service_cost;
                                         $dataMethodPayments['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataMethodPayments[$operation->currency]['total'] += $operation->service_cost;
@@ -395,7 +395,7 @@
                                             "counter" => 0,                                            
                                         ];
                                     }
-                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
+                                    if( (auth()->user()->serviceStatus($operation) == "COMPLETADO" || auth()->user()->serviceStatus($operation) == "PENDIENTE") && (auth()->user()->operationStatus($operation) == "OK" || auth()->user()->operationStatus($operation) == "PENDIENTE") ){
                                         $dataSites['total'] += $operation->service_cost;
                                         $dataSites['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataSites[$operation->currency]['total'] += $operation->service_cost;
@@ -426,7 +426,7 @@
                                             "counter" => 0,                                            
                                         ];
                                     }
-                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
+                                    if( (auth()->user()->serviceStatus($operation) == "COMPLETADO" || auth()->user()->serviceStatus($operation) == "PENDIENTE") && (auth()->user()->operationStatus($operation) == "OK" || auth()->user()->operationStatus($operation) == "PENDIENTE") ){
                                         $dataOriginSale['total'] += $operation->service_cost;
                                         $dataOriginSale['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataOriginSale[$operation->currency]['total'] += $operation->service_cost;
@@ -450,7 +450,7 @@
                                             "counter" => 0,
                                         ];
                                     }
-                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
+                                    if( (auth()->user()->serviceStatus($operation) == "COMPLETADO" || auth()->user()->serviceStatus($operation) == "PENDIENTE") && (auth()->user()->operationStatus($operation) == "OK" || auth()->user()->operationStatus($operation) == "PENDIENTE") ){
                                         $dataCurrency['total'] += $operation->service_cost;
                                         $dataCurrency['gran_total'] += ( $operation->currency == "USD" ? ($operation->service_cost * $exchange) : $operation->service_cost );
                                         $dataCurrency['data'][$operation->currency]['total'] += $operation->service_cost;
@@ -460,7 +460,7 @@
                                     }
 
                                     //CONDUCTORES DE OPERACION
-                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
+                                    if( (auth()->user()->serviceStatus($operation) == "COMPLETADO" || auth()->user()->serviceStatus($operation) == "PENDIENTE") && (auth()->user()->operationStatus($operation) == "OK" || auth()->user()->operationStatus($operation) == "PENDIENTE") ){
                                         if (!isset( $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))] ) ){
                                             $dataDriver['data'][strtoupper(Str::slug(auth()->user()->setOperationDriver($operation)))] = [
                                                 "name" => auth()->user()->setOperationDriver($operation),
@@ -500,7 +500,7 @@
                                     }
                                     
                                     //UNIDADES DE OPERACION
-                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
+                                    if( (auth()->user()->serviceStatus($operation) == "COMPLETADO" || auth()->user()->serviceStatus($operation) == "PENDIENTE") && (auth()->user()->operationStatus($operation) == "OK" || auth()->user()->operationStatus($operation) == "PENDIENTE") ){
                                         if (!isset( $dataUnit['data'][strtoupper(Str::slug(auth()->user()->setOperationUnit($operation)))] ) ){
                                             $dataUnit['data'][strtoupper(Str::slug(auth()->user()->setOperationUnit($operation)))] = [
                                                 "name" => auth()->user()->setOperationUnit($operation),
@@ -534,7 +534,7 @@
                                     }
 
                                     //TIPO DE SERVICIO
-                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
+                                    if( (auth()->user()->serviceStatus($operation) == "COMPLETADO" || auth()->user()->serviceStatus($operation) == "PENDIENTE") && (auth()->user()->operationStatus($operation) == "OK" || auth()->user()->operationStatus($operation) == "PENDIENTE") ){
                                         if (!isset( $dataServiceType['data'][strtoupper(Str::slug($operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP'))] ) ){
                                             $dataServiceType['data'][strtoupper(Str::slug($operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP'))] = [
                                                 "name" => strtoupper($operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP'),
@@ -566,7 +566,7 @@
                                     }                                    
 
                                     //TIPO DE SERVICIO EN OPERACION
-                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){
+                                    if( (auth()->user()->serviceStatus($operation) == "COMPLETADO" || auth()->user()->serviceStatus($operation) == "PENDIENTE") && (auth()->user()->operationStatus($operation) == "OK" || auth()->user()->operationStatus($operation) == "PENDIENTE") ){
                                         if (!isset( $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] ) ){
                                             $dataServiceTypeOperation['data'][strtoupper(Str::slug($operation->final_service_type))] = [
                                                 "name" => $operation->final_service_type,
@@ -597,7 +597,7 @@
                                     }
 
                                     //VEHICULOS
-                                    if( auth()->user()->serviceStatus($operation) == "COMPLETADO" && auth()->user()->operationStatus($operation) == "OK" ){                               
+                                    if( (auth()->user()->serviceStatus($operation) == "COMPLETADO" || auth()->user()->serviceStatus($operation) == "PENDIENTE") && (auth()->user()->operationStatus($operation) == "OK" || auth()->user()->operationStatus($operation) == "PENDIENTE") ){
                                         if (!isset( $dataVehicles['data'][strtoupper(Str::slug(auth()->user()->setOperationVehicle($operation)))] ) ){
                                             $dataVehicles['data'][strtoupper(Str::slug(auth()->user()->setOperationVehicle($operation)))] = [
                                                 "name" => auth()->user()->setOperationVehicle($operation),
