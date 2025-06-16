@@ -91,11 +91,11 @@ if( document.querySelector('.table-rendering') != null ){
 //     });
 // }
 
-function getPoints(event, destination_id, zone_id) {
+function getPoints(event, destination_id, zone_id, enterprise_id) {
     event.preventDefault();
     $("#zonesModal").modal("show");
     $.ajax({
-        url: `/enterprises/destinations/${destination_id}/points`,
+        url: `/enterprises/destinations/${destination_id}/points?enterprise_id=${enterprise_id}`,
         type: 'GET',
         data: { zone_id: zone_id },
         beforeSend: function() {        
@@ -171,12 +171,12 @@ function getPoints(event, destination_id, zone_id) {
                             if (result.isConfirmed) {
                                     
                                     $.ajax({
-                                        url: `/enterprises/destinations/${pointId}/points`,
+                                        url: `/enterprises/destinations/${location.id}/points`,
                                         type: 'DELETE',
-                                        data: { 
-                                            new_path: updatedCoords,
-                                            zone_id: this.zoneId 
-                                        },
+                                        // data: { 
+                                        //     new_path: updatedCoords,
+                                        //     zone_id: this.zoneId 
+                                        // },
                                         success: function() {
                                             // Swal.fire(
                                             //     'Eliminado!',

@@ -65,7 +65,7 @@ class ZonesEnterpriseController extends Controller
                         'message' =>  'destination_id is required'
                     ]
                 ], Response::HTTP_BAD_REQUEST);
-        }
+        }       
 
         if (!$request->zone_id) {
             return response()->json([
@@ -75,6 +75,15 @@ class ZonesEnterpriseController extends Controller
                     ]
                 ], Response::HTTP_BAD_REQUEST);
         }
+
+        if (!$request->enterprise_id) {
+            return response()->json([
+                    'error' => [
+                        'code' => 'required_params', 
+                        'message' =>  'enterprise_id is required'
+                    ]
+                ], Response::HTTP_BAD_REQUEST);
+        }        
 
         return $this->zone->points($request);
     }

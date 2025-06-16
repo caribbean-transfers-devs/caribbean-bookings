@@ -194,8 +194,9 @@ class ZonesEnterpriseRepository{
                                 zp.longitude
                             FROM zones_enterprises as zon
                                 INNER JOIN zones_points_enterprises as zp ON zp.zone_id = zon.id
-                                WHERE zon.destination_id = :destination_id",[
+                                WHERE zon.destination_id = :destination_id AND zon.enterprise_id = :enterprise_id",[
                                     'destination_id' => $request->id,
+                                    'enterprise_id' => $request->enterprise_id,
                                 ]);
                                 
         if(sizeof($data) <= 0):
@@ -258,7 +259,7 @@ class ZonesEnterpriseRepository{
         try {
             DB::beginTransaction();
             
-            $delete = ZonesPointsEnterprise::where('id', $request->id)->delete();
+            $delete = ZonesPointsEnterprise::where('zone_id', $request->id)->delete();
 
             DB::commit();
 
@@ -272,6 +273,6 @@ class ZonesEnterpriseRepository{
                 'message' => 'Hubo un error, contacte a soporte',
                 'success' => false
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }        
+        }
     }    
 }
