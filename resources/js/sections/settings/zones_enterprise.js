@@ -178,11 +178,6 @@ function getPoints(event, destination_id, zone_id, enterprise_id) {
                                         //     zone_id: this.zoneId 
                                         // },
                                         success: function() {
-                                            // Swal.fire(
-                                            //     'Eliminado!',
-                                            //     'El punto ha sido eliminado de la geocerca.',
-                                            //     'success'
-                                            // );
                                             Swal.fire({
                                                 title: 'Eliminado!',
                                                 icon: 'success',

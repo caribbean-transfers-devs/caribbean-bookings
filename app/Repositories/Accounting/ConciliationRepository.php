@@ -104,6 +104,7 @@ class ConciliationRepository
         $end = ( isset($request->endDate) ? $request->endDate." 23:59:59" : "" );
         //CONSULTAMOS LOS PAGOS
         $payments = $this->getPaymentsConciliation("STRIPE", $init, $end);
+        // dd($init, $end, $payments);
 
         if (empty($payments)) {
             return response()->json([
