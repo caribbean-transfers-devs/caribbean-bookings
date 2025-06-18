@@ -73,4 +73,30 @@ class DriverSchedulesController extends Controller
         // }
         return $this->DriverSchedulesRepository->destroy($request, $schedule);
     }
+
+
+    public function timeCheckout(Request $request)
+    {
+        return $this->DriverSchedulesRepository->timeCheckout($request);
+    }
+    
+    public function unit(Request $request)
+    {
+        return $this->DriverSchedulesRepository->unit($request);
+    }
+    
+    public function driver(Request $request)
+    {
+        return $this->DriverSchedulesRepository->driver($request);
+    }
+
+    public function comments(Request $request)
+    {
+        return $this->DriverSchedulesRepository->comments($request);
+    }
+
+    public function status(Request $request)
+    {
+        return $this->DriverSchedulesRepository->status($request);
+    }    
 }

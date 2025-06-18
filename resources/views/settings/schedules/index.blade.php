@@ -68,8 +68,8 @@
                             <th class="text-center">Horas extras</th>
                             <th class="text-center">Unidad</th>
                             <th class="text-center">Estatus unidad</th>
-                            <th class="text-center">Driver</th>                            
-                            <th class="text-center">Estatus</th>
+                            <th class="text-center">Conductor</th>                            
+                            <th class="text-center">Estatus conductor</th>
                             <th class="text-center">Observaciónes</th>
                             <th class="text-center">Estado</th>
                             <th></th>
@@ -77,53 +77,94 @@
                     </thead>
                     <tbody>
                         @foreach ($schedules as $schedule)
+                            {{-- @dump($schedule->toArray()) --}}
                             <tr>
                                 <td class="text-center">{{ Carbon::parse($schedule->date)->translatedFormat('d F Y') }}</td>
                                 <td class="text-center">{{ Carbon::parse($schedule->check_in_time)->format('H:i A') }}</td>
                                 <td class="text-center"><span class="badge badge-success w-100">{{ Carbon::parse($schedule->check_out_time)->format('H:i A') }}</span></td>
                                 <td class="text-center">
-                                    @php
-                                        $time = Carbon::parse($schedule->end_check_out_time)->format('H:i A');
-                                    @endphp
-                                    <?=( $schedule->end_check_out_time != NULL ? '<span class="badge badge-'.( $schedule->extra_hours != NULL && $schedule->check_out_time != $schedule->end_check_out_time ? 'danger' : 'success' ).' w-100">'.$time.'</span>' : 'SIN HORARIO DE SALIDA' )?>
+                                    @if ( $schedule->is_open == 0 )
+                                        @php
+                                            $time = Carbon::parse($schedule->end_check_out_time)->format('H:i A');
+                                        @endphp
+                                        <?=( $schedule->end_check_out_time != NULL ? '<span class="badge badge-'.( $schedule->extra_hours != NULL && $schedule->check_out_time != $schedule->end_check_out_time ? 'danger' : 'success' ).' w-100">'.$time.'</span>' : 'SIN HORARIO DE SALIDA' )?>
+                                    @else
+                                        <input type="text" name="end_check_out_time" class="form-control end_check_out_time" placeholder="Hora de salida final" value="{{ isset($schedule->end_check_out_time) ? $schedule->end_check_out_time : '' }}" data-code="{{ $schedule->id }}">
+                                    @endif
                                 </td>
                                 <td class="text-center">
                                     @php
                                         $time = Carbon::parse($schedule->extra_hours)->format('H:i');
-                                    @endphp                                    
+                                    @endphp
                                     <?=( $schedule->extra_hours != NULL && $schedule->extra_hours != "00:00:00" ? '<span class="badge badge-success w-100">'.$time.'</span>' : 'SIN HORARIO' )?>
                                 </td>
                                 <td class="text-center"><button class="btn btn-dark w-100">{{ isset($schedule->vehicle->name) ? $schedule->vehicle->name : 'SIN UNIDAD' }} - {{ isset($schedule->vehicle->destination_service->name) ? $schedule->vehicle->destination_service->name : 'SIN NOMBRE DE VEHÍCULO' }} - {{ isset($schedule->vehicle->enterprise->names) ? $schedule->vehicle->enterprise->names : 'SIN NOMBRE DE EMPRESA' }}</button></td>
                                 <td class="text-center">
-                                    @if ( $schedule->status_unit != NULL )
+                                    @if ( $schedule->is_open == 0 )
                                         <?=auth()->user()->renderStatusSchedulesUnit($schedule->status_unit)?>
                                     @else
-                                        {{ "SIN ESTATUS" }}                                        
+                                        <select class="form-control schedule_status_unit" name="status_unit" data-code="{{ $schedule->id }}">
+                                            <option value="0">Selecciona una opción</option>
+                                            <option {{ isset($schedule->status_unit) && $schedule->status_unit == "OP" ? 'selected' : '' }} value="OP">OPERACIÓN</option>
+                                            <option {{ isset($schedule->status_unit) && $schedule->status_unit == "S" ? 'selected' : '' }} value="S">SINIESTRO</option>
+                                            <option {{ isset($schedule->status_unit) && $schedule->status_unit == "OPB" ? 'selected' : '' }} value="OPB">OPERACIÓN BAJA</option>
+                                            <option {{ isset($schedule->status_unit) && $schedule->status_unit == "FO" ? 'selected' : '' }} value="FO">FALTA DE OPERADOR</option>
+                                            <option {{ isset($schedule->status_unit) && $schedule->status_unit == "T" ? 'selected' : '' }} value="T">TALLER</option>
+                                        </select>
                                     @endif
                                 </td>                                
                                 <td class="text-center">{{ isset($schedule->driver->names) ? $schedule->driver->names : 'SIN NOMBRE DE CONDUCTOR' }} {{ isset($schedule->driver->surnames) ? $schedule->driver->surnames : 'SIN APELLIDO DE CONDUCTOR' }}</td>
                                 <td class="text-center">
-                                    @if ( $schedule->status != NULL )
+                                    @if ( $schedule->is_open == 0 )
                                         <?=auth()->user()->renderStatusSchedulesDriver($schedule->status)?>
                                     @else
-                                        {{ "SIN ESTATUS" }}                                        
+                                        <select class="form-control schedule_status_driver" name="status_driver" data-code="{{ $schedule->id }}">
+                                            <option value="0">Selecciona una opción</option>
+                                            <option {{ isset($schedule->status) && $schedule->status == "A" ? 'selected' : '' }} value="A">ASISTENCIA</option>
+                                            <option {{ isset($schedule->status) && $schedule->status == "F" ? 'selected' : '' }} value="F">FALTA</option>
+                                            <option {{ isset($schedule->status) && $schedule->status == "DT" ? 'selected' : '' }} value="DT">DESCANSO TRABAJADO</option>
+                                            <option {{ isset($schedule->status) && $schedule->status == "PSG" ? 'selected' : '' }} value="PSG">PERMISO SIN GOZE</option>
+                                            <option {{ isset($schedule->status) && $schedule->status == "INC" ? 'selected' : '' }} value="INC">INCAPACIDAD</option>
+                                            <option {{ isset($schedule->status) && $schedule->status == "D" ? 'selected' : '' }} value="D">DESCANSO</option>
+                                            <option {{ isset($schedule->status) && $schedule->status == "V" ? 'selected' : '' }} value="V">VACACIONES</option>
+                                        </select>
                                     @endif
                                 </td>
-                                <td class="text-center">{{ $schedule->observations }}</td>
                                 <td class="text-center">
-                                    <button class="btn btn-{{ $schedule->is_open == 1 ? 'success' : ( $schedule->is_open == 2 ? 'warning' : 'danger' ) }} w-100">{{ $schedule->is_open == 1 ? 'ABIERTO' : ( $schedule->is_open == 2  ? 'OTRO HORARIO' : 'CERRADO' ) }}</button>
+                                    @if ( $schedule->is_open == 0 )
+                                        {{ $schedule->observations }}
+                                    @else
+                                        <input type="text" class="form-control schedule_comments" value="{{ isset($schedule->observations) ? $schedule->observations : '' }}" data-code="{{ $schedule->id }}">
+                                    @endif
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex gap-3">
+                                    @if ( $schedule->is_open == 0 )
+                                        <button class="btn btn-{{ auth()->user()->classStatus($schedule->is_open) }} w-100" style="font-size: 13px;">{{ auth()->user()->classStatusText($schedule->is_open) }}</button>
+                                    @else
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-{{ auth()->user()->classStatus($schedule->is_open) }} w-100 dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white; font-size:13px;">
+                                                {{ auth()->user()->classStatusText($schedule->is_open) }}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                            </button>
+                                            <div class="dropdown-menu" style="">
+                                                <a href="javascript:void(0);" class="dropdown-item statusSchedule" data-code="{{ $schedule->id }}" data-status="1" >ABIERTO</a>
+                                                <a href="javascript:void(0);" class="dropdown-item statusSchedule" data-code="{{ $schedule->id }}" data-status="2" >OTRO HORARIO</a>
+                                                <a href="javascript:void(0);" class="dropdown-item statusSchedule" data-code="{{ $schedule->id }}" data-status="0" >CERRADO</a>
+                                            </div>
+                                        </div>
+                                    @endif                                    
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column gap-3">
                                         @if ( $schedule->is_open == 1 )
-                                            <a class="btn btn-primary" href="{{ route('schedules.edit', [$schedule->id]) }}">Editar</a>    
+                                            <a class="btn btn-primary" href="{{ route('schedules.edit', [$schedule->id]) }}" style="font-size: 13px;">Editar</a>    
                                         @endif
 
                                         @if ( $schedule->is_open == 1 )
                                             <form action="{{ route('schedules.destroy', $schedule->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                <button type="submit" class="btn btn-danger" style="font-size: 13px;">Eliminar</button>
                                             </form>                                            
                                         @endif
                                     </div>

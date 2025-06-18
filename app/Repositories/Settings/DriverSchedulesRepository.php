@@ -5,6 +5,7 @@ namespace App\Repositories\Settings;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
 //TRAIT
@@ -175,6 +176,297 @@ class DriverSchedulesRepository
             $schedule->delete();
             return redirect()->route('schedules.index')->with('success', 'Se elimimo correctamente el tipo de cancelación.');
         } catch (Exception $e) {
+        }
+    }
+
+    public function timeCheckout($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|integer',
+            'value' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $schedule = DriverSchedule::find($request->code);
+
+        if (!$schedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Horario no encontrado'
+                ],
+                'status' => 'error',
+                'message' => 'Horario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }        
+
+        try {
+            DB::beginTransaction();             
+
+            if (!empty($request->value)) { 
+                $time_in = Carbon::createFromFormat('H:i:s', $schedule->check_out_time);
+                $time_out = Carbon::createFromFormat('H:i:s', $request->value.':00');
+                $difference = $time_in->diff($time_out);
+                $schedule->end_check_out_time = $request->value;
+                // Asigna el valor si hay diferencia, de lo contrario deja null
+                if ($difference->h != 0 || $difference->i != 0) {
+                    $schedule->extra_hours = sprintf('%02d:%02d:00', $difference->h, $difference->i);
+                } else {
+                    $schedule->extra_hours = null;
+                }
+            }
+    
+            $schedule->save();
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo horario de salida correctamente',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    public function unit($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|integer',
+            'value' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $schedule = DriverSchedule::find($request->code);
+
+        if (!$schedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Horario no encontrado'
+                ],
+                'status' => 'error',
+                'message' => 'Horario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }        
+
+        try {
+            DB::beginTransaction();             
+
+            $schedule->status_unit = $request->value ?? NULL;
+    
+            $schedule->save();
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo estus de unidad correctamente',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    public function driver($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|integer',
+            'value' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $schedule = DriverSchedule::find($request->code);
+
+        if (!$schedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Horario no encontrado'
+                ],
+                'status' => 'error',
+                'message' => 'Horario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }        
+
+        try {
+            DB::beginTransaction();             
+
+            $schedule->status = $request->value ?? NULL;
+    
+            $schedule->save();
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo estatus de conductor',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    public function comments($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|integer',
+            'value' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $schedule = DriverSchedule::find($request->code);
+
+        if (!$schedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Horario no encontrado'
+                ],
+                'status' => 'error',
+                'message' => 'Horario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }        
+
+        try {
+            DB::beginTransaction();             
+
+            $schedule->observations = $request->value ?? NULL;
+    
+            $schedule->save();
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo observaciones correctamente',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    public function status($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|integer',
+            'status' => 'required|integer|in:1,2,0'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $schedule = DriverSchedule::find($request->code);
+
+        if (!$schedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Horario no encontrado'
+                ],
+                'status' => 'error',
+                'message' => 'Horario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }        
+
+        try {
+            DB::beginTransaction();             
+
+            $schedule->is_open = $request->status ?? 0;
+    
+            $schedule->save();
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo estatus correctamente',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }    
 }

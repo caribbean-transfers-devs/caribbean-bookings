@@ -331,10 +331,50 @@ trait OperationTrait
     }
 
     public function renderStatusSchedulesUnit($status){
-        return '<button type="button" class="btn btn-'.self::classScheduleDriver($status).' w-100">'.self::statusScheduleUnit($status).'</button>';        
+        if ($status != NULL) {
+            return '<button type="button" class="btn btn-'.self::classScheduleDriver($status).' w-100">'.self::statusScheduleUnit($status).'</button>';        
+        }else{
+            return "SIN ESTATUS";
+        }        
     }
 
     public function renderStatusSchedulesDriver($status){
-        return '<button type="button" class="btn btn-'.self::classScheduleDriver($status).' w-100">'.self::statusScheduleDriver($status).'</button>';        
+        if ($status != NULL) {
+            return '<button type="button" class="btn btn-'.self::classScheduleDriver($status).' w-100">'.self::statusScheduleDriver($status).'</button>';        
+        } else {
+            return "SIN ESTATUS";
+        }
+        
+        
+    }
+
+    public function classStatus($status)
+    {
+        switch ($status) {
+            case '2':
+                return 'warning';
+                break;
+            case '0':
+                return 'danger';
+                break;
+            default:
+                return 'success';
+                break;
+        }        
+    }
+
+        public function classStatusText($status)
+    {
+        switch ($status) {
+            case '2':
+                return 'OTRO HORARIO';
+                break;
+            case '0':
+                return 'CERRADO';
+                break;
+            default:
+                return 'ABIERTO';
+                break;
+        }        
     }
 }

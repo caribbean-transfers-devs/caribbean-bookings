@@ -102,7 +102,7 @@ function getPoints(event, destination_id, zone_id, enterprise_id) {
             $("#zone_map_container").empty().html(`<div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div>`)
         },
         success: function(resp) {
-            console.log(resp);            
+            // console.log(resp);
             initMap();
             
             // Objeto para guardar la relación entre coordenadas y point_id
@@ -111,13 +111,12 @@ function getPoints(event, destination_id, zone_id, enterprise_id) {
             for (const key in resp) {
                 if (resp.hasOwnProperty(key)) {
                     let polygonCoords = [];
-                    const location = resp[key];
+                    const locations = resp[key];
                     
                     // Guardar todos los point_ids para esta geocerca
                     const geocercaPoints = [];
                     
-                    location.points.forEach(point => {
-                        console.log(point);
+                    locations.points.forEach(point => {
                         const coordKey = `${point.lat},${point.lng}`;
                         pointReferences[coordKey] = point.point_id;
                         geocercaPoints.push(point.point_id);
@@ -126,89 +125,70 @@ function getPoints(event, destination_id, zone_id, enterprise_id) {
                     
                     var polygonData = new google.maps.Polygon({
                         paths: polygonCoords,
-                        strokeColor: ((zone_id == location.id) ? '#1cbb8c' : '#FF0000'),
+                        strokeColor: ((zone_id == locations.id) ? '#1cbb8c' : '#FF0000'),
                         strokeOpacity: 0.8,
                         strokeWeight: 2,
-                        fillColor: ((zone_id == location.id) ? '#1cbb8c' : '#FF0000'),
+                        fillColor: ((zone_id == locations.id) ? '#1cbb8c' : '#FF0000'),
                         fillOpacity: 0.35
                     });
                     
                     // Almacenar los point_ids asociados a este polígono
                     polygonData.pointIds = geocercaPoints;
-                    polygonData.zoneId = location.id;
-                    polygonData.zoneName = location.name;
+                    polygonData.zoneId = locations.id;
+                    polygonData.zoneName = locations.name;
                     polygonData.destinationId = destination_id;
-                    
                     polygonData.setMap(map);
                     
-                    google.maps.event.addListener(polygonData, 'click', function(event) {
-                        // Obtener el punto más cercano al click
-                        const clickedPoint = this.getPath().getArray()
-                            .map(p => ({lat: p.lat(), lng: p.lng()}))
-                            .reduce((prev, curr) => {
-                                const prevDist = google.maps.geometry.spherical.computeDistanceBetween(
-                                    new google.maps.LatLng(prev.lat, prev.lng),
-                                    new google.maps.LatLng(event.latLng.lat(), event.latLng.lng())
-                                );
-                                const currDist = google.maps.geometry.spherical.computeDistanceBetween(
-                                    new google.maps.LatLng(curr.lat, curr.lng),
-                                    new google.maps.LatLng(event.latLng.lat(), event.latLng.lng())
-                                );
-                                return currDist < prevDist ? curr : prev;
-                            });
-                        
-                        const pointKey = `${clickedPoint.lat},${clickedPoint.lng}`;
-                        const pointId = pointReferences[pointKey];
-                        
+                    google.maps.event.addListener(polygonData, 'click', function(event) {                        
                         Swal.fire({
                             title: '¿Eliminar este punto de la geocerca?',
-                            html: `Geocerca con ID: <b>${pointId}</b><br>De la Zona: ${this.zoneName}`,
+                            html: `Geocerca De la Zona: ${this.zoneName}`,
                             icon: 'question',
                             showCancelButton: true,
                             confirmButtonText: 'Sí, eliminar',
-                            cancelButtonText: 'Cancelar'
+                            cancelButtonText: 'Cancelar',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,  // Esta línea evita que se cierre con ESC                            
                         }).then((result) => {
-                            if (result.isConfirmed) {
-                                    
-                                    $.ajax({
-                                        url: `/enterprises/destinations/${location.id}/points`,
-                                        type: 'DELETE',
-                                        // data: { 
-                                        //     new_path: updatedCoords,
-                                        //     zone_id: this.zoneId 
-                                        // },
-                                        success: function() {
-                                            Swal.fire({
-                                                title: 'Eliminado!',
-                                                icon: 'success',
-                                                html: 'El punto ha sido eliminado de la geocerca',
-                                                timer: 2500,
-                                                timerProgressBar: true,
-                                                didOpen: () => {
-                                                    Swal.showLoading()
-                                                    const b = Swal.getHtmlContainer().querySelector('b')
-                                                    timerInterval = setInterval(() => {
-                                                        b.textContent = (Swal.getTimerLeft() / 1000)
-                                                            .toFixed(0)
-                                                    }, 100)
-                                                },
-                                                willClose: () => {
-                                                    clearInterval(timerInterval)
-                                                }
-                                            }).then((result) => {
+                            if (result.isConfirmed) {                                    
+                                $.ajax({
+                                    url: `/enterprises/destinations/${locations.id}/points`,
+                                    type: 'DELETE',
+                                    beforeSend: function(){
+                                        Swal.fire({
+                                            title: "Procesando solicitud...",
+                                            text: "Por favor, espera mientras se guarda la geocerca.",
+                                            allowOutsideClick: false,
+                                            allowEscapeKey: false,  // Esta línea evita que se cierre con ESC
+                                            didOpen: () => {
+                                                Swal.showLoading();
+                                            }
+                                        });
+                                    },
+                                    success: function(response) {
+                                        console.log(response);
+                                        Swal.fire({
+                                            title: '¡Éxito!',
+                                            icon: 'success',
+                                            html: 'Geocerca eliminada con éxito.',
+                                            confirmButtonText: 'OK',
+                                            allowOutsideClick: false,
+                                            allowEscapeKey: false,  // Esta línea evita que se cierre con ESC                            
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
                                                 location.reload();
-                                            })                                            
-                                        }
-                                    }).fail(function() {
-                                        Swal.fire(
-                                            'Error',
-                                            'No se pudo eliminar el punto',
-                                            'error'
-                                        );
-                                        // Revertir cambios visuales si falla
-                                        polygonData.setPath(polygonCoords);
-                                    });
-
+                                            }
+                                        });                                           
+                                    }
+                                }).fail(function() {
+                                    Swal.fire(
+                                        'Error',
+                                        'No se pudo eliminar el punto',
+                                        'error'
+                                    );
+                                    // Revertir cambios visuales si falla
+                                    polygonData.setPath(polygonCoords);
+                                });
                             }
                         });
                     });
@@ -245,7 +225,7 @@ function initDraw(zone_id) {
 
     // Escucha el evento cuando se complete el dibujo del polígono
     google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
-      console.log(event, event.type, google.maps.drawing.OverlayType);        
+    //   console.log(event, event.type, google.maps.drawing.OverlayType);
       if (event.type === google.maps.drawing.OverlayType.POLYGON) {
         polygon = event.overlay;
         const path = polygon.getPath();
@@ -269,40 +249,42 @@ function initDraw(zone_id) {
                     data: { coordinates },
                     beforeSend: function() {        
                         $("#zone_map_container").empty().html(`<div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div>`);
+                        Swal.fire({
+                            title: "Procesando solicitud...",
+                            text: "Por favor, espera mientras se guarda la geocerca.",
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,  // Esta línea evita que se cierre con ESC
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });                        
                     },
-                    success: function(resp) {                        
+                    success: function(resp) {
+                        // console.log(resp);
                         Swal.fire({
                             title: '¡Éxito!',
                             icon: 'success',
-                            html: 'Geocerca actualizada con éxito. Será redirigido en <b></b>',
-                            timer: 2500,
-                            timerProgressBar: true,
-                            didOpen: () => {
-                                Swal.showLoading()
-                                const b = Swal.getHtmlContainer().querySelector('b')
-                                timerInterval = setInterval(() => {
-                                    b.textContent = (Swal.getTimerLeft() / 1000)
-                                        .toFixed(0)
-                                }, 100)
-                            },
-                            willClose: () => {
-                                clearInterval(timerInterval)
-                            }
+                            html: 'Geocerca actualizada con éxito.',
+                            confirmButtonText: 'OK',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,  // Esta línea evita que se cierre con ESC
                         }).then((result) => {
-                            location.reload();
-                        })
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });                        
                     }
                 }).fail(function(xhr, status, error) {
-                        console.log(xhr);
-                        Swal.fire(
-                            '¡ERROR!',
-                            xhr.responseJSON.message,
-                            'error'
-                        );
-                        $("#zonesModal").modal("hide");
+                    console.log(xhr);
+                    Swal.fire(
+                        '¡ERROR!',
+                        xhr.responseJSON.message,
+                        'error'
+                    );
+                    $("#zonesModal").modal("hide");
                 });
                 console.log( coordinates );
-            }else{                
+            }else{
                 clearPolygon();
             }            
         });

@@ -299,6 +299,12 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::put('/schedules/{schedule}',                                             [SCHEDULES::class, 'update'])->name('schedules.update');
         Route::delete('/schedules/{schedule}',                                          [SCHEDULES::class, 'destroy'])->name('schedules.destroy');
 
+        Route::post('/schedules/timeCheckout',                                          [SCHEDULES::class, 'timeCheckout'])->name('schedules.timecheckout');
+        Route::post('/schedules/unit',                                                  [SCHEDULES::class, 'unit'])->name('schedules.unit');
+        Route::post('/schedules/driver',                                                [SCHEDULES::class, 'driver'])->name('schedules.driver');
+        Route::post('/schedules/comments',                                              [SCHEDULES::class, 'comments'])->name('schedules.comments');
+        Route::post('/schedules/status',                                                [SCHEDULES::class, 'status'])->name('schedules.status');
+
         //TIPO DE CAMBIO PARA REPORTES
         Route::get('/config/exchange-reports',                                          [EXCHANGE_REPORTS::class, 'index'])->name('exchanges.index');
         Route::get('/config/exchange-reports/create',                                   [EXCHANGE_REPORTS::class, 'create'])->name('exchanges.create');

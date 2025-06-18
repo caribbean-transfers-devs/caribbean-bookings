@@ -93,11 +93,11 @@
                                                 <label for="status">Selecciona un estatus unidad</label>
                                                 <select class="form-control selectpicker" data-live-search="true" id="status_unit" name="status_unit">
                                                     <option value="0">Selecciona una opción</option>
-                                                    <option {{ isset($schedule->status) && $schedule->status == "OP" ? 'selected' : '' }} value="OP">OPERACIÓN</option>
-                                                    <option {{ isset($schedule->status) && $schedule->status == "S" ? 'selected' : '' }} value="S">SINIESTRO</option>
-                                                    <option {{ isset($schedule->status) && $schedule->status == "OPB" ? 'selected' : '' }} value="OPB">OPERACIÓN BAJA</option>
-                                                    <option {{ isset($schedule->status) && $schedule->status == "FO" ? 'selected' : '' }} value="FO">FALTA DE OPERADOR</option>
-                                                    <option {{ isset($schedule->status) && $schedule->status == "T" ? 'selected' : '' }} value="T">TALLER</option>
+                                                    <option {{ isset($schedule->status_unit) && $schedule->status_unit == "OP" ? 'selected' : '' }} value="OP">OPERACIÓN</option>
+                                                    <option {{ isset($schedule->status_unit) && $schedule->status_unit == "S" ? 'selected' : '' }} value="S">SINIESTRO</option>
+                                                    <option {{ isset($schedule->status_unit) && $schedule->status_unit == "OPB" ? 'selected' : '' }} value="OPB">OPERACIÓN BAJA</option>
+                                                    <option {{ isset($schedule->status_unit) && $schedule->status_unit == "FO" ? 'selected' : '' }} value="FO">FALTA DE OPERADOR</option>
+                                                    <option {{ isset($schedule->status_unit) && $schedule->status_unit == "T" ? 'selected' : '' }} value="T">TALLER</option>
                                                 </select>
                                             </div>
                                         </div>

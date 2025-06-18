@@ -126,7 +126,7 @@
                                         @endif
                                         {{-- ZONAS DE AGENCIA --}}                              
                                         @if ( $enterprise->is_external == 1 )
-                                            <a class="btn btn-secondary w-100 position-relative overflow-visible" href="{{ route('enterprises.zones.index',     [$enterprise->id]) }}" style="font-size: 13px;">                                                
+                                            <a class="btn btn-secondary w-100 position-relative overflow-visible" href="{{ route('enterprises.zones.index',     [$enterprise->id]) }}" style="font-size: 13px;">
                                                 <span class="btn-text-inner">Zonas</span>
                                                 <span class="badge badge-danger counter">{{ $enterprise->zones_enterprises_count }}</span>
                                             </a>
@@ -138,7 +138,7 @@
                                         @endif
                                         {{-- TARIFA DE AGENCIA --}}
                                         @if ( $enterprise->is_external == 1 && auth()->user()->hasPermission(104) )
-                                            <a class="btn btn-success w-100 position-relative overflow-visible" href="{{ route('enterprises.rates.index',        [$enterprise->id]) }}" style="font-size: 13px;">                                            
+                                            <a class="btn btn-success w-100 position-relative overflow-visible" href="{{ route('enterprises.rates.index',        [$enterprise->id]) }}" style="font-size: 13px;">
                                                 <span class="btn-text-inner">Tarifas</span>
                                                 <span class="badge badge-danger counter">{{ $enterprise->rates_enterprises_count }}</span>
                                             </a>
