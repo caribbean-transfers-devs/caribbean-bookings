@@ -49,7 +49,7 @@ class VehicleRepository
                     ]                    
                 ],
                 'enterprises' => Enterprise::where('type_enterprise', 'PROVIDER')->get(),
-                'services' => DestinationService::all()
+                'services' => DestinationService::with('destination')->get()
             ]);
         } catch (Exception $e) {
         }

@@ -67,7 +67,7 @@
                                             <label for="destination_service_id">Selecciona un servicio</label>
                                             <select id="destination_service_id" name="destination_service_id" class="form-control mb-3">
                                                 @foreach ($services as $service)
-                                                    <option {{ ( isset($vehicle->destination_service_id) && $vehicle->destination_service_id == $service->id ? 'selected' : '' ) }} value="{{ $service->id }}">{{ $service->name }}</option>
+                                                    <option {{ ( isset($vehicle->destination_service_id) && $vehicle->destination_service_id == $service->id ? 'selected' : '' ) }} value="{{ $service->id }}">{{ $service->name }} - {{ $service->destination->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>

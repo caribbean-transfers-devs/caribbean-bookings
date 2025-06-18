@@ -107,7 +107,7 @@
                                     <button class="btn btn-{{ ( $enterprise->status == 1 ) ? 'success' : 'danger' }}" style="font-size: 13px;">{{ ( $enterprise->status == 1 ) ? 'activo' : 'Inactivo' }}</button>
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'success' : 'primary' }}" style="font-size: 13px;">{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'Proveedor' : 'Cliente' }}</button>
+                                    <button class="btn btn-{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'success' : ( $enterprise->type_enterprise == "CUSTOMER" ? 'secondary' : 'primary' ) }}" style="font-size: 13px;">{{ ( $enterprise->type_enterprise == "PROVIDER" ) ? 'Proveedor' : ( $enterprise->type_enterprise == "CUSTOMER" ? 'Cliente' : 'Principal' ) }}</button>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column gap-2">
