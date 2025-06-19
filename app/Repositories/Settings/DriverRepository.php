@@ -85,7 +85,7 @@ class DriverRepository
 
     public function edit($request, $id){
         try {
-            $driver = Driver::find($id);
+            $driver = Driver::with('enterprise', 'destination')->where('id', $id)->first();
             return view('settings.drivers.new', [
                 'breadcrumbs' => [
                     [

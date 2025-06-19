@@ -80,6 +80,7 @@ class VehicleRepository
     }
 
     public function edit($request, $id){
+        $vehicle = Vehicle::with('enterprise', 'destination_service', 'destination')->where('id', $id)->first();
         try {
             return view('settings.vehicles.new', [
                 'breadcrumbs' => [
@@ -95,8 +96,8 @@ class VehicleRepository
                     ]                    
                 ],
                 'enterprises' => Enterprise::where('type_enterprise', 'PROVIDER')->get(),
-                'services' => DestinationService::all(),
-                'vehicle' => Vehicle::find($id),
+                'services' => DestinationService::with('destination')->get(),
+                'vehicle' => $vehicle,
             ]);
         } catch (Exception $e) {
         }

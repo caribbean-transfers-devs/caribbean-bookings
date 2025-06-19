@@ -573,6 +573,7 @@ class ReservationsRepository
         $arrival_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
         if($lang == "en"):
             return <<<EOF
+                    <p><strong>DEAR CUSTOMER,  FOR SECURITY REASONS REMEMBER TO PRESENT AN ID WHAT IT MATCH WITH THE NAME OF THE CARDHOLDER AND SIGN THE PAYMENT AUTHORIZATION FORM IN ORDER TO ABOARD THE VEHICLE OTHERWISE YOU WILL BE ASKED TO PAY IN CASH AND THEN THE ONLINE PAYMENT WILL BE REINBURSED IN FULL BACK TO THE CARDHOLDER'S ACCOUNT. THIS INFORMATION IS REQUIRED BY THE  BANKS INSTITUTION TO PROOF THE PAYMENT HAS BEEN GENUINELY AUTHORIZED.</strong></p>
                     <p>Arrival confirmation</p>
                     <p>Before boarding, you will be asked to show photo identification of the cardholder of the card with which the payment was made.</p>
                     <p>This is your reservation voucher, please verify that the following information is correct.</p>
@@ -589,6 +590,7 @@ class ReservationsRepository
             EOF;
         else:
             return <<<EOF
+                <p><strong>ESTIMADO CLIENTE, POR MOTIVOS DE SEGURIDAD, RECUERDE PRESENTAR UNA IDENTIFICACIÓN QUE COINCIDA CON EL NOMBRE DEL TITULAR DE LA TARJETA Y FIRMAR EL FORMULARIO DE AUTORIZACIÓN DE PAGO PARA PODER SUBIR AL VEHÍCULO. DE LO CONTRARIO, SE LE SOLICITARÁ QUE PAGUE EN EFECTIVO Y LUEGO EL PAGO EN LÍNEA SE REEMBOLSARÁ ÍNTEGRAMENTE A LA CUENTA DEL TITULAR DE LA TARJETA. ESTA INFORMACIÓN ES REQUERIDA POR LA INSTITUCIÓN BANCARIA PARA COMPROBAR QUE EL PAGO HA SIDO AUTORIZADO.</strong></p>
                 <p>Confirmación de llegada</p>
                 <p>Antes de abordar se le solicitará la identificación con fotografía del titular de la tarjeta con la que se realizó el pago</p>
                 <p>Este es su comprobante de reserva, verifique que la información detallada a continuación sea correcta.</p>
@@ -695,14 +697,14 @@ class ReservationsRepository
             $destination = $item->to_name;
         endif;
 
-        if($type == "departure" && $is_round_trip == 0):            
+        if($type == "departure" && $is_round_trip == 0):
             $destination = $item->from_name;
             $departure_date = date("Y-m-d H:i", strtotime($item->op_one_pickup));
             $departure_date_new = date("Y-m-d", strtotime($item->op_one_pickup));
             $departure_time = date("H:i", strtotime($item->op_one_pickup));
         endif;
 
-        if($type == "departure" && $is_round_trip == 1):            
+        if($type == "departure" && $is_round_trip == 1):
             $destination = $item->to_name;
             $departure_date = date("Y-m-d H:i", strtotime($item->op_two_pickup));
             $departure_date_new = date("Y-m-d", strtotime($item->op_two_pickup));
@@ -742,6 +744,8 @@ class ReservationsRepository
             //     EOF;
 
             return <<<EOF
+                        <p><strong>DEAR CUSTOMER,  FOR SECURITY REASONS REMEMBER TO PRESENT AN ID WHAT IT MATCH WITH THE NAME OF THE CARDHOLDER AND SIGN THE PAYMENT AUTHORIZATION FORM IN ORDER TO ABOARD THE VEHICLE OTHERWISE YOU WILL BE ASKED TO PAY IN CASH AND THEN THE ONLINE PAYMENT WILL BE REINBURSED IN FULL BACK TO THE CARDHOLDER'S ACCOUNT. THIS INFORMATION IS REQUIRED BY THE  BANKS INSTITUTION TO PROOF THE PAYMENT HAS BEEN GENUINELY AUTHORIZED.</strong></p>
+
                         <p>Departure confirmation</p>
                         <p>Dear $item->client_first_name | Booking Number: <strong>$item->code</strong></p>
                         <p>Thank you for choosing Caribbean Transfers. This is to confirm your departure transfer scheduled for <strong>$departure_date_new</strong>, at <strong>$departure_time</strong> hrs. Our driver will be waiting for you at the <strong>$destination</strong>.</p>
@@ -752,6 +756,8 @@ class ReservationsRepository
                     EOF;            
         else:
             return <<<EOF
+                    <p><strong>ESTIMADO CLIENTE, POR MOTIVOS DE SEGURIDAD, RECUERDE PRESENTAR UNA IDENTIFICACIÓN QUE COINCIDA CON EL NOMBRE DEL TITULAR DE LA TARJETA Y FIRMAR EL FORMULARIO DE AUTORIZACIÓN DE PAGO PARA PODER SUBIR AL VEHÍCULO. DE LO CONTRARIO, SE LE SOLICITARÁ QUE PAGUE EN EFECTIVO Y LUEGO EL PAGO EN LÍNEA SE REEMBOLSARÁ ÍNTEGRAMENTE A LA CUENTA DEL TITULAR DE LA TARJETA. ESTA INFORMACIÓN ES REQUERIDA POR LA INSTITUCIÓN BANCARIA PARA COMPROBAR QUE EL PAGO HA SIDO AUTORIZADO.</strong></p>
+
                     <p>Confirmación de salida</p>
                     <p>Estimado/a $item->client_first_name | Reservación No: <strong>$item->code</strong></p>
                     <p>Gracias por elegir a Caribbean Transfers el motivo de este correo es confirmar su hora de recolección. La fecha indicada en su reserva es $departure_date hrs. Le estaremos esperando en $destination a esa hora.</p>

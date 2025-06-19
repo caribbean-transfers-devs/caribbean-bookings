@@ -95,8 +95,9 @@
                     </thead>
                     <tbody>
                         @if(sizeof($items)>=1)
-                            @foreach($items as $key => $operation)
+                            @foreach($items as $key => $operation)                            
                                 @php
+                                    dump($operation);
                                     if( isset( $resume[ $operation->payment_status ] ) && !in_array($operation->reservation_id, $resume['BOOKINGS']) ):
                                         $resume['BOOKINGS'][] = $operation->reservation_id;
                                         $resume[ $operation->payment_status ][ $operation->currency ] += ( $operation->cash_amount > 0 ? $operation->cash_amount : $operation->total_sales );
