@@ -111,7 +111,7 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex flex-column gap-2">
-                                        @if ( ( ($enterprise->type_enterprise == "CUSTOMER") || ( ($enterprise->type_enterprise == "CUSTOMER" || $enterprise->type_enterprise == "PROVIDER") && $enterprise->is_external == 0 ) ) && auth()->user()->hasPermission(102) )
+                                        @if ( ( ($enterprise->type_enterprise == "CUSTOMER") || ( ($enterprise->type_enterprise == "CUSTOMER" || $enterprise->type_enterprise == "PROVIDER" || $enterprise->type_enterprise == "MAIN") && $enterprise->is_external == 0 ) ) && auth()->user()->hasPermission(102) )
                                             <a class="btn btn-primary w-100 position-relative overflow-visible" href="{{ route('enterprises.sites.index', [$enterprise->id]) }}" style="font-size: 13px;">                                                
                                                 <span class="btn-text-inner">Sitios</span>
                                                 @if ($enterprise->is_external == 1)
