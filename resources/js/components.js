@@ -612,18 +612,19 @@ let components = {
     },
 
     typesCancellations:         async function(){
-        try {
-            const response = await fetch(_LOCAL_URL + "/data/typesCancellations", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-
-            if (!response.ok) throw new Error("Error al obtener los tipos de cancelación");
-
-            const options = await response.json();
-
+        fetch(_LOCAL_URL + "/data/typesCancellations", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al obtener los tipos de cancelación");
+            }
+            return response.json();
+        })
+        .then(options => {
             if (!Array.isArray(options)) {
                 throw new Error("Respuesta inesperada del servidor");
             }
@@ -637,10 +638,11 @@ let components = {
             });
 
             // console.log("Tipos de cancelación cargados:", __typesCancellations);
-        } catch (error) {
+        })
+        .catch(error => {
             console.error("Error:", error.message);
             Swal.fire("Error", error.message, "error");
-        }
+        });
     }
 }
 

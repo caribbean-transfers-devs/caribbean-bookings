@@ -758,7 +758,9 @@ if( markReservationDuplicate ){
  */
 document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("click", components.debounce(function (event) {
-        //PERMITE CALIFICAR LA RESERVACION        
+        components.typesCancellations();
+        
+        //PERMITE CALIFICAR LA RESERVACION
         if (event.target.classList.contains('enabledLike')) {
             event.preventDefault();
 
@@ -831,8 +833,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Obtener datos del elemento clickeado
             const { reservation, item, service, status, type } = event.target.dataset;
        
-            (async () => {
-                components.typesCancellations();
+            (async () => {                
                 // Crear un contenedor para Dropzone y el select
                 const dropzoneContainer = document.createElement("div");
                 let HTML = "";
