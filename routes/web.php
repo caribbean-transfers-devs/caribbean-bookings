@@ -66,6 +66,7 @@ use App\Http\Controllers\Payments\PaymentsController;
 
 //ACTIONS
 use App\Http\Controllers\Actions\FinanceController as               FINANCE;
+use App\Http\Controllers\Actions\DataController as                  DATA;
 use App\Http\Controllers\Actions\ActionsController as               ACTIONS_RESERVATION;
 use Illuminate\Support\Facades\Route;
 
@@ -349,6 +350,9 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::resource('/sales',SalesController::class);
     Route::resource('/payments',PaymentsController::class);
 
+    //NOS TRAE DATOS GENERALES
+    Route::match(['get'], '/data/typesCancellations',                               [DATA::class, 'typesCancellations'])->name('get.types.cancellations');
+
     //ACCIONES UTILIZADAS EN FINANZAS
         Route::post('/action/addPaymentRefund',                                     [FINANCE::class, 'addPaymentRefund'])->name('add.payment.refund');
         Route::post('/action/refundNotApplicable',                                  [FINANCE::class, 'refundNotApplicable'])->name('add.not.applicable.refund');
@@ -360,24 +364,24 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     //SE UTILIZA EN LA CONCILIACION DE STRIPE
         Route::match(['get', 'post'], '/action/getChargesStripe',                   [FINANCE::class, 'getChargesStripe'])->name('get.charges.stripe');
 
-    Route::post('/action/addCreditPayment',                                     [FINANCE::class, 'addCreditPayment'])->name('add.credit.payment');
+    Route::post('/action/addCreditPayment',                                         [FINANCE::class, 'addCreditPayment'])->name('add.credit.payment');
 
     //ACCIONES UTILIZADAS EN REPORTES
-    Route::post('/action/cashConciliation',                                     [FINANCE::class, 'cashConciliation'])->name('cash.payment.conciliation');
+    Route::post('/action/cashConciliation',                                         [FINANCE::class, 'cashConciliation'])->name('cash.payment.conciliation');
 
     //ACCIONES GENERALES DE DETALLES DE RESERVA
-    Route::post('/action/deleteCommission', [ACTIONS_RESERVATION::class, 'deleteCommission'])->name('update.booking.delete.commission');
+    Route::post('/action/deleteCommission',                                         [ACTIONS_RESERVATION::class, 'deleteCommission'])->name('update.booking.delete.commission');
 
-    Route::post('/action/sendMessageWhatsApp', [ACTIONS_RESERVATION::class, 'sendMessageWhatsApp'])->name('update.booking.send.message.whatsapp');
-    Route::post('/action/enablePayArrival', [ACTIONS_RESERVATION::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
-    Route::post('/action/enablePlusService', [ACTIONS_RESERVATION::class, 'enablePlusService'])->name('update.booking.plus.service');
-    Route::post('/action/markReservationOpenCredit', [ACTIONS_RESERVATION::class, 'markReservationOpenCredit'])->name('update.booking.mark.open.credit');
-    Route::post('/action/reactivateReservation', [ACTIONS_RESERVATION::class, 'reactivateReservation'])->name('update.booking.reactivate');
-    Route::post('/action/refundRequest', [ACTIONS_RESERVATION::class, 'refundRequest'])->name('update.booking.refund.request');
-    Route::post('/action/markReservationDuplicate', [ACTIONS_RESERVATION::class, 'markReservationDuplicate'])->name('update.booking.mark.duplicate');    
+    Route::post('/action/sendMessageWhatsApp',                                      [ACTIONS_RESERVATION::class, 'sendMessageWhatsApp'])->name('update.booking.send.message.whatsapp');
+    Route::post('/action/enablePayArrival',                                         [ACTIONS_RESERVATION::class, 'enablePayArrival'])->name('update.booking.pay.arrival');
+    Route::post('/action/enablePlusService',                                        [ACTIONS_RESERVATION::class, 'enablePlusService'])->name('update.booking.plus.service');
+    Route::post('/action/markReservationOpenCredit',                                [ACTIONS_RESERVATION::class, 'markReservationOpenCredit'])->name('update.booking.mark.open.credit');
+    Route::post('/action/reactivateReservation',                                    [ACTIONS_RESERVATION::class, 'reactivateReservation'])->name('update.booking.reactivate');
+    Route::post('/action/refundRequest',                                            [ACTIONS_RESERVATION::class, 'refundRequest'])->name('update.booking.refund.request');
+    Route::post('/action/markReservationDuplicate',                                 [ACTIONS_RESERVATION::class, 'markReservationDuplicate'])->name('update.booking.mark.duplicate');    
 
-    Route::put('/action/updateServiceStatus', [ACTIONS_RESERVATION::class, 'updateServiceStatus'])->name('update.service.status');
-    Route::post('/action/enabledLike', [ACTIONS_RESERVATION::class, 'enabledLike'])->name('update.booking.like');
-    Route::post('/action/confirmService', [ACTIONS_RESERVATION::class, 'confirmService'])->name('update.service.confirm');
-    Route::post('/action/updateServiceUnlock', [ACTIONS_RESERVATION::class, 'updateServiceUnlock'])->name('update.service.unlock');
+    Route::put('/action/updateServiceStatus',                                       [ACTIONS_RESERVATION::class, 'updateServiceStatus'])->name('update.service.status');
+    Route::post('/action/enabledLike',                                              [ACTIONS_RESERVATION::class, 'enabledLike'])->name('update.booking.like');
+    Route::post('/action/confirmService',                                           [ACTIONS_RESERVATION::class, 'confirmService'])->name('update.service.confirm');
+    Route::post('/action/updateServiceUnlock',                                      [ACTIONS_RESERVATION::class, 'updateServiceUnlock'])->name('update.service.unlock');
 });

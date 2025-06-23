@@ -1,10 +1,12 @@
-const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-const language = document.documentElement.lang;
-const _LOCAL_URL = window.location.origin;
-const __loading = document.getElementById('content');
-const __load_screen = document.getElementById("load_screen");
-const __btn_filter = document.querySelector('.btn-filter');
-const translations = {
+// DECLARACIÓN DE VARIABLES
+let __typesCancellations     = {};
+const csrfToken             = document.querySelector('meta[name="csrf-token"]').content;
+const _LOCAL_URL            = window.location.origin;
+const language              = document.documentElement.lang;
+const __loading             = document.getElementById('content');
+const __load_screen         = document.getElementById("load_screen");
+const __btn_filter          = document.querySelector('.btn-filter');
+const translations          = {
     en: {
         "table.results": "Results",
         "table.search": "Search",
@@ -578,7 +580,7 @@ let components = {
      * @param {*} __table 
      * @param {*} __storageName 
      */
-    validateColumnVisibility: function(__table, __storageName){
+    validateColumnVisibility:   function(__table, __storageName){
         const __DataTable = $(__table).DataTable(); //DOM DataTable
         const localStorageKey = __storageName; //El nombre del localStorage        
         const savedState = JSON.parse(localStorage.getItem(localStorageKey)) || {};
@@ -597,7 +599,7 @@ let components = {
         }
     },
 
-    setValueSelectpicker: function(){
+    setValueSelectpicker:       function(){
         const __selectpickers = document.querySelectorAll('.selectpicker');
         if( __selectpickers.length > 0 ){
             __selectpickers.forEach(__selectpicker => {
@@ -606,6 +608,38 @@ let components = {
                     $("#" + __selectpicker.getAttribute('id')).selectpicker('val', JSON.parse(value));
                 }
             });
+        }
+    },
+
+    typesCancellations:         async function(){
+        try {
+            const response = await fetch(_LOCAL_URL + "/data/typesCancellations", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) throw new Error("Error al obtener los tipos de cancelación");
+
+            const options = await response.json();
+
+            if (!Array.isArray(options)) {
+                throw new Error("Respuesta inesperada del servidor");
+            }
+
+            // Ordenar alfabéticamente por 'name_es'
+            options.sort((a, b) => a.name_es.localeCompare(b.name_es));
+
+            // Llenar el objeto typesCancellations
+            options.forEach(option => {
+                __typesCancellations[option.id] = option.name_es;
+            });
+
+            // console.log("Tipos de cancelación cargados:", __typesCancellations);
+        } catch (error) {
+            console.error("Error:", error.message);
+            Swal.fire("Error", error.message, "error");
         }
     }
 }

@@ -261,7 +261,6 @@ class DetailRepository
             ],
             'reservation' => $reservation,
             'data' => $data,
-            'types_cancellations' => ApiTrait::makeTypesCancellations(),
             'request' => $request->input(),
         ]);
     }

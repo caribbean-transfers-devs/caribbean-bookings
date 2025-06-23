@@ -13,9 +13,17 @@ use App\Models\Site;
 use App\Models\SalesType;
 
 //TRAITS
+use App\Traits\ApiTrait;
 
 class DataRepository
 {
+    use ApiTrait;
+
+    public function typesCancellations($request)
+    {
+        return ApiTrait::makeTypesCancellations();
+    }
+
     public function getZones($request)
     {
         try {

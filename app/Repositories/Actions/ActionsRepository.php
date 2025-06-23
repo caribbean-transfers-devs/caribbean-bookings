@@ -918,17 +918,27 @@ class ActionsRepository
 
             //Declaramos variables
             $reservationId = $item->reservation_id;
-            $updateReservationStatus = true;
+            $updateReservationStatus = false; // Por defecto NO se cancela la reserva
 
             // Verificar si todos los items están cancelados (solo si es round trip)
+            // Si es round trip, se valida que ambos trayectos estén cancelados
             if ($item->is_round_trip) {
                 $allCancelled = ReservationsItem::where('reservation_id', $reservationId)
                     ->where(function ($query) {
                         $query->where('op_one_status', '!=', 'CANCELLED')
-                              ->orWhere('op_two_status', '!=', 'CANCELLED');
+                            ->orWhere('op_two_status', '!=', 'CANCELLED');
                     })
                     ->doesntExist(); // Si no hay ninguno distinto a 'CANCELLED', entonces todos están cancelados.
     
+                $updateReservationStatus = $allCancelled;
+            } else {
+                // Si es One Way, se valida que TODOS los ítems asociados estén cancelados
+                $allCancelled = ReservationsItem::where('reservation_id', $reservationId)
+                    ->where(function ($query) {
+                        $query->where('op_one_status', '!=', 'CANCELLED');
+                    })
+                    ->doesntExist();
+
                 $updateReservationStatus = $allCancelled;
             }
 

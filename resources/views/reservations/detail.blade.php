@@ -293,8 +293,6 @@
         <div class="col-xxl-9 col-xl-8 col-12">
             <div class="controls">
                 @csrf
-                <input type="hidden" value='{{ json_encode($types_cancellations) }}' id="types_cancellations">
-
                 <button class="btn social-button" id="sendMessageWhatsApp" data-code="{{ $reservation->id }}">
                     <img src="https://affiliates.gotransfers.us/assets/img/icons/png/whatsapp.png" alt="WhatsApp" class="img-fluid" width="20" height="20">
                     WHATSAPP
