@@ -90,6 +90,7 @@
                 <table id="dataZones" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Destino</th>
                             <th>Nombre de zona</th>
                             <th class="text-center">Primario</th>
@@ -101,6 +102,7 @@
                         @if(sizeof($zones->zones_enterprises) >= 1)
                             @foreach($zones->zones_enterprises as $key => $value)
                                 <tr>
+                                    <td>{{ $value->id }}</td>
                                     <td>{{ $value->destination->name }}</td>
                                     <td>{{ $value->name }}</td>
                                     <td class="text-center">
