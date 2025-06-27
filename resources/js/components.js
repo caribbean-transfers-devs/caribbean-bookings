@@ -188,7 +188,7 @@ let components = {
         table.on('init', function () {
             __table.columns.adjust().draw();
         });        
-    },  
+    },
 
     formReset: function(){
         const __closes = document.querySelectorAll('.__close');

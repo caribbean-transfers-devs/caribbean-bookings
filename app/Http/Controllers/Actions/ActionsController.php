@@ -107,6 +107,13 @@ class ActionsController extends Controller
     /**
      * 
      */
+    public function deleteItem(Request $request){
+        return $this->ActionsRepository->deleteItem($request);
+    }    
+
+    /**
+     * 
+     */
     public function updateServiceUnlock(Request $request){
         return $this->ActionsRepository->updateServiceUnlock($request);
     }    

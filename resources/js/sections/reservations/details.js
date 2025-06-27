@@ -826,6 +826,71 @@ document.addEventListener("DOMContentLoaded", function() {
             });            
         }
 
+        //PERMITE ELIMINAR ITEM DE LA RESERVACION
+        if (event.target.classList.contains('deleteItem')) {
+            event.preventDefault();
+
+            // Definir parámetros de la petición
+            const target     = event.target;
+            const _params    = {
+                item_id: target.dataset.item || ""
+            };
+            
+            Swal.fire({
+                html: '¿Está seguro de la eliminar el item de la reservación?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                allowOutsideClick: false,
+                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se elimina el item de la reservación.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+    
+                    fetch('/action/deleteItem', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },            
+                        body: JSON.stringify(_params)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.status,
+                            html: data.message,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }
+            });            
+        }        
+
         //ACTUALIZA EL ESTATUS DEL SERVICIO
         if (event.target.classList.contains('serviceStatusUpdate')) {
             event.preventDefault();

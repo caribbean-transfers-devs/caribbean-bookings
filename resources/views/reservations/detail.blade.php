@@ -391,7 +391,22 @@
                 {{-- NOS PERMITE MARCAR COMO DUPLICADA LA RESERVA --}}
                 @if (auth()->user()->hasPermission(24) && $reservation->is_quotation == 0 && $reservation->is_cancelled == 0 && $reservation->is_duplicated == 0 )
                     <button class="btn btn-danger btn-sm markReservationDuplicate" id="markReservationDuplicate" data-code="{{ $reservation->id }}" data-status="{{ $data['status'] }}"><i class="align-middle" data-feather="delete"></i> MARCAR COMO DUPLICADO</button>
-                @endif                
+                @endif
+                
+                                            {{-- NOS PERMITE REALIZAR ESTAS ACCIONES SOLO CUANDO LA RESERVA ESTA PENDIENTE CONFIRMADA O A CREDITO --}}
+                                            {{-- Y NOS PERMITE DARLE UNA CALIFICACIÓN A LA RESERVA --}}
+                                            @if ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" )                                                
+                                                @if ( $reservation->reserve_rating != NULL )
+                                                    <div class="btn-group" role="group" aria-label="likes">                                                    
+                                                        <button type="button" class="btn btn-{{ $reservation->reserve_rating == 1 ? 'success' : 'danger' }} bs-tooltip" title="Esta es la calificación final de la reserva."><?=( $reservation->reserve_rating == 1 ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>' )?></button>
+                                                    </div>
+                                                @else
+                                                    <div class="btn-group" role="group" aria-label="likes">                                                    
+                                                        <button type="button" class="btn btn-success bs-tooltip enabledLike" title="click para calificar como positiva la reserva." data-reservation="{{ $reservation->id }}" data-status="1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></button>
+                                                        <button type="button" class="btn btn-danger bs-tooltip enabledLike" title="click para calificar como negativa la reserva." data-reservation="{{ $reservation->id }}" data-status="0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg></button>
+                                                    </div>
+                                                @endif
+                                            @endif                
             </div>
 
             @if ( $data['status'] == "QUOTATION" )
@@ -466,7 +481,7 @@
                     <div class="tab-pane services active" id="icon-tab-1" role="tabpanel">
                         @foreach ($reservation->items as $item)
                             {{-- @dump($item->toArray()); --}}
-                            <div class="services-container">
+                            <div class="services-container mb-2">
                                 <h3>{{ $item->code }}</h3>
                                 {{-- NOS INDICA QUE TIENE ACTIVO EL SERVICIO AVANZADO --}}
                                 @if ( $reservation->is_advanced == 1 )
@@ -529,18 +544,10 @@
                                                 @endif
                                             </div>
 
-                                            {{-- NOS PERMITE REALIZAR ESTAS ACCIONES SOLO CUANDO LA RESERVA ESTA PENDIENTE CONFIRMADA O A CREDITO --}}
-                                            @if ( $data['status'] == "PENDING" || $data['status'] == "PAY_AT_ARRIVAL" || $data['status'] == "CONFIRMED" || $data['status'] == "CREDIT" || $data['status'] == "QUOTATION" )                                                
-                                                @if ( $reservation->reserve_rating != NULL )
-                                                    <div class="btn-group" role="group" aria-label="likes">                                                    
-                                                        <button type="button" class="btn btn-{{ $reservation->reserve_rating == 1 ? 'success' : 'danger' }} bs-tooltip" title="Esta es la calificación final de la reserva."><?=( $reservation->reserve_rating == 1 ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>' )?></button>
-                                                    </div>
-                                                @else
-                                                    <div class="btn-group" role="group" aria-label="likes">                                                    
-                                                        <button type="button" class="btn btn-success bs-tooltip enabledLike" title="click para calificar como positiva la reserva." data-reservation="{{ $reservation->id }}" data-status="1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></button>
-                                                        <button type="button" class="btn btn-danger bs-tooltip enabledLike" title="click para calificar como negativa la reserva." data-reservation="{{ $reservation->id }}" data-status="0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg></button>
-                                                    </div>
-                                                @endif
+                                            @if ( auth()->user()->hasPermission(128) )
+                                                <div class="btn-group" role="group" aria-label="delete">
+                                                    <button type="button" class="btn btn-primary deleteItem" data-item="{{ $item->id }}">Eliminar véhiculo</button>
+                                                </div>
                                             @endif
                                         </div>
                                     </div>

@@ -363,7 +363,6 @@ trait QueryTrait
                                             GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(date_conciliation, '%Y-%m-%d') END SEPARATOR ', ') AS credit_conciliation_dates,
                                             GROUP_CONCAT(DISTINCT CASE WHEN category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(deposit_date, '%Y-%m-%d') END SEPARATOR ', ') AS credit_deposit_dates,
                                             
-
                                             GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
                                             GROUP_CONCAT(
                                                 DISTINCT CONCAT(
@@ -566,6 +565,7 @@ trait QueryTrait
                                 -- Nuevos campos para pagos en efectivo
                                 COALESCE(p.cash_amount, 0) AS cash_amount,
                                 COALESCE(p.cash_references) AS cash_references,
+                                COALESCE(p.cash_comments) AS cash_comments,
                                 COALESCE(p.cash_payment_ids) AS cash_payment_ids,
                                 COALESCE(p.cash_is_conciliated) AS cash_is_conciliated,
 
@@ -692,6 +692,8 @@ trait QueryTrait
                                             ),
                                             ']'
                                         ) AS cash_references,
+                                        -- Comentario de pagos en efectivo concatenadas
+                                        GROUP_CONCAT(DISTINCT CASE WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN conciliation_comment END SEPARATOR ', ') AS cash_comments,
                                         -- Nuevo campo: solo IDs de pagos en efectivo concatenados
                                         CONCAT(
                                             '[',
@@ -722,7 +724,7 @@ trait QueryTrait
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryOne}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_payment_ids, p.cash_is_conciliated {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_comments, p.cash_payment_ids, p.cash_is_conciliated {$queryHaving}
 
                             UNION
 
@@ -864,6 +866,7 @@ trait QueryTrait
                                 -- Nuevos campos para pagos en efectivo
                                 COALESCE(p.cash_amount, 0) AS cash_amount,
                                 COALESCE(p.cash_references) AS cash_references,
+                                COALESCE(p.cash_comments) AS cash_comments,
                                 COALESCE(p.cash_payment_ids) AS cash_payment_ids,
                                 COALESCE(p.cash_is_conciliated) AS cash_is_conciliated,
 
@@ -991,6 +994,8 @@ trait QueryTrait
                                             ),
                                             ']'
                                         ) AS cash_references,
+                                        -- Comentario de pagos en efectivo concatenadas
+                                        GROUP_CONCAT(DISTINCT CASE WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN conciliation_comment END SEPARATOR ', ') AS cash_comments,                                        
                                         -- Nuevo campo: solo IDs de pagos en efectivo concatenados
                                         CONCAT(
                                             '[',
@@ -1021,7 +1026,7 @@ trait QueryTrait
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryTwo}
-                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_payment_ids, p.cash_is_conciliated {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_comments, p.cash_payment_ids, p.cash_is_conciliated {$queryHaving}
                             -- ) AS combined_results
                             ORDER BY filtered_date ASC ",[
                                 "init_date_one" => $queryData['init'],
@@ -1030,15 +1035,6 @@ trait QueryTrait
                                 "init_date_four" => $queryData['end'],
                             ]);
     }
-
-
-
-
-
-
-
-
-
 
     public function queryConciliationStripe($query, $query2, $queryData){
         $bookings = DB::select("SELECT 

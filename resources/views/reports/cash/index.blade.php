@@ -89,7 +89,8 @@
                             <th class="text-center">TOTAL DE RESERVACIÓN</th>
                             <th class="text-center">TOTAL COBRADO EN EFECTIVO</th>
                             <th class="text-center">MONEDA</th>
-                            <th class="text-center">ESTATUS DE PAGO</th>
+                            <th class="text-center">COMENTARIO DE CONCILIACIÓN</th>
+                            <th class="text-center">ESTATUS DE PAGO</th>                            
                             <th class="text-center">ESTATUS DE CONCILIACIÓN</th>
                         </tr>
                     </thead>
@@ -97,12 +98,16 @@
                         @if(sizeof($items)>=1)
                             @foreach($items as $key => $operation)                            
                                 @php
-                                    dump($operation);
+                                    
                                     if( isset( $resume[ $operation->payment_status ] ) && !in_array($operation->reservation_id, $resume['BOOKINGS']) ):
                                         $resume['BOOKINGS'][] = $operation->reservation_id;
                                         $resume[ $operation->payment_status ][ $operation->currency ] += ( $operation->cash_amount > 0 ? $operation->cash_amount : $operation->total_sales );
                                         $resume[ $operation->payment_status ]['count']++;
                                     endif;
+
+                                    // if ($operation->reservation_id == 50330) {
+                                    //     dump($operation);
+                                    // }
                                 @endphp
                                 <tr>
                                     <td class="text-center">{{ $operation->reservation_id }}</td>
@@ -131,6 +136,7 @@
                                     <td class="text-center">{{ number_format($operation->total_sales,2) }}</td>
                                     <td class="text-center">{{ number_format(( $operation->cash_amount > 0 ? $operation->cash_amount : $operation->total_sales ),2) }}</td>
                                     <td class="text-center">{{ $operation->currency }}</td>
+                                    <td class="text-center">{{ $operation->cash_comments }}</td>
                                     <td class="text-center" <?=auth()->user()->classStatusPayment($operation)?>>{{ auth()->user()->statusPayment($operation->payment_status) }}</td>
                                     <td class="text-center {{ auth()->user()->hasPermission(120) && $operation->cash_is_conciliated == 0 ? 'cashConciliation' : '' }}" data-code="{{ $operation->cash_payment_ids }}" data-statu="{{ $operation->cash_is_conciliated }}" style="cursor: pointer;background-color:#{{ $operation->cash_is_conciliated == 0 ? 'e7515a' : '00ab55' }};color:#fff;">
                                         @if ( $operation->cash_is_conciliated == 0 )

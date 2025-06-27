@@ -670,6 +670,71 @@ class ActionsRepository
                 'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * NOS AYUDA A PODER CALIFICAR EL ESTATUS DE RESERVACIÓN, EN LOS DETALLES DE LA RESERVACIÓN
+     * @param request :la información recibida en la solicitud
+    */
+    public function deleteItem($request)
+    {
+        // Reglas de validación
+        $rules = [
+            'item_id' => 'required|integer',
+        ];
+
+        // Validación de datos
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'REQUIRED_PARAMS',
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422
+        }
+
+        // Obtener el item de la reservación
+        $booking = ReservationsItem::where('id', $request->item_id)->first();
+        
+        if (!$booking) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND', 
+                    'message' =>  "reservación no encontrada" 
+                ],
+                'status' => 'error',
+                'message' => 'reservación no encontrada'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $booking->delete();
+
+            // ESTATUS DE RESERVACIÓN
+            $this->create_followUps($booking->reservation_id, "El usuario: ".auth()->user()->name.", elimino el item de la reservación con código: ".$booking->code, 'HISTORY', "DELETE_ITEM_RESERVATION");
+    
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se elimino correctamente el item de la reservación.',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],                
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }    
 
     /**
