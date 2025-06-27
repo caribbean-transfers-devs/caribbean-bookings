@@ -4,6 +4,19 @@
 let map;
 let drawingManager;
 let polygon;
+// Coordenadas por destino
+const DESTINATIONS = {
+  1: { // Cancún
+    lat: 21.161908, 
+    lng: -86.851528,
+    zoom: 11
+  },
+  2: { // Los Cabos
+    lat: 22.890533, 
+    lng: -109.916740,
+    zoom: 11
+  }
+};
 
 if( document.querySelector('.table-rendering') != null ){
     components.actionTable($('.table-rendering'));
@@ -98,16 +111,13 @@ function getPoints(event, destination_id, zone_id, enterprise_id) {
         url: `/enterprises/destinations/${destination_id}/points?enterprise_id=${enterprise_id}`,
         type: 'GET',
         data: { zone_id: zone_id },
-        beforeSend: function() {        
+        beforeSend: function() {
             $("#zone_map_container").empty().html(`<div class="spinner-border text-dark me-2" role="status"><span class="visually-hidden">Loading...</span></div>`)
         },
         success: function(resp) {
-            // console.log(resp);
-            initMap();
-            
+            initMap(destination_id);            
             // Objeto para guardar la relación entre coordenadas y point_id
-            const pointReferences = {};
-            
+            const pointReferences = {};            
             for (const key in resp) {
                 if (resp.hasOwnProperty(key)) {
                     let polygonCoords = [];
@@ -201,11 +211,14 @@ function getPoints(event, destination_id, zone_id, enterprise_id) {
     });
 }
 
-function initMap(){
+function initMap(destination_id = 1){
+    const defaultDestination = DESTINATIONS[destination_id]; // Cancún como valor por defecto
+
     // Opciones del mapa
     var mapOptions = {
-        center: { lat: 21.0715784, lng: -86.870175 }, // Centro del mapa
-        zoom: 11 // Zoom inicial
+        // center: { lat: 21.0715784, lng: -86.870175 }, // Centro del mapa
+        center: { lat: defaultDestination.lat, lng: defaultDestination.lng }, // Centro del mapa
+        zoom: defaultDestination.zoom // Zoom inicial
     };
     map = new google.maps.Map(document.getElementById('zone_map_container'), mapOptions);
 }

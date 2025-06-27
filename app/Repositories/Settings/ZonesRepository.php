@@ -127,7 +127,7 @@ class ZonesRepository{
                         "active" => false
                     ],
                     [
-                        "route" => route('enterprises.zones.index', [( isset($enterprise->id) ? $enterprise->id : 0 )]),
+                        "route" => route('enterprises.zones.web.index', [( isset($enterprise->id) ? $enterprise->id : 0 )]),
                         "name" => "Sitios de la empresa: ".( isset($enterprise->names) ? $enterprise->names : 'NO DEFINIDO' ),
                         "active" => false
                     ],

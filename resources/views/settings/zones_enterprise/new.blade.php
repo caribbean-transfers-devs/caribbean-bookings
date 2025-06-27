@@ -51,7 +51,7 @@
                                             <select name="destination_id" class="form-control" id="destinationID">
                                                 @if (sizeof($destinations) >= 1)
                                                     @foreach ($destinations as $destination)
-                                                        <option value="{{ $destination->id }}">{{ $destination->name }}</option>
+                                                        <option {{ old('destination_id', $zone->destination_id ?? '') == $destination->id ? 'selected' : '' }} value="{{ $destination->id }}">{{ $destination->name }}</option>
                                                     @endforeach                                        
                                                 @endif                                
                                             </select>
