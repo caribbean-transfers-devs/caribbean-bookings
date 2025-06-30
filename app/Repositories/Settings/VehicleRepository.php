@@ -48,7 +48,7 @@ class VehicleRepository
                         "active" => true
                     ]                    
                 ],
-                'enterprises' => Enterprise::where('type_enterprise', 'PROVIDER')->get(),
+                'enterprises' => Enterprise::whereIn('type_enterprise', ['PROVIDER', 'MAIN'])->get(),
                 'services' => DestinationService::with('destination')->get()
             ]);
         } catch (Exception $e) {
@@ -95,7 +95,7 @@ class VehicleRepository
                         "active" => true
                     ]                    
                 ],
-                'enterprises' => Enterprise::where('type_enterprise', 'PROVIDER')->get(),
+                'enterprises' => Enterprise::whereIn('type_enterprise', ['PROVIDER', 'MAIN'])->get(),
                 'services' => DestinationService::with('destination')->get(),
                 'vehicle' => $vehicle,
             ]);

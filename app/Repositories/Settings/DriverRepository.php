@@ -52,7 +52,7 @@ class DriverRepository
                         "active" => true
                     ]                    
                 ],
-                'enterprises' => Enterprise::where('type_enterprise', 'PROVIDER')->get(),
+                'enterprises' => Enterprise::whereIn('type_enterprise', ['PROVIDER', 'MAIN'])->get(),
                 'units' => $this->Units(),
             ]);
         } catch (Exception $e) {
@@ -99,7 +99,7 @@ class DriverRepository
                         "active" => true
                     ]                    
                 ],
-                'enterprises' => Enterprise::where('type_enterprise', 'PROVIDER')->get(),
+                'enterprises' => Enterprise::whereIn('type_enterprise', ['PROVIDER', 'MAIN'])->get(),
                 'driver' => $driver,
                 'units' => $this->Units(),
             ]);
