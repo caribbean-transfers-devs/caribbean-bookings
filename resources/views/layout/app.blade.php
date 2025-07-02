@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title') | Bookings</title>
+    <title>{{ config('app.name', 'CRM Caribbean Transfers') }} - @yield('title')</title>
 	<meta name="description" content="Caribbean Transfers | Bookings">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="shortcut icon" href="/assets/img/icons/favicon.ico">
@@ -21,7 +21,6 @@
     @stack('Css')
 </head>
 <body class="">
-
     @once
         @include('layout.partials.loader')
     @endonce

@@ -1,0 +1,236 @@
+// Variables
+$orange: rgba(251, 86, 7, 0.72);
+$primary: #4e73df;
+$secondary: #858796;
+$success: #1cc88a;
+$info: #36b9cc;
+$warning: #f6c23e;
+$danger: #e74a3b;
+$light: #f8f9fc;
+$white: #fff;
+$dark: #5a5c69;
+$gray: #95a5a6;
+
+$font-family-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$border-radius: 0.5rem;
+$box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+$transition: all 0.3s ease;
+
+// Custom styles
+.card {
+    background: $white;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    overflow: hidden;
+    transition: $transition;
+    
+    .card-header {
+        padding: 1rem;
+        border-bottom: 1px solid rgba($gray, 0.1);
+        background: #16161d;
+        color: $white;
+        
+        h5 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: $white;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+    }
+    
+    .card-body {
+        padding: 0;
+    }
+}
+
+.table {
+    margin-bottom: 0;
+    
+    thead {
+        th {
+            background: $orange !important;
+            color: #000;
+            font-weight: 600 !important;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            // letter-spacing: 0.05em;
+            padding: 0.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;            
+            border-bottom-width: 1px;
+        }
+    }
+    
+    tbody {
+        tr {
+            transition: $transition;
+            border-bottom: 1px solid rgba($gray, 0.1);
+
+            td {
+                color: #000;
+                font-size: 0.75rem;
+                padding: 0.5rem;
+                vertical-align: middle;
+                border-top: 1px solid rgba(0, 0, 0, 0.03);            
+            }
+            
+            &:hover {
+                background-color: rgba($orange, 0.03);
+            }
+        }
+    }
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+    font-size: 0.875em;
+    letter-spacing: 0.02em;
+    
+    &.bg-primary {
+        background-color: rgba($primary, 0.1) !important;
+        color: $primary !important;
+    }
+    
+    &.bg-info {
+        background-color: rgba($info, 0.1) !important;
+        color: $info !important;
+    }
+}
+
+// Zones assigned
+.zones-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.zone-tag {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    &.internal {
+        background: rgba($orange, 0.1);
+        color: $orange;
+        border: 1px solid rgba($orange, 0.2);
+    }
+
+    &.client {
+        background: rgba($info, 0.1);
+        color: $info;
+        border: 1px solid rgba($info, 0.2);
+    }
+
+    .zone-enterprise {
+        font-size: 0.65rem;
+        opacity: 0.8;
+    }
+}
+
+.btn {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: $border-radius;
+    
+    &-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    &-outline-secondary {
+        border-color: #ddd;
+        color: $secondary;
+        
+        &:hover {
+            background-color: #f8f9fa;
+        }
+    }
+}
+
+.alert {
+    border-radius: $border-radius;
+    padding: 0.75rem 1.25rem;
+    
+    &-dismissible {
+        .btn-close {
+            padding: 0.75rem 1.25rem;
+        }
+    }
+}
+
+// Form styles
+.form-control, .form-select {
+    border-radius: $border-radius;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    
+    &:focus {
+        box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+        border-color: $primary;
+    }
+}
+
+.form-label {
+    font-weight: 500;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    color: $dark;
+}
+
+// Custom utilities
+.bg-light {
+    background-color: #f8f9fc !important;
+}
+
+.rounded-lg {
+    border-radius: $border-radius * 2 !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+// Tags container
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        background-color: rgba($primary, 0.1);
+        color: $primary;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        
+        .tag-enterprise {
+            opacity: 0.7;
+            margin-left: 0.25rem;
+            font-size: 0.65rem;
+        }
+        
+        &.tag-internal {
+            background-color: rgba($primary, 0.1);
+            color: $primary;
+        }
+        
+        &.tag-client {
+            background-color: rgba($info, 0.1);
+            color: $info;
+        }
+    }
+}

@@ -56,6 +56,7 @@ use App\Http\Controllers\Settings\RatesController as                RATES_WEB;
 use App\Http\Controllers\Settings\RatesEnterpriseController as      RATES_ENTERPRISE;
 use App\Http\Controllers\Settings\TypesCancellationsController as   TYPES_CANCELLATIONS;
 use App\Http\Controllers\Settings\TypesSalesController as           TYPES_SALES;
+use App\Http\Controllers\Settings\OperatorFeeController as          OPERATORFEE;
 
 //DETAILS RESERVATION
 use App\Http\Controllers\Reservations\ReservationsController as     DETAILS_RESERVATION;
@@ -329,6 +330,9 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/types-sales/{sale}/edit',                                          [TYPES_SALES::class, 'edit'])->name('types.sales.edit');
         Route::put('/types-sales/{sale}',                                               [TYPES_SALES::class, 'update'])->name('types.sales.update');
         Route::delete('/types-sales/{sale}',                                            [TYPES_SALES::class, 'destroy'])->name('types.sales.destroy');
+
+        Route::resource('operator-fees',                                                OPERATORFEE::class)->except(['show']);
+        Route::match(['GET'],'operator-fees/{operator_fee}/history',                    [OPERATORFEE::class, 'show'])->name('operator-fees.show');
 
         Route::put('/reservations/{reservation}',                                       [DETAILS_RESERVATION::class, 'update'])->name('reservations.update');
         Route::delete('/reservations/{reservation}',                                    [DETAILS_RESERVATION::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA

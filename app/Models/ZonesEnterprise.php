@@ -13,7 +13,7 @@ class ZonesEnterprise extends Model
 
     public function enterprise()
     {
-        return $this->belongsTo(Enterprise::class, 'enterprise_id', 'id');
+        return $this->belongsTo(Enterprise::class, 'enterprise_id', 'id')->withTrashed();
     }
 
     public function destination()

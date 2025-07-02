@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 
+use App\Models\OperatorFee;
+use App\Observers\OperatorFeeObserver;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -22,5 +25,6 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         Paginator::useBootstrap();
+        OperatorFee::observe(OperatorFeeObserver::class);
     }
 }

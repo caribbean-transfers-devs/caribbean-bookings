@@ -70,6 +70,10 @@ mix.sass('resources/scss/core/fonts.scss', data.assets + "css/base/fonts.min.css
             mix.sass('resources/scss/sections/settings/_rates.scss', data.assets + "css/sections/settings/rates.min.css"); //RATES
             mix.sass('resources/scss/sections/settings/_rates_enterprise.scss', data.assets + "css/sections/settings/rates_enterprise.min.css"); //RATES ENTERPRISE
             mix.sass('resources/scss/sections/settings/_types_cancellations.scss', data.assets + "css/sections/settings/types_cancellations.min.css"); //TYPES CANCELLATIONS
+            mix.sass('resources/scss/sections/settings/_operator-fee.scss', data.assets + "css/sections/settings/operator-fee.min.css"); //OPERATOR FEE
+            mix.sass('resources/scss/sections/settings/_operator-fee-list.scss', data.assets + "css/sections/settings/operator-fee-list.min.css"); //OPERATOR FEE
+            mix.sass('resources/scss/sections/settings/_operator-fee-history.scss', data.assets + "css/sections/settings/operator-fee-history.min.css"); //OPERATOR FEE
+            
 
         mix.sass('resources/scss/sections/enterprise_forms.scss', data.assets + "css/sections/enterprise_forms.min.css");
         mix.sass('resources/scss/sections/vehicle_forms.scss', data.assets + "css/sections/vehicle_forms.min.css");
