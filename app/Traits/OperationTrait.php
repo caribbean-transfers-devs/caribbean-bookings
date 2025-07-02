@@ -168,9 +168,11 @@ trait OperationTrait
     public function setOperationUnit($service)
     {
         if( $service->op_type == "TYPE_ONE" && $service->vehicle_one_name != null ){
-            return $service->vehicle_one_name." - ".$service->vehicle_name_one;
+            // return $service->vehicle_one_name." - ".$service->vehicle_name_one;
+            return $service->vehicle_one_name;
         }else if( $service->op_type == "TYPE_TWO" && $service->vehicle_two_name != null ){
-            return $service->vehicle_two_name." - ".$service->vehicle_name_two;
+            // return $service->vehicle_two_name." - ".$service->vehicle_name_two;
+            return $service->vehicle_two_name;
         }else{
             return "Unidad no seleccionada";
         }
