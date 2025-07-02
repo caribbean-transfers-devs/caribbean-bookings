@@ -3,6 +3,7 @@
         $links_dashboard = [];
         $links_finances = [];
         $links_reports = [];
+        $links_reportsSales_destination = [];
         $links_operations = [];
         $links_settings = [];
 
@@ -110,10 +111,25 @@
                 ];
             endif;            
             if(auth()->user()->hasPermission(98)):
+                $links_reportsSales_destination[] = [
+                    'name' => 'Cancun',
+                    'route' => route('reports.sales.cancun'),
+                    'active' => request()->routeIs('reports.sales.cancun'),
+                ];
+
+                $links_reportsSales_destination[] = [
+                    'name' => 'Los cabos',
+                    'route' => route('reports.sales.cabos'),
+                    'active' => request()->routeIs('reports.sales.cabos'),
+                ];                
                 $links_reports[] = [
+                    'type' => 'multiple',
+                    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>',
+                    'code' => 'sales',
                     'name' => 'Ventas',
-                    'route' => route('reports.sales'),
-                    'active' => request()->routeIs('reports.sales','reports.sales.action'),
+                    'route' => null,
+                    'active' => request()->routeIs('reports.sales.*'),
+                    'urls' => $links_reportsSales_destination
                 ];
             endif;
             if(auth()->user()->hasPermission(97)):
@@ -361,7 +377,7 @@
                         </li>  
                     @else
                         <li class="menu <?=( $link['active'] ? 'active' : '' )?>">
-                            <a href="#{{ $link['code'] }}" data-bs-toggle="collapse" aria-expanded="<?=( $link['active'] ? true : false )?>" class="dropdown-toggle">
+                            <a href="#{{ $link['code'] }}" data-bs-toggle="collapse" aria-expanded="<?=( $link['active'] ? 'true' : 'false' )?>" class="dropdown-toggle">
                                 <div class="">
                                     <?=strval($link['icon'])?>
                                     <span>{{ $link['name'] }}</span>
@@ -373,9 +389,25 @@
                             <ul class="collapse submenu list-unstyled <?=( $link['active'] ? 'show' : '' )?>" id="{{ $link['code'] }}" data-bs-parent="#accordionExample">
                                 @if ( isset($link['urls']) )
                                     @foreach ($link['urls'] as $url)
-                                    <li class="<?=( $url['active'] ? 'active' : '' )?>">
-                                        <a href="{{ $url['route'] }}"> {{ $url['name'] }} </a>
-                                    </li>
+                                        @if ( isset($url['type']) && $url['type'] == "multiple" )
+                                            <li class="<?=( $url['active'] ? 'active' : '' )?>">
+                                                <a href="#{{ $url['code'] }}" data-bs-toggle="collapse" aria-expanded="<?=( $url['active'] ? 'true' : 'false' )?>" class="dropdown-toggle collapsed">
+                                                    {{ $url['name'] }}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                                </a>
+                                                <ul class="list-unstyled sub-submenu collapse <?=( $url['active'] ? 'show' : '' )?>" id="{{ $url['code'] }}" data-bs-parent="#{{ $url['code'] }}">
+                                                    @foreach ($url['urls'] as $urls)
+                                                        <li class="<?=( $urls['active'] ? 'active' : '' )?>">
+                                                            <a href="{{ $urls['route'] }}"> {{ $urls['name'] }} </a>
+                                                        </li>                                                
+                                                    @endforeach
+                                                </ul>
+                                            </li>                                            
+                                        @else
+                                            <li class="<?=( $url['active'] ? 'active' : '' )?>">
+                                                <a href="{{ $url['route'] }}"> {{ $url['name'] }} </a>
+                                            </li>
+                                        @endif
                                     @endforeach
                                 @endif
                             </ul>

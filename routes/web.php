@@ -173,7 +173,9 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::match(['post','get'], '/reports/sales/stats/charts/commissions', [COMMISSIONS::class, 'chartsSales'])->name('reports.sales.stats.charts.commissions.get');
         Route::match(['post','get'], '/reports/operations/stats/charts/commissions', [COMMISSIONS::class, 'chartsOperations'])->name('reports.operations.stats.charts.commissions.get');
         ////////////
-        Route::match(['post','get'], '/reports/sales', [SALES::class, 'index'])->name('reports.sales'); //VENTAS
+        Route::match(['post','get'], '/reports/sales/cancun', [SALES::class, 'index'])->name('reports.sales.cancun'); //VENTAS
+        Route::match(['post','get'], '/reports/sales/cabos', [SALES::class, 'index'])->name('reports.sales.cabos'); //VENTAS
+        
         Route::match(['post','get'], '/reports/operations', [OPERATIONSS::class, 'index'])->name('reports.operations'); //OPERACIONES
         Route::match(['post','get'], '/reports/operations2', [DATAOPERATION::class, 'index'])->name('reports.operations2'); //OPERACIONES
 

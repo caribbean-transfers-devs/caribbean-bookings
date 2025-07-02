@@ -21,7 +21,7 @@ class SalesRepository
         7 => 'julio', 8 => 'agosto', 9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
     ];    
 
-    public function index($request)
+    public function index($request, $id)
     {
         ini_set('memory_limit', '-1'); // Sin límite
         set_time_limit(120); // Aumenta el límite a 60 segundos
@@ -56,11 +56,12 @@ class SalesRepository
             "refund_request_count" => ( isset($request->refund_request_count) ? $request->refund_request_count : NULL ),
         ];
         
-        $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end ';
+        $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.destination_id = :destination ';
         $havingConditions = []; $queryHaving = '';
         $queryData = [
-            'init' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
-            'end' => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+            'init'          => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ) . " 00:00:00",
+            'end'           => ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") ) . " 23:59:59",
+            'destination'   => $id
         ];       
 
         //TIPO DE SERVICIO is_round_trip
