@@ -248,6 +248,7 @@
                             <th class="text-center">FUE COTIZACIÓN</th>
                             <th class="text-center">CALIFICACIÓN</th>
                             <th class="text-center">COMISIÓNABLE</th>
+                            <th class="text-center">TIPO DE CANCELACIÓN</th>
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                             <th class="text-center">TIENE REEMBOLSO</th>
                             <th class="text-center">CUANTAS SOLICITUDES</th>
@@ -581,6 +582,13 @@
                                     <td class="text-center">
                                         @if ( $item->is_commissionable == 1 )
                                             <button class="btn btn-success" type="button">Sí</button>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <p>{{ $item->one_service_status == "CANCELLED" ? ( isset($item->one_cancellation_level) ? $item->one_cancellation_level : "SIN TIPO" ) : "" }}</p>
+                                        
+                                        @if ( $item->is_round_trip != 0 )
+                                            <p>{{ $item->two_service_status == "CANCELLED" ? ( isset($item->two_cancellation_level) ? $item->two_cancellation_level : "SIN TIPO" ) : "" }}</p>
                                         @endif
                                     </td>
                                     <td class="text-center">

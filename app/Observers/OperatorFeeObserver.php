@@ -48,7 +48,18 @@ class OperatorFeeObserver
                 $notes = [];
                 foreach ($newData as $field => $value) {
                     $oldValue = $oldData[$field] ?? null;
-                    $notes[] = "Campo '{$field}' cambiado de '{$oldValue}' a '{$value}'";
+
+                    // Manejo especial para campos que son arrays
+                    if ($field === 'zone_ids') {
+                        $notes[] = $this->formatZoneIdsChange($oldValue, $value);
+                    } else {
+                        $notes[] = sprintf(
+                            "Campo '%s' cambiado de '%s' a '%s'",
+                            $field,
+                            $this->formatValue($oldValue),
+                            $this->formatValue($value)
+                        );
+                    }                    
                 }
                 return implode("\n", $notes);
             case 'delete':
@@ -57,4 +68,52 @@ class OperatorFeeObserver
                 return 'Acción desconocida';
         }
     }
+
+    /**
+     * Formatea valores para el log de cambios
+     */
+    protected function formatValue($value)
+    {
+        if (is_array($value)) {
+            return json_encode($value);
+        }
+        
+        if (is_null($value)) {
+            return 'NULL';
+        }
+        
+        if ($value === '') {
+            return '(vacío)';
+        }
+        
+        return $value;
+    }
+
+    /**
+     * Genera un mensaje descriptivo para cambios en zone_ids
+     */
+    protected function formatZoneIdsChange($oldValue, $newValue)
+    {
+        $oldZones = is_array($oldValue) ? $oldValue : json_decode($oldValue, true) ?? [];
+        $newZones = is_array($newValue) ? $newValue : json_decode($newValue, true) ?? [];
+        
+        $added = array_diff($newZones, $oldZones);
+        $removed = array_diff($oldZones, $newZones);
+        
+        $messages = [];
+        
+        if (!empty($added)) {
+            $messages[] = 'Zonas agregadas: ' . implode(', ', $added);
+        }
+        
+        if (!empty($removed)) {
+            $messages[] = 'Zonas eliminadas: ' . implode(', ', $removed);
+        }
+        
+        if (empty($messages)) {
+            return 'Cambio en zonas asignadas (sin cambios visibles)';
+        }
+        
+        return 'Cambio en zonas asignadas: ' . implode('; ', $messages);
+    }    
 }

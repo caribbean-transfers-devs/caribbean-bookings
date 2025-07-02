@@ -64,12 +64,17 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex gap-3">
-                                        <a class="btn btn-primary" href="{{ route('config.types-cancellations.edit', [$cancellation->id]) }}">Editar</a>
-                                        <form action="{{ route('config.types-cancellations.destroy', $cancellation->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                                        </form>
+                                        @if ( auth()->user()->hasPermission(110) )
+                                            <a class="btn btn-primary" href="{{ route('config.types-cancellations.edit', [$cancellation->id]) }}">Editar</a>
+                                        @endif
+
+                                        @if ( auth()->user()->hasPermission(111) )
+                                            <form action="{{ route('config.types-cancellations.destroy', $cancellation->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

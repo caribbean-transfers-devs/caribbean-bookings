@@ -10,8 +10,13 @@ use App\Models\Zones;
 use App\Models\ZonesEnterprise;
 use App\Models\OperatorFee;
 
+//TRAITS
+use App\Traits\RoleTrait;
+
 class OperatorFeeController extends Controller
 {
+    use RoleTrait;
+        
     protected function getAllZones()
     {
         $zones = Zones::select('id', 'name')->get()->map(function($zone) {
@@ -43,6 +48,10 @@ class OperatorFeeController extends Controller
 
     public function index()
     {
+        if(!$this->hasPermission(129)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+
         // $fees = OperatorFee::all()->map(function($fee) {
         //     $fee->commission = $fee->calculateCommission();
         //     return $fee;
@@ -57,6 +66,13 @@ class OperatorFeeController extends Controller
         });
         
         return view('settings.operator-fees.index-v2', [
+            'breadcrumbs' => [
+                [
+                    "route" => "",
+                    "name" => "Listado de costos operativos",
+                    "active" => true
+                ]
+            ],
             'allZones' => $this->getAllZones(),
             'fees' => $fees
         ]);
@@ -64,13 +80,33 @@ class OperatorFeeController extends Controller
 
     public function create()
     {
+        if(!$this->hasPermission(130)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+
         return view('settings.operator-fees.new', [ 
+            'breadcrumbs' => [
+                [
+                    "route" => route("operator-fees.index"),
+                    "name" => "Listado de costos operativos",
+                    "active" => false
+                ],
+                [
+                    "route" => "",
+                    "name" => "Nuevo grupo",
+                    "active" => true
+                ]
+            ],
             'allZones' => $this->getAllZones() 
         ]);
     }
 
     public function store(Request $request)
     {
+        if(!$this->hasPermission(130)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'base_amount' => 'required|numeric|min:0',
@@ -97,11 +133,34 @@ class OperatorFeeController extends Controller
 
     public function edit(OperatorFee $operatorFee)
     {
-        return view('settings.operator-fees.new', [ 'allZones' => $this->getAllZones(), 'operatorFee' => $operatorFee ]);
+        if(!$this->hasPermission(131)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+
+        return view('settings.operator-fees.new', [ 
+            'breadcrumbs' => [
+                [
+                    "route" => route("operator-fees.index"),
+                    "name" => "Listado de costos operativos",
+                    "active" => false
+                ],
+                [
+                    "route" => "",
+                    "name" => "Editar grupo: ".$operatorFee->name,
+                    "active" => true
+                ]
+            ],
+            'allZones' => $this->getAllZones(), 
+            'operatorFee' => $operatorFee 
+        ]);
     }
 
     public function update(Request $request, OperatorFee $operatorFee)
     {
+        if(!$this->hasPermission(131)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'base_amount' => 'required|numeric|min:0',
@@ -125,6 +184,10 @@ class OperatorFeeController extends Controller
 
     public function show(OperatorFee $operatorFee)
     {
+        if(!$this->hasPermission(133)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+
         return view('settings.operator-fees.show', [
             'allZones'      => $this->getAllZones(),
             'operatorFee'   => $operatorFee, 
@@ -134,6 +197,10 @@ class OperatorFeeController extends Controller
 
     public function destroy(OperatorFee $operatorFee)
     {
+        if(!$this->hasPermission(132)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+
         $operatorFee->delete();
         return redirect()->route('operator-fees.index')
                          ->with('success', 'Tarifa eliminada exitosamente');

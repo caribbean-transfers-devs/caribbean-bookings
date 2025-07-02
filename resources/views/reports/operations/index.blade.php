@@ -306,6 +306,7 @@
                             <th class="text-center">MONEDA</th>
                             <th class="text-center">MÉTODO DE PAGO</th>
                             <th class="text-center">COMISIÓNABLE</th> 
+                            <th class="text-center">TIPO DE CANCELACIÓN</th>
                             <th class="text-center">MOTIVO DE CANCELACIÓN</th>
                             <th class="text-center">TIENE REEMBOLSO</th>
                             <th class="text-center">CUANTAS SOLICITUDES</th>
@@ -678,6 +679,17 @@
                                             <button class="btn btn-success" type="button">Sí</button>
                                         @endif
                                     </td>
+                                    <td class="text-center">
+                                        @if ( $operation->op_type == "TYPE_ONE"  )
+                                            @if ( $operation->one_service_status == "CANCELLED" )
+                                                {{ isset($operation->op_one_cancellation_level) ? $operation->op_one_cancellation_level : "SIN TIPO" }}
+                                            @endif
+                                        @else
+                                            @if ( $operation->two_service_status == "CANCELLED" )
+                                                {{ isset($operation->op_two_cancellation_level) ? $operation->op_two_cancellation_level : "SIN TIPO" }}
+                                            @endif                                            
+                                        @endif
+                                    </td>                                    
                                     <td class="text-center">
                                         @if ( ($operation->reservation_status == "CANCELLED" && auth()->user()->serviceStatus($operation, "no_translate") == "CANCELLED") || ($operation->reservation_status != "CANCELLED" && auth()->user()->serviceStatus($operation, "no_translate") == "CANCELLED") )
                                             @if ( !empty($operation->cancellation_reason) )

@@ -161,7 +161,7 @@ document.addEventListener('click', function (event) {
             headers: {
                 'Content-Type': 'application/json', // 👈 Asegura el tipo de contenido
                 'X-CSRF-TOKEN': csrfToken
-            },            
+            },
             body: JSON.stringify({ 
                 enterprise_id: _enterprise.value, 
                 destination_id: _destination.value, 

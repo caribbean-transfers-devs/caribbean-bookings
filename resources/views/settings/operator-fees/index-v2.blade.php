@@ -1,6 +1,3 @@
-@php
-    use App\Traits\RoleTrait;
-@endphp
 @extends('layout.app')
 @section('title') Listado De Costo Operativo @endsection
 
@@ -20,7 +17,7 @@
         <div class="card">
             <div class="card-header p-3">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Listado de grupos de costo operativo</h5>
+                    <h5 class="mb-0">Listado de grupos</h5>
                     <a href="{{ route('operator-fees.create') }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus me-1"></i> Nuevo grupo
                     </a>
@@ -77,19 +74,27 @@
                                 <td class="align-middle">${{ number_format($fee->commission, 2) }}</td>
                                 <td class="text-end pe-4 align-middle">
                                     <div class="btn-group">
-                                        <a href="{{ route('operator-fees.edit', $fee->id) }}" class="btn btn-sm btn-outline-secondary">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ route('operator-fees.show', $fee->id) }}" class="btn btn-sm btn-outline-info">
-                                            <i class="fas fa-history"></i>
-                                        </a>
-                                        <form action="{{ route('operator-fees.destroy', $fee->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Estás seguro?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        @if ( auth()->user()->hasPermission(131) )
+                                            <a href="{{ route('operator-fees.edit', $fee->id) }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>                                            
+                                        @endif
+
+                                        @if ( auth()->user()->hasPermission(133) )
+                                            <a href="{{ route('operator-fees.show', $fee->id) }}" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-history"></i>
+                                            </a>                                        
+                                        @endif
+
+                                        @if ( auth()->user()->hasPermission(132) )
+                                            <form action="{{ route('operator-fees.destroy', $fee->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Estás seguro?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

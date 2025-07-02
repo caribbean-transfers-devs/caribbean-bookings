@@ -425,14 +425,6 @@ let components = {
         }
     },
 
-    waitMeHide: function(_container = null){
-        _container = ( _container != null ? _container : 'body' );
-        components.waitMe({
-            container: _container,
-            event: 'hide'
-        })
-    },
-
     loadScreen: function(){
         __load_screen.classList.remove('d-none');
     },
@@ -611,7 +603,7 @@ let components = {
         }
     },
 
-    typesCancellations:         async function(){
+    typesCancellations:         function(){
         fetch(_LOCAL_URL + "/data/typesCancellations", {
             method: "GET",
             headers: {
@@ -620,7 +612,7 @@ let components = {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Error al obtener los tipos de cancelación");
+                return response.json().then(err => { throw err; });
             }
             return response.json();
         })

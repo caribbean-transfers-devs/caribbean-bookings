@@ -223,6 +223,9 @@ trait QueryTrait
                                     GROUP_CONCAT(DISTINCT it.pickup_to ORDER BY it.pickup_to ASC SEPARATOR ',') AS pickup_to,
                                     GROUP_CONCAT(DISTINCT it.one_service_status ORDER BY it.one_service_status ASC SEPARATOR ',') AS one_service_status,
                                     GROUP_CONCAT(DISTINCT it.two_service_status ORDER BY it.two_service_status ASC SEPARATOR ',') AS two_service_status,
+
+                                    GROUP_CONCAT(DISTINCT it.one_cancellation_level ORDER BY it.one_cancellation_level ASC SEPARATOR ',') AS one_cancellation_level,
+                                    GROUP_CONCAT(DISTINCT it.two_cancellation_level ORDER BY it.two_cancellation_level ASC SEPARATOR ',') AS two_cancellation_level,                                    
                                     SUM(it.passengers) as passengers,
                                     COALESCE(SUM(it.op_one_pickup_today) + SUM(it.op_two_pickup_today), 0) as is_today,
                                     COALESCE(SUM(it.op_one_pickup_tomorrow) + SUM(it.op_two_pickup_tomorrow), 0) as is_tomorrow,
@@ -397,6 +400,9 @@ trait QueryTrait
                                             GROUP_CONCAT(DISTINCT it.op_two_pickup ORDER BY it.op_two_pickup ASC SEPARATOR ',') AS pickup_to,
                                             GROUP_CONCAT(DISTINCT it.op_one_status ORDER BY it.op_one_status ASC SEPARATOR ',') AS one_service_status,
                                             GROUP_CONCAT(DISTINCT it.op_two_status ORDER BY it.op_two_status ASC SEPARATOR ',') AS two_service_status,
+
+                                            GROUP_CONCAT(DISTINCT it.op_one_cancellation_level ORDER BY it.op_one_cancellation_level ASC SEPARATOR ',') AS one_cancellation_level,
+                                            GROUP_CONCAT(DISTINCT it.op_two_cancellation_level ORDER BY it.op_two_cancellation_level ASC SEPARATOR ',') AS two_cancellation_level,                                            
                                             MAX(CASE WHEN DATE(it.op_one_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_one_pickup_today,
                                             MAX(CASE WHEN DATE(it.op_two_pickup) = DATE(rez.created_at) THEN 1 ELSE 0 END) AS op_two_pickup_today,
 
@@ -512,6 +518,8 @@ trait QueryTrait
                                 it.op_one_confirmation,
                                 it.op_one_operation_close,
                                 it.op_one_comments,
+                                it.op_one_cancelled_at,
+                                it.op_one_cancellation_level,
                                 it.vehicle_id_one,
                                 it.driver_id_one,
                                 zone_two.id as zone_two_id,
@@ -528,6 +536,8 @@ trait QueryTrait
                                 it.op_two_confirmation,
                                 it.op_two_operation_close,
                                 it.op_two_comments,
+                                it.op_two_cancelled_at,
+                                it.op_two_cancellation_level,
                                 it.vehicle_id_two,
                                 it.driver_id_two,
                                 it.is_open,
@@ -813,6 +823,8 @@ trait QueryTrait
                                 it.op_one_confirmation,
                                 it.op_one_operation_close,
                                 it.op_one_comments,
+                                it.op_one_cancelled_at,
+                                it.op_one_cancellation_level,
                                 it.vehicle_id_one,
                                 it.driver_id_one,                                
                                 zone_two.id as zone_two_id,
@@ -829,6 +841,8 @@ trait QueryTrait
                                 it.op_two_confirmation,
                                 it.op_two_operation_close,
                                 it.op_two_comments,
+                                it.op_two_cancelled_at,
+                                it.op_two_cancellation_level,
                                 it.vehicle_id_two,
                                 it.driver_id_two,
                                 it.is_open,
@@ -1036,6 +1050,7 @@ trait QueryTrait
                             ]);
     }
 
+    //NO SE ESTA UTILIZANDO POR NINGUN LADO
     public function queryConciliationStripe($query, $query2, $queryData){
         $bookings = DB::select("SELECT 
                                     rez.id AS reservation_id, 

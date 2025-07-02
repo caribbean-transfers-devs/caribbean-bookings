@@ -167,7 +167,7 @@
                         <th class="text-center">COSTO OPERATIVO</th>
                         <th class="text-center">ESTATUS DE SERVICIO</th>
                         <th class="text-center">VEHÍCULO</th>
-                        <th class="text-center">ESTATUS DE SERVICIO</th><!-- ESTATUS DE RESERVACION -->
+                        <th class="text-center">ESTATUS DE RESERVACIÓN</th><!-- ESTATUS DE RESERVACION -->
                         <th class="text-center">PAGO</th>
                         <th class="text-center">TOTAL</th>
                     </tr>
