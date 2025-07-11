@@ -24,7 +24,7 @@ class ConciliationRepository
     public function __construct()
     {
         $this->initPayPal();
-        $this->initStripe();        
+        $this->initStripe();
     }
 
     //PAYPAL

@@ -112,7 +112,7 @@
                             <div class="stat-label">Último Cambio</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value">{{ $logs->last()->user->name ?? 'Sistema' }}</div>
+                            <div class="stat-value">{{ $logs->sortByDesc('created_at')->first()->user->name ?? 'Sistema' }}</div>
                             <div class="stat-label">Creado por</div>
                         </div>
                         <div class="stat-item">

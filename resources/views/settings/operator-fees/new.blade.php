@@ -15,33 +15,33 @@
             $('.select2').select2({
                 placeholder: "Selecciona las zonas",
                 allowClear: true,
-                templateResult: formatZone,
-                templateSelection: formatZoneSelection
+                // templateResult: formatZone,
+                // templateSelection: formatZoneSelection
             });
             
-            function formatZone(zone) {
-                if (!zone.id) { return zone.text; }
+            // function formatZone(zone) {
+            //     if (!zone.id) { return zone.text; }
                 
-                var $zone = $(
-                    '<span><span class="zone-name">' + zone.text + '</span></span>'
-                );
+            //     var $zone = $(
+            //         '<span><span class="zone-name">' + zone.text + '</span></span>'
+            //     );
                 
-                return $zone;
-            }
+            //     return $zone;
+            // }
             
-            function formatZoneSelection(zone) {
-                if (!zone.id) { return zone.text; }
+            // function formatZoneSelection(zone) {
+            //     if (!zone.id) { return zone.text; }
                 
-                var type = $(zone.element).data('type');
-                var textParts = zone.text.split(' - ');
-                var name = textParts[0];
+            //     var type = $(zone.element).data('type');
+            //     var textParts = zone.text.split(' - ');
+            //     var name = textParts[0];
                 
-                return $(
-                    '<span class="badge bg-' + (type == 'internal' ? 'primary' : 'info') + ' me-1">' + 
-                        name + 
-                    '</span>'
-                );
-            }
+            //     return $(
+            //         '<span class="badge bg-' + (type == 'internal' ? 'primary' : 'info') + ' me-1">' + 
+            //             name + 
+            //         '</span>'
+            //     );
+            // }
         });
     </script>
 @endpush

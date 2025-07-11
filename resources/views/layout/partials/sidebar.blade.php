@@ -402,7 +402,7 @@
                                                         </li>                                                
                                                     @endforeach
                                                 </ul>
-                                            </li>                                            
+                                            </li>
                                         @else
                                             <li class="<?=( $url['active'] ? 'active' : '' )?>">
                                                 <a href="{{ $url['route'] }}"> {{ $url['name'] }} </a>
