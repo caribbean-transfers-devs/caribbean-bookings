@@ -43,6 +43,14 @@
                                 </div>
                             </div>
                             <div class="elements">
+                                <div class="rate_group">
+                                    <label class="form-label" for="bookingRategroupForm">Destino</label>
+                                    <select class="form-control mb-2" id="bookingRategroupForm" name="rate_group">
+                                        <option value="xLjDl18">Cancún</option>
+                                        <option value="uLKvL2025">Los cabos</option>
+                                    </select>
+                                </div>
+
                                 <div class="from">
                                     <label class="form-label" for="aff-input-from">Desde</label>
                                     <input class="form-control" type="text" name="from_name" id="aff-input-from">
