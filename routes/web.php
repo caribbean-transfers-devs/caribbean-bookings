@@ -209,8 +209,10 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/operation/history/get', [Operations::class, 'getHistory'])->name('operation.history.get');
         Route::get('/operation/data/customer/get', [Operations::class, 'getDataCustomer'])->name('operation.data.customer.get');
         Route::post('/operation/preassignments', [Operations::class, 'preassignments'])->name('operation.preassignments');
-        Route::post('/operation/closeOperation', [Operations::class, 'closeOperation'])->name('operation.close.operation');
-        Route::post('/operation/openOperation', [Operations::class, 'openOperation'])->name('operation.open.operation');
+
+        Route::match(['get', 'post'], '/operation/closeOperation', [Operations::class, 'closeOperation'])->name('operation.close.operation');
+        Route::match(['get', 'post'], '/operation/openOperation',  [Operations::class, 'openOperation'])->name('operation.open.operation');
+
         Route::put('/operation/preassignment', [Operations::class, 'preassignment'])->name('operation.preassignment');
         Route::post('/operation/capture/service', [Operations::class, 'createService'])->name('operation.capture.service');
         Route::get('/operation/board/exportExcel', [Operations::class, 'exportExcelBoard'])->name('operation.board.exportExcel');

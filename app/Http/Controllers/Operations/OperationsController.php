@@ -59,8 +59,8 @@ class OperationsController extends Controller
             "driver" => ( isset($request->driver) ? $request->driver : 0 ),
         ];
 
-        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
-        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
+        $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one   AND :init_date_two  AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND ( it.op_one_status != 'CANCELLED' OR  (it.op_one_status = 'CANCELLED' AND (it.op_one_cancellation_level = 'OPERATION' OR it.op_one_cancellation_level IS NULL)) ) ";
+        $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND ( it.op_two_status != 'CANCELLED' OR  (it.op_two_status = 'CANCELLED' AND (it.op_two_cancellation_level = 'OPERATION' OR it.op_two_cancellation_level IS NULL)) ) AND it.is_round_trip = 1 ";        
         $havingConditions = []; $queryHaving = "";
         $date = ( isset( $request->date ) ? $request->date : date("Y-m-d") );
         $queryData = [
@@ -128,7 +128,7 @@ class OperationsController extends Controller
         try {
             //DECLARAMOS VARIABLES
             $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one   AND :init_date_two  AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND ( it.op_one_status != 'CANCELLED' OR  (it.op_one_status = 'CANCELLED' AND (it.op_one_cancellation_level = 'OPERATION' OR it.op_one_cancellation_level IS NULL)) ) ";
-            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND ( it.op_two_status != 'CANCELLED' OR  (it.op_two_status = 'CANCELLED' AND (it.op_two_cancellation_level = 'OPERATION' OR it.op_two_cancellation_level IS NULL)) ) AND it.is_round_trip = 1 ";            
+            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND ( it.op_two_status != 'CANCELLED' OR  (it.op_two_status = 'CANCELLED' AND (it.op_two_cancellation_level = 'OPERATION' OR it.op_two_cancellation_level IS NULL)) ) AND it.is_round_trip = 1 ";
             $havingConditions = []; $queryHaving = "";
             $queryData = [
                 'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 00:00:00",
@@ -219,8 +219,8 @@ class OperationsController extends Controller
             }
 
             //DECLARAMOS VARIABLES
-            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
-            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
+            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one   AND :init_date_two  AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.op_one_operation_close = 0 AND ( it.op_one_status != 'CANCELLED' OR  (it.op_one_status = 'CANCELLED' AND (it.op_one_cancellation_level = 'OPERATION' OR it.op_one_cancellation_level IS NULL)) ) ";
+            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.op_two_operation_close = 0 AND ( it.op_two_status != 'CANCELLED' OR  (it.op_two_status = 'CANCELLED' AND (it.op_two_cancellation_level = 'OPERATION' OR it.op_two_cancellation_level IS NULL)) ) AND it.is_round_trip = 1 ";
             $havingConditions = []; $queryHaving = "";
             $queryData = [
                 'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 00:00:00",
@@ -229,22 +229,28 @@ class OperationsController extends Controller
     
             //CONSULTAMOS SERVICIOS
             $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
-            $errors = [];
-    
-            DB::beginTransaction();
+            if(empty($items)){
+                return response()->json([
+                    'status'    => 'info',
+                    'success'   => true,
+                    'message'   => 'La operación ya se encuentra cerrada correctamente',
+                ], 200);
+            }
+
+            $errors = $this->validateServiceQualification($items);
+            if(!empty($errors)){
+                return response()->json([
+                    'status'    => 'error',
+                    'success'   => false,
+                    'message'   => 'La operación no pudo cerrarse ya que hay servicios que no están calificados correctamente.',
+                    'items'      => $errors
+                ], 200);
+            }
 
             //RECORREMOS LOS SERVICIOS PARA PODER REALISAR LA PREASIGNACION
             if( sizeof($items)>=1 ):
                 foreach($items as $key => $item):
                     $service = ReservationsItem::find($item->id);
-
-                    if( $item->op_type == "TYPE_ONE" && ( $item->one_service_status == "PENDING" || ( $item->one_service_status == "COMPLETED" && $item->one_service_operation_status != "OK" ) ) ){
-                        array_push($errors, $item->code);
-                    }
-
-                    if( $item->op_type == "TYPE_TWO" && ( $item->two_service_status == "PENDING" || ( $item->two_service_status == "COMPLETED" && $item->two_service_operation_status != "OK" ) ) ){
-                        array_push($errors, $item->code);
-                    }
                     
                     if( $item->op_type == "TYPE_ONE" ){
                         $service->op_one_operation_close = 1;
@@ -258,30 +264,12 @@ class OperationsController extends Controller
                 endforeach;
             endif;
 
-            if( $errors ){
-                return response()->json([
-                    'errors' => [
-                        'code'      => 'internal_server',
-                        'message'   => "No se pudo cerrar operación hay servicios mal calificados"
-                    ],
-                    'status'        => 'error',
-                    'success'       => false,
-                    'message'       => "No se pudo cerrar operación hay servicios mal calificados",
-                    'data'          => $errors
-                ], 500);                
-            }
-
-            DB::commit();
-
             return response()->json([
                 'status'    => 'success',
                 'success'   => true,
                 'message'   => 'Se cerro la operación correctamente',
-                'data'      => []
             ], 200);
         } catch (Exception $e) {
-            DB::rollBack();
-
             return response()->json([
                 'errors' => [
                     'code' => 'internal_server',
@@ -292,6 +280,23 @@ class OperationsController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function validateServiceQualification($items): array
+    {
+        $errors = [];
+
+        foreach($items as $key => $item):
+            if( $item->op_type == "TYPE_ONE" && ( $item->one_service_status == "PENDING" || ( $item->one_service_status == "COMPLETED" && $item->one_service_operation_status != "OK" ) ) ){
+                array_push($errors, $item->code);
+            }
+
+            if( $item->op_type == "TYPE_TWO" && ( $item->two_service_status == "PENDING" || ( $item->two_service_status == "COMPLETED" && $item->two_service_operation_status != "OK" ) ) ){
+                array_push($errors, $item->code);
+            }
+        endforeach;
+
+        return $errors;
     }
 
     public function openOperation(Request $request){
@@ -310,8 +315,8 @@ class OperationsController extends Controller
             }
 
             //DECLARAMOS VARIABLES
-            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 ";
-            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.is_round_trip = 1 ";
+            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one   AND :init_date_two  AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.op_one_operation_close = 1 AND ( it.op_one_status != 'CANCELLED' OR  (it.op_one_status = 'CANCELLED' AND (it.op_one_cancellation_level = 'OPERATION' OR it.op_one_cancellation_level IS NULL)) ) ";
+            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_duplicated = 0 AND rez.open_credit = 0 AND rez.is_quotation = 0 AND it.op_two_operation_close = 1 AND ( it.op_two_status != 'CANCELLED' OR  (it.op_two_status = 'CANCELLED' AND (it.op_two_cancellation_level = 'OPERATION' OR it.op_two_cancellation_level IS NULL)) ) AND it.is_round_trip = 1 ";
             $havingConditions = []; $queryHaving = "";
             $queryData = [
                 'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 00:00:00",
@@ -320,6 +325,13 @@ class OperationsController extends Controller
     
             //CONSULTAMOS SERVICIOS
             $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
+            if(empty($items)){
+                return response()->json([
+                    'status'    => 'info',
+                    'success'   => true,
+                    'message'   => 'No hay operación que abrir',
+                ], 200);                
+            }            
     
             //RECORREMOS LOS SERVICIOS PARA PODER REALISAR LA PREASIGNACION
             if( sizeof($items)>=1 ):
@@ -360,9 +372,6 @@ class OperationsController extends Controller
         try {
             DB::beginTransaction();
             //DECLARAMOS VARIABLES
-            // $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 ";
-            // $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND rez.is_cancelled = 0 AND rez.is_duplicated = 0 AND it.is_round_trip = 1 ";
-
             $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND it.op_one_preassignment IS NOT NULL ";
             $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND it.op_two_preassignment IS NOT NULL AND it.is_round_trip = 1 ";            
 

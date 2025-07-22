@@ -731,14 +731,24 @@ document.addEventListener("DOMContentLoaded", function() {
                         return response.json();
                     })
                     .then(data => {
-                        console.log(data);
+                        // console.log(data);
+
+                        let message = data.message;
+                        if(data.hasOwnProperty('items') && data.items.length > 0){
+                            data.items.forEach(item => {
+                                message += `\n<strong>${item}</strong>`; // Reemplaza nombrePropiedad con la real
+                            });
+                        }
+
                         Swal.fire({
                             icon: data.status,
-                            html: data.message,
+                            html: message,
                             allowOutsideClick: false,
                             allowEscapeKey: false, // Esta línea evita que se cierre con ESC
                         }).then(() => {
-                            location.reload();
+                            if( data.status == "success" ){
+                                location.reload();
+                            }                            
                         });                        
                     })
                     .catch(error => {
