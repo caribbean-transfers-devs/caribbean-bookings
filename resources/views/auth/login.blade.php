@@ -128,7 +128,7 @@
 
     <script src="{{ mix('/assets/js/core/core.min.js') }}"></script>
     <script src="{{ mix('/assets/js/panel/panel_custom.min.js') }}"></script>	
-	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+	{{-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> --}}
     <script>
         function onSubmit(token) {
             document.getElementById("log-in-form").submit();
