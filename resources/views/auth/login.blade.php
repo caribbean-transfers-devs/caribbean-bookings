@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="csrf-token" content="{{ csrf_token() }}">
     
     <title>Bookings</title>
 	<meta name="description" content="Caribbean Transfers | Login">
@@ -126,7 +127,7 @@
     </div>
 
     <script src="{{ mix('/assets/js/core/core.min.js') }}"></script>
-    <script src="{{ mix('/assets/js/panel/panel.min.js') }}"></script>	
+    <script src="{{ mix('/assets/js/panel/panel_custom.min.js') }}"></script>	
 	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script>
         function onSubmit(token) {

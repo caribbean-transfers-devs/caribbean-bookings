@@ -1,5 +1,5 @@
 // DECLARACIÓN DE VARIABLES
-let __typesCancellations     = {};
+let __typesCancellations    = {};
 const csrfToken             = document.querySelector('meta[name="csrf-token"]').content;
 const _LOCAL_URL            = window.location.origin;
 const language              = document.documentElement.lang;
