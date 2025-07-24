@@ -111,6 +111,10 @@ Route::middleware(['guest','Debug'])->group(function () {
     Route::post('login', [LoginController::class, 'check'])->name('login');
 });
 
+        Route::get('/ejemplo-url', function () {
+            echo "hola como estas";
+        });
+
 //Meter al middleware para protejer estas rutas...
 Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -393,8 +397,4 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     Route::post('/action/deleteItem',                                               [ACTIONS_RESERVATION::class, 'deleteItem'])->name('delete.booking.item');
     Route::post('/action/confirmService',                                           [ACTIONS_RESERVATION::class, 'confirmService'])->name('update.service.confirm');
     Route::post('/action/updateServiceUnlock',                                      [ACTIONS_RESERVATION::class, 'updateServiceUnlock'])->name('update.service.unlock');
-
-        Route::get('/ejemplo-url', function () {
-            echo "hola como estas";
-        });
 });
