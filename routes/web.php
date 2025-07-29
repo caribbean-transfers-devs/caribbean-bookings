@@ -124,6 +124,8 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
     //BOTS
         //SET RATES MASTER TOUR
         Route::get('/set/rates/MasterTour', [MasterToursController::class, 'ListServicesMasterTour'])->name('list.services.master.tours')->withoutMiddleware(['auth']);
+        Route::match(['get', 'post'], '/set/schedules', [SCHEDULES::class, 'botSchedules'])->name('schedules.bot');
+        Route::match(['get', 'post'], '/set/processSchedulesForToday', [SCHEDULES::class, 'processSchedulesForToday'])->name('schedules.processForToday');
 
         //PAYPAL
         Route::get('/bot/conciliation/paypal',                                                  [CONCILIATION::class, 'PayPalPayments'])->name('bot.paypal')->withoutMiddleware(['auth']);
@@ -309,9 +311,13 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::put('/schedules/{schedule}',                                             [SCHEDULES::class, 'update'])->name('schedules.update');
         Route::delete('/schedules/{schedule}',                                          [SCHEDULES::class, 'destroy'])->name('schedules.destroy');
 
+        Route::post('/schedules/reload/schedules',                                      [SCHEDULES::class, 'reloadSchedules'])->name('schedules.reload');
+
+        Route::post('/schedules/timeCheckIn',                                           [SCHEDULES::class, 'timeCheckIn'])->name('schedules.timeCheckIn');
         Route::post('/schedules/timeCheckout',                                          [SCHEDULES::class, 'timeCheckout'])->name('schedules.timecheckout');
         Route::post('/schedules/unit',                                                  [SCHEDULES::class, 'unit'])->name('schedules.unit');
         Route::post('/schedules/driver',                                                [SCHEDULES::class, 'driver'])->name('schedules.driver');
+        Route::post('/schedules/status/driver',                                         [SCHEDULES::class, 'statusDriver'])->name('schedules.status.driver');
         Route::post('/schedules/comments',                                              [SCHEDULES::class, 'comments'])->name('schedules.comments');
         Route::post('/schedules/status',                                                [SCHEDULES::class, 'status'])->name('schedules.status');
 

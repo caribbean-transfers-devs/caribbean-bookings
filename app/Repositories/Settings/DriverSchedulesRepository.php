@@ -15,6 +15,7 @@ use App\Traits\QueryTrait;
 
 //MODELS
 use App\Models\DriverSchedule;
+use App\Models\Vehicle;
 
 class DriverSchedulesRepository
 {
@@ -179,6 +180,62 @@ class DriverSchedulesRepository
         }
     }
 
+    public function timeCheckIn($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|integer',
+            'value' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $schedule = DriverSchedule::find($request->code);
+
+        if (!$schedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Horario no encontrado'
+                ],
+                'status' => 'error',
+                'message' => 'Horario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }        
+
+        try {
+            DB::beginTransaction();             
+
+            $schedule->check_in_time = $request->value;
+    
+            $schedule->save();
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo horario de salida correctamente',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function timeCheckout($request)
     {
         $validator = Validator::make($request->all(), [
@@ -301,8 +358,79 @@ class DriverSchedulesRepository
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     public function driver($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|integer',
+            'value' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $date = date('Y-m-d');
+        $duplicateSchedule = DriverSchedule::where('date', $date)->where('driver_id', $request->value)
+                                                                 ->where('is_open', 1)->first();
+
+        if ($duplicateSchedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'duplicate_schedule', 
+                    'message' => "Ya esta asignado este conductor a otra unidad."  
+                ],
+                'status' => 'error',
+                'message' => "Ya esta asignado este conductor a otra unidad.",
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }        
+
+        $schedule = DriverSchedule::find($request->code);
+
+        if (!$schedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Horario no encontrado'
+                ],
+                'status' => 'error',
+                'message' => 'Horario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }        
+
+        try {
+            DB::beginTransaction();             
+
+            $schedule->driver_id = $request->value ?? NULL;
+    
+            $schedule->save();
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo estatus correctamente',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
+    
+    public function statusDriver($request)
     {
         $validator = Validator::make($request->all(), [
             'code' => 'required|integer',
@@ -443,19 +571,52 @@ class DriverSchedulesRepository
                 'status' => 'error',
                 'message' => 'Horario no encontrado'
             ], Response::HTTP_NOT_FOUND);
+        }
+
+        if(empty($schedule->check_out_time)){
+            return response()->json([
+                'errors' => [
+                    'code' => 'EMPTY_TIME_OUT',
+                    'message' => 'No puede cerrar el turno, falta que pase 8 hr para obtener el horario de salida'
+                ],
+                'status' => 'error',
+                'message' => 'No puede cerrar el turno, falta que pase 8 hr para obtener el horario de salida'
+            ], Response::HTTP_NOT_FOUND);            
         }        
 
         try {
-            DB::beginTransaction();             
+            DB::beginTransaction();
+            
+            // Obtener la hora actual del servidor
+            $now = Carbon::now();
+            $currentTime = $now->format('H:i');
 
-            $schedule->is_open = $request->status ?? 0;
+            // Calcular horas extras
+            $checkOutTime = Carbon::parse($schedule->date . ' ' . $schedule->check_out_time);
+            $endCheckOutTime = Carbon::parse($schedule->date . ' ' . $currentTime);
+
+            // Si la hora de fin es menor que la de check-out (día siguiente)
+            if ($endCheckOutTime->lt($checkOutTime)) {
+                $endCheckOutTime->addDay();
+            }
+
+            $extraHoursInSeconds = $checkOutTime->diffInSeconds($endCheckOutTime);
+
+            // Convertir segundos a formato time (H:i:s)
+            $extraHours = gmdate('H:i', $extraHoursInSeconds);
     
-            $schedule->save();
+            // Actualizar el registro
+            $schedule->update([
+                'end_check_out_time' => $currentTime,
+                'extra_hours' => $extraHours,
+                'is_open' => $request->status ?? 0,
+                'updated_at' => $now,
+            ]);
 
             DB::commit();
             return response()->json([
                 'status' => 'success',
-                'message' => 'Se actualizo estatus correctamente',
+                'message' => 'Turno cerrado correctamente',
             ], Response::HTTP_OK);
         } catch (Exception $e) {
             DB::rollBack();
@@ -467,6 +628,155 @@ class DriverSchedulesRepository
                 'status' => 'error',                
                 'message' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+    //BOTS
+    public function botSchedules($request)
+    {
+        try {
+            $date = ( isset($request->date) ? $request->date : date('Y-m-d') );
+            $schedules = DriverSchedule::where('date', $date)->get();
+            $vehicles = Vehicle::where('status', 1)->get();
+
+            if($schedules->count() > 0){
+                return response()->json([
+                    'errors' => [
+                        'code' => 'required_params', 
+                        'message' =>  "ya hay horarios para esa fecha" 
+                    ],
+                    'status' => 'error',
+                    'message' => "ya hay horarios para esa fecha",
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);                
+            }
+
+            if($vehicles->count() == 0){
+                return response()->json([
+                    'errors' => [
+                        'code' => 'required_params', 
+                        'message' =>  "No hay vehiculos para crear horarios" 
+                    ],
+                    'status' => 'error',
+                    'message' => "No hay vehiculos para crear horarios",
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);                    
+            }
+
+            foreach ($vehicles as $key => $vehicle) {
+                $schedule = DriverSchedule::where('date', $date)->where('vehicle_id', $vehicle->id)->first();
+                if(empty($schedule)){
+                    $schedule = new DriverSchedule();
+                    $schedule->date = $date;
+                    $schedule->vehicle_id = $vehicle->id ?? NULL;
+                    $schedule->save();                    
+                }
+            }
+                        
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se crearon los horarios correctamente',
+            ], Response::HTTP_OK);                        
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function reloadSchedules($request)
+    {
+        try {
+            $date = ( isset($request->date) ? $request->date : date('Y-m-d') );
+            $schedules = DriverSchedule::where('date', $date)->where('is_open', 0)->get();
+
+            if($schedules->count() == 0){
+                return response()->json([
+                    'errors' => [
+                        'code' => 'empty_params', 
+                        'message' =>  "No hay horarios para crear" 
+                    ],
+                    'status' => 'info',
+                    'message' => "No hay horarios para crear",
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);                
+            }
+
+            foreach ($schedules as $key => $vehicle) {
+                $schedule = new DriverSchedule();
+                $schedule->date = $date;
+                $schedule->vehicle_id = $vehicle->vehicle_id ?? NULL;
+                $schedule->save();
+            }
+                        
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se crearon los horarios correctamente',
+            ], Response::HTTP_OK);                        
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }        
+    }
+
+    public function processSchedulesForToday()
+    {
+        try {
+            $today = now()->toDateString();
+            
+            // Obtener todos los registros del día actual que tengan check_in_time pero no check_out_time
+            $schedules = DriverSchedule::where('date', $today)
+                ->where('is_open', 1)
+                ->whereNotNull('check_in_time')
+                ->whereNull('check_out_time')
+                ->get();
+
+            foreach ($schedules as $schedule) {
+                $this->processSchedule($schedule);
+            }
+
+            // return $schedules->count();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se crearon los horarios correctamente',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    protected function processSchedule(DriverSchedule $schedule)
+    {
+        $checkInTime = Carbon::parse($schedule->date . ' ' . $schedule->check_in_time);
+        $now = now();
+
+        // Calcular la diferencia en horas
+        $hoursWorked = $checkInTime->diffInHours($now);
+
+        // Si han pasado 8 horas o más, actualizar el check_out_time
+        if ($hoursWorked >= 8) {
+            $schedule->update([
+                'check_out_time' => $checkInTime->copy()->addHours(8)->format('H:i'),
+                'updated_at' => $now,
+            ]);
         }
     }    
 }

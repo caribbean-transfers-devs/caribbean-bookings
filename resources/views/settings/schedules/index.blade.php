@@ -1,7 +1,7 @@
 @php
-    use App\Traits\RoleTrait;
     use Carbon\Carbon;
     Carbon::setLocale('es');
+    $drivers = auth()->user()->DriversSchedules();
 @endphp
 @extends('layout.app')
 @section('title') Empresas @endsection
@@ -17,6 +17,7 @@
 
 @section('content')
     @php
+        // 'url' => route('schedules.create')
         $buttons = array(
             array(  
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="filter" class=""><path fill="" fill-rule="evenodd" d="M5 7a1 1 0 000 2h14a1 1 0 100-2H5zm2 5a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm3 4a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg> Filtrar',
@@ -28,9 +29,8 @@
                 )
             ),            
             array(  
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Agregar Horario de conductor',
-                'className' => 'btn btn-primary ',
-                'url' => route('schedules.create')
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Generar nuevos horarios',
+                'className' => 'btn btn-primary reloadSchedules',                
             )
         );
     @endphp
@@ -64,7 +64,7 @@
                             <th class="text-center">Fecha</th>
                             <th class="text-center">Hora entrada</th>
                             <th class="text-center">Hora salida</th>
-                            <th class="text-center">Hora salida/final</th>
+                            {{-- <th class="text-center">Hora salida/final</th> --}}
                             <th class="text-center">Horas extras</th>
                             <th class="text-center">Unidad</th>
                             <th class="text-center">Estatus unidad</th>
@@ -72,7 +72,7 @@
                             <th class="text-center">Estatus conductor</th>
                             <th class="text-center">Observaciónes</th>
                             <th class="text-center">Estado</th>
-                            <th></th>
+                            {{-- <th></th> --}}
                         </tr>
                     </thead>
                     <tbody>
@@ -80,9 +80,24 @@
                             {{-- @dump($schedule->toArray()) --}}
                             <tr>
                                 <td class="text-center">{{ Carbon::parse($schedule->date)->translatedFormat('d F Y') }}</td>
-                                <td class="text-center">{{ Carbon::parse($schedule->check_in_time)->format('H:i A') }}</td>
-                                <td class="text-center"><span class="badge badge-success w-100">{{ Carbon::parse($schedule->check_out_time)->format('H:i A') }}</span></td>
                                 <td class="text-center">
+                                    @if ( $schedule->is_open == 0 )
+                                        @php
+                                            $check_in_time = Carbon::parse($schedule->check_in_time)->format('H:i A');
+                                        @endphp
+                                        {{ $schedule->check_in_time != NULL ? $schedule->check_in_time : 'SIN HORE DE ENTRADA' }}
+                                    @else
+                                        <input type="text" name="check_in_time" class="form-control check_in_time" placeholder="Hora de entrada" value="{{ isset($schedule->check_in_time) ? $schedule->check_in_time : '' }}" data-code="{{ $schedule->id }}">                                        
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @php
+                                        $check_out_time = Carbon::parse($schedule->check_out_time)->format('H:i A');
+                                    @endphp                                    
+                                    <?=( $schedule->check_out_time != NULL ? '<span class="badge badge-success w-100">'.$check_out_time.'</span>' : 'SIN HORA DE SALIDA'  )?>
+                                </td>
+
+                                {{-- <td class="text-center">
                                     @if ( $schedule->is_open == 0 )
                                         @php
                                             $time = Carbon::parse($schedule->end_check_out_time)->format('H:i A');
@@ -91,13 +106,15 @@
                                     @else
                                         <input type="text" name="end_check_out_time" class="form-control end_check_out_time" placeholder="Hora de salida final" value="{{ isset($schedule->end_check_out_time) ? $schedule->end_check_out_time : '' }}" data-code="{{ $schedule->id }}">
                                     @endif
-                                </td>
+                                </td> --}}
+
                                 <td class="text-center">
                                     @php
                                         $time = Carbon::parse($schedule->extra_hours)->format('H:i');
                                     @endphp
-                                    <?=( $schedule->extra_hours != NULL && $schedule->extra_hours != "00:00:00" ? '<span class="badge badge-success w-100">'.$time.'</span>' : 'SIN HORARIO' )?>
+                                    <?=( $schedule->extra_hours != NULL && $schedule->extra_hours != "00:00:00" ? '<span class="badge badge-success w-100">'.$time.'</span>' : 'SIN HORAS EXTRAS' )?>
                                 </td>
+
                                 <td class="text-center"><button class="btn btn-dark w-100">{{ isset($schedule->vehicle->name) ? $schedule->vehicle->name : 'SIN UNIDAD' }} - {{ isset($schedule->vehicle->destination_service->name) ? $schedule->vehicle->destination_service->name : 'SIN NOMBRE DE VEHÍCULO' }} - {{ isset($schedule->vehicle->enterprise->names) ? $schedule->vehicle->enterprise->names : 'SIN NOMBRE DE EMPRESA' }}</button></td>
                                 <td class="text-center">
                                     @if ( $schedule->is_open == 0 )
@@ -112,8 +129,22 @@
                                             <option {{ isset($schedule->status_unit) && $schedule->status_unit == "T" ? 'selected' : '' }} value="T">TALLER</option>
                                         </select>
                                     @endif
-                                </td>                                
-                                <td class="text-center">{{ isset($schedule->driver->names) ? $schedule->driver->names : 'SIN NOMBRE DE CONDUCTOR' }} {{ isset($schedule->driver->surnames) ? $schedule->driver->surnames : 'SIN APELLIDO DE CONDUCTOR' }}</td>
+                                </td> 
+
+                                <td class="text-center">
+                                    @if ( $schedule->is_open == 0 )
+                                        {{ isset($schedule->driver->names) ? $schedule->driver->names : 'SIN NOMBRE DE CONDUCTOR' }} {{ isset($schedule->driver->surnames) ? $schedule->driver->surnames : 'SIN APELLIDO DE CONDUCTOR' }}
+                                    @else
+                                        <select class="form-control schedule_driver" name="driver_id" data-code="{{ $schedule->id }}">
+                                            <option value="0">Selecciona un conductor</option>
+                                            @if ( isset($drivers) && count($drivers) >= 1 )
+                                                @foreach ($drivers as $driver)
+                                                    <option {{ isset($schedule->driver_id) && $schedule->driver_id == $driver->id ? 'selected' : '' }} value="{{ $driver->id }}">{{ $driver->names }} {{ $driver->surnames }} - {{ $driver->enterprise->names }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>                                        
+                                    @endif                                    
+                                </td>
                                 <td class="text-center">
                                     @if ( $schedule->is_open == 0 )
                                         <?=auth()->user()->renderStatusSchedulesDriver($schedule->status)?>
@@ -130,6 +161,7 @@
                                         </select>
                                     @endif
                                 </td>
+
                                 <td class="text-center">
                                     @if ( $schedule->is_open == 0 )
                                         {{ $schedule->observations }}
@@ -148,13 +180,13 @@
                                             </button>
                                             <div class="dropdown-menu" style="">
                                                 <a href="javascript:void(0);" class="dropdown-item statusSchedule" data-code="{{ $schedule->id }}" data-status="1" >ABIERTO</a>
-                                                <a href="javascript:void(0);" class="dropdown-item statusSchedule" data-code="{{ $schedule->id }}" data-status="2" >OTRO HORARIO</a>
+                                                {{-- <a href="javascript:void(0);" class="dropdown-item statusSchedule" data-code="{{ $schedule->id }}" data-status="2" >OTRO HORARIO</a> --}}
                                                 <a href="javascript:void(0);" class="dropdown-item statusSchedule" data-code="{{ $schedule->id }}" data-status="0" >CERRADO</a>
                                             </div>
                                         </div>
                                     @endif                                    
                                 </td>
-                                <td class="text-center">
+                                {{-- <td class="text-center">
                                     <div class="d-flex flex-column gap-3">
                                         @if ( $schedule->is_open == 1 )
                                             <a class="btn btn-primary" href="{{ route('schedules.edit', [$schedule->id]) }}" style="font-size: 13px;">Editar</a>    
@@ -168,7 +200,7 @@
                                             </form>                                            
                                         @endif
                                     </div>
-                                </td>
+                                </td> --}}
                             </tr>
                         @endforeach
                     </tbody>

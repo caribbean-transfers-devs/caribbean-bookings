@@ -32,6 +32,8 @@ const __date_schedule = document.getElementById('date_schedule');
 const __check_in = document.getElementById('check_in_time');
 const __check_out = document.getElementById('check_out_time');
 const __end_check_out = document.getElementById('end_check_out_time');
+
+const options_check_in = document.querySelectorAll('.check_in_time');
 const options_check_out = document.querySelectorAll('.end_check_out_time');
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -55,9 +57,67 @@ document.addEventListener("DOMContentLoaded", function() {
         options_check_out.forEach(item => {
            schedules.calendarFilter(item, { enableTime: true, noCalendar: true, dateFormat: "H:i", altFormat: "h:i K", defaultDate: item.value ?? '', minDate: null }); 
         });
+    }    
+
+    if( options_check_in.length ){
+        options_check_in.forEach(item => {
+           schedules.calendarFilter(item, { enableTime: true, noCalendar: true, dateFormat: "H:i", altFormat: "h:i K", defaultDate: item.value ?? '', minDate: null }); 
+        });
     }
 
     document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('reloadSchedules')) {
+            event.preventDefault();        
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se crean los nuevos horarios.",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('/schedules/reload/schedules', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                // body: JSON.stringify({
+                //     code: code,
+                //     status: status
+                // })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    text: 'Estatus actualizado con exito.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }                    
+                });
+            })
+            .catch(error => {
+                Swal.fire(
+                    '¡ERROR!',
+                    error.message || 'Ocurrió un error',
+                    'error'
+                );
+            });            
+        }
+
         if (event.target.classList.contains('statusSchedule')) {
             event.preventDefault();
             
@@ -115,6 +175,60 @@ document.addEventListener("DOMContentLoaded", function() {
     })
     
     document.addEventListener('change', function (event) {
+        if (event.target.classList.contains('check_in_time')) {
+            const target = event.target;
+            const code = target.dataset.code;
+            const value = target.value;
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se actualizan horario.",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('/schedules/timeCheckIn', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    code: code,
+                    value: value                    
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    text: 'Hora actualizada con exito.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }                    
+                });
+            })
+            .catch(error => {
+                Swal.fire(
+                    '¡ERROR!',
+                    error.message || 'Ocurrió un error',
+                    'error'
+                );
+            });
+        }
+
         if (event.target.classList.contains('end_check_out_time')) {
             const target = event.target;
             const code = target.dataset.code;
@@ -222,6 +336,60 @@ document.addEventListener("DOMContentLoaded", function() {
                 );
             });            
         }
+
+        if (event.target.classList.contains('schedule_driver')) {
+            const target = event.target;
+            const code = target.dataset.code;
+            const value = target.value;
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se asigna el conductor.",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            fetch('/schedules/driver', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    code: code,
+                    value: value                    
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    text: 'Estatus de conductor actualizado con exito.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }                    
+                });
+            })
+            .catch(error => {
+                Swal.fire(
+                    '¡ERROR!',
+                    error.message || 'Ocurrió un error',
+                    'error'
+                );
+            });              
+        }
         
         if (event.target.classList.contains('schedule_status_driver')) {
             const target = event.target;
@@ -238,7 +406,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
             
-            fetch('/schedules/driver', {
+            fetch('/schedules/status/driver', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

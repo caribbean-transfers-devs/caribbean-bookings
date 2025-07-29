@@ -74,6 +74,17 @@ class DriverSchedulesController extends Controller
         return $this->DriverSchedulesRepository->destroy($request, $schedule);
     }
 
+    
+    //ESTO NOS PERMITE ACTUALIZAR CIERTOS VALORES DE MANERA DIRECTA
+    public function reloadSchedules(Request $request)
+    {
+        return $this->DriverSchedulesRepository->reloadSchedules($request);
+    }
+
+    public function timeCheckIn(Request $request)
+    {
+        return $this->DriverSchedulesRepository->timeCheckIn($request);
+    }
 
     public function timeCheckout(Request $request)
     {
@@ -84,10 +95,17 @@ class DriverSchedulesController extends Controller
     {
         return $this->DriverSchedulesRepository->unit($request);
     }
-    
+
+    //ASIGNA CONDUCTOR
     public function driver(Request $request)
     {
         return $this->DriverSchedulesRepository->driver($request);
+    }
+
+    //CAMBIA EL ESTATUS DEL CONDUCTOR
+    public function statusDriver(Request $request)
+    {
+        return $this->DriverSchedulesRepository->statusDriver($request);
     }
 
     public function comments(Request $request)
@@ -98,5 +116,16 @@ class DriverSchedulesController extends Controller
     public function status(Request $request)
     {
         return $this->DriverSchedulesRepository->status($request);
+    }
+
+    //ESTA ACCION LA REALIZA EL BOT
+    public function botSchedules(Request $request)
+    {
+        return $this->DriverSchedulesRepository->botSchedules($request);
+    }
+
+    public function processSchedulesForToday(Request $request)
+    {
+        return $this->DriverSchedulesRepository->processSchedulesForToday($request);
     }    
 }
