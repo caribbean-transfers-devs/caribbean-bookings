@@ -93,7 +93,7 @@
                                         @php
                                             $check_in_time = Carbon::parse($schedulemain->check_in_time)->format('H:i A');
                                         @endphp
-                                        {{ $schedule->check_in_time != NULL ? $schedulemain->check_in_time : 'SIN HORE DE ENTRADA' }}
+                                        {{ $schedulemain->check_in_time != NULL ? $schedulemain->check_in_time : 'SIN HORE DE ENTRADA' }}
                                     @else
                                         <input type="text" name="check_in_time" class="form-control check_in_time" placeholder="Hora de entrada" value="{{ isset($schedulemain->check_in_time) ? $schedulemain->check_in_time : '' }}" data-code="{{ $schedulemain->id }}">                                        
                                     @endif
