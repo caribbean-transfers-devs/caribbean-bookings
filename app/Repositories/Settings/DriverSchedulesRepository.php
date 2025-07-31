@@ -653,16 +653,16 @@ class DriverSchedulesRepository
             ], Response::HTTP_NOT_FOUND);
         }
 
-        // if(empty($schedule->check_out_time)){
-        //     return response()->json([
-        //         'errors' => [
-        //             'code' => 'EMPTY_TIME_OUT',
-        //             'message' => 'No puede cerrar el turno, falta que pase 8 hr para obtener el horario de salida'
-        //         ],
-        //         'status' => 'error',
-        //         'message' => 'No puede cerrar el turno, falta que pase 8 hr para obtener el horario de salida'
-        //     ], Response::HTTP_NOT_FOUND);            
-        // }        
+        if(empty($schedule->check_out_time)){
+            return response()->json([
+                'errors' => [
+                    'code' => 'EMPTY_TIME_OUT',
+                    'message' => 'No puede cerrar el turno, falta que pase 8 hr para obtener el horario de salida'
+                ],
+                'status' => 'error',
+                'message' => 'No puede cerrar el turno, falta que pase 8 hr para obtener el horario de salida'
+            ], Response::HTTP_NOT_FOUND);            
+        }        
 
         try {
             DB::beginTransaction();
