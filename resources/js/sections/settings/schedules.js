@@ -283,6 +283,60 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
 
+        if (event.target.classList.contains('schedule_unit')) {
+            const target = event.target;
+            const code = target.dataset.code;
+            const value = target.value;
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se asigna el conductor.",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            fetch('/schedules/set/unit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    code: code,
+                    value: value                    
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    text: 'Estatus de conductor actualizado con exito.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }                    
+                });
+            })
+            .catch(error => {
+                Swal.fire(
+                    '¡ERROR!',
+                    error.message || 'Ocurrió un error',
+                    'error'
+                );
+            });              
+        }        
+
         if (event.target.classList.contains('schedule_status_unit')) {
             const target = event.target;
             const code = target.dataset.code;

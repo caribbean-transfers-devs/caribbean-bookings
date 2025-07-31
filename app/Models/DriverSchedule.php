@@ -29,7 +29,8 @@ class DriverSchedule extends Model
         'check_in_time_fleetio',
         'check_out_time_fleetio',
         'is_open',
-        'observations'
+        'observations',
+        'type'
     ];    
 
     protected $table = 'driver_schedules';

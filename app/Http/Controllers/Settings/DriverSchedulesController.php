@@ -97,6 +97,11 @@ class DriverSchedulesController extends Controller
     }
 
     //ASIGNA CONDUCTOR
+    public function setUnit(Request $request)
+    {
+        return $this->DriverSchedulesRepository->setUnit($request);
+    }
+
     public function driver(Request $request)
     {
         return $this->DriverSchedulesRepository->driver($request);

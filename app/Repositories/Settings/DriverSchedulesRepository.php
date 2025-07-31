@@ -15,6 +15,7 @@ use App\Traits\QueryTrait;
 
 //MODELS
 use App\Models\DriverSchedule;
+use App\Models\Driver;
 use App\Models\Vehicle;
 
 class DriverSchedulesRepository
@@ -47,7 +48,14 @@ class DriverSchedulesRepository
             "end" => $dates['end'],
         ];
 
-        $schedules = DriverSchedule::with(['vehicle.destination_service', 'vehicle.enterprise', 'driver'])->whereBetween('date', [$dates['init'] . " 00:00:00", $dates['end'] . " 23:59:59"])
+        $schedulesMain = DriverSchedule::with(['vehicle.destination_service', 'vehicle.enterprise', 'driver'])->whereBetween('date', [$dates['init'] . " 00:00:00", $dates['end'] . " 23:59:59"])
+                                    ->where('type', 'main')
+                                    ->orderBy('date', 'ASC')
+                                    ->orderBy('check_in_time', 'ASC')
+                                    ->get();
+
+        $schedulesSecondary = DriverSchedule::with(['vehicle.destination_service', 'vehicle.enterprise', 'driver'])->whereBetween('date', [$dates['init'] . " 00:00:00", $dates['end'] . " 23:59:59"])
+                                    ->where('type', 'secondary')
                                     ->orderBy('date', 'ASC')
                                     ->orderBy('check_in_time', 'ASC')
                                     ->get();
@@ -62,7 +70,8 @@ class DriverSchedulesRepository
                     "active" => true
                 ]
             ],
-            'schedules' => $schedules,
+            'schedulesMain' => $schedulesMain,
+            'schedulesSecondary' => $schedulesSecondary,
             'data' => $data,
         ]);
     }
@@ -359,6 +368,77 @@ class DriverSchedulesRepository
         }
     }
 
+    public function setUnit($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|integer',
+            'value' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'required_params', 
+                    'message' =>  $validator->errors()->all() 
+                ],
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $date = date('Y-m-d');
+        $duplicateSchedule = DriverSchedule::where('date', $date)->where('vehicle_id', $request->value)
+                                                                 ->where('is_open', 1)->first();
+
+        if ($duplicateSchedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'duplicate_schedule', 
+                    'message' => "Ya esta asignado este unidad a otro operador."
+                ],
+                'status' => 'error',
+                'message' => "Ya esta asignado este unidad a otro operador."
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }        
+
+        $schedule = DriverSchedule::find($request->code);
+
+        if (!$schedule) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'NOT_FOUND',
+                    'message' => 'Horario no encontrado'
+                ],
+                'status' => 'error',
+                'message' => 'Horario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }        
+
+        try {
+            DB::beginTransaction();             
+
+            $schedule->vehicle_id = $request->value ?? NULL;
+    
+            $schedule->save();
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se actualizo unidad correctamente',
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }     
+
     public function driver($request)
     {
         $validator = Validator::make($request->all(), [
@@ -640,6 +720,7 @@ class DriverSchedulesRepository
         try {
             $date = ( isset($request->date) ? $request->date : date('Y-m-d') );
             $schedules = DriverSchedule::where('date', $date)->get();
+            $drivers = Driver::with('enterprise')->where('status', 1)->get();
             $vehicles = Vehicle::where('status', 1)->get();
 
             if($schedules->count() > 0){
@@ -653,25 +734,27 @@ class DriverSchedulesRepository
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);                
             }
 
-            if($vehicles->count() == 0){
+            if($drivers->count() == 0){
                 return response()->json([
                     'errors' => [
                         'code' => 'required_params', 
-                        'message' =>  "No hay vehiculos para crear horarios" 
+                        'message' =>  "No hay operadores para crear horarios" 
                     ],
                     'status' => 'error',
-                    'message' => "No hay vehiculos para crear horarios",
+                    'message' => "No hay operadores para crear horarios",
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);                    
             }
 
-            foreach ($vehicles as $key => $vehicle) {
-                $schedule = DriverSchedule::where('date', $date)->where('vehicle_id', $vehicle->id)->first();
-                if(empty($schedule)){
+            foreach ($drivers as $key => $driver) {
+                // $schedule = DriverSchedule::where('date', $date)->where('vehicle_id', $vehicle->id)->first();
+                $schedule = DriverSchedule::where('date', $date)->first();
+                // if(empty($schedule)){
                     $schedule = new DriverSchedule();
                     $schedule->date = $date;
-                    $schedule->vehicle_id = $vehicle->id ?? NULL;
-                    $schedule->save();                    
-                }
+                    $schedule->driver_id = $driver->id ?? NULL;
+                    $schedule->type = ( $driver->enterprise->type_enterprise == "MAIN" ? 'main': 'secondary' );
+                    $schedule->save();
+                // }
             }
                         
             return response()->json([

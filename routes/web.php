@@ -315,8 +315,11 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
 
         Route::post('/schedules/timeCheckIn',                                           [SCHEDULES::class, 'timeCheckIn'])->name('schedules.timeCheckIn');
         Route::post('/schedules/timeCheckout',                                          [SCHEDULES::class, 'timeCheckout'])->name('schedules.timecheckout');
+
         Route::post('/schedules/unit',                                                  [SCHEDULES::class, 'unit'])->name('schedules.unit');
+        Route::post('/schedules/set/unit',                                              [SCHEDULES::class, 'setUnit'])->name('schedules.set.unit');
         Route::post('/schedules/driver',                                                [SCHEDULES::class, 'driver'])->name('schedules.driver');
+
         Route::post('/schedules/status/driver',                                         [SCHEDULES::class, 'statusDriver'])->name('schedules.status.driver');
         Route::post('/schedules/comments',                                              [SCHEDULES::class, 'comments'])->name('schedules.comments');
         Route::post('/schedules/status',                                                [SCHEDULES::class, 'status'])->name('schedules.status');
