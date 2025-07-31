@@ -60,7 +60,7 @@ class DriverSchedulesRepository
                                     ->orderBy('check_in_time', 'ASC')
                                     ->get();
 
-        // dd($schedules);
+        // dd($schedulesMain);
 
         return view('settings.schedules.index', [
             'breadcrumbs' => [
@@ -772,6 +772,51 @@ class DriverSchedulesRepository
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function updateSchedules($request)
+    {
+        try {
+            $date = ( isset($request->date) ? $request->date : date('Y-m-d') );
+            $drivers = Driver::with('enterprise')->where('status', 1)->get();
+
+            if($drivers->count() == 0){
+                return response()->json([
+                    'errors' => [
+                        'code' => 'required_params', 
+                        'message' =>  "No hay operadores para crear horarios" 
+                    ],
+                    'status' => 'error',
+                    'message' => "No hay operadores para crear horarios",
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);                    
+            }
+
+            foreach ($drivers as $key => $driver) {
+                // $schedule = DriverSchedule::where('date', $date)->where('vehicle_id', $vehicle->id)->first();
+                $schedule = DriverSchedule::where('date', $date)->where('driver_id', $driver->id)->first();
+                if(empty($schedule)){
+                    $schedule = new DriverSchedule();
+                    $schedule->date = $date;
+                    $schedule->driver_id = $driver->id ?? NULL;
+                    $schedule->type = ( $driver->enterprise->type_enterprise == "MAIN" ? 'main': 'secondary' );
+                    $schedule->save();
+                }
+            }
+                        
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Se crearon los horarios correctamente',
+            ], Response::HTTP_OK);                        
+        } catch (Exception $e) {
+            return response()->json([
+                'errors' => [
+                    'code' => 'INTERNAL_SERVER',
+                    'message' =>  $e->getMessage()
+                ],
+                'status' => 'error',                
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }    
 
     public function reloadSchedules($request)
     {

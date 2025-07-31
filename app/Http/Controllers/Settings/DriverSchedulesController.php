@@ -76,6 +76,11 @@ class DriverSchedulesController extends Controller
 
     
     //ESTO NOS PERMITE ACTUALIZAR CIERTOS VALORES DE MANERA DIRECTA
+    public function updateSchedules(Request $request)
+    {
+        return $this->DriverSchedulesRepository->updateSchedules($request);
+    }
+
     public function reloadSchedules(Request $request)
     {
         return $this->DriverSchedulesRepository->reloadSchedules($request);

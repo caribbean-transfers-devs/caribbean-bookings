@@ -66,6 +66,58 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('updateDriver')) {
+            event.preventDefault();        
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se crean los nuevos horarios.",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('/schedules/update/schedules', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                // body: JSON.stringify({
+                //     code: code,
+                //     status: status
+                // })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    text: 'Nuevos horarios generados correctamente.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }                    
+                });
+            })
+            .catch(error => {
+                Swal.fire(
+                    '¡ERROR!',
+                    error.message || 'Ocurrió un error',
+                    'error'
+                );
+            });            
+        }
+
         if (event.target.classList.contains('reloadSchedules')) {
             event.preventDefault();        
 
