@@ -876,7 +876,7 @@ class DriverSchedulesRepository
             
             // Obtener todos los registros del día actual que tengan check_in_time pero no check_out_time
             $schedules = DriverSchedule::where('date', $today)
-                ->whereIn('is_open', [1,0])
+                ->whereIn('is_open', [1])
                 ->whereNotNull('check_in_time')
                 ->whereNull('check_out_time')
                 ->get();
