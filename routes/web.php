@@ -310,9 +310,9 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/schedules/{schedule}/edit',                                        [SCHEDULES::class, 'edit'])->name('schedules.edit');
         Route::put('/schedules/{schedule}',                                             [SCHEDULES::class, 'update'])->name('schedules.update');
         Route::delete('/schedules/{schedule}',                                          [SCHEDULES::class, 'destroy'])->name('schedules.destroy');
-
-        Route::match(['GET', 'POST'], '/schedules/reload/schedules',                    [SCHEDULES::class, 'reloadSchedules'])->name('schedules.reload');
+        
         Route::match(['GET', 'POST'], '/schedules/update/schedules',                    [SCHEDULES::class, 'updateSchedules'])->name('schedules.update.driver');
+        Route::match(['GET', 'POST'], '/schedules/reload/schedules',                    [SCHEDULES::class, 'reloadSchedules'])->name('schedules.reload');
 
         Route::post('/schedules/timeCheckIn',                                           [SCHEDULES::class, 'timeCheckIn'])->name('schedules.timeCheckIn');
         Route::post('/schedules/timeCheckout',                                          [SCHEDULES::class, 'timeCheckout'])->name('schedules.timecheckout');

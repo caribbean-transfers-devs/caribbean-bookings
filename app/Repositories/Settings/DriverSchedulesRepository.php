@@ -720,8 +720,13 @@ class DriverSchedulesRepository
         try {
             $date = ( isset($request->date) ? $request->date : date('Y-m-d') );
             $schedules = DriverSchedule::where('date', $date)->get();
-            $drivers = Driver::with('enterprise')->where('status', 1)->get();
-            $vehicles = Vehicle::where('status', 1)->get();
+            // $drivers = Driver::with('enterprise')->where('status', 1)->get();
+            $drivers = Driver::with(['enterprise' => function($query) {
+                    $query->where('status', 1)->whereNull('deleted_at');
+                }])
+                ->where('status', 1)
+                ->whereNull('deleted_at')
+                ->get();            
 
             if($schedules->count() > 0){
                 return response()->json([
@@ -746,20 +751,20 @@ class DriverSchedulesRepository
             }
 
             foreach ($drivers as $key => $driver) {
-                // $schedule = DriverSchedule::where('date', $date)->where('vehicle_id', $vehicle->id)->first();
-                $schedule = DriverSchedule::where('date', $date)->first();
-                // if(empty($schedule)){
+                $schedule = DriverSchedule::where('date', $date)->where('driver_id', $driver->id)->first();
+                // $schedule = DriverSchedule::where('date', $date)->first();
+                if(empty($schedule)){
                     $schedule = new DriverSchedule();
                     $schedule->date = $date;
                     $schedule->driver_id = $driver->id ?? NULL;
                     $schedule->type = ( $driver->enterprise->type_enterprise == "MAIN" ? 'main': 'secondary' );
                     $schedule->save();
-                // }
+                }
             }
                         
             return response()->json([
                 'status' => 'success',
-                'message' => 'Se crearon los horarios correctamente',
+                'message' => 'Se crearon los operadores correctamente',
             ], Response::HTTP_OK);                        
         } catch (Exception $e) {
             return response()->json([
@@ -777,7 +782,12 @@ class DriverSchedulesRepository
     {
         try {
             $date = ( isset($request->date) ? $request->date : date('Y-m-d') );
-            $drivers = Driver::with('enterprise')->where('status', 1)->get();
+            $drivers = Driver::with(['enterprise' => function($query) {
+                    $query->where('status', 1)->whereNull('deleted_at');
+                }])
+                ->where('status', 1)
+                ->whereNull('deleted_at')
+                ->get();
 
             if($drivers->count() == 0){
                 return response()->json([
@@ -791,7 +801,6 @@ class DriverSchedulesRepository
             }
 
             foreach ($drivers as $key => $driver) {
-                // $schedule = DriverSchedule::where('date', $date)->where('vehicle_id', $vehicle->id)->first();
                 $schedule = DriverSchedule::where('date', $date)->where('driver_id', $driver->id)->first();
                 if(empty($schedule)){
                     $schedule = new DriverSchedule();

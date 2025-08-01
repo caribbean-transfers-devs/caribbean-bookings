@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     document.addEventListener('click', function (event) {
+        //PERMITE AGREGAR NUEVOS DRIVER EN CASO DE QUE NO ESTEN EN LOS HORARIOS
         if (event.target.classList.contains('updateDriver')) {
             event.preventDefault();        
 
@@ -115,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     error.message || 'Ocurrió un error',
                     'error'
                 );
-            });            
+            });
         }
 
         if (event.target.classList.contains('reloadSchedules')) {
@@ -224,6 +225,80 @@ document.addEventListener("DOMContentLoaded", function() {
                 );
             });            
         }
+
+        //PERMITE AGREGAR LA PREASIGNACIÓN
+        if (event.target.classList.contains('creatingSchedules')) {
+            event.preventDefault();
+
+            const fechaActual = new Date();
+
+            swal.fire({
+                text: '¿Está seguro de cargar los operadores, para asignación de horarios y unidad ?',
+                icon: 'warning',
+                inputLabel: "Selecciona la fecha que pre-asignara",
+                input: "date",
+                inputValue: fechaActual,
+                inputValidator: (result) => {
+                    return !result && "Selecciona un fecha";
+                },
+                didOpen: () => {
+                    const today = (new Date()).toISOString();
+                    Swal.getInput().min = today.split("T")[0];
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if(result.isConfirmed == true){
+                    Swal.fire({
+                        title: "Procesando solicitud...",
+                        text: "Por favor, espera mientras se crean los operadores, para asignación de horarios y unidad.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch('/set/schedules', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({
+                            date: result.value
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            icon: data.status,
+                            text: data.message,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }                    
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            '¡ERROR!',
+                            error.message || 'Ocurrió un error',
+                            'error'
+                        );
+                    });
+                }
+            });
+        }        
     })
     
     document.addEventListener('change', function (event) {
