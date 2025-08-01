@@ -308,9 +308,9 @@
                                     <td class="text-center">{{ $item->deposit_date != NULL ? date("Y-m-d", strtotime($item->deposit_date)) : "SIN FECHA DE PAGO " }}</td>
                                     <td class="text-center" style="color:#fff;background-color:#{{ $item->deposit_date != NULL ? '00ab55' : 'e7515a' }};">
                                         @if ($item->deposit_date != NULL)
-                                            PAGADO
+                                            DEPOSITADO
                                         @else
-                                            PENDIENTE DE PAGO
+                                            PENDIENTE DE DEPOSITO
                                         @endif
                                     </td>
                                     <td class="text-center">$ {{ number_format(( $item->total_final_net ), 2) }}</td>
