@@ -672,7 +672,7 @@ class DriverSchedulesRepository
             $currentTime = $now->format('H:i');
 
             // Calcular horas extras
-            $checkOutTime = Carbon::parse($schedule->date . ' ' . $schedule->check_out_time);
+            $checkOutTime = Carbon::parse($schedule->date . ' ' . ( $schedule->check_out_time != NULL ? $schedule->check_out_time : $currentTime ));
             $endCheckOutTime = Carbon::parse($schedule->date . ' ' . $currentTime);
 
             // Si la hora de fin es menor que la de check-out (día siguiente)
@@ -687,6 +687,7 @@ class DriverSchedulesRepository
     
             // Actualizar el registro
             $schedule->update([
+                'check_out_time' => ( $schedule->check_out_time != NULL ? $schedule->check_out_time : $currentTime ),
                 'end_check_out_time' => $currentTime,
                 'extra_hours' => $extraHours,
                 'is_open' => $request->status ?? 0,
@@ -867,6 +868,7 @@ class DriverSchedulesRepository
         }        
     }
 
+    //CALCULA LA HORA DE SALIDA DE LOS HORARIOS
     public function processSchedulesForToday()
     {
         try {
@@ -874,7 +876,7 @@ class DriverSchedulesRepository
             
             // Obtener todos los registros del día actual que tengan check_in_time pero no check_out_time
             $schedules = DriverSchedule::where('date', $today)
-                ->where('is_open', 1)
+                ->whereIn('is_open', [1,0])
                 ->whereNotNull('check_in_time')
                 ->whereNull('check_out_time')
                 ->get();
@@ -886,7 +888,7 @@ class DriverSchedulesRepository
             // return $schedules->count();
             return response()->json([
                 'status' => 'success',
-                'message' => 'Se crearon los horarios correctamente',
+                'message' => 'Se actualizaron las horas de salida de los operadores',
             ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([
