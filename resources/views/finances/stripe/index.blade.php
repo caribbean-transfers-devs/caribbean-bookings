@@ -249,9 +249,9 @@
                             <th class="text-center">TOTAL COBRADO EN STRIPE</th>
                             <th class="text-center">COMISIÓN DE STRIPE</th>
                             <th class="text-center">TOTAL A PAGAR POR STRIPE</th>
-                            <th class="text-center">FECHA DE PAGO STRIPE</th>
-                            <th class="text-center">ESTATUS DE PAGO STRIPE</th>
-                            <th class="text-center">TOTAL PAGADO POR STRIPE</th>
+                            <th class="text-center">FECHA DE DEPOSITO STRIPE</th>
+                            <th class="text-center">ESTATUS DE DEPOSITO STRIPE</th>
+                            <th class="text-center">TOTAL DEPOSITADO POR STRIPE</th>
                             <th class="text-center">REFERENCIA DE PAGADO POR STRIPE</th>
                             <th class="text-center">BANCO</th>
                             <th class="text-center">TIENE REEMBOLSO</th>
