@@ -146,11 +146,11 @@
                                     @else
                                         <select class="form-control schedule_status_unit" name="status_unit" data-code="{{ $schedulemain->id }}">
                                             <option value="0">Selecciona una opción</option>
-                                            <option {{ isset($schedulemain->status_unit) && $schedule->status_unit == "OP" ? 'selected' : '' }} value="OP">OPERACIÓN</option>
-                                            <option {{ isset($schedulemain->status_unit) && $schedule->status_unit == "S" ? 'selected' : '' }} value="S">SINIESTRO</option>
-                                            <option {{ isset($schedulemain->status_unit) && $schedule->status_unit == "OPB" ? 'selected' : '' }} value="OPB">OPERACIÓN BAJA</option>
-                                            <option {{ isset($schedulemain->status_unit) && $schedule->status_unit == "FO" ? 'selected' : '' }} value="FO">FALTA DE OPERADOR</option>
-                                            <option {{ isset($schedulemain->status_unit) && $schedule->status_unit == "T" ? 'selected' : '' }} value="T">TALLER</option>
+                                            <option {{ isset($schedulemain->status_unit) && $schedulemain->status_unit == "OP" ? 'selected' : '' }} value="OP">OPERACIÓN</option>
+                                            <option {{ isset($schedulemain->status_unit) && $schedulemain->status_unit == "S" ? 'selected' : '' }} value="S">SINIESTRO</option>
+                                            <option {{ isset($schedulemain->status_unit) && $schedulemain->status_unit == "OPB" ? 'selected' : '' }} value="OPB">OPERACIÓN BAJA</option>
+                                            <option {{ isset($schedulemain->status_unit) && $schedulemain->status_unit == "FO" ? 'selected' : '' }} value="FO">FALTA DE OPERADOR</option>
+                                            <option {{ isset($schedulemain->status_unit) && $schedulemain->status_unit == "T" ? 'selected' : '' }} value="T">TALLER</option>
                                         </select>
                                     @endif
                                 </td>
