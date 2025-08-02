@@ -28,10 +28,11 @@ if( document.querySelector('.table-rendering') != null ){
 }
 components.formReset();
 
-const __date_schedule = document.getElementById('date_schedule');
-const __check_in = document.getElementById('check_in_time');
-const __check_out = document.getElementById('check_out_time');
-const __end_check_out = document.getElementById('end_check_out_time');
+const __date            = document.getElementById('lookup_date');
+const __date_schedule   = document.getElementById('date_schedule');
+const __check_in        = document.getElementById('check_in_time');
+const __check_out       = document.getElementById('check_out_time');
+const __end_check_out   = document.getElementById('end_check_out_time');
 
 const options_check_in = document.querySelectorAll('.check_in_time');
 const options_check_out = document.querySelectorAll('.end_check_out_time');
@@ -66,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     document.addEventListener('click', function (event) {
-        //PERMITE AGREGAR NUEVOS DRIVER EN CASO DE QUE NO ESTEN EN LOS HORARIOS
+        //PERMITE AGREGAR NUEVOS OPERADORES EN CASO DE QUE NO ESTEN EN LOS HORARIOS
         if (event.target.classList.contains('updateDriver')) {
             event.preventDefault();        
 
@@ -86,10 +87,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                // body: JSON.stringify({
-                //     code: code,
-                //     status: status
-                // })
+                body: JSON.stringify({
+                    date: __date.value
+                })
             })
             .then(response => {
                 if (!response.ok) {
@@ -119,6 +119,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
 
+        //NOS PERMITE GENERAR NUEVAMENTE EL REGISTRO DEL OPERADOR SI YA LO CERRE 
         if (event.target.classList.contains('reloadSchedules')) {
             event.preventDefault();        
 
@@ -142,61 +143,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 //     code: code,
                 //     status: status
                 // })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw err; });
-                }
-                return response.json();
-            })
-            .then(data => {
-                Swal.fire({
-                    title: '¡Éxito!',
-                    icon: 'success',
-                    text: 'Estatus actualizado con exito.',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        location.reload();
-                    }                    
-                });
-            })
-            .catch(error => {
-                Swal.fire(
-                    '¡ERROR!',
-                    error.message || 'Ocurrió un error',
-                    'error'
-                );
-            });            
-        }
-
-        if (event.target.classList.contains('statusSchedule')) {
-            event.preventDefault();
-            
-            const target = event.target;
-            const { code, status } = target.dataset;
-
-            Swal.fire({
-                title: "Procesando solicitud...",
-                text: "Por favor, espera mientras se actualiza el estatus.",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            fetch('/schedules/status', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({
-                    code: code,
-                    status: status
-                })
             })
             .then(response => {
                 if (!response.ok) {
@@ -299,6 +245,61 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
         }        
+
+        if (event.target.classList.contains('statusSchedule')) {
+            event.preventDefault();
+            
+            const target = event.target;
+            const { code, status } = target.dataset;
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se actualiza el estatus.",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('/schedules/status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    code: code,
+                    status: status
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    text: 'Estatus actualizado con exito.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }                    
+                });
+            })
+            .catch(error => {
+                Swal.fire(
+                    '¡ERROR!',
+                    error.message || 'Ocurrió un error',
+                    'error'
+                );
+            });            
+        }
     })
     
     document.addEventListener('change', function (event) {
@@ -433,7 +434,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 body: JSON.stringify({
                     code: code,
-                    value: value                    
+                    value: value,
+                    date: __date.value                    
                 })
             })
             .then(response => {

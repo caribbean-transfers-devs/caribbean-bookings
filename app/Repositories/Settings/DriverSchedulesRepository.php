@@ -386,7 +386,7 @@ class DriverSchedulesRepository
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $date = date('Y-m-d');
+        $date = ( isset($request->date) ? $request->date : date('Y-m-d') );
         $duplicateSchedule = DriverSchedule::where('date', $date)->where('vehicle_id', $request->value)
                                                                  ->where('is_open', 1)->first();
 
