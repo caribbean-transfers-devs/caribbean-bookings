@@ -399,7 +399,7 @@ class DriverSchedulesRepository
                 'status' => 'error',
                 'message' => "Ya esta asignado este unidad a otro operador."
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }        
+        }
 
         $schedule = DriverSchedule::find($request->code);
 

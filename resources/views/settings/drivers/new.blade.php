@@ -77,7 +77,7 @@
                                             <input type="text" id="phone" name="phone" class="form-control mb-3" placeholder="Teléfono" value="{{ ( isset($driver->phone) ? $driver->phone : '' ) }}">
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    {{-- <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="vehicle_id">Selecciona un vehículo</label>
                                             <select id="vehicle_id" name="vehicle_id" class="form-control mb-3">
@@ -87,7 +87,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="status">Selecciona el estatus</label>

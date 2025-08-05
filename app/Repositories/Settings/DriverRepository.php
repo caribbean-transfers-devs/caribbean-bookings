@@ -137,10 +137,10 @@ class DriverRepository
             $driver = Driver::find($id);
             $driver->delete();
             DB::commit();
-            return redirect()->route('settings.drivers.index')->with('success', 'Se elimimo correctamente el conductor.');
+            return redirect()->route('drivers.index')->with('success', 'Se elimimo correctamente el conductor.');
         } catch (Exception $e) {
             DB::rollBack();
-            return redirect()->route('settings.drivers.index')->with('danger', 'Error al eliminar el conductor.');
+            return redirect()->route('drivers.index')->with('danger', 'Error al eliminar el conductor.');
         }
     } 
 }
