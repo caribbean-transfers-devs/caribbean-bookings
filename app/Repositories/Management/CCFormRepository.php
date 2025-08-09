@@ -697,7 +697,14 @@ class CCFormRepository
                 ) as p ON p.reservation_id = rez.id
                 WHERE rez.id = :codeTwo
                 AND rez.is_cancelled = 0
-                GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id",[
+                GROUP BY it.id, 
+                         rez.id,
+                         rez.uuid, 
+                         serv.id, 
+                         sit.id, 
+                         zone_one.id, 
+                         zone_two.id,",
+                [
                     "codeOne" => $id,
                     "codeTwo" => $id,
                 ]);
