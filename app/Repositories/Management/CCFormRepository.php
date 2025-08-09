@@ -656,6 +656,15 @@ class CCFormRepository
                                     it.op_two_cancelled_at,
                                     it.op_two_cancellation_level,
 
+                                    zone_one.id,
+                                    zone_one.name,
+                                    zone_one.is_primary,
+                                    zone_one.cut_off_operation,
+                                    zone_two.id,
+                                    zone_two.name,
+                                    zone_two.is_primary,
+                                    zone_two.cut_off_operation,
+
                                     it.created_at,
                                     it.updated_at,
                                     it.spam,
@@ -802,6 +811,15 @@ class CCFormRepository
                             it.op_two_cancellation_type_id,
                             it.op_two_cancelled_at,
                             it.op_two_cancellation_level,
+
+                            zone_one.id,
+                            zone_one.name,
+                            zone_one.is_primary,
+                            zone_one.cut_off_operation,
+                            zone_two.id,
+                            zone_two.name,
+                            zone_two.is_primary,
+                            zone_two.cut_off_operation,                            
 
                             it.created_at,
                             it.updated_at,
