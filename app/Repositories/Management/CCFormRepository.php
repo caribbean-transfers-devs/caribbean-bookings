@@ -559,6 +559,7 @@ class CCFormRepository
                                 AND rez.is_cancelled = 0
                             GROUP BY it.id, 
                                         rez.uuid, 
+                                        rez.id, 
                                         rez.client_first_name, 
                                         rez.client_last_name,
                                         rez.client_email,
@@ -625,6 +626,7 @@ class CCFormRepository
                 AND rez.is_cancelled = 0
                 GROUP BY it.id, 
                             rez.uuid, 
+                            rez.id, 
                             rez.client_first_name, 
                             rez.client_last_name,
                             rez.client_email,
@@ -709,6 +711,7 @@ class CCFormRepository
                                 AND rez.is_cancelled = 0
                             GROUP BY it.id,
                                         rez.uuid, 
+                                        rez.id,                                         
                                         rez.client_first_name, 
                                         rez.client_last_name,
                                         rez.client_email,
@@ -784,6 +787,7 @@ class CCFormRepository
                 AND rez.is_cancelled = 0
                 GROUP BY it.id, 
                             rez.uuid, 
+                            rez.id, 
                             rez.client_first_name, 
                             rez.client_last_name,
                             rez.client_email,
