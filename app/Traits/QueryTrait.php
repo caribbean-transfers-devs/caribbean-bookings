@@ -452,7 +452,6 @@ trait QueryTrait
                                         rez.campaign,
                                         rez.reserve_rating,
                                         rez.is_last_minute,
-                                        rez.was_is_quotation,
                                         us.id,
                                         us.status,
                                         us.name,
@@ -842,14 +841,13 @@ trait QueryTrait
                                     it.passengers,
                                     it.spam,
                                     it.spam_count,
-                                    it.op_two_pickup,
+                                    it.op_one_pickup,
                                     it.from_name,
                                     it.op_one_status,
                                     it.op_one_status_operation,
                                     it.op_one_time_operation,
                                     it.op_one_preassignment,
                                     it.op_one_operating_cost,
-                                    it.op_one_pickup,
                                     it.op_one_confirmation,
                                     it.op_one_operation_close,
                                     it.op_one_comments,
@@ -857,13 +855,13 @@ trait QueryTrait
                                     it.op_one_cancellation_level,
                                     it.vehicle_id_one,
                                     it.driver_id_one,
+                                    it.op_two_pickup,
                                     it.to_name,
                                     it.op_two_status,
                                     it.op_two_status_operation,
                                     it.op_two_time_operation,
                                     it.op_two_preassignment,
                                     it.op_two_operating_cost,
-                                    it.op_two_pickup,
                                     it.op_two_confirmation,
                                     it.op_two_operation_close,
                                     it.op_two_comments,
@@ -878,7 +876,7 @@ trait QueryTrait
                                     p.cash_references,
                                     p.cash_comments,
                                     p.cash_payment_ids,
-                                    p.cash_is_conciliated                                    
+                                    p.cash_is_conciliated                                   
                                     {$queryHaving}
 
                             UNION
@@ -1249,14 +1247,13 @@ trait QueryTrait
                                     it.passengers,
                                     it.spam,
                                     it.spam_count,
-                                    it.op_two_pickup,
+                                    it.op_one_pickup,
                                     it.from_name,
                                     it.op_one_status,
                                     it.op_one_status_operation,
                                     it.op_one_time_operation,
                                     it.op_one_preassignment,
-                                    it.op_one_operating_cost,
-                                    it.op_one_pickup,
+                                    it.op_one_operating_cost,                        
                                     it.op_one_confirmation,
                                     it.op_one_operation_close,
                                     it.op_one_comments,
@@ -1264,13 +1261,13 @@ trait QueryTrait
                                     it.op_one_cancellation_level,
                                     it.vehicle_id_one,
                                     it.driver_id_one,
+                                    it.op_two_pickup,
                                     it.to_name,
                                     it.op_two_status,
                                     it.op_two_status_operation,
                                     it.op_two_time_operation,
                                     it.op_two_preassignment,
                                     it.op_two_operating_cost,
-                                    it.op_two_pickup,
                                     it.op_two_confirmation,
                                     it.op_two_operation_close,
                                     it.op_two_comments,
@@ -1285,7 +1282,7 @@ trait QueryTrait
                                     p.cash_references,
                                     p.cash_comments,
                                     p.cash_payment_ids,
-                                    p.cash_is_conciliated                             
+                                    p.cash_is_conciliated
                                     {$queryHaving}
                             -- ) AS combined_results
                             ORDER BY filtered_date ASC ",[
