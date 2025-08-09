@@ -163,7 +163,14 @@ trait QueryTrait
                                         GROUP BY it.reservation_id, it.is_round_trip
                                     ) as it ON it.reservation_id = rez.id
                                     WHERE 1=1 {$query}
-                                GROUP BY refund.id, refund.message_refund, refund.status, refund.end_at, refund.link_refund, rez.id, site.id, site.type_site, site.name, site.is_cxc {$query2}",
+                                GROUP BY refund.id, refund.message_refund, refund.response_message, refund.status, 
+                                        refund.end_at, refund.link_refund, rez.id, rez.client_first_name, rez.client_last_name,
+                                        rez.client_email, rez.client_phone, rez.currency, rez.is_cancelled, rez.is_commissionable,
+                                        rez.site_id, rez.pay_at_arrival, rez.reference, rez.affiliate_id, rez.terminal,
+                                        rez.comments, rez.is_duplicated, rez.open_credit, rez.is_complete, rez.created_at,
+                                        rez.is_quotation, rez.was_is_quotation, rez.campaign, rez.is_last_minute,
+                                        us.id, us.status, us.name, site.id, site.type_site, site.name, site.is_cxc,
+                                        origin.code, tc.name_es {$query2}",
                                     $queryData);
 
                                     //, site.is_cxc
