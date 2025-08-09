@@ -641,8 +641,7 @@ class CCFormRepository
                                         it.vehicle_id_two,
                                         it.driver_id_two,
                                         it.is_open,
-                                        it.open_service_time,
-                                        it_counter.quantity
+                                        it.open_service_time
                             
                             UNION 
                 SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_two_pickup as filtered_date, 'departure' as operation_type, sit.name as site_name, '' as messages,
@@ -764,8 +763,7 @@ class CCFormRepository
                             it.vehicle_id_two,
                             it.driver_id_two,
                             it.is_open,
-                            it.open_service_time,
-                            it_counter.quantity",
+                            it.open_service_time",
                 [
                         "init_date_one" => $search['init_date'],
                         "init_date_two" => $search['end_date'],
