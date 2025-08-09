@@ -216,7 +216,9 @@ class DashboardRepository
                                 GROUP BY it.reservation_id, it.is_round_trip
                             ) as it ON it.reservation_id = rez.id
                         WHERE 1=1 {$query}
-                        GROUP BY rez.id, site.name, site.type_site",
+                        GROUP BY rez.id, rez.client_first_name, rez.client_last_name, rez.client_email, 
+                                 rez.currency, rez.is_cancelled, rez.is_duplicated, rez.affiliate_id, 
+                                 rez.pay_at_arrival, rez.open_credit, rez.created_at, site.name, site.type_site",
                             $queryData);
     }   
 }
