@@ -464,7 +464,8 @@ trait QueryTrait
                                         p.credit_payment_ids,
                                         p.credit_conciliation_status,
                                         rr.reservation_id,
-                                        rr.refund_count {$query2}",
+                                        rr.refund_count,
+                                        rr.pending_refund_count {$query2}",
                                     $queryData);
 
         if(sizeof( $bookings ) > 0):
