@@ -557,7 +557,7 @@ class CCFormRepository
                                 ) as p ON p.reservation_id = rez.id
                             WHERE it.op_one_pickup BETWEEN :init_date_one AND :init_date_two
                                 AND rez.is_cancelled = 0
-                            GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
+                            GROUP BY it.id, rez.uuid, rez.id, serv.id, sit.id, zone_one.id, zone_two.id
                             
                             UNION 
                 SELECT rez.id as reservation_id, rez.*, it.*, serv.name as service_name, it.op_two_pickup as filtered_date, 'departure' as operation_type, sit.name as site_name, '' as messages,
@@ -595,7 +595,7 @@ class CCFormRepository
                 ) as p ON p.reservation_id = rez.id
                 WHERE it.op_two_pickup BETWEEN :init_date_three AND :init_date_four
                 AND rez.is_cancelled = 0
-                GROUP BY it.id, rez.id, serv.id, sit.id, zone_one.id, zone_two.id",[
+                GROUP BY it.id, rez.uuid, rez.id, serv.id, sit.id, zone_one.id, zone_two.id",[
                         "init_date_one" => $search['init_date'],
                         "init_date_two" => $search['end_date'],
                         "init_date_three" => $search['init_date'],
