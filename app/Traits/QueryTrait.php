@@ -452,6 +452,7 @@ trait QueryTrait
                                         rez.campaign,
                                         rez.reserve_rating,
                                         rez.is_last_minute,
+                                        rez.was_is_quotation,
                                         us.id,
                                         us.status,
                                         us.name,
