@@ -8,6 +8,9 @@
         'PENDING' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
         'PAID' => [ 'USD' => 0, 'MXN' => 0, 'count' => 0 ],
     ];
+
+    $viewBooking        = auth()->user()->hasPermission(61);
+    $btnConciliation    = auth()->user()->hasPermission(120);
 @endphp
 @extends('layout.app')
 @section('title') Reporte de Balances (Efectivo) @endsection
@@ -73,6 +76,11 @@
                 <table id="dataCash" class="table table-rendering dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                     <thead>
                         <tr>
+                            <th class="text-center">
+                                <div class="form-check form-check-primary">
+                                    <input class="form-check-input chk-parent" type="checkbox" id="select-all">
+                                </div>
+                            </th> <!-- Checkbox para seleccionar todos -->
                             <th class="text-center">ID</th>
                             <th class="text-center">FECHA DE SERVICIO</th>
                             <th class="text-center">TIPO DE SERVICIO</th>
@@ -98,23 +106,25 @@
                         @if(sizeof($items)>=1)
                             @foreach($items as $key => $operation)                            
                                 @php
-                                    
                                     if( isset( $resume[ $operation->payment_status ] ) && !in_array($operation->reservation_id, $resume['BOOKINGS']) ):
                                         $resume['BOOKINGS'][] = $operation->reservation_id;
                                         $resume[ $operation->payment_status ][ $operation->currency ] += ( $operation->cash_amount > 0 ? $operation->cash_amount : $operation->total_sales );
                                         $resume[ $operation->payment_status ]['count']++;
                                     endif;
-
-                                    // if ($operation->reservation_id == 50330) {
-                                    //     dump($operation);
-                                    // }
                                 @endphp
                                 <tr>
+                                    <td class="text-center">
+                                        @if ( $operation->cash_is_conciliated == 0 )
+                                            <div class="form-check form-check-primary">
+                                                <input class="form-check-input chk-chk row-check" type="checkbox" value="{{ $operation->reservation_id }}">
+                                            </div>
+                                        @endif
+                                    </td>
                                     <td class="text-center">{{ $operation->reservation_id }}</td>
                                     <td class="text-center">{{ auth()->user()->setDateTime($operation, "date") }}</td>
                                     <td class="text-center"><span class="badge badge-{{ $operation->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $operation->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
                                     <td class="text-center">
-                                        @if (auth()->user()->hasPermission(61))
+                                        @if ($viewBooking)
                                             <a href="/reservations/detail/{{ $operation->reservation_id }}" target="_black"><p class="mb-1">{{ $operation->code }}</p></a>
                                         @else
                                             <p class="mb-1">{{ $operation->code }}</p>
@@ -138,7 +148,7 @@
                                     <td class="text-center">{{ $operation->currency }}</td>
                                     <td class="text-center">{{ $operation->cash_comments }}</td>
                                     <td class="text-center" <?=auth()->user()->classStatusPayment($operation)?>>{{ auth()->user()->statusPayment($operation->payment_status) }}</td>
-                                    <td class="text-center {{ auth()->user()->hasPermission(120) && $operation->cash_is_conciliated == 0 ? 'cashConciliation' : '' }}" data-code="{{ $operation->cash_payment_ids }}" data-statu="{{ $operation->cash_is_conciliated }}" style="cursor: pointer;background-color:#{{ $operation->cash_is_conciliated == 0 ? 'e7515a' : '00ab55' }};color:#fff;">
+                                    <td class="text-center {{ $btnConciliation && $operation->cash_is_conciliated == 0 ? 'cashConciliation' : '' }}" data-code="{{ $operation->cash_payment_ids }}" data-statu="{{ $operation->cash_is_conciliated }}" style="cursor: pointer;background-color:#{{ $operation->cash_is_conciliated == 0 ? 'e7515a' : '00ab55' }};color:#fff;">
                                         @if ( $operation->cash_is_conciliated == 0 )
                                             Click para conciliar pago
                                         @endif

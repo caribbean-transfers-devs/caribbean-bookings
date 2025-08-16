@@ -16,6 +16,24 @@ document.addEventListener("DOMContentLoaded", function() {
         enableTime: false,
     });
 
+    document.getElementById('select-all').addEventListener('change', function () {
+        const isChecked = this.checked;
+        const checkboxes = document.querySelectorAll('.row-check');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = isChecked;
+        });
+    });
+    
+    // Lógica para sincronizar el checkbox "select-all" con las filas seleccionadas
+    document.querySelector('#dataCash tbody').addEventListener('change', function (event) {
+        if (event.target.classList.contains('row-check')) {
+            const allCheckboxes = document.querySelectorAll('.row-check');
+            const checkedCheckboxes = document.querySelectorAll('.row-check:checked');
+            const allChecked = allCheckboxes.length === checkedCheckboxes.length;
+            document.getElementById('select-all').checked = allChecked;
+        }
+    });    
+
     document.addEventListener("click", components.debounce(function (event) {
         if (event.target && event.target.id === '__close_modal') {
             _formCashConciliation.reset();

@@ -76,6 +76,7 @@ class CashRepository
         $paramsPayment = "FIND_IN_SET('CASH', payment_type_name) > 0 OR ";
         $paramsPayment = rtrim($paramsPayment, ' OR ');
         $havingConditions[] = " (".$paramsPayment.") ";
+        $havingConditions[] = " op_type = 'TYPE_ONE' ";
 
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){
             // $queryData = [];
@@ -104,6 +105,7 @@ class CashRepository
 
         // dd($queryOne, $queryTwo, $queryHaving, $queryData);
         $operations = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
+        // dd($operations);
 
         return view('reports.cash.index', [
             'breadcrumbs' => [

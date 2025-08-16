@@ -248,11 +248,13 @@
                             <th class="text-center">ESTATUS DE COBRO STRIPE</th>
                             <th class="text-center">TOTAL COBRADO EN STRIPE</th>
                             <th class="text-center">COMISIÓN DE STRIPE</th>
-                            <th class="text-center">TOTAL A PAGAR POR STRIPE</th>
-                            <th class="text-center">FECHA DE DEPOSITO STRIPE</th>
-                            <th class="text-center">ESTATUS DE DEPOSITO STRIPE</th>
-                            <th class="text-center">TOTAL DEPOSITADO POR STRIPE</th>
-                            <th class="text-center">REFERENCIA DE PAGADO POR STRIPE</th>
+
+                            <th class="text-center">TOTAL A DEPOSITAR POR STRIPE</th>
+
+                            <th class="text-center">FECHA DEPOSITADA AL BANCO</th>
+                            <th class="text-center">ESTATUS DEL DEPOSITO BANCO</th>
+                            <th class="text-center">TOTAL DEPOSITADO AL BANCO</th>
+                            <th class="text-center">REFERENCIA DEL DEPOSITO AL BANCO POR STRIPE</th>
                             <th class="text-center">BANCO</th>
                             <th class="text-center">TIENE REEMBOLSO</th>
                             <th class="text-center">TIENE DISPUTA</th>

@@ -475,6 +475,831 @@ trait QueryTrait
         return $bookings;
     }
 
+    //ESTE FUNCIONA BIEN PARA SERVIDOR DIGITAL OCEAN
+    // public function queryOperations($queryOne, $queryTwo, $queryHaving, $queryData){
+    //     return  DB::select("SELECT 
+    //                             rez.id as reservation_id,
+    //                             rez.categories,
+    //                             CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
+    //                             rez.client_email,
+    //                             rez.client_phone,
+    //                             rez.currency,
+    //                             rez.language,
+    //                             rez.is_cancelled,
+    //                             rez.is_commissionable,
+    //                             rez.site_id,
+    //                             rez.pay_at_arrival,
+    //                             rez.reference,
+    //                             rez.affiliate_id,
+    //                             rez.terminal,
+    //                             rez.comments,
+    //                             rez.is_duplicated,
+    //                             rez.open_credit,
+    //                             rez.is_complete,
+    //                             rez.created_at,
+    //                             rez.campaign,
+    //                             rez.reserve_rating,
+    //                             rez.is_last_minute,
+
+    //                             us.id AS employee_code,
+    //                             us.status AS employee_status,
+    //                             us.name AS employee,
+
+    //                             site.id as site_code,
+    //                             site.type_site AS type_site,
+    //                             site.color as site_color,
+    //                             site.name as site_name,
+
+    //                             origin.code AS origin_code,
+    //                             tc.name_es AS cancellation_reason,
+    //                             CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
+    //                             CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+
+    //                             -- Información de reembolsos
+    //                             CASE WHEN rr.reservation_id IS NOT NULL THEN 1 ELSE 0 END as has_refund_request,
+    //                             COALESCE(rr.refund_count, 0) as refund_request_count,
+    //                             CASE 
+    //                                 WHEN rr.reservation_id IS NULL THEN 'NO_REFUND'
+    //                                 WHEN rr.pending_refund_count > 0 THEN 'REFUND_REQUESTED'
+    //                                 ELSE 'REFUND_COMPLETED'
+    //                             END as refund_status,
+
+    //                             CASE
+    //                                 WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+    //                                 WHEN rez.is_cancelled = 1   THEN 'CANCELLED'                                    
+    //                                 WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+    //                                 WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+    //                                 WHEN rez.is_quotation = 1   THEN 'QUOTATION'
+    //                                 -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+    //                                 WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
+    //                                 WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
+    //                                 WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+    //                                 WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
+    //                                 ELSE 'UNKNOWN'
+    //                             END AS reservation_status,
+
+    //                             'arrival' as operation_type,
+    //                             'TYPE_ONE' as op_type,
+    //                             it.id,
+    //                             it.code,
+    //                             it.flight_number,
+    //                             it.is_round_trip,
+    //                             it.passengers,
+    //                             it.spam,
+    //                             it.spam_count,
+    //                             it.op_one_pickup as filtered_date,
+    //                             zone_one.id as zone_one_id,
+    //                             zone_one.name as destination_name_from,
+    //                             it.from_name as from_name,
+    //                             zone_one.is_primary as zone_one_is_primary,
+    //                             zone_one.cut_off_operation as zone_one_cut_off,
+    //                             it.op_one_status as one_service_status,
+    //                             it.op_one_status_operation as one_service_operation_status,
+    //                             it.op_one_time_operation,
+    //                             it.op_one_preassignment,
+    //                             it.op_one_operating_cost,
+    //                             it.op_one_pickup as pickup_from,
+    //                             it.op_one_confirmation,
+    //                             it.op_one_operation_close,
+    //                             it.op_one_comments,
+    //                             it.op_one_cancelled_at,
+    //                             it.op_one_cancellation_level,
+    //                             it.vehicle_id_one,
+    //                             it.driver_id_one,
+    //                             zone_two.id as zone_two_id,
+    //                             zone_two.name as destination_name_to,
+    //                             it.to_name as to_name,
+    //                             zone_two.is_primary as zone_two_is_primary,
+    //                             zone_two.cut_off_operation as zone_two_cut_off,
+    //                             it.op_two_status as two_service_status,
+    //                             it.op_two_status_operation as two_service_operation_status,
+    //                             it.op_two_time_operation,
+    //                             it.op_two_preassignment,
+    //                             it.op_two_operating_cost,
+    //                             it.op_two_pickup as pickup_to,
+    //                             it.op_two_confirmation,
+    //                             it.op_two_operation_close,
+    //                             it.op_two_comments,
+    //                             it.op_two_cancelled_at,
+    //                             it.op_two_cancellation_level,
+    //                             it.vehicle_id_two,
+    //                             it.driver_id_two,
+    //                             it.is_open,
+    //                             it.open_service_time,
+    //                             tc_one.name_es AS cancellation_reason_one,
+    //                             tc_two.name_es AS cancellation_reason_two,
+
+    //                             CASE 
+    //                                 WHEN zone_one.is_primary = 1 THEN 'ARRIVAL'
+    //                                 WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 1 THEN 'DEPARTURE'
+    //                                 WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+    //                             END AS final_service_type,
+
+    //                             serv.id as service_type_id,
+    //                             serv.name as service_type_name,
+    //                             vehicle_one.name as vehicle_one_name,
+    //                             d_one.name as vehicle_name_one,
+    //                             vehicle_two.name as vehicle_two_name,
+    //                             d_two.name as vehicle_name_two,
+    //                             CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
+    //                             CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
+
+    //                             it_counter.quantity,
+    //                             -- GROUP_CONCAT(DISTINCT p.codes_payment ORDER BY p.codes_payment ASC SEPARATOR ',') AS codes_payment,
+    //                             GROUP_CONCAT(
+    //                                 DISTINCT 
+    //                                 CASE 
+    //                                     WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
+    //                                     WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+    //                                     WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+    //                                     ELSE 'NO DEFENIDO'
+    //                                 END
+    //                             ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+
+    //                             -- Nuevos campos para pagos en efectivo
+    //                             COALESCE(p.cash_amount, 0) AS cash_amount,
+    //                             COALESCE(p.cash_references) AS cash_references,
+    //                             COALESCE(p.cash_comments) AS cash_comments,
+    //                             COALESCE(p.cash_payment_ids) AS cash_payment_ids,
+    //                             COALESCE(p.cash_is_conciliated) AS cash_is_conciliated,
+
+    //                             COALESCE(SUM(s.total_sales), 0) as total_sales,
+    //                             COALESCE(SUM(p.total_payments), 0) as total_payments,
+    //                             COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+    //                             CASE
+    //                                 WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+    //                                 WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
+    //                                 ELSE 'PENDING'
+    //                             END AS payment_status,
+    //                             CASE 
+    //                                 WHEN it.is_round_trip = 1 THEN COALESCE(SUM(s.total_sales), 0) / 2
+    //                                 ELSE COALESCE(SUM(s.total_sales), 0)
+    //                             END AS service_cost,
+    //                             CASE 
+    //                                 WHEN it_counter.quantity > 0 THEN COALESCE(SUM(s.total_sales), 0) / it_counter.quantity
+    //                                 ELSE 0
+    //                             END AS cost
+    //                         FROM reservations_items as it
+    //                             INNER JOIN reservations as rez ON rez.id = it.reservation_id
+    //                             INNER JOIN sites as site ON site.id = rez.site_id
+    //                             INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
+    //                             INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
+    //                             INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
+    //                             LEFT OUTER JOIN users as us ON us.id = rez.call_center_agent_id
+    //                             LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
+    //                             LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
+    //                             LEFT OUTER JOIN vehicles as vehicle_one ON vehicle_one.id = it.vehicle_id_one
+    //                             LEFT OUTER JOIN destination_services as d_one ON d_one.id = vehicle_one.destination_service_id
+    //                             LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
+    //                             LEFT OUTER JOIN destination_services as d_two ON d_two.id = vehicle_two.destination_service_id
+    //                             LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
+    //                             LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+
+    //                             LEFT OUTER JOIN types_cancellations as tc_one ON tc_one.id = it.op_one_cancellation_type_id
+    //                             LEFT OUTER JOIN types_cancellations as tc_two ON tc_two.id = it.op_two_cancellation_type_id
+
+    //                             LEFT OUTER JOIN (
+    //                                 SELECT DISTINCT reservation_id
+    //                                 FROM reservations_media
+    //                             ) as upload ON upload.reservation_id = rez.id
+    //                             LEFT OUTER JOIN (
+    //                                 SELECT DISTINCT reservation_id
+    //                                 FROM reservations_follow_up
+    //                                 WHERE type IN ('CLIENT', 'OPERATION')
+    //                             ) as rfu ON rfu.reservation_id = rez.id
+
+    //                             -- Nuevos JOINs para la tabla de reembolsos
+    //                             LEFT OUTER JOIN (
+    //                                 SELECT 
+    //                                     reservation_id,
+    //                                     COUNT(*) as refund_count,
+    //                                     SUM(CASE WHEN status != 'REFUND_COMPLETED' THEN 1 ELSE 0 END) as pending_refund_count
+    //                                 FROM reservations_refunds
+    //                                 GROUP BY reservation_id
+    //                             ) as rr ON rr.reservation_id = rez.id
+
+    //                             LEFT JOIN (
+    //                                     SELECT
+    //                                         it.reservation_id,
+    //                                         SUM(CASE WHEN it.is_round_trip = 1 THEN 2 ELSE 1 END) as quantity
+    //                                     FROM reservations_items as it
+    //                                     GROUP BY it.reservation_id
+    //                             ) as it_counter ON it_counter.reservation_id = it.reservation_id
+    //                             LEFT JOIN (
+    //                                 SELECT 
+    //                                     reservation_id,  
+    //                                     ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+    //                                 FROM sales
+    //                                     WHERE deleted_at IS NULL
+    //                                 GROUP BY reservation_id
+    //                             ) as s ON s.reservation_id = rez.id
+    //                             LEFT JOIN (
+    //                                 SELECT 
+    //                                     reservation_id,
+    //                                     -- ROUND(SUM(CASE 
+    //                                     --     WHEN operation = 'multiplication' THEN total * exchange_rate
+    //                                     --     WHEN operation = 'division' THEN total / exchange_rate
+    //                                     --     ELSE total END), 2) AS total_payments,
+    //                                     ROUND(SUM(CASE
+    //                                         WHEN category IN ('PAYOUT', 'PAYOUT_CREDIT_PAID') THEN 
+    //                                             CASE 
+    //                                                 WHEN operation = 'multiplication' THEN total * exchange_rate
+    //                                                 WHEN operation = 'division' THEN total / exchange_rate
+    //                                                 ELSE total 
+    //                                             END
+    //                                         ELSE 0
+    //                                     END), 2) AS total_payments,
+
+    //                                     GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
+
+    //                                     -- Monto en efectivo
+    //                                     ROUND(SUM(CASE 
+    //                                         WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+    //                                             CASE 
+    //                                                 WHEN operation = 'multiplication' THEN total * exchange_rate
+    //                                                 WHEN operation = 'division' THEN total / exchange_rate
+    //                                                 ELSE total 
+    //                                             END
+    //                                         ELSE 0 
+    //                                     END), 2) AS cash_amount,                                        
+    //                                     -- Referencias de pagos en efectivo concatenadas
+    //                                     CONCAT(
+    //                                         '[',
+    //                                         GROUP_CONCAT(
+    //                                             DISTINCT 
+    //                                             CASE 
+    //                                                 WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+    //                                                     CONCAT(
+    //                                                         'Referencia: ', IFNULL(reference, 'SIN REFERENCIA'), 
+    //                                                         ' - Monto: ', 
+    //                                                         ROUND(
+    //                                                             CASE 
+    //                                                                 WHEN operation = 'multiplication' THEN total * exchange_rate
+    //                                                                 WHEN operation = 'division' THEN total / exchange_rate
+    //                                                                 ELSE total 
+    //                                                             END, 2
+    //                                                         )
+    //                                                     )
+    //                                                 ELSE NULL
+    //                                             END
+    //                                             SEPARATOR ']\n['
+    //                                         ),
+    //                                         ']'
+    //                                     ) AS cash_references,
+    //                                     -- Comentario de pagos en efectivo concatenadas
+    //                                     GROUP_CONCAT(DISTINCT CASE WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN conciliation_comment END SEPARATOR ', ') AS cash_comments,
+    //                                     -- Nuevo campo: solo IDs de pagos en efectivo concatenados
+    //                                     CONCAT(
+    //                                         '[',
+    //                                         GROUP_CONCAT(
+    //                                             DISTINCT 
+    //                                             CASE 
+    //                                                 WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN id
+    //                                                 ELSE NULL
+    //                                             END
+    //                                             ORDER BY id ASC
+    //                                             SEPARATOR ','
+    //                                         ),
+    //                                         ']'
+    //                                     ) AS cash_payment_ids,
+    //                                     -- Suma de estatus de conciliación (para determinar si todos están conciliados)
+    //                                     SUM(CASE 
+    //                                         WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+    //                                             CASE WHEN is_conciliated = 1 THEN 1 ELSE 0 END
+    //                                         ELSE 0
+    //                                     END) AS cash_is_conciliated,
+    //                                     -- Contador de pagos en efectivo
+    //                                     SUM(CASE 
+    //                                         WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 1
+    //                                         ELSE 0
+    //                                     END) AS cash_payment_count                                                                       
+    //                                 FROM payments
+    //                                     WHERE deleted_at IS NULL
+    //                                 GROUP BY reservation_id
+    //                             ) as p ON p.reservation_id = rez.id
+    //                         WHERE 1=1 {$queryOne}
+    //                         GROUP BY it.id, 
+    //                                 rez.id, 
+    //                                 rez.categories,
+    //                                 rez.client_first_name,
+    //                                 rez.client_last_name,
+    //                                 rez.client_email,
+    //                                 rez.client_phone,
+    //                                 rez.currency,
+    //                                 rez.language,
+    //                                 rez.is_cancelled,
+    //                                 rez.is_commissionable,
+    //                                 rez.site_id,
+    //                                 rez.pay_at_arrival,
+    //                                 rez.reference,
+    //                                 rez.affiliate_id,
+    //                                 rez.terminal,
+    //                                 rez.comments,
+    //                                 rez.is_duplicated,
+    //                                 rez.open_credit,
+    //                                 rez.is_complete,
+    //                                 rez.created_at,
+    //                                 rez.campaign,
+    //                                 rez.reserve_rating,
+    //                                 rez.is_last_minute,
+    //                                 rez.was_is_quotation,
+    //                                 rez.is_quotation,
+    //                                 site.is_cxc,
+    //                                 us.id,
+    //                                 us.status,
+    //                                 us.name,
+    //                                 site.id,
+    //                                 site.type_site,
+    //                                 site.color,
+    //                                 site.name,
+    //                                 origin.code,
+    //                                 tc.name_es,
+    //                                 upload.reservation_id,
+    //                                 rfu.reservation_id,
+    //                                 rr.reservation_id,
+    //                                 rr.refund_count,
+    //                                 rr.pending_refund_count,
+    //                                 serv.id,
+    //                                 serv.name,
+    //                                 zone_one.id,
+    //                                 zone_one.name,
+    //                                 zone_one.is_primary,
+    //                                 zone_one.cut_off_operation,
+    //                                 zone_two.id,
+    //                                 zone_two.name,
+    //                                 zone_two.is_primary,
+    //                                 zone_two.cut_off_operation,
+    //                                 vehicle_one.name,
+    //                                 d_one.name,
+    //                                 vehicle_two.name,
+    //                                 d_two.name,
+    //                                 driver_one.names,
+    //                                 driver_one.surnames,
+    //                                 driver_two.names,
+    //                                 driver_two.surnames,
+    //                                 tc_one.name_es,
+    //                                 tc_two.name_es,
+    //                                 it.code,
+    //                                 it.flight_number,
+    //                                 it.is_round_trip,
+    //                                 it.passengers,
+    //                                 it.spam,
+    //                                 it.spam_count,
+    //                                 it.op_one_pickup,
+    //                                 it.from_name,
+    //                                 it.op_one_status,
+    //                                 it.op_one_status_operation,
+    //                                 it.op_one_time_operation,
+    //                                 it.op_one_preassignment,
+    //                                 it.op_one_operating_cost,
+    //                                 it.op_one_confirmation,
+    //                                 it.op_one_operation_close,
+    //                                 it.op_one_comments,
+    //                                 it.op_one_cancelled_at,
+    //                                 it.op_one_cancellation_level,
+    //                                 it.vehicle_id_one,
+    //                                 it.driver_id_one,
+    //                                 it.op_two_pickup,
+    //                                 it.to_name,
+    //                                 it.op_two_status,
+    //                                 it.op_two_status_operation,
+    //                                 it.op_two_time_operation,
+    //                                 it.op_two_preassignment,
+    //                                 it.op_two_operating_cost,
+    //                                 it.op_two_confirmation,
+    //                                 it.op_two_operation_close,
+    //                                 it.op_two_comments,
+    //                                 it.op_two_cancelled_at,
+    //                                 it.op_two_cancellation_level,
+    //                                 it.vehicle_id_two,
+    //                                 it.driver_id_two,
+    //                                 it.is_open,
+    //                                 it.open_service_time,
+    //                                 it_counter.quantity,
+    //                                 p.cash_amount,
+    //                                 p.cash_references,
+    //                                 p.cash_comments,
+    //                                 p.cash_payment_ids,
+    //                                 p.cash_is_conciliated                                   
+    //                                 {$queryHaving}
+
+    //                         UNION
+
+    //                         SELECT 
+    //                             rez.id as reservation_id,
+    //                             rez.categories,
+    //                             CONCAT(rez.client_first_name, ' ', rez.client_last_name) as full_name,
+    //                             rez.client_email,
+    //                             rez.client_phone,
+    //                             rez.currency,
+    //                             rez.language,
+    //                             rez.is_cancelled,
+    //                             rez.is_commissionable,
+    //                             rez.site_id,
+    //                             rez.pay_at_arrival,
+    //                             rez.reference,
+    //                             rez.affiliate_id,
+    //                             rez.terminal,
+    //                             rez.comments,
+    //                             rez.is_duplicated,
+    //                             rez.open_credit,
+    //                             rez.is_complete,
+    //                             rez.created_at,
+    //                             rez.campaign,
+    //                             rez.reserve_rating,
+    //                             rez.is_last_minute,
+
+    //                             us.id AS employee_code,
+    //                             us.status AS employee_status,
+    //                             us.name AS employee,
+
+    //                             site.id as site_code,
+    //                             site.type_site AS type_site,
+    //                             site.color as site_color,
+    //                             site.name as site_name,
+
+    //                             origin.code AS origin_code,
+    //                             tc.name_es AS cancellation_reason,
+    //                             CASE WHEN upload.reservation_id IS NOT NULL THEN 1 ELSE 0 END as pictures,
+    //                             CASE WHEN rfu.reservation_id IS NOT NULL THEN 1 ELSE 0 END as messages,
+
+    //                             -- Información de reembolsos
+    //                             CASE WHEN rr.reservation_id IS NOT NULL THEN 1 ELSE 0 END as has_refund_request,
+    //                             COALESCE(rr.refund_count, 0) as refund_request_count,
+    //                             CASE 
+    //                                 WHEN rr.reservation_id IS NULL THEN 'NO_REFUND'
+    //                                 WHEN rr.pending_refund_count > 0 THEN 'REFUND_REQUESTED'
+    //                                 ELSE 'REFUND_COMPLETED'
+    //                             END as refund_status,                                
+
+    //                             CASE
+    //                                 WHEN rez.is_cancelled = 1   AND rez.was_is_quotation = 1  THEN 'EXPIRED_QUOTATION'
+    //                                 WHEN rez.is_cancelled = 1   THEN 'CANCELLED'                                    
+    //                                 WHEN rez.is_duplicated = 1  THEN 'DUPLICATED'
+    //                                 WHEN rez.open_credit = 1    THEN 'OPENCREDIT'
+    //                                 WHEN rez.is_quotation = 1   THEN 'QUOTATION'
+    //                                 -- WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+    //                                 WHEN site.is_cxc = 1 AND ( COALESCE(SUM(p.total_payments), 0) = 0 OR ( COALESCE(SUM(p.total_payments), 0) < COALESCE(SUM(s.total_sales), 0) ) ) THEN 'CREDIT'
+    //                                 WHEN rez.pay_at_arrival = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'PAY_AT_ARRIVAL'
+    //                                 WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) > 0 THEN 'PENDING'
+    //                                 WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'CONFIRMED'
+    //                                 ELSE 'UNKNOWN'
+    //                             END AS reservation_status,
+
+    //                             'departure' as operation_type,
+    //                             'TYPE_TWO' as op_type,
+    //                             it.id,
+    //                             it.code,
+    //                             it.flight_number,
+    //                             it.is_round_trip,
+    //                             it.passengers,
+    //                             it.spam,
+    //                             it.spam_count,
+    //                             it.op_two_pickup as filtered_date,
+    //                             zone_one.id as zone_one_id,
+    //                             zone_one.name as destination_name_from,
+    //                             it.from_name as from_name,
+    //                             zone_one.is_primary as zone_one_is_primary, 
+    //                             zone_one.cut_off_operation as zone_one_cut_off,
+    //                             it.op_one_status as one_service_status,
+    //                             it.op_one_status_operation as one_service_operation_status,
+    //                             it.op_one_time_operation,
+    //                             it.op_one_preassignment,
+    //                             it.op_one_operating_cost,
+    //                             it.op_one_pickup as pickup_from,
+    //                             it.op_one_confirmation,
+    //                             it.op_one_operation_close,
+    //                             it.op_one_comments,
+    //                             it.op_one_cancelled_at,
+    //                             it.op_one_cancellation_level,
+    //                             it.vehicle_id_one,
+    //                             it.driver_id_one,                                
+    //                             zone_two.id as zone_two_id,
+    //                             zone_two.name as destination_name_to,                                
+    //                             it.to_name as to_name,
+    //                             zone_two.is_primary as zone_two_is_primary, 
+    //                             zone_two.cut_off_operation as zone_two_cut_off,
+    //                             it.op_two_status as two_service_status,
+    //                             it.op_two_status_operation as two_service_operation_status,
+    //                             it.op_two_time_operation,
+    //                             it.op_two_preassignment,
+    //                             it.op_two_operating_cost,
+    //                             it.op_two_pickup as pickup_to,
+    //                             it.op_two_confirmation,
+    //                             it.op_two_operation_close,
+    //                             it.op_two_comments,
+    //                             it.op_two_cancelled_at,
+    //                             it.op_two_cancellation_level,
+    //                             it.vehicle_id_two,
+    //                             it.driver_id_two,
+    //                             it.is_open,
+    //                             it.open_service_time,
+    //                             tc_one.name_es AS cancellation_reason_one,
+    //                             tc_two.name_es AS cancellation_reason_two,
+
+    //                             CASE
+    //                                 WHEN zone_two.is_primary = 0 AND zone_one.is_primary = 1  THEN 'DEPARTURE'
+    //                                 WHEN zone_one.is_primary = 0 AND zone_two.is_primary = 0 THEN 'TRANSFER'
+    //                                 ELSE 'ARRIVAL'
+    //                             END AS final_service_type,
+
+    //                             serv.id as service_type_id,
+    //                             serv.name as service_type_name,
+    //                             vehicle_one.name as vehicle_one_name,
+    //                             d_one.name as vehicle_name_one,
+    //                             vehicle_two.name as vehicle_two_name,
+    //                             d_two.name as vehicle_name_two,
+    //                             CONCAT(driver_one.names,' ',driver_one.surnames) as driver_one_name,
+    //                             CONCAT(driver_two.names,' ',driver_two.surnames) as driver_two_name,
+
+    //                             it_counter.quantity,
+    //                             -- GROUP_CONCAT(DISTINCT p.codes_payment ORDER BY p.codes_payment ASC SEPARATOR ',') AS codes_payment,
+    //                             GROUP_CONCAT(
+    //                                 DISTINCT 
+    //                                 CASE
+    //                                     WHEN site.is_cxc = 1 AND p.payment_type_name IS NULL THEN 'CREDIT'
+    //                                     WHEN p.payment_type_name IS NOT NULL THEN p.payment_type_name
+    //                                     WHEN rez.pay_at_arrival = 1 THEN 'CASH'  -- Asumiendo que pay_at_arrival=1 significa pago en efectivo
+    //                                     ELSE 'NO DEFENIDO'                                        
+    //                                 END
+    //                             ORDER BY p.payment_type_name ASC SEPARATOR ', ') AS payment_type_name,
+
+    //                             -- Nuevos campos para pagos en efectivo
+    //                             COALESCE(p.cash_amount, 0) AS cash_amount,
+    //                             COALESCE(p.cash_references) AS cash_references,
+    //                             COALESCE(p.cash_comments) AS cash_comments,
+    //                             COALESCE(p.cash_payment_ids) AS cash_payment_ids,
+    //                             COALESCE(p.cash_is_conciliated) AS cash_is_conciliated,
+
+    //                             COALESCE(SUM(s.total_sales), 0) as total_sales,
+    //                             COALESCE(SUM(p.total_payments), 0) as total_payments,
+    //                             COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) AS total_balance,
+    //                             CASE
+    //                                 WHEN site.is_cxc = 1 AND COALESCE(SUM(p.total_payments), 0) = 0 THEN 'CREDIT'
+    //                                 WHEN COALESCE(SUM(s.total_sales), 0) - COALESCE(SUM(p.total_payments), 0) <= 0 THEN 'PAID'
+    //                                 ELSE 'PENDING'
+    //                             END AS payment_status,
+    //                             CASE 
+    //                                 WHEN it.is_round_trip = 1 THEN COALESCE(SUM(s.total_sales), 0) / 2
+    //                                 ELSE COALESCE(SUM(s.total_sales), 0)
+    //                             END AS service_cost,
+    //                             CASE 
+    //                                 WHEN it_counter.quantity > 0 THEN COALESCE(SUM(s.total_sales), 0) / it_counter.quantity
+    //                                 ELSE 0
+    //                             END AS cost                                
+    //                         FROM reservations_items as it
+    //                             INNER JOIN reservations as rez ON rez.id = it.reservation_id
+    //                             INNER JOIN sites as site ON site.id = rez.site_id
+    //                             INNER JOIN zones as zone_one ON zone_one.id = it.from_zone
+    //                             INNER JOIN zones as zone_two ON zone_two.id = it.to_zone
+    //                             INNER JOIN destination_services as serv ON serv.id = it.destination_service_id
+    //                             LEFT OUTER JOIN users as us ON us.id = rez.call_center_agent_id
+    //                             LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
+    //                             LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
+    //                             LEFT OUTER JOIN vehicles as vehicle_one ON vehicle_one.id = it.vehicle_id_one
+    //                             LEFT OUTER JOIN destination_services as d_one ON d_one.id = vehicle_one.destination_service_id
+    //                             LEFT OUTER JOIN vehicles as vehicle_two ON vehicle_two.id = it.vehicle_id_two
+    //                             LEFT OUTER JOIN destination_services as d_two ON d_two.id = vehicle_two.destination_service_id
+    //                             LEFT OUTER JOIN drivers as driver_one ON driver_one.id = it.driver_id_one
+    //                             LEFT OUTER JOIN drivers as driver_two ON driver_two.id = it.driver_id_two
+
+    //                             LEFT OUTER JOIN types_cancellations as tc_one ON tc_one.id = it.op_one_cancellation_type_id
+    //                             LEFT OUTER JOIN types_cancellations as tc_two ON tc_two.id = it.op_two_cancellation_type_id                                
+
+    //                             LEFT OUTER JOIN (
+    //                                 SELECT DISTINCT reservation_id
+    //                                 FROM reservations_media
+    //                             ) as upload ON upload.reservation_id = rez.id
+    //                             LEFT OUTER JOIN (
+    //                                 SELECT DISTINCT reservation_id
+    //                                 FROM reservations_follow_up
+    //                                 WHERE type IN ('CLIENT', 'OPERATION')
+    //                             ) as rfu ON rfu.reservation_id = rez.id
+
+    //                             -- Nuevos JOINs para la tabla de reembolsos
+    //                             LEFT OUTER JOIN (
+    //                                 SELECT 
+    //                                     reservation_id,
+    //                                     COUNT(*) as refund_count,
+    //                                     SUM(CASE WHEN status != 'REFUND_COMPLETED' THEN 1 ELSE 0 END) as pending_refund_count
+    //                                 FROM reservations_refunds
+    //                                 GROUP BY reservation_id
+    //                             ) as rr ON rr.reservation_id = rez.id
+
+    //                             LEFT JOIN (
+    //                                     SELECT
+    //                                         it.reservation_id,
+    //                                         SUM(CASE WHEN it.is_round_trip = 1 THEN 2 ELSE 1 END) as quantity
+    //                                     FROM reservations_items as it
+    //                                     GROUP BY it.reservation_id
+    //                             ) as it_counter ON it_counter.reservation_id = it.reservation_id
+    //                             LEFT JOIN (
+    //                                 SELECT 
+    //                                     reservation_id,  
+    //                                     ROUND( COALESCE(SUM(total), 0), 2) as total_sales
+    //                                 FROM sales
+    //                                     WHERE deleted_at IS NULL
+    //                                 GROUP BY reservation_id
+    //                             ) as s ON s.reservation_id = rez.id
+    //                             LEFT JOIN (
+    //                                 SELECT 
+    //                                     reservation_id,
+    //                                     -- ROUND(SUM(CASE 
+    //                                     --             WHEN operation = 'multiplication' THEN total * exchange_rate
+    //                                     --             WHEN operation = 'division' THEN total / exchange_rate
+    //                                     --             ELSE total 
+    //                                     --         END), 2) AS total_payments,
+    //                                     ROUND(SUM(CASE
+    //                                         WHEN category IN ('PAYOUT', 'PAYOUT_CREDIT_PAID') THEN 
+    //                                             CASE 
+    //                                                 WHEN operation = 'multiplication' THEN total * exchange_rate
+    //                                                 WHEN operation = 'division' THEN total / exchange_rate
+    //                                                 ELSE total 
+    //                                             END
+    //                                         ELSE 0
+    //                                     END), 2) AS total_payments,
+
+    //                                     GROUP_CONCAT(DISTINCT payment_method ORDER BY payment_method ASC SEPARATOR ',') AS payment_type_name,
+
+    //                                     -- Monto en efectivo
+    //                                     ROUND(SUM(CASE 
+    //                                                 WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+    //                                                 CASE 
+    //                                                     WHEN operation = 'multiplication' THEN total * exchange_rate
+    //                                                     WHEN operation = 'division' THEN total / exchange_rate
+    //                                                     ELSE total 
+    //                                                 END
+    //                                             ELSE 0 
+    //                                     END), 2) AS cash_amount,
+    //                                     -- Referencias de pagos en efectivo concatenadas
+    //                                     CONCAT(
+    //                                         '[',
+    //                                         GROUP_CONCAT(
+    //                                             DISTINCT 
+    //                                             CASE 
+    //                                                 WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+    //                                                     CONCAT(
+    //                                                         'Referencia: ', IFNULL(reference, 'SIN REFERENCIA'), 
+    //                                                         ' - Monto: ', 
+    //                                                         ROUND(
+    //                                                             CASE 
+    //                                                                 WHEN operation = 'multiplication' THEN total * exchange_rate
+    //                                                                 WHEN operation = 'division' THEN total / exchange_rate
+    //                                                                 ELSE total 
+    //                                                             END, 2
+    //                                                         )
+    //                                                     )
+    //                                                 ELSE NULL
+    //                                             END
+    //                                             SEPARATOR ']\n['
+    //                                         ),
+    //                                         ']'
+    //                                     ) AS cash_references,
+    //                                     -- Comentario de pagos en efectivo concatenadas
+    //                                     GROUP_CONCAT(DISTINCT CASE WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN conciliation_comment END SEPARATOR ', ') AS cash_comments,                                        
+    //                                     -- Nuevo campo: solo IDs de pagos en efectivo concatenados
+    //                                     CONCAT(
+    //                                         '[',
+    //                                         GROUP_CONCAT(
+    //                                             DISTINCT 
+    //                                             CASE 
+    //                                                 WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN id
+    //                                                 ELSE NULL
+    //                                             END
+    //                                             ORDER BY id ASC
+    //                                             SEPARATOR ','
+    //                                         ),
+    //                                         ']'
+    //                                     ) AS cash_payment_ids,
+    //                                     -- Suma de estatus de conciliación (para determinar si todos están conciliados)
+    //                                     SUM(CASE 
+    //                                         WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 
+    //                                             CASE WHEN is_conciliated = 1 THEN 1 ELSE 0 END
+    //                                         ELSE 0
+    //                                     END) AS cash_is_conciliated,
+    //                                     -- Contador de pagos en efectivo
+    //                                     SUM(CASE 
+    //                                         WHEN payment_method = 'CASH' OR payment_method LIKE '%EFECTIVO%' THEN 1
+    //                                         ELSE 0
+    //                                     END) AS cash_payment_count
+    //                                 FROM payments
+    //                                     WHERE deleted_at IS NULL
+    //                                 GROUP BY reservation_id
+    //                             ) as p ON p.reservation_id = rez.id
+    //                         WHERE 1=1 {$queryTwo}
+    //                         GROUP BY it.id, 
+    //                                 rez.id, 
+    //                                 rez.categories,
+    //                                 rez.client_first_name,
+    //                                 rez.client_last_name,
+    //                                 rez.client_email,
+    //                                 rez.client_phone,
+    //                                 rez.currency,
+    //                                 rez.language,
+    //                                 rez.is_cancelled,
+    //                                 rez.is_commissionable,
+    //                                 rez.site_id,
+    //                                 rez.pay_at_arrival,
+    //                                 rez.reference,
+    //                                 rez.affiliate_id,
+    //                                 rez.terminal,
+    //                                 rez.comments,
+    //                                 rez.is_duplicated,
+    //                                 rez.open_credit,
+    //                                 rez.is_complete,
+    //                                 rez.created_at,
+    //                                 rez.campaign,
+    //                                 rez.reserve_rating,
+    //                                 rez.is_last_minute,
+    //                                 rez.was_is_quotation,
+    //                                 rez.is_quotation,
+    //                                 site.is_cxc,
+    //                                 us.id,
+    //                                 us.status,
+    //                                 us.name,
+    //                                 site.id,
+    //                                 site.type_site,
+    //                                 site.color,
+    //                                 site.name,
+    //                                 origin.code,
+    //                                 tc.name_es,
+    //                                 upload.reservation_id,
+    //                                 rfu.reservation_id,
+    //                                 rr.reservation_id,
+    //                                 rr.refund_count,
+    //                                 rr.pending_refund_count,
+    //                                 serv.id,
+    //                                 serv.name,
+    //                                 zone_one.id,
+    //                                 zone_one.name,
+    //                                 zone_one.is_primary,
+    //                                 zone_one.cut_off_operation,
+    //                                 zone_two.id,
+    //                                 zone_two.name,
+    //                                 zone_two.is_primary,
+    //                                 zone_two.cut_off_operation,
+    //                                 vehicle_one.name,
+    //                                 d_one.name,
+    //                                 vehicle_two.name,
+    //                                 d_two.name,
+    //                                 driver_one.names,
+    //                                 driver_one.surnames,
+    //                                 driver_two.names,
+    //                                 driver_two.surnames,
+    //                                 tc_one.name_es,
+    //                                 tc_two.name_es,
+    //                                 it.code,
+    //                                 it.flight_number,
+    //                                 it.is_round_trip,
+    //                                 it.passengers,
+    //                                 it.spam,
+    //                                 it.spam_count,
+    //                                 it.op_one_pickup,
+    //                                 it.from_name,
+    //                                 it.op_one_status,
+    //                                 it.op_one_status_operation,
+    //                                 it.op_one_time_operation,
+    //                                 it.op_one_preassignment,
+    //                                 it.op_one_operating_cost,                        
+    //                                 it.op_one_confirmation,
+    //                                 it.op_one_operation_close,
+    //                                 it.op_one_comments,
+    //                                 it.op_one_cancelled_at,
+    //                                 it.op_one_cancellation_level,
+    //                                 it.vehicle_id_one,
+    //                                 it.driver_id_one,
+    //                                 it.op_two_pickup,
+    //                                 it.to_name,
+    //                                 it.op_two_status,
+    //                                 it.op_two_status_operation,
+    //                                 it.op_two_time_operation,
+    //                                 it.op_two_preassignment,
+    //                                 it.op_two_operating_cost,
+    //                                 it.op_two_confirmation,
+    //                                 it.op_two_operation_close,
+    //                                 it.op_two_comments,
+    //                                 it.op_two_cancelled_at,
+    //                                 it.op_two_cancellation_level,
+    //                                 it.vehicle_id_two,
+    //                                 it.driver_id_two,
+    //                                 it.is_open,
+    //                                 it.open_service_time,
+    //                                 it_counter.quantity,
+    //                                 p.cash_amount,
+    //                                 p.cash_references,
+    //                                 p.cash_comments,
+    //                                 p.cash_payment_ids,
+    //                                 p.cash_is_conciliated
+    //                                 {$queryHaving}
+    //                         -- ) AS combined_results
+    //                         ORDER BY filtered_date ASC ",[
+    //                             "init_date_one" => $queryData['init'],
+    //                             "init_date_two" => $queryData['end'],
+    //                             "init_date_three" => $queryData['init'],
+    //                             "init_date_four" => $queryData['end'],
+    //                         ]);
+    // }
+
     public function queryOperations($queryOne, $queryTwo, $queryHaving, $queryData){
         return  DB::select("SELECT 
                                 rez.id as reservation_id,
@@ -777,110 +1602,7 @@ trait QueryTrait
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryOne}
-                            GROUP BY it.id, 
-                                    rez.id, 
-                                    rez.categories,
-                                    rez.client_first_name,
-                                    rez.client_last_name,
-                                    rez.client_email,
-                                    rez.client_phone,
-                                    rez.currency,
-                                    rez.language,
-                                    rez.is_cancelled,
-                                    rez.is_commissionable,
-                                    rez.site_id,
-                                    rez.pay_at_arrival,
-                                    rez.reference,
-                                    rez.affiliate_id,
-                                    rez.terminal,
-                                    rez.comments,
-                                    rez.is_duplicated,
-                                    rez.open_credit,
-                                    rez.is_complete,
-                                    rez.created_at,
-                                    rez.campaign,
-                                    rez.reserve_rating,
-                                    rez.is_last_minute,
-                                    rez.was_is_quotation,
-                                    rez.is_quotation,
-                                    site.is_cxc,
-                                    us.id,
-                                    us.status,
-                                    us.name,
-                                    site.id,
-                                    site.type_site,
-                                    site.color,
-                                    site.name,
-                                    origin.code,
-                                    tc.name_es,
-                                    upload.reservation_id,
-                                    rfu.reservation_id,
-                                    rr.reservation_id,
-                                    rr.refund_count,
-                                    rr.pending_refund_count,
-                                    serv.id,
-                                    serv.name,
-                                    zone_one.id,
-                                    zone_one.name,
-                                    zone_one.is_primary,
-                                    zone_one.cut_off_operation,
-                                    zone_two.id,
-                                    zone_two.name,
-                                    zone_two.is_primary,
-                                    zone_two.cut_off_operation,
-                                    vehicle_one.name,
-                                    d_one.name,
-                                    vehicle_two.name,
-                                    d_two.name,
-                                    driver_one.names,
-                                    driver_one.surnames,
-                                    driver_two.names,
-                                    driver_two.surnames,
-                                    tc_one.name_es,
-                                    tc_two.name_es,
-                                    it.code,
-                                    it.flight_number,
-                                    it.is_round_trip,
-                                    it.passengers,
-                                    it.spam,
-                                    it.spam_count,
-                                    it.op_one_pickup,
-                                    it.from_name,
-                                    it.op_one_status,
-                                    it.op_one_status_operation,
-                                    it.op_one_time_operation,
-                                    it.op_one_preassignment,
-                                    it.op_one_operating_cost,
-                                    it.op_one_confirmation,
-                                    it.op_one_operation_close,
-                                    it.op_one_comments,
-                                    it.op_one_cancelled_at,
-                                    it.op_one_cancellation_level,
-                                    it.vehicle_id_one,
-                                    it.driver_id_one,
-                                    it.op_two_pickup,
-                                    it.to_name,
-                                    it.op_two_status,
-                                    it.op_two_status_operation,
-                                    it.op_two_time_operation,
-                                    it.op_two_preassignment,
-                                    it.op_two_operating_cost,
-                                    it.op_two_confirmation,
-                                    it.op_two_operation_close,
-                                    it.op_two_comments,
-                                    it.op_two_cancelled_at,
-                                    it.op_two_cancellation_level,
-                                    it.vehicle_id_two,
-                                    it.driver_id_two,
-                                    it.is_open,
-                                    it.open_service_time,
-                                    it_counter.quantity,
-                                    p.cash_amount,
-                                    p.cash_references,
-                                    p.cash_comments,
-                                    p.cash_payment_ids,
-                                    p.cash_is_conciliated                                   
-                                    {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_comments, p.cash_payment_ids, p.cash_is_conciliated {$queryHaving}
 
                             UNION
 
@@ -1186,110 +1908,7 @@ trait QueryTrait
                                     GROUP BY reservation_id
                                 ) as p ON p.reservation_id = rez.id
                             WHERE 1=1 {$queryTwo}
-                            GROUP BY it.id, 
-                                    rez.id, 
-                                    rez.categories,
-                                    rez.client_first_name,
-                                    rez.client_last_name,
-                                    rez.client_email,
-                                    rez.client_phone,
-                                    rez.currency,
-                                    rez.language,
-                                    rez.is_cancelled,
-                                    rez.is_commissionable,
-                                    rez.site_id,
-                                    rez.pay_at_arrival,
-                                    rez.reference,
-                                    rez.affiliate_id,
-                                    rez.terminal,
-                                    rez.comments,
-                                    rez.is_duplicated,
-                                    rez.open_credit,
-                                    rez.is_complete,
-                                    rez.created_at,
-                                    rez.campaign,
-                                    rez.reserve_rating,
-                                    rez.is_last_minute,
-                                    rez.was_is_quotation,
-                                    rez.is_quotation,
-                                    site.is_cxc,
-                                    us.id,
-                                    us.status,
-                                    us.name,
-                                    site.id,
-                                    site.type_site,
-                                    site.color,
-                                    site.name,
-                                    origin.code,
-                                    tc.name_es,
-                                    upload.reservation_id,
-                                    rfu.reservation_id,
-                                    rr.reservation_id,
-                                    rr.refund_count,
-                                    rr.pending_refund_count,
-                                    serv.id,
-                                    serv.name,
-                                    zone_one.id,
-                                    zone_one.name,
-                                    zone_one.is_primary,
-                                    zone_one.cut_off_operation,
-                                    zone_two.id,
-                                    zone_two.name,
-                                    zone_two.is_primary,
-                                    zone_two.cut_off_operation,
-                                    vehicle_one.name,
-                                    d_one.name,
-                                    vehicle_two.name,
-                                    d_two.name,
-                                    driver_one.names,
-                                    driver_one.surnames,
-                                    driver_two.names,
-                                    driver_two.surnames,
-                                    tc_one.name_es,
-                                    tc_two.name_es,
-                                    it.code,
-                                    it.flight_number,
-                                    it.is_round_trip,
-                                    it.passengers,
-                                    it.spam,
-                                    it.spam_count,
-                                    it.op_one_pickup,
-                                    it.from_name,
-                                    it.op_one_status,
-                                    it.op_one_status_operation,
-                                    it.op_one_time_operation,
-                                    it.op_one_preassignment,
-                                    it.op_one_operating_cost,                        
-                                    it.op_one_confirmation,
-                                    it.op_one_operation_close,
-                                    it.op_one_comments,
-                                    it.op_one_cancelled_at,
-                                    it.op_one_cancellation_level,
-                                    it.vehicle_id_one,
-                                    it.driver_id_one,
-                                    it.op_two_pickup,
-                                    it.to_name,
-                                    it.op_two_status,
-                                    it.op_two_status_operation,
-                                    it.op_two_time_operation,
-                                    it.op_two_preassignment,
-                                    it.op_two_operating_cost,
-                                    it.op_two_confirmation,
-                                    it.op_two_operation_close,
-                                    it.op_two_comments,
-                                    it.op_two_cancelled_at,
-                                    it.op_two_cancellation_level,
-                                    it.vehicle_id_two,
-                                    it.driver_id_two,
-                                    it.is_open,
-                                    it.open_service_time,
-                                    it_counter.quantity,
-                                    p.cash_amount,
-                                    p.cash_references,
-                                    p.cash_comments,
-                                    p.cash_payment_ids,
-                                    p.cash_is_conciliated
-                                    {$queryHaving}
+                            GROUP BY it.id, rez.id, serv.id, site.id, zone_one.id, zone_two.id, us.name, upload.reservation_id, rfu.reservation_id, it_counter.quantity, rr.reservation_id, rr.refund_count, rr.pending_refund_count, p.cash_amount, p.cash_references, p.cash_comments, p.cash_payment_ids, p.cash_is_conciliated {$queryHaving}
                             -- ) AS combined_results
                             ORDER BY filtered_date ASC ",[
                                 "init_date_one" => $queryData['init'],
@@ -1297,7 +1916,7 @@ trait QueryTrait
                                 "init_date_three" => $queryData['init'],
                                 "init_date_four" => $queryData['end'],
                             ]);
-    }
+    }    
 
     //NO SE ESTA UTILIZANDO POR NINGUN LADO
     public function queryConciliationStripe($query, $query2, $queryData){

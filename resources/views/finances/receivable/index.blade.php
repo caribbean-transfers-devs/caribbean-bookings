@@ -96,7 +96,6 @@
                     <tbody>
                         @if(sizeof($bookings) >= 1)
                             @foreach ($bookings as $booking)
-                                {{-- @dump($booking); --}}
                                 @php
                                     $color_status = '#e7515a';
                                     $text_status = 'PENDIENTE DE CONCILIAR PAGO';
