@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     allowEscapeKey: false,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        location.reload();
+                        // location.reload();
                     }                    
                 });
             })
@@ -398,8 +398,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     allowEscapeKey: false,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        location.reload();
-                    }                    
+                        // location.reload();
+                    }
                 });
             })
             .catch(error => {
@@ -453,7 +453,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     allowEscapeKey: false,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        location.reload();
+                        // location.reload();
                     }                    
                 });
             })
@@ -507,7 +507,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     allowEscapeKey: false,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        location.reload();
+                        // location.reload();
                     }                    
                 });
             })
@@ -561,7 +561,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     allowEscapeKey: false,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        location.reload();
+                        // location.reload();
                     }                    
                 });
             })
@@ -615,8 +615,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     allowEscapeKey: false,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        location.reload();
-                    }                    
+                        // location.reload();
+                    }
                 });
             })
             .catch(error => {
@@ -669,7 +669,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     allowEscapeKey: false,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        location.reload();
+                        // location.reload();
                     }                    
                 });
             })
