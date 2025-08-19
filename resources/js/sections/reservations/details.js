@@ -759,6 +759,29 @@ if( markReservationDuplicate ){
 document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("click", components.debounce(function (event) {
         components.typesCancellations();
+
+        if (event.target.classList.contains('paymentLink')) {
+            event.preventDefault();
+
+            // Definir parámetros de la petición
+            const target     = event.target;
+            const { reservation, email, language, type } = target.dataset;
+            
+            let URL = `https://caribbean-transfers.com/easy-payment?code=${reservation}&email=${email}&language=${language}&type=${type}`;
+            if(language == "es"){
+                URL = `https://caribbean-transfers.com/es/easy-payment?code=${reservation}&email=${email}&language=${language}&type=${type}`;
+            }
+
+            navigator.clipboard.writeText(URL).then(function() {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    html: `Se ha copiado la URL (${language}) al porta papeles`,
+                })            
+            }).catch(function(error) {
+                console.error('Error al copiar el texto al portapapeles: ', error);
+            });            
+        }        
         
         //PERMITE CALIFICAR LA RESERVACION
         if (event.target.classList.contains('enabledLike')) {
@@ -1901,39 +1924,6 @@ $( document ).delegate( ".deleteMedia", "click", function(e) {
         }
     });
 });
-
-function copyPaymentLink(event, code, email, lang){
-    event.preventDefault();
-
-    let URL = `https://caribbean-transfers.com/easy-payment?code=${code}&email=${email}`;
-    if(lang == "es"){
-        URL = `https://caribbean-transfers.com/es/easy-payment?code=${code}&email=${email}`;
-    }
-
-    navigator.clipboard.writeText(URL).then(function() {
-
-        Swal.fire({
-            title: '¡Éxito!',
-            icon: 'success',
-            html: `Se ha copiado la URL (${lang}) al porta papeles`,
-            timer: 1500,
-            timerProgressBar: true,
-            didOpen: () => {
-                Swal.showLoading()
-                const b = Swal.getHtmlContainer().querySelector('b')
-                timerInterval = setInterval(() => {
-                }, 100)
-            },
-            willClose: () => {
-                clearInterval(timerInterval)
-            }
-        }).then((result) => {
-            location.reload();
-        })
-    }).catch(function(error) {
-        console.error('Error al copiar el texto al portapapeles: ', error);
-    });    
-}
 
 const __site = document.getElementById('serviceSiteReference');
 if( __site ){
