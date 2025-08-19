@@ -58,3 +58,52 @@ USE transportation_api; SELECT COUNT(*) FROM information_schema.tables WHERE tab
 
 sudo chown -R www-data:www-data /var/www/transportation_api
 sudo chmod -R 775 storage bootstrap/cache
+
+sudo systemctl restart mysql
+
+[ERROR en la consulta 42] Data truncated for column 'status_unit' at row 2
+[ERROR en la consulta 148] Incorrect string value: '\xF0\x9F\x99\x84' for column 'text' at row 412
+[ERROR en la consulta 165] Incorrect string value: '\xF0\x9F\x8E\x88' for column 'text' at row 360
+[ERROR en la consulta 182] Incorrect string value: '\xF0\x9F\x98\x81' for column 'text' at row 3334
+[ERROR en la consulta 186] Incorrect string value: '\xF0\x9F\x91\x8D' for column 'text' at row 3951
+[ERROR en la consulta 208] Incorrect string value: '\xF0\x9F\x98\x8A' for column 'text' at row 3145
+[ERROR en la consulta 215] Incorrect string value: '\xF0\x9F\xA5\xB3' for column 'text' at row 2348
+[ERROR en la consulta 239] Incorrect string value: '\xF0\x9F\x98\x8A' for column 'text' at row 1128
+[ERROR en la consulta 244] Incorrect string value: '\xF0\x9F\x98\x8A' for column 'text' at row 4660
+[ERROR en la consulta 262] Incorrect string value: '\xF0\x9D\x99\xB2\xF0\x9D...' for column 'text' at row 921
+[ERROR en la consulta 264] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 1194
+[ERROR en la consulta 266] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 3598
+[ERROR en la consulta 271] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 2963
+[ERROR en la consulta 272] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 2604
+[ERROR en la consulta 274] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 4487
+[ERROR en la consulta 275] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 4512
+[ERROR en la consulta 276] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 890
+[ERROR en la consulta 317] Incorrect string value: '\xF0\x9D\x99\xB3\xF0\x9D...' for column 'flight_number' at row 1112
+[ERROR en la consulta 343] Incorrect string value: '\xF0\x9D\x99\xB2\xF0\x9D...' for column 'client_first_name' at row 2295
+[ERROR en la consulta 344] Incorrect string value: '\xF0\x9D\x99\xB3\xF0\x9D...' for column 'client_first_name' at row 314
+
+[ERROR en la consulta 148] Incorrect string value: '\xF0\x9F\x93\xA7. ...' for column 'text' at row 1527
+[ERROR en la consulta 165] Incorrect string value: '\xF0\x9F\x8E\x88' for column 'text' at row 360
+[ERROR en la consulta 182] Incorrect string value: '\xF0\x9F\x98\x81' for column 'text' at row 3334
+[ERROR en la consulta 186] Incorrect string value: '\xF0\x9F\x91\x8D' for column 'text' at row 3951
+[ERROR en la consulta 208] Incorrect string value: '\xF0\x9F\x98\x8A' for column 'text' at row 3145
+[ERROR en la consulta 215] Incorrect string value: '\xF0\x9F\xA5\xB3' for column 'text' at row 2348
+[ERROR en la consulta 239] Incorrect string value: '\xF0\x9F\x98\x8A' for column 'text' at row 1128
+[ERROR en la consulta 244] Incorrect string value: '\xF0\x9F\x98\x8A' for column 'text' at row 4660
+[ERROR en la consulta 262] Incorrect string value: '\xF0\x9D\x99\xB2\xF0\x9D...' for column 'text' at row 921
+[ERROR en la consulta 264] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 1194
+[ERROR en la consulta 266] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 3598
+[ERROR en la consulta 271] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 2963
+[ERROR en la consulta 272] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 2604
+[ERROR en la consulta 274] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 4487
+[ERROR en la consulta 275] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 4512
+[ERROR en la consulta 276] Incorrect string value: '\xF0\x9F\x8C\xB4\xF0\x9F...' for column 'text' at row 890
+[ERROR en la consulta 318] Incorrect string value: '\xF0\x9D\x99\xB3\xF0\x9D...' for column 'flight_number' at row 1114
+[ERROR en la consulta 344] Incorrect string value: '\xF0\x9D\x99\xB2\xF0\x9D...' for column 'client_first_name' at row 2295
+[ERROR en la consulta 345] Incorrect string value: '\xF0\x9D\x99\xB3\xF0\x9D...' for column 'client_first_name' at row 314
+
+ID de reservations_items 42775, 42776, tema con flight_number
+reservations tema con client_first_name
+
+update driver_schedules set status = NULL where status not in ('A','F','DT','PSG','INC','D','v')
+update driver_schedules set status_unit = NULL where status_unit not in ('T','FO','OPB','S','OP')

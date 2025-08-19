@@ -71,6 +71,8 @@ use App\Http\Controllers\Actions\DataController as                  DATA;
 use App\Http\Controllers\Actions\ActionsController as               ACTIONS_RESERVATION;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\DualDatabaseController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -86,6 +88,14 @@ Route::get('/qr/create/{type}/{id}/{language}', [TpvController2::class, 'createQ
 Route::post('/tpv2/autocomplete', [APIAutocomplete::class,'index']);
 Route::post('/tpv2/quote', [APIQuote::class,'index']);
 Route::post('/tpv2/re-quote', [APIQuote::class,'checkout']);
+
+Route::get('/validate-sales',               [DualDatabaseController::class,  'validateSales']);
+Route::get('/validate-payments',            [DualDatabaseController::class,  'validatePayments']);
+Route::get('/validate-reservationItems',    [DualDatabaseController::class,  'validateReservationItems']);
+Route::get('/insert-reservationItems',      [DualDatabaseController::class,  'insertReservationItems']);
+
+Route::get('/statisticsServer',      [DualDatabaseController::class,  'statisticsServer']);
+
 
 //TPV AND BOOKING DETAILS
 Route::middleware(['locale','ApiChecker','Debug'])->group(function () {
