@@ -1,0 +1,87 @@
+# OPTIMIZACIÓN ESPECÍFICA PARA LARAVEL
+innodb_buffer_pool_size = 1G
+innodb_log_file_size = 128M
+innodb_flush_log_at_trx_commit = 2
+innodb_flush_method = O_DIRECT
+
+# CONEXIONES
+max_connections = 100
+thread_cache_size = 16
+wait_timeout = 300
+interactive_timeout = 300
+
+# PERFORMANCE
+tmp_table_size = 128M
+max_heap_table_size = 128M
+max_allowed_packet = 256M
+
+# LOGS PARA DEBUGGING
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/laravel-slow.log
+long_query_time = 1
+
+CONFIGURACIONES DE NUEVO SERVIDOR:
+
+// CREAMOS LA BASE DE DATOS Y USUARIO LOCALHOST
+    CREATE DATABASE transportation_api CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    CREATE USER 'caribbean_root'@'localhost' IDENTIFIED BY 'QQK8RCiBszsjqnH';
+    GRANT ALL PRIVILEGES ON transportation_api.* TO 'caribbean_root'@'localhost';
+    FLUSH PRIVILEGES;
+    EXIT;
+
+    USUARIO CON CONEXION REMOTA
+    CREATE USER 'caribbean_remote'@'%' IDENTIFIED BY 'WVi85RatgvkM6YW';
+    GRANT ALL PRIVILEGES ON transportation_api.* TO 'caribbean_remote'@'%';
+    FLUSH PRIVILEGES;
+    EXIT;
+
+    PERMITIR MYSQL DESDE UNA IP:
+    sudo ufw allow from 187.190.174.84 to any port 3306
+
+    sudo systemctl restart mariadb
+
+// INTALAMOS Y CONFIGURAMOS PHPMYADMIN
+    sudo apt install -y phpmyadmin
+
+    Usuario: admin
+    Contraseña: QQK8RCiBszsjqnH
+
+    sudo a2enconf phpmyadmin
+    sudo systemctl reload apache2
+
+// INSTALAMOS Y CONFIGURAMOS FTP
+    adduser caribbean_root
+    contraseña: QQK8RCiBszsjqnH
+    sudo usermod -a -G www-data caribbean_root
+    sudo chown -R www-data:www-data /var/www
+    sudo chmod -R 775 /var/www
+
+    //PROBLEMAS PARA CONECTAR POR FILEZILLA Y ME DA 2 OPCIONES PARA SOLUCIONARLO
+    Opción 1 (Recomendada y Más Segura): Usar Clave SSH
+    ssh-copy-id -i ~/.ssh/id_ed25519.pub caribbean_root@45.55.244.245
+    Opción 2 (Menos Segura): Habilitar Autenticación por Contraseña en el Servidor SSH
+
+
+
+SI ACTIVO REGLA DE FIREWALL DE ESTA MANERA LO PUEDO ELIMINAR:
+sudo ufw status verbose -> Verifica el estado de UFW:
+sudo ufw disable -> Prueba desactivar UFW temporalmente:
+sudo ufw delete allow from 100.64.0.9 to any port 3306
+sudo ufw status numbered. -> VALIDO ESTATUS
+sudo ufw status
+
+sudo ufw allow from 100.64.0.9 to any port 80,443,3306 proto tcp -> AGRAGA REGLA
+sudo ufw delete allow from 100.64.0.9 to any port 80,443,3306 -> ELIMINO REGLA
+cat ~/.ssh/authorized_keys -> VER MIS SSH
+
+Habilita UFW con las reglas correctas:
+sudo ufw allow 80/tcp     # HTTP
+sudo ufw allow 443/tcp    # HTTPS
+sudo ufw allow 22/tcp     # SSH (para no perder acceso remoto)
+sudo ufw allow 20/tcp
+sudo ufw allow 21/tcp
+sudo ufw allow 40000:50000/tcp
+sudo ufw enable
+
+
+

@@ -36,27 +36,38 @@
                     'data-bs-target' => '#filterModal'
                 )
             ),
-            array(  
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar Excel',
-                'extend' => 'excelHtml5',
-                'titleAttr' => 'Exportar Excel',
+            array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Conciliar Reservas',
                 'className' => 'btn btn-primary',
-                'exportOptions' => [
-                    'columns' => ':visible'  // Solo exporta las columnas visibles   
-                ]
-            ),
-            array(  
-                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-printer"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Imprimir',
-                'extend' => 'print',
-                'titleAttr' => 'Imprimir',
-                'className' => 'btn btn-primary',
-                'exportOptions' => [
-                    'columns' => ':visible',  // Solo exporta las columnas visibles   
-                    // 'modifier' => [
-                    //     'page' => 'current' // Imprimir solo la página actual
-                    // ]
-                ]
+                'attr' => array(     
+                    'id' => 'checkboxSelected',
+                    'data-bs-toggle' => 'modal',
+                    'data-bs-target' => '#addCashConciliationModal'
+                )
             ),            
+            // array(  
+            //     'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="cloud-download" class=""><path fill="" fill-rule="evenodd" d="M12 4a7 7 0 00-6.965 6.299c-.918.436-1.701 1.177-2.21 1.95A5 5 0 007 20a1 1 0 100-2 3 3 0 01-2.505-4.65c.43-.653 1.122-1.206 1.772-1.386A1 1 0 007 11a5 5 0 0110 0 1 1 0 00.737.965c.646.176 1.322.716 1.76 1.37a3 3 0 01-.508 3.911 3.08 3.08 0 01-1.997.754 1 1 0 00.016 2 5.08 5.08 0 003.306-1.256 5 5 0 00.846-6.517c-.51-.765-1.28-1.5-2.195-1.931A7 7 0 0012 4zm1 7a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 16.586V11z" clip-rule="evenodd"></path></svg> Exportar Excel',
+            //     'extend' => 'excelHtml5',
+            //     'titleAttr' => 'Exportar Excel',
+            //     'className' => 'btn btn-primary',
+            //     'exportOptions' => [
+            //         'columns' => ':visible'  // Solo exporta las columnas visibles   
+            //     ]
+            // ),
+            // array(
+            //     'text' => 'Tipo de cambio: '.$exchange,
+            //     'titleAttr' => 'Tipo de cambio',
+            //     'className' => 'btn btn-warning',
+            // ),            
+            // array(  
+            //     'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-printer"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Imprimir',
+            //     'extend' => 'print',
+            //     'titleAttr' => 'Imprimir',
+            //     'className' => 'btn btn-primary',
+            //     'exportOptions' => [
+            //         'columns' => ':visible',
+            //     ]
+            // ),            
         );
     @endphp
     <div class="row layout-top-spacing">
@@ -116,7 +127,7 @@
                                     <td class="text-center">
                                         @if ( $operation->cash_is_conciliated == 0 )
                                             <div class="form-check form-check-primary">
-                                                <input class="form-check-input chk-chk row-check" type="checkbox" value="{{ $operation->reservation_id }}">
+                                                <input class="form-check-input chk-chk row-check" type="checkbox" value="{{ $operation->cash_payment_ids }}">
                                             </div>
                                         @endif
                                     </td>

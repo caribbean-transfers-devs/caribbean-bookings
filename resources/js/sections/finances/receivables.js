@@ -1,3 +1,8 @@
+//DECLARACION DE VARIABLES
+const _processSelected      = document.getElementById('processSelected');
+const _actionType           = document.getElementById('actionType');
+const _reservationID        = document.getElementById('reservationID');
+
 let refunds = {
     reservation_id: 0,
     getLoader: function() {
@@ -100,10 +105,6 @@ let refunds = {
         this.fetchData('/action/getPaymentsReservation', data, _params);
     },
 };
-
-//DECLARACION DE VARIABLES
-const _actionType           = document.getElementById('actionType');
-const _reservationID        = document.getElementById('reservationID');
 
 //VALIDAMOS DOM
 document.addEventListener("DOMContentLoaded", function() {
@@ -248,7 +249,6 @@ document.addEventListener("DOMContentLoaded", function() {
             // Aquí puedes procesar los IDs seleccionados
             console.log('IDs seleccionados:', selectedIds);
 
-            const _processSelected = document.getElementById('processSelected');
             const _formData     = new FormData(_processSelected);
             _formData.append('codes', selectedIds);
         

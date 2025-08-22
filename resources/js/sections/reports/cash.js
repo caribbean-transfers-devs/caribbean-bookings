@@ -1,13 +1,17 @@
+//DECLARACION DE VARIABLES
+const _formCashConciliation = document.getElementById('formCashConciliation');
+const _actionType           = document.getElementById('actionType');
+const _paymentsID           = document.getElementById('paymentsID');
+
 //VALIDAMOS DOM
 document.addEventListener("DOMContentLoaded", function() {
-    //VARIABLES
-    const _formCashConciliation = document.getElementById('formCashConciliation');
-
     if( document.querySelector('.table-rendering') != null ){
         components.actionTable($('.table-rendering'), 'fixedheader');
     }
 
     components.titleModalFilter();
+    // components.renderCheckboxColumns('dataCash', 'columns');
+    components.setValueSelectpicker();
 
     //CALENDARIO MODAL
     let picker = flatpickr("#date_conciliation", {
@@ -35,17 +39,22 @@ document.addEventListener("DOMContentLoaded", function() {
     });    
 
     document.addEventListener("click", components.debounce(function (event) {
-        if (event.target && event.target.id === '__close_modal') {
-            _formCashConciliation.reset();
+        if (event.target && event.target.id === 'checkboxSelected') {
+            event.preventDefault();
+            
+            _actionType.value = "multiple";
         }
 
         //PERMITE CONCILIAR EL PAGO EN EFECTIVO
         if (event.target.classList.contains('cashConciliation')) {
             event.preventDefault();
+
             const { code } = event.target.dataset;
+
+            _actionType.value = "single";
             if( code ){
                 $("#addCashConciliationModal").modal('show');
-                document.getElementById('codes_payment_conciliation').value = code;
+                _paymentsID.value = code;
             }else{
                 Swal.fire(
                     '¡ERROR!',
@@ -54,67 +63,95 @@ document.addEventListener("DOMContentLoaded", function() {
                 );
             }
         };
+
+        if (event.target && event.target.id === '__close_modal') {
+            _formCashConciliation.reset();
+        }
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
 
     document.addEventListener('submit', function(event) {
         if (event.target && event.target.id === 'formCashConciliation') {
             event.preventDefault();
 
+            let selectedIds        = [];
+            const checkboxes       = document.querySelectorAll('.row-check:checked');
+        
+            if( _actionType.value == "multiple" ){
+                checkboxes.forEach(function (checkbox) {
+                    
+                    selectedIds.push(checkbox.value); // Obtén los IDs de las filas seleccionadas
+                });
+            }else{
+                selectedIds.push(_paymentsID.value); // Obtén los IDs de las filas seleccionadas
+            }
+        
+            if (selectedIds.length === 0) {
+                components.proccessResponse({
+                    status: "error",
+                    message: "No hay reservas seleccionadas.",
+                    reload: false
+                });
+                return;
+            }
+
+            // Aquí puedes procesar los IDs seleccionados
+            console.log('IDs seleccionados:', selectedIds);            
+
             const _formData     = new FormData(_formCashConciliation);
             const _btnCashConciliation   = document.getElementById('CashConciliation');
             _btnCashConciliation.disabled = true;
             _btnCashConciliation.textContent = "procesando...";
 
-            Swal.fire({
-                title: "Procesando solicitud...",
-                text: "Por favor, espera mientras se realiza la conciliación.",
-                allowOutsideClick: false,
-                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                didOpen: () => {
-                  Swal.showLoading();
-                }
-            });
+            // Swal.fire({
+            //     title: "Procesando solicitud...",
+            //     text: "Por favor, espera mientras se realiza la conciliación.",
+            //     allowOutsideClick: false,
+            //     allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+            //     didOpen: () => {
+            //       Swal.showLoading();
+            //     }
+            // });
 
-            fetch('/action/cashConciliation', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json'
-                },
-                body: _formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw err; });
-                }        
-                return response.json();
-            })
-            .then(data => {                
-                if( data.status  == "success" ){                        
-                    $("#addCashConciliationModal").modal('hide');
-                }
+            // fetch('/action/cashConciliation', {
+            //     method: 'POST',
+            //     headers: {
+            //         'X-CSRF-TOKEN': csrfToken,
+            //         'Accept': 'application/json'
+            //     },
+            //     body: _formData
+            // })
+            // .then(response => {
+            //     if (!response.ok) {
+            //         return response.json().then(err => { throw err; });
+            //     }        
+            //     return response.json();
+            // })
+            // .then(data => {
+            //     if( data.status  == "success" ){                        
+            //         $("#addCashConciliationModal").modal('hide');
+            //     }
 
-                _btnCashConciliation.disabled = false;
-                _btnCashConciliation.textContent = "Guardar";
+            //     _btnCashConciliation.disabled = false;
+            //     _btnCashConciliation.textContent = "Guardar";
 
-                Swal.fire({
-                    icon: data.status,
-                    html: data.message,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                }).then(() => {
-                    location.reload();
-                });
-            })
-            .catch(error => {
-                Swal.fire(
-                '¡ERROR!',
-                error.message || 'Ocurrió un error',
-                'error'
-                );
-                _btnCashConciliation.disabled = false;
-                _btnCashConciliation.textContent = "Guardar";
-            });
+            //     Swal.fire({
+            //         icon: data.status,
+            //         html: data.message,
+            //         allowOutsideClick: false,
+            //         allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+            //     }).then(() => {
+            //         location.reload();
+            //     });
+            // })
+            // .catch(error => {
+            //     Swal.fire(
+            //     '¡ERROR!',
+            //     error.message || 'Ocurrió un error',
+            //     'error'
+            //     );
+            //     _btnCashConciliation.disabled = false;
+            //     _btnCashConciliation.textContent = "Guardar";
+            // });
         };
     }, true); // <- el `true` activa "capturing" y sí detecta el submit        
 });

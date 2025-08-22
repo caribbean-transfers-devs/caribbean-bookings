@@ -22,18 +22,6 @@
                     'data-bs-target' => '#filterModal',
                 )
             ),
-            // array(
-            //     'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
-            //     'titleAttr' => 'Administrar columnas',
-            //     'className' => 'btn btn-primary __btn_columns',
-            //     'attr' => array(
-            //         'data-title' =>  "Administrar columnas",
-            //         'data-bs-toggle' => 'modal',
-            //         'data-bs-target' => '#columnsModal',
-            //         'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
-            //         'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
-            //     )                
-            // ),
             array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Conciliar Reservas',
                 'className' => 'btn btn-primary',
@@ -52,11 +40,16 @@
             //         'columns' => ':visible'  // Solo exporta las columnas visibles   
             //     ]
             // ),
-            array(
-                'text' => 'Tipo de cambio: '.$exchange,
-                'titleAttr' => 'Tipo de cambio',
-                'className' => 'btn btn-warning',
-            ),
+
+            // array(  
+            //     'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-printer"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Imprimir',
+            //     'extend' => 'print',
+            //     'titleAttr' => 'Imprimir',
+            //     'className' => 'btn btn-primary',
+            //     'exportOptions' => [
+            //         'columns' => ':visible',
+            //     ]
+            // ),            
         );
     @endphp
     <div class="row layout-top-spacing" id="contentData">

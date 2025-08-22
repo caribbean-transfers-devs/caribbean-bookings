@@ -29,12 +29,10 @@ SET GLOBAL validate_password.policy = MEDIUM;
 //COMANDO PARA CONFIGURAR FIREWALL
 sudo ufw allow from 187.190.174.84 to any port 3306
 sudo ufw allow from 138.68.15.200 to any port 3306
-
 -- sudo ufw allow from 100.64.0.9     to any port 3306
 -- # Permitir IP de Railway (reemplaza <IP_RAILWAY> con la IP que obtuviste)
 sudo ufw allow from 100.64.0.9 to any port 80,443,3306
 sudo ufw allow from 100.64.0.9 to any port 80,443,3306 proto tcp
-
 # Permitir rangos de IPs de Cloudflare (HTTP/HTTPS)
 sudo ufw allow from 173.245.48.0/20 to any port 80,443 proto tcp
 sudo ufw allow from 103.21.244.0/22 to any port 80,443 proto tcp
@@ -47,19 +45,17 @@ sudo ufw reload
 sudo ufw status
 sudo ufw status numbered
 
-
 sudo systemctl restart mysql
 sudo systemctl status mysql
 
+sudo systemctl restart apache2
+sudo systemctl status apache2
 
 sudo ufw delete allow from 100.64.0.9 to any port 3306
 USE transportation_api; SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'transportation_api'
 
-
 sudo chown -R www-data:www-data /var/www/transportation_api
 sudo chmod -R 775 storage bootstrap/cache
-
-sudo systemctl restart mysql
 
 [ERROR en la consulta 42] Data truncated for column 'status_unit' at row 2
 [ERROR en la consulta 148] Incorrect string value: '\xF0\x9F\x99\x84' for column 'text' at row 412
