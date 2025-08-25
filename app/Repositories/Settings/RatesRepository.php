@@ -42,10 +42,12 @@ class RatesRepository{
         }
 
         if ($request->filled('zone_one')) {
+            echo "hola";
             $query->where('zone_one', $request->zone_one);
         }
         
         if ($request->filled('zone_two')) {
+            echo "hola";
             $query->where('zone_two', $request->zone_two);
         }
 
@@ -211,9 +213,6 @@ class RatesRepository{
                 ->with('danger', 'Error al actualizar la tarifa: ' . $e->getMessage());
         }
     }    
-
-
-
 
     public function items($request){
         $data = [

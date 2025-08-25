@@ -921,7 +921,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Obtener datos del elemento clickeado
             const { reservation, item, service, status, type } = event.target.dataset;
        
-            (async () => {                
+            (async () => {
                 // Crear un contenedor para Dropzone y el select
                 const dropzoneContainer = document.createElement("div");
                 let HTML = "";
@@ -973,7 +973,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             });
                         }
                     },
-                    preConfirm: () => {
+                    preConfirm: (value) => {
                         if (status == "CANCELLED" || status == "NOSHOW") {
                             const reason = document.getElementById("cancelReason").value;
                             const dropzone = Dropzone.forElement("#dropzoneService");
@@ -995,6 +995,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
         
                 if (isConfirmed) {
+                    console.log(value);
+                    
                     const params = {
                         item_id: item,
                         service: service,
@@ -1041,7 +1043,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 window.location.reload();
                             });
                         }
-                    }         
+                    }
                 }
             })();            
         }

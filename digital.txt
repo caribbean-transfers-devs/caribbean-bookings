@@ -20,6 +20,9 @@ slow_query_log = 1
 slow_query_log_file = /var/log/mysql/laravel-slow.log
 long_query_time = 1
 
+sudo apt install -y certbot python3-certbot-apache
+sudo certbot --apache -d bookings.caribbeantransfers.tech
+
 CONFIGURACIONES DE NUEVO SERVIDOR:
 
 // CREAMOS LA BASE DE DATOS Y USUARIO LOCALHOST
@@ -37,6 +40,7 @@ CONFIGURACIONES DE NUEVO SERVIDOR:
 
     PERMITIR MYSQL DESDE UNA IP:
     sudo ufw allow from 187.190.174.84 to any port 3306
+    sudo ufw allow from 138.68.15.200 to any port 3306
 
     sudo systemctl restart mariadb
 
@@ -48,6 +52,7 @@ CONFIGURACIONES DE NUEVO SERVIDOR:
 
     sudo a2enconf phpmyadmin
     sudo systemctl reload apache2
+    sudo systemctl restart apache2
 
 // INSTALAMOS Y CONFIGURAMOS FTP
     adduser caribbean_root
@@ -61,14 +66,15 @@ CONFIGURACIONES DE NUEVO SERVIDOR:
     ssh-copy-id -i ~/.ssh/id_ed25519.pub caribbean_root@45.55.244.245
     Opción 2 (Menos Segura): Habilitar Autenticación por Contraseña en el Servidor SSH
 
-
+Victor2020##@@,()
 
 SI ACTIVO REGLA DE FIREWALL DE ESTA MANERA LO PUEDO ELIMINAR:
 sudo ufw status verbose -> Verifica el estado de UFW:
 sudo ufw disable -> Prueba desactivar UFW temporalmente:
 sudo ufw delete allow from 100.64.0.9 to any port 3306
-sudo ufw status numbered. -> VALIDO ESTATUS
+sudo ufw reload
 sudo ufw status
+sudo ufw status numbered. -> VALIDO ESTATUS
 
 sudo ufw allow from 100.64.0.9 to any port 80,443,3306 proto tcp -> AGRAGA REGLA
 sudo ufw delete allow from 100.64.0.9 to any port 80,443,3306 -> ELIMINO REGLA
@@ -85,3 +91,42 @@ sudo ufw enable
 
 
 
+
+
+# DB_HOST=aws.connect.psdb.cloud
+
+#PRUEBAS
+# DB_DATABASE=transportation-api
+# DB_USERNAME=6l03hrblyogcgscqkv35
+# DB_PASSWORD=pscale_pw_Ldt5fPgBqKIWC8cCBWQEX3N21AhEJKABhggCOddzXiC
+
+# PRODUCION
+# DB_DATABASE=transportation-api
+# DB_USERNAME=bjdl6g9bc7ntxke68hmv
+# DB_PASSWORD=pscale_pw_MHdnWcPy9bQGaT02Z0fh18qRSZrVYcTv43uTXpytGq
+
+# PRODUCION CON PERMISOS
+# DB_DATABASE=transportation-api
+# DB_USERNAME=x44ndy8dc4nbahupmyju
+# DB_PASSWORD=pscale_pw_iBFqt1ozgAj7pd21Xise2U9UI5jONyVvYHXRy7p2vhB
+# MYSQL_ATTR_SSL_CA=/etc/ssl/cert.pem
+
+
+
+
+# DB_HOST="localhost"
+# DB_DATABASE="transportation_api"
+# DB_USERNAME="caribbean_root"
+# DB_PASSWORD="QQK8RCiBszsjqnH"
+
+# DESTINO_DB_HOST="82.197.82.72"
+# DESTINO_DB_DATABASE="u635545471_transportation"
+# DESTINO_DB_USERNAME="u635545471_transportation"
+# DESTINO_DB_PASSWORD="7/wZ!UX[6aAq"
+
+# //CONEXION ORIGINAL DEL CRM
+#DB_HOST="aws.connect.psdb.cloud"
+#DB_DATABASE="transportation-api"
+#DB_USERNAME="bjdl6g9bc7ntxke68hmv"
+#DB_PASSWORD="pscale_pw_MHdnWcPy9bQGaT02Z0fh18qRSZrVYcTv43uTXpytGq"
+#MYSQL_ATTR_SSL_CA="/etc/ssl/certs/ca-certificates.crt"

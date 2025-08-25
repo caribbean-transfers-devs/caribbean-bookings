@@ -1,6 +1,7 @@
 CREATE DATABASE transportation_api;
-CREATE USER 'caribbean_user'@'localhost' IDENTIFIED BY 'caribbean2025##,().';
-GRANT ALL PRIVILEGES ON transportation_api.* TO 'caribbean_user'@'localhost';
+
+CREATE USER 'caribbean_root'@'localhost' IDENTIFIED BY 'C@ribb3anT2025!##()';
+GRANT ALL PRIVILEGES ON transportation_api.* TO 'caribbean_root'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 

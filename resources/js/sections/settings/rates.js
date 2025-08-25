@@ -24,17 +24,19 @@ let rates = {
             return response.json();
         })
         .then(resp => {
-            // _btnQuoteRate.removeAttribute('disabled');            
+            // _btnQuoteRate.removeAttribute('disabled');
+            console.log(resp);
+            
             for (const key in resp) {
                 if (resp.hasOwnProperty(key)) {
                     const data = resp[key];    
                     if (key == "zones") {
-                        let xHTML = ``;
+                        let xHTML = `<option value="">Selecciona una zona</option>`;
                         data.forEach(item => {
                             xHTML += `<option value="${item.id}">${item.name}</option>`;
                         });
-                        _zoneOne.innerHTML = ( xHTML != "" ? xHTML : `<option>Sin resultados</option>` );
-                        _zoneTwo.innerHTML = ( xHTML != "" ? xHTML : `<option>Sin resultados</option>` );
+                        _zoneOne.innerHTML = ( xHTML != "" ? xHTML : `<option value="">Sin resultados</option>` );
+                        _zoneTwo.innerHTML = ( xHTML != "" ? xHTML : `<option value="">Sin resultados</option>` );
 
                         if( _zoneOne.dataset.code ){
                             _zoneOne.value = _zoneOne.dataset.code;
@@ -68,9 +70,10 @@ let rates = {
     },
     changeDestination: function(value){
         if (value == 0) {
-            _zoneOne.innerHTML  = '<option value="">Zona de origen</option>';
-            _zoneTwo.innerHTML  = '<option value="">Zona de destino</option>';
-            _service.innerHTML    = '<option value="">[TODOS]</option>';
+            _zoneOne.innerHTML    = '<option value="">Zona de origen</option>';
+            _zoneTwo.innerHTML    = '<option value="">Zona de destino</option>';
+            _service.innerHTML    = '<option value="">[Vehículo]</option>';
+            _group.innerHTML      = '<option value="">[Grupo de tarifa]</option>';            
             return false;            
         }
         rates.getInputs(value);
