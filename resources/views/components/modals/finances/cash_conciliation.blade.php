@@ -11,7 +11,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <input type="hidden" id="actionType" name="action_type" value="" required>
-                        <input type="hidden" name="codes" value="" id="paymentsID">                
+                        <input type="hidden" name="paymentsID" value="" id="paymentsID">                
                         <div class="col-12 mb-2">
                             <label class="form-label" for="status_conciliation">Selecciona opción</label>
                             <select class="form-control" id="status_conciliation" name="status_conciliation">

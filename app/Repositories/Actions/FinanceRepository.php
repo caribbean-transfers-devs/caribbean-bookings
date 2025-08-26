@@ -286,7 +286,7 @@ class FinanceRepository
             'status_conciliation' => 'required|integer|in:1,2',
             'date_conciliation' => 'required|date',
             'receives_money_conciliation' => 'required|string|in:carlos,margarita',
-            'response_message' => 'required|string'
+            'response_message' => 'nullable|string'
         ], [
             'codes.required' => 'El campo de códigos es obligatorio.',
             'codes.array' => 'Los códigos deben ser proporcionados como un arreglo.',
@@ -327,7 +327,7 @@ class FinanceRepository
                 ],
                 'message' => 'No se encontraron los pagos'
             ], Response::HTTP_NOT_FOUND);
-        }        
+        }
 
         // Buscar los pagos correspondientes a los códigos
         $payments = Payment::whereIn('id', $codesArray)->get();
@@ -732,7 +732,6 @@ class FinanceRepository
                 "message" => $validator->errors()->all(),
             ], Response::HTTP_UNPROCESSABLE_ENTITY);  // 422
         }
-
 
         $codesArray = MethodsTrait::parseArray2($request->codes ?? '');
 
