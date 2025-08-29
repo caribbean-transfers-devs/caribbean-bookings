@@ -1,5 +1,4 @@
 Si se me estaba yendo 
-
 Minuta 5 de agosto
 
 Agregar filtros en módulo de conciliación de Stripe, el filtro tendrá la siguiente tarea poder filtrar por rango de fechas pagos pendientes de cobrar así como cobrados y también depósitos recibidos y pendientes de ser depositados
@@ -10,13 +9,16 @@ Agregar filtros en módulo de conciliación de Stripe, el filtro tendrá la sigu
 
 Poder obtener en la grafica de ventas el total de ventas llegadas, total de venta salidas, y total de ventas que son llegada y salida al mismo tiempo
 
+Falto del identificador el filtro
 <!-- Poder conciliar de manera masiva los efectivos -->
 
 Poder generar un identificador para saber que que reservas se pagaron posterior a su creación y poner un filtro a que nos permita saber cuáles son 
 
-Agragar las negativa de pago (disputas, reembolso, y comisión por depósito de stripe)
 
+Agragar las negativa de pago (disputas, reembolso, y comisión por depósito de stripe)
 Estatus de servicio, NO OPERADO, NO SHOW, CANCELADO, DISPUTADO Y REEMBOLSADO
+
+Estatus de no operado
 
 Choose Region: New York
 DataCenter: Datacenter 3 -NYC3

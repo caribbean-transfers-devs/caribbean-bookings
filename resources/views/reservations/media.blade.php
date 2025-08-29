@@ -29,6 +29,9 @@
                     @endif
                     {{-- LA CATEGORIA DE LA IMAGEN --}}
                     <?=auth()->user()->renderCategoryPicture($value->type_media)?>
+                    @if ($value->text)
+                        <button class="btn btn-primary btn-sm">{{ $value->text }}</button>
+                    @endif                    
                 </div>                    
             </div>
             <div class="content-bottom">

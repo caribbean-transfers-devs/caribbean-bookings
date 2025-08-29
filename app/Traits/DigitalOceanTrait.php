@@ -64,6 +64,7 @@ trait DigitalOceanTrait
             $media->path = $filePath;
             $media->url = $result['ObjectURL'];
             $media->type_media = $request->type_media;
+            $media->text = $request->additional_notes ?? NULL;
             $media->save();
 
             $this->create_followUps($request->input('folder'), "El usuario: ".auth()->user()->name.", ha agregado el archivo multimedia: ".$file->getClientOriginalName(), 'HISTORY', 'MEDIA');

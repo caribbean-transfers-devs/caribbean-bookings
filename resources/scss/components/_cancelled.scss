@@ -8,11 +8,11 @@
         margin: 1em auto 0;
     }
     
-    select, .dropzone{
+    select, input, .dropzone{
         margin: 1em 0 3px;
     }
 
-    select{
+    select, input{
         background: transparent;
         color: inherit;
         font-family: inherit;

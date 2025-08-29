@@ -1,4 +1,4 @@
-@props(['data','users','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','rating','istoday','isbalance','isduplicated','isagency','wasIsQuotation','refundRequestCount'])
+@props(['data','users','isSearch','services','vehicles','reservationstatus','servicesoperation','serviceoperationstatus','units','drivers','operationstatus','paymentstatus','currencies','methods','cancellations','zones','websites','origins','iscommissionable','ispayarrival','rating','istoday','isbalance','isduplicated','isagency','wasIsQuotation','refundRequestCount','isPaidAfterSale'])
 @php
     $date = "";
     if( isset($data) ){
@@ -93,7 +93,7 @@
                         @endif
                     </div>
                     
-                    @if ( (isset($users) && !empty($users)) || (isset($websites) && !empty($websites)) || (isset($origins) && !empty($origins)) || (isset($reservationstatus) && !empty($reservationstatus)) || (isset($servicesoperation) && !empty($servicesoperation)) || (isset($vehicles) && !empty($vehicles)) || (isset($zones) && !empty($zones)) || (isset($serviceoperationstatus) && !empty($serviceoperationstatus)) || (isset($units) && !empty($units)) || (isset($drivers) && !empty($drivers)) || (isset($operationstatus) && !empty($operationstatus)) || (isset($paymentstatus) && !empty($paymentstatus)) || (!empty($methods)) || (isset($iscommissionable)) || (isset($ispayarrival)) || (!empty($cancellations)) || (isset($isbalance)) || (isset($wasIsQuotation)) )
+                    @if ( (isset($users) && !empty($users)) || (isset($websites) && !empty($websites)) || (isset($origins) && !empty($origins)) || (isset($reservationstatus) && !empty($reservationstatus)) || (isset($servicesoperation) && !empty($servicesoperation)) || (isset($vehicles) && !empty($vehicles)) || (isset($zones) && !empty($zones)) || (isset($serviceoperationstatus) && !empty($serviceoperationstatus)) || (isset($units) && !empty($units)) || (isset($drivers) && !empty($drivers)) || (isset($operationstatus) && !empty($operationstatus)) || (isset($paymentstatus) && !empty($paymentstatus)) || (!empty($methods)) || (isset($iscommissionable)) || (isset($ispayarrival)) || (!empty($cancellations)) || (isset($isbalance)) || (isset($wasIsQuotation)) || (isset($refundRequestCount)) || (isset($isPaidAfterSale)) )
                         <div class="row g-0 bottom">
 
                             @if ( isset($users) && !empty($users) )
@@ -282,6 +282,14 @@
                                     <option {{ $data['refund_request_count'] == '0' ? 'selected' : '' }} value="0">No</option>
                                 </select>
                             @endif
+
+                            {{-- REEMBOLSOS --}}
+                            @if ( isset($isPaidAfterSale) )
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="{{ isset($data['is_paidaftersale']) ? $data['is_paidaftersale'] : 0 }}" name="is_paidaftersale" id="is_paidaftersale" {{ !empty($data['is_paidaftersale']) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_paidaftersale">Pagado despues de la venta</label>
+                                </div>
+                            @endif                            
                         </div>
                     @endif
                 </div>

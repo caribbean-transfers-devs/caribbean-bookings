@@ -198,6 +198,7 @@
             ),
         );
     @endphp
+    
     <div class="row layout-top-spacing">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
@@ -253,6 +254,7 @@
                             <th class="text-center">TIENE REEMBOLSO</th>
                             <th class="text-center">CUANTAS SOLICITUDES</th>
                             <th class="text-center">ESTATUS DE REEMBOLSO</th>
+                            <th class="text-center">PAGADO DESPUÉS DE LA VENTA</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -615,6 +617,11 @@
                                             <button class="btn btn-{{ auth()->user()->classStatusRefund($item->refund_status) }} btn-sm">{{ auth()->user()->statusRefund($item->refund_status) }}</button>
                                         @endif
                                     </td>
+                                    <td class="text-center">
+                                        @if ($item->transportation_payment_status == "PAID_AFTER_SALE")
+                                            <button class="btn btn-success btn-sm">Sí</button>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         @endif
@@ -624,7 +631,7 @@
         </div>
     </div>
 
-    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :istoday="1" :isduplicated="1" :isagency="1" :currencies="$currencies" :users="$users" :websites="$websites" :origins="$origins" :reservationstatus="$reservation_status" :vehicles="$vehicles" :zones="$zones" :paymentstatus="$payment_status" :isbalance="1" :methods="$methods" :wasIsQuotation="1" :rating="1" :iscommissionable="1" :cancellations="$cancellations" :ispayarrival="1" :refundRequestCount="1" />
+    <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :istoday="1" :isduplicated="1" :isagency="1" :currencies="$currencies" :users="$users" :websites="$websites" :origins="$origins" :reservationstatus="$reservation_status" :vehicles="$vehicles" :zones="$zones" :paymentstatus="$payment_status" :isbalance="1" :methods="$methods" :wasIsQuotation="1" :rating="1" :iscommissionable="1" :cancellations="$cancellations" :ispayarrival="1" :refundRequestCount="1" :isPaidAfterSale="1" />
     <x-modals.reports.columns />
     <x-modals.charts.sales2 :bookingsStatus="$bookingsStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataSites="$dataSites" :dataDestinations="$dataDestinations" :dataOriginSale="$dataOriginSale" />
 @endsection

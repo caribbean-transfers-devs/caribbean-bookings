@@ -35,6 +35,7 @@ let filters = {
 const __is_today = document.getElementById('is_today');
 const __is_duplicated = document.getElementById('is_duplicated');
 const __is_agency = document.getElementById('is_agency');
+const __is_paidaftersale = document.getElementById('is_paidaftersale');
 const __lookup_date = document.getElementById('lookup_date');
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -58,6 +59,13 @@ document.addEventListener("DOMContentLoaded", function() {
             filters.checked(this, 'agency');
         });
     }
+
+    if( __is_paidaftersale ){
+        filters.checked(__is_paidaftersale, 'paidaftersale');
+        __is_paidaftersale.addEventListener('change', function(){
+            filters.checked(this, 'paidaftersale');
+        });
+    }    
 
     if( __lookup_date ){
         filters.calendarFilter(__lookup_date, { mode: "range", defaultDate: __lookup_date.value ?? 'today', minDate: null });

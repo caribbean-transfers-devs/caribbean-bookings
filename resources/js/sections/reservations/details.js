@@ -920,7 +920,7 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Obtener datos del elemento clickeado
             const { reservation, item, service, status, type } = event.target.dataset;
-       
+
             (async () => {
                 // Crear un contenedor para Dropzone y el select
                 const dropzoneContainer = document.createElement("div");
@@ -929,21 +929,32 @@ document.addEventListener("DOMContentLoaded", function() {
                 if ( status == "CANCELLED" || status == "NOSHOW" ){
                     HTML = `
                         <label for="cancelReason">Selecciona el motivo de cancelación:</label>
-                        <select id="cancelReason" class="swal2-input">
+                        <select id="cancelReason" class="swal2-input w-100" required>
                             <option value="">Seleccione una opción</option>
                             ${Object.entries(__typesCancellations).map(([key, value]) => `<option value="${key}">${value}</option>`).join('')}
                         </select>
-                        <label for="attachPicture">Debes adjuntar al menos una imagen:</label>
-                        <div id="dropzoneService" class="dropzone"></div>            
+                    `;
+
+                    if( status == "CANCELLED" ){
+                        HTML += `
+                            <label for="additionalNotes">Comentarios adicionales (obligatorio):</label>
+                            <input id="additionalNotes" class="swal2-input w-100" placeholder="Ejemplo: imagen 1" required />
+                        `;
+                    }
+                    
+                    HTML += `
+                        <label for="attachPicture" style="margin-top: 10px;">Debes adjuntar al menos una imagen:</label>
+                        <div id="dropzoneService" class="dropzone"></div>
                     `;
                 }
+                
                 let selectedFiles = []; // Array para almacenar las imágenes seleccionadas
                 dropzoneContainer.classList.add('box_cancelation');
                 dropzoneContainer.innerHTML = `
                     <p>${ status == "CANCELLED" || status == "NOSHOW" ? '¿Está seguro de cancelar la reservación? <br>  Esta acción no se puede revertir' : '¿Está seguro de actualizar el estatus? <br> Esta acción no se puede revertir' }</p>
                     ${HTML}
                 `;
-        
+
                 const { isConfirmed, value } = await swal.fire({
                     html: dropzoneContainer,
                     icon: "question",
@@ -973,41 +984,51 @@ document.addEventListener("DOMContentLoaded", function() {
                             });
                         }
                     },
-                    preConfirm: (value) => {
+                    preConfirm: () => {
                         if (status == "CANCELLED" || status == "NOSHOW") {
-                            const reason = document.getElementById("cancelReason").value;
-                            const dropzone = Dropzone.forElement("#dropzoneService");
-                
+                            const reason            = document.getElementById("cancelReason").value;
+                            const additionalNotes   = document.getElementById("additionalNotes").value;
+                            const dropzone          = Dropzone.forElement("#dropzoneService");
+
                             if (!reason) {
                                 Swal.showValidationMessage("Debes seleccionar un motivo de cancelación.");
                                 return false;
                             }
+                            
+                            if (!additionalNotes.trim()) {
+                                Swal.showValidationMessage("Debes proporcionar comentarios adicionales.");
+                                return false;
+                            }
+                            
                             if (dropzone.files.length === 0) {
                                 Swal.showValidationMessage("Debes subir al menos una imagen.");
                                 return false;
                             }
-        
-                            return { reason, images: dropzone.files };
+
+                            return { 
+                                reason, 
+                                additionalNotes: additionalNotes.trim(),
+                                images: dropzone.files 
+                            };
                         } else {
-                            return value;
+                            return true;
                         }
                     }            
                 });
-        
+
                 if (isConfirmed) {
-                    console.log(value);
-                    
                     const params = {
                         item_id: item,
                         service: service,
                         status: status,
                         type: type,
-                        type_cancel: (status == "CANCELLED" || status == "NOSHOW") ? value.reason : value
+                        type_cancel: (status == "CANCELLED" || status == "NOSHOW") ? value.reason : "",
+                        additional_notes: (status == "CANCELLED" || status == "NOSHOW") ? value.additionalNotes : ""
                     };
 
                     Swal.fire({
                         title: "Actualizando estatus...",
-                        text: "Por favor, espera mientras se actualiza el estatus.", //Realiza la function de HTML en el Swal
+                        text: "Por favor, espera mientras se actualiza el estatus.",
                         allowOutsideClick: false,
                         allowEscapeKey: false,
                         didOpen: () => Swal.showLoading()
@@ -1019,7 +1040,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (status == "CANCELLED" || status == "NOSHOW") {
                             Swal.fire({
                                 title: "Subiendo imágenes...",
-                                text: "Por favor, espera mientras se suben todas las imagenes", //Realiza la function de HTML en el Swal
+                                text: "Por favor, espera mientras se suben todas las imagenes",
                                 allowOutsideClick: false,
                                 allowEscapeKey: false,
                                 didOpen: () => Swal.showLoading()
@@ -1046,7 +1067,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
             })();            
-        }
+        }        
 
         //ENVIAR CONFIRMACIÓN DE LLEGADA
         if (event.target.classList.contains('arrivalConfirmation')) {
@@ -1808,52 +1829,89 @@ Dropzone.options.uploadForm = {
     init: function() {
         const dropzone = this;
         let selectedOption = null; // Variable para almacenar la opción seleccionada
+        let additionalNotes = null; // Variable para almacenar las notas adicionales
 
         // Interceptar el evento "addedfile"
         this.on("addedfile", function(file) {
+            // Crear el HTML del formulario
+            const formHTML = `
+                <div class="box_cancelation" style="text-align: left;">
+                    <label for="imageCategory">Selecciona la categoría de la imagen:</label>
+                    <select id="imageCategory" class="swal2-input w-100" style="margin-bottom: 15px;">
+                        <option value="">Seleccione una opción</option>
+                        <option value="GENERAL">General</option>
+                        <option value="NOSHOW">No se presentó</option>
+                        <option value="CANCELLATION">Cancelación</option>
+                        <option value="OPERATION">Operación</option>
+                        <option value="REFUND">Reembolso</option>
+                    </select>
+                    <div id="additionalNotesContainer" style="display: none; margin-bottom: 15px;">
+                        <label for="additionalNotes">Comentarios adicionales (obligatorio):</label>
+                        <input id="additionalNotes" class="swal2-input w-100" placeholder="Ejemplo: imagen 1" required />
+                    </div>
+                </div>
+            `;
+
             Swal.fire({
-                html: '¿Está seguro de agregar una imagen?',
+                html: '¿Está seguro de agregar una imagen?<br>' + formHTML,
                 icon: 'question',
-                inputLabel: 'Selecciona la categoría de la imagen:',
-                input: 'select',
-                inputOptions: {
-                    'GENERAL': 'General',
-                    'NOSHOW': 'No se presentó',
-                    'CANCELLATION': 'Cancelación',
-                    'OPERATION': 'Operación',
-                    'REFUND': 'Reembolso'
-                },
-                inputPlaceholder: 'Seleccione una opción',
                 showCancelButton: true,
                 confirmButtonText: 'Guardar',
                 cancelButtonText: 'Cancelar',
                 allowOutsideClick: false,
                 allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                preConfirm: (value) => {
-                    if (!value) {
+                didOpen: () => {
+                    // Mostrar/ocultar campo adicional según la selección
+                    const categorySelect = document.getElementById('imageCategory');
+                    const notesContainer = document.getElementById('additionalNotesContainer');
+                    
+                    categorySelect.addEventListener('change', function() {
+                        if (this.value === 'CANCELLATION' || this.value === 'REFUND') {
+                            notesContainer.style.display = 'block';
+                        } else {
+                            notesContainer.style.display = 'none';
+                            document.getElementById('additionalNotes').value = '';
+                        }
+                    });
+                },
+                preConfirm: () => {
+                    const categoryValue = document.getElementById('imageCategory').value;
+                    const notesValue = document.getElementById('additionalNotes').value;
+                    
+                    if (!categoryValue) {
                         Swal.showValidationMessage('Debes seleccionar una categoría de imagen.');
                         return false;
                     }
-                    return value;
+                    
+                    // Validar campo adicional para cancelación/reembolso
+                    if ((categoryValue === 'CANCELLATION' || categoryValue === 'REFUND') && !notesValue.trim()) {
+                        Swal.showValidationMessage('Debes proporcionar comentarios adicionales para esta categoría.');
+                        return false;
+                    }
+                    
+                    return {
+                        category: categoryValue,
+                        notes: notesValue
+                    };
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
                         title: "Subiendo imágen...",
-                        text: "Por favor, espera mientras se cargan la imágen.", //Realiza la function de HTML en el Swal
+                        text: "Por favor, espera mientras se cargan la imágen.",
                         allowOutsideClick: false,
-                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
+                        allowEscapeKey: false,
                         didOpen: () => {
                             Swal.showLoading();
                         }
                     });
 
-                    // Guardar la opción seleccionada
-                    selectedOption = result.value;
+                    // Guardar la opción seleccionada y las notas
+                    selectedOption = result.value.category;
+                    additionalNotes = result.value.notes;
+                    
                     // Si el usuario confirma, enviar el archivo
-                    // Procesar el archivo
                     dropzone.processFile(file);
-                    // console.log('Opción seleccionada:', result.value);
                 } else {
                     // Si el usuario cancela, eliminar el archivo
                     dropzone.removeFile(file);
@@ -1864,7 +1922,12 @@ Dropzone.options.uploadForm = {
         // Añadir el valor seleccionado a los datos enviados
         this.on("sending", function(file, xhr, formData) {
             if (selectedOption) {
-                formData.append("type_media", selectedOption); // Agregar la opción seleccionada
+                formData.append("type_media", selectedOption);
+
+                // Agregar las notas adicionales si existen
+                if (additionalNotes) {
+                    formData.append("additional_notes", additionalNotes);
+                }
             }
         });
 

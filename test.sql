@@ -30,6 +30,9 @@ SET GLOBAL validate_password.policy = MEDIUM;
 //COMANDO PARA CONFIGURAR FIREWALL
 sudo ufw allow from 187.190.174.84 to any port 3306
 sudo ufw allow from 138.68.15.200 to any port 3306
+
+sudo ufw delete allow from 187.190.174.58 to any port 3306
+
 -- sudo ufw allow from 100.64.0.9     to any port 3306
 -- # Permitir IP de Railway (reemplaza <IP_RAILWAY> con la IP que obtuviste)
 sudo ufw allow from 100.64.0.9 to any port 80,443,3306

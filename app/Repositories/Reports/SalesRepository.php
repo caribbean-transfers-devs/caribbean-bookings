@@ -54,6 +54,7 @@ class SalesRepository
             "cancellation_status" => ( isset( $request->cancellation_status ) && !empty( $request->cancellation_status ) ? $request->cancellation_status : 0 ),
             "is_pay_at_arrival" => ( isset($request->is_pay_at_arrival) ? $request->is_pay_at_arrival : NULL ),
             "refund_request_count" => ( isset($request->refund_request_count) ? $request->refund_request_count : NULL ),
+            "is_paidaftersale" => ( isset($request->is_paidaftersale) ? $request->is_paidaftersale : 0 ),
         ];
         
         $query = ' AND rez.site_id NOT IN(21,11) AND rez.created_at BETWEEN :init AND :end AND rez.destination_id = :destination ';
@@ -219,6 +220,10 @@ class SalesRepository
 
         if(isset( $request->refund_request_count )){
             $havingConditions[] = ( $request->refund_request_count == 1 ? ' refund_request_count > 0 ' : ' refund_request_count <= 0 ' );
+        }
+
+        if(isset( $request->is_paidaftersale ) && !empty( $request->is_paidaftersale )){
+            $havingConditions[] = " transportation_payment_status = 'PAID_AFTER_SALE' ";
         }
         
         if(isset( $request->filter_text ) && !empty( $request->filter_text )){

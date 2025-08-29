@@ -464,7 +464,77 @@ let setup = {
             __email.removeAttribute('readonly');
             __phone.removeAttribute('readonly');
         }
-    }    
+    },
+    /**
+     * 
+     * @param {*} params 
+     * @returns 
+     */
+    updateServiceStatus: async function (params) {
+        try {
+            const response = await fetch(_LOCAL_URL + "/action/updateServiceStatus", {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(params)
+            });
+
+            if (!response.ok) throw new Error("Error en la petición");
+
+            const result = await response.json();
+            if (result.status !== "success") {
+                throw new Error(result.message || "No se pudo actualizar el estatus");
+            }
+
+            return true; // Si todo bien, continúa
+        } catch (error) {
+            Swal.fire("Error", error.message || "Ocurrió un error", "error");
+            return false;
+        }
+    },
+    /**
+     * 
+     * @param {*} files 
+     * @param {*} id 
+     * @param {*} status 
+     * @returns 
+     */
+    uploadImages: async function (files, id, status = "CANCELLATION") {
+        const uploadedImages = [];
+        for (const file of files) {
+            // Obtener el token CSRF desde el meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const formData = new FormData();
+            formData.append("folder", id);
+            formData.append("type_media", ( status == "CANCELLED" ? "CANCELLATION" : status ));
+            formData.append("file", file);
+
+            try {
+                const response = await fetch(_LOCAL_URL + "/reservations/upload", {
+                    method: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken  // Incluir el token en los headers
+                    },                
+                    body: formData
+                });
+
+                // console.log(response);
+                if (response.ok) {
+                    const data = await response.json();
+                    uploadedImages.push(data.imageUrl); // Suponiendo que el servidor responde con `{ "imageUrl": "URL de la imagen" }`
+                } else {
+                    throw new Error("Error al subir una imagen.");
+                }
+            } catch (error) {
+                console.error("Error subiendo imagen:", error);
+                return [];
+            }
+        }
+        return uploadedImages;
+    }
 };
 
 if( document.querySelector('.table-rendering') != null ){
@@ -1297,15 +1367,26 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Crear un contenedor para Dropzone y el select                
                 const dropzoneContainer = document.createElement("div");
                 let HTML = "";
+
                 if( status == "CANCELLED" || status == "NOSHOW" ){
                     HTML = `
                         <label for="cancelReason">Selecciona el motivo de cancelación:</label>
-                        <select id="cancelReason" class="swal2-input">
+                        <select id="cancelReason" class="swal2-input w-100" required>
                             <option value="">Seleccione una opción</option>
                             ${Object.entries(types_cancellations).map(([key, value]) => `<option value="${key}">${value}</option>`).join('')}
                         </select>
-                        <label for="attachPicture">Debes adjuntar al menos una imagen:</label>
-                        <div id="dropzoneService" class="dropzone"></div>            
+                    `;
+
+                    if( status == "CANCELLED" ){
+                        HTML += `
+                            <label for="additionalNotes">Comentarios adicionales (obligatorio):</label>
+                            <input id="additionalNotes" class="swal2-input w-100" placeholder="Ejemplo: imagen 1" required />
+                        `;
+                    }
+
+                    HTML += `
+                        <label for="attachPicture" style="margin-top: 10px;">Debes adjuntar al menos una imagen:</label>
+                        <div id="dropzoneService" class="dropzone"></div>
                     `;
                 }
                 let selectedFiles = []; // Array para almacenar las imágenes seleccionadas
@@ -1336,47 +1417,59 @@ document.addEventListener("DOMContentLoaded", function() {
                                 dictRemoveFile: "Eliminar imagen",
                                 autoProcessQueue: false,
                                 init: function () {
-                                    let dz = this;
-                                    dz.on("addedfile", function (file) {
-                                        selectedFiles.push(file);
-                                    });
-                
-                                    dz.on("removedfile", function (file) {
+                                    this.on("addedfile", file => selectedFiles.push(file));
+                                    this.on("removedfile", file => {
                                         selectedFiles = selectedFiles.filter(f => f !== file);
                                     });
                                 }
                             });
                         }
                     },
-                    preConfirm: (value) => {
+                    preConfirm: () => {
                         if( status == "CANCELLED" || status == "NOSHOW" ){
-                            const reason = document.getElementById("cancelReason").value;
-                            const dropzone = Dropzone.forElement("#dropzoneService");
+                            const reason            = document.getElementById("cancelReason").value;
+                            const additionalNotes   = document.getElementById("additionalNotes").value;
+                            const dropzone          = Dropzone.forElement("#dropzoneService");
                 
                             if (!reason) {
                                 Swal.showValidationMessage("Debes seleccionar un motivo de cancelación.");
                                 return false;
                             }
+                            
+                            if (!additionalNotes.trim()) {
+                                Swal.showValidationMessage("Debes proporcionar comentarios adicionales.");
+                                return false;
+                            }
+                            
                             if (dropzone.files.length === 0) {
                                 Swal.showValidationMessage("Debes subir al menos una imagen.");
                                 return false;
                             }
     
-                            return { reason, images: dropzone.files };
+                            return { 
+                                reason, 
+                                additionalNotes: additionalNotes.trim(),
+                                images: dropzone.files 
+                            };
                         }else{
-                            return value;
+                            return true;
                         }
                     }            
                 });
     
                 if (isConfirmed) {
-                    const { reason, images } = value;
+                    const params = {
+                        item_id: item,
+                        service: service,
+                        status: status,
+                        type: type,
+                        type_cancel: (status == "CANCELLED" || status == "NOSHOW") ? value.reason : "",
+                        additional_notes: (status == "CANCELLED" || status == "NOSHOW") ? value.additionalNotes : ""
+                    };
+
                     const __vehicle = document.getElementById('vehicle_id_' + key);
                     const __driver = document.getElementById('driver_id_' + key);
     
-                    // ( __vehicle.value == 0 && __driver.value == 0 ) || 
-                    // || ( __driver.value == 0 )
-                    // y conductor
                     if ( ( __vehicle.value == 0 ) ) {
                         Swal.fire({
                             text: 'Valida la selección de unidad.',
@@ -1387,80 +1480,45 @@ document.addEventListener("DOMContentLoaded", function() {
                             allowEscapeKey: false, // Esta línea evita que se cierre con ESC                            
                         });
                     }else{
-                        if( status == "CANCELLED" || status == "NOSHOW" ){
-                            Swal.fire({
-                                title: "Subiendo imágenes...",
-                                text: "Por favor, espera mientras se cargan las imágenes.", //Realiza la function de HTML en el Swal
-                                allowOutsideClick: false,
-                                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                                didOpen: () => {
-                                    Swal.showLoading();
+                        Swal.fire({
+                            title: "Actualizando estatus...",
+                            text: "Por favor, espera mientras se actualiza el estatus.",
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        const statusUpdated = await setup.updateServiceStatus(params);
+
+                        if (statusUpdated) {
+                            if (status == "CANCELLED" || status == "NOSHOW") {
+                                Swal.fire({
+                                    title: "Subiendo imágenes...",
+                                    text: "Por favor, espera mientras se suben todas las imagenes",
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false,
+                                    didOpen: () => Swal.showLoading()
+                                });
+
+                                try {
+                                    const uploadedImages = await details.uploadImages(value.images, reservation, status);
+
+                                    if (uploadedImages.length === value.images.length) {
+                                        Swal.fire("Éxito", "Cancelación confirmada y archivos subidos.", "success").then(() => {
+                                            window.location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire("Error", "Algunas imágenes no se pudieron subir. Intenta de nuevo.", "error");
+                                    }
+                                } catch (err) {
+                                    Swal.fire("Error", "Ocurrió un problema al subir las imágenes.", "error");
                                 }
-                            });
-                
-                            try {
-                                const uploadedImages = await uploadImages(images, reservation, status);
-                    
-                                if (uploadedImages.length === images.length) {
-                                    // ✅ Todas las imágenes se subieron correctamente, ahora cancelar la reserva
-                                    Swal.fire({
-                                        title: "Confirmando cancelación...",
-                                        text: "Procesando la cancelación de la reservación.", //Realiza la function de HTML en el Swal
-                                        allowOutsideClick: false,
-                                        allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                                        didOpen: () => {
-                                            Swal.showLoading();
-                                        }
-                                    });
-                    
-                                    $.ajax({
-                                        url: _LOCAL_URL + '/action/updateServiceStatus',
-                                        type: 'PUT',
-                                        data: { item_id: item, service: service, status: status, type: type, type_cancel: reason, key: key },
-                                        success: function(resp) {
-                                            Swal.fire({
-                                                title: '¡Éxito!',
-                                                icon: 'success',
-                                                html: 'Servicio actualizado con éxito.',
-                                                showConfirmButton: false,
-                                                timer: 1500,
-                                                allowOutsideClick: false,
-                                                allowEscapeKey: false, // Esta línea evita que se cierre con ESC
-                                                willClose: () => {
-                                                    socket.emit("updateStatusBookingServer", resp.data);
-                                                }
-                                            });
-                                        }
-                                    });
-                                } else {
-                                    // Title, HTML, Icon
-                                    Swal.fire("Error en la subida", "Algunas imágenes no se pudieron subir. Intenta de nuevo.", "error");
-                                }
-                            } catch (error) {
-                                Swal.fire("Error", "Ocurrió un problema al subir las imágenes. Inténtalo nuevamente.", "error");
+                            } else {
+                                Swal.fire("Éxito", "Estatus actualizado correctamente.", "success").then(() => {
+                                    window.location.reload();
+                                });
                             }
-                        }else{
-                            $.ajax({
-                                url: _LOCAL_URL + '/action/updateServiceStatus',
-                                type: 'PUT',
-                                data: { item_id: item, service: service, status: status, type: type, type_cancel: reason, key: key },
-                                beforeSend: function() {
-                                    components.loadScreen();
-                                },
-                                success: function(resp) {
-                                    Swal.fire({
-                                        title: '¡Éxito!',
-                                        icon: 'success',
-                                        html: 'Servicio actualizado con éxito.',
-                                        showConfirmButton: false,
-                                        timer: 1500,
-                                        willClose: () => {
-                                            socket.emit("updateStatusBookingServer", resp.data);
-                                        }
-                                    });
-                                }
-                            });
-                        } 
+                        }
                     }
                 }
             })();            
@@ -1816,57 +1874,6 @@ if (__btn_update_status_operations.length > 0) {
           });
       });
   });
-}
-
-if (serviceStatusUpdates.length > 0) {
-    serviceStatusUpdates.forEach(serviceStatusUpdate => {
-        serviceStatusUpdate.addEventListener('click', function(event) {
-        event.preventDefault();
-
-    });
-  });
-}
-
-/**
- * 
- * @param {*} files // los archivos que se subiran
- * @param {*} id // el id de la reservación
- * @returns 
- */
-async function uploadImages(files, id, status = "CANCELLATION") {
-    const uploadedImages = [];
-    console.log(files, id, status);
-    
-    for (const file of files) {
-        // Obtener el token CSRF desde el meta tag
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        const formData = new FormData();
-        formData.append("folder", id);
-        formData.append("type_media", ( status == "CANCELLED" ? "CANCELLATION" : status ));
-        formData.append("file", file);
-
-        try {
-            const response = await fetch(_LOCAL_URL + "/reservations/upload", {
-                method: "POST",
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken  // Incluir el token en los headers
-                },                
-                body: formData
-            });
-
-            // console.log(response);
-            if (response.ok) {
-                const data = await response.json();
-                uploadedImages.push(data.imageUrl); // Suponiendo que el servidor responde con `{ "imageUrl": "URL de la imagen" }`
-            } else {
-                throw new Error("Error al subir una imagen.");
-            }
-        } catch (error) {
-            console.error("Error subiendo imagen:", error);
-            return [];
-        }
-    }
-    return uploadedImages;
 }
 
 history();
