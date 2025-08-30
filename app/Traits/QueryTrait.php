@@ -305,12 +305,37 @@ trait QueryTrait
                                     GROUP_CONCAT(DISTINCT p.payment_details ORDER BY p.payment_details ASC SEPARATOR ', ') AS payment_details
                                 FROM reservations as rez
                                     INNER JOIN sites as site ON site.id = rez.site_id
-                                    LEFT OUTER JOIN users as us ON us.id = rez.call_center_agent_id
-                                    LEFT OUTER JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
-                                    LEFT OUTER JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id
+                                    LEFT JOIN users as us ON us.id = rez.call_center_agent_id
+                                    LEFT JOIN origin_sales as origin ON origin.id = rez.origin_sale_id
+                                    LEFT JOIN types_cancellations as tc ON tc.id = rez.cancellation_type_id                                    
                                     
-                                    -- Nuevos JOINs para la tabla de reembolsos
-                                    LEFT OUTER JOIN (
+                                    -- -- Nuevos JOINs para la tabla de reembolsos
+                                    -- LEFT OUTER JOIN (
+                                    --     SELECT 
+                                    --         reservation_id,
+                                    --         COUNT(*) as refund_count,
+                                    --         SUM(CASE WHEN status != 'REFUND_COMPLETED' THEN 1 ELSE 0 END) as pending_refund_count
+                                    --     FROM reservations_refunds
+                                    --     GROUP BY reservation_id
+                                    -- ) as rr ON rr.reservation_id = rez.id
+
+                                    -- -- JOINs para tabla de ventas (sales)
+                                    -- LEFT JOIN (
+                                    --     SELECT 
+                                    --         reservation_id, 
+                                    --         ROUND( COALESCE(SUM(total), 0), 2) as total_sales,
+                                    --         ROUND(COALESCE(SUM(CASE WHEN sale_type_id = 1 THEN total ELSE 0 END), 0), 2) AS total_sales_credit,
+                                    --         -- NUEVO: Monto de transportación
+                                    --         ROUND(COALESCE(SUM(CASE WHEN sale_type_id = 1 THEN total ELSE 0 END), 0), 2) AS transportation_sales,
+                                    --         -- NUEVO: Fecha de venta de transportación
+                                    --         MAX(CASE WHEN sale_type_id = 1 THEN created_at END) AS transportation_sale_date                                            
+                                    --     FROM sales
+                                    --         WHERE deleted_at IS NULL 
+                                    --     GROUP BY reservation_id
+                                    -- ) as s ON s.reservation_id = rez.id
+
+                                    -- Reembolsos optimizados
+                                    LEFT JOIN (
                                         SELECT 
                                             reservation_id,
                                             COUNT(*) as refund_count,
@@ -318,36 +343,165 @@ trait QueryTrait
                                         FROM reservations_refunds
                                         GROUP BY reservation_id
                                     ) as rr ON rr.reservation_id = rez.id
-                                    -- JOINs para tabla de ventas (sales)
+                                    
+                                    -- Ventas optimizadas
                                     LEFT JOIN (
                                         SELECT 
                                             reservation_id, 
-                                            ROUND( COALESCE(SUM(total), 0), 2) as total_sales,
-                                            ROUND(COALESCE(SUM(CASE WHEN sale_type_id = 1 THEN total ELSE 0 END), 0), 2) AS total_sales_credit,
-                                            -- NUEVO: Monto de transportación
-                                            ROUND(COALESCE(SUM(CASE WHEN sale_type_id = 1 THEN total ELSE 0 END), 0), 2) AS transportation_sales,
-                                            -- NUEVO: Fecha de venta de transportación
-                                            MAX(CASE WHEN sale_type_id = 1 THEN created_at END) AS transportation_sale_date                                            
+                                            ROUND(SUM(total), 2) as total_sales,
+                                            ROUND(SUM(CASE WHEN sale_type_id = 1 THEN total ELSE 0 END), 2) AS total_sales_credit,
+                                            ROUND(SUM(CASE WHEN sale_type_id = 1 THEN total ELSE 0 END), 2) AS transportation_sales,
+                                            MAX(CASE WHEN sale_type_id = 1 THEN created_at END) AS transportation_sale_date
                                         FROM sales
-                                            WHERE deleted_at IS NULL 
+                                        WHERE deleted_at IS NULL 
                                         GROUP BY reservation_id
                                     ) as s ON s.reservation_id = rez.id
 
-                                    -- JOINs para tabla de pagos (payments)
+                                    -- -- JOINs para tabla de pagos (payments)
+                                    -- LEFT JOIN (
+                                    --     SELECT 
+                                    --         p.reservation_id,
+                                    --         -- is_conciliated,
+                                    --         -- ROUND(SUM(CASE 
+                                    --         --     WHEN operation = 'multiplication' THEN total * exchange_rate
+                                    --         --     WHEN operation = 'division' THEN total / exchange_rate
+                                    --         --     ELSE total END), 2) AS total_payments,
+
+                                    --         ROUND(SUM(CASE
+                                    --             WHEN p.category IN ('PAYOUT', 'PAYOUT_CREDIT_PAID') THEN 
+                                    --                 CASE 
+                                    --                     WHEN p.operation = 'multiplication' THEN p.total * p.exchange_rate
+                                    --                     WHEN p.operation = 'division' THEN p.total / p.exchange_rate
+                                    --                     ELSE p.total 
+                                    --                 END
+                                    --             ELSE 0
+                                    --         END), 2) AS total_payments,
+
+                                    --         ROUND(SUM(CASE
+                                    --             WHEN p.category IN ('PAYOUT_CREDIT_PENDING', 'PAYOUT_CREDIT_PAID') THEN 
+                                    --                 CASE 
+                                    --                     WHEN p.operation = 'multiplication' THEN p.total * p.exchange_rate
+                                    --                     WHEN p.operation = 'division' THEN p.total / p.exchange_rate
+                                    --                     ELSE p.total 
+                                    --                 END
+                                    --             ELSE 0
+                                    --         END), 2) AS total_payments_credit,
+
+                                    --         -- NUEVO: Campos para transportación
+                                    --         MAX(CASE 
+                                    --             WHEN p.total >= (
+                                    --                 SELECT COALESCE(SUM(s2.total), 0)
+                                    --                 FROM sales s2 
+                                    --                 WHERE s2.reservation_id = p.reservation_id 
+                                    --                 AND s2.sale_type_id = 1
+                                    --                 AND s2.deleted_at IS NULL
+                                    --             ) 
+                                    --             AND DATE(p.created_at) > DATE((
+                                    --                 SELECT MAX(s3.created_at)
+                                    --                 FROM sales s3 
+                                    --                 WHERE s3.reservation_id = p.reservation_id 
+                                    --                 AND s3.sale_type_id = 1
+                                    --                 AND s3.deleted_at IS NULL
+                                    --             ))
+                                    --             THEN 1 
+                                    --             ELSE 0 
+                                    --         END) AS transportation_paid_later,
+
+                                    --         ROUND(SUM(CASE
+                                    --             WHEN p.total >= (
+                                    --                 SELECT COALESCE(SUM(s2.total), 0)
+                                    --                 FROM sales s2 
+                                    --                 WHERE s2.reservation_id = p.reservation_id 
+                                    --                 AND s2.sale_type_id = 1
+                                    --                 AND s2.deleted_at IS NULL
+                                    --             )
+                                    --             AND p.created_at > (
+                                    --                 SELECT MAX(s3.created_at)
+                                    --                 FROM sales s3 
+                                    --                 WHERE s3.reservation_id = p.reservation_id 
+                                    --                 AND s3.sale_type_id = 1
+                                    --                 AND s3.deleted_at IS NULL
+                                    --             )
+                                    --             THEN 
+                                    --                 CASE 
+                                    --                     WHEN p.operation = 'multiplication' THEN p.total * p.exchange_rate
+                                    --                     WHEN p.operation = 'division' THEN p.total / p.exchange_rate
+                                    --                     ELSE p.total 
+                                    --                 END
+                                    --             ELSE 0
+                                    --         END), 2) AS transportation_payment_amount,
+
+                                    --         MAX(CASE 
+                                    --             WHEN p.total >= (
+                                    --                 SELECT COALESCE(SUM(s2.total), 0)
+                                    --                 FROM sales s2 
+                                    --                 WHERE s2.reservation_id = p.reservation_id 
+                                    --                 AND s2.sale_type_id = 1
+                                    --                 AND s2.deleted_at IS NULL
+                                    --             )
+                                    --             AND p.created_at > (
+                                    --                 SELECT MAX(s3.created_at)
+                                    --                 FROM sales s3 
+                                    --                 WHERE s3.reservation_id = p.reservation_id 
+                                    --                 AND s3.sale_type_id = 1
+                                    --                 AND s3.deleted_at IS NULL
+                                    --             )
+                                    --             THEN p.created_at 
+                                    --             ELSE NULL 
+                                    --         END) AS transportation_payment_date,
+
+                                    --         CONCAT(
+                                    --             '[',
+                                    --                 GROUP_CONCAT(
+                                    --                     DISTINCT 
+                                    --                     CASE 
+                                    --                         WHEN p.payment_method = 'CREDIT' OR p.payment_method LIKE '%CREDIT%' THEN p.id
+                                    --                         ELSE NULL
+                                    --                     END
+                                    --                     ORDER BY p.id ASC
+                                    --                     SEPARATOR ','
+                                    --                 ),
+                                    --             ']'
+                                    --         ) AS credit_payment_ids,
+                                    --         -- Conciliación para créditos
+                                    --         CASE 
+                                    --             WHEN MAX(CASE WHEN p.category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.is_conciliated END) = 2 THEN 'pre-reconciled'
+                                    --             WHEN MAX(CASE WHEN p.category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.is_conciliated END) = 1 THEN 'reconciled'
+                                    --             WHEN MAX(CASE WHEN p.category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.is_conciliated END) = 3 THEN 'cxc'
+                                    --             ELSE NULL
+                                    --         END AS credit_conciliation_status,
+                                    --         -- NUEVOS CAMPOS desde categorías de crédito específico
+                                    --         GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.reference_invoice END SEPARATOR ', ') AS credit_references_agency,
+                                    --         GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.reference END SEPARATOR ', ') AS credit_references_payment,
+                                    --         GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.conciliation_comment END SEPARATOR ', ') AS credit_comments,
+                                    --         GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(p.date_conciliation, '%Y-%m-%d') END SEPARATOR ', ') AS credit_conciliation_dates,
+                                    --         GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(p.deposit_date, '%Y-%m-%d') END SEPARATOR ', ') AS credit_deposit_dates,
+                                            
+                                    --         GROUP_CONCAT(DISTINCT p.payment_method ORDER BY p.payment_method ASC SEPARATOR ',') AS payment_type_name,
+                                    --         GROUP_CONCAT(
+                                    --             DISTINCT CONCAT(
+                                    --                 p.payment_method, ' | ', 
+                                    --                 ROUND(CASE 
+                                    --                     WHEN p.operation = 'multiplication' THEN p.total * p.exchange_rate
+                                    --                     WHEN p.operation = 'division' THEN p.total / p.exchange_rate
+                                    --                     ELSE p.total END, 2), ' | ', 
+                                    --                 p.reference
+                                    --         ) ORDER BY p.payment_method ASC SEPARATOR ', ') AS payment_details
+                                    --     FROM payments p
+                                    --         WHERE p.deleted_at IS NULL
+                                    --     GROUP BY p.reservation_id
+                                    -- ) as p ON p.reservation_id = rez.id
+
+                                    -- PAGOS OPTIMIZADOS (CRÍTICO)
                                     LEFT JOIN (
                                         SELECT 
                                             p.reservation_id,
-                                            -- is_conciliated,
-                                            -- ROUND(SUM(CASE 
-                                            --     WHEN operation = 'multiplication' THEN total * exchange_rate
-                                            --     WHEN operation = 'division' THEN total / exchange_rate
-                                            --     ELSE total END), 2) AS total_payments,
-
+                                            -- Totales
                                             ROUND(SUM(CASE
                                                 WHEN p.category IN ('PAYOUT', 'PAYOUT_CREDIT_PAID') THEN 
-                                                    CASE 
-                                                        WHEN p.operation = 'multiplication' THEN p.total * p.exchange_rate
-                                                        WHEN p.operation = 'division' THEN p.total / p.exchange_rate
+                                                    CASE p.operation
+                                                        WHEN 'multiplication' THEN p.total * p.exchange_rate
+                                                        WHEN 'division' THEN p.total / p.exchange_rate
                                                         ELSE p.total 
                                                     END
                                                 ELSE 0
@@ -355,104 +509,64 @@ trait QueryTrait
 
                                             ROUND(SUM(CASE
                                                 WHEN p.category IN ('PAYOUT_CREDIT_PENDING', 'PAYOUT_CREDIT_PAID') THEN 
-                                                    CASE 
-                                                        WHEN p.operation = 'multiplication' THEN p.total * p.exchange_rate
-                                                        WHEN p.operation = 'division' THEN p.total / p.exchange_rate
+                                                    CASE p.operation
+                                                        WHEN 'multiplication' THEN p.total * p.exchange_rate
+                                                        WHEN 'division' THEN p.total / p.exchange_rate
                                                         ELSE p.total 
                                                     END
                                                 ELSE 0
-                                            END), 2) AS total_payments_credit,
+                                            END), 2) AS total_payments_credit,                                            
 
-                                            -- NUEVO: Campos para transportación
+                                            -- Transportación (SIN subconsultas correlacionadas)
                                             MAX(CASE 
-                                                WHEN p.total >= (
-                                                    SELECT COALESCE(SUM(s2.total), 0)
-                                                    FROM sales s2 
-                                                    WHERE s2.reservation_id = p.reservation_id 
-                                                    AND s2.sale_type_id = 1
-                                                    AND s2.deleted_at IS NULL
-                                                ) 
-                                                AND DATE(p.created_at) > DATE((
-                                                    SELECT MAX(s3.created_at)
-                                                    FROM sales s3 
-                                                    WHERE s3.reservation_id = p.reservation_id 
-                                                    AND s3.sale_type_id = 1
-                                                    AND s3.deleted_at IS NULL
-                                                ))
+                                                WHEN st.transportation_total > 0 
+                                                    AND p.total >= st.transportation_total
+                                                    AND DATE(p.created_at) > DATE(st.max_transportation_date)
                                                 THEN 1 
                                                 ELSE 0 
                                             END) AS transportation_paid_later,
 
                                             ROUND(SUM(CASE
-                                                WHEN p.total >= (
-                                                    SELECT COALESCE(SUM(s2.total), 0)
-                                                    FROM sales s2 
-                                                    WHERE s2.reservation_id = p.reservation_id 
-                                                    AND s2.sale_type_id = 1
-                                                    AND s2.deleted_at IS NULL
-                                                )
-                                                AND p.created_at > (
-                                                    SELECT MAX(s3.created_at)
-                                                    FROM sales s3 
-                                                    WHERE s3.reservation_id = p.reservation_id 
-                                                    AND s3.sale_type_id = 1
-                                                    AND s3.deleted_at IS NULL
-                                                )
+                                                WHEN st.transportation_total > 0 
+                                                    AND p.total >= st.transportation_total
+                                                    AND DATE(p.created_at) > DATE(st.max_transportation_date)
                                                 THEN 
-                                                    CASE 
-                                                        WHEN p.operation = 'multiplication' THEN p.total * p.exchange_rate
-                                                        WHEN p.operation = 'division' THEN p.total / p.exchange_rate
+                                                    CASE p.operation
+                                                        WHEN 'multiplication' THEN p.total * p.exchange_rate
+                                                        WHEN 'division' THEN p.total / p.exchange_rate
                                                         ELSE p.total 
                                                     END
                                                 ELSE 0
                                             END), 2) AS transportation_payment_amount,
 
                                             MAX(CASE 
-                                                WHEN p.total >= (
-                                                    SELECT COALESCE(SUM(s2.total), 0)
-                                                    FROM sales s2 
-                                                    WHERE s2.reservation_id = p.reservation_id 
-                                                    AND s2.sale_type_id = 1
-                                                    AND s2.deleted_at IS NULL
-                                                )
-                                                AND p.created_at > (
-                                                    SELECT MAX(s3.created_at)
-                                                    FROM sales s3 
-                                                    WHERE s3.reservation_id = p.reservation_id 
-                                                    AND s3.sale_type_id = 1
-                                                    AND s3.deleted_at IS NULL
-                                                )
+                                                WHEN st.transportation_total > 0 
+                                                    AND p.total >= st.transportation_total
+                                                    AND DATE(p.created_at) > DATE(st.max_transportation_date)
                                                 THEN p.created_at 
                                                 ELSE NULL 
                                             END) AS transportation_payment_date,
 
-                                            CONCAT(
-                                                '[',
-                                                    GROUP_CONCAT(
-                                                        DISTINCT 
-                                                        CASE 
-                                                            WHEN p.payment_method = 'CREDIT' OR p.payment_method LIKE '%CREDIT%' THEN p.id
-                                                            ELSE NULL
-                                                        END
-                                                        ORDER BY p.id ASC
-                                                        SEPARATOR ','
-                                                    ),
-                                                ']'
-                                            ) AS credit_payment_ids,
-                                            -- Conciliación para créditos
+                                            -- Campos existentes de pagos
+                                            CONCAT('[',
+                                                GROUP_CONCAT(DISTINCT 
+                                                    CASE WHEN p.payment_method = 'CREDIT' OR p.payment_method LIKE '%CREDIT%' THEN p.id END
+                                                    ORDER BY p.id ASC SEPARATOR ','
+                                                ), ']'
+                                            ) AS credit_payment_ids,                                        
+                                            
                                             CASE 
                                                 WHEN MAX(CASE WHEN p.category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.is_conciliated END) = 2 THEN 'pre-reconciled'
                                                 WHEN MAX(CASE WHEN p.category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.is_conciliated END) = 1 THEN 'reconciled'
                                                 WHEN MAX(CASE WHEN p.category IN ('PAYOUT_CREDIT', 'PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.is_conciliated END) = 3 THEN 'cxc'
                                                 ELSE NULL
                                             END AS credit_conciliation_status,
-                                            -- NUEVOS CAMPOS desde categorías de crédito específico
+
                                             GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.reference_invoice END SEPARATOR ', ') AS credit_references_agency,
                                             GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.reference END SEPARATOR ', ') AS credit_references_payment,
                                             GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN p.conciliation_comment END SEPARATOR ', ') AS credit_comments,
                                             GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(p.date_conciliation, '%Y-%m-%d') END SEPARATOR ', ') AS credit_conciliation_dates,
-                                            GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(p.deposit_date, '%Y-%m-%d') END SEPARATOR ', ') AS credit_deposit_dates,
-                                            
+                                            GROUP_CONCAT(DISTINCT CASE WHEN p.category IN ('PAYOUT_CREDIT_PAID', 'PAYOUT_CREDIT_PENDING') THEN DATE_FORMAT(p.deposit_date, '%Y-%m-%d') END SEPARATOR ', ') AS credit_deposit_dates,                                            
                                             GROUP_CONCAT(DISTINCT p.payment_method ORDER BY p.payment_method ASC SEPARATOR ',') AS payment_type_name,
                                             GROUP_CONCAT(
                                                 DISTINCT CONCAT(
@@ -464,9 +578,22 @@ trait QueryTrait
                                                     p.reference
                                             ) ORDER BY p.payment_method ASC SEPARATOR ', ') AS payment_details
                                         FROM payments p
-                                            WHERE p.deleted_at IS NULL
+
+                                        -- JOIN CRÍTICO: Precalculamos datos de transportación
+                                        LEFT JOIN (
+                                            SELECT reservation_id,
+                                                SUM(CASE WHEN sale_type_id = 1 THEN total ELSE 0 END) AS transportation_total,
+                                                MAX(CASE WHEN sale_type_id = 1 THEN created_at END) AS max_transportation_date
+                                            FROM sales
+                                            WHERE deleted_at IS NULL
+                                            GROUP BY reservation_id
+                                        ) st ON st.reservation_id = p.reservation_id
+                                        
+                                        WHERE p.deleted_at IS NULL
                                         GROUP BY p.reservation_id
-                                    ) as p ON p.reservation_id = rez.id                                    -- JOINs para tabla de items de reservacion (reservations_items)
+                                    ) as p ON p.reservation_id = rez.id
+
+                                    -- JOINs para tabla de items de reservacion (reservations_items)
                                     LEFT JOIN (
                                         SELECT  
                                             it.reservation_id, 

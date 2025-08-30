@@ -1428,7 +1428,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     preConfirm: () => {
                         if( status == "CANCELLED" || status == "NOSHOW" ){
                             const reason            = document.getElementById("cancelReason").value;
-                            const additionalNotes   = document.getElementById("additionalNotes").value;
+                            const additionalNotes   = document.getElementById("additionalNotes")?.value;
                             const dropzone          = Dropzone.forElement("#dropzoneService");
                 
                             if (!reason) {

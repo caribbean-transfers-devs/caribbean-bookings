@@ -759,7 +759,6 @@ if( markReservationDuplicate ){
 document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("click", components.debounce(function (event) {
         components.typesCancellations();
-
         if (event.target.classList.contains('paymentLink')) {
             event.preventDefault();
 
@@ -781,7 +780,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }).catch(function(error) {
                 console.error('Error al copiar el texto al portapapeles: ', error);
             });            
-        }        
+        }
         
         //PERMITE CALIFICAR LA RESERVACION
         if (event.target.classList.contains('enabledLike')) {
@@ -912,7 +911,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
                 }
             });            
-        }        
+        }
 
         //ACTUALIZA EL ESTATUS DEL SERVICIO
         if (event.target.classList.contains('serviceStatusUpdate')) {
@@ -987,7 +986,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     preConfirm: () => {
                         if (status == "CANCELLED" || status == "NOSHOW") {
                             const reason            = document.getElementById("cancelReason").value;
-                            const additionalNotes   = document.getElementById("additionalNotes").value;
+                            const additionalNotes   = document.getElementById("additionalNotes")?.value;
                             const dropzone          = Dropzone.forElement("#dropzoneService");
 
                             if (!reason) {
@@ -1067,7 +1066,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
             })();            
-        }        
+        }
 
         //ENVIAR CONFIRMACIÓN DE LLEGADA
         if (event.target.classList.contains('arrivalConfirmation')) {
@@ -1082,7 +1081,7 @@ document.addEventListener("DOMContentLoaded", function() {
             __btnSendArrivalConfirmation.classList.remove('d-none');
             __titleModal.innerHTML = "Confirmación de llegada";
             __closeModalFooter.innerHTML = "Cerrar";        
-        }        
+        }
 
         //ACTUALIZA LA CONFIRMACIÓN DEL SERVICIO
         if (event.target.classList.contains('confirmService')) {
