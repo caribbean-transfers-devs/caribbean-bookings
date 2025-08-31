@@ -20,7 +20,7 @@
         "data" => []
     ];
 
-    $dataMethodPayments = [        
+    $dataMethodPayments = [
         "total" => 0,
         "gran_total" => 0,
         "USD" => [
@@ -113,6 +113,23 @@
     ];
 
     $dataOriginSale = [
+        "total" => 0,
+        "gran_total" => 0,
+        "USD" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "MXN" => [
+            "total" => 0,
+            "gran_total" => 0,
+            "counter" => 0,
+        ],
+        "counter" => 0,
+        "data" => []
+    ];
+
+    $dataServiceTypeOperation = [
         "total" => 0,
         "gran_total" => 0,
         "USD" => [
@@ -290,6 +307,36 @@
                                     $bookingsStatus['data'][$item->reservation_status][$item->currency]['total'] += $item->total_sales;
                                     $bookingsStatus['data'][$item->reservation_status][$item->currency]['counter']++;
                                     $bookingsStatus['data'][$item->reservation_status]['counter']++;
+
+                                    if (!isset( $dataServiceTypeOperation['data'][strtoupper(Str::slug($item->service_types))] ) ){
+                                        $dataServiceTypeOperation['data'][strtoupper(Str::slug($item->service_types))] = [
+                                            "name" => $item->service_types,
+                                            "total" => 0,
+                                            "gran_total" => 0,
+                                            "USD" => [
+                                                "total" => 0,
+                                                "gran_total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "MXN" => [
+                                                "total" => 0,
+                                                "gran_total" => 0,
+                                                "counter" => 0,
+                                            ],
+                                            "counter" => 0,                                            
+                                        ];
+                                    }
+                                    $dataServiceTypeOperation['total'] += $item->total_sales;
+                                    $dataServiceTypeOperation['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
+                                    $dataServiceTypeOperation[$item->currency]['total'] += $item->total_sales;
+                                    $dataServiceTypeOperation[$item->currency]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
+                                    $dataServiceTypeOperation[$item->currency]['counter']++;
+                                    $dataServiceTypeOperation['data'][strtoupper(Str::slug($item->service_types))]['total'] += $item->total_sales;
+                                    $dataServiceTypeOperation['data'][strtoupper(Str::slug($item->service_types))]['gran_total'] += ( $item->currency == "USD" ? ($item->total_sales * $exchange) : $item->total_sales );
+                                    $dataServiceTypeOperation['data'][strtoupper(Str::slug($item->service_types))][$item->currency]['total'] += $item->total_sales;
+                                    $dataServiceTypeOperation['data'][strtoupper(Str::slug($item->service_types))][$item->currency]['counter']++;
+                                    $dataServiceTypeOperation['data'][strtoupper(Str::slug($item->service_types))]['counter']++;
+                                    $dataServiceTypeOperation['counter']++;
 
                                     //METODOS DE PAGO
                                     if (!isset( $dataMethodPayments['data'][strtoupper(Str::slug($item->payment_type_name))] ) ){
@@ -496,7 +543,10 @@
                                 @endphp
                                 <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ $background_identifier }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
                                     <td class="text-center">{{ $item->reservation_id }}</td>
-                                    <td class="text-center"><span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span></td>
+                                    <td class="text-center">
+                                        <span class="badge badge-{{ $item->is_round_trip == 0 ? 'success' : 'danger' }} text-lowercase">{{ $item->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</span>
+                                        [{{ $item->service_types }}]
+                                    </td>
                                     <td class="text-center">
                                         @php
                                             $codes_string = "";
@@ -633,5 +683,5 @@
 
     <x-modals.filters.bookings :data="$data" :isSearch="1" :services="$services" :istoday="1" :isduplicated="1" :isagency="1" :currencies="$currencies" :users="$users" :websites="$websites" :origins="$origins" :reservationstatus="$reservation_status" :vehicles="$vehicles" :zones="$zones" :paymentstatus="$payment_status" :isbalance="1" :methods="$methods" :wasIsQuotation="1" :rating="1" :iscommissionable="1" :cancellations="$cancellations" :ispayarrival="1" :refundRequestCount="1" :isPaidAfterSale="1" />
     <x-modals.reports.columns />
-    <x-modals.charts.sales2 :bookingsStatus="$bookingsStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataSites="$dataSites" :dataDestinations="$dataDestinations" :dataOriginSale="$dataOriginSale" />
+    <x-modals.charts.sales2 :bookingsStatus="$bookingsStatus" :dataMethodPayments="$dataMethodPayments" :dataCurrency="$dataCurrency" :dataVehicles="$dataVehicles" :dataServiceType="$dataServiceType" :dataSites="$dataSites" :dataDestinations="$dataDestinations" :dataOriginSale="$dataOriginSale" :dataServiceTypeOperation="$dataServiceTypeOperation" />
 @endsection

@@ -33,7 +33,7 @@
                 @endif
                 @if ( isset($dataServiceType) )
                     <input type="hidden" id="dataServiceType" value='@json(( isset($dataServiceType['data']) ? $dataServiceType['data'] : [] ))'>
-                @endif                
+                @endif
                 @if ( isset($dataServiceTypeOperation) )
                     <input type="hidden" id="dataServiceTypeOperation" value='@json(( isset($dataServiceTypeOperation['data']) ? $dataServiceTypeOperation['data'] : [] ))'>
                 @endif
@@ -52,6 +52,9 @@
                 @endif
                 @if ( isset($dataOriginSale) )
                     <input type="hidden" id="dataOriginSale" value='@json(( isset($dataOriginSale['data']) ? $dataOriginSale['data'] : [] ))'>
+                @endif
+                @if ( isset($dataServiceTypeOperation) )
+                    <input type="hidden" id="dataServiceTypeOperation" value='@json(( isset($dataServiceTypeOperation['data']) ? $dataServiceTypeOperation['data'] : [] ))'>
                 @endif
                 <div class="container_left">
                     @if ( isset($bookingsStatus) )
