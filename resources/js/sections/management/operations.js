@@ -1436,10 +1436,12 @@ document.addEventListener("DOMContentLoaded", function() {
                                 return false;
                             }
                             
-                            if (!additionalNotes.trim()) {
-                                Swal.showValidationMessage("Debes proporcionar comentarios adicionales.");
-                                return false;
-                            }
+                            if (status == "CANCELLED") {
+                                if (!additionalNotes || !additionalNotes.trim()) {
+                                    Swal.showValidationMessage("Debes proporcionar comentarios adicionales.");
+                                    return false;
+                                }
+                            }                            
                             
                             if (dropzone.files.length === 0) {
                                 Swal.showValidationMessage("Debes subir al menos una imagen.");
@@ -1448,7 +1450,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
                             return { 
                                 reason, 
-                                additionalNotes: additionalNotes.trim(),
+                                additionalNotes: additionalNotes?.trim() || "",
                                 images: dropzone.files 
                             };
                         }else{
@@ -1689,11 +1691,6 @@ $('#dataManagementOperations').on('click', '.extract_confirmation', function() {
     __terminal2.innerHTML = __message_terminal2;
     __terminal3.innerHTML = __message_terminal3;
 });
-
-//NOTIFICACIONES PARA VER DETALLES DE RESERVA
-function notificationInfo(item){
-    console.log(item);    
-}
 
 if( __is_open != null ){
     __is_open.addEventListener('change', function(){

@@ -751,14 +751,15 @@ if( markReservationDuplicate ){
     })
 }
 
+components.typesCancellations();
+
 //VALIDAMOS DOM
 /*
     se dispara cuando el documento HTML ha sido completamente cargado y parseado, 
     sin esperar a que se carguen los estilos, imágenes u otros recursos externos.
  */
 document.addEventListener("DOMContentLoaded", function() {
-    document.addEventListener("click", components.debounce(function (event) {
-        components.typesCancellations();
+    document.addEventListener("click", components.debounce(function (event) {        
         if (event.target.classList.contains('paymentLink')) {
             event.preventDefault();
 
@@ -994,9 +995,11 @@ document.addEventListener("DOMContentLoaded", function() {
                                 return false;
                             }
                             
-                            if (!additionalNotes.trim()) {
-                                Swal.showValidationMessage("Debes proporcionar comentarios adicionales.");
-                                return false;
+                            if (status == "CANCELLED") {
+                                if (!additionalNotes || !additionalNotes.trim()) {
+                                    Swal.showValidationMessage("Debes proporcionar comentarios adicionales.");
+                                    return false;
+                                }
                             }
                             
                             if (dropzone.files.length === 0) {
@@ -1006,7 +1009,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                             return { 
                                 reason, 
-                                additionalNotes: additionalNotes.trim(),
+                                additionalNotes: additionalNotes?.trim() || "",
                                 images: dropzone.files 
                             };
                         } else {
