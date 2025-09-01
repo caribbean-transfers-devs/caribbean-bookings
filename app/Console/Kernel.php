@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         // Tarea diaria a las 12:45 AM
+        $schedule->command('app:test-cron')->everyMinute();
         $schedule->call(function () {
             file_get_contents('https://bookings.caribbeantransfers.tech/set/schedules');
         })->dailyAt('00:45');
@@ -22,7 +23,6 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             file_get_contents('https://bookings.caribbeantransfers.tech/set/processSchedulesForToday');
         })->everyEightHours();        
-        $schedule->command('app:test-cron')->everyMinute();
     }
 
     /**
