@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             file_get_contents('https://bookings.caribbeantransfers.tech/set/processSchedulesForToday');
         })->everyEightHours();        
+        $schedule->command('app:test-cron')->everyMinute();
     }
 
     /**
