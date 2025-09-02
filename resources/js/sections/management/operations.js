@@ -1503,7 +1503,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 });
 
                                 try {
-                                    const uploadedImages = await details.uploadImages(value.images, reservation, status);
+                                    const uploadedImages = await setup.uploadImages(value.images, reservation, status);
 
                                     if (uploadedImages.length === value.images.length) {
                                         Swal.fire("Éxito", "Cancelación confirmada y archivos subidos.", "success").then(() => {
