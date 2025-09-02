@@ -635,6 +635,10 @@
                                                                         <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="NOSHOW" data-type="TYPE_ONE">No show</a>
                                                                         <hr>
                                                                         <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="CANCELLED" data-type="TYPE_ONE">Cancelado</a>
+                                                                        <hr>
+                                                                        <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="NOTOPERATED"    data-type="TYPE_ONE">No operado</a>
+                                                                        <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="REFUND"         data-type="TYPE_ONE">Reembolso</a>
+                                                                        <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="DISPUTE"        data-type="TYPE_ONE">Disputa</a>
                                                                     </div>
                                                                 </div>
                                                             @else
@@ -718,6 +722,10 @@
                                                                             <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="NOSHOW" data-type="TYPE_TWO">No show</a>
                                                                             <hr>
                                                                             <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="CANCELLED" data-type="TYPE_TWO">Cancelado</a>
+                                                                            <hr>
+                                                                            <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="NOTOPERATED"    data-type="TYPE_TWO">No operado</a>
+                                                                            <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="REFUND"         data-type="TYPE_TWO">Reembolso</a>
+                                                                            <a href="javascript:void(0);" class="dropdown-item serviceStatusUpdate" data-reservation="{{ $reservation->id }}" data-item="{{ $item->reservations_item_id }}" data-service="{{ $item->final_service_type_one }}" data-status="DISPUTE"        data-type="TYPE_TWO">Disputa</a>                                                                            
                                                                         </div>
                                                                     </div>
                                                                 @else
