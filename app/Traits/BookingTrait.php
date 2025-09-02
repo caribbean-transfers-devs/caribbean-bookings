@@ -13,6 +13,7 @@ trait BookingTrait
                 break;
             case 'PENDING':
             case 'NOSHOW':
+            case 'NOTOPERATED':
             case 'C':
                 return ( $status == "PENDING" && $section == "OPERATION" ? 'secondary' : 'warning' );
                 break;
@@ -27,6 +28,7 @@ trait BookingTrait
                 break;
             case 'CREDIT':
             case 'REFUND':
+            case 'DISPUTE':
             case 'E':
                 return 'info';
                 break;
@@ -129,6 +131,12 @@ trait BookingTrait
                 break;
             case 'EXPIRED_QUOTATION':
                 return 'COTIZACIÓN VENCIDA';
+                break;
+            case 'NOTOPERATED':
+                return 'NO OPERADO';
+                break;
+            case 'DISPUTE':
+                return 'DISPUTA';
                 break;
             default:
                 return 'CONFIRMADO';

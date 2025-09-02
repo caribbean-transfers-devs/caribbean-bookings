@@ -253,7 +253,6 @@ trait OperationTrait
         return ( $payment * $percentage );
     }
 
-
     //////
     public function classScheduleDriver($status)
     {
@@ -367,7 +366,7 @@ trait OperationTrait
         }        
     }
 
-        public function classStatusText($status)
+    public function classStatusText($status)
     {
         switch ($status) {
             case '2':
