@@ -920,7 +920,7 @@ class ActionsRepository
         $validator = Validator::make($request->all(), [
             'item_id' => 'required|integer',
             'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
-            'status' => 'required|string|in:PENDING,COMPLETED,NOSHOW,CANCELLED',
+            'status' => 'required|string|in:PENDING,COMPLETED,NOSHOW,CANCELLED,DUPLICATE,NOTOPERATED,REFUND,DISPUTE',
             'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',
         ]);
 
