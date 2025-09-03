@@ -378,7 +378,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if ( auth()->user()->hasPermission(88) && $close_operation == 0 )                                        
+                                    @if ( auth()->user()->hasPermission(88) && $close_operation == 0 )
                                         <?=auth()->user()->renderOperationOptionsStatus($key,$value)?>
                                     @else
                                         <?=auth()->user()->renderOperationStatus($value)?>
