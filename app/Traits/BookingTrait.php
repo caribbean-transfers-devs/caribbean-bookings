@@ -109,10 +109,10 @@ trait BookingTrait
                 return 'COMPLETADO';
                 break;
             case 'E':
-                return 'E';
+                return 'ENVIADO';
                 break;
             case 'C':
-                return 'C';
+                return 'CONFIRMADO';
                 break;                
             case 'OK':
                 return 'OK';
