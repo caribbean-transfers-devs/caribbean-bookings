@@ -283,7 +283,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     tr += `<tr>`;
                         tr += `<td class="text-left">${stripePayment.code}</td>`;
                         tr += `<td class="text-left">${stripePayment.object.destination.bank_name}</td>`;
-                        tr += `<td class="text-right">${formatMoney(stripePayment.object.amount)}</td>`;
+                        tr += `<td class="text-right">${formatMoney(stripePayment.object.amount/100)}</td>`;
                         tr += `<td class="text-left">${formatDateFromTimestamp(stripePayment.object.arrival_date)}</td>`;
                         tr += `<td class="text-left">`;
                             tr += `<button class="btn btn-primary d-flex align-items-center _effect--ripple waves-effect waves-light open-payment-detail" data-payout-id="${stripePayment.code}">`;
