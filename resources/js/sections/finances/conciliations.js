@@ -65,12 +65,26 @@ document.addEventListener("DOMContentLoaded", function() {
             const date = new Date(timestamp);
             return date.toISOString().split("T")[0]; // "YYYY-MM-DD"
         }
-        const formatMoney = (amount) => (new Intl.NumberFormat("es-MX", {
-            style: "currency",
-            currency: "MXN",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(amount))
+        const formatMoney = (amount) => {
+            if (amount === null || amount === undefined) return "$0.00";
+            const clean = String(amount).replace(/,/g, "").trim();
+            const num = Number(clean);
+            if (isNaN(num)) return "$0.00";
+
+            return new Intl.NumberFormat("es-MX", {
+                style: "currency",
+                currency: "MXN",
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            }).format(num);
+        };
+        const getNumber = (amount) => {
+            if (amount === null || amount === undefined) return 0;
+            const clean = String(amount).replace(/,/g, "").trim();
+            const num = Number(clean);
+
+            return isNaN(num) ? 0 : num;
+        };
 
         if (event.target && event.target.id === 'conciliationActionBtn') {
             event.preventDefault();            
@@ -296,7 +310,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 $('.open-payment-detail').click(function() {
                     let tr = '';
+                    let importe_venta = 0;
+                    let importe_cobrado = 0;
+                    let importe_pesos = 0;
+                    let total_cobrado_stripe = 0;
+                    let comision_stripe = 0;
+                    let total_depositar_stripe = 0;
+                    let total_depositado_banco = 0;
                     data.conciliations.filter(conciliation => conciliation.referencia_deposito_banco === $(this).data('payout-id')).forEach(item => {
+                        importe_venta += getNumber(item.importe_venta);
+                        importe_cobrado += getNumber(item.importe_cobrado);
+                        importe_pesos += getNumber(item.importe_pesos);
+                        total_cobrado_stripe += getNumber(item.total_cobrado_stripe);
+                        comision_stripe += getNumber(item.comision_stripe);
+                        total_depositar_stripe += getNumber(item.total_depositar_stripe);
+                        total_depositado_banco += getNumber(item.total_depositado_banco);
+
                         tr += `<tr>`;
                             tr += `<td class="text-center">${item.reservation_id}</td>`;
                             tr += `<td class="text-center">${item.fecha}</td>`;
@@ -327,6 +356,36 @@ document.addEventListener("DOMContentLoaded", function() {
                             tr += `<td class="text-center">${item.tiene_disputa ? '<button class="btn btn-success">Sí</button>' : ''}</td>`;
                         tr += `</tr>`;
                     });
+                    tr += `<tr>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-right"><strong>${formatMoney(importe_venta)}</strong></td>`;
+                        tr += `<td class="text-right"><strong>${formatMoney(importe_cobrado)}</strong></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-right"><strong>${formatMoney(importe_pesos)}</strong></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-right"><strong>${formatMoney(total_cobrado_stripe)}</strong></td>`;
+                        tr += `<td class="text-right"><strong>${formatMoney(comision_stripe)}</strong></td>`;
+                        tr += `<td class="text-right"><strong>${formatMoney(total_depositar_stripe)}</strong></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-right"><strong>${formatMoney(total_depositado_banco)}</strong></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                        tr += `<td class="text-center"></td>`;
+                    tr += `</tr>`;
+
 
                     $("#paymentsFromStripeAutomaticConciliationDataModal_tbody").html(tr);
                     $('#paymentsFromStripeAutomaticConciliationDataModal').modal('show');
