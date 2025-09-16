@@ -250,7 +250,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
             
-            fetch('/stripeInternal/stripeTemporalSemiAutomaticConciliation', {
+            fetch('/stripe-internal/stripe-temporal-semi-automatic-conciliation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -351,7 +351,7 @@ document.addEventListener("DOMContentLoaded", function() {
             })
             .then((dataToSend) => {
                 if(!dataToSend) return;
-                return fetch('/stripeInternal/stripeTemporalConfirmAutomaticConciliation', {
+                return fetch('/stripe-internal/stripe-temporal-confirm-automatic-conciliation', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
