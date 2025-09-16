@@ -216,6 +216,22 @@ trait StripeTrait
         }
     }    
 
+    public function getLast10Payouts() {
+        try {
+            $url = $this->apiUrlStripe . "/v1/payouts?expand[]=data.balance_transaction&expand[]=data.destination&limit=10";
+            $response = $this->makeCurlRequest($url, $this->clientSecretStripeP);
+            
+            if ($response['status'] >= 200 && $response['status'] < 300) {
+                return response()->json($response['body']);
+            } else {
+                $errorMsg = $response['body']['error']['message'] ?? 'Failed to retrieve balance';
+                throw new \Exception($errorMsg);
+            }
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
     /*********************************************************************/
     /****************************** BALANCE ******************************/
     /*********************************************************************/

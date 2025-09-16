@@ -11,6 +11,11 @@ class StripePayments extends Model
 
     protected $table = 'stripe_payments';
 
+    protected $fillable = [
+        'id',
+        'code',
+    ];
+
     protected $casts = [
         'object' => 'array', // Se asegura de que Laravel lo maneje como un array automáticamente
     ];

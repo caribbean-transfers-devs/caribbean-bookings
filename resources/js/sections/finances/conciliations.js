@@ -56,6 +56,22 @@ document.addEventListener("DOMContentLoaded", function() {
     components.setValueSelectpicker();
 
     document.addEventListener("click", components.debounce(async function (event) {
+        const formatDateFromTimestamp = (timestamp) => {
+            // Detectar si el timestamp viene en segundos o milisegundos
+            if (timestamp.toString().length === 10) {
+                timestamp *= 1000; // convertir segundos -> ms
+            }
+
+            const date = new Date(timestamp);
+            return date.toISOString().split("T")[0]; // "YYYY-MM-DD"
+        }
+        const formatMoney = (amount) => (new Intl.NumberFormat("es-MX", {
+            style: "currency",
+            currency: "MXN",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(amount))
+
         if (event.target && event.target.id === 'conciliationActionBtn') {
             event.preventDefault();            
 
@@ -221,6 +237,152 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error("Error al obtener datos:", error);
                 Object.values(elements).forEach(el => el.innerHTML = '<p style="color:red;">Error al cargar datos.</p>');
             }
+        }
+
+        if (event.target && event.target.id === 'generateStripeAutomaticConciliationData') {
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se pre-concilian todos los pagos de stripe. Esto puede tardar de 1 - 2 minutos",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            fetch('/stripeInternal/stripeTemporalSemiAutomaticConciliation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }        
+                return response.json();
+            })
+            .then(data => {
+                Swal.close();
+
+                if(data.stripe_payments.length === 0) {
+                    Swal.fire({
+                        title: "Listo!",
+                        text: "Por el momento todos los pagos de stripe han sido conciliados",
+                        icon: "success"
+                    });
+                    return;
+                }
+
+                $('#generateStripeAutomaticConciliationDataModal').modal('show');
+
+                let tr = '';
+                data.stripe_payments.forEach(stripePayment => {
+                    tr += `<tr>`;
+                        tr += `<td class="text-left">${stripePayment.code}</td>`;
+                        tr += `<td class="text-left">${stripePayment.object.destination.bank_name}</td>`;
+                        tr += `<td class="text-right">${formatMoney(stripePayment.object.amount)}</td>`;
+                        tr += `<td class="text-left">${formatDateFromTimestamp(stripePayment.object.arrival_date)}</td>`;
+                        tr += `<td class="text-left">`;
+                            tr += `<button class="btn btn-primary d-flex align-items-center _effect--ripple waves-effect waves-light open-payment-detail" data-payout-id="${stripePayment.code}">`;
+                                tr += `<i class="fa-solid fa-eye"></i>`;
+                            tr += `</button>`;
+                        tr += `</td>`;
+                    tr += `</tr>`;
+                });
+                $("#generateStripeAutomaticConciliationDataModal_tbody").html(tr);
+
+                $('.open-payment-detail').click(function() {
+                    let tr = '';
+                    data.conciliations.filter(conciliation => conciliation.referencia_deposito_banco === $(this).data('payout-id')).forEach(item => {
+                        tr += `<tr>`;
+                            tr += `<td class="text-center">${item.reservation_id}</td>`;
+                            tr += `<td class="text-center">${item.fecha}</td>`;
+                            tr += `<td class="text-center">${item.sitio}</td>`;
+                            tr += `<td class="text-center">${item.codigo.split(",").map(c => `<p class="mb-1">${c}</p>`).join('')}</td>`;
+                            tr += `<td class="text-center"><button class="btn btn-${item.estatus === 'CONFIRMED' ? 'success' : 'warning'}">${item.estatus}</button></td>`;
+                            tr += `<td class="text-center">${item.cliente}</td>`;
+                            tr += `<td class="text-center">${item.servicio}</td>`;
+                            tr += `<td class="text-center">${item.pax}</td>`;
+                            tr += `<td class="text-center">${item.destino}</td>`;
+                            tr += `<td class="text-right">${formatMoney(item.importe_venta)}</td>`;
+                            tr += `<td class="text-right">${formatMoney(item.importe_cobrado)}</td>`;
+                            tr += `<td class="text-center">${item.moneda}</td>`;
+                            tr += `<td class="text-center">${item.metodo_pago}</td>`;
+                            tr += `<td class="text-right">${formatMoney(item.importe_pesos)}</td>`;
+                            tr += `<td class="text-center">${item.id_stripe ? `<a href="javascript:void(0)" class="chargeInformationStripe" data-reference="${item.id_stripe}">${item.id_stripe}</a>` : ''}</td>`;
+                            tr += `<td class="text-center">${item.fecha_cobro_stripe ?? 'SIN FECHA DE COBRO'}</td>`;
+                            tr += `<td class="text-center" style="color:#fff;background-color:#${item.estatus_cobro_stripe === 'COBRADO' ? '00ab55' : 'e7515a'};">${item.estatus_cobro_stripe}</td>`;
+                            tr += `<td class="text-right">${formatMoney(item.total_cobrado_stripe)}</td>`;
+                            tr += `<td class="text-right">${formatMoney(item.comision_stripe)}</td>`;
+                            tr += `<td class="text-right">${formatMoney(item.total_depositar_stripe)}</td>`;
+                            tr += `<td class="text-center">${item.fecha_depositada_banco ?? 'SIN FECHA DE PAGO'}</td>`;
+                            tr += `<td class="text-center" style="color:#fff;background-color:#${item.estatus_deposito_banco === 'DEPOSITADO' ? '00ab55' : 'e7515a'};">${item.estatus_deposito_banco}</td>`;
+                            tr += `<td class="text-right">${formatMoney(item.total_depositado_banco)}</td>`;
+                            tr += `<td class="text-center">${item.referencia_deposito_banco}</td>`;
+                            tr += `<td class="text-center">${item.banco}</td>`;
+                            tr += `<td class="text-center">${item.tiene_reembolso ? '<button class="btn btn-success">Sí</button>' : ''}</td>`;
+                            tr += `<td class="text-center">${item.tiene_disputa ? '<button class="btn btn-success">Sí</button>' : ''}</td>`;
+                        tr += `</tr>`;
+                    });
+
+                    $("#paymentsFromStripeAutomaticConciliationDataModal_tbody").html(tr);
+                    $('#paymentsFromStripeAutomaticConciliationDataModal').modal('show');
+                });
+
+                return (new Promise((resolve) => {
+                    $('#confirm_conciliation').click(function() {
+                        Swal.fire({
+                            title: "Procesando solicitud...",
+                            text: "Se está conciliando todos los pagos de stripe mostrados anteriormente",
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        $('#generateStripeAutomaticConciliationDataModal').modal('hide');
+                        resolve(data);
+                    });
+                }))
+            })
+            .then((dataToSend) => {
+                if(!dataToSend) return;
+                return fetch('/stripeInternal/stripeTemporalConfirmAutomaticConciliation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(dataToSend)
+                })
+            })
+            .then(response => {
+                if(!response) return;
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }        
+                return response.json();
+            })
+            .then(response => {
+                if(!response) return;
+                Swal.fire({
+                    title: "Listo!",
+                    text: "Todos los pagos mostrados anteriormente han sido conciliados. Ahora puedes filtrar los pagos para ver los resultados finales",
+                    icon: "success"
+                });
+            })
+            .catch(error => {
+                Swal.fire(
+                '¡ERROR!',
+                error.message || 'Ocurrió un error',
+                'error'
+                );
+            });
         }
 
         const btnConciliationStripe = event.target.closest('.btnConciliationStripe');

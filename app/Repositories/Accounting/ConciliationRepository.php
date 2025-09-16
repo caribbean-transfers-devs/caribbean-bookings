@@ -16,6 +16,8 @@ use App\Models\StripePayments;
 use App\Traits\QueryTrait;
 use App\Traits\PayPalTrait;
 use App\Traits\StripeTrait;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class ConciliationRepository
 {
@@ -485,5 +487,156 @@ class ConciliationRepository
         $payment->total_net = $net;
         $payment->conciliation_comment = ( isset($request->conciliation_comment) ? $request->conciliation_comment : "" );
         $payment->save();
+    }
+
+    public function generateStripeAutomaticConciliationData() {
+        try {
+            $stripeResponse = $this->getLast10Payouts();
+            $payouts = $stripeResponse->getData(true);
+
+            $payoutIds = collect($payouts['data'])->pluck('id');
+            $existingPayoutIds = StripePayments::whereIn('code', $payoutIds)->pluck('code');
+
+            $payoutsToConciliate = collect($payouts['data'])->filter(function ($payout) use ($existingPayoutIds) {
+                return !$existingPayoutIds->contains($payout['id']);
+            })->values()->all();
+
+            if(sizeof($payoutsToConciliate) === 0) {
+                Cache::delete('stripe-automatic-conciliation-key');
+                return [
+                    'conciliations' => [],
+                    'payments' => [],
+                    'stripe_payments' => [],
+                ];
+            }
+
+            $counter = 0;
+            $stripePayments = [];
+            $payments = [];
+            foreach($payoutsToConciliate as $payout) {
+                $conciliation = $this->getBalancePayoutV2($payout['id']);
+                $conciliationData = $conciliation->getData(true);
+
+                if( isset($conciliationData['data']) && empty($conciliationData['data']) ){
+                    Log::error("No se encontró información adicional (conciliationData) para el payout: " . $payout['id']);
+                    continue;
+                }
+
+                foreach ($conciliationData['data'] as $key => $value) {
+                    if (in_array($value['type'], ['payment', 'charge'])) {
+                        $payment = Payment::where("payment_method", "STRIPE")
+                        ->where("reference", $value['source']['id'])
+                        ->first();
+
+                        if( $payment ){
+                            $payment->reference_conciliation    = $payout['id'];
+                            $payment->deposit_date              = Carbon::parse($value['available_on'] ?? null)->format('Y-m-d H:i:s');
+                            $payment->total_final_net           = ($value['net']/100);
+                            $payment->bank_name                 = $payout['destination']['bank_name'];
+                            $payments[] = $payment;
+                        }
+                    }
+                }
+
+                $newPayout          = new StripePayments();
+                $newPayout->code    = $payout['id'];
+                $newPayout->object = $payout;
+                $stripePayments[] = $newPayout;
+
+                $counter++;
+                if($counter >= 5) {
+                    $counter = 0;
+                    sleep(1); // Para no exceder el límite de peticiones por segundo en stripe
+                }
+            }
+
+            $ids = collect($payments)->pluck('id')->values()->toArray();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $conciliations = $this->queryConciliation(
+                "AND p.id IN ($placeholders)",
+                null,
+                $ids
+            );
+
+            $conciliationsTransformedData = collect($payments)->map(function($payment) use ($conciliations) {
+                // Buscar la conciliación relacionada a este payment
+                $conciliation = collect($conciliations)->firstWhere('reservation_id', $payment['reservation_id']);
+
+                $total_payments = 0;
+                if (isset($conciliation->operation, $conciliation->total_payments_stripe)) {
+                    switch ($conciliation->operation) {
+                        case "multiplication":
+                            $total_payments = round($conciliation->total_payments_stripe * ($conciliation->exchange_rate ?? 1));
+                            break;
+                        case "division":
+                            $total_payments = round($conciliation->total_payments_stripe / ($conciliation->exchange_rate ?? 1));
+                            break;
+                        default:
+                            $total_payments = round($conciliation->total_payments_stripe);
+                    }
+                }
+
+                return [
+                    'reservation_id' => $payment['reservation_id'],
+                    'fecha' => isset($conciliation->created_at) ? date("Y-m-d", strtotime($conciliation->created_at)) : null,
+                    'sitio' => $conciliation->site_name ?? null,
+                    'codigo' => $conciliation->reservation_codes ?? null,
+                    'estatus' => $conciliation->reservation_status ?? null,
+                    'cliente' => $conciliation->full_name ?? null,
+                    'servicio' => $conciliation->service_type_name ?? null,
+                    'pax' => $conciliation->passengers ?? null,
+                    'destino' => $conciliation->to_name ?? null,
+                    'importe_venta' => $conciliation->total_sales ?? null,
+                    'importe_cobrado' => $total_payments,
+                    'moneda' => $conciliation->currency ?? null,
+                    'metodo_pago' => $payment['payment_type_name'] ?? $conciliation->payment_type_name ?? null,
+                    'importe_pesos' => number_format(round($conciliation->total_payments_stripe), 2),
+                    'id_stripe' => $conciliation->reference_stripe ?? null,
+                    'fecha_cobro_stripe' => $conciliation->date_conciliation != NULL ? date("Y-m-d", strtotime($conciliation->date_conciliation)) : "SIN FECHA DE COBRO",
+                    'estatus_cobro_stripe' => $conciliation->date_conciliation != NULL ? 'COBRADO' : 'PENDIENTE DE COBRAR',
+                    'total_cobrado_stripe' => $payment['amount'] ?? null,
+                    'comision_stripe' => $payment['fee'] ?? null,
+                    'total_depositar_stripe' => $payment['total_net'] ?? null,
+                    'fecha_depositada_banco' => $payment['deposit_date'] ?? null,
+                    'estatus_deposito_banco' => isset($payment['deposit_date']) ? 'DEPOSITADO' : 'PENDIENTE DE DEPOSITO',
+                    'total_depositado_banco' => $payment['total_final_net'] ?? null,
+                    'referencia_deposito_banco' => $payment['reference_conciliation'] ?? null,
+                    'banco' => $payment['bank_name'] ?? null,
+                    'tiene_reembolso' => $payment['refunded'] > 0,
+                    'tiene_disputa' => $payment['disputed'] > 0,
+                ];
+            })->toArray();
+
+            return [
+                'conciliations' => $conciliationsTransformedData,
+                'payments' => $payments,
+                'stripe_payments' => $stripePayments,
+            ];
+            
+        } catch(Exception $e) {
+            Log::error("ocurrió un error inesperado en conciliación automática: " . $e->getMessage());
+            throw new Exception($e);
+        }
+    }
+
+    public function saveStripeAutomaticConciliation($stripeAutomaticConciliationData) {
+        DB::beginTransaction();
+        
+        foreach($stripeAutomaticConciliationData['payments'] as $payment) {
+            $paymentObj = Payment::find($payment['id']);
+            $paymentObj->reference_conciliation = $payment['reference_conciliation'];
+            $paymentObj->deposit_date           = $payment['deposit_date'];
+            $paymentObj->total_final_net        = $payment['total_final_net'];
+            $paymentObj->bank_name              = $payment['bank_name'];
+            $paymentObj->save();
+        }
+
+        foreach($stripeAutomaticConciliationData['stripe_payments'] as $stripePayment) {
+            $stripePaymentObj = new StripePayments($stripePayment);
+            $stripePaymentObj->setObjectAttribute($stripePayment['object']);
+            $stripePaymentObj->save();
+        }
+
+        DB::commit();
     }
 }
