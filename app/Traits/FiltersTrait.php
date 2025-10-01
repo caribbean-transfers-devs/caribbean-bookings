@@ -110,10 +110,16 @@ trait FiltersTrait
 
     public function SitesTpv():object
     {
-        $query = Site::select(['id', 'name', 'type_site', 'transactional_phone', 'transactional_email'])
-                        ->with(['enterprise' => function($query) {
-                            $query->select(['id', 'names']);
-                        }])
+        $query = Site::select([
+                            'id',
+                            'name',
+                            'type_site',
+                            'transactional_phone',
+                            'transactional_email'])
+                        ->with(['enterprise' =>
+                            function($query) {
+                                $query->select(['id', 'names']);
+                            }])
                         ->whereHas('enterprise', function($query) {
                             $query->whereNull('deleted_at'); // Solo con empresas no eliminadas
                         })
@@ -123,7 +129,7 @@ trait FiltersTrait
                         ->where('status', 1);
 
         return $query->get();
-    }    
+    }
 
     public function Origins()
     {
@@ -176,7 +182,7 @@ trait FiltersTrait
         if ($destination_id) {
             $query->where('destination_id', $destination_id);
         }
-    
+
         return $query->get();
     }
 
@@ -210,9 +216,9 @@ trait FiltersTrait
                             ->with(['destination' => function($query) {
                                 $query->select(['id', 'name']);
                             }]);
-    
+
         $query->whereIn('status', $status ?: [1]);
-    
+
         return $query->get();
     }
 
@@ -244,7 +250,7 @@ trait FiltersTrait
         if ($action !== "filters") {
             $query->where('status', 1);
         }
-    
+
         return $query->get();
     }
 
@@ -259,7 +265,7 @@ trait FiltersTrait
         if ($action !== "filters") {
             $query->where('status', 1);
         }
-    
+
         return $query->get();
     }
 
@@ -278,9 +284,9 @@ trait FiltersTrait
                             ->whereNull('deleted_at')
                             ->where('status', 1)
                             ->orderBy('names', 'ASC');
-    
+
         return $query->get();
-    }    
+    }
 
     //ESTATUS DE OPERACIÓN
     public function statusOperation()
@@ -291,8 +297,8 @@ trait FiltersTrait
             "C" => "C",
             "OK" => "OK",
         );
-    }    
-    
+    }
+
     //ESTATUS DE PAGO DE RESERVACIÓN
     public function paymentStatus()
     {
@@ -311,7 +317,7 @@ trait FiltersTrait
             "MXN" => "MXN",
         );
     }
-    
+
     //METODO DE PAGO DE RESERVACIÓN
     public function Methods()
     {
@@ -346,7 +352,7 @@ trait FiltersTrait
         if ($destination_id) {
             $query->where('destination_id', $destination_id);
         }
-    
+
         return $query->get();
     }
 
@@ -355,7 +361,7 @@ trait FiltersTrait
             $filteredData = array_filter($data, function($value) {
                 return $value !== NULL && $value !== 0;
             });
-            
+
             // Envuelve cada valor del array en comillas simples
             $string = implode(',', array_map(function($value) use ($marks) {
                 if( $marks != NULL && $marks == "single" ){
@@ -363,7 +369,7 @@ trait FiltersTrait
                 }else if( $marks != NULL && $marks == "single" ){
                     return '"' . $value . '"';
                 }else{
-                    return $value;   
+                    return $value;
                 }
             }, $filteredData));
             return $string;

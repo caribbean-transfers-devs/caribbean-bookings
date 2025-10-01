@@ -31,18 +31,18 @@ class TpvRepository
         //             'status' => Response::HTTP_INTERNAL_SERVER_ERROR
         //         ]);
         //     endif;
-            
+
         //     $tpv = [
         //         "token" => [
         //             "token" => $token['data']['token'],
         //             "expires_in" => date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " + " . $token['data']['expires_in'] . " seconds"))
-        //         ]      
+        //         ]
         //     ];
         //     $tpv[$uuid] = $this->empty();
         //     Session::put('tpv', $tpv);
         //     return redirect('/tpv/edit/'.$uuid);
         // endif;
-        
+
         // $tpv = Session::get('tpv');
         // $tpv[$uuid] = $this->empty();
 
@@ -90,7 +90,7 @@ class TpvRepository
         Session::put('tpv', $tpv);
 
         // Redirigimos a la edición de la cotización
-        return redirect('/tpv/edit/' . $uuid);        
+        return redirect('/tpv/edit/' . $uuid);
     }
 
     public function index($request){
@@ -110,11 +110,11 @@ class TpvRepository
             'config' => [
                 "code" => $request->code,
                 "items" => $tpv[ $request->code ]['data']
-            ],            
+            ],
         ]);
     }
 
-    public function quote($request){        
+    public function quote($request){
         $tpv = Session::get('tpv');
         if(!isset( $tpv[ $request->code ] )):
             return response()->json([
@@ -126,7 +126,7 @@ class TpvRepository
                 ]
             ], Response::HTTP_BAD_REQUEST);
         endif;
-            
+
         $type = ( isset($request->is_round_trip) && $request->is_round_trip == 1 ? 'round-trip' : 'one-way' );
         $tpv[ $request->code ]['type'] = $type;
         $tpv[ $request->code ]['start']['place'] = $request->from_name;
@@ -165,24 +165,24 @@ class TpvRepository
 
     public function create($request){
         $data = [
-            'service_token' => $request->service_token,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email_address' => $request->email_address,
-            'phone' => str_replace(' ', '', $request->phone),
-            'flight_number' => $request->flight_number,
-            'special_request' => $request->special_request,
-            'site_id' => $request->site_id,
-            'origin_sale_id' => $request->origin_sale_id,
-            'call_center_agent' => $request->call_center_agent,
-            'data' => [
-                'callcenter' => [
-                    'reference' => $request->data['callcenter']['reference'],
-                    'total' => $request->data['callcenter']['total']
+            'service_token'    => $request->service_token,
+            'first_name'       => $request->first_name,
+            'last_name'        => $request->last_name,
+            'email_address'    => $request->email_address,
+            'phone'            => str_replace(' ', '', $request->phone),
+            'flight_number'    => $request->flight_number,
+            'special_request'  => $request->special_request,
+            'site_id'          => $request->site_id,
+            'origin_sale_id'   => $request->origin_sale_id,
+            'call_center_agent'=> $request->call_center_agent,
+            'data'             => [
+                'callcenter'   => [
+                    'reference'=> $request->data['callcenter']['reference'],
+                    'total'    => $request->data['callcenter']['total']
                 ]
             ]
         ];
-        
+
         if($request->payment_method == "CASH"):
             $data['pay_at_arrival'] = 1;
         endif;
@@ -190,7 +190,7 @@ class TpvRepository
         if(!empty($request->is_quotation)):
             $data['is_quotation'] = 1;
         endif;
-        
+
         $rez = $this->makeReservation($data, $request->uuid);
 
         if(isset($rez['error'])):
@@ -213,5 +213,5 @@ class TpvRepository
         }
         return response()->json($rez, Response::HTTP_OK);
     }
-    
+
 }
