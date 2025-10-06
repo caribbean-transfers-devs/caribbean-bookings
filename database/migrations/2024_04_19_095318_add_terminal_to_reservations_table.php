@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('reservations', function (Blueprint $table) {
-            $table->enum('terminal', ['T1', 'T2', 'T3', 'T4'])->nullable()->after('rate_group');
-        });
+        if (!Schema::hasColumn('reservations', 'terminal')) {
+            Schema::table('reservations', function (Blueprint $table) {
+                $table->enum('terminal', ['T1', 'T2', 'T3', 'T4'])->nullable()->after('rate_group');
+            });
+        }
     }
 
     /**

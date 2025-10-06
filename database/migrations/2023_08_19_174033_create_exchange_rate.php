@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('exchange_rate', function (Blueprint $table) {
-            $table->id();
-            $table->string('origin');
-            $table->string('destination');
-            $table->decimal('exchange_rate', 10, 2);
-            $table->enum('operation', ['multiplication', 'division'])->default('multiplication');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('exchange_rate')) {
+            Schema::create('exchange_rate', function (Blueprint $table) {
+                $table->id();
+                $table->string('origin');
+                $table->string('destination');
+                $table->decimal('exchange_rate', 10, 2);
+                $table->enum('operation', ['multiplication', 'division'])->default('multiplication');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

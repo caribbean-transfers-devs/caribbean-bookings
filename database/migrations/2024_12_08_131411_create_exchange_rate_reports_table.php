@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('exchange_rate_reports', function (Blueprint $table) {
-            $table->id();
-            $table->double('exchange', 255, 2); // 8 dígitos en total, 2 de ellos después del punto decimal
-            $table->date('date_init'); // YYYY-MM-DD
-            $table->date('date_end'); // YYYY-MM-DD
-            $table->tinyInteger('status')->default(1);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('exchange_rate_reports')) {
+            Schema::create('exchange_rate_reports', function (Blueprint $table) {
+                $table->id();
+                $table->double('exchange', 255, 2); // 8 dígitos en total, 2 de ellos después del punto decimal
+                $table->date('date_init'); // YYYY-MM-DD
+                $table->date('date_end'); // YYYY-MM-DD
+                $table->tinyInteger('status')->default(1);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

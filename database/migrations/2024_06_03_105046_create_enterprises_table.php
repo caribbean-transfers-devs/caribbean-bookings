@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('enterprises', function (Blueprint $table) {
-            $table->id();
-            $table->string('names');
-            $table->integer('is_external')->default(0)->index();
-            $table->unsignedBigInteger('destination_id')->default(1)->index();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('enterprises')) {
+            Schema::create('enterprises', function (Blueprint $table) {
+                $table->id();
+                $table->string('names');
+                $table->integer('is_external')->default(0)->index();
+                $table->unsignedBigInteger('destination_id')->default(1)->index();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

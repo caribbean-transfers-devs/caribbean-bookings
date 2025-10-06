@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('terminal_payments_exchange_rate'))
+            return;
+        
         Schema::create('terminal_payments_exchange_rate', function (Blueprint $table) {
             $table->id();
 

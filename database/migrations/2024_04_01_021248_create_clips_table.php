@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('clips', function (Blueprint $table) {
-            $table->id();
-
-            $table->string('name');
-            $table->boolean('status');
-
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('clips')) {
+            Schema::create('clips', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->boolean('status');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

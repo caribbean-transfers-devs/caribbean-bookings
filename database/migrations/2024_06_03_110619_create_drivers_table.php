@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('drivers', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('enterprise_id')->nullable()->index();
-            $table->unsignedBigInteger('destination_id')->default(1)->index();
-            $table->string('names');
-            $table->string('surnames');
-            $table->string('phone')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('drivers')) {
+            Schema::create('drivers', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('enterprise_id')->nullable()->index();
+                $table->unsignedBigInteger('destination_id')->default(1)->index();
+                $table->string('names');
+                $table->string('surnames');
+                $table->string('phone')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

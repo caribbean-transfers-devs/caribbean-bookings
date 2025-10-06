@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasColumn('reservations', 'user_id'))
+            return;
+
         Schema::table('reservations', function (Blueprint $table) {
             $table->bigInteger('user_id')->nullable()->after('vendor_id');
-            
+
             $table->index('user_id');
         });
     }

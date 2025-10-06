@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vehicles', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('enterprise_id')->index();
-            $table->unsignedBigInteger('destination_service_id')->index();
-            $table->unsignedBigInteger('destination_id')->default(1)->index();
-            $table->string('name');
-            $table->integer('unit_code');
-            $table->string('plate_number')->index();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('vehicles')) {
+            Schema::create('vehicles', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('enterprise_id')->index();
+                $table->unsignedBigInteger('destination_service_id')->index();
+                $table->unsignedBigInteger('destination_id')->default(1)->index();
+                $table->string('name');
+                $table->integer('unit_code');
+                $table->string('plate_number')->index();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('payments', function (Blueprint $table) {
-            $table->bigInteger('clip_id')->nullable()->after('currency');
-            
-            $table->index('clip_id');
-        });
+        if (!Schema::hasColumn('payments', 'clip_id')) {
+            Schema::table('payments', function (Blueprint $table) {
+                $table->bigInteger('clip_id')->nullable()->after('currency');
+                $table->index('clip_id');
+            });
+        }
     }
 
     /**
