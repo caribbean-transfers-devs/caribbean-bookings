@@ -57,15 +57,6 @@
                                 </div>
                             </form>
                         </div>
-
-                        @if (auth()->user()->hasPermission(61))
-                            <div>
-                                <button class="btn btn-primary _effect--ripple waves-effect waves-light" id="generateStripeAutomaticConciliationData">
-                                    <i class="fa-solid fa-cash-register"></i>
-                                </button>
-                            </div>
-                        @endif
-                        <!-- Botón conciliación automática temporal -->
                         
                         <!-- Botones de Acción -->
                         <div class="d-flex flex-wrap gap-2">
@@ -636,5 +627,4 @@
     <x-modals.reports.columns />
     <x-modals.finances.charge_stripe />
     <x-modals.finances.help_stripe />
-    <x-modals.finances.automatic_conciliation_result />
 @endsection
