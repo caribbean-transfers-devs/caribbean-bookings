@@ -232,6 +232,49 @@ trait StripeTrait
         }
     }
 
+    public function getRefunds($startingAfter = null) {
+        try {
+            // Construimos la URL base con limit = 10 por defecto
+            $url = $this->apiUrlStripe . "/v1/refunds?limit=10&expand[]=data.charge&expand[]=data.balance_transaction&expand[]=data.payment_intent";
+
+            // Si me pasan un starting_after, lo agrego a la URL
+            if (!empty($startingAfter)) {
+                $url .= "&starting_after=" . urlencode($startingAfter);
+            }
+
+            $response = $this->makeCurlRequest($url, $this->clientSecretStripeP);
+
+            if ($response['status'] >= 200 && $response['status'] < 300) {
+                return response()->json($response['body']);
+            } else {
+                $errorMsg = $response['body']['error']['message'] ?? 'Failed to retrieve refunds';
+                throw new \Exception($errorMsg);
+            }
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function getPayouts($startingAfter = null, $limit = 100) {
+        try {
+            $url = $this->apiUrlStripe . "/v1/payouts?expand[]=data.balance_transaction&expand[]=data.destination&limit=$limit";
+            if (!empty($startingAfter)) {
+                $url .= "&starting_after=" . urlencode($startingAfter);
+            }
+
+            $response = $this->makeCurlRequest($url, $this->clientSecretStripeP);
+
+            if ($response['status'] >= 200 && $response['status'] < 300) {
+                return response()->json($response['body']);
+            } else {
+                $errorMsg = $response['body']['error']['message'] ?? 'Failed to retrieve payouts';
+                throw new \Exception($errorMsg);
+            }
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
     /*********************************************************************/
     /****************************** BALANCE ******************************/
     /*********************************************************************/

@@ -148,14 +148,18 @@ class StripeRepository
             if (empty($item->reference_stripe)) return true;
                         
             $prefix = substr($item->reference_stripe, 0, 3);
-            return in_array($prefix, ['pi_', 'py_', 'ch_']);
+            return in_array($prefix, ['pi_', 'py_', 'ch_', 're_']);
         });
 
         $otherReferences = collect($conciliations)->reject(function ($item) {
             if (empty($item->reference_stripe)) return false;
 
             $prefix = substr($item->reference_stripe, 0, 3);
-            return in_array($prefix, ['pi_', 'py_', 'ch_']);
+            return in_array($prefix, ['pi_', 'py_', 'ch_', 're_']);
+        });
+
+        $refunds = collect($conciliations)->filter(function ($item) {
+            return $item->is_refund;
         });
 
         return view('finances.stripe.index', [
@@ -169,6 +173,7 @@ class StripeRepository
             ],
             'conciliations' => $filteredConciliations,
             'otherReferences' => $otherReferences,
+            'refunds' => $refunds,
             'currencies' => $this->Currencies(),
             // 'exchange' => $this->Exchange(( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[0] : date("Y-m-d") ), ( isset( $request->date ) && !empty( $request->date) ? explode(" - ", $request->date)[1] : date("Y-m-d") )),
             'exchange' => "19",

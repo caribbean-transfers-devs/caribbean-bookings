@@ -12,7 +12,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('app:test-cron')->everyMinute();      
+        $schedule->command('app:test-cron')->hourly();
+        $schedule->command('app:check-for-new-stripe-refunds')->dailyAt('02:00');
+        $schedule->command('app:check-for-new-stripe-conciliations')->dailyAt('03:00');
     }
 
     /**

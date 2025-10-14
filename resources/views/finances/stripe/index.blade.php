@@ -224,6 +224,10 @@
         {{-- listado de pagos de stripe --}}
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
+                <div style="padding: 10px;">
+                    <h5 class="mb-0">Listado de pagos de stripe</h5>
+                </div>
+
                 @if ($errors->any())
                     <div class="alert alert-light-danger alert-dismissible fade show border-0 mb-4" role="alert">
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x close" data-bs-dismiss="alert"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
@@ -348,6 +352,9 @@
         {{-- listado de pagos de stripe pero sin codigo de referencia validos --}}
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget-content widget-content-area br-8">
+                <div style="padding: 10px;">
+                    <h5 class="mb-0">Listado de pagos de stripe pero sin codigo de referencia válidos</h5>
+                </div>
                 {{-- <div class="table-responsive"> --}}
                     <table id="dataOthersReferences" class="table table-rendering dt-table-hover" style="width:100%">
                         <thead>
@@ -384,6 +391,147 @@
                         <tbody>
                             @if(sizeof($otherReferences)>=1)
                                 @foreach($otherReferences as $key => $item)
+                                    @php
+                                        // Inicialización con punto y coma
+                                        $total_payments = 0;
+
+                                        // Verificar si $item tiene las propiedades necesarias
+                                        if (isset($item->operation, $item->total_payments_stripe)) {
+                                            switch ($item->operation) {
+                                                case "multiplication":
+                                                    $total_payments = round($item->total_payments_stripe * ($item->exchange_rate ?? 1));
+                                                    break;
+                                                case "division":
+                                                    $total_payments = round($item->total_payments_stripe / ($item->exchange_rate ?? 1));
+                                                    break;
+                                                default:
+                                                    $total_payments = round($item->total_payments_stripe);
+                                            }
+                                        }
+
+                                        // Verificar y actualizar resumen por moneda
+                                        if (isset($item->currency, $resume[$item->currency])) {
+                                            $resume[$item->currency]['TOTAL'] += $item->total_payments_stripe ?? 0;
+                                            $resume[$item->currency]['QUANTITY']++;
+                                        }
+                                    @endphp
+                                    <tr>
+                                        <td class="text-center">{{ $item->reservation_id }}</td>
+                                        <td class="text-center">{{ date("Y-m-d", strtotime($item->created_at)) }}</td>
+                                        <td class="text-center">{{ $item->site_name }}</td>
+                                        <td class="text-center">
+                                            @php
+                                                $codes_string = "";
+                                                $codes = explode(",",$item->reservation_codes);
+                                                foreach ($codes as $key => $code) {
+                                                    $codes_string .= '<p class="mb-1">'.$code.'</p>';
+                                                }
+                                            @endphp
+                                            @if (auth()->user()->hasPermission(61))
+                                                <a href="/reservations/detail/{{ $item->reservation_id }}"><?=$codes_string?></a>
+                                            @else
+                                                <?=$codes_string?>
+                                            @endif
+                                        </td>
+                                        <td class="text-center"><button type="button" class="btn btn-{{ auth()->user()->classStatusBooking($item->reservation_status) }}">{{ auth()->user()->statusBooking($item->reservation_status) }}</button></td>
+                                        <td class="text-center">{{ $item->full_name }}</td>
+                                        <td class="text-center">{{ $item->service_type_name }}</td>
+                                        <td class="text-center">{{ $item->passengers }}</td>
+                                        <td class="text-center">{{ $item->to_name }}</td>
+                                        <td class="text-center">{{ $item->total_sales }}</td>
+                                        <td class="text-center">$ {{ number_format($total_payments, 2) }}</td>
+                                        <td class="text-center">{{ $item->currency }}</td>
+                                        <td class="text-center">{{ $item->payment_type_name }}</td>
+                                        <td class="text-center">$ {{ number_format(( $item->currency == "MXN" ? $total_payments : ( $total_payments * $item->exchange_rate ) ), 2) }}</td>
+                                        <td class="text-center">
+                                            @if ( !empty($item->reference_stripe) )
+                                                <a href="javascript:void(0)" class="chargeInformationStripe" data-reference="{{ $item->reference_stripe }}">{{ $item->reference_stripe }}</a>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">{{ $item->date_conciliation != NULL ? date("Y-m-d", strtotime($item->date_conciliation)) : "SIN FECHA DE COBRO" }}</td>
+                                        <td class="text-center" style="color:#fff;background-color:#{{ $item->date_conciliation != NULL ? '00ab55' : 'e7515a' }};">
+                                            @if ($item->date_conciliation != NULL)
+                                                COBRADO
+                                            @else
+                                                PENDIENTE DE COBRAR
+                                            @endif
+                                        </td>
+                                        <td class="text-center">$ {{ number_format($item->amount, 2) }}</td>
+                                        <td class="text-center">$ {{ number_format($item->total_fee, 2) }}</td>
+                                        <td class="text-center">$ {{ number_format($item->total_net, 2) }}</td>
+                                        <td class="text-center">{{ $item->deposit_date != NULL ? date("Y-m-d", strtotime($item->deposit_date)) : "SIN FECHA DE PAGO " }}</td>
+                                        <td class="text-center" style="color:#fff;background-color:#{{ $item->deposit_date != NULL ? '00ab55' : 'e7515a' }};">
+                                            @if ($item->deposit_date != NULL)
+                                                PAGADO
+                                            @else
+                                                PENDIENTE DE PAGO
+                                            @endif
+                                        </td>
+                                        <td class="text-center">$ {{ number_format(( $item->total_final_net ), 2) }}</td>
+                                        <td class="text-center">{{ $item->reference_conciliation }}</td>
+                                        <td class="text-center">{{ $item->bank_name }}</td>
+                                        <td class="text-center">
+                                            @if ( $item->refunded > 0 )
+                                                <button class="btn btn-success">Sí</button>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if ( $item->disputed > 0 )
+                                                <button class="btn btn-success">Sí</button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                {{-- </div> --}}
+            </div>
+        </div>
+
+        {{-- Reembolsos --}}
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+            <div class="widget-content widget-content-area br-8">
+                <div style="padding: 10px;">
+                    <h5 class="mb-0 text-danger">Reembolsos</h5>
+                </div>
+
+                {{-- <div class="table-responsive"> --}}
+                    <table id="dataRefunds" class="table table-rendering dt-table-hover" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th class="text-center">ID</th>
+                                <th class="text-center">FECHA</th>
+                                <th class="text-center">SITIO</th>
+                                <th class="text-center">CÓDIGO</th>
+                                <th class="text-center">ESTATUS</th>
+                                <th class="text-center">CLIENTE</th>
+                                <th class="text-center">SERVICIO</th>
+                                <th class="text-center">PAX</th>
+                                <th class="text-center">DESTINO</th>
+                                <th class="text-center">IMPORTE DE VENTA</th>
+                                <th class="text-center">IMPORTE COBRADO</th>
+                                <th class="text-center">MONEDA</th>
+                                <th class="text-center">METODO DE PAGO</th>
+                                <th class="text-center">IMPORTE PESOS</th>
+                                <th class="text-center">ID STRIPE / REFERENCIA</th>
+                                <th class="text-center">FECHA DE COBRO STRIPE</th>
+                                <th class="text-center">ESTATUS DE COBRO STRIPE</th>
+                                <th class="text-center">TOTAL COBRADO EN STRIPE</th>
+                                <th class="text-center">COMISIÓN DE STRIPE</th>
+                                <th class="text-center">TOTAL A PAGAR POR STRIPE</th>
+                                <th class="text-center">FECHA DE PAGO STRIPE</th>
+                                <th class="text-center">ESTATUS DE PAGO STRIPE</th>
+                                <th class="text-center">TOTAL PAGADO POR STRIPE</th>
+                                <th class="text-center">REFERENCIA DE PAGADO POR STRIPE</th>
+                                <th class="text-center">BANCO</th>
+                                <th class="text-center">TIENE REEMBOLSO</th>
+                                <th class="text-center">TIENE DISPUTA</th>                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(sizeof($refunds)>=1)
+                                @foreach($refunds as $key => $item)
                                     @php
                                         // Inicialización con punto y coma
                                         $total_payments = 0;

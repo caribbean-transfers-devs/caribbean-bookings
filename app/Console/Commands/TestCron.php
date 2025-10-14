@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Traits\LoggerTrait;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 
 class TestCron extends Command
 {
+    use LoggerTrait;
+
     /**
      * The name and signature of the console command.
      *
@@ -26,6 +28,9 @@ class TestCron extends Command
      */
     public function handle()
     {
-        Log::info('TestCron ejecutado a las ' . now());
+        $this->createLog([
+            'type' => 'info',
+            'message' => "Probando que funcione cron (temporal)",
+        ]);
     }
 }
