@@ -27,6 +27,19 @@ class PaymentRepository
 
     public function store($request)
     {
+        $reference = trim($request->reference);
+
+        $payment_with_same_reference_exists = Payment::where('payment_method', $request->payment_method)
+        ->where('reference', $reference)
+        ->exists();
+
+        if($payment_with_same_reference_exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Ya existe un pago con la referencia: $reference. Favor de poner una referencia diferente",
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         try {
             DB::beginTransaction();
             
@@ -108,6 +121,20 @@ class PaymentRepository
 
     public function update($request,$payment)
     {
+        $reference = trim($request->reference);
+
+        $payment_with_same_reference_exists = Payment::where('id', '!=', $payment->id)
+        ->where('payment_method', $request->payment_method)
+        ->where('reference', $reference)
+        ->exists();
+
+        if($payment_with_same_reference_exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Ya existe un pago con la referencia: $reference. Favor de poner una referencia diferente",
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         try {
             DB::beginTransaction();
 
