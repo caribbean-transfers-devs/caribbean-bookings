@@ -674,10 +674,42 @@ class OperationsController extends Controller
 
             $driver = Driver::find(( isset($infoUnitDriver->driver_id) ? $infoUnitDriver->driver_id : 0 ));
             // dd($infoUnitDriver->toArray(), $driver->toArray());
+            
+            $vehicle_new = Vehicle::find($request->vehicle_id);
+
+            if( !$vehicle_new ) {
+                $item->vehicle_id_one = null;
+                $item->op_one_operating_cost = 0;
+                $item->vehicle_id_two = null;
+                $item->op_two_operating_cost = 0;
+                $item->driver_id_one = null;
+                $item->driver_id_two = null;
+                
+                $item->save();
+
+                DB::commit();
+                return response()->json([
+                    'status' => 'success',
+                    'success' => true,
+                    'message' => 'Se removió la asignación correctamente a la unidad',
+                    'data' => array(
+                        "item"  => $request->id,
+                        "value"  => 0,
+                        "name" => "Sin asignar",
+                        "cost"  => 0,
+                        "message" => "Actualización de unidad (".( isset($vehicle_current->name) ? $vehicle_current->name : "NULL" )."). Se removió la asignación al servicio: ".$item->id.", por ".auth()->user()->name
+                    ),
+                    'data2' => array(
+                        "item"  => $request->id,
+                        "value"  => ( isset($driver->id) ? $driver->id : NULL ),
+                        "name" => ( isset($driver->id) ? $driver->names.' '.$driver->surnames : NULL ),
+                        "message" => "Se desasignó el conductor, por ".auth()->user()->name
+                    )                
+                ], Response::HTTP_OK);
+            }
 
             $vehicleIdOld = ( $request->type == 'TYPE_ONE' ? $item->vehicle_id_one : $item->vehicle_id_two );
             $operatingCostOld = ( $request->type == 'TYPE_ONE' ? $item->op_one_operating_cost : $item->op_two_operating_cost );
-            $vehicle_new = Vehicle::find($request->vehicle_id);
             $vehicle_current = Vehicle::find(( $request->type == 'TYPE_ONE' ? $item->vehicle_id_one : $item->vehicle_id_two ));
 
             if($request->type == "TYPE_ONE"):
