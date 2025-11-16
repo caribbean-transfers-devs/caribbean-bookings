@@ -687,6 +687,8 @@ class OperationsController extends Controller
                 
                 $item->save();
 
+                $this->create_followUps($item->reservation_id, "El usuario: ".auth()->user()->name.", desasignó la unidad.", 'HISTORY', "UPDATE_SERVICE_VEHICLE");
+
                 DB::commit();
                 return response()->json([
                     'status' => 'success',
