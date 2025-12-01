@@ -678,12 +678,25 @@ class OperationsController extends Controller
             $vehicle_new = Vehicle::find($request->vehicle_id);
 
             if( !$vehicle_new ) {
-                $item->vehicle_id_one = null;
-                $item->op_one_operating_cost = 0;
-                $item->vehicle_id_two = null;
-                $item->op_two_operating_cost = 0;
-                $item->driver_id_one = null;
-                $item->driver_id_two = null;
+                if($request->type == "TYPE_ONE"):
+                    $item->vehicle_id_one = null;
+                    $item->op_one_operating_cost = 0;
+                endif;
+
+                if($request->type == "TYPE_TWO"):
+                    $item->vehicle_id_two = null;
+                    $item->op_two_operating_cost = 0;
+                endif;
+
+                if( $driver ){
+                    if($request->type == "TYPE_ONE"):
+                        $item->driver_id_one = null;
+                    endif;
+        
+                    if($request->type == "TYPE_TWO"):
+                        $item->driver_id_two = null;
+                    endif;
+                }
                 
                 $item->save();
 
