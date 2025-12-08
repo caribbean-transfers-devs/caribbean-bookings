@@ -386,4 +386,64 @@ trait OperationTrait
                 break;
         }        
     }
+
+    public function extractNextAvailablePreassignments($date) {
+        $results = DB::table('reservations_items')
+            ->select(
+                DB::raw("CASE 
+                            WHEN op_one_preassignment LIKE 'L%' AND op_one_pickup BETWEEN '{$date} 00:00:00' AND '{$date} 23:59:59'
+                                THEN op_one_preassignment
+                            WHEN op_two_preassignment LIKE 'L%' AND op_two_pickup BETWEEN '{$date} 00:00:00' AND '{$date} 23:59:59'
+                                THEN op_two_preassignment
+                        END AS L_value"),
+
+                DB::raw("CASE 
+                            WHEN op_one_preassignment LIKE 'T%' AND op_one_pickup BETWEEN '{$date} 00:00:00' AND '{$date} 23:59:59'
+                                THEN op_one_preassignment
+                            WHEN op_two_preassignment LIKE 'T%' AND op_two_pickup BETWEEN '{$date} 00:00:00' AND '{$date} 23:59:59'
+                                THEN op_two_preassignment
+                        END AS T_value"),
+
+                DB::raw("CASE 
+                            WHEN op_one_preassignment LIKE 'S%' AND op_one_pickup BETWEEN '{$date} 00:00:00' AND '{$date} 23:59:59'
+                                THEN op_one_preassignment
+                            WHEN op_two_preassignment LIKE 'S%' AND op_two_pickup BETWEEN '{$date} 00:00:00' AND '{$date} 23:59:59'
+                                THEN op_two_preassignment
+                        END AS S_value")
+            )
+            ->where(function ($q) use ($date) {
+                $q->whereBetween('op_one_pickup', [
+                    $date . ' 00:00:00',
+                    $date . ' 23:59:59'
+                ])->orWhereBetween('op_two_pickup', [
+                    $date . ' 00:00:00',
+                    $date . ' 23:59:59'
+                ]);
+            })
+            ->get();
+
+        // Función interna para obtener el siguiente disponible
+        $extractNext = function ($prefix) use ($results) {
+            $item = $results
+                ->filter(fn($row) => !empty($row->{$prefix . '_value'}))
+                ->map(function ($row) use ($prefix) {
+                    $value = $row->{$prefix . '_value'};
+                    preg_match('/([A-Z]+)(\d+)/', $value, $m);
+                    return [
+                        'number' => intval($m[2] ?? 0)
+                    ];
+                })
+                ->sortByDesc('number')
+                ->first();
+
+            // Si no hay nada, devolver 1
+            return $item['number'] ?? 0 ? ($item['number'] + 1) : 1;
+        };
+
+        return [
+            'next_L' => $extractNext('L'),
+            'next_T' => $extractNext('T'),
+            'next_S' => $extractNext('S'),
+        ];
+    }
 }

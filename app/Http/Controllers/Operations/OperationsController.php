@@ -43,7 +43,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class OperationsController extends Controller
 {
-    use ApiTrait, CodeTrait, RoleTrait, FiltersTrait, QueryTrait, FollowUpTrait;
+    use ApiTrait, CodeTrait, RoleTrait, FiltersTrait, QueryTrait, FollowUpTrait, OperationTrait;
 
     public function index(Request $request){
         ini_set('memory_limit', '-1'); // Sin límite
@@ -134,55 +134,60 @@ class OperationsController extends Controller
                 'init' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 00:00:00",
                 'end' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ) ." 23:59:59",
             ];            
-
-            $arrival_counter = 1;
-            $transfer_counter = 1;
-            $departure_counter = 1;
     
             //CONSULTAMOS SERVICIOS
             $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
     
             //RECORREMOS LOS SERVICIOS PARA PODER REALISAR LA PREASIGNACION
             if( sizeof($items)>=1 ):
+
+                $next_available_preassignment = $this->extractNextAvailablePreassignments( isset( $request->date ) ? $request->date : date("Y-m-d") );
+
+                $arrival_current_counter = $next_available_preassignment['next_L'];
+                $transfer_current_counter = $next_available_preassignment['next_T'];
+                $departure_current_counter = $next_available_preassignment['next_S'];
+
                 foreach($items as $key => $item):
                     $preassignment = "";
                     $service = ReservationsItem::find($item->id); //ES LA INFORMACION DEL SERVICIO
-                    if( $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
-                        $preassignment = "L".$arrival_counter;
+                    if( !$service->op_one_preassignment && $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
+                        $preassignment = "L".$arrival_current_counter;
                         $service->op_one_preassignment = $preassignment;
-                        $arrival_counter ++;
+                        $arrival_current_counter ++;
                     }
-                    if( $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
-                        $preassignment = "L".$arrival_counter;
+                    if( !$service->op_two_preassignment && $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
+                        $preassignment = "L".$arrival_current_counter;
                         $service->op_two_preassignment = $preassignment;
-                        $arrival_counter ++;
+                        $arrival_current_counter ++;
                     }                                     
 
-                    if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
-                        $preassignment = "T".$transfer_counter;
+                    if( !$service->op_one_preassignment && $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
+                        $preassignment = "T".$transfer_current_counter;
                         $service->op_one_preassignment = $preassignment;
-                        $transfer_counter ++;
+                        $transfer_current_counter ++;
                     }
-                    if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
-                        $preassignment = "T".$transfer_counter;
+                    if( !$service->op_two_preassignment && $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
+                        $preassignment = "T".$transfer_current_counter;
                         $service->op_two_preassignment = $preassignment;
-                        $transfer_counter ++;
+                        $transfer_current_counter ++;
                     }
 
-                    if( $item->final_service_type == 'DEPARTURE' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
-                        $preassignment = "S".$departure_counter;
+                    if( !$service->op_one_preassignment && $item->final_service_type == 'DEPARTURE' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) ){
+                        $preassignment = "S".$departure_current_counter;
                         $service->op_one_preassignment = $preassignment;
-                        $departure_counter ++;
+                        $departure_current_counter ++;
                     }
-                    if( $item->final_service_type == 'DEPARTURE' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
-                        $preassignment = "S".$departure_counter;
+                    if( !$service->op_two_preassignment && $item->final_service_type == 'DEPARTURE' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) ){
+                        $preassignment = "S".$departure_current_counter;
                         $service->op_two_preassignment = $preassignment;
-                        $departure_counter ++;
+                        $departure_current_counter ++;
                     }
-                    $service->save();
-
-                    //CREAMOS UN LOG
-                    $this->create_followUps($item->reservation_id, "Se pre-asigno de (NULL) por ".$preassignment. " al servicio: ".$item->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
+                    if($preassignment !== "") {
+                        $service->save();
+    
+                        //CREAMOS UN LOG
+                        $this->create_followUps($item->reservation_id, "Se pre-asigno de (NULL) por ".$preassignment. " al servicio: ".$item->id.", por ".auth()->user()->name, 'HISTORY', auth()->user()->name);
+                    }
                 endforeach;
             endif;
 
@@ -371,48 +376,12 @@ class OperationsController extends Controller
     public function preassignment(Request $request){
         try {
             DB::beginTransaction();
-            //DECLARAMOS VARIABLES
-            $queryOne = " AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two AND it.op_one_preassignment IS NOT NULL ";
-            $queryTwo = " AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND it.op_two_preassignment IS NOT NULL AND it.is_round_trip = 1 ";            
 
-            $havingConditions = []; $queryHaving = "";
-            $queryData = [
-                'init' => $request->date." 00:00:00",
-                'end' => $request->date." 23:59:59",
-            ];
+            $next_available_preassignment = $this->extractNextAvailablePreassignments( isset( $request->date ) ? $request->date : date("Y-m-d") );
 
-            $arrival_counter = 0;
-            $transfer_counter = 0;
-            $departure_counter = 0;
-
-            //CONSULTAMOS SERVICIOS
-            $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
-
-            //RECORREMOS LOS SERVICIOS PARA PODER INDENTIFICAR LA CONTINUIDAD DE LA PREASIGNACION
-            if( sizeof($items)>=1 ):
-                foreach($items as $key => $item):
-                    if( $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) && $item->op_one_preassignment != "" ){
-                        $arrival_counter ++;
-                    }
-                    if( $item->final_service_type == 'ARRIVAL' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) && $item->op_two_preassignment != "" ){
-                        $arrival_counter ++;
-                    }
-
-                    if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) && $item->op_one_preassignment != "" ){
-                        $transfer_counter ++;
-                    }
-                    if( $item->final_service_type == 'TRANSFER' && $item->op_type == "TYPE_TWO" && ( $item->is_round_trip == 1 ) && $item->op_two_preassignment != "" ){
-                        $transfer_counter ++;
-                    }                    
-
-                    if( $item->final_service_type == 'DEPARTURE' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 0 || $item->is_round_trip == 1 ) && $item->op_one_preassignment != "" ){
-                        $departure_counter ++;
-                    }                    
-                    if( $item->final_service_type == 'DEPARTURE' && $item->op_type == "TYPE_ONE" && ( $item->is_round_trip == 1 ) && $item->op_two_preassignment != "" ){
-                        $departure_counter ++;
-                    }
-                endforeach;
-            endif;
+            $arrival_current_counter = $next_available_preassignment['next_L'];
+            $transfer_current_counter = $next_available_preassignment['next_T'];
+            $departure_current_counter = $next_available_preassignment['next_S'];
                         
             $preassignment = "";
             //OBTENEMOS INFORMACION DEL SERVICIO
@@ -420,32 +389,33 @@ class OperationsController extends Controller
             // dd($request, $service);
             //REALIZAMOS LA PREASIGNACION DEPENDIENDO DE LA OPERACION
             if( $request->operation == 'ARRIVAL' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
-                $preassignment = "L".( $arrival_counter == 0 ? 1 : ($arrival_counter + 1) );
+                $preassignment = "L$arrival_current_counter";
                 $service->op_one_preassignment = $preassignment;
+                $arrival_current_counter++;
             }
             if( $request->operation == 'ARRIVAL' && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ){
-                $preassignment = "L".( $arrival_counter == 0 ? 1 : ($arrival_counter + 1) );
+                $preassignment = "L$arrival_current_counter";
                 $service->op_two_preassignment = $preassignment;
             }
 
             if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
-                $preassignment = "T".( $transfer_counter == 0 ? 1 : ($transfer_counter + 1) );
+                $preassignment = "T$transfer_current_counter";
                 $service->op_one_preassignment = $preassignment;
+                $transfer_current_counter++;
             }
             if( $request->operation == 'TRANSFER' && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ){
-                $preassignment = "T".( $transfer_counter == 0 ? 1 : ($transfer_counter + 1) );
+                $preassignment = "T$transfer_current_counter";
                 $service->op_two_preassignment = $preassignment;
             }
 
             if( $request->operation == 'DEPARTURE' && $request->type == 'TYPE_ONE' && ( $service->is_round_trip == 0 || $service->is_round_trip == 1 ) ){
-                $preassignment = "S".( $departure_counter == 0 ? 1 : ($departure_counter + 1) );
+                $preassignment = "S$departure_current_counter";
                 $service->op_one_preassignment = $preassignment;
-                $departure_counter ++;
+                $departure_current_counter ++;
             }            
             if( $request->operation == 'DEPARTURE' && $request->type == 'TYPE_TWO' && ( $service->is_round_trip == 1 ) ){
-                $preassignment = "S".( $departure_counter == 0 ? 1 : ($departure_counter + 1) );
+                $preassignment = "S$departure_current_counter";
                 $service->op_two_preassignment = $preassignment;
-                $departure_counter ++;
             }               
             $service->save();
 

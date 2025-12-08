@@ -350,6 +350,7 @@
                                 <td class="text-center" style="{{ $color_agency }}">{{ $value->site_name }}</td>
                                 <td class="text-center" data-order="{{ ( $vehicle_d != NULL ) ? $vehicle_d : 0 }}" data-name="{{ auth()->user()->setOperationUnit($value) }}">
                                     @if ( auth()->user()->hasPermission(86) && $close_operation == 0 )
+                                    <div style="width: 100px;">
                                         <select class="form-control vehicles selectpicker" data-live-search="true" id="vehicle_id_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-item="{{ $value->id }}" data-service="{{ $value->final_service_type }}" data-type="{{ $value->op_type }}" data-service_id="{{ $value->service_type_id }}">
                                             <option value="0">Selecciona un vehículo</option>
                                             @if ( isset($units2) && count($units2) >= 1 )
@@ -358,6 +359,7 @@
                                                 @endforeach
                                             @endif
                                         </select>
+                                    </div>
                                     @else
                                         {{ auth()->user()->setOperationUnit($value) }}
                                     @endif

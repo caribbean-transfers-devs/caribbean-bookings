@@ -537,6 +537,21 @@ let setup = {
     }
 };
 
+const reloadWithLastWindowPosition = () => {
+    localStorage.setItem("scrollPos", window.scrollY);
+    window.location.reload();
+}
+
+const scrollToLastWindowPosition = () => {
+    const scroll = localStorage.getItem("scrollPos");
+    if (scroll !== null) {
+        window.scrollTo(0, parseInt(scroll));
+        localStorage.removeItem("scrollPos");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", scrollToLastWindowPosition);
+
 if( document.querySelector('.table-rendering') != null ){
     setup.actionTable($('.table-rendering'));
 }
@@ -1507,7 +1522,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                                     if (uploadedImages.length === value.images.length) {
                                         Swal.fire("Éxito", "Cancelación confirmada y archivos subidos.", "success").then(() => {
-                                            window.location.reload();
+                                            reloadWithLastWindowPosition();
                                         });
                                     } else {
                                         Swal.fire("Error", "Algunas imágenes no se pudieron subir. Intenta de nuevo.", "error");
@@ -1517,7 +1532,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 }
                             } else {
                                 Swal.fire("Éxito", "Estatus actualizado correctamente.", "success").then(() => {
-                                    window.location.reload();
+                                    reloadWithLastWindowPosition();
                                 });
                             }
                         }
@@ -1750,6 +1765,7 @@ if( __btn_preassignment != null ){
                             showConfirmButton: false,
                             timer: 1500,
                         });
+                        reloadWithLastWindowPosition();
                     }
                 });
             }
@@ -1789,6 +1805,7 @@ if (__add_preassignments.length > 0) {
                                 socket.emit("addPreassignmentServer", response.data);
                             }
                         });
+                        reloadWithLastWindowPosition();
                     }
                 });
               }
@@ -1865,6 +1882,7 @@ if (__btn_update_status_operations.length > 0) {
                                   socket.emit("updateStatusOperationServer", resp.data);
                               }
                           });
+                            reloadWithLastWindowPosition();
                       }
                   });
               }

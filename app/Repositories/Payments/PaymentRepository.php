@@ -30,6 +30,7 @@ class PaymentRepository
         $reference = trim($request->reference);
 
         $payment_with_same_reference_exists = Payment::where('payment_method', $request->payment_method)
+        ->whereIn('payment_method', ['PAYPAL', 'STRIPE'])
         ->where('reference', $reference)
         ->exists();
 
