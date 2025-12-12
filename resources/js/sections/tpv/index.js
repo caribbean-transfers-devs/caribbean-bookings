@@ -172,6 +172,11 @@ let setup = {
           finalElement.innerHTML = '';          
         },
     }).fail(function(xhr, status, error) {
+      Swal.fire(
+          'Zona no registrada',
+          `No se pudo agregar el hotel, ya que no se tiene ninguna zona que coincida con las coordenadas: (${item.start.lat} ${item.start.lng})`,
+          'error'
+        );
       console.log(error);
     });
   },
