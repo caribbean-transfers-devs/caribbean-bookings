@@ -96,7 +96,7 @@ trait ApiTrait
         self::checkToken($uuid);
         $tpv = Session::get('tpv')[$uuid];
         // dd($tpv['token']['token'], json_encode($data));
-        return self::sendRequest('/api/v1/quote-tpv', 'POST', $data, $tpv['token']['token']);
+        return self::sendRequest('/api/v1/quote', 'POST', $data, $tpv['token']['token']);
     }
 
     public static function makeReservation($data = [], $uuid = ''){

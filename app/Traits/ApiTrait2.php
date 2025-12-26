@@ -121,7 +121,7 @@ trait ApiTrait2
             $data['end']['pickup'] = $quote['to']['pickupDate'];
         endif;
 
-        return self::sendRequest('/api/v1/quote-tpv', 'POST', $data, $headers);
+        return self::sendRequest('/api/v1/quote', 'POST', $data, $headers);
     }
 
     public static function make($request){
