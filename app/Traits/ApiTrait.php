@@ -111,7 +111,7 @@ trait ApiTrait
     }
 
     public static function sendRequest($end_point, $method = 'GET', $data = null, $token = null) {
-        $url = 'http://api.caribbean-transfers.com'.$end_point;
+        $url = 'https://api.caribbean-transfers.com'.$end_point;
         // $url = 'http://127.0.0.1:8001'.$end_point;
         $ch = curl_init($url);
 
