@@ -13,6 +13,8 @@
     $currencies = auth()->user()->Currencies();
     $methods = auth()->user()->Methods();
     $cancellations = auth()->user()->CancellationTypes();
+
+    $allowed_emails_for_res_deletion = ['development@caribbean-transfers.com', 'csanroman@caribbean-transfers.com', 'luis@caribbean-transfer.com.mx'];
 @endphp
 @extends('layout.app')
 @section('title') Gestión De Reservaciones @endsection
@@ -146,6 +148,9 @@
                                     <th class="text-center">CALIFICACIÓN</th>
                                     <th class="text-center">COMISIÓNABLE</th>
                                     <th class="text-center">MOTIVO DE CANCELACIÓN</th>
+                                    @if ( in_array(auth()->user()->email, $allowed_emails_for_res_deletion) )
+                                        <th class="text-center"></th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -230,6 +235,13 @@
                                                     @endif
                                                 @endif
                                             </td>                                    
+                                            @if ( in_array(auth()->user()->email, $allowed_emails_for_res_deletion) )
+                                                <td>
+                                                    <button class="btn btn-danger delete-reservation" data-id="{{ $item->reservation_id }}">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            @endif
                                         </tr>
                                     @endforeach
                                 @endif

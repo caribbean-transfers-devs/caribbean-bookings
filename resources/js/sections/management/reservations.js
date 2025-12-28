@@ -224,4 +224,65 @@ document.addEventListener("DOMContentLoaded", function() {
             });            
         }
     }, 300)); // 300ms de espera antes de ejecutar de nuevo
+
+    document.querySelectorAll('.delete-reservation').forEach(element => {
+        element.addEventListener("click", (event) => {
+        
+            const reservation_id = event.currentTarget.getAttribute('data-id');
+
+            Swal.fire({
+                title: 'Escribe "eliminar", para borrar la reservación',
+                input: "text",
+                inputAttributes: {
+                    autocapitalize: "off"
+                },
+                showCancelButton: true,
+                confirmButtonText: "Eliminar",
+                showLoaderOnConfirm: true,
+                preConfirm: async (input) => {
+                    if(input !== 'eliminar') {
+                        Swal.showValidationMessage('Escribe "eliminar", para borrar la reservación');
+                        return false;
+                    }
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then(async (result) => {
+                if (!result.isConfirmed) return;
+
+                Swal.fire({
+                    title: "Procesando solicitud...",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                try {
+                    let res = await fetch(`/reservations/delete-reservation/${reservation_id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                    })
+                    res = await res.json();
+                    
+                    Swal.fire({
+                        icon: res.status,
+                        html: res.message,
+                        allowOutsideClick: false,
+                    }).then(() => {
+                        if(res.status === 'success') location.reload();
+                    });
+                } catch(e) {
+                    Swal.fire(
+                        '¡ERROR!',
+                        e.message || 'Ocurrió un error',
+                        'error'
+                    );
+                }
+            });
+
+        });
+    });
 });

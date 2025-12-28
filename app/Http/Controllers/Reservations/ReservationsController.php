@@ -58,6 +58,12 @@ class ReservationsController extends Controller
         }
     }
 
+    public function deleteReservation(Request $request, ReservationsRepository $reservationRepository){
+        if($this->hasPermission(24)){
+            return $reservationRepository->deleteReservation($request);
+        }
+    }
+
     public function followups(ReservationFollowUpsRequest $request, ReservationsRepository $reservationRepository){
         if($this->hasPermission(23)){
             return $reservationRepository->follow_ups($request);

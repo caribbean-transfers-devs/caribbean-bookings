@@ -364,6 +364,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
 
         Route::put('/reservations/{reservation}',                                       [DETAILS_RESERVATION::class, 'update'])->name('reservations.update');
         Route::delete('/reservations/{reservation}',                                    [DETAILS_RESERVATION::class, 'destroy'])->name('reservations.destroy');//LA CANCELACIÓNDE LA RESERVA
+        Route::delete('/reservations/delete-reservation/{id}',                          [DETAILS_RESERVATION::class, 'deleteReservation'])->name('reservations.deletereservation');
         Route::get('/reservations/detail/{id}',                                         [DETAILS_RESERVATION::class, 'detail'])->name('reservations.details')->where('id', '[0-9]+');
         Route::get('/GetExchange/{reservation}',                                        [DETAILS_RESERVATION::class, 'get_exchange'])->name('reservations.get_exchange');
         Route::post('/reservationsfollowups',                                           [DETAILS_RESERVATION::class, 'followups'])->name('reservations.followups');

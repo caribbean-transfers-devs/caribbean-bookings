@@ -15,6 +15,24 @@
     $units2 = auth()->user()->UnitsSchedules();
     $drivers = auth()->user()->Drivers();
     // $drivers2 = auth()->user()->Drivers('active');
+
+    function getPreassignmentStyles($service_type, $vehicle_d) {
+        if($service_type === 'ARRIVAL') {
+            return "background: #FFB000; border-color: #9A6A00; box-shadow: 0 3px 15px #9A6A00;";
+        }
+        else if($service_type === 'DEPARTURE') {
+            $styles = "background: #00ab55; border-color: #00ab55; box-shadow: 1px 3px 15px #00AAED;";
+            if($vehicle_d == 0) {
+                return $styles . "animation: .5s ease-in-out 0s infinite alternate forwards grow-reduce;";
+            }
+            else {
+                return $styles;
+            }
+        }
+        else {
+            return "background: #0B1C2D; border-color: #040C14; box-shadow: 0 3px 15px #040C14;";
+        }
+    }
 @endphp
 @extends('layout.app')
 @section('title') Gestión De Operaciones @endsection
@@ -63,6 +81,14 @@
             60% { transform: rotate(10deg); }
             75% { transform: rotate(-5deg); }
             100% { transform: rotate(0); }
+        }
+        @keyframes grow-reduce {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.1);
+            }
         }
     </style>
 @endpush
@@ -254,7 +280,7 @@
                                     @endif
 
                                     @if ( $flag_preassignment )
-                                        <button type="button" class="btn btn-<?=( $value->final_service_type == 'ARRIVAL' ? 'success' : ( $value->final_service_type == 'DEPARTURE' ? 'primary' : 'info' ) )?> btn_operations w-100 mb-1 text-uppercase">{{ $preassignment }}</button>
+                                        <button type="button" style="color: white; {{ getPreassignmentStyles($value->final_service_type, $vehicle_d) }}" class="btn btn_operations w-100 mb-1 text-uppercase">{{ $preassignment }}</button>
                                     @else
                                         <button type="button" class="btn btn-danger text-uppercase btn_operations w-100 mb-1 {{ auth()->user()->hasPermission(81) && $close_operation == 0 ? 'add_preassignment' : 'disabled' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
                                     @endif

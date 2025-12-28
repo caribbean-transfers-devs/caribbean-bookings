@@ -115,6 +115,43 @@ class ReservationsRepository
         }
     }
 
+    public function deleteReservation($request){
+        try {
+            $reservation = Reservation::find($request->id);
+
+            $hasCompletedItems = $reservation->items()->where(function ($query) {
+                $query->where('op_one_status', 'COMPLETED')
+                ->orWhere('op_two_status', 'COMPLETED');
+            })->exists();
+            if ($hasCompletedItems) {                
+                return response()->json(['status' => 'warning', 'message' => 'No se puede eliminar la reserva porque tiene servicios con estado COMPLETADO'], Response::HTTP_BAD_REQUEST);
+            }
+            
+            $hasPayments = $reservation->payments()->exists();
+            if($hasPayments) {
+                return response()->json(['status' => 'warning', 'message' => 'La reservación tiene pagos'], Response::HTTP_BAD_REQUEST);
+            }
+
+            DB::transaction(function () use ($reservation) {
+                $reservation->followUps()->delete();
+                $reservation->items()->delete();
+                $reservation->photos()->delete();
+                $reservation->sales()->withTrashed()->forceDelete();
+                $reservation->delete();
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Reserva eliminada correctamente'
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'danger',
+                'message' => 'Error al eliminar la reserva',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function get_exchange($request, $reservation){
         $currency = $request->currency;
         $to_currency = $reservation->currency;

@@ -1028,6 +1028,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             if( data.data2.value != null ){
                                 socket.emit("setDriverReservationServer", data.data2);
                             }
+                            reloadWithLastWindowPosition();
                         }                        
                     })
                     .catch(error => {
