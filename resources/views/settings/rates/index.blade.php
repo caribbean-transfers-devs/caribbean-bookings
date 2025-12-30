@@ -91,7 +91,7 @@
                                             <p class="mb-0"><strong>Hacia:</strong>      {{ isset($value->zoneTwo->name) ? $value->zoneTwo->name." (".$value->zoneTwo->id.") " : 'Zona no encontrada' }}</p>
                                             <p class="mb-0"><strong>Servicio:</strong>   {{ isset($value->destination_service->name) ? $value->destination_service->name : 'Tipo de unidad no encontrada' }}</p>
                                         </div>
-                                        <div class="icons position-relative">
+                                        <div class="icons position-relative item-actions">
                                             @if (auth()->user()->hasPermission(34))
                                                 <a class="btn btn-success" href="{{ route('enterprises.rates.web.edit', [$value->id]) }}">Editar tarifa</a>
                                             @endif                            

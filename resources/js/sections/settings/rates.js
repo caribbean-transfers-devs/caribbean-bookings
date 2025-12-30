@@ -126,6 +126,12 @@ document.addEventListener('change', function (event) {
     }
 });
 
+document.querySelectorAll('.item-actions button, .item-actions a').forEach(el => {
+    el.addEventListener('click', e => {
+        if(el.href) window.location = el.href;
+    });
+});
+
 document.addEventListener('click', function (event) {
     if (event.target && event.target.id === 'btnGetRates') {
         event.preventDefault();
