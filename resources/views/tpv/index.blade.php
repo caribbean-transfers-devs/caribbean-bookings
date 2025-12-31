@@ -31,6 +31,7 @@
                         <input type="hidden" name="to_lng">
                         <input type="hidden" id="flexSwitchCheckDefault" name="is_round_trip" value="0">
                         <input type="hidden" id="bookingCurrencyForm" name="currency" value="USD">
+                        <input type="hidden" id="is_tpv" name="is_tpv" value="true">
                         <div class="box">
                             <div class="options">
                                 <div class="one">
