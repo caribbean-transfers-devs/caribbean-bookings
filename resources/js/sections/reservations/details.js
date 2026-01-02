@@ -149,8 +149,8 @@ let details = {
         $("#to_lat_edit").val(item.to_lat);
         $("#to_lng_edit").val(item.to_lng);
     
-        __serviceDateForm.value = item.op_one_pickup,
-        __serviceDateForm.min = item.op_one_pickup;
+        __serviceDateForm.value = item.op_one_pickup;
+        // __serviceDateForm.min = item.op_one_pickup;
         if(item.op_one_status != 'PENDING'){
             $("#serviceDateForm").prop('readonly', true);
         }
@@ -160,8 +160,8 @@ let details = {
         }
     
         if(item.is_round_trip == 1){
-            __serviceDateRoundForm.value = item.op_two_pickup,
-            __serviceDateRoundForm.min = item.op_one_pickup;
+            __serviceDateRoundForm.value = item.op_two_pickup;
+            // __serviceDateRoundForm.min = item.op_one_pickup;
             $("#info_return").removeClass('d-none');
             __service_type.classList.add('d-none');
             __serviceType.removeAttribute('name');

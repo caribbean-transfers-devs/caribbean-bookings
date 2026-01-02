@@ -33,6 +33,15 @@ class ReservationsRepository
     public function update($request,$reservation)
     {
         $validatedData = $this->validateBookingRequest($request); //Validar y preparar los datos de la solicitud
+        
+        $allow_edit = $this->checkIfCanBeEdited($reservation->id);
+        if( !$allow_edit ) {
+            return response()->json([
+                'message' => 'No se puede editar la reservación porque la operación ya ha sido cerrada', 
+                'success' => false,
+                'status' => 'error',
+            ], Response::HTTP_FORBIDDEN);
+        }
 
         try{
             DB::beginTransaction();
@@ -162,6 +171,15 @@ class ReservationsRepository
     public function editreservitem($request, $item)
     {
         $validatedData = $this->validateServiceRequest($request); //Validar y preparar los datos de la solicitud
+
+        $allow_edit = $this->checkIfCanBeEdited($item->reservation_id);
+        if( !$allow_edit ) {
+            return response()->json([
+                'message' => 'No se puede editar el servicio porque la operación ya ha sido cerrada', 
+                'success' => false,
+                'status' => 'error',
+            ], Response::HTTP_FORBIDDEN);
+        }
         
         try {
             DB::beginTransaction();
@@ -968,5 +986,26 @@ class ReservationsRepository
         }else{
             return response()->json(['message' => 'Error creating follow up','success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private function checkIfCanBeEdited($reservation_id) {
+        $allow_edit = true;
+        $reservation_item = ReservationsItem::where('reservation_id', $reservation_id)->first();
+
+        if($reservation_item) {
+            if($reservation_item->op_one_preassignment && $reservation_item->op_two_preassignment) {
+                if($reservation_item->op_one_operation_close && $reservation_item->op_two_operation_close) {
+                    $allow_edit = false;
+                }
+            }
+            else if($reservation_item->op_one_preassignment) {
+                if($reservation_item->op_one_operation_close) $allow_edit = false;
+            }
+            else if($reservation_item->op_two_preassignment) {
+                if($reservation_item->op_two_operation_close) $allow_edit = false;
+            }
+        }
+
+        return $allow_edit;
     }
 }
