@@ -968,6 +968,21 @@ class ActionsRepository
             //ESTE LOG ES EL QUE SE HACIA EN OPERATIONSCONTROLLER, QUE YA NO SE USARA
             // $this->create_followUps($service->reservation_id, "Actualización de estatus de reservación (".$request->operation.") por ".$request->status, 'HISTORY', auth()->user()->name);
 
+            // Cancelando todos los estatus
+            if($request->status == "CANCELLED") {
+                if($request->type == "TYPE_ONE"):
+                    $item->op_one_status_operation = 'CANCELLED';
+                    $item->vehicle_id_one = null;
+                    $item->driver_id_one = null;
+                endif;
+                
+                if($request->type == "TYPE_TWO"):
+                    $item->op_two_status_operation = 'CANCELLED';
+                    $item->vehicle_id_two = null;
+                    $item->driver_id_two = null;
+                endif;
+            }
+
             // Guardar el cambio y verificar que se guardó correctamente
             if (!$item->save()) {
                 DB::rollBack();
