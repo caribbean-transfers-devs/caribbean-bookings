@@ -234,12 +234,20 @@ class ReservationsRepository
         }
 
         $comment = $request->comment ? $request->comment : null;
+        $message = $comment ? $comment : ' --- ';
         if($request->type === 'one') {
             $reservation_item->op_one_comments = $comment;
         }
         else {
             $reservation_item->op_two_comments = $comment;
         }
+
+        $this->create_followUps(
+            $reservation_item->reservation_id, 
+            "El usuario: " . auth()->user()->name . ", actualizó el comentario de la operación ". ($request->type === 'one' ? 'uno' : 'dos') ." a: " . $message, 
+            'HISTORY',
+            'UPDATE_SERVICE'
+        );
 
         $reservation_item->save();
 
