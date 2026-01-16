@@ -146,7 +146,7 @@ class ActionsRepository
             // $linkWhatsapp = "https://wa.me/{$booking->client_phone}?text={$mensajeTexto}";         
 
             $telefono = $booking->client_phone; // Código de país + número sin espacios
-            $mensaje = urlencode("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&email=".$booking->client_email."&language=".$booking->language."");
+            $mensaje = urlencode("https://api.caribbean-transfers.com/api/v1/mailing/reservation/viewQR?code=".$booking->items[0]->code."&language=".$booking->language."&email=".$booking->client_email."");
             $linkWhatsapp = "https://wa.me/$telefono?text=$mensaje";
 
             return response()->json([

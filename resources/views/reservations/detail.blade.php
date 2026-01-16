@@ -645,7 +645,18 @@
                                                                 <button <?=$tooltip?> type="button" class="btn {{ $btn_op_one_type }} btn-sm bs-tooltip">{{ auth()->user()->statusBooking($item->op_one_status) }}</button>                                
                                                             @endif
                                                         </td>
-                                                        <td>{{ isset($item->op_one_comments) ? $item->op_one_comments : 'SIN COMENTARIOS' }}</td>
+                                                        <td>
+                                                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                                                                <span style="white-space: pre-line;">
+                                                                    {{ isset($item->op_one_comments) ? $item->op_one_comments : ' ---' }}
+                                                                </span>
+                                                                @if(auth()->user()->hasPermission(13))
+                                                                    <button style="word-break: keep-all;" data-bs-toggle="modal" data-bs-target="#item_comment_modal" data-bs-placement="top" title="Click para editar comentario" class="btn btn-primary bs-tooltip edit-comment" type="button" data-item="{{ $item->reservations_item_id }}" data-comment="{{ $item->op_one_comments }}" data-type="one">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
+                                                                @endif
+                                                            </div>
+                                                        </td>
                                                         <td>
                                                             {{-- NOS PERMITE ACTUALIZAR Y ENVIAR LA CONFIRMACION DEL SERVICIO AL CLIENTE POR CORREO --}}
                                                             {{-- VER SI EL SERVICIO ESTA EN UNA OPERACION ABIERTA O CERRADA --}}
@@ -732,7 +743,18 @@
                                                                     <button <?=$tooltip?> type="button" class="btn {{ $btn_op_two_type }} btn-sm bs-tooltip">{{ auth()->user()->statusBooking($item->op_two_status) }}</button> 
                                                                 @endif
                                                             </td>
-                                                            <td>{{ isset($item->op_two_comments) ? $item->op_two_comments : 'SIN COMENTARIOS' }}</td>
+                                                            <td>
+                                                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                                                                    <span style="white-space: pre-line;">
+                                                                        {{ isset($item->op_two_comments) ? $item->op_two_comments : ' ---' }}
+                                                                    </span>
+                                                                    @if(auth()->user()->hasPermission(13))
+                                                                        <button style="word-break: keep-all;" data-bs-toggle="modal" data-bs-target="#item_comment_modal" data-bs-placement="top" title="Click para editar comentario" class="btn btn-primary bs-tooltip edit-comment" type="button" data-item="{{ $item->reservations_item_id }}" data-comment="{{ $item->op_two_comments }}" data-type="two">
+                                                                            <i class="fas fa-edit"></i>
+                                                                        </button>
+                                                                    @endif
+                                                                </div>
+                                                            </td>
                                                             <td>
                                                                 {{-- NOS PERMITE ACTUALIZAR Y ENVIAR LA CONFIRMACION DEL SERVICIO AL CLIENTE POR CORREO --}}
                                                                 {{-- VER SI EL SERVICIO ESTA EN UNA OPERACION ABIERTA O CERRADA --}}
@@ -972,4 +994,6 @@
         <x-slot name="reservation_id">{{ $reservation->id }}</x-slot>
     </x-modals.new_follow_reservation>
     <x-modals.reservations.confirmation :reservation=$reservation />
+    <x-modals.reservations.confirmation :reservation=$reservation />
+    <x-modals.reservations.edit_item_comment />
 @endsection

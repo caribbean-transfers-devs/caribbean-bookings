@@ -1708,6 +1708,63 @@ $("#btn_edit_item").on('click', function(){
     });
 });
 
+$(".edit-comment").on('click', function(){
+    $('#item_comment_modal input[name="item_id"]').val($(this).data('item'));
+    $('#item_comment_modal input[name="type"]').val($(this).data('type'));
+    $('#item_comment_modal [name="comment"]').val($(this).data('comment'));
+});
+
+$(".confirm-edit-comment").on('click', function(){
+    const data = $("#item_comment_form").serializeArray();
+    $(".confirm-edit-comment").prop('disabled', true);
+    
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('#item_comment_modal input[name="_token"]').attr('value')
+        }
+    });
+    $.ajax({
+        url: "/edit-reservation-item-comment",
+        type: 'post',
+        data,
+        success: function(resp) {
+            if (resp.success == 1) {
+                window.onbeforeunload = null;
+                let timerInterval
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    html: 'Comentario editado con éxito. Será redirigido en <b></b>',
+                    timer: 2500,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        const b = Swal.getHtmlContainer().querySelector('b')
+                        timerInterval = setInterval(() => {
+                            b.textContent = (Swal.getTimerLeft() / 1000)
+                                .toFixed(0)
+                        }, 100)
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    location.reload();
+                })
+            } else {
+                $(".confirm-edit-comment").prop('disabled', false);
+            }
+        }
+    }).fail(function(xhr, status, error) {
+        Swal.fire(
+            '¡ERROR!',
+            xhr.responseJSON.message,
+            'error'
+        )
+        $(".confirm-edit-comment").prop('disabled', false);
+    });
+});
+
 function sendArrivalConfirmation() {
     const btn = document.getElementById("btnSendArrivalConfirmation");
     const form = document.getElementById("formArrivalConfirmation");

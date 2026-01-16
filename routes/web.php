@@ -369,6 +369,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/GetExchange/{reservation}',                                        [DETAILS_RESERVATION::class, 'get_exchange'])->name('reservations.get_exchange');
         Route::post('/reservationsfollowups',                                           [DETAILS_RESERVATION::class, 'followups'])->name('reservations.followups');
         Route::put('/editreservitem/{item}',                                            [DETAILS_RESERVATION::class, 'editreservitem'])->name('reservations.editreservitem');
+        Route::post('/edit-reservation-item-comment',                                   [DETAILS_RESERVATION::class, 'editReservationItemComment'])->name('reservations.editReservationItemComment');
 
         Route::post('/reservations/confirmation/arrival',                               [DETAILS_RESERVATION::class, 'arrivalConfirmation'])->name('reservations.confirmationArrival');
         Route::post('/reservations/confirmation/departure',                             [DETAILS_RESERVATION::class, 'departureConfirmation'])->name('reservations.confirmationDeparture');

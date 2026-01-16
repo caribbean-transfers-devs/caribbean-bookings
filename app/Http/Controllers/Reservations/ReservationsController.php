@@ -80,6 +80,12 @@ class ReservationsController extends Controller
         }
     }
 
+    public function editReservationItemComment(Request $request, ReservationsRepository $reservationRepository){
+        if($this->hasPermission(13)){
+            return $reservationRepository->editReservationItemComment($request);
+        }
+    }
+
     public function arrivalConfirmation(ReservationConfirmationRequest $request, ReservationsRepository $reservationRepository){
         return $reservationRepository->sendArrivalConfirmation($request);
     }

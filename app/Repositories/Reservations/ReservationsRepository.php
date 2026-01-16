@@ -25,6 +25,7 @@ use App\Traits\MailjetTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
 use App\Traits\FollowUpTrait;
+use Illuminate\Support\Facades\Validator;
 
 class ReservationsRepository
 {
@@ -203,6 +204,50 @@ class ReservationsRepository
                 'status' => 'error',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function editReservationItemComment($request)
+    {
+        $validator = Validator::make($request->all(), [            
+            'item_id' => 'required|',
+            'type' => 'required|in:one,two',
+            'comment' => 'string|nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => [
+                    'code' => 'REQUIRED_PARAMS', 
+                    'message' =>  $validator->errors()->all() 
+                ]
+            ], 422);
+        }
+            
+        $reservation_item = ReservationsItem::find($request->item_id);
+        if(!$reservation_item) {
+            return response()->json([
+                'error' => [
+                    'code' => 'NOT_FOUND', 
+                    'message' =>  'No se encontró el servicio' 
+                ]
+            ], 404);
+        }
+
+        $comment = $request->comment ? $request->comment : null;
+        if($request->type === 'one') {
+            $reservation_item->op_one_comments = $comment;
+        }
+        else {
+            $reservation_item->op_two_comments = $comment;
+        }
+
+        $reservation_item->save();
+
+        return response()->json([
+            'message' => 'Comentario actualizado exitosamente', 
+            'success' => true,
+            'status' => 'success',
+        ], Response::HTTP_OK);     
     }
 
     /**
