@@ -73,7 +73,7 @@ let rates = {
             _zoneOne.innerHTML    = '<option value="">Zona de origen</option>';
             _zoneTwo.innerHTML    = '<option value="">Zona de destino</option>';
             _service.innerHTML    = '<option value="">[Vehículo]</option>';
-            _group.innerHTML      = '<option value="">[Grupo de tarifa]</option>';            
+            _group.value = "";
             return false;            
         }
         rates.getInputs(value);

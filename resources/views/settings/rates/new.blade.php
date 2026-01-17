@@ -53,6 +53,7 @@
                                         <div class="form-group mb-2">
                                             <label class="form-label" for="rateGroupID">Selecciona Grupo de tarifa</label>
                                             <select name="rate_group_id" class="form-control" id="rateGroupID">
+                                                <option value="">[Grupo de tarifa]</option>
                                                 @if(sizeof($rate_groups) >= 1)
                                                     @foreach ($rate_groups as $value)
                                                         <option value="{{ $value->id }}">({{ $value->code }}) {{ $value->name }}</option>
