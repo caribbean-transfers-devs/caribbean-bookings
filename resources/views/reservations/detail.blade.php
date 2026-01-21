@@ -359,6 +359,15 @@
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item paymentLink" href="javascript:void(0)" data-reservation="{{ $reservation->items[0]['code'] }}" data-email="{{ trim($reservation->client_email) }}" data-language="es" data-type="STRIPE">Español</a>
                         </div>
+                        <button id="btndefaultpaypal" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            COPIAR LINK DE PAGO PAYPAL
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="btndefaultpaypal">
+                            <a class="dropdown-item paymentLink" href="javascript:void(0)" data-reservation="{{ $reservation->items[0]['code'] }}" data-email="{{ trim($reservation->client_email) }}" data-language="en" data-type="PAYPAL-V3" >Inglés</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item paymentLink" href="javascript:void(0)" data-reservation="{{ $reservation->items[0]['code'] }}" data-email="{{ trim($reservation->client_email) }}" data-language="es" data-type="PAYPAL-V3">Español</a>
+                        </div>
                     </div>
                 @endif
 
