@@ -110,6 +110,58 @@ trait ApiTrait
         return self::sendRequest('/api/v1/types/cancellations/get', 'GET', $data);
     }
 
+    public static function sendPaymentRequestApi(string $reservation_id, string $lang) {
+        $data = [
+            'reservation_id' => $reservation_id,
+            'lang' => $lang,
+        ];
+
+        $data = [
+            "status" => false,
+            "data" => NULL
+        ];
+
+        $url = "https://api.caribbean-transfers.com/api/v1/mailing/reservation/payment-request";
+        // $url = "http://127.0.0.1:8001/api/v1/mailing/reservation/payment-request";
+
+        $params = array(
+            'reservation_id' => $reservation_id,
+            'lang' => $lang,
+        );
+        
+        $ch = curl_init();
+        $urlWithParams = $url . '?' . http_build_query($params);
+        curl_setopt($ch, CURLOPT_URL, $urlWithParams);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $response = curl_exec($ch);
+    
+        if (curl_errno($ch)) {
+            $data['status'] = false;
+            $data['data'] = [
+                'error' => [
+                    'code' => 'curl_error',
+                    'message' => 'Error en la solicitud cURL: '.curl_error($ch)
+                ]
+            ];
+            return $data;
+        }
+        curl_close($ch);
+        
+        $jsonData = json_decode($response);
+        if ($jsonData === null && json_last_error() !== JSON_ERROR_NONE) {
+            //Es HTML, esto indica que todo va bien...
+            $data['status'] = true;
+            $data['data'] = $response;
+            return $data;
+        }else{
+            //Es un JSON por lo que algo salió mal...
+            $data['status'] = false;
+            $data['data'] = json_decode($response, true);
+            return $data;     
+        }
+    }
+
     public static function sendRequest($end_point, $method = 'GET', $data = null, $token = null) {
         $url = 'https://api.caribbean-transfers.com'.$end_point;
         // $url = 'http://127.0.0.1:8001'.$end_point;

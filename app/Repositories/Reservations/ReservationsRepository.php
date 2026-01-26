@@ -19,7 +19,7 @@ use App\Models\ContactPoints;
 use App\Models\Zones;
 use App\Models\Site;
 use App\Models\Sale;
-
+use App\Traits\ApiTrait;
 //TRAITS
 use App\Traits\MailjetTrait;
 use App\Traits\FiltersTrait;
@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ReservationsRepository
 {
-    use MailjetTrait, FiltersTrait, QueryTrait, FollowUpTrait;
+    use MailjetTrait, FiltersTrait, QueryTrait, FollowUpTrait, ApiTrait;
 
     public function update($request,$reservation)
     {
@@ -878,140 +878,67 @@ class ReservationsRepository
     }
 
     public function sendPaymentRequest($request){
-
         $item = DB::select("SELECT sit.payment_domain, sit.transactional_phone, rez.client_email, rez.client_first_name, rez.id as reservation_id, sit.success_payment_url, sit.cancel_payment_url
                             FROM reservations as rez 
                                 INNER JOIN sites as sit ON sit.id = rez.site_id
                             WHERE rez.id = :id", ['id' => $request['item_id'] ]);
         $item = $item[0];
         $lang = $request['lang'];
-        $message = '';
 
-        $paypal_URL = $this->makePaymentURL( $request, $item, 'PAYPAL' );
-        $stripe_URL = $this->makePaymentURL( $request, $item, 'STRIPE' );
+        try {
+            $response = $this->sendPaymentRequestApi($request['item_id'], $request['lang']);
 
-        if($lang == "en"):
-            // $message = <<<EOF
-            //         <p>Hello again!</p>
-            //         <p>We have noticed that your reservation has not been confirmed yet, don't miss the opportunity to secure your transfer with us and enjoy our special online prices!</p>
-            //         <p>Why pay now?</p>
-            //         <ul>
-            //             <li><strong>Guaranteed security:</strong> By pre-paying, you are assured to have your transportation ready and waiting for your arrival.</li>
-            //             <li><strong>Time saving:</strong> Avoid long waits and complications at the airport.</li>
-            //             <li><strong>Total peace of mind:</strong> Enjoy your trip knowing that everything is organized and worry-free.</li>
-            //             <li><strong>Secure payment:</strong> We use HTTPS to guarantee the security of your data, and we work with the best payment platforms such as PayPal and Stripe.</li>
-            //         </ul>
-                    
-            //         <p>To pay with STRIPE, click <a href="$stripe_URL" title="Pay with Stripe">here</a></p>
-            //         <p>To pay with PayPal, click <a href="$paypal_URL" title="Pay with PayPal">here</a></p>
+            if($response['status'] == false):
+                throw new Exception('No se pudo enviar el correo correctamente');
+            endif;
 
-            //         <p>If you have any questions, our team is ready to assist you. Contact us at: $item->transactional_phone </p>
-            //         <p><strong>Business hours:</strong> From 7:00 am to 11:00 pm.</p>
-            //         <p>We look forward to seeing you soon and providing you with exceptional service</p>
-            //     EOF;
-
-            $message = <<<EOF
-                    <p>Complete Your Reservation</p>
-                    <p>Secure your transfer now at our special online rate:</p>
-
-                    <p><a href="$stripe_URL" title="Pay with Stripe">[Pay with Stripe]</a></p>
-                    <p><a href="$paypal_URL" title="Pay with PayPal">[Pay with PayPal]</a></p>
-
-                    <p>Hi again!</p>
-                    <p>We noticed your booking is still pending. Prepay now to</p>
-                    <p>confirm your transfer and avoid delays or last-minute fees.</p>
-
-                    <p>Once payment is received, you'll get a confirmation by email.</p>
-
-                    <p>Questions? Message us on WhatsApp: $item->transactional_phone </p>
-                    <p><strong>Hours:</strong> 7:00 am to 11:00 pm.</p>
-                    <p>We look forward to welcoming you soon!</p>
-                EOF;
-        else:
-            // $message = <<<EOF
-            //         <p>¡Hola de nuevo!</p>
-            //         <p>Hemos notado que su reservación aún no ha sido confirmada. ¡No pierda la oportunidad de asegurar su traslado con nosotros y disfrutar de nuestros precios especiales en línea!</p>
-            //         <p>¿Por qué pagar ahora?</p>
-            //         <ul>
-            //             <li><strong>Seguridad garantizada:</strong> Al pre-pagar, se asegura de tener su transporte listo y esperando a su llegada.</li>
-            //             <li><strong>Ahorro de tiempo:</strong> Evite largas esperas y complicaciones en el aeropuerto.</li>
-            //             <li><strong>Tranquilidad total:</strong> Disfrute de su viaje sabiendo que todo está organizado y sin preocupaciones.</li>
-            //             <li><strong>Pago seguro:</strong> Utilizamos HTTPS para garantizar la seguridad de sus datos, y trabajamos con las mejores plataformas de pago como PayPal y Stripe.</li>
-            //         </ul>
-                    
-            //         <p>Para pagar con STRIPE, de click <a href="$stripe_URL" title="Paga con Stripe">aquí</a></p>                    
-            //         <p>Para pagar con PayPal, de click <a href="$paypal_URL" title="Paga con PayPal">aquí</a></p>
-
-            //         <p>Si tiene alguna pregunta, nuestro equipo está listo para asistirle. Contáctenos al: $item->transactional_phone </p>
-            //         <p><strong>Horario de atención:</strong> De 7:00 a 23:00 h.</p>
-            //         <p>Esperamos verle pronto y brindarle un servicio excepcional.</p>
-            //     EOF;
-            
-            $message = <<<EOF
-                    <p>Complete su reserva</p>
-                    <p>Asegura tu traslado ahora con nuestra tarifa especial online:</p>
-
-                    <p><a href="$stripe_URL" title="Pagar con Stripe">[Pagar con Stripe]</a></p>
-                    <p><a href="$paypal_URL" title="Pagar con PayPal">[Pagar con PayPal]</a></p>
-
-                    <p>¡Hola de nuevo!</p>
-                    <p>Nos hemos dado cuenta de que tu reserva sigue pendiente. Paga por adelantado ahora para confirmar tu traslado y evitar retrasos o cargos de última hora.</p>
-
-                    <p>Una vez recibido el pago, recibirás una confirmación por correo electrónico.</p>
-
-                    <p>¿Tienes preguntas? Envíanos un mensaje por WhatsApp: $item->transactional_phone </p>
-                    <p><strong>Horario:</strong> 7:00 am - 11:00 pm</p>
-                    <p>¡Esperamos darte la bienvenida pronto! </p>
-                EOF;            
-        endif;  
-
-        //Data to send in confirmation..
-        $email_data = array(
-            "Messages" => array(
-                array(
-                    "From" => array(
-                        "Email" => 'bookings@caribbean-transfers.com',
-                        "Name" => "Bookings"
-                    ),
-                    "To" => array(
-                        array(
-                            "Email" => $item->client_email,
-                            "Name" => $item->client_first_name,
-                        )
-                    ),
-                    "Bcc" => array(
-                        array(
+            $email_data = array(
+                "Messages" => array(
+                    array(
+                        "From" => array(
                             "Email" => 'bookings@caribbean-transfers.com',
                             "Name" => "Bookings"
-                        )
-                    ),
-                    "Subject" => (($lang == "en")?'Payment request':'Solicitúd de pago'),
-                    "TextPart" => (($lang == "en")?'Dear client':'Estimado cliente'),
-                    "HTMLPart" => $message
+                        ),
+                        "To" => array(
+                            array(
+                                "Email" => $item->client_email,
+                                "Name" => $item->client_first_name,
+                            )
+                        ),
+                        "Bcc" => array(
+                            array(
+                                "Email" => 'bookings@caribbean-transfers.com',
+                                "Name" => "Bookings"
+                            )
+                        ),
+                        "Subject" => (($lang == "en")?'Payment request':'Solicitúd de pago'),
+                        "TextPart" => (($lang == "en")?'Dear client':'Estimado cliente'),
+                        "HTMLPart" => $response['data']
+                    )
                 )
-            )
-        );
+            );
 
-        $email_response = $this->sendMailjet($email_data);
+            $email_response = $this->sendMailjet($email_data);
 
-        if(isset($email_response['Messages'][0]['Status']) && $email_response['Messages'][0]['Status'] == "success"):
-            $check = $this->create_followUps($item->reservation_id, 'El usuario: '.auth()->user()->name.", a enviado E-mail (solicitúd de pago) para la reservación: ".$item->reservation_id, 'INTERN', 'SISTEMA');
-            // E-mail enviado (solicitúd de pago) por '.auth()->user()->name
+            if(isset($email_response['Messages'][0]['Status']) && $email_response['Messages'][0]['Status'] == "success") {
+                $this->create_followUps($item->reservation_id, 'El usuario: '.auth()->user()->name.", a enviado E-mail (solicitúd de pago) para la reservación: ".$item->reservation_id, 'INTERN', 'SISTEMA');
+            }
+            else {
+                throw new Exception('No se pudo enviar el correo correctamente');
+            }
 
             return response()->json(['status' => "success"], 200);
-        else:
-            $check = $this->create_followUps($item->reservation_id, 'No fue posible enviar el e-mail de solicitúd de pago, por favor contactar a Desarrollo', 'INTERN', 'SISTEMA');
-            // No fue posible enviar el e-mail de solicitúd de pago, por favor contactar a Desarrollo
-            
+        } catch(Exception $e) {
+            die("no pasa");
+            $this->create_followUps($item->reservation_id, 'No fue posible enviar el e-mail de solicitúd de pago, por favor contactar a Desarrollo', 'INTERN', 'SISTEMA');
+
             return response()->json([
                 'error' => [
                     'code' => 'mailing_system',
-                    'message' => 'The mailing platform has a problem, please report to development'
+                    'message' => 'No se pudo enviar el correo correctamente'
                 ]
-            ], 404);
-        endif;
-
-        echo $message; die();
+            ], 500);
+        }
     }
 
     private function orderByDateTime($a, $b) {
