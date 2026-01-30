@@ -93,11 +93,8 @@ class ReservationsRepository
         }
 
         //DUPLICADAS
-        if(!isset( $request->is_duplicated )){
-            $query .= " AND rez.is_duplicated = 0 ";
-        }        
         if(isset( $request->is_duplicated )){
-            $query .= " AND rez.is_duplicated IN (1,0) ";
+            $query .= " AND rez.is_duplicated = 1 ";
         }        
 
         //MONEDA DE LA RESERVA
