@@ -156,8 +156,8 @@
     <div class="row layout-top-spacing">
         <div class="col-xxl-3 col-xl-4 col-12">
             <div class="card mb-2">
-                <div class="card-header">
-                    <div class="card-actions float-end">
+                <div class="card-header" style="display: flex; gap: 5px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                    <div class="card-actions float-end" style="order: 2;">
                         @if (auth()->user()->hasPermission(11))
 
                         {{-- <div class="dropdown show"> --}}
@@ -171,7 +171,11 @@
                         {{-- </div> --}}
                         @endif
                     </div>
-                    <h5 class="card-title mb-0">{{ $reservation->site->name }}</h5>
+                    <button class="btn btn-warning" style="cursor: normal; pointer-events: none; order: 1;">
+                        <h5 class="card-title mb-0" style="color: white;">
+                            {{ $reservation->site->name }}
+                        </h5>
+                    </button>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-container table-details-booking">
