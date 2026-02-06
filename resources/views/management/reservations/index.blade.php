@@ -213,7 +213,8 @@
                                             <td class="text-center">{{ $item->passengers }}</td>                                    
                                             <td class="text-center">{{ $item->from_name }}</td>
                                             <td class="text-center">{{ $item->to_name }}</td>
-                                            <td class="text-center" <?=auth()->user()->classStatusPayment($item)?>>{{ auth()->user()->statusPayment($item->payment_status) }}</td>
+                                            {{-- En el estatus de pago, hubo un requerimiento que pedía que si es tipo "crédito", que debe ser "pendiente", pero puede causar confuciones a futuro teniendo en cuenta los filtros, porque hay un filtro con opción de estatus de pago "crédito" --}}
+                                            <td class="text-center" <?=auth()->user()->classStatusPayment($item)?>>{{ auth()->user()->statusPayment($item->payment_status) === 'CREDITO' ? 'PENDIENTE' : auth()->user()->statusPayment($item->payment_status) }}</td>
                                             <td class="text-center" <?=auth()->user()->classStatusPayment($item)?>>{{ number_format(($item->total_sales),2) }}</td>
                                             <td class="text-center" {{ (($item->total_balance > 0)? "style=background-color:green;color:white;font-weight:bold;":"") }}>{{ number_format($item->total_balance,2) }}</td>                                
                                             <td class="text-center">{{ $item->currency }}</td>
