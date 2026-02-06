@@ -135,10 +135,13 @@ class CCFormRepository
         endif;
 
         $pdf = new Fpdf();
+
+        $did_last_page_entered = false;
     
         if(sizeof($payments_with_success) >=1 ):
             foreach($payments_with_success as $key => $value):
-                
+                $did_last_page_entered = true;
+
                 $info = [
                     "client_full_name" => "",
                     "payment_amount" => "",
@@ -296,10 +299,12 @@ class CCFormRepository
             endforeach;
         endif;
         
-        $pdf->AddPage('P', 'Letter');
-        $pdf->SetFont('Arial','', 11);
-
         if(sizeof($payments_with_errors) >=1 ):
+            if($did_last_page_entered) {
+                $pdf->AddPage('P', 'Letter');
+                $pdf->SetFont('Arial','', 11);
+            }
+            
             foreach($payments_with_errors as $key => $value):
                 
                 $info = [
