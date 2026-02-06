@@ -398,7 +398,7 @@
 
                 {{-- NOS PERMITE PONER COMO CREDITO ABIERTO CUANDO LA RESERVA ESTA CONFIRMADA Y EL CLIENTE QUIERE CANCELAR --}}
                 {{-- NECESITO APLICAR RECLAS MUCHO MAS ESPECIFICAS --}}
-                @if ( $data['status'] == "CONFIRMED" && auth()->user()->hasPermission(72) )
+                @if ( ($data['status'] == "CONFIRMED" || $data['status'] == "CREDIT") && auth()->user()->hasPermission(72) )
                     <button class="btn btn-warning btn-sm markReservationOpenCredit" id="markReservationOpenCredit" data-code="{{ $reservation->id }}" data-status="{{ $data['status'] }}" onclick="openCredit({{ $reservation->id }})"><i class="align-middle" data-feather="delete"></i> CRÉDITO ABIERTO</button>
                 @endif
                     
