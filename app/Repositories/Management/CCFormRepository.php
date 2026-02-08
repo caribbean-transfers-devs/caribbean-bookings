@@ -162,7 +162,6 @@ class CCFormRepository
                     "current_date" => date("M d, Y", strtotime( date("Y-m-d") ))
                 ];
 
-                $info['client_full_name'] =  ucfirst(ucwords(trim($value->rezervation->client_first_name))). " " . ucfirst(ucwords(trim($value->rezervation->client_last_name)));
                 $info['reservation_creation_date'] = date("M/d, Y", strtotime($value->rezervation->created_at));
                 $info['client_phone'] = $value->rezervation->client_phone;
                 $info['client_email'] = $value->rezervation->client_email;
@@ -205,6 +204,8 @@ class CCFormRepository
                 if( $value->payment_method == "PAYPAL" ):
                     $info = $this->PayPal($value, $info);
                 endif;
+
+                $info['client_full_name'] = $info['card_holder_name'];
 
                 $pdf->AddPage('P', 'Letter');
                 $pdf->SetFont('Arial','', 11);
@@ -327,7 +328,7 @@ class CCFormRepository
                     "current_date" => date("M d, Y", strtotime( date("Y-m-d") ))
                 ];    
 
-                $info['client_full_name'] =  ucfirst(ucwords(trim($value->rezervation->client_first_name))). " " . ucfirst(ucwords(trim($value->rezervation->client_last_name)));
+                $info['client_full_name'] = '';
                 $info['reservation_creation_date'] = date("M/d, Y", strtotime($value->rezervation->created_at));
                 $info['client_phone'] = $value->rezervation->client_phone;
                 $info['client_email'] = $value->rezervation->client_email;
@@ -487,7 +488,7 @@ class CCFormRepository
         $info['payment_type'] = "CARD";
         $info['payment_amount'] = number_format(round($value->object['amount'] / 100), 2)." ".$value->currency;
         $full_name = $value->rezervation->client_first_name." ".$value->rezervation->client_last_name;
-        $info['card_holder_name'] = ucfirst(ucwords(trim(( isset($value->object['billing_details']['name']) ? $value->object['billing_details']['name'] : $full_name ))));
+        $info['card_holder_name'] = ucfirst(ucwords(trim(( isset($value->object['billing_details']['name']) ? $value->object['billing_details']['name'] : '' ))));
         if( isset($value->object['payment_method_details']['card']) ){
             $info['card_number'] = $value->object['payment_method_details']['card']['last4'];
             $info['card_expiration_date'] = $value->object['payment_method_details']['card']['exp_month']."/".$value->object['payment_method_details']['card']['exp_year'];
@@ -509,7 +510,7 @@ class CCFormRepository
 
         $info['payment_type'] = "PAYPAL";
         $info['payment_amount'] = number_format(round($value->object['mc_gross']), 2)." ".$value->currency;
-        $info['card_holder_name'] = ucfirst(ucwords(trim(( isset($value->object['first_name']) ? $value->object['first_name'] : $value->rezervation->client_first_name )))). " " . ucfirst(ucwords(trim(( isset($value->object['last_name']) ? $value->object['last_name'] : $value->rezervation->client_last_name ))));
+        $info['card_holder_name'] = ucfirst(ucwords(trim(( isset($value->object['first_name']) ? $value->object['first_name'] : '' )))). " " . ucfirst(ucwords(trim(( isset($value->object['last_name']) ? $value->object['last_name'] : '' ))));
         $info['payment_email'] = $value->object['payer_email'];
         $info['payment_invoice'] = $value->object['txn_id'];        
         
