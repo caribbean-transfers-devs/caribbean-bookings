@@ -197,8 +197,20 @@ let setup = {
   },
   setTotal: function(total){
     const _total = document.getElementById('formTotal');
-    _total.value = total;
-    _total.removeAttribute('readonly');
+    
+    if( document.getElementById('formPaymentMethod').value === 'CORTESIA' ) {
+      _total.value = 0;
+      _total.setAttribute('readonly', true);
+    }
+    else {
+      _total.value = total;
+      _total.removeAttribute('readonly');
+    }
+  },  
+  setCortesiaTotal: function(){
+    const _total = document.getElementById('formTotal');
+    _total.value = 0;
+    _total.setAttribute("readonly", true);
   },  
   actionSite: function(__site){
     const __reference       = document.getElementById('formReference');
@@ -363,6 +375,18 @@ document.addEventListener('DOMContentLoaded', function() {
       // Obtener datos del elemento clickeado
       const { total } = event.target.dataset;
       setup.setTotal(total);
+    }
+
+    if( event.target && event.target.id === 'formPaymentMethod' ) {
+      if( event.target.value === 'CORTESIA' ) {
+        setup.setTotal(0);
+      }
+      else {
+        const checkedButtonDataset = document.querySelector('.checkButton:checked')?.dataset;
+        const _total = document.getElementById('formTotal');
+
+        if(checkedButtonDataset && _total.value == 0) setup.setTotal(checkedButtonDataset.total);
+      }
     }
   });
 

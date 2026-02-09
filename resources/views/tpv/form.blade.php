@@ -2,6 +2,8 @@
     $sites = auth()->user()->SitesTpv();
     $origins = auth()->user()->Origins();
     $users = auth()->user()->CallCenterAgent([1]);
+
+    $allowed_emails_for_courtesy = ['development@caribbean-transfers.com', 'csanroman@caribbean-transfers.com', 'luis@caribbean-transfer.com.mx'];
 @endphp
 <form class="quote_container" id="formReservation">
     <div class="left_">
@@ -117,6 +119,9 @@
                         <option value="CASH">Efectivo</option>
                         <option value="CARD">Tarjeta de crédito / Débito</option>
                         <option value="PAYPAL">PayPal</option>
+                        @if ( in_array(auth()->user()->email, $allowed_emails_for_courtesy) )
+                            <option value="CORTESIA">Cortesía</option>
+                        @endif
                     </select>
                 </div>                
                 {{-- <div>

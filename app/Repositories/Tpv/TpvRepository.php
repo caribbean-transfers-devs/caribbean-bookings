@@ -176,6 +176,7 @@ class TpvRepository
             'site_id' => $request->site_id,
             'origin_sale_id' => $request->origin_sale_id,
             'call_center_agent' => $request->call_center_agent,
+            'payment_method' => $request->payment_method,
             'data' => [
                 'callcenter' => [
                     'reference' => $request->data['callcenter']['reference'],
