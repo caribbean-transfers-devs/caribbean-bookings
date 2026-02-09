@@ -107,6 +107,9 @@
                                         @if ( auth()->user()->hasPermission(125) )
                                             <button class="btn btn-primary viewMap" data-lat="{{ $hotel->latitude }}" data-lng="{{ $hotel->longitude }}">Ver mapa</button>   
                                         @endif                                        
+                                        @if ( auth()->user()->hasPermission(134) )
+                                            <button class="btn btn-danger delete-hotel" style="margin-top: 5px;" data-id="{{ $hotel->id }}" data-name="{{ $hotel->name }}">Eliminar</button>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

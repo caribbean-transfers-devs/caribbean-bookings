@@ -211,6 +211,53 @@ document.addEventListener("DOMContentLoaded", function() {
             $("#serviceMapModal").modal('show');
             hotels.initMap(event.target.dataset.lat, event.target.dataset.lng);
         }
+        if (event.target && event.target.classList.contains('delete-hotel')){
+            event.preventDefault();
+            const confirmed = confirm(`¿Confirmas la eliminación del hotel (${event.target.dataset.name})?`);
+            if(!confirmed) return;
+
+            Swal.fire({
+                title: "Procesando solicitud...",
+                text: "Por favor, espera mientras se guarda el hotel.",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch(`/management/hotels/${event.target.dataset.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },            
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(() => {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    html: 'Hotel eliminado con éxito',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then(() => {
+                    Swal.close(); // Cierra el Swal al recibir respuesta
+                    location.reload();                    
+                });
+            })
+            .catch(error => {
+                Swal.fire(
+                    '¡ERROR!',
+                    error.message || 'Ocurrió un error',
+                    'error'
+                );
+            });  
+        }
     })
     
     /*

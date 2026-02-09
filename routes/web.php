@@ -239,6 +239,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         //HOTELES
         Route::match(['get', 'post'], '/management/hotels', [HOTELS::class, 'index'])->name('management.hotels');
         Route::match(['post'], '/management/hotel/add', [HOTELS::class, 'hotelAdd'])->name('management.hotel.add');
+        Route::delete('/management/hotels/{id}', [HOTELS::class, 'delete'])->name('management.hotel.delete');
 
     //CONFIGURACIONES
         Route::resource('/roles', ROLES::class);

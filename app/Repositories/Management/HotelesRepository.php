@@ -88,4 +88,30 @@ class HotelesRepository
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function delete($request)
+    {
+        $hotel = Autocomplete::find($request->id);
+
+        if(!$hotel) {
+            return response()->json([
+                'status' => 'error',
+                "message" => 'No se encontró el hotel',
+            ], Response::HTTP_NOT_FOUND);
+        }
+            
+        try {
+            $hotel->delete();
+        } catch(Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                "message" => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Se eliminó correctamente el hotel',
+        ], Response::HTTP_OK);
+    }
 }

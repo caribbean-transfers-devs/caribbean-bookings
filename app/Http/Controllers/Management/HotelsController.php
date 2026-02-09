@@ -35,4 +35,11 @@ class HotelsController extends Controller
         }
         return $this->HotelesRepository->hotelAdd($request);        
     }
+
+    public function delete(Request $request){
+        if(!$this->hasPermission(134)){
+            abort(403, 'NO TIENE AUTORIZACIÓN.');
+        }
+        return $this->HotelesRepository->delete($request);        
+    }
 }
