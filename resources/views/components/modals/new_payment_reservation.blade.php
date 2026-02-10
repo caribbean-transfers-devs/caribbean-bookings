@@ -14,6 +14,7 @@
                                 <option value="CASH" selected>Efectivo</option>
                                 <option value="PAYPAL">PayPal</option>
                                 <option value="STRIPE">Stripe</option>
+                                <option value="OPENPAY">Openpay</option>
                                 <option value="SANTANDER">Santander</option>
                                 <option value="TRANSFER">Transferencia</option>
                                 <option value="MIFEL">MIFEL</option>
