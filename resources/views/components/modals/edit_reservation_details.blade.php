@@ -1,6 +1,7 @@
 @php
     $sites = auth()->user()->Sites();
     $origins = auth()->user()->Origins();
+    $users = auth()->user()->CallCenterAgent([1]);
 @endphp
 <div class="modal fade" id="serviceClientModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -59,6 +60,18 @@
                                 <option value="MXN" {{ $reservation->currency == 'MXN' ? 'selected' : '' }}>MXN</option>
                             </select>
                         </div>
+                        @if(auth()->user()->hasRole(14))
+                            <div class="col-sm-12">
+                                <label class="form-label" for="formAgent">Agente</label>
+                                <select class="form-control selectpicker" data-live-search="true" name="call_center_agent_id">
+                                    @if (isset( $users ) && $users)
+                                        @foreach ($users as $item)
+                                            <option value="{{ $item->id }}" {{ $reservation->call_center_agent_id == $item->id ? 'selected' : '' }}>{{ $item->name }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        @endif
                         <div class="col-sm-12">
                             <label class="form-label" for="bookingComment">Solicitudes especiales</label>
                             <textarea class="form-control" name="special_request" id="formSpecialRequest"></textarea>

@@ -19,6 +19,7 @@ use App\Models\ContactPoints;
 use App\Models\Zones;
 use App\Models\Site;
 use App\Models\Sale;
+use App\Models\User;
 use App\Traits\ApiTrait;
 //TRAITS
 use App\Traits\MailjetTrait;
@@ -263,7 +264,7 @@ class ReservationsRepository
      */
     protected function validateBookingRequest($request): array
     {
-        return [
+        $validatedData = [
             'client_first_name' => $request->client_first_name,
             'client_last_name' => $request->client_last_name,
             'client_email' => $request->client_email,
@@ -274,6 +275,15 @@ class ReservationsRepository
             'currency' => $request->currency,
             'special_request' => $request->special_request ?: NULL,
         ];
+
+        if(isset($request->call_center_agent_id) && auth()->user()->hasRole(14)) {
+            $call_center = User::find($request->call_center_agent_id);
+            if($call_center) {
+                $validatedData['call_center_agent_id'] = $call_center->id;
+            }
+        }
+
+        return $validatedData;
     }
 
     /**
@@ -500,6 +510,7 @@ class ReservationsRepository
 
         // Actualización de campos básicos
         $reservation->fill($data);
+        if(isset($data['call_center_agent_id'])) $reservation->call_center_agent_id = $data['call_center_agent_id'];
 
         // Manejo de solicitud especial
         if (!empty($data['special_request'])) {
