@@ -18,10 +18,10 @@
 
     function getPreassignmentStyles($service_type, $vehicle_d) {
         if($service_type === 'ARRIVAL') {
-            return "background: #FFB000; border-color: #9A6A00; box-shadow: 0 3px 15px #9A6A00;";
+            return "background: #00ab55; border-color: #00ab55; box-shadow: 0 3px 15px #9A6A00; font-size: 18px;";
         }
         else if($service_type === 'DEPARTURE') {
-            $styles = "background: #00ab55; border-color: #00ab55; box-shadow: 1px 3px 15px #00AAED;";
+            $styles = "background: #2196f3; border-color: #2196f3; box-shadow: 1px 3px 15px #00AAED;";
             if($vehicle_d == 0) {
                 return $styles . "animation: .5s ease-in-out 0s infinite alternate forwards grow-reduce;";
             }
@@ -33,6 +33,24 @@
             return "background: #0B1C2D; border-color: #040C14; box-shadow: 0 3px 15px #040C14;";
         }
     }
+
+    // Función pendiente
+    // function getCellStatusOpColor($status) {
+    //     $items = [
+    //         "ENVIADO" => "#B7C6E6",
+    //         // "NO ASIGNADO" => "#C9C9C9",
+    //         "PENDIENTE" => "#BFBFBF",
+
+
+
+    //         "NO OPERADO" => "#A86AD8",
+    //         "ASIGNADO" => "#8CCB4F",
+    //         "CANCELADO" => "#FF4C4C",
+    //         "NO SHOW" => "#D88C7F",
+    //     ];
+
+    //     return isset($items[$status]) ? $items[$status] : 'initial';
+    // }
 @endphp
 @extends('layout.app')
 @section('title') Gestión De Operaciones @endsection
@@ -209,7 +227,7 @@
                                 // dump($value);
                                 //DECLARAMOS VARIABLES DE IDENTIFICADORES
                                 //SABER SI SON ARRIVAL, DEPARTURE O TRANSFER, MEDIANTE UN COLOR DE FONDO
-                                $background_color = "background-color: #".( $value->final_service_type == 'ARRIVAL' ? "ddf5f0" : ( $value->final_service_type == 'TRANSFER' ? "f2eafa" : "dbe0f9" ) ).";";
+                                $default_background_color = "background-color: #D9D9D9;";
                                 $color_agency = ( $value->type_site == "AGENCY" ? "background-color: ".$value->site_color.";color: #ffffff;" : '' )."";
 
                                 //PREASIGNACION
@@ -269,14 +287,31 @@
                                         }
                                         $generalTimeGroup[$hour]['quantity']++;
                                     }
+
+                                    // Obtener background_color de filas
+                                    $operation_status = auth()->user()->getOperationStatus($value);
+                                    $service_status = auth()->user()->getServiceStatusOP($value);
+                                    // $item_reservation_status = auth()->user()->statusBooking($value->reservation_status);
+                                    $background_color = '';
+                                    if(in_array($operation_status, ['OK', 'CONFIRMADO']) && $service_status === 'COMPLETADO') {
+                                        $background_color = 'background-color: #92D050;';
+                                    }
+                                    if($operation_status === 'NO SE PRESENTÓ' && $service_status === 'NO SE PRESENTÓ') {
+                                        $background_color = 'background-color: #F79999;';
+                                    }
+
+                                    // ---- Pendiente
+                                    // Background celda "estatus de operación"
+                                    // $estatus_de_operación_cell_color = getCellStatusOpColor()
+                                    $estatus_de_operación_cell_color = 'initial';           
                             @endphp
-                            <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="{{ $background_color }}">
+                            <tr class="item-{{ $key.$value->id }}" id="item-{{ $key.$value->id }}" data-payment-method="{{ $value->payment_type_name }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}" data-close_operation="{{ $close_operation }}" style="background-color: {{ $value->row_background_color }}; border-bottom: 1px solid #0e1726;">
                                 <td class="text-center">
                                     {{-- MUESTRA CÓDIGO DE RESERVA --}}
                                     @if (auth()->user()->hasPermission(61))
-                                        <a class="btn btn-dark w-100 mb-1" href="/reservations/detail/{{ $value->reservation_id }}">CÓDIGO: {{ $value->code }}</a>
+                                        <a class="btn btn-dark w-100 mb-1 mt-1" href="/reservations/detail/{{ $value->reservation_id }}">CÓDIGO: {{ $value->code }}</a>
                                     @else
-                                        <div class="btn btn-dark w-100 mb-1">CÓDIGO: {{ $value->code }}</div>                                        
+                                        <div class="btn btn-dark w-100 mb-1 mt-1">CÓDIGO: {{ $value->code }}</div>                                        
                                     @endif
 
                                     @if ( $flag_preassignment )
@@ -335,6 +370,12 @@
                                             </div> --}}
                                         @endif
                                     </div>
+
+                                    @if (auth()->user()->hasPermission(40))
+                                        <div class="w-100 mt-1 mb-1">
+                                            <?=auth()->user()->renderStatusConfirmation($value)?>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="text-center">{{ auth()->user()->setDateTime($value, "time") }}</td>
                                 <td class="text-center">
@@ -405,7 +446,7 @@
                                         {{ auth()->user()->setOperationDriver($value) }}
                                     @endif
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center" style="background-color: {{ $estatus_de_operación_cell_color }};">
                                     @if ( auth()->user()->hasPermission(88) && $close_operation == 0 )
                                         <?=auth()->user()->renderOperationOptionsStatus($key,$value)?>
                                     @else

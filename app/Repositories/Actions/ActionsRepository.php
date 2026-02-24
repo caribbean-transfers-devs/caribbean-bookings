@@ -747,7 +747,7 @@ class ActionsRepository
         $rules = [
             'item_id' => 'required|integer',
             'service' => 'required|string|in:ARRIVAL,DEPARTURE,TRANSFER',
-            'status' => 'required|integer|in:1,0',
+            'status' => 'required|integer|in:2,1,0',
             'type' => 'required|string|in:TYPE_ONE,TYPE_TWO',
         ];
 

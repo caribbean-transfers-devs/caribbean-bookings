@@ -70,7 +70,60 @@ trait OperationTrait
 
     // BOTON DE CONFIRMACION    
     public function renderStatusConfirmation($service){
-        return '<button type="button" class="btn btn-'.( self::serviceStatusConfirmation($service) == 0 ? 'warning' : 'success' ).' confirmService" data-item="'.$service->id.'" data-service="'.$service->final_service_type.'" data-status="'.( self::serviceStatusConfirmation($service) == 1 ? 0 : 1 ).'" data-type="'.$service->op_type.'">'.( self::serviceStatusConfirmation($service) == 0 ? 'N' : 'Y' ).'</button>';
+        $button_content = '';
+        $data_status = 0;
+
+        if( self::serviceStatusConfirmation($service) == 0 ) {
+            $button_content .= '---';
+            $data_status = 1;
+        }
+        else if( self::serviceStatusConfirmation($service) == 1 ) {
+            $button_content .= '<svg xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-check">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>';
+            $data_status = 2;
+        }
+        else if( self::serviceStatusConfirmation($service) == 2 ) {
+            $button_content .= '<svg xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-check">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-check">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>';
+            $data_status = 0;
+        }
+
+        $button = '<button title="1 palomita: Enviado. | 2 palomitas: Confirmado. | Rayita: Ninguno de los anteriores | Puedes hacer click para modificar el estado" type="button" class="btn btn-secondary w-100 bs-tooltip confirmService" data-item="'.$service->id.'" data-service="'.$service->final_service_type.'" data-status="'. $data_status .'" data-type="'.$service->op_type.'">';
+        $button .= $button_content;
+        $button .= '</button>';
+        return $button;
     }
 
     //COLOR AGENCY
@@ -144,6 +197,11 @@ trait OperationTrait
     public function renderServiceStatusOP($service)
     {
         return '<button type="button" class="btn btn-'.$this->classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ), 'OPERATION').'">'.$this->statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status )).'</button>';
+    }
+
+    public function getServiceStatusOP($service)
+    {
+        return $this->statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_status : $service->two_service_status ));
     }
 
     //AQUI NOS MUESTRA EL BOTON CON LAS OPCIONES DE ESTATUS, CUANDO LA OPERACIÓN ESTA ABIERTA
@@ -235,6 +293,10 @@ trait OperationTrait
         return '<button type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ), 'OPERATION').'">'.self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status )).'</button>';
     }
 
+    public function getOperationStatus($service){
+        return self::statusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ));
+    }
+
     public function renderOperationOptionsStatus($key,$service){
         return '<div class="btn-group" role="group">
                     <button id="optionsOperation'.$key.$service->id.'" data-item="'.$key.$service->id.'" type="button" class="btn btn-'.self::classStatusBooking(( $service->op_type == "TYPE_ONE" ? $service->one_service_operation_status : $service->two_service_operation_status ), 'OPERATION').' dropdown-toggle btn_status_action" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -245,6 +307,7 @@ trait OperationTrait
                         <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="PENDING" data-item="'. $service->id .'" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> Pendiente</a>
                         <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="E" data-item="'. $service->id.'}" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> Enviado</a>
                         <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="C" data-item="'. $service->id .'" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> Confirmado</a>
+                        <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="NOSHOW" data-item="'. $service->id .'" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> No show</a>
                         <div class="dropdown-divider"></div>
                         <a href="javascript:void(0);" class="dropdown-item btn_update_status_operation" data-operation="'. $service->final_service_type .'" data-service="'. $service->operation_type .'" data-type="'. $service->op_type .'" data-status="CANCELLED" data-item="'. $service->id .'" data-booking="'. $service->reservation_id .'" data-key="'. $key.$service->id .'"><i class="flaticon-home-fill-1 mr-1"></i> Cancelado</a>
                         <div class="dropdown-divider"></div>

@@ -107,6 +107,41 @@ class OperationsController extends Controller
 
         $items = $this->queryOperations($queryOne, $queryTwo, $queryHaving, $queryData);
 
+        $items = collect($items)
+        ->values() // asegurar índices consecutivos
+        ->map(function ($item, $index) {
+
+            $operation_status = auth()->user()->getOperationStatus($item);
+            $service_status   = auth()->user()->getServiceStatusOP($item);
+
+            $background_color = '#D9D9D9'; // gris por defecto
+            $priority = 1;
+
+            // VERDE
+            if (in_array($operation_status, ['OK', 'CONFIRMADO']) && $service_status === 'COMPLETADO') {
+                $background_color = '#92D050';
+                $priority = 3;
+            }
+
+            // ROJO
+            if ($operation_status === 'NO SE PRESENTÓ' && $service_status === 'NO SE PRESENTÓ') {
+                $background_color = '#F79999';
+                $priority = 2;
+            }
+
+            // Agregamos campos dinámicamente
+            $item->row_background_color = $background_color;
+            $item->row_priority = $priority;
+            $item->original_index = $index; // para mantener orden estable
+
+            return $item;
+        })
+        ->sortBy([
+            ['row_priority', 'asc'],     // gris (1), rojo (2), verde (3)
+            ['original_index', 'asc'],   // mantener orden original
+        ])
+        ->values()->toArray(); // reindexar
+
         return view('management.operations.index', [
             'items' => $items,
             'date' => ( isset( $request->date ) ? $request->date : date("Y-m-d") ),
