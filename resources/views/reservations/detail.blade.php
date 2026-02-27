@@ -379,16 +379,16 @@
                 @if ( $data['status'] != "CANCELLED" && $data['status'] != "DUPLICATED" )
                     <div class="btn-group btn-group-sm" role="group">
                         <button id="btndefault" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            COPIAR LINK DE PAGO SANTANDER
+                            COPIAR LINK DE PAGO OPENPAY
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btndefault">
-                            <a class="dropdown-item paymentLink" href="javascript:void(0)" data-reservation="{{ $reservation->items[0]['code'] }}" data-email="{{ trim($reservation->client_email) }}" data-language="en" data-type="SANTANDER" >Inglés</a>
+                            <a class="dropdown-item paymentLink" href="javascript:void(0)" data-reservation="{{ $reservation->items[0]['code'] }}" data-email="{{ trim($reservation->client_email) }}" data-language="en" data-type="OPENPAY" >Inglés</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item paymentLink" href="javascript:void(0)" data-reservation="{{ $reservation->items[0]['code'] }}" data-email="{{ trim($reservation->client_email) }}" data-language="es" data-type="SANTANDER">Español</a>
+                            <a class="dropdown-item paymentLink" href="javascript:void(0)" data-reservation="{{ $reservation->items[0]['code'] }}" data-email="{{ trim($reservation->client_email) }}" data-language="es" data-type="OPENPAY">Español</a>
                         </div>
                     </div>
-                @endif                
+                @endif
 
                 {{-- NOS PERMITE INDICAR QUE CLIENTE PAGARA A LA LLEGADA, SOLO SE MOSTRARA CUANDO SEA COTIZACIÓN O PENDIENTE --}}
                 @if ( $reservation->pay_at_arrival == 0 && ( $data['status'] == "QUOTATION" || $data['status'] == "PENDING" ) )
