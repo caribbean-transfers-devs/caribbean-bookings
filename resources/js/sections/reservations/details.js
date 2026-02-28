@@ -1438,47 +1438,70 @@ function sendMail(code,mail,languague){
 function sendInvitation(event, item_id, lang = 'en'){
     event.preventDefault();
     var url = "/reservations/payment-request";
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    }); 
-    $.ajax({
-        url: url,
-        type: 'POST',
-        dataType: 'json',
-        data: { item_id:item_id, lang:lang },
-        success: function (data) {
-            Swal.fire({
-                title: '¡Éxito!',
-                icon: 'success',
-                html: 'Solicitúd de pago enviada. Será redirigido en <b></b>',
-                timer: 2500,
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading()
-                    const b = Swal.getHtmlContainer().querySelector('b')
-                    timerInterval = setInterval(() => {
-                        b.textContent = (Swal.getTimerLeft() / 1000)
-                            .toFixed(0)
-                    }, 100)
-                },
-                willClose: () => {
-                    clearInterval(timerInterval)
-                }
-            }).then((result) => {
-                location.reload();
-            })
-        },
-        error: function (data) {
-            swal.fire({
-                title: 'Error',
-                text: 'Ha ocurrido un error al enviar el invitación',
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
-            });
-        }
-    });    
+
+    const confirmSendInvitation = () => {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        }); 
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: { item_id:item_id, lang:lang },
+            success: function (data) {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    icon: 'success',
+                    html: 'Solicitúd de pago enviada. Será redirigido en <b></b>',
+                    timer: 2500,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        const b = Swal.getHtmlContainer().querySelector('b')
+                        timerInterval = setInterval(() => {
+                            b.textContent = (Swal.getTimerLeft() / 1000)
+                                .toFixed(0)
+                        }, 100)
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    location.reload();
+                })
+            },
+            error: function (data) {
+                swal.fire({
+                    title: 'Error',
+                    text: 'Ha ocurrido un error al enviar el invitación',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        });    
+    }
+
+    if(payment_request_sent) {
+        Swal.fire({
+            html: 'Ya se ha enviado la solicitud de pago previamente. ¿Deseas volver a enviarla?',
+            icon: 'warning',    
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',
+            allowOutsideClick: false,
+            allowEscapeKey: false, // Esta línea evita que se cierre con ESC      
+        }).then((result) => {
+            if (result.isConfirmed) {
+                confirmSendInvitation();
+            }
+        });
+    }
+    else {
+        confirmSendInvitation();
+    }
+
 }
 
 function saveFollowUp(){

@@ -29,6 +29,17 @@ return new class extends Migration
     public function down(): void
     {
         DB::statement("
+            UPDATE reservations_items
+            SET op_one_status_operation = 'CANCELLED'
+            WHERE op_one_status_operation = 'NOSHOW'
+        ");
+        DB::statement("
+            UPDATE reservations_items
+            SET op_two_status_operation = 'CANCELLED'
+            WHERE op_two_status_operation = 'NOSHOW'
+        ");
+
+        DB::statement("
             ALTER TABLE reservations_items 
             MODIFY op_one_status_operation 
             ENUM('PENDING','E','C','CANCELLED','OK') 

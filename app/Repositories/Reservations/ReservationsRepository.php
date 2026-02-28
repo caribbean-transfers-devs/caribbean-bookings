@@ -940,7 +940,6 @@ class ReservationsRepository
 
             return response()->json(['status' => "success"], 200);
         } catch(Exception $e) {
-            die("no pasa");
             $this->create_followUps($item->reservation_id, 'No fue posible enviar el e-mail de solicitúd de pago, por favor contactar a Desarrollo', 'INTERN', 'SISTEMA');
 
             return response()->json([

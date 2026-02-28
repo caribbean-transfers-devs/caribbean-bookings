@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('app:check-for-new-stripe-refunds')->dailyAt('02:00');
         $schedule->command('app:check-for-new-stripe-conciliations')->dailyAt('03:00');
+        $schedule->command('app:send-payment-request')->dailyAt('11:00');
     }
 
     /**
