@@ -120,12 +120,18 @@ class OperationsController extends Controller
             // VERDE
             if (in_array($operation_status, ['OK', 'CONFIRMADO']) && $service_status === 'COMPLETADO') {
                 $background_color = '#92D050';
+                $priority = 4;
+            }
+
+            // ROSA
+            if ($operation_status === 'NO SE PRESENTÓ' && $service_status === 'NO SE PRESENTÓ') {
+                $background_color = '#F8B4B4';
                 $priority = 3;
             }
 
             // ROJO
-            if ($operation_status === 'NO SE PRESENTÓ' && $service_status === 'NO SE PRESENTÓ') {
-                $background_color = '#F79999';
+            if ($operation_status === 'CANCELADO' && $service_status === 'CANCELADO') {
+                $background_color = '#DC2626';
                 $priority = 2;
             }
 
