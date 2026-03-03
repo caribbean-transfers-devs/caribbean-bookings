@@ -131,7 +131,7 @@ class OperationsController extends Controller
 
             // ROJO
             if ($operation_status === 'CANCELADO' && $service_status === 'CANCELADO') {
-                $background_color = '#DC2626';
+                $background_color = '#e7515a';
                 $priority = 2;
             }
 
