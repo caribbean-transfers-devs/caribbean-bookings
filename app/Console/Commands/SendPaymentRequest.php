@@ -35,8 +35,11 @@ class SendPaymentRequest extends Command
      */
     public function handle()
     {
+        $process_id = $this->generateRandomProcessId();
+
         $this->createLog([
             'type' => 'info',
+            'process_id' => $process_id,
             'category' => $this->signature,
             'message' => "Iniciando $this->signature",
         ]);
@@ -75,6 +78,15 @@ class SendPaymentRequest extends Command
             });
         })->values();
 
+        $number_of_reservations = sizeof($reservations);
+        $this->createLog([
+            'type' => 'info',
+            'process_id' => $process_id,
+            'category' => $this->signature,
+            'message' => "Se encontraron: $number_of_reservations reservaciones",
+        ]);
+
+        $counter = 0;
         foreach($reservations as $reservation) {
             try {
                 if(!in_array($reservation->client_email, ['luisf.dzay@gmail.com', 'luisdzay.extras@gmail.com', 'luisdzay.juegos@gmail.com'])) continue;
@@ -88,8 +100,9 @@ class SendPaymentRequest extends Command
                 } catch(Exception $e) {
                     $this->createLog([
                         'type' => 'error',
+                        'process_id' => $process_id,
                         'category' => $this->signature,
-                        'message' => $e->getMessage(),
+                        'message' => "Error en sendMail. No se pudo enviar el correo.",
                         'exception' => $e,
                     ]);
                     continue;
@@ -98,9 +111,18 @@ class SendPaymentRequest extends Command
                 $this->create_followUps($reservation->id, "El sistema (robot), ha enviado E-mail (solicitúd de pago) para la reservación: $reservation->id", 'INTERN', 'SISTEMA');
                 $reservation->payment_request_sent = 1;
                 $reservation->save();
+
+                $counter++;
+                $this->createLog([
+                    'type' => 'info',
+                    'process_id' => $process_id,
+                    'category' => $this->signature,
+                    'message' => "Se envió el correo a la reservación: $reservation->id",
+                ]);
             } catch(Exception $e) {
                 $this->createLog([
                     'type' => 'error',
+                    'process_id' => $process_id,
                     'category' => $this->signature,
                     'exception' => $e,
                 ]);
@@ -111,8 +133,9 @@ class SendPaymentRequest extends Command
         
         $this->createLog([
             'type' => 'info',
+            'process_id' => $process_id,
             'category' => $this->signature,
-            'message' => "Proceso $this->signature terminado",
+            'message' => "Proceso $this->signature terminado. Total de correos enviados: $counter",
         ]);
     }
 
@@ -156,5 +179,10 @@ class SendPaymentRequest extends Command
         if(!(isset($email_response['Messages'][0]['Status']) && $email_response['Messages'][0]['Status'] == "success")) {
             throw new Exception( json_encode($email_response) );
         }
+    }
+
+    private function generateRandomProcessId() {
+        $length = 32;
+        return bin2hex(random_bytes($length / 2));
     }
 }
