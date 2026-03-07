@@ -18,7 +18,7 @@
 
     function getPreassignmentStyles($service_type, $vehicle_d) {
         if($service_type === 'ARRIVAL') {
-            return "background: #00ab55; border-color: #00ab55; box-shadow: 0 3px 15px #9A6A00; font-size: 18px;";
+            return "background: #00ab55; border-color: #00ab55; box-shadow: 0 3px 15px #9A6A00;";
         }
         else if($service_type === 'DEPARTURE') {
             $styles = "background: #2196f3; border-color: #2196f3; box-shadow: 1px 3px 15px #00AAED;";
@@ -218,6 +218,7 @@
                         <th class="text-center">ESTATUS DE RESERVACIÓN</th><!-- ESTATUS DE RESERVACION -->
                         <th class="text-center">PAGO</th>
                         <th class="text-center">TOTAL</th>
+                        <th class="text-center">MÉTODOS DE PAGO</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -315,7 +316,7 @@
                                     @endif
 
                                     @if ( $flag_preassignment )
-                                        <button type="button" style="color: white; {{ getPreassignmentStyles($value->final_service_type, $vehicle_d) }}" class="btn btn_operations w-100 mb-1 text-uppercase">{{ $preassignment }}</button>
+                                        <button type="button" style="color: white; font-size: 18px; {{ getPreassignmentStyles($value->final_service_type, $vehicle_d) }}" class="btn btn_operations w-100 mb-1 text-uppercase">{{ $preassignment }}</button>
                                     @else
                                         <button type="button" class="btn btn-danger text-uppercase btn_operations w-100 mb-1 {{ auth()->user()->hasPermission(81) && $close_operation == 0 ? 'add_preassignment' : 'disabled' }}" id="btn_preassignment_{{ $key.$value->id }}" data-id="{{ $key.$value->id }}" data-reservation="{{ $value->reservation_id }}" data-item="{{ $value->id }}" data-operation="{{ $value->final_service_type }}" data-service="{{ $value->operation_type }}" data-type="{{ $value->op_type }}">ADD</button>
                                     @endif
@@ -467,6 +468,9 @@
                                 <td class="text-center" <?=auth()->user()->classStatusPayment($value)?>>{{ auth()->user()->statusPayment($value->payment_status) }}</td>
                                 <td class="text-center" >
                                     {{ number_format( ( $value->total_balance > 0 ? $value->total_balance : $value->total_sales ) ,2) }} {{ $value->currency }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $value->payment_type_name }}
                                 </td>
                             </tr>
                         @endforeach

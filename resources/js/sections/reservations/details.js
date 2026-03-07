@@ -1407,6 +1407,7 @@ $(function() {
         $("#payment_id").val('');
         $("#type_form_pay").val(1);
         $("#btn_new_payment").prop('disabled', false);
+        $('#servicePaymentsExchangeModal').prop('readonly', true);
     });
 });
 
@@ -1636,6 +1637,12 @@ function getPayment(id){
             $("#servicePaymentsConciliationModal").val(data.is_conciliated);
             $("#servicePaymentsMessageConciliationModal").val(data.conciliation_comment);
             $("#btn_new_payment").prop('disabled', false);
+
+            if (rez_currency === data.currency) {
+                $('#servicePaymentsExchangeModal').prop('readonly', true);
+            } else {
+                $('#servicePaymentsExchangeModal').prop('readonly', false);
+            }
         },
         error: function (data) {
             console.log(data);
@@ -1664,6 +1671,13 @@ function deletePayment(id){
 $("#servicePaymentsCurrencyModalPayment").on('change', function(){
     let currency = $(this).val();
     let reservation_id = $("#reserv_id_pay").val();
+
+    if (rez_currency === currency) {
+        $('#servicePaymentsExchangeModal').prop('readonly', true);
+    } else {
+        $('#servicePaymentsExchangeModal').prop('readonly', false);
+    }
+
     $.ajax({
         url: '/GetExchange/'+reservation_id+'?currency='+currency,
         type: 'GET',
