@@ -47,7 +47,7 @@ class SendPaymentRequest extends Command
         $maxHoursSinceCreation = 48;
         $minHoursBeforeSending = 3;
         $now = Carbon::now();
-        $waitingSecondsToSendNextEmail = 30;
+        $waitingSecondsToSendNextEmail = 10;
         
         $reservations = Reservation::
         // ->where('accept_messages', 1) // Pendiente revisar este campo. Por el momento no es necesario porque no se está utilizando esta columna (no modificar)
@@ -89,7 +89,6 @@ class SendPaymentRequest extends Command
         $counter = 0;
         foreach($reservations as $reservation) {
             try {
-                if(!in_array($reservation->client_email, ['luisf.dzay@gmail.com', 'luisdzay.extras@gmail.com', 'luisdzay.juegos@gmail.com'])) continue;
                 $bookings = $this->queryBookings("AND rez.id = $reservation->id", '', []); // Aquí se obtienen los pendientes de nuevo, para volver a validar que sigan pendientes (por el tema del sleep)
                 if( sizeof($bookings) === 0 ) continue;
                 $booking = $bookings[0];
