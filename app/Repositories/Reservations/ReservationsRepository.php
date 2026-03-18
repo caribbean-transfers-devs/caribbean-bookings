@@ -26,11 +26,12 @@ use App\Traits\MailjetTrait;
 use App\Traits\FiltersTrait;
 use App\Traits\QueryTrait;
 use App\Traits\FollowUpTrait;
+use App\Traits\LoggerTrait;
 use Illuminate\Support\Facades\Validator;
 
 class ReservationsRepository
 {
-    use MailjetTrait, FiltersTrait, QueryTrait, FollowUpTrait, ApiTrait;
+    use MailjetTrait, FiltersTrait, QueryTrait, FollowUpTrait, ApiTrait, LoggerTrait;
 
     public function update($request,$reservation)
     {
@@ -930,6 +931,20 @@ class ReservationsRepository
             );
 
             $email_response = $this->sendMailjet($email_data);
+
+            try {
+                $this->createLog([
+                    'type' => 'info',
+                    'category' => 'mailjet_debug',
+                    'message' => json_encode($email_response),
+                ]);
+            } catch(Exception $e) {
+                $this->createLog([
+                    'type' => 'error',
+                    'category' => 'mailjet_debug',
+                    'exception' => $e,
+                ]);
+            }
 
             if(isset($email_response['Messages'][0]['Status']) && $email_response['Messages'][0]['Status'] == "success") {
                 $this->create_followUps($item->reservation_id, 'El usuario: '.auth()->user()->name.", a enviado E-mail (solicitúd de pago) para la reservación: ".$item->reservation_id, 'INTERN', 'SISTEMA');
