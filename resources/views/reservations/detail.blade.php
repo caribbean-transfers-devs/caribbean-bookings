@@ -1011,4 +1011,5 @@
     <x-modals.reservations.confirmation :reservation=$reservation />
     <x-modals.reservations.confirmation :reservation=$reservation />
     <x-modals.reservations.edit_item_comment />
+    <x-modals.reservations.payment_link_amount />
 @endsection

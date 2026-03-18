@@ -115,4 +115,10 @@ class ReservationsController extends Controller
             return $this->DetailRepository->getMedia($request);
         }
     }
+
+    public function paymentLink(Request $request){
+        if($this->hasPermission(61)){
+            return $this->DetailRepository->paymentLink($request);
+        }
+    }
 }

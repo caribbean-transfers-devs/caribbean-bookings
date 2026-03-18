@@ -763,24 +763,38 @@ document.addEventListener("DOMContentLoaded", function() {
         if (event.target.classList.contains('paymentLink')) {
             event.preventDefault();
 
-            // Definir parámetros de la petición
-            const target     = event.target;
+            const target = event.target;
             const { reservation, email, language, type } = target.dataset;
-            
-            let URL = `https://caribbean-transfers.com/easy-payment?code=${reservation}&email=${email}&language=${language}&type=${type}`;
-            if(language == "es"){
-                URL = `https://caribbean-transfers.com/es/easy-payment?code=${reservation}&email=${email}&language=${language}&type=${type}`;
-            }
 
-            navigator.clipboard.writeText(URL).then(function() {
-                Swal.fire({
-                    title: '¡Éxito!',
-                    icon: 'success',
-                    html: `Se ha copiado la URL (${language}) al porta papeles`,
-                })            
-            }).catch(function(error) {
-                console.error('Error al copiar el texto al portapapeles: ', error);
-            });            
+            Swal.fire({
+                html: '¿Deseas agregar un monto personalizado al link de pago?',
+                icon: 'question',
+                showDenyButton: true,
+                confirmButtonText: 'Sí',
+                denyButtonText: 'No',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Poblar los campos ocultos del modal
+                    document.getElementById('pl_code').value     = reservation;
+                    document.getElementById('pl_email').value    = email;
+                    document.getElementById('pl_language').value = language;
+                    document.getElementById('pl_type').value     = type;
+
+                    // Preseleccionar moneda de la reserva y limpiar monto
+                    const plCurrency = document.getElementById('pl_currency');
+                    plCurrency.value    = rez_currency;
+                    plCurrency.disabled = (type === 'STRIPE');
+                    document.getElementById('pl_amount').value = '';
+                    document.getElementById('pl_amount').classList.remove('is-invalid');
+
+                    const modal = new bootstrap.Modal(document.getElementById('paymentLinkAmountModal'));
+                    modal.show();
+                } else if (result.isDenied) {
+                    generatePaymentLink({ code: reservation, email, language, type });
+                }
+            });
         }
         
         //PERMITE CALIFICAR LA RESERVACION
@@ -2137,3 +2151,76 @@ if( document.querySelectorAll(".pdf-lightbox") != null ){
     //     }
     // });
 }
+
+// ===== Payment Link =====
+
+function generatePaymentLink(params) {
+    Swal.fire({
+        title: 'Generando link...',
+        text: 'Por favor, espera mientras se genera el link de pago.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    fetch(_LOCAL_URL + '/reservations/create-payment-link', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify(params)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err; });
+        }
+        return response.json();
+    })
+    .then(data => {
+        return navigator.clipboard.writeText(data.link).then(() => {
+            Swal.fire({
+                title: '¡Éxito!',
+                icon: 'success',
+                html: `Se ha copiado la URL (${params.language}) al porta papeles`,
+            });
+        });
+    })
+    .catch(error => {
+        Swal.fire(
+            '¡ERROR!',
+            error.message || 'No se pudo obtener el link de pago',
+            'error'
+        );
+    });
+}
+
+document.getElementById('btn_confirm_payment_link').addEventListener('click', function () {
+    const amountInput    = document.getElementById('pl_amount');
+    const currency       = document.getElementById('pl_currency').value;
+    const amount         = parseFloat(amountInput.value);
+    const minAmount      = currency === 'USD' ? 1 : 20;
+    const feedbackEl     = document.getElementById('pl_amount_feedback');
+
+    if (!amountInput.value || isNaN(amount) || amount < minAmount) {
+        feedbackEl.textContent = `El monto mínimo es ${currency === 'USD' ? '$1 USD' : '$20 MXN'}.`;
+        amountInput.classList.add('is-invalid');
+        return;
+    }
+    amountInput.classList.remove('is-invalid');
+
+    const params = {
+        code:     document.getElementById('pl_code').value,
+        email:    document.getElementById('pl_email').value,
+        language: document.getElementById('pl_language').value,
+        type:     document.getElementById('pl_type').value,
+        currency: document.getElementById('pl_currency').value,
+        amount:   amount,
+    };
+
+    bootstrap.Modal.getInstance(document.getElementById('paymentLinkAmountModal')).hide();
+    generatePaymentLink(params);
+});

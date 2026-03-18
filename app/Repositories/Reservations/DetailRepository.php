@@ -14,6 +14,9 @@ use App\Models\ReservationsMedia;
 use App\Traits\ApiTrait;
 use App\Traits\FiltersTrait;
 
+use App\Models\ReservationsItem;
+use App\Models\PaymentLink;
+
 class DetailRepository
 {
     use ApiTrait, FiltersTrait;
@@ -308,5 +311,57 @@ class DetailRepository
         $media = $query->get();
 
         return view('reservations.media', compact('media'));
+    }
+
+    public function paymentLink($request){
+        $request->validate([
+            'code' => ['required', 'string'],
+            'email' => ['required', 'string'],
+            'language' => ['required', 'in:en,es'],
+            'type' => 'required|string|in:STRIPE,PAYPAL-V3,OPENPAY',
+            'currency' => ['nullable', 'in:MXN,USD'],
+            'amount' => ['nullable', 'numeric'],
+        ]);
+
+        $link_code = $this->generateLinkCode();
+        $link = env('MAIN_CT_SITE_URL', 'https://caribbean-transfers.com');
+        if($request->language === 'es') $link .= "/es";
+        $link .= "/payment-link/$link_code";
+
+        $reservation_item = ReservationsItem::where('code', $request->code)->first();
+        if(!$reservation_item) throw new Exception('No se encontró la reservación');
+        
+        $payment_link = new PaymentLink();
+        $payment_link->reservation_id = $reservation_item->reservation_id;
+        $payment_link->link_code = $link_code;
+        $payment_link->code = $request->code;
+        $payment_link->email = $request->email;
+        $payment_link->language = $request->language;
+        $payment_link->type = $request->type;
+        $payment_link->link = $link;
+        if( $request->currency && $request->amount ) {
+            $payment_link->currency = $request->currency;
+            $payment_link->amount = $request->amount;
+        }
+        $payment_link->save();
+
+        return $payment_link;
+    }
+
+    function generateLinkCode(int $length = 9){
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+
+        do {
+            $bytes = random_bytes($length);
+            $code = '';
+
+            for ($i = 0; $i < $length; $i++) {
+                $code .= $characters[ord($bytes[$i]) % $charactersLength];
+            }
+
+        } while (PaymentLink::where('link_code', $code)->exists());
+
+        return $code;
     }
 }
