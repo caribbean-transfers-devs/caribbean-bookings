@@ -302,7 +302,7 @@ class DetailRepository
     public function getMedia($request)
     {
         $query = ReservationsMedia::where('reservation_id', $request->id)
-            ->orderBy('id', 'desc');
+            ->orderByRaw('CASE WHEN `order` IS NULL THEN 1 ELSE 0 END, `order` ASC, id DESC');
 
         if (isset($request->type)) {
             $query->where('type_media', 'OPERATION');
@@ -346,6 +346,22 @@ class DetailRepository
         $payment_link->save();
 
         return $payment_link;
+    }
+
+    public function reorderMedia($request)
+    {
+        $request->validate([
+            'order'           => 'required|array',
+            'order.*.id'      => 'required|integer',
+            'order.*.order'   => 'required|integer',
+        ]);
+
+        foreach ($request->order as $item) {
+            ReservationsMedia::where('id', $item['id'])
+                ->update(['order' => $item['order']]);
+        }
+
+        return response()->json(['success' => true]);
     }
 
     function generateLinkCode(int $length = 9){

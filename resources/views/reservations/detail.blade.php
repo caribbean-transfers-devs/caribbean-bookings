@@ -64,10 +64,31 @@
             font-weight: bold;
             color: #ff5757;
         }
+
+        .order-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 10;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            pointer-events: none;
+            backdrop-filter: blur(2px);
+        }
     </style>
 @endpush
 
 @push('Js')
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
     <script>
         const rez_id = {{ isset($reservation->id) ? $reservation->id : 0 }};
         const payment_request_sent = {{ isset($reservation->payment_request_sent) ? $reservation->payment_request_sent : 0 }};
@@ -969,7 +990,20 @@
                                 </form>
                             @endif
                             @if (auth()->user()->hasPermission(65))
-                                <div class="image-listing" id="media-listing"></div>
+                                @if (auth()->user()->hasPermission(66))
+                                    <div class="d-flex align-items-center gap-2 mb-2 mt-2">
+                                        <button id="btn-toggle-sort" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-sort"></i> Reordenar imágenes
+                                        </button>
+                                        <div id="sort-controls" style="display:none;" class="d-flex align-items-center gap-2">
+                                            <button id="btn-save-order" class="btn btn-sm btn-success">
+                                                <i class="fas fa-save me-1"></i> Guardar orden
+                                            </button>
+                                            <span class="text-muted small">Arrastra las imágenes para reordenarlas</span>
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="image-listing" id="media-listing" data-can-reorder="{{ auth()->user()->hasPermission(66) ? 'true' : 'false' }}"></div>
                             @endif
                         </div>
                     @endif

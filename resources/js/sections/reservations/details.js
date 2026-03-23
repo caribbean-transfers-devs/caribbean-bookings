@@ -1924,8 +1924,112 @@ function loadContent() {
         if (status == "error") {
             $('#media-listing').html('Error al cargar el contenido');
         }
+        initSortable();
     });
 }
+
+function updateOrderBadges() {
+    $('#media-listing .item').each(function(index) {
+        $(this).find('.order-badge').text(index + 1);
+    });
+}
+
+function initSortable() {
+    if ($('#media-listing').data('can-reorder')) {
+        if ($('#media-listing').data('ui-sortable')) {
+            $('#media-listing').sortable('destroy');
+        }
+        $('#media-listing').sortable({
+            items: '> .item',
+            cursor: 'grabbing',
+            opacity: 0.75,
+            disabled: true,
+            change: function(event, ui) {
+                var pos = 1;
+                $('#media-listing').children().each(function() {
+                    if ($(this).hasClass('ui-sortable-placeholder')) {
+                        ui.item.find('.order-badge').text(pos);
+                        pos++;
+                    } else if ($(this).hasClass('item')) {
+                        $(this).find('.order-badge').text(pos);
+                        pos++;
+                    }
+                });
+            },
+            stop: function() {
+                updateOrderBadges();
+            },
+        });
+    }
+}
+
+var _originalOrder = [];
+
+$(document).on('click', '#btn-toggle-sort', function() {
+    var $sortable = $('#media-listing');
+    if (!$sortable.data('ui-sortable')) {
+        initSortable();
+    }
+    var isDisabled = $sortable.sortable('option', 'disabled');
+
+    if (isDisabled) {
+        // Activar: guardar orden actual antes de empezar
+        _originalOrder = $('#media-listing .item').map(function() {
+            return this;
+        }).get();
+
+        $sortable.sortable('option', 'disabled', false);
+        $('#sort-controls').show();
+        $(this).removeClass('btn-outline-secondary').addClass('btn-warning');
+        $(this).html('<i class="fas fa-times"></i> Cancelar reordenamiento');
+    } else {
+        // Cancelar: restaurar orden original
+        $.each(_originalOrder, function(i, item) {
+            $sortable.append(item);
+        });
+        updateOrderBadges();
+
+        $sortable.sortable('option', 'disabled', true);
+        $('#sort-controls').hide();
+        $(this).removeClass('btn-warning').addClass('btn-outline-secondary');
+        $(this).html('<i class="fas fa-sort"></i> Reordenar imágenes');
+    }
+});
+
+$(document).on('click', '#btn-save-order', function() {
+    var orderData = [];
+    $('#media-listing .item').each(function(index) {
+        orderData.push({ id: $(this).data('id'), order: index + 1 });
+    });
+
+    Swal.fire({
+        title: 'Guardando orden...',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: function() { Swal.showLoading(); }
+    });
+
+    $.ajax({
+        url: '/reservations/upload/reorder',
+        type: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            order: orderData
+        },
+        success: function() {
+            $('#media-listing').sortable('option', 'disabled', true);
+            $('#sort-controls').hide();
+            $('#btn-toggle-sort')
+                .removeClass('btn-warning').addClass('btn-outline-secondary')
+                .html('<i class="fas fa-sort"></i> Reordenar imágenes');
+
+            Swal.fire({ title: 'Orden guardado', icon: 'success', timer: 1500, showConfirmButton: false });
+        },
+        error: function() {
+            Swal.fire({ title: 'Error', text: 'No se pudo guardar el orden', icon: 'error' });
+        }
+    });
+});
 
 loadContent();
 

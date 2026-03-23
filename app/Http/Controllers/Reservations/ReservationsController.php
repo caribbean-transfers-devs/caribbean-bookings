@@ -116,6 +116,12 @@ class ReservationsController extends Controller
         }
     }
 
+    public function reorderMedia(Request $request){
+        if($this->hasPermission(66)){
+            return $this->DetailRepository->reorderMedia($request);
+        }
+    }
+
     public function paymentLink(Request $request){
         if($this->hasPermission(61)){
             return $this->DetailRepository->paymentLink($request);

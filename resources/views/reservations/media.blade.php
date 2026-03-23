@@ -6,7 +6,7 @@
             $extension = pathinfo($value->url, PATHINFO_EXTENSION);
         @endphp
 
-        <div class="item">
+        <div class="item" data-id="{{ $value->id }}">
             @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
                 <img src="{{ $value->url }}" alt="{{ $value->path }}">
             @elseif(strtolower($extension) == 'pdf')
@@ -21,6 +21,7 @@
                 <a href="{{ $value->url }}" class="pdf-lightbox" href="{{ $value->url }}" data-title="{{ $value->path }}"></a>
             @endif
 
+            <span class="order-badge">{{ $key + 1 }}</span>
             <div class="content-top">
                 <div class="btn_">
                     {{-- PERMITE ELIMINAR UNA IMAGEN --}}
@@ -31,8 +32,8 @@
                     <?=auth()->user()->renderCategoryPicture($value->type_media)?>
                     @if ($value->text)
                         <button class="btn btn-primary btn-sm">{{ $value->text }}</button>
-                    @endif                    
-                </div>                    
+                    @endif
+                </div>
             </div>
             <div class="content-bottom">
                 <p>{{ $value->path }}</p>

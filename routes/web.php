@@ -377,6 +377,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         
         Route::post('/reservations/payment-request',                                    [DETAILS_RESERVATION::class, 'paymentRequest'])->name('reservations.paymentRequest');
         Route::post('/reservations/upload',                                             [DETAILS_RESERVATION::class, 'uploadMedia'])->name('reservations.upload');
+        Route::post('/reservations/upload/reorder',                                     [DETAILS_RESERVATION::class, 'reorderMedia'])->name('reservations.upload.reorder');
         Route::get('/reservations/upload/{id}',                                         [DETAILS_RESERVATION::class, 'getMedia'])->name('reservations.upload.getmedia');
         Route::delete('/reservations/upload/{id}',                                      [DETAILS_RESERVATION::class, 'deleteMedia'])->name('reservations.upload.deleteMedia');
         Route::post('/reservations/create-payment-link',                                [DETAILS_RESERVATION::class, 'paymentLink'])->name('reservations.paymentLink');
