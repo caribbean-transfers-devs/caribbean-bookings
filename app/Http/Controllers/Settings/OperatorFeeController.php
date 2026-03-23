@@ -22,12 +22,13 @@ class OperatorFeeController extends Controller
         $zones = Zones::select('id', 'name')->get()->map(function($zone) {
             return [
                 'id' => $zone->id,
+                'composite_id' => 'interno_' . $zone->id,
                 'name' => $zone->name,
                 'type' => 'internal',
                 'enterprise' => 'Caribbean Transfers'
             ];
         });
-    
+
         $enterpriseZones = ZonesEnterprise::select('id', 'enterprise_id', 'name')
                             ->whereHas('enterprise', function($query) {
                                 $query->where('type_enterprise', 'CUSTOMER');
@@ -37,6 +38,7 @@ class OperatorFeeController extends Controller
                             }])->get()->map(function($zone) {
             return [
                 'id' => $zone->id,
+                'composite_id' => 'cliente_' . $zone->id,
                 'name' => $zone->name,
                 'type' => 'customer',
                 'enterprise' => $zone->enterprise ? $zone->enterprise->names : null
@@ -113,8 +115,8 @@ class OperatorFeeController extends Controller
             'commission_percentage' => 'required|numeric|min:0|max:100',
             'zone_ids' => 'required|array',
             'zone_ids.*' => [
-                'integer',
-                    Rule::unique('operator_fees', 'zone_ids->*')->where(function ($query) {
+                'string',
+                Rule::unique('operator_fees', 'zone_ids->*')->where(function ($query) {
                     return $query->whereNotNull('zone_ids');
                 })
             ]
@@ -167,7 +169,7 @@ class OperatorFeeController extends Controller
             'commission_percentage' => 'required|numeric|min:0|max:100',
             'zone_ids' => 'required|array',
             'zone_ids.*' => [
-                'integer',
+                'string',
                 Rule::unique('operator_fees', 'zone_ids->*')
                     ->where(function ($query) {
                         return $query->whereNotNull('zone_ids');

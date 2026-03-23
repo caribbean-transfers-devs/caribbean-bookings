@@ -97,9 +97,9 @@
                                     <label for="zone_ids">Zonas (IDs):</label>
                                     <select name="zone_ids[]" id="zone_ids" class="form-control select2" multiple required>
                                         @foreach($allZones as $zone)
-                                            <option {{ in_array($zone['id'], $operatorFee->zone_ids ?? []) ? 'selected' : '' }} value="{{ $zone['id'] }}" data-type="{{ $zone['type'] }}">
+                                            <option {{ in_array($zone['composite_id'], $operatorFee->zone_ids ?? []) ? 'selected' : '' }} value="{{ $zone['composite_id'] }}" data-type="{{ $zone['type'] }}">
                                                 {{ $zone['name'] }} - {{ $zone['enterprise'] }} - ({{ $zone['type'] == 'internal' ? 'Interno' : 'Cliente' }})
-                                            </option>                                                
+                                            </option>
                                         @endforeach
                                     </select>
                                     <small class="form-text text-muted">Selecciona las zonas que tendrán este mismo costo operativo.</small>

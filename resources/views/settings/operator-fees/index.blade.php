@@ -73,7 +73,7 @@
                                     <div class="zones-tags">
                                         @foreach($fee->zone_ids as $zoneId)
                                             @php
-                                                $zone = $allZones->firstWhere('id', $zoneId);
+                                                $zone = $allZones->firstWhere('composite_id', $zoneId);
                                             @endphp
                                             @if($zone)
                                                 <span class="zone-tag {{ $zone['type'] }}">

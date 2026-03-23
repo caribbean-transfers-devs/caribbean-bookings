@@ -32,8 +32,8 @@ class OperatorFee extends Model
         return $this->base_amount * ($this->commission_percentage / 100);
     }
 
-    public static function getByZoneId($zoneId)
+    public static function getByZoneId($compositeId)
     {
-        return static::whereJsonContains('zone_ids', (string)$zoneId)->first();
+        return static::whereJsonContains('zone_ids', $compositeId)->first();
     }    
 }
