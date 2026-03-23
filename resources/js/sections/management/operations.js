@@ -206,7 +206,7 @@ let setup = {
         _settings.oLanguage = {
             "sProcessing": "Procesando...",
             "sZeroRecords": "No se encontraron resultados",             
-            "sInfo": "Mostrando _TOTAL_ registros",
+            "sInfo": 'Mostrando <strong style="font-size: 20px;">_TOTAL_</strong> registros',
             "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
             "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
             "sSearchPlaceholder": components.getTranslation("table.search") + "...",
