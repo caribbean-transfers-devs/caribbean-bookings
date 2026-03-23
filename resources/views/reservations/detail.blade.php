@@ -142,30 +142,38 @@
         </script>
     @endif
     <script>
-        function searchOne(){
-            $("#iframeOneContainer").empty();
+        function loadPdfIntoContainer(containerId, type) {
+            var container = document.getElementById(containerId);
+            container.innerHTML = '<p class="text-muted p-3">Cargando PDF...</p>';
 
-            var iframe = document.createElement('iframe');
-            iframe.id = 'pdfIframe';
-            iframe.width = '100%';
-            iframe.height = '700px';
-            iframe.style.border = '1px solid #ddd';
-            iframe.src = '/reports/ccform/pdf?type=arrival&id='+rez_id;
-        
-            document.getElementById('iframeOneContainer').appendChild(iframe);
+            fetch('/reports/ccform/pdf?type=' + type + '&id=' + rez_id, {
+                credentials: 'same-origin'
+            })
+            .then(function(response) {
+                if (!response.ok) throw new Error('Error ' + response.status);
+                return response.blob();
+            })
+            .then(function(blob) {
+                var blobUrl = URL.createObjectURL(blob);
+                var iframe = document.createElement('iframe');
+                iframe.width = '100%';
+                iframe.height = '700px';
+                iframe.style.border = '1px solid #ddd';
+                iframe.src = blobUrl;
+                container.innerHTML = '';
+                container.appendChild(iframe);
+            })
+            .catch(function() {
+                container.innerHTML = '<p class="text-danger p-3">No se pudo cargar el PDF. Verifica tu sesión e intenta de nuevo.</p>';
+            });
+        }
+
+        function searchOne(){
+            loadPdfIntoContainer('iframeOneContainer', 'arrival');
         }
 
         function searchTwo(){
-            $("#iframeTwoContainer").empty();
-
-            var iframe = document.createElement('iframe');
-            iframe.id = 'pdfIframe';
-            iframe.width = '100%';
-            iframe.height = '700px';
-            iframe.style.border = '1px solid #ddd';
-            iframe.src = '/reports/ccform/pdf?type=departure&id='+rez_id;
-        
-            document.getElementById('iframeTwoContainer').appendChild(iframe);
+            loadPdfIntoContainer('iframeTwoContainer', 'departure');
         }
 
         lightGallery(document.getElementById('media-listing'), {
