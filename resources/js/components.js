@@ -131,7 +131,7 @@ let components = {
         };
         _settings.infoCallback = function(settings, start, end, max, total, pre) {
             // Siempre muestra "Mostrando _TOTAL_ registros" independientemente del total
-            return `Mostrando ${total} registros`;
+            return `Mostrando <strong style="font-size: 20px;">${total}</strong> registros`;
         };
 
         __table_render = table.DataTable( _settings );        
