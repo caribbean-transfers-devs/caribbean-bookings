@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     if (document.querySelector('.table-rendering') != null) {
-        components.actionTable($('.table-rendering'), 'fixedheader');
+        components.actionTable($('.table-rendering'), 'fixedheaderPagination');
+        __table_render.page.len(10).draw();
     }
     components.formReset();
 
