@@ -57,6 +57,7 @@ use App\Http\Controllers\Settings\RatesEnterpriseController as      RATES_ENTERP
 use App\Http\Controllers\Settings\TypesCancellationsController as   TYPES_CANCELLATIONS;
 use App\Http\Controllers\Settings\TypesSalesController as           TYPES_SALES;
 use App\Http\Controllers\Settings\OperatorFeeController as          OPERATORFEE;
+use App\Http\Controllers\Settings\ScheduleRestrictionsController as SCHEDULE_RESTRICTIONS;
 
 //DETAILS RESERVATION
 use App\Http\Controllers\Reservations\ReservationsController as     DETAILS_RESERVATION;
@@ -343,6 +344,14 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
         Route::get('/config/exchange-reports/{exchage}/edit',                           [EXCHANGE_REPORTS::class, 'edit'])->name('exchanges.edit');
         Route::put('/config/exchange-reports/{exchage}',                                [EXCHANGE_REPORTS::class, 'update'])->name('exchanges.update');
         Route::delete('/config/exchange-reports/{exchage}',                             [EXCHANGE_REPORTS::class, 'destroy'])->name('exchanges.destroy');
+
+        //SCHEDULE RESTRICTIONS
+        Route::get('/config/schedule-restrictions',               [SCHEDULE_RESTRICTIONS::class, 'index'])->name('config.schedule-restrictions.index');
+        Route::get('/config/schedule-restrictions/create',        [SCHEDULE_RESTRICTIONS::class, 'create'])->name('config.schedule-restrictions.create');
+        Route::post('/config/schedule-restrictions',              [SCHEDULE_RESTRICTIONS::class, 'store'])->name('config.schedule-restrictions.store');
+        Route::get('/config/schedule-restrictions/{id}/edit',     [SCHEDULE_RESTRICTIONS::class, 'edit'])->name('config.schedule-restrictions.edit');
+        Route::put('/config/schedule-restrictions/{id}',          [SCHEDULE_RESTRICTIONS::class, 'update'])->name('config.schedule-restrictions.update');
+        Route::delete('/config/schedule-restrictions/{id}',       [SCHEDULE_RESTRICTIONS::class, 'destroy'])->name('config.schedule-restrictions.destroy');
 
         //TYPES CANCELLATIONS
         Route::get('/config/types-cancellations',                                       [TYPES_CANCELLATIONS::class, 'index'])->name('config.types-cancellations.index');
