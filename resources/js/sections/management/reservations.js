@@ -146,6 +146,48 @@ document.addEventListener("DOMContentLoaded", function() {
     components.formReset();
     components.renderCheckboxColumns('dataBookings', 'columns');
     components.setValueSelectpicker();
+
+    // Filtro rápido: Canceladas / Duplicadas
+    const btnFilterCD = document.getElementById('btn_filter_cancelled_duplicated');
+    if (btnFilterCD) {
+        btnFilterCD.addEventListener('click', function () {
+            $('#reservation_status').selectpicker('val', ['CANCELLED', 'DUPLICATED']);
+            document.getElementById('formSearch').submit();
+        });
+    }
+
+    // Selección múltiple para eliminación de reservas
+    const selectAllBookings = document.getElementById('select-all-bookings');
+    const btnDeleteSelected = document.getElementById('btn_delete_selected');
+
+    function updateDeleteButton() {
+        if (!btnDeleteSelected) return;
+        const checked = document.querySelectorAll('.row-check-booking:checked');
+        btnDeleteSelected.classList.toggle('d-none', checked.length === 0);
+    }
+
+    if (selectAllBookings) {
+        selectAllBookings.addEventListener('change', function () {
+            document.querySelectorAll('.row-check-booking').forEach(cb => {
+                cb.checked = this.checked;
+            });
+            updateDeleteButton();
+        });
+    }
+
+    const bookingsTbody = document.querySelector('#dataBookings tbody');
+    if (bookingsTbody) {
+        bookingsTbody.addEventListener('change', function (event) {
+            if (event.target.classList.contains('row-check-booking')) {
+                if (selectAllBookings) {
+                    const all = document.querySelectorAll('.row-check-booking');
+                    const checked = document.querySelectorAll('.row-check-booking:checked');
+                    selectAllBookings.checked = all.length === checked.length;
+                }
+                updateDeleteButton();
+            }
+        });
+    }
     
     // Iniciar cuando el DOM esté listo
     inicializarAutoRecarga();

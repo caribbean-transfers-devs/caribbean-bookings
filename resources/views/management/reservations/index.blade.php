@@ -70,6 +70,14 @@
                 )
             ),
             array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"></path></svg> Canceladas / Duplicadas',
+                'className' => 'btn btn-warning __btn_filter_cd',
+                'attr' => array(
+                    'id' => 'btn_filter_cancelled_duplicated',
+                    'title' => 'Filtrar reservas canceladas o duplicadas',
+                )
+            ),
+            array(
                 'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" name="layout-columns" class=""><path fill="" fill-rule="evenodd" d="M7 5a2 2 0 00-2 2v10a2 2 0 002 2h1V5H7zm3 0v14h4V5h-4zm6 0v14h1a2 2 0 002-2V7a2 2 0 00-2-2h-1zM3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" clip-rule="evenodd"></path></svg> Administrar columnas',
                 'titleAttr' => 'Administrar columnas',
                 'className' => 'btn btn-primary __btn_columns',
@@ -78,10 +86,20 @@
                     'data-bs-toggle' => 'modal',
                     'data-bs-target' => '#columnsModal',
                     'data-table' => 'bookings',// EL ID DE LA TABLA QUE VAMOS A OBTENER SUS HEADERS
-                    'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS                    
-                )                
-            ),            
+                    'data-container' => 'columns', //EL ID DEL DIV DONDE IMPRIMIREMOS LOS CHECKBOX DE LOS HEADERS
+                )
+            ),
         );
+
+        if ( in_array(auth()->user()->email, $allowed_emails_for_res_deletion) ) {
+            $buttons[] = array(
+                'text' => '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg> Eliminar reservas',
+                'className' => 'btn btn-danger d-none',
+                'attr' => array(
+                    'id' => 'btn_delete_selected',
+                )
+            );
+        }
     @endphp
     <div class="row layout-top-spacing">
         @if ($errors->any())
@@ -123,6 +141,13 @@
                         <table id="dataBookings" class="table table-bookings dt-table-hover" style="width:100%" data-button='<?=json_encode($buttons)?>'>
                             <thead>
                                 <tr>
+                                    @if ( in_array(auth()->user()->email, $allowed_emails_for_res_deletion) )
+                                        <th class="text-center">
+                                            <div class="form-check form-check-primary">
+                                                <input class="form-check-input chk-parent" type="checkbox" id="select-all-bookings">
+                                            </div>
+                                        </th>
+                                    @endif
                                     <th class="text-center">ID</th>
                                     <th class="text-center">INDICADORES</th>
                                     <th class="text-center">TIPO DE SERVICIO</th>
@@ -171,6 +196,13 @@
                                             // }                                            
                                         @endphp
                                         <tr class="{{ ( $item->is_today != 0 ? 'bs-tooltip' : '' ) }}" title="{{ ( $item->is_today != 0 ? 'Es una reserva que se opera el mismo día en que se creo #: '.$item->reservation_id : '' ) }}" style="{{ $background_identifier }}" data-reservation="{{ $item->reservation_id }}" data-is_round_trip="{{ $item->is_round_trip }}">
+                                            @if ( in_array(auth()->user()->email, $allowed_emails_for_res_deletion) )
+                                                <td class="text-center">
+                                                    <div class="form-check form-check-primary">
+                                                        <input class="form-check-input chk-chk row-check-booking" type="checkbox" value="{{ $item->reservation_id }}">
+                                                    </div>
+                                                </td>
+                                            @endif
                                             <td class="text-center">{{ $item->reservation_id }}</td>
                                             <td class="text-center">
                                                 @if ($item->is_same_day_round_trip)                                                                                                
