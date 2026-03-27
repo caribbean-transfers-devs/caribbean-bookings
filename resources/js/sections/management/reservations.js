@@ -188,6 +188,121 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+
+    // Modal de eliminación múltiple
+    const confirmDeleteInput  = document.getElementById('confirm-delete-input');
+    const confirmBulkDeleteBtn = document.getElementById('confirm-bulk-delete-btn');
+    const bulkDeleteModal     = document.getElementById('bulkDeleteReservationsModal')
+                                    ? new bootstrap.Modal(document.getElementById('bulkDeleteReservationsModal'))
+                                    : null;
+
+    if (btnDeleteSelected && bulkDeleteModal) {
+        btnDeleteSelected.addEventListener('click', function () {
+            const checkedBoxes = document.querySelectorAll('.row-check-booking:checked');
+            const tbody = document.getElementById('bulk-delete-table-body');
+            const countEl = document.getElementById('bulk-delete-count');
+
+            tbody.innerHTML = '';
+
+            checkedBoxes.forEach(cb => {
+                const row = cb.closest('tr');
+                const tds = row.querySelectorAll('td');
+
+                // Índices: [0]=checkbox [1]=ID [4]=Código [7]=Fecha [12]=Estatus [13]=Cliente [19]=Total [21]=Moneda
+                const id       = tds[1]  ? tds[1].textContent.trim()  : '';
+                const codigoParts = tds[4] ? Array.from(tds[4].querySelectorAll('p')).map(p => p.textContent.trim()) : [];
+                const codigo = codigoParts.length > 0 ? codigoParts.join('<br>') : (tds[4] ? tds[4].textContent.trim() : '');
+                const cliente  = tds[13] ? tds[13].textContent.trim() : '';
+                const fecha    = tds[7]  ? tds[7].textContent.trim()  : '';
+                const estatus  = tds[12] ? tds[12].querySelector('button')?.textContent.trim() ?? tds[12].textContent.trim() : '';
+                const total    = tds[19] ? tds[19].textContent.trim() : '';
+                const moneda   = tds[21] ? tds[21].textContent.trim() : '';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center">${id}</td>
+                    <td class="text-center">${codigo}</td>
+                    <td class="text-center">${cliente}</td>
+                    <td class="text-center">${fecha}</td>
+                    <td class="text-center">${estatus}</td>
+                    <td class="text-center">${total} ${moneda}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            countEl.textContent = checkedBoxes.length;
+
+            if (confirmDeleteInput) {
+                confirmDeleteInput.value = '';
+            }
+            if (confirmBulkDeleteBtn) {
+                confirmBulkDeleteBtn.disabled = true;
+            }
+
+            bulkDeleteModal.show();
+        });
+    }
+
+    if (confirmDeleteInput && confirmBulkDeleteBtn) {
+        confirmDeleteInput.addEventListener('input', function () {
+            confirmBulkDeleteBtn.disabled = this.value.trim() !== 'eliminar';
+        });
+    }
+
+    if (confirmBulkDeleteBtn) {
+        confirmBulkDeleteBtn.addEventListener('click', async function () {
+            const checkedBoxes = document.querySelectorAll('.row-check-booking:checked');
+            const ids = Array.from(checkedBoxes).map(cb => cb.value);
+
+            if (ids.length === 0) return;
+
+            confirmBulkDeleteBtn.disabled = true;
+            confirmBulkDeleteBtn.textContent = 'Procesando...';
+
+            try {
+                let res = await fetch('/reservations/delete-reservations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({ ids }),
+                });
+                res = await res.json();
+
+                bulkDeleteModal.hide();
+
+                let html = '';
+
+                if (res.deleted && res.deleted.length > 0) {
+                    html += `<p class="text-success fw-bold">${res.deleted.length} reserva(s) eliminada(s) correctamente:</p>`;
+                    html += `<p>${res.deleted.map(id => '#' + id).join(', ')}</p>`;
+                }
+
+                if (res.failed && res.failed.length > 0) {
+                    html += `<p class="text-danger fw-bold mt-2">❌ ${res.failed.length} reserva(s) no pudieron eliminarse:</p>`;
+                    html += '<table class="table table-sm table-bordered mt-1"><thead><tr><th>ID</th><th>Motivo</th></tr></thead><tbody>';
+                    res.failed.forEach(f => {
+                        html += `<tr><td>#${f.id}</td><td>${f.reason}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+
+                Swal.fire({
+                    icon: res.status,
+                    title: res.deleted?.length > 0 ? 'Proceso completado' : 'Sin cambios',
+                    html: html,
+                    allowOutsideClick: false,
+                }).then(() => {
+                    if (res.deleted && res.deleted.length > 0) location.reload();
+                });
+
+            } catch (e) {
+                bulkDeleteModal.hide();
+                Swal.fire('¡ERROR!', e.message || 'Ocurrió un error', 'error');
+            }
+        });
+    }
     
     // Iniciar cuando el DOM esté listo
     inicializarAutoRecarga();

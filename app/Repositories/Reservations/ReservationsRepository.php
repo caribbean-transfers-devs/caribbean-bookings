@@ -164,6 +164,60 @@ class ReservationsRepository
         }
     }
 
+    public function deleteReservations($request){
+        $ids     = $request->ids ?? [];
+        $deleted = [];
+        $failed  = [];
+
+        foreach ($ids as $id) {
+            try {
+                $reservation = Reservation::find($id);
+
+                if (!$reservation) {
+                    $failed[] = ['id' => $id, 'reason' => 'Reserva no encontrada'];
+                    continue;
+                }
+
+                $hasCompletedItems = $reservation->items()->where(function ($query) {
+                    $query->where('op_one_status', 'COMPLETED')
+                          ->orWhere('op_two_status', 'COMPLETED');
+                })->exists();
+
+                if ($hasCompletedItems) {
+                    $failed[] = ['id' => $id, 'reason' => 'Tiene servicios con estado COMPLETADO'];
+                    continue;
+                }
+
+                $hasPayments = $reservation->payments()->exists();
+                if ($hasPayments) {
+                    $failed[] = ['id' => $id, 'reason' => 'La reservación tiene pagos'];
+                    continue;
+                }
+
+                DB::transaction(function () use ($reservation) {
+                    $reservation->followUps()->delete();
+                    $reservation->items()->delete();
+                    $reservation->photos()->delete();
+                    $reservation->sales()->withTrashed()->forceDelete();
+                    $reservation->delete();
+                });
+
+                $deleted[] = $id;
+
+            } catch (Exception $e) {
+                $failed[] = ['id' => $id, 'reason' => 'Error interno al procesar'];
+            }
+        }
+
+        $status = count($deleted) > 0 ? 'success' : 'warning';
+
+        return response()->json([
+            'status'  => $status,
+            'deleted' => $deleted,
+            'failed'  => $failed,
+        ], Response::HTTP_OK);
+    }
+
     public function get_exchange($request, $reservation){
         $currency = $request->currency;
         $to_currency = $reservation->currency;
