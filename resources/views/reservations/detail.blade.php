@@ -93,6 +93,7 @@
         const rez_id = {{ isset($reservation->id) ? $reservation->id : 0 }};
         const payment_request_sent = {{ isset($reservation->payment_request_sent) ? $reservation->payment_request_sent : 0 }};
         const rez_currency = "{{ $reservation->currency }}";
+        const rez_pending  = {{ round($data['total_sales'], 2) - round($data['total_payments'], 2) }};
     </script>    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>

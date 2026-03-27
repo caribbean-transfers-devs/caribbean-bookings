@@ -766,35 +766,22 @@ document.addEventListener("DOMContentLoaded", function() {
             const target = event.target;
             const { reservation, email, language, type } = target.dataset;
 
-            Swal.fire({
-                html: '¿Deseas agregar un monto personalizado al link de pago?',
-                icon: 'question',
-                showDenyButton: true,
-                confirmButtonText: 'Sí',
-                denyButtonText: 'No',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Poblar los campos ocultos del modal
-                    document.getElementById('pl_code').value     = reservation;
-                    document.getElementById('pl_email').value    = email;
-                    document.getElementById('pl_language').value = language;
-                    document.getElementById('pl_type').value     = type;
+            // Poblar los campos ocultos del modal
+            document.getElementById('pl_code').value     = reservation;
+            document.getElementById('pl_email').value    = email;
+            document.getElementById('pl_language').value = language;
+            document.getElementById('pl_type').value     = type;
 
-                    // Preseleccionar moneda de la reserva y limpiar monto
-                    const plCurrency = document.getElementById('pl_currency');
-                    plCurrency.value    = rez_currency;
-                    plCurrency.disabled = (type === 'STRIPE');
-                    document.getElementById('pl_amount').value = '';
-                    document.getElementById('pl_amount').classList.remove('is-invalid');
+            // Preseleccionar moneda y pre-llenar con el monto pendiente de pago
+            const plCurrency = document.getElementById('pl_currency');
+            plCurrency.value    = rez_currency;
+            plCurrency.disabled = (type === 'STRIPE');
+            const pendingAmount = Math.max(0, parseFloat(rez_pending) || 0);
+            document.getElementById('pl_amount').value = pendingAmount > 0 ? pendingAmount.toFixed(2) : '';
+            document.getElementById('pl_amount').classList.remove('is-invalid');
 
-                    const modal = new bootstrap.Modal(document.getElementById('paymentLinkAmountModal'));
-                    modal.show();
-                } else if (result.isDenied) {
-                    generatePaymentLink({ code: reservation, email, language, type });
-                }
-            });
+            const modal = new bootstrap.Modal(document.getElementById('paymentLinkAmountModal'));
+            modal.show();
         }
         
         //PERMITE CALIFICAR LA RESERVACION
