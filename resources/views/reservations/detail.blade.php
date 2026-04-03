@@ -507,6 +507,12 @@
                             Reembolsos
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#icon-tab-8" data-bs-toggle="tab" role="tab">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-truck align-middle"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                            Operación
+                        </a>
+                    </li>
                     @if (auth()->user()->hasPermission(65))
                         <li class="nav-item">
                             <a class="nav-link" href="#icon-tab-5" data-bs-toggle="tab" role="tab">
@@ -986,6 +992,67 @@
                                             </td>
                                         </tr>
                                     @endforeach                                   
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="icon-tab-8" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">PICKUP</th>
+                                        <th class="text-center">TIPO DE SERVICIO</th>
+                                        <th class="text-center">PAX</th>
+                                        <th class="text-center">ORIGEN</th>
+                                        <th class="text-center">DESTINO</th>
+                                        <th class="text-center">UNIDAD</th>
+                                        <th class="text-center">CONDUCTOR</th>
+                                        <th class="text-center">ESTATUS DE OPERACIÓN</th>
+                                        <th class="text-center">HORA OPERACIÓN</th>
+                                        <th class="text-center">COSTO OPERATIVO</th>
+                                        <th class="text-center">ESTATUS DE SERVICIO</th>
+                                        <th class="text-center">VEHÍCULO</th>
+                                        <th class="text-center">ESTATUS DE RESERVACIÓN</th>
+                                        <th class="text-center">PAGO</th>
+                                        <th class="text-center">TOTAL</th>
+                                        <th class="text-center">MÉTODOS DE PAGO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($operations ?? [] as $value)
+                                        <tr>
+                                            <td class="text-center">{{ date("Y/m/d H:i", strtotime($value->filtered_date)) }}</td>
+                                            <td class="text-center">
+                                                {{ $value->final_service_type }}
+                                                @if ($value->final_service_type == "ARRIVAL")
+                                                    <br><small>{{ $value->is_round_trip == 0 ? 'ONE WAY' : 'ROUND TRIP' }}</small>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">{{ $value->passengers }}</td>
+                                            <td class="text-center">
+                                                {{ auth()->user()->setFrom($value, "name") }}
+                                                @if (!empty($value->flight_number))
+                                                    <br><small>({{ $value->flight_number }})</small>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">{{ auth()->user()->setTo($value, "name") }}</td>
+                                            <td class="text-center">{{ auth()->user()->setOperationUnit($value) }}</td>
+                                            <td class="text-center">{{ auth()->user()->setOperationDriver($value) }}</td>
+                                            <td class="text-center"><?= auth()->user()->renderOperationStatus($value) ?></td>
+                                            <td class="text-center"><?= auth()->user()->setOperationTime($value) ?></td>
+                                            <td class="text-center"><?= auth()->user()->setOperatingCost($value) ?></td>
+                                            <td class="text-center"><?= auth()->user()->renderServiceStatusOP($value) ?></td>
+                                            <td class="text-center">{{ $value->service_type_name }}</td>
+                                            <td class="text-center">{{ auth()->user()->statusBooking($value->reservation_status) }}</td>
+                                            <td class="text-center">{{ auth()->user()->statusPayment($value->payment_status) }}</td>
+                                            <td class="text-center">
+                                                {{ number_format(($value->total_balance > 0 ? $value->total_balance : $value->total_sales), 2) }}
+                                                {{ $value->currency }}
+                                            </td>
+                                            <td class="text-center">{{ $value->payment_type_name }}</td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

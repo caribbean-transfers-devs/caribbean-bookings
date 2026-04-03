@@ -13,13 +13,14 @@ use App\Models\ReservationsMedia;
 //TRAITS
 use App\Traits\ApiTrait;
 use App\Traits\FiltersTrait;
+use App\Traits\QueryTrait;
 
 use App\Models\ReservationsItem;
 use App\Models\PaymentLink;
 
 class DetailRepository
 {
-    use ApiTrait, FiltersTrait;
+    use ApiTrait, FiltersTrait, QueryTrait;
     
     // Constantes para estados de reservación
     private const STATUS_PENDING = 'PENDING';
@@ -254,6 +255,13 @@ class DetailRepository
      */    
     protected function buildReservationDetailView($request, int $id, Reservation $reservation, array $data)
     {
+        $queryOne = " AND rez.id = {$id} AND it.op_one_pickup BETWEEN :init_date_one AND :init_date_two ";
+        $queryTwo = " AND rez.id = {$id} AND it.op_two_pickup BETWEEN :init_date_three AND :init_date_four AND it.is_round_trip = 1 ";
+        $operations = $this->queryOperations($queryOne, $queryTwo, "", [
+            'init' => '1900-01-01 00:00:00',
+            'end'  => '2099-12-31 23:59:59',
+        ]);
+
         return view('reservations.detail', [
             'breadcrumbs' => [
                 [
@@ -265,6 +273,7 @@ class DetailRepository
             'reservation' => $reservation,
             'data' => $data,
             'request' => $request->input(),
+            'operations' => $operations,
         ]);
     }
 
