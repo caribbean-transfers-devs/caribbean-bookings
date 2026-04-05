@@ -61,6 +61,7 @@ use App\Http\Controllers\Settings\ScheduleRestrictionsController as SCHEDULE_RES
 
 //DETAILS RESERVATION
 use App\Http\Controllers\Reservations\ReservationsController as     DETAILS_RESERVATION;
+use App\Http\Controllers\Reservations\ServiceOrderController as     SERVICE_ORDER;
 
 //GENERALS
 use App\Http\Controllers\Sales\SalesController;
@@ -203,6 +204,7 @@ Route::group(['middleware' => ['auth', 'Debug']], function () {
 
         Route::match(['get', 'post'], '/management/ccform',         [CCFORM::class, 'index'])->name('management.ccform');
         Route::match(['get'],         '/reports/ccform/pdf',        [CCFORM::class, 'createPDF'])->name('management.ccform.createPDF');
+        Route::match(['get'],         '/reports/service-order/pdf', [SERVICE_ORDER::class, 'createPDF'])->name('reports.service-order.pdf');
 
         Route::match(['post'], '/management/quotation/get', [QUOTATION::class, 'get'])->name('management.quotation.get'); // TRAE LAS COTIZACIONES DE AGENTE DE CALL CENTER
         Route::match(['post'], '/management/pending/get', [PENDING::class, 'get'])->name('management.pending.get'); // TRAE LAS RESERVAS PENDIENTES

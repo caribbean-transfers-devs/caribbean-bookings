@@ -20,16 +20,18 @@
 
 <style>
     .so-wrap {
-        box-sizing: border-box;
-        width: 816px;
-        min-height: 1056px;
+        width: 100%;
         background: #ffffff;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 12px;
         color: #2c2c2c;
     }
 
-    .so-wrap * {
+    .so-wrap table,
+    .so-wrap td,
+    .so-wrap th,
+    .so-wrap div,
+    .so-wrap span {
         box-sizing: border-box;
     }
 
@@ -569,9 +571,9 @@
             <div class="so-notes-body">
                 <ul class="so-notes-list">
                     @forelse($notes as $note)
-                        <li><span class="so-notes-marker">▸</span>{{ $note }}</li>
+                        <li><span class="so-notes-marker">&gt;</span>{{ $note }}</li>
                     @empty
-                        <li><span class="so-notes-marker">▸</span>Sin notas adicionales.</li>
+                        <li><span class="so-notes-marker">&gt;</span>Sin notas adicionales.</li>
                     @endforelse
                 </ul>
             </div>

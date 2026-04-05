@@ -177,6 +177,35 @@
             loadPdfIntoContainer('iframeTwoContainer', 'departure');
         }
 
+        function searchServiceOrder(){
+            var container = document.getElementById('iframeServiceOrderContainer');
+            if (container.dataset.loaded) return;
+            container.dataset.loaded = '1';
+            container.innerHTML = '<p class="text-muted p-3">Cargando PDF...</p>';
+
+            fetch('/reports/service-order/pdf', {
+                credentials: 'same-origin'
+            })
+            .then(function(response) {
+                if (!response.ok) throw new Error('Error ' + response.status);
+                return response.blob();
+            })
+            .then(function(blob) {
+                var blobUrl = URL.createObjectURL(blob);
+                var iframe = document.createElement('iframe');
+                iframe.width = '100%';
+                iframe.height = '700px';
+                iframe.style.border = '1px solid #ddd';
+                iframe.src = blobUrl;
+                container.innerHTML = '';
+                container.appendChild(iframe);
+            })
+            .catch(function() {
+                container.innerHTML = '<p class="text-danger p-3">No se pudo cargar el PDF. Verifica tu sesión e intenta de nuevo.</p>';
+                container.dataset.loaded = '';
+            });
+        }
+
         lightGallery(document.getElementById('media-listing'), {
             thumbnail: true,
         })        
@@ -542,6 +571,12 @@
                             </a>
                         </li>                        
                     @endif
+                    <li class="nav-item">
+                        <a class="nav-link" href="#icon-tab-9" data-bs-toggle="tab" role="tab" onclick="searchServiceOrder()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                            Orden de Servicio
+                        </a>
+                    </li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane services active" id="icon-tab-1" role="tabpanel">
@@ -1088,7 +1123,10 @@
                     </div>
                     <div class="tab-pane" id="icon-tab-7" role="tabpanel">
                         <div id="iframeTwoContainer"></div>
-                    </div>                   
+                    </div>
+                    <div class="tab-pane" id="icon-tab-9" role="tabpanel">
+                        <div id="iframeServiceOrderContainer"></div>
+                    </div>
                 </div>
             </div>
         </div>
