@@ -55,7 +55,7 @@
         width: 200px;
     }
 
-    .so-header-logo-cell img {
+    .so-header-logo-cell svg {
         width: 190px;
         height: auto;
         display: block;
@@ -371,8 +371,7 @@
         line-height: 1.4;
     }
 
-    .so-notes-list li::before {
-        content: '▸';
+    .so-notes-marker {
         color: #f07c3c;
         font-size: 10px;
         margin-right: 8px;
@@ -426,7 +425,7 @@
         <table class="so-header-table">
             <tr>
                 <td class="so-header-logo-cell">
-                    <img src="{{ asset('assets/img/logos/logo.svg') }}" alt="Caribbean Transfers">
+                    {!! file_get_contents(public_path('assets/img/logos/logo.svg')) !!}
                 </td>
                 <td class="so-header-doc-cell">
                     <span class="so-doc-label">Orden de Servicio</span>
@@ -570,9 +569,9 @@
             <div class="so-notes-body">
                 <ul class="so-notes-list">
                     @forelse($notes as $note)
-                        <li>{{ $note }}</li>
+                        <li><span class="so-notes-marker">▸</span>{{ $note }}</li>
                     @empty
-                        <li>Sin notas adicionales.</li>
+                        <li><span class="so-notes-marker">▸</span>Sin notas adicionales.</li>
                     @endforelse
                 </ul>
             </div>
