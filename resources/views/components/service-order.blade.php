@@ -15,8 +15,64 @@
     'carSeat'       => null,
     'booster'       => null,
     'luggage'       => null,
-    'notes'         => [],
+    'lang'          => 'es',
 ])
+
+@php
+$t = $lang === 'en' ? [
+    'doc_label'        => 'Service Order',
+    'section_booking'  => 'Booking Information',
+    'order_number'     => 'Order No.',
+    'created_at'       => 'Created Date',
+    'service_date'     => 'Service Date',
+    'service_type'     => 'Service Type',
+    'section_pax'      => 'Main Passenger',
+    'passenger_name'   => 'Passenger Name',
+    'pickup_time'      => 'Pickup Time',
+    'pickup_suffix'    => 'hrs',
+    'section_details'  => 'Service Details',
+    'provider'         => 'Provider',
+    'flight'           => 'Flight',
+    'hotel'            => 'Hotel',
+    'room'             => 'Room',
+    'section_luggage'  => 'Passengers & Luggage',
+    'adults'           => 'Adults',
+    'minors'           => 'Minors',
+    'infants'          => 'Infants',
+    'car_seat'         => 'Car Seat',
+    'booster'          => 'Booster',
+    'luggage'          => 'Luggage',
+    'section_notes'    => 'Important Notes',
+    'footer_text'      => 'This document is a service order generated electronically by Caribbean Transfers.',
+    'signature'        => 'Received By',
+] : [
+    'doc_label'        => 'Orden de Servicio',
+    'section_booking'  => 'Información de la Reserva',
+    'order_number'     => 'No. de Orden',
+    'created_at'       => 'Fecha de Creación',
+    'service_date'     => 'Fecha de Servicio',
+    'service_type'     => 'Tipo de Servicio',
+    'section_pax'      => 'Pasajero Principal',
+    'passenger_name'   => 'Nombre del Pasajero',
+    'pickup_time'      => 'Hora de Pickup',
+    'pickup_suffix'    => 'hrs',
+    'section_details'  => 'Detalles del Servicio',
+    'provider'         => 'Proveedor',
+    'flight'           => 'Vuelo',
+    'hotel'            => 'Hotel',
+    'room'             => 'Habitación',
+    'section_luggage'  => 'Pasajeros y Equipaje',
+    'adults'           => 'Adultos',
+    'minors'           => 'Menores',
+    'infants'          => 'Infantes',
+    'car_seat'         => 'Silla de Auto',
+    'booster'          => 'Booster',
+    'luggage'          => 'Maletas',
+    'section_notes'    => 'Notas Importantes',
+    'footer_text'      => 'Este documento es una orden de servicio generada electrónicamente por Caribbean Transfers.',
+    'signature'        => 'Firma de Recibido',
+];
+@endphp
 
 <style>
     .so-wrap {
@@ -430,7 +486,7 @@
                     {!! file_get_contents(public_path('assets/img/logos/logo.svg')) !!}
                 </td>
                 <td class="so-header-doc-cell">
-                    <span class="so-doc-label">Orden de Servicio</span>
+                    <span class="so-doc-label">{{ $t['doc_label'] }}</span>
                     <span class="so-doc-title">{{ $orderNumber ? '# '.$orderNumber : '' }}</span>
                 </td>
             </tr>
@@ -443,15 +499,15 @@
         {{-- SECCIÓN 1 — INFORMACIÓN DE RESERVA          --}}
         {{-- ─────────────────────────────────────────── --}}
         <div class="so-section">
-            <span class="so-section-title">Información de la Reserva</span>
+            <span class="so-section-title">{{ $t['section_booking'] }}</span>
             <div class="so-section-body">
                 <table class="so-info-table">
                     <thead>
                         <tr>
-                            <th>No. de Orden</th>
-                            <th>Fecha de Creación</th>
-                            <th>Fecha de Servicio</th>
-                            <th>Tipo de Servicio</th>
+                            <th>{{ $t['order_number'] }}</th>
+                            <th>{{ $t['created_at'] }}</th>
+                            <th>{{ $t['service_date'] }}</th>
+                            <th>{{ $t['service_type'] }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -476,18 +532,18 @@
         {{-- SECCIÓN 2 — PASAJERO                        --}}
         {{-- ─────────────────────────────────────────── --}}
         <div class="so-section">
-            <span class="so-section-title">Pasajero Principal</span>
+            <span class="so-section-title">{{ $t['section_pax'] }}</span>
             <div class="so-section-body">
                 <table class="so-passenger-table">
                     <tr>
                         <td class="so-passenger-name-cell">
-                            <span class="so-passenger-label">Nombre del Pasajero</span>
+                            <span class="so-passenger-label">{{ $t['passenger_name'] }}</span>
                             <span class="so-passenger-name">{{ $passengerName ?: '-' }}</span>
                         </td>
                         <td class="so-pickup-cell">
-                            <span class="so-pickup-label">Hora de Pickup</span>
+                            <span class="so-pickup-label">{{ $t['pickup_time'] }}</span>
                             @if($pickupTime)
-                                <span class="so-pickup-time">{{ $pickupTime }} <span class="so-pickup-suffix">hrs</span></span>
+                                <span class="so-pickup-time">{{ $pickupTime }} <span class="so-pickup-suffix">{{ $t['pickup_suffix'] }}</span></span>
                             @else
                                 <span class="so-pickup-time">-</span>
                             @endif
@@ -501,15 +557,15 @@
         {{-- SECCIÓN 3 — DETALLES DEL SERVICIO           --}}
         {{-- ─────────────────────────────────────────── --}}
         <div class="so-section">
-            <span class="so-section-title">Detalles del Servicio</span>
+            <span class="so-section-title">{{ $t['section_details'] }}</span>
             <div class="so-section-body">
                 <table class="so-details-table">
                     <thead>
                         <tr>
-                            <th>Proveedor</th>
-                            <th>Vuelo</th>
-                            <th>Hotel</th>
-                            <th>Habitación</th>
+                            <th>{{ $t['provider'] }}</th>
+                            <th>{{ $t['flight'] }}</th>
+                            <th>{{ $t['hotel'] }}</th>
+                            <th>{{ $t['room'] }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -528,17 +584,17 @@
         {{-- SECCIÓN 4 — PASAJEROS Y EQUIPAJE            --}}
         {{-- ─────────────────────────────────────────── --}}
         <div class="so-section">
-            <span class="so-section-title">Pasajeros y Equipaje</span>
+            <span class="so-section-title">{{ $t['section_luggage'] }}</span>
             <div class="so-section-body">
                 <table class="so-pax-table">
                     <thead>
                         <tr>
-                            <th>Adultos</th>
-                            <th>Menores</th>
-                            <th>Infantes</th>
-                            <th>Silla de Auto</th>
-                            <th>Booster</th>
-                            <th>Maletas</th>
+                            <th>{{ $t['adults'] }}</th>
+                            <th>{{ $t['minors'] }}</th>
+                            <th>{{ $t['infants'] }}</th>
+                            <th>{{ $t['car_seat'] }}</th>
+                            <th>{{ $t['booster'] }}</th>
+                            <th>{{ $t['luggage'] }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -567,14 +623,29 @@
         {{-- SECCIÓN 5 — NOTAS IMPORTANTES               --}}
         {{-- ─────────────────────────────────────────── --}}
         <div class="so-section">
-            <span class="so-section-title">Notas Importantes</span>
+            <span class="so-section-title">{{ $t['section_notes'] }}</span>
             <div class="so-notes-body">
+                @php
+                $hardcodedNotes = $lang === 'en' ? [
+                    'Please arrive 10 minutes early at the designated meeting point in the arrivals area.',
+                    'Present this voucher printed or on a mobile device to the assigned driver.',
+                    'The service does not include tips for the driver; these are at the passenger\'s discretion.',
+                    'If you cannot locate the driver, contact the emergency number immediately.',
+                    'Rate applied according to the current agreement with the provider.',
+                    'Schedule changes must be reported at least 4 hours in advance.',
+                ] : [
+                    'Llegar 10 minutos antes al punto de encuentro designado en el área de llegadas.',
+                    'Presentar este voucher impreso o en dispositivo móvil al conductor asignado.',
+                    'El servicio no incluye propinas al conductor; éstas quedan a criterio del pasajero.',
+                    'En caso de no localizar al conductor, comunicarse de inmediato al número de emergencia.',
+                    'Tarifa aplicada conforme al convenio vigente con el proveedor.',
+                    'Cambios de horario deben notificarse con al menos 4 horas de anticipación.',
+                ];
+                @endphp
                 <ul class="so-notes-list">
-                    @forelse($notes as $note)
+                    @foreach($hardcodedNotes as $note)
                         <li><span class="so-notes-marker">&gt;</span>{{ $note }}</li>
-                    @empty
-                        <li><span class="so-notes-marker">&gt;</span>Sin notas adicionales.</li>
-                    @endforelse
+                    @endforeach
                 </ul>
             </div>
         </div>
@@ -585,13 +656,11 @@
         <table class="so-footer-table" style="margin-top: 28px;">
             <tr>
                 <td class="so-footer-left">
-                    <span class="so-footer-text">
-                        Este documento es una orden de servicio generada electrónicamente por Caribbean Transfers.
-                    </span>
+                    <span class="so-footer-text">{{ $t['footer_text'] }}</span>
                 </td>
                 <td class="so-footer-right">
                     <div class="so-signature-line"></div>
-                    <span class="so-signature-label">Firma de Recibido</span>
+                    <span class="so-signature-label">{{ $t['signature'] }}</span>
                 </td>
             </tr>
         </table>

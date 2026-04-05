@@ -177,13 +177,13 @@
             loadPdfIntoContainer('iframeTwoContainer', 'departure');
         }
 
-        function searchServiceOrder(){
-            var container = document.getElementById('iframeServiceOrderContainer');
+        function fetchServiceOrder(containerId, type) {
+            var container = document.getElementById(containerId);
             if (container.dataset.loaded) return;
             container.dataset.loaded = '1';
             container.innerHTML = '<p class="text-muted p-3">Cargando PDF...</p>';
 
-            fetch('/reports/service-order/pdf', {
+            fetch('/reports/service-order/pdf?type=' + type + '&id=' + rez_id, {
                 credentials: 'same-origin'
             })
             .then(function(response) {
@@ -205,6 +205,9 @@
                 container.dataset.loaded = '';
             });
         }
+
+        function searchServiceOrderArrival()   { fetchServiceOrder('iframeSOArrivalContainer',   'arrival');   }
+        function searchServiceOrderDeparture() { fetchServiceOrder('iframeSODepartureContainer', 'departure'); }
 
         lightGallery(document.getElementById('media-listing'), {
             thumbnail: true,
@@ -571,12 +574,26 @@
                             </a>
                         </li>                        
                     @endif
-                    <li class="nav-item">
-                        <a class="nav-link" href="#icon-tab-9" data-bs-toggle="tab" role="tab" onclick="searchServiceOrder()">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-                            Orden de Servicio
-                        </a>
-                    </li>
+                    @if ($data['transfer_types']['has_arrival'] && $data['status'] != "CANCELLED")
+                        <li class="nav-item">
+                            <a class="nav-link" href="#icon-tab-9" data-bs-toggle="tab" role="tab" onclick="searchServiceOrderArrival()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                                OS Llegada
+                            </a>
+                        </li>
+                    @endif
+                    @if (($data['transfer_types']['has_departure'] || $data['transfer_types']['has_transfer']) && $data['status'] != "CANCELLED")
+                        <li class="nav-item">
+                            <a class="nav-link" href="#icon-tab-10" data-bs-toggle="tab" role="tab" onclick="searchServiceOrderDeparture()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                                @if ($data['transfer_types']['has_transfer'])
+                                    OS Traslado
+                                @else
+                                    OS Salida
+                                @endif
+                            </a>
+                        </li>
+                    @endif
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane services active" id="icon-tab-1" role="tabpanel">
@@ -1125,7 +1142,10 @@
                         <div id="iframeTwoContainer"></div>
                     </div>
                     <div class="tab-pane" id="icon-tab-9" role="tabpanel">
-                        <div id="iframeServiceOrderContainer"></div>
+                        <div id="iframeSOArrivalContainer"></div>
+                    </div>
+                    <div class="tab-pane" id="icon-tab-10" role="tabpanel">
+                        <div id="iframeSODepartureContainer"></div>
                     </div>
                 </div>
             </div>
