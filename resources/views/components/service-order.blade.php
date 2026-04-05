@@ -1,3 +1,23 @@
+@props([
+    'orderNumber'   => null,
+    'createdAt'     => null,
+    'serviceDate'   => null,
+    'serviceType'   => null,
+    'passengerName' => null,
+    'pickupTime'    => null,
+    'provider'      => null,
+    'flight'        => null,
+    'hotel'         => null,
+    'room'          => null,
+    'adults'        => null,
+    'minors'        => null,
+    'infants'       => null,
+    'carSeat'       => null,
+    'booster'       => null,
+    'luggage'       => null,
+    'notes'         => [],
+])
+
 <style>
     .so-wrap {
         box-sizing: border-box;
@@ -410,7 +430,7 @@
                 </td>
                 <td class="so-header-doc-cell">
                     <span class="so-doc-label">Orden de Servicio</span>
-                    <span class="so-doc-title"># CT-2026-0042</span>
+                    <span class="so-doc-title">{{ $orderNumber ? '# '.$orderNumber : '' }}</span>
                 </td>
             </tr>
         </table>
@@ -435,10 +455,16 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>RES-20260042</td>
-                            <td>04 Abr 2026</td>
-                            <td>05 Abr 2026</td>
-                            <td><span class="so-badge">Llegada</span></td>
+                            <td>{{ $orderNumber ?: '-' }}</td>
+                            <td>{{ $createdAt ?: '-' }}</td>
+                            <td>{{ $serviceDate ?: '-' }}</td>
+                            <td>
+                                @if($serviceType)
+                                    <span class="so-badge">{{ $serviceType }}</span>
+                                @else
+                                    -
+                                @endif
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -455,11 +481,15 @@
                     <tr>
                         <td class="so-passenger-name-cell">
                             <span class="so-passenger-label">Nombre del Pasajero</span>
-                            <span class="so-passenger-name">James A. Richardson</span>
+                            <span class="so-passenger-name">{{ $passengerName ?: '-' }}</span>
                         </td>
                         <td class="so-pickup-cell">
                             <span class="so-pickup-label">Hora de Pickup</span>
-                            <span class="so-pickup-time">14:30 <span class="so-pickup-suffix">hrs</span></span>
+                            @if($pickupTime)
+                                <span class="so-pickup-time">{{ $pickupTime }} <span class="so-pickup-suffix">hrs</span></span>
+                            @else
+                                <span class="so-pickup-time">-</span>
+                            @endif
                         </td>
                     </tr>
                 </table>
@@ -483,19 +513,10 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>
-                                GoTravel Caribbean
-                                <span class="so-detail-sub">Agencia autorizada</span>
-                            </td>
-                            <td>
-                                AA 1234
-                                <span class="so-detail-sub">Privado</span>
-                            </td>
-                            <td>
-                                Barceló Maya Grand Resort
-                                <span class="so-detail-sub">Riviera Maya, Q. Roo</span>
-                            </td>
-                            <td>512-A</td>
+                            <td>{{ $provider ?: '-' }}</td>
+                            <td>{{ $flight ?: '-' }}</td>
+                            <td>{{ $hotel ?: '-' }}</td>
+                            <td>{{ $room ?: '-' }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -520,13 +541,21 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $pAdults  = $adults  ?? 0;
+                            $pMinors  = $minors  ?? 0;
+                            $pInfants = $infants ?? 0;
+                            $pCarSeat = $carSeat ?? 0;
+                            $pBooster = $booster ?? 0;
+                            $pLuggage = $luggage ?? 0;
+                        @endphp
                         <tr>
-                            <td>2</td>
-                            <td>1</td>
-                            <td class="so-pax-zero">0</td>
-                            <td class="so-pax-zero">0</td>
-                            <td>1</td>
-                            <td>3</td>
+                            <td class="{{ $pAdults  == 0 ? 'so-pax-zero' : '' }}">{{ $pAdults }}</td>
+                            <td class="{{ $pMinors  == 0 ? 'so-pax-zero' : '' }}">{{ $pMinors }}</td>
+                            <td class="{{ $pInfants == 0 ? 'so-pax-zero' : '' }}">{{ $pInfants }}</td>
+                            <td class="{{ $pCarSeat == 0 ? 'so-pax-zero' : '' }}">{{ $pCarSeat }}</td>
+                            <td class="{{ $pBooster == 0 ? 'so-pax-zero' : '' }}">{{ $pBooster }}</td>
+                            <td class="{{ $pLuggage == 0 ? 'so-pax-zero' : '' }}">{{ $pLuggage }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -534,45 +563,17 @@
         </div>
 
         {{-- ─────────────────────────────────────────── --}}
-        {{-- SECCIÓN 5 — CONFIRMACIÓN                    --}}
-        {{-- ─────────────────────────────────────────── --}}
-        <div class="so-section">
-            <span class="so-section-title">Confirmación y Contacto</span>
-            <div class="so-section-body">
-                <table class="so-confirm-table">
-                    <thead>
-                        <tr>
-                            <th>Estado</th>
-                            <th>No. de Confirmación</th>
-                            <th>Conductor Asignado</th>
-                            <th>Contacto de Emergencia</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="so-status-confirmed">Confirmado</span></td>
-                            <td>CONF-84921</td>
-                            <td>Carlos M. Reyes</td>
-                            <td>+52 998 123 4567</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        {{-- ─────────────────────────────────────────── --}}
-        {{-- SECCIÓN 6 — NOTAS IMPORTANTES               --}}
+        {{-- SECCIÓN 5 — NOTAS IMPORTANTES               --}}
         {{-- ─────────────────────────────────────────── --}}
         <div class="so-section">
             <span class="so-section-title">Notas Importantes</span>
             <div class="so-notes-body">
                 <ul class="so-notes-list">
-                    <li>Llegar 10 minutos antes al punto de encuentro designado en el área de llegadas.</li>
-                    <li>Presentar este voucher impreso o en dispositivo móvil al conductor asignado.</li>
-                    <li>El servicio no incluye propinas al conductor; éstas quedan a criterio del pasajero.</li>
-                    <li>En caso de no localizar al conductor, comunicarse de inmediato al número de emergencia.</li>
-                    <li>Tarifa aplicada conforme al convenio vigente con el proveedor GoTravel Caribbean.</li>
-                    <li>Cambios de horario deben notificarse con al menos 4 horas de anticipación.</li>
+                    @forelse($notes as $note)
+                        <li>{{ $note }}</li>
+                    @empty
+                        <li>Sin notas adicionales.</li>
+                    @endforelse
                 </ul>
             </div>
         </div>
