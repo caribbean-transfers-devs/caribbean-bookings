@@ -20,8 +20,7 @@ class ServiceOrderController extends Controller
 
     public function createPDF(Request $request)
     {
-        // TODO: reemplazar con permiso definitivo
-        if (!$this->hasPermission(6)) {
+        if (!$this->hasPermission(61)) {
             abort(403, 'NO TIENE AUTORIZACIÓN.');
         }
 
