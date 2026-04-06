@@ -87,6 +87,64 @@
     </style>
 @endpush
 
+@php
+    $soLang     = in_array($reservation->language, ['en', 'es']) ? $reservation->language : 'es';
+    $soProvider = optional($reservation->site)->name;
+    $soPax      = trim($reservation->client_first_name . ' ' . $reservation->client_last_name);
+    $soCreated  = $reservation->created_at ? date('d M Y', strtotime($reservation->created_at)) : null;
+
+    // Arrival
+    $soArrivalItem   = $reservation->items->first(fn($i) => ($i->final_service_type_one ?? null) === 'ARRIVAL');
+    $soArrivalParams = $soArrivalItem ? [
+        'orderNumber'   => $soArrivalItem->code,
+        'createdAt'     => $soCreated,
+        'serviceDate'   => $soArrivalItem->op_one_pickup ? date('d M Y', strtotime($soArrivalItem->op_one_pickup)) : null,
+        'serviceType'   => $soLang === 'en' ? 'Arrival' : 'Llegada',
+        'passengerName' => $soPax,
+        'pickupTime'    => $soArrivalItem->op_one_pickup ? date('H:i', strtotime($soArrivalItem->op_one_pickup)) : null,
+        'provider'      => $soProvider,
+        'flight'        => $soArrivalItem->flight_number ?: null,
+        'hotel'         => $soArrivalItem->to_name,
+        'adults'        => (int) $soArrivalItem->passengers,
+        'luggage'       => (int) $soArrivalItem->passengers,
+        'lang'          => $soLang,
+    ] : null;
+
+    // Departure / Transfer
+    $soDepOwnItem = $reservation->items->first(fn($i) => in_array($i->final_service_type_one ?? null, ['DEPARTURE', 'TRANSFER']));
+    $soDepRtItem  = !$soDepOwnItem
+        ? $reservation->items->first(fn($i) => ($i->final_service_type_one ?? null) === 'ARRIVAL' && $i->is_round_trip == 1 && !empty($i->op_two_pickup))
+        : null;
+    $soDepItem = $soDepOwnItem ?? $soDepRtItem;
+    $isRtLeg   = !$soDepOwnItem && $soDepRtItem;
+
+    if ($soDepItem) {
+        $soDepPickup = $isRtLeg ? $soDepItem->op_two_pickup : $soDepItem->op_one_pickup;
+        $soDepHotel  = $isRtLeg ? $soDepItem->to_name       : $soDepItem->from_name;
+        $soDepSvcKey = $isRtLeg ? 'DEPARTURE'               : $soDepItem->final_service_type_one;
+        $soDepLabels = [
+            'es' => ['DEPARTURE' => 'Salida',    'TRANSFER' => 'Traslado'],
+            'en' => ['DEPARTURE' => 'Departure', 'TRANSFER' => 'Transfer'],
+        ];
+        $soDepartureParams = [
+            'orderNumber'   => $soDepItem->code,
+            'createdAt'     => $soCreated,
+            'serviceDate'   => $soDepPickup ? date('d M Y', strtotime($soDepPickup)) : null,
+            'serviceType'   => $soDepLabels[$soLang][$soDepSvcKey] ?? $soDepSvcKey,
+            'passengerName' => $soPax,
+            'pickupTime'    => $soDepPickup ? date('H:i', strtotime($soDepPickup)) : null,
+            'provider'      => $soProvider,
+            'flight'        => $soDepItem->flight_number ?: null,
+            'hotel'         => $soDepHotel,
+            'adults'        => (int) $soDepItem->passengers,
+            'luggage'       => (int) $soDepItem->passengers,
+            'lang'          => $soLang,
+        ];
+    } else {
+        $soDepartureParams = null;
+    }
+@endphp
+
 @push('Js')
     <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
     <script>
@@ -94,6 +152,8 @@
         const payment_request_sent = {{ isset($reservation->payment_request_sent) ? $reservation->payment_request_sent : 0 }};
         const rez_currency = "{{ $reservation->currency }}";
         const rez_pending  = {{ round($data['total_sales'], 2) - round($data['total_payments'], 2) }};
+        const soArrivalParams   = @json($soArrivalParams);
+        const soDepartureParams = @json($soDepartureParams);
     </script>    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
@@ -177,13 +237,14 @@
             loadPdfIntoContainer('iframeTwoContainer', 'departure');
         }
 
-        function fetchServiceOrder(containerId, type) {
+        function fetchServiceOrder(containerId, params) {
             var container = document.getElementById(containerId);
             if (container.dataset.loaded) return;
             container.dataset.loaded = '1';
             container.innerHTML = '<p class="text-muted p-3">Cargando PDF...</p>';
 
-            fetch('/reports/service-order/pdf?type=' + type + '&id=' + rez_id, {
+            var qs = new URLSearchParams(params).toString();
+            fetch('/reports/service-order/pdf?' + qs, {
                 credentials: 'same-origin'
             })
             .then(function(response) {
@@ -206,8 +267,8 @@
             });
         }
 
-        function searchServiceOrderArrival()   { fetchServiceOrder('iframeSOArrivalContainer',   'arrival');   }
-        function searchServiceOrderDeparture() { fetchServiceOrder('iframeSODepartureContainer', 'departure'); }
+        function searchServiceOrderArrival()   { fetchServiceOrder('iframeSOArrivalContainer',   soArrivalParams);   }
+        function searchServiceOrderDeparture() { fetchServiceOrder('iframeSODepartureContainer', soDepartureParams); }
 
         lightGallery(document.getElementById('media-listing'), {
             thumbnail: true,
@@ -578,7 +639,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#icon-tab-9" data-bs-toggle="tab" role="tab" onclick="searchServiceOrderArrival()">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-                                OS Llegada
+                                Orden Servicio Llegada
                             </a>
                         </li>
                     @endif
@@ -587,9 +648,9 @@
                             <a class="nav-link" href="#icon-tab-10" data-bs-toggle="tab" role="tab" onclick="searchServiceOrderDeparture()">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
                                 @if ($data['transfer_types']['has_transfer'])
-                                    OS Traslado
+                                    Orden Servicio Traslado
                                 @else
-                                    OS Salida
+                                    Orden Servicio Salida
                                 @endif
                             </a>
                         </li>

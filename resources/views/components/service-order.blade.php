@@ -113,11 +113,6 @@ $t = $lang === 'en' ? [
         width: 200px;
     }
 
-    .so-header-logo-cell svg {
-        width: 190px;
-        height: auto;
-        display: block;
-    }
 
     .so-header-doc-cell {
         vertical-align: middle;
@@ -483,7 +478,8 @@ $t = $lang === 'en' ? [
         <table class="so-header-table">
             <tr>
                 <td class="so-header-logo-cell">
-                    {!! file_get_contents(public_path('assets/img/logos/logo.svg')) !!}
+                    @php $logoB64 = base64_encode(file_get_contents(public_path('assets/img/logos/logo.png'))); @endphp
+                    <img src="data:image/png;base64,{{ $logoB64 }}" style="width:190px; height:auto; display:block;" />
                 </td>
                 <td class="so-header-doc-cell">
                     <span class="so-doc-label">{{ $t['doc_label'] }}</span>
