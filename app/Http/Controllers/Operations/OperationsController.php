@@ -293,6 +293,16 @@ class OperationsController extends Controller
                 ], 200);
             }
 
+            $payment_errors = $this->validatePaymentCoverage($items);
+            if(!empty($payment_errors)){
+                return response()->json([
+                    'status'    => 'error',
+                    'success'   => false,
+                    'message'   => 'La operación no pudo cerrarse ya que hay servicios confirmados con el pago sin cubrir.',
+                    'items'     => $payment_errors
+                ], 200);
+            }
+
             //RECORREMOS LOS SERVICIOS PARA PODER REALISAR LA PREASIGNACION
             if( sizeof($items)>=1 ):
                 foreach($items as $key => $item):
@@ -326,6 +336,32 @@ class OperationsController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function validatePaymentCoverage($items): array
+    {
+        $errors = [];
+
+        foreach ($items as $item) {
+            $operation_status_raw = $item->op_type == "TYPE_ONE"
+                ? $item->one_service_operation_status
+                : $item->two_service_operation_status;
+
+            $service_status_raw = $item->op_type == "TYPE_ONE"
+                ? $item->one_service_status
+                : $item->two_service_status;
+
+            // Solo aplica si la operación está completamente confirmada (VERDE)
+            $is_fully_confirmed = in_array($operation_status_raw, ['OK', 'C']) && $service_status_raw === 'COMPLETED';
+
+            $effective_total = $item->total_balance > 0 ? $item->total_balance : $item->total_sales;
+
+            if ($is_fully_confirmed && $effective_total > 0 && $item->payment_status !== 'PAID') {
+                array_push($errors, $item->code);
+            }
+        }
+
+        return $errors;
     }
 
     public function validateServiceQualification($items): array
